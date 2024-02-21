@@ -5,7 +5,7 @@ title: "🚀 Getting Started"
 
 ## How to Install 🚀
 
-🌟 **Important Note on User Roles and Privacy:**
+:::info **Important Note on User Roles and Privacy**
 
 - **Admin Creation:** The very first account to sign up on Open WebUI will be granted **Administrator privileges**. This account will have comprehensive control over the platform, including user management and system settings.
 
@@ -13,9 +13,9 @@ title: "🚀 Getting Started"
 
 - **Privacy and Data Security:** We prioritize your privacy and data security above all. Please be reassured that all data entered into Open WebUI is stored locally on your device. Our system is designed to be privacy-first, ensuring that no external requests are made, and your data does not leave your local environment. We are committed to maintaining the highest standards of data privacy and security, ensuring that your information remains confidential and under your control.
 
-### Steps to Install Open WebUI
+:::
 
-#### Before You Begin
+## Before You Begin
 
 1. **Installing Docker:**
 
@@ -48,7 +48,7 @@ title: "🚀 Getting Started"
 3. **Verify Ollama Installation:**
    - After installing Ollama, check if it's working by visiting [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Remember, the port number might be different for you.
 
-#### Installing with Docker 🐳
+## Installing with Docker 🐳
 
 - **Important:** When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 
@@ -67,7 +67,7 @@ title: "🚀 Getting Started"
 
 - After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000).
 
-#### Using Ollama on a Different Server
+### Using Ollama on a Different Server
 
 - To connect to Ollama on another server, change the `OLLAMA_API_BASE_URL` to the server's URL:
 
@@ -134,7 +134,7 @@ title: "🚀 Getting Started"
 
 For other ways to install, like using Kustomize or Helm, check out [INSTALLATION.md](/getting-started/installation). Join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s) for more help and information.
 
-### Updating your Docker Installation
+## Updating your Docker Installation
 
 In case you want to update your local Docker installation to the latest version, you can do it performing the following actions:
 
