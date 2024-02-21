@@ -1,4 +1,4 @@
-# Installation
+# Alternative Installation
 
 ### Installing Both Ollama and Open WebUI Using Kustomize
 
@@ -25,13 +25,13 @@ helm package ./kubernetes/helm/
 For cpu-only pod
 
 ```bash
-helm install ollama-webui ./ollama-webui-*.tgz
+helm install open-webui ./open-webui-*.tgz
 ```
 
 For gpu-enabled pod
 
 ```bash
-helm install ollama-webui ./ollama-webui-*.tgz --set ollama.resources.limits.nvidia.com/gpu="1"
+helm install open-webui ./open-webui-*.tgz --set ollama.resources.limits.nvidia.com/gpu="1"
 ```
 
 Check the `kubernetes/helm/values.yaml` file to know which parameters are available for customization
