@@ -132,7 +132,7 @@ title: "🚀 Getting Started"
 
 ### Alternative Installation Methods
 
-For other ways to install, like using Kustomize or Helm, check out [INSTALLATION.md](/getting-started/installation). Join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s) for more help and information.
+For other ways to install, like using Kustomize or Helm, check out [INSTALLATION](/getting-started/installation). Join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s) for more help and information.
 
 ### Updating your Docker Installation
 
