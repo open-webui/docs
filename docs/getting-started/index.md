@@ -134,7 +134,7 @@ title: "🚀 Getting Started"
 
 For other ways to install, like using Kustomize or Helm, check out [INSTALLATION.md](/getting-started/installation). Join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s) for more help and information.
 
-## Updating your Docker Installation
+### Updating your Docker Installation
 
 In case you want to update your local Docker installation to the latest version, you can do it performing the following actions:
 
@@ -145,3 +145,43 @@ docker pull ghcr.io/open-webui/open-webui:main
 ```
 
 In the last line, you need to use the very same command you used to install (local install, remote server, etc.)
+
+## How to Install Without Docker
+
+While we strongly recommend using our convenient Docker container installation for optimal support, we understand that some situations may require a non-Docker setup, especially for development purposes. Please note that non-Docker installations are not officially supported, and you might need to troubleshoot on your own.
+
+### Project Components
+
+Open WebUI consists of two primary components: the frontend and the backend (which serves as a reverse proxy, handling static frontend files, and additional features). Both need to be running concurrently for the development environment.
+
+:::info
+The backend is required for proper functionality
+:::
+
+### Requirements 📦
+
+- 🐰 [Node.js](https://nodejs.org/en) >= 20.10 or [Bun](https://bun.sh) >= 1.0.21
+- 🐍 [Python](https://python.org) >= 3.11
+
+### Build and Install 🛠️
+
+Run the following commands to install:
+
+```sh
+git clone https://github.com/open-webui/open-webui.git
+cd open-webui/
+
+# Copying required .env file
+cp -RPp example.env .env
+
+# Building Frontend Using Node
+npm i
+npm run build
+
+# Serving Frontend with the Backend
+cd ./backend
+pip install -r requirements.txt -U
+bash start.sh
+```
+
+You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
