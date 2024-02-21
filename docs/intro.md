@@ -79,4 +79,4 @@ Don't forget to explore our sibling project, [Open WebUI Community](https://open
 
 If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](/getting-started/troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s).
 
-Continue with the full [getting started guide](./getting-started.md).
+Continue with the full [getting started guide](/getting-started).
