@@ -65,12 +65,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: "img/docusaurus-social-card.jpg",
+      // image: "img/docusaurus-social-card.jpg",
       navbar: {
         title: "Open WebUI",
         logo: {
-          alt: "My Site Logo",
           src: "img/logo.png",
+          srcDark: "img/logo-dark.png",
         },
         items: [
           // {
@@ -87,49 +87,49 @@ const config = {
         ],
       },
       footer: {
-        style: "dark",
-        // links: [
-        //   {
-        //     title: "Docs",
-        //     items: [
-        //       {
-        //         label: "Tutorial",
-        //         to: "/docs/intro",
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     title: "Community",
-        //     items: [
-        //       {
-        //         label: "Stack Overflow",
-        //         href: "https://stackoverflow.com/questions/tagged/docusaurus",
-        //       },
-        //       {
-        //         label: "Discord",
-        //         href: "https://discordapp.com/invite/docusaurus",
-        //       },
-        //       {
-        //         label: "Twitter",
-        //         href: "https://twitter.com/docusaurus",
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     title: "More",
-        //     items: [
-        //       {
-        //         label: "Blog",
-        //         to: "/blog",
-        //       },
-        //       {
-        //         label: "GitHub",
-        //         href: "https://github.com/facebook/docusaurus",
-        //       },
-        //     ],
-        //   },
-        // ],
-        copyright: `Copyright © ${new Date().getFullYear()} OpenWebUI`,
+        logo: {
+          src: "img/logo-dark.png",
+          height: 100,
+        },
+        style: "light",
+        links: [
+          {
+            title: "Docs",
+            items: [
+              {
+                label: "Getting Started",
+                to: "getting-started",
+              },
+            ],
+          },
+          {
+            title: "Community",
+            items: [
+              {
+                label: "GitHub",
+                href: "https://github.com/open-webui/open-webui",
+              },
+              {
+                label: "Discord",
+                href: "https://discord.gg/5rJgQTnV4s",
+              },
+              {
+                label: "Twitter",
+                href: "https://twitter.com/OpenWebUI",
+              },
+            ],
+          },
+          {
+            title: "More",
+            items: [
+              {
+                label: "About",
+                to: "https://openwebui.com",
+              },
+            ],
+          },
+        ],
+        // copyright: `Copyright © ${new Date().getFullYear()} OpenWebUI`,
       },
       prism: {
         theme: prismThemes.github,

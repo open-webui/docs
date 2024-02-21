@@ -4,6 +4,7 @@
  * work well for content-centric websites.
  */
 
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap");
 
@@ -414,7 +415,7 @@ article p a {
 }
 
 :root {
-  --ifm-font-family-base: "Inter";
+  --ifm-font-family-base: "Manrope", "Inter";
 }
 
 /* Header Dropdown Menu */
