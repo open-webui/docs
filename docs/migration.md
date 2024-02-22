@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "🚀 Migration"
+title: "🔄 Migration"
 ---
 
 # Moving from Ollama WebUI to Open WebUI
