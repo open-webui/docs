@@ -5,8 +5,8 @@ title: "📋 FAQ"
 
 # 📋 Frequently Asked Questions
 
-**Q:** Why is it asking for me to sign up? Where are my data being sent to?
+**Q: Why am I asked to sign up? Where are my data being sent to?**
 
-**A:** For enhanced security measures, we require admin users to sign up. Rest assured, all data remains local, and we do not collect any personal information. User sign-up is conducted on your server and never leaves your device, ensuring maximum privacy and control over your data.
+**A:** We require you to sign up to become the admin user for enhanced security. This ensures that if the Open WebUI is ever exposed to external access, your data remains secure. It's important to note that everything is kept local. We do not collect your data. When you sign up, all information stays within your server and never leaves your device. Your privacy and security are our top priorities, ensuring that your data remains under your control at all times.
 
-Feel free to reach out if you have more questions or concerns! 🛡️
+If you have any further questions or concerns, please don't hesitate to reach out! 🛡️
