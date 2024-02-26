@@ -22,7 +22,7 @@ Open WebUI now supports image generation through the AUTOMATIC1111 [API](https:/
 
 ## Using Image Generation
 
-![Image Generation Tutorial](/static/tutorial_image_generation.png)
+![Image Generation Tutorial](/img/tutorial_image_generation.png)
 
 1. First, use a text generation model to write a prompt for image generation.
 2. After the response has finished, you can click the Picture icon to generate an image.
