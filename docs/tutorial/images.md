@@ -20,4 +20,11 @@ Open WebUI now supports image generation through the AUTOMATIC1111 [API](https:/
    ```
    If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, replace `<your_automatic1111_address>` with `host.docker.internal`.
 
+## Using Image Generation
+
+![Image Generation Tutorial](/static/tutorial_image_generation.png)
+
+1. First, use a text generation model to write a prompt for image generation.
+2. After the response has finished, you can click the Picture icon to generate an image.
+
 Please note that, as of now, only AUTOMATIC1111's API is supported for image generation within Open WebUI.
