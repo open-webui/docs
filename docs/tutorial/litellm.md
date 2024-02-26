@@ -1,4 +1,4 @@
-# LiteLLM Config
+# LiteLLM Configuration
 
 [LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
 
