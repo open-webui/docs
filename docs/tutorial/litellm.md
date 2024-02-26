@@ -14,7 +14,7 @@ _Note: `config.yaml` does not need to exist on the host before running for the f
 
 ## Configuring Open WebUI
 
-1. Go to the Settings > Models > LiteLLM model management interface.
+1. Go to the **Settings > Models > Manage LiteLLM Models**.
 2. In 'Simple' mode, you will only see the option to enter a **Model**.
 3. For additional configuration options, click on the 'Simple' toggle to switch to 'Advanced' mode. Here you can enter:
 
