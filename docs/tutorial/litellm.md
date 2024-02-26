@@ -1,5 +1,17 @@
 # LiteLLM Config
 
+## Initial Setup
+
+To allow editing of your [LiteLLM]() `config.yaml` file, use `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` to bind-bound it with your `docker run` command:
+
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+*Note: `config.yaml` does not need to exist on the host before running for the first time.*
+
+## Configuring Open WebUI
+
 **LiteLLM** supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
 
 1. Go to the Settings > Models > LiteLLM model management interface.
@@ -20,4 +32,4 @@
 *Gemini API (MakerSuite/AI Studio):*
 ![LiteLLM Config Gemini](/img/tutorial_litellm_gemini.png)
 
-For more information on the specific providers and advanced settings, consult the [LiteLLM Providers Documentation](https://litellm.vercel.app/docs/providers).
+Advanced configuration options not covered in the settings interface can be edited in the `config.yaml` file manually. For more information on the specific providers and advanced settings, consult the [LiteLLM Providers Documentation](https://litellm.vercel.app/docs/providers).
