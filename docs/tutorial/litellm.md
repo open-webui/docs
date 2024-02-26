@@ -2,7 +2,7 @@
 
 ## Initial Setup
 
-To allow editing of your [LiteLLM]() `config.yaml` file, use `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` to bind-bound it with your `docker run` command:
+To allow editing of your [LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) `config.yaml` file, use `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` to bind-bound it with your `docker run` command:
 
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml --name open-webui --restart always ghcr.io/open-webui/open-webui:main
