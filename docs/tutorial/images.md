@@ -13,7 +13,7 @@ Open WebUI now supports image generation through the **AUTOMATIC1111** [API](htt
 
 ## Configuring Open WebUI
 
-1. In Open WebUI, navigate to Settings > Images.
+1. In Open WebUI, navigate to **Settings > Images**.
 2. In the API URL field, enter the address where AUTOMATIC1111's API is accessible, following this format:
    ```
    http://<your_automatic1111_address>:7860
