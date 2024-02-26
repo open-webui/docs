@@ -1,15 +1,15 @@
 # Image Generation
 
-Open WebUI now supports image generation through the AUTOMATIC1111 [API](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API). To set this up, follow these steps:
+Open WebUI now supports image generation through the **AUTOMATIC1111** [API](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API). To set this up, follow these steps:
 
 ## Initial Setup
 
 1. Ensure that you have [AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) installed.
-2. Launch the WebUI with additional flags to enable API access:
+2. Launch AUTOMATIC1111 with additional flags to enable API access:
    ```
    ./webui.sh --api --listen
    ```
-   For Docker installations, use the `--listen` flag to allow connections outside of localhost.
+   For Docker installations of Open WebUI, use the `--listen` flag to allow connections outside of localhost.
 
 ## Configuring Open WebUI
 

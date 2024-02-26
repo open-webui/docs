@@ -1,6 +1,8 @@
 # LiteLLM Config
 
-LiteLLM supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
+**LiteLLM** supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
+
+![LiteLLM Config Ollama](/img/tutorial_litellm_ollama.png) ![LiteLLM Config Gemini](/img/tutorial_litellm_gemini.png)
 
 1. Go to the Settings > Models > LiteLLM model management interface.
 2. In 'Simple' mode, you will only see the option to enter a **Model**.
