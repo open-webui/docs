@@ -15,31 +15,31 @@ title: "🚀 Getting Started"
 
 :::
 
-## Before You Begin
-
+<details>
+<summary>Before You Begin</summary>
 1. **Installing Docker:**
 
-   - **For Windows and Mac Users:**
+- **For Windows and Mac Users:**
 
-     - Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
-     - Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
+  - Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
+  - Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
 
-   - **For Ubuntu and Other Linux Users:**
-     - Open your terminal.
-     - Set up your Docker apt repository according to the [Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
-     - Update your package index:
-       ```bash
-       sudo apt-get update
-       ```
-     - Install Docker using the following command:
-       ```bash
-       sudo apt-get install docker-ce docker-ce-cli containerd.io
-       ```
-     - Verify the Docker installation with:
-       ```bash
-       sudo docker run hello-world
-       ```
-       This command downloads a test image and runs it in a container, which prints an informational message.
+- **For Ubuntu and Other Linux Users:**
+  - Open your terminal.
+  - Set up your Docker apt repository according to the [Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+  - Update your package index:
+    ```bash
+    sudo apt-get update
+    ```
+  - Install Docker using the following command:
+    ```bash
+    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    ```
+  - Verify the Docker installation with:
+    ```bash
+    sudo docker run hello-world
+    ```
+    This command downloads a test image and runs it in a container, which prints an informational message.
 
 2. **Ensure You Have the Latest Version of Ollama:**
 
@@ -48,41 +48,9 @@ title: "🚀 Getting Started"
 3. **Verify Ollama Installation:**
    - After installing Ollama, check if it's working by visiting [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Remember, the port number might be different for you.
 
-## Installing with Docker 🐳
+</details>
 
-- **Important:** When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
-
-- **If Ollama is on your computer**, use this command:
-
-  ```bash
-  docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-  ```
-
-- **To build the container yourself**, follow these steps:
-
-  ```bash
-  docker build -t open-webui .
-  docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always open-webui
-  ```
-
-- After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000).
-
-### Using Ollama on a Different Server
-
-- To connect to Ollama on another server, change the `OLLAMA_API_BASE_URL` to the server's URL:
-
-  ```bash
-  docker run -d -p 3000:8080 -e OLLAMA_API_BASE_URL=https://example.com/api -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-  ```
-
-  Or for a self-built container:
-
-  ```bash
-  docker build -t open-webui .
-  docker run -d -p 3000:8080 -e OLLAMA_API_BASE_URL=https://example.com/api -v open-webui:/app/backend/data --name open-webui --restart always open-webui
-  ```
-
-### Installing Ollama and Open WebUI Together
+## One-line Command to Install Ollama and Open WebUI Together
 
 #### Using Docker Compose
 
@@ -129,6 +97,38 @@ title: "🚀 Getting Started"
   ```bash
   ./run-compose.sh --enable-gpu --build
   ```
+
+## Quick Start with Docker 🐳
+
+:::info
+When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
+:::
+
+- **If Ollama is on your computer**, use this command:
+
+  ```bash
+  docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+  ```
+
+- **If Ollama is on a Different Server**, use this command:
+
+- To connect to Ollama on another server, change the `OLLAMA_API_BASE_URL` to the server's URL:
+
+  ```bash
+  docker run -d -p 3000:8080 -e OLLAMA_API_BASE_URL=https://example.com/api -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+  ```
+
+- After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+
+#### Open WebUI: Server Connection Error
+
+If you're experiencing connection issues, it’s often due to the WebUI docker container not being able to reach the Ollama server at 127.0.0.1:11434 (host.docker.internal:11434) inside the container . Use the `--network=host` flag in your docker command to resolve this. Note that the port changes from 3000 to 8080, resulting in the link: `http://localhost:8080`.
+
+**Example Docker Command**:
+
+```bash
+docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_API_BASE_URL=http://127.0.0.1:11434/api --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
 
 ## Installing with Podman
 
