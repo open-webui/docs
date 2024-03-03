@@ -39,7 +39,7 @@ docker run --rm -v ollama-webui:/from -v open-webui:/to alpine ash -c "cd /from 
 [insert the equivalent command that you used to install with the new Docker image name]
 ```
 
-Once you verify that all the data has been migrated you can erase the old volumen using the following command:
+Once you verify that all the data has been migrated you can erase the old volume using the following command:
 
 ```bash
 docker volume rm ollama-webui
