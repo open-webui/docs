@@ -1,9 +1,9 @@
 ---
 sidebar_position: 7
-title: "🧑‍🔬 Research Tools"
+title: "🧑‍🔬 Open WebUI for Research"
 ---
 
-# 🧑‍🔬 Research Tools
+# 🧑‍🔬 Open WebUI for Research
 
 ## Interested in Using Open WebUI for Research?
 
