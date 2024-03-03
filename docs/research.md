@@ -5,9 +5,9 @@ title: "🧑‍🔬 Research Tools"
 
 # 🧑‍🔬 Research Tools
 
-## Interested in Research Collaboration?
+## Interested in Using Open WebUI for Research?
 
-🔍 **Do you want to collaborate?** We're eager to explore partnership opportunities! In addition to our ongoing efforts in maintaining our Open WebUI repository, we are enthusiastic about building a custom pipeline with a tailored UI specifically designed to meet your research requirements.
+🔍 **Are you interested in leveraging Open WebUI for your research?** We're excited about the prospect of collaborating with you! Alongside our continuous work on maintaining the Open WebUI repository, we're keen on developing a customized pipeline featuring a tailored UI crafted specifically to fulfill your research needs.
 
 🧪 **Research-Centric Features:**
 
