@@ -112,10 +112,10 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
 
 - **If Ollama is on a Different Server**, use this command:
 
-- To connect to Ollama on another server, change the `OLLAMA_API_BASE_URL` to the server's URL:
+- To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL:
 
   ```bash
-  docker run -d -p 3000:8080 -e OLLAMA_API_BASE_URL=https://example.com/api -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+  docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
 - After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
@@ -127,7 +127,7 @@ If you're experiencing connection issues, it’s often due to the WebUI docker c
 **Example Docker Command**:
 
 ```bash
-docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_API_BASE_URL=http://127.0.0.1:11434/api --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
 ## Installing with Podman
@@ -143,10 +143,10 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_API_BASE_
    ```
 2. Create a new container using desired configuration:
 
-   **Note:** `-p 127.0.0.1:3000:8080` ensures that we listen only on localhost, `--network slirp4netns:allow_host_loopback=true` permits the container to access Ollama when it also listens strictly on localhost. `--add-host=ollama.local:10.0.2.2 --env 'OLLAMA_API_BASE_URL=http://ollama.local:11434/api'` adds a hosts record to the container and configures open-webui to use the friendly hostname. `10.0.2.2` is the default slirp4netns address used for localhost mapping. `--env 'ANONYMIZED_TELEMETRY=False'` isn't necessary since Chroma telemetry has been disabled in the code but is included as an example.
+   **Note:** `-p 127.0.0.1:3000:8080` ensures that we listen only on localhost, `--network slirp4netns:allow_host_loopback=true` permits the container to access Ollama when it also listens strictly on localhost. `--add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434'` adds a hosts record to the container and configures open-webui to use the friendly hostname. `10.0.2.2` is the default slirp4netns address used for localhost mapping. `--env 'ANONYMIZED_TELEMETRY=False'` isn't necessary since Chroma telemetry has been disabled in the code but is included as an example.
 
    ```bash
-   podman create -p 127.0.0.1:3000:8080 --network slirp4netns:allow_host_loopback=true --add-host=ollama.local:10.0.2.2 --env 'OLLAMA_API_BASE_URL=http://ollama.local:11434/api' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
+   podman create -p 127.0.0.1:3000:8080 --network slirp4netns:allow_host_loopback=true --add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
    ```
 
 3. Prepare for systemd user service:
