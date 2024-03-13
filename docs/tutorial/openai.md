@@ -36,7 +36,7 @@ services:
       - 'OPENAI_API_BASE_URLS=${OPENAI_API_BASE_URLS}'
       - 'OPENAI_API_KEYS=${OPENAI_API_KEYS}'
 ```
-You can edit the ${VARIABLES} directly, or optionally define the values of these variables in an `.env` file, which should be placed in the same directory as the `docker-compose.yaml` file:
+You can edit the `${VARIABLES}` directly, or optionally define the values of these variables in an `.env` file, which should be placed in the same directory as the `docker-compose.yaml` file:
 ```ini
 OPENAI_API_BASE_URLS="https://api.openai.com/v1;https://api.mistral.ai/v1"
 OPENAI_API_KEYS="<OPENAI_API_KEY_1>;<OPENAI_API_KEY_2>"
