@@ -1,8 +1,10 @@
-# LiteLLM Config
+# LiteLLM Configuration
+
+[LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
 
 ## Initial Setup
 
-To allow editing of your [LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) `config.yaml` file, use `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` to bind-mount it with your `docker run` command:
+To allow editing of your `config.yaml` file, use `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` to bind-mount it with your `docker run` command:
 
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml --name open-webui --restart always ghcr.io/open-webui/open-webui:main
@@ -12,9 +14,7 @@ _Note: `config.yaml` does not need to exist on the host before running for the f
 
 ## Configuring Open WebUI
 
-**LiteLLM** supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
-
-1. Go to the Settings > Models > LiteLLM model management interface.
+1. Go to the **Settings > Models > Manage LiteLLM Models**.
 2. In 'Simple' mode, you will only see the option to enter a **Model**.
 3. For additional configuration options, click on the 'Simple' toggle to switch to 'Advanced' mode. Here you can enter:
 
