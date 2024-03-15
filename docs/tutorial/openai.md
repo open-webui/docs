@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 title: "OpenAI API"
 ---
 
@@ -9,7 +9,7 @@ In this tutorial, we will demonstrate how to configure multiple OpenAI (or compa
 
 ## Docker Run
 
-Here's an example `docker run` command similar to what you might use for Open-WebUI:
+Here's an example `docker run` command similar to what you might use for Open WebUI:
 ```bash
 docker run -d -p 3000:8080 \
   -v open-webui:/app/backend/data \
@@ -28,7 +28,7 @@ You can adapt this command to your own needs, and add even more endpoint/key pai
 
 ## Docker Compose
 
-Alternatively, you can use a `docker-compose.yaml` file to define and run the Open-WebUI container. Here's an abridged version of what that might look like:
+Alternatively, you can use a `docker-compose.yaml` file to define and run the Open WebUI container. Here's an abridged version of what that might look like:
 ```yaml
 services:
   open-webui:
