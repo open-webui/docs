@@ -36,4 +36,12 @@ This process updates the app while keeping your data safe.
 
 By following the correct update steps—pulling the new image, removing the old container without deleting the volume, and creating a new container with the updated image and the existing volume—your application code is updated while your data remains unchanged and safe.
 
+#### **Q: Should I use the distro-packaged Docker or the official Docker package?**
+
+**A:** We recommend using the official Docker package over distro-packaged versions for running Open WebUI. The official Docker package is frequently updated with the latest features, bug fixes, and security patches, ensuring optimal performance and security. Additionally, it supports important functionalities like `host.docker.internal`, which may not be available in distro-packaged versions. This feature is essential for proper network configurations and connectivity within Docker containers.
+
+By choosing the official Docker package, you benefit from consistent behavior across different environments, more reliable troubleshooting support, and access to the latest Docker advancements. The broader Docker community and resources are also more aligned with the official package, providing you with a wealth of information and support for any issues you might encounter.
+
+Everything you need to run Open WebUI, including your data, remains within your control and your server environment, emphasizing our commitment to your privacy and security. For instructions on installing the official Docker package, please refer to the [Install Docker Engine](https://docs.docker.com/engine/install/) guide on Docker's official documentation site.
+
 If you have any further questions or concerns, please don't hesitate to reach out! 🛡️
