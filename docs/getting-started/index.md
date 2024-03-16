@@ -186,7 +186,9 @@ For other ways to install, like using Kustomize or Helm, check out [INSTALLATION
 
 ### Updating your Docker Installation
 
-In case you want to update your local Docker installation to the latest version, you can do it with [Watchtower](https://containrrr.dev/watchtower/):
+For detailed instructions on manually updating your local Docker installation of Open WebUI, including steps for those not using Watchtower and updates via Docker Compose, please refer to our dedicated guide: [UPDATING](/getting-started/updating).
+
+For a quick update with Watchtower, use the command below. Remember to replace `open-webui` with your actual container name if it differs.
 
 ```bash
 docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
