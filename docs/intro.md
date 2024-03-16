@@ -7,7 +7,7 @@ hide_title: true
 
 # Open WebUI
 
-**Open WebUI is an extensible, feature-rich, and user-friendly self-hosted WebUI for various LLM runners**, supported LLM runners include Ollama and OpenAI-compatible APIs.
+**Open WebUI is an extensible, feature-rich, and user-friendly self-hosted WebUI designed to operate entirely offline.** It supports various LLM runners, including Ollama and OpenAI-compatible APIs.
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
