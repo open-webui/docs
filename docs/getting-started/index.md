@@ -200,6 +200,12 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/wa
 
 In the last part of the command, replace `open-webui` with your container name if it is different.
 
+:::info
+
+After updating Open WebUI, you might need to refresh your browser cache to see the changes.
+
+:::
+
 ## How to Install Without Docker
 
 While we strongly recommend using our convenient Docker container installation for optimal support, we understand that some situations may require a non-Docker setup, especially for development purposes. Please note that non-Docker installations are not officially supported, and you might need to troubleshoot on your own.

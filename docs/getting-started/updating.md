@@ -112,7 +112,9 @@ bash start.sh
 This command should be run from within the `backend` directory of your Open WebUI project.
 
 :::info
+
 Direct installations require more manual effort to update compared to Docker-based installations. If you frequently need updates and want to streamline the process, consider transitioning to a Docker-based setup for easier management.
+
 :::
 
 By following these steps, you can update your direct installation of Open WebUI, ensuring you're running the latest version with all its benefits. Remember to back up any critical data or custom configurations before starting the update process to prevent any unintended loss.
