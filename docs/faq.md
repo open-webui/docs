@@ -48,6 +48,10 @@ Everything you need to run Open WebUI, including your data, remains within your 
 
 **A:** GPU support in Docker is available but varies depending on the platform. Officially, GPU support is provided in Docker for Windows and Docker Engine on Linux. Other platforms, such as Docker Desktop for Linux and MacOS, do not currently offer GPU support. This limitation is important to consider for applications requiring GPU acceleration. For the best experience and to utilize GPU capabilities, we recommend using Docker on platforms that officially support GPU integration.
 
+#### **Q: Why doesn't STT/TTS work in my deployment?**
+
+**A:** The functionality of Speech-to-Text (STT) and Text-to-Speech (TTS) services in your deployment may require HTTPS to operate correctly. Modern browsers enforce security measures that restrict certain features, including STT and TTS, to only work under secure HTTPS connections. If your deployment is not configured to use HTTPS, these services might not function as expected. Ensuring your deployment is accessible over HTTPS can resolve these issues, enabling full functionality of STT/TTS features.
+
 #### **Q: Why doesn't the project include HTTPS support?**
 
 **A:** While we understand the desire for an all-in-one solution that includes HTTPS support, we believe such an approach wouldn't adequately serve the diverse needs of our user base. Implementing HTTPS directly within the project could limit flexibility and may not align with the specific requirements or preferences of all users. To ensure that everyone can tailor their setup to their unique environment, we leave the implementation of HTTPS termination to the users for their production deployments. This decision allows for greater adaptability and customization. Though we don't offer official documentation on setting up HTTPS, community members may provide guidance upon request, sharing insights and suggestions based on their experiences.
