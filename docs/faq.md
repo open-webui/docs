@@ -44,4 +44,12 @@ By choosing the official Docker package, you benefit from consistent behavior ac
 
 Everything you need to run Open WebUI, including your data, remains within your control and your server environment, emphasizing our commitment to your privacy and security. For instructions on installing the official Docker package, please refer to the [Install Docker Engine](https://docs.docker.com/engine/install/) guide on Docker's official documentation site.
 
+#### **Q: Is GPU support available in Docker?**
+
+**A:** GPU support in Docker is available but varies depending on the platform. Officially, GPU support is provided in Docker for Windows and Docker Engine on Linux. Other platforms, such as Docker Desktop for Linux and MacOS, do not currently offer GPU support. This limitation is important to consider for applications requiring GPU acceleration. For the best experience and to utilize GPU capabilities, we recommend using Docker on platforms that officially support GPU integration.
+
+#### **Q: Why doesn't the project include HTTPS support?**
+
+**A:** While we understand the desire for an all-in-one solution that includes HTTPS support, we believe such an approach wouldn't adequately serve the diverse needs of our user base. Implementing HTTPS directly within the project could limit flexibility and may not align with the specific requirements or preferences of all users. To ensure that everyone can tailor their setup to their unique environment, we leave the implementation of HTTPS termination to the users for their production deployments. This decision allows for greater adaptability and customization. Though we don't offer official documentation on setting up HTTPS, community members may provide guidance upon request, sharing insights and suggestions based on their experiences.
+
 #### If you have any further questions or concerns, please out our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
