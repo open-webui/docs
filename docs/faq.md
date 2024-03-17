@@ -56,4 +56,16 @@ Everything you need to run Open WebUI, including your data, remains within your 
 
 **A:** While we understand the desire for an all-in-one solution that includes HTTPS support, we believe such an approach wouldn't adequately serve the diverse needs of our user base. Implementing HTTPS directly within the project could limit flexibility and may not align with the specific requirements or preferences of all users. To ensure that everyone can tailor their setup to their unique environment, we leave the implementation of HTTPS termination to the users for their production deployments. This decision allows for greater adaptability and customization. Though we don't offer official documentation on setting up HTTPS, community members may provide guidance upon request, sharing insights and suggestions based on their experiences.
 
+#### **Q: I updated/restarted/installed some new software and now my WebUI isn't working anymore!**
+
+**A:** If your Open WebUI isn't launching post-update or installation of new software, it's likely related to a direct installation approach, especially if you didn't use a virtual environment for your backend dependencies. Direct installations can be sensitive to changes in the system's environment, such as updates or new installations that alter existing dependencies. To avoid conflicts and ensure stability, we recommend using a virtual environment for managing the `requirements.txt` dependencies of your backend. This isolates your Open WebUI dependencies from other system packages, minimizing the risk of such issues.
+
+#### **Q: I updated/restarted and now my login isn't working anymore, I had to create a new account and all my chats are gone.**
+
+**A:** This issue typically arises when a Docker container is created without mounting a volume for `/app/backend/data` or if the designated Open WebUI volume (usually named `open-webui` in our examples) was unintentionally deleted. Docker volumes are crucial for persisting your data across container lifecycles. If you find yourself needing to create a new account after a restart, it's likely you've initiated a new container without attaching the existing volume where your data resides. Ensure that your Docker run command includes a volume mount pointing to the correct data location to prevent data loss.
+
+#### **Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.**
+
+**A:** This situation occurs when you forget the password for the initial admin account created during the first setup. The first account is automatically designated as the admin account. Creating a new account without access to the admin account will result in the need for admin activation. Avoiding the loss of the initial admin account credentials is crucial for seamless access and management of Open WebUI.
+
 #### If you have any further questions or concerns, please out our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
