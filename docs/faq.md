@@ -7,19 +7,19 @@ title: "📋 FAQ"
 
 ### Table of Contents
 
-- [Q:  Why am I asked to sign up? Where are my data being sent to?](faq#q-why-am-i-asked-to-sign-up-where-are-my-data-being-sent-to)
-- [Q: Why can't my Docker container connect to services on the host using `localhost`?](faq#q-why-cant-my-docker-container-connect-to-services-on-the-host-using-localhost)
-- [Q: How do I make my host's services accessible to Docker containers?](faq#q-how-do-i-make-my-hosts-services-accessible-to-docker-containers)
-- [Q: Why isn't my Open WebUI updating? I've re-pulled/restarted the container, and nothing changed.](faq#q-why-isnt-my-open-webui-updating-ive-re-pulledrestarted-the-container-and-nothing-changed)
-- [Q: Wait, delete my container, won't I lose my data?](faq#q-wait-delete-my-container-wont-i-lose-my-data)
-- [Q: Should I use the distro-packaged Docker or the official Docker package?](faq#q-should-i-use-the-distro-packaged-docker-or-the-official-docker-package)
-- [Q: Is GPU support available in Docker?](faq#q-is-gpu-support-available-in-docker)
-- [Q: Why does the WebUI project emphasize the use of Docker?](faq#q-why-does-the-webui-project-emphasize-the-use-of-docker)
-- [Q: Why doesn't STT/TTS work in my deployment?](faq#q-why-doesnt-stttts-work-in-my-deployment)
-- [Q: Why doesn't the WebUI include HTTPS support built-in?](faq#q-why-doesnt-the-webui-include-https-support-built-in)
-- [Q: I updated/restarted/installed some new software and now my WebUI isn't working anymore!](faq#q-i-updatedrestartedinstalled-some-new-software-and-now-my-webui-isnt-working-anymore)
-- [Q: I updated/restarted and now my login isn't working anymore, I had to create a new account and all my chats are gone.](faq#q-i-updatedrestarted-and-now-my-login-isnt-working-anymore-i-had-to-create-a-new-account-and-all-my-chats-are-gone)
-- [Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.](faq#q-i-tried-to-login-and-couldnt-made-a-new-account-and-now-im-being-told-my-account-needs-to-be-activated-by-an-admin)
+- [Q:  Why am I asked to sign up? Where are my data being sent to?](#q-why-am-i-asked-to-sign-up-where-are-my-data-being-sent-to)
+- [Q: Why can't my Docker container connect to services on the host using `localhost`?](#q-why-cant-my-docker-container-connect-to-services-on-the-host-using-localhost)
+- [Q: How do I make my host's services accessible to Docker containers?](#q-how-do-i-make-my-hosts-services-accessible-to-docker-containers)
+- [Q: Why isn't my Open WebUI updating? I've re-pulled/restarted the container, and nothing changed.](#q-why-isnt-my-open-webui-updating-ive-re-pulledrestarted-the-container-and-nothing-changed)
+- [Q: Wait, delete my container, won't I lose my data?](#q-wait-delete-my-container-wont-i-lose-my-data)
+- [Q: Should I use the distro-packaged Docker or the official Docker package?](#q-should-i-use-the-distro-packaged-docker-or-the-official-docker-package)
+- [Q: Is GPU support available in Docker?](#q-is-gpu-support-available-in-docker)
+- [Q: Why does the WebUI project emphasize the use of Docker?](#q-why-does-the-webui-project-emphasize-the-use-of-docker)
+- [Q: Why doesn't STT/TTS work in my deployment?](#q-why-doesnt-stttts-work-in-my-deployment)
+- [Q: Why doesn't the WebUI include HTTPS support built-in?](#q-why-doesnt-the-webui-include-https-support-built-in)
+- [Q: I updated/restarted/installed some new software and now my WebUI isn't working anymore!](#q-i-updatedrestartedinstalled-some-new-software-and-now-my-webui-isnt-working-anymore)
+- [Q: I updated/restarted and now my login isn't working anymore, I had to create a new account and all my chats are gone.](#q-i-updatedrestarted-and-now-my-login-isnt-working-anymore-i-had-to-create-a-new-account-and-all-my-chats-are-gone)
+- [Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.](#q-i-tried-to-login-and-couldnt-made-a-new-account-and-now-im-being-told-my-account-needs-to-be-activated-by-an-admin)
 
 #### **Q: Why am I asked to sign up? Where are my data being sent to?**
 
