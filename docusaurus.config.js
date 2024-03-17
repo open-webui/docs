@@ -103,6 +103,10 @@ const config = {
               {
                 label: "Tutorial",
                 to: "tutorial",
+              },
+              {
+                label: "FAQ",
+                to: "faq"
               }
             ],
           },
