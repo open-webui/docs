@@ -44,4 +44,4 @@ By choosing the official Docker package, you benefit from consistent behavior ac
 
 Everything you need to run Open WebUI, including your data, remains within your control and your server environment, emphasizing our commitment to your privacy and security. For instructions on installing the official Docker package, please refer to the [Install Docker Engine](https://docs.docker.com/engine/install/) guide on Docker's official documentation site.
 
-#### If you have any further questions or concerns, please don't hesitate to reach out on our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
+#### If you have any further questions or concerns, please out our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
