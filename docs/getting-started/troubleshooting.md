@@ -30,3 +30,35 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
    - Confirm that the Ollama Server URL is correctly set to `[OLLAMA URL]` (e.g., `http://localhost:11434`).
 
 By following these enhanced troubleshooting steps, connection issues should be effectively resolved. For further assistance or queries, feel free to reach out to us on our community Discord.
+
+## Reset Admin Password
+
+If you've forgotten your admin password, you can reset it by following these steps:
+
+### Reset Admin Password in Docker
+
+To reset the admin password for Open WebUI in a Docker deployment, generate a bcrypt hash of your new password and run a Docker command to update the database. Replace `your-new-password` with the desired password and execute:
+
+1. **Generate bcrypt hash** (local machine):
+   ```bash
+   htpasswd -bnBC 10 "" your-new-password | tr -d ':\n'
+   ```
+
+2. **Update password in Docker** (replace `HASH` and `admin@example.com`):
+   ```bash
+   docker run --rm -v open-webui:/data alpine/socat EXEC:"bash -c 'apk add sqlite && echo UPDATE auth SET password='\''HASH'\'' WHERE email='\''admin@example.com'\''; | sqlite3 /data/ollama.db'", STDIO
+   ```
+
+### Reset Admin Password Locally
+
+For local installations of Open WebUI, navigate to the `open-webui` directory and update the password in the `backend/data/webui.db` database.
+
+1. **Generate bcrypt hash** (local machine):
+   ```bash
+   htpasswd -bnBC 10 "" your-new-password | tr -d ':\n'
+   ```
+
+2. **Update password locally** (replace `HASH` and `admin@example.com`):
+   ```bash
+   sqlite3 backend/data/webui.db "UPDATE auth SET password='HASH' WHERE email='admin@example.com';"
+   ```
