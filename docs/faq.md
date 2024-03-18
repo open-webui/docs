@@ -86,6 +86,6 @@ Everything you need to run Open WebUI, including your data, remains within your 
 
 #### **Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.**
 
-**A:** This situation occurs when you forget the password for the initial admin account created during the first setup. The first account is automatically designated as the admin account. Creating a new account without access to the admin account will result in the need for admin activation. Avoiding the loss of the initial admin account credentials is crucial for seamless access and management of Open WebUI.
+**A:** This situation occurs when you forget the password for the initial admin account created during the first setup. The first account is automatically designated as the admin account. Creating a new account without access to the admin account will result in the need for admin activation. Avoiding the loss of the initial admin account credentials is crucial for seamless access and management of Open WebUI. See the [Resetting the Admin Password](getting-started/troubleshooting#reset-admin-password) guide for instructions on recovering the admin account.
 
 #### If you have any further questions or concerns, please out our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
