@@ -100,6 +100,14 @@ const config = {
                 label: "Getting Started",
                 to: "getting-started",
               },
+              {
+                label: "Tutorial",
+                to: "tutorial",
+              },
+              {
+                label: "FAQ",
+                to: "faq"
+              }
             ],
           },
           {
@@ -123,9 +131,17 @@ const config = {
             title: "More",
             items: [
               {
+                label: "Release Notes",
+                to: "https://github.com/open-webui/open-webui/blob/main/CHANGELOG.md",
+              },
+              {
                 label: "About",
                 to: "https://openwebui.com",
               },
+              {
+                label: "Research",
+                to: "research",
+              }
             ],
           },
         ],
