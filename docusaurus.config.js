@@ -101,13 +101,9 @@ const config = {
                 to: "getting-started",
               },
               {
-                label: "Tutorial",
-                to: "tutorial",
-              },
-              {
                 label: "FAQ",
-                to: "faq"
-              }
+                to: "faq",
+              },
             ],
           },
           {
@@ -141,7 +137,7 @@ const config = {
               {
                 label: "Research",
                 to: "research",
-              }
+              },
             ],
           },
         ],
