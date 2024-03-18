@@ -17,36 +17,71 @@ title: "🚀 Getting Started"
 
 <details>
 <summary>Before You Begin</summary>
-1. **Installing Docker:**
+### Installing Docker
 
-- **For Windows and Mac Users:**
+#### For Windows and Mac Users:
 
-  - Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
-  - Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
+- Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
+- Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
 
-- **For Ubuntu and Other Linux Users:**
-  - Open your terminal.
-  - Set up your Docker apt repository according to the [Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
-  - Update your package index:
-    ```bash
-    sudo apt-get update
-    ```
-  - Install Docker using the following command:
-    ```bash
-    sudo apt-get install docker-ce docker-ce-cli containerd.io
-    ```
-  - Verify the Docker installation with:
-    ```bash
-    sudo docker run hello-world
-    ```
-    This command downloads a test image and runs it in a container, which prints an informational message.
+#### For Ubuntu Users:
+1. **Open your terminal.**
 
-2. **Ensure You Have the Latest Version of Ollama:**
+2. **Set up Docker's apt repository:**
+   - Update your package index:
+     ```bash
+     sudo apt-get update
+     ```
+   - Install packages to allow apt to use a repository over HTTPS:
+     ```bash
+     sudo apt-get install ca-certificates curl
+     ```
+   - Create a directory for the Docker apt keyring:
+     ```bash
+     sudo install -m 0755 -d /etc/apt/keyrings
+     ```
+   - Add Docker's official GPG key:
+     ```bash
+     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+     sudo chmod a+r /etc/apt/keyrings/docker.asc
+     ```
+   - Add the Docker repository to Apt sources:
+     ```bash
+     echo \
+       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+       $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+       sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+     ```
+     Note: If you're using an Ubuntu derivative distro, such as Linux Mint, you might need to use `UBUNTU_CODENAME` instead of `VERSION_CODENAME`.
 
-   - Download the latest version from [https://ollama.com/](https://ollama.com/).
+3. **Install Docker Engine:**
+   - Update your package index again:
+     ```bash
+     sudo apt-get update
+     ```
+   - Install Docker Engine, CLI, and containerd:
+     ```bash
+     sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+     ```
 
-3. **Verify Ollama Installation:**
-   - After installing Ollama, check if it's working by visiting [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Remember, the port number might be different for you.
+4. **Verify the Docker installation:**
+   - Use the following command to run a test image:
+     ```bash
+     sudo docker run hello-world
+     ```
+     This command downloads a test image and runs it in a container. If successful, it prints an informational message confirming that Docker is installed and working correctly.
+
+#### Other Linux Distributions:
+
+- For other Linux distributions, please refer to the [official Docker documentation](https://docs.docker.com/engine/install/) for installation instructions specific to your distro.
+
+### Ensure You Have the Latest Version of Ollama:
+
+- Download the latest version from [https://ollama.com/](https://ollama.com/).
+
+### Verify Ollama Installation:
+
+- After installing Ollama, verify its functionality by accessing [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Note that the port number might be different based on your installation.
 
 </details>
 
