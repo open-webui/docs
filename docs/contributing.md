@@ -38,7 +38,7 @@ Help us make Open WebUI more accessible by improving documentation, writing tuto
 
 Help us make Open WebUI available to a wider audience. In this section, we'll guide you through the process of adding new translations to the project.
 
-We use JSON files to store translations. You can find the existing translation files in the `src/lib/i18n/locales` directory. Each directory corresponds to a specific language, for example, `en-US` for English (US), `fr-FR` for French (France) and so on. You can refer to [ISO 639 Language Codes][http://www.lingoes.net/en/translator/langcode.htm] to find the appropriate code for a specific language.
+We use JSON files to store translations. You can find the existing translation files in the `src/lib/i18n/locales` directory. Each directory corresponds to a specific language, for example, `en-US` for English (US), `fr-FR` for French (France) and so on. You can refer to [ISO 639 Language Codes](http://www.lingoes.net/en/translator/langcode.htm) to find the appropriate code for a specific language.
 
 To add a new language:
 
