@@ -35,9 +35,9 @@ The default global log level of `INFO` can be overridden with the `GLOBAL_LOG_LE
 
 In addition to all Open-WebUI `log()` statements, this also affects any imported Python modules that use the Python Logging module `basicConfig` mechanism including [urllib](https://docs.python.org/3/library/urllib.html).
 
-For example, set as a Docker parameter:
+For example, set `DEBUG` logging level as a Docker parameter:
 ```
---env GLOBAL_LOG_LEVEL="INFO"
+--env GLOBAL_LOG_LEVEL="DEBUG"
 ```
 
 ### App/Backend ###
