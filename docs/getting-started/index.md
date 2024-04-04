@@ -153,7 +153,8 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-- After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+- After installation, you can use the following address to run Open WebUI on the browser of your local computer at [http://localhost:3000](http://localhost:3000). If you visualized it with success, please enjoy! 😄
+- In case you're getting error, please ensure you have `ollama` up and running on your local host too. To verify this, you can open a tab and type `http://127.0.0.1:11434/` and you'll see `Ollama is running`.
 
 #### Open WebUI: Server Connection Error
 
