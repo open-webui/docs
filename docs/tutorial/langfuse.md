@@ -5,7 +5,7 @@ title: "Monitoring with Langfuse"
 
 # Monitoring with Langfuse
 
-Integrating [Langfuse](https://cloud.langfuse.com) with LiteLLM allows for detailed observation and recording of API calls. 
+Integrating [Langfuse](https://cloud.langfuse.com) with LiteLLM allows for detailed observation and recording of API calls.
 This guide walks you through setting up Langfuse callbacks with LiteLLM.
 
 The local deployment of Langfuse is an option available through their open-source alternative. However, for the convenience of this tutorial, we will utilize the free limited version of their Cloud service. If data privacy is a concern for you, it is recommended to install the local version instead.
@@ -23,7 +23,7 @@ To integrate Langfuse with LiteLLM, you'll need to modify the LiteLLM `config.ya
 
 ### Editing the LiteLLM Configuration File
 
-Edit the LiteLLM `config.yaml` file, located in your host Docker mount point at `/data/litellm/config.yaml`. 
+Edit the LiteLLM `config.yaml` file, located in your host Docker mount point at `/data/litellm/config.yaml`.
 Add the following under the general settings as shown in the [LiteLLM official documentation](https://litellm.vercel.app/docs/observability/langfuse_integration):
 
 ```yaml
@@ -44,9 +44,11 @@ These variables can be set directly in the docker run command or through a Docke
 ```
 
 ## Testing the Integration
+
 Once setup is complete, your Langfuse dashboard should start recording every API call made through the LiteLLM integration. This allows for efficient monitoring and troubleshooting of API interactions.
 
-![Langfuse Dashboard](/img/langfuse.png)
+![Langfuse Dashboard](/img/tutorial_langfuse.png)
 
 ## Note
+
 Ensure that all configurations are correctly set, and environment variables are properly passed to avoid integration issues.
