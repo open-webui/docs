@@ -18,6 +18,12 @@ If you're experiencing connection issues, it’s often due to the WebUI docker c
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+If you're experiencing connection issues with the SSL error of huggingface.co, please checked the huggingface server, if it is down, you could set the `HF_ENDPOINT` to `https://hf-mirror.com/` in the `docker run` command.
+
+```bash
+docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
 ### General Connection Errors
 
 **Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
