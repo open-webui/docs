@@ -174,11 +174,13 @@ For more details on networking in Docker and addressing common connectivity issu
 <details>
 <summary>Rootless (Podman) local-only Open WebUI with Systemd service and auto-update</summary>
 
-> [!IMPORTANT]
-> Consult the Docker documentation because much of the configuration and syntax is interchangeable with [Podman](https://github.com/containers/podman). See also [rootless_tutorial](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md). This example requires the [slirp4netns](https://github.com/rootless-containers/slirp4netns) network backend to facilitate server listen and Ollama communication over localhost only.
+:::note
+Consult the Docker documentation because much of the configuration and syntax is interchangeable with [Podman](https://github.com/containers/podman). See also [rootless_tutorial](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md). This example requires the [slirp4netns](https://github.com/rootless-containers/slirp4netns) network backend to facilitate server listen and Ollama communication over localhost only.
+:::
 
-> [!WARNING]
-> Rootless container execution with Podman (and Docker/ContainerD) does **not** support [AppArmor confinment](https://github.com/containers/podman/pull/19303). This may increase the attack vector due to [requirement of user namespace](https://rootlesscontaine.rs/caveats). Caution should be exercised and judement (in contrast to the root daemon) rendered based on threat model.
+:::warning
+Rootless container execution with Podman (and Docker/ContainerD) does **not** support [AppArmor confinment](https://github.com/containers/podman/pull/19303). This may increase the attack vector due to [requirement of user namespace](https://rootlesscontaine.rs/caveats). Caution should be exercised and judement (in contrast to the root daemon) rendered based on threat model.
+:::
 
 1. Pull the latest image:
    ```bash
@@ -186,8 +188,9 @@ For more details on networking in Docker and addressing common connectivity issu
    ```
 2. Create a new container using desired configuration:
 
-   > [!NOTE]
-   > `-p 127.0.0.1:3000:8080` ensures that we listen only on localhost, `--network slirp4netns:allow_host_loopback=true` permits the container to access Ollama when it also listens strictly on localhost. `--add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434'` adds a hosts record to the container and configures open-webui to use the friendly hostname. `10.0.2.2` is the default slirp4netns address used for localhost mapping. `--env 'ANONYMIZED_TELEMETRY=False'` isn't necessary since Chroma telemetry has been disabled in the code but is included as an example.
+   :::note
+   `-p 127.0.0.1:3000:8080` ensures that we listen only on localhost, `--network slirp4netns:allow_host_loopback=true` permits the container to access Ollama when it also listens strictly on localhost. `--add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434'` adds a hosts record to the container and configures open-webui to use the friendly hostname. `10.0.2.2` is the default slirp4netns address used for localhost mapping. `--env 'ANONYMIZED_TELEMETRY=False'` isn't necessary since Chroma telemetry has been disabled in the code but is included as an example.
+   :::
 
    ```bash
    podman create -p 127.0.0.1:3000:8080 --network slirp4netns:allow_host_loopback=true --add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
@@ -222,8 +225,9 @@ For more details on networking in Docker and addressing common connectivity issu
    podman auto-update --dry-run
    ```
 
-> [!NOTE]
-> This process is compatible with Windows 11 WSL deployments when using Ollama within the WSL environment or using the Ollama Windows Preview. When using the native Ollama Windows Preview version, one additional step is required: enable [mirrored networking mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking). 
+:::tip
+This process is compatible with Windows 11 WSL deployments when using Ollama within the WSL environment or using the Ollama Windows Preview. When using the native Ollama Windows Preview version, one additional step is required: enable [mirrored networking mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking).
+:::
 
 ### Enabling Windows 11 mirrored networking
 
