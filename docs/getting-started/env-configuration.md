@@ -2,7 +2,7 @@
 
 ## App/Backend ##
 
-Here is a list of supported enviornment variables ready by `backend/config.py` intended to provide Open WebUI configuration. See also the [logging environment variables](/getting-started/logging#appbackend).
+Here is a list of supported environment variables used by `backend/config.py` intended to provide Open WebUI startup configurability. See also the [logging environment variables](/getting-started/logging#appbackend).
 
 | Environment Variable              | App/Backend                                                                 |
 | --------------------------------- | --------------------------------------------------------------------------- |
