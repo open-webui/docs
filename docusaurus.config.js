@@ -31,7 +31,15 @@ const config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: "en",
-    locales: ["en"],
+    locales: ["en", "zh-CN"],
+    localeConfigs: {
+      en: {
+        label: "English",
+      },
+      "zh-CN": {
+        label: "简体中文",
+      },
+    },
   },
 
   presets: [
@@ -79,6 +87,10 @@ const config = {
           //   position: "left",
           //   label: "Tutorial",
           // },
+          {
+            type: 'localeDropdown',
+            position: 'right',
+          },
           {
             href: "https://github.com/open-webui/open-webui",
             label: "GitHub",

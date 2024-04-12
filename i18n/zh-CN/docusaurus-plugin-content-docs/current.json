@@ -1,0 +1,18 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.tutorialSidebar.category.🏡 Home": {
+    "message": "🏡 Open WebUI 介绍",
+    "description": "The label for category 🚀 Getting Started in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.🚀 Getting Started": {
+    "message": "🚀 开始上手",
+    "description": "The label for category 🚀 Getting Started in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.📝 Tutorial": {
+    "message": "📝 指南",
+    "description": "The label for category 📝 Tutorial in sidebar tutorialSidebar"
+  }
+}
