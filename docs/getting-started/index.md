@@ -196,6 +196,14 @@ Rootless container execution with Podman (and Docker/ContainerD) does **not** su
    podman create -p 127.0.0.1:3000:8080 --network slirp4netns:allow_host_loopback=true --add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
    ```
 
+   :::note
+   `[Podman 5.0](https://www.redhat.com/en/blog/podman-50-unveiled) has updated the default rootless network backend to use the more performant [pasta](https://passt.top/passt/about/). While `slirp4netns:allow_host_loopback=true` still achieves the same local-only intention, it's now recommended use a simple TCP forward instead like: `--network=pasta:-T,11434 --add-host=ollama.local:127.0.0.1`. Full example:
+   :::
+
+   ```bash
+   podman create -p 127.0.0.1:3000:8080 --network=pasta:-T,11434 --add-host=ollama.local:127.0.0.1 --env 'OLLAMA_BASE_URL=http://ollama.local:11434' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
+   ```
+
 3. Prepare for systemd user service:
    ```bash
    mkdir -p ~/.config/systemd/user/
