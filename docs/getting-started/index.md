@@ -197,7 +197,7 @@ Rootless container execution with Podman (and Docker/ContainerD) does **not** su
    ```
 
    :::note
-   `[Podman 5.0](https://www.redhat.com/en/blog/podman-50-unveiled) has updated the default rootless network backend to use the more performant [pasta](https://passt.top/passt/about/). While `slirp4netns:allow_host_loopback=true` still achieves the same local-only intention, it's now recommended use a simple TCP forward instead like: `--network=pasta:-T,11434 --add-host=ollama.local:127.0.0.1`. Full example:
+   [Podman 5.0](https://www.redhat.com/en/blog/podman-50-unveiled) has updated the default rootless network backend to use the more performant [pasta](https://passt.top/passt/about/). While `slirp4netns:allow_host_loopback=true` still achieves the same local-only intention, it's now recommended use a simple TCP forward instead like: `--network=pasta:-T,11434 --add-host=ollama.local:127.0.0.1`. Full example:
    :::
 
    ```bash
