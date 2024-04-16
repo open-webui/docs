@@ -20,6 +20,7 @@ title: "📋 FAQ"
 - [Q: I updated/restarted/installed some new software and now my WebUI isn't working anymore!](#q-i-updatedrestartedinstalled-some-new-software-and-now-my-webui-isnt-working-anymore)
 - [Q: I updated/restarted and now my login isn't working anymore, I had to create a new account and all my chats are gone.](#q-i-updatedrestarted-and-now-my-login-isnt-working-anymore-i-had-to-create-a-new-account-and-all-my-chats-are-gone)
 - [Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.](#q-i-tried-to-login-and-couldnt-made-a-new-account-and-now-im-being-told-my-account-needs-to-be-activated-by-an-admin)
+- [Q: Why does the WebUI project can't be started with ssl error?](#q-why-does-the-webui-project-cant-be-started-with-ssl-error)
 
 #### **Q: Why am I asked to sign up? Where are my data being sent to?**
 
@@ -87,5 +88,13 @@ Everything you need to run Open WebUI, including your data, remains within your 
 #### **Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.**
 
 **A:** This situation occurs when you forget the password for the initial admin account created during the first setup. The first account is automatically designated as the admin account. Creating a new account without access to the admin account will result in the need for admin activation. Avoiding the loss of the initial admin account credentials is crucial for seamless access and management of Open WebUI. See the [Resetting the Admin Password](getting-started/troubleshooting#reset-admin-password) guide for instructions on recovering the admin account.
+
+#### **Q: Why does the WebUI project can't be started with ssl error?**
+
+**A:** The SSL error you're encountering when starting the WebUI project is likely due to the absence of SSL certificates or incorrect configuration of [huggingface.co](https://huggingface.co/). To resolve this issue, you could set up a mirror for huggingface, such as [hf-mirror.com](https://hf-mirror.com/), and specify it as the endpoint when starting the Docker container. Use the `-e HF_ENDPOINT=https://hf-mirror.com/` parameter to define the huggingface mirror address in the Docker run command. For example, you can modify the Docker run command as follows:
+
+```bash
+docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
 
 #### If you have any further questions or concerns, please out our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
