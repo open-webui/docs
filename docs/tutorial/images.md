@@ -9,7 +9,7 @@ Open WebUI now supports image generation through two backends: **AUTOMATIC1111**
 
 ## AUTOMATIC1111
 
-Open WebUI supports image generation through the **AUTOMATIC1111** [API](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API). Follow these steps to get started:
+Open WebUI supports image generation through the **AUTOMATIC1111** [API](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API). Here are the steps to get started:
 
 ### Initial Setup
 
@@ -18,20 +18,52 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
    ```
    ./webui.sh --api --listen
    ```
-   For Docker installations of Open WebUI, use the `--listen` flag to allow connections outside of localhost.
+3. For Docker installation of WebUI with the environment variables preset, use the following command:
+   ```
+   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e IMAGE_GENERATION_ENABLED=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   ```
 
 ### Configuring Open WebUI
 
 1. In Open WebUI, navigate to **Settings > Images**.
 2. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
    ```
-   http://<your_automatic1111_address>:7860
+   http://<your_automatic1111_address>:7860/
    ```
-   If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, use `host.docker.internal` as your address.
+   If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, use `http://host.docker.internal:7860/` as your address.
+
+## ComfyUI
+
+ComfyUI provides an alternative interface for managing and interacting with image generation models. Learn more or download it from its [GitHub page](https://github.com/comfyanonymous/ComfyUI). Below are the setup instructions to get ComfyUI running alongside your other tools.
+
+### Initial Setup
+
+1. Download and extract the ComfyUI software package from [GitHub](https://github.com/comfyanonymous/ComfyUI) to your desired directory.
+2. To start ComfyUI, run the following command:
+   ```
+   python main.py
+   ```
+   For systems with low VRAM, launch ComfyUI with additional flags to reduce memory usage:
+   ```
+   python main.py --lowvram
+   ```
+3. For Docker installation of WebUI with the environment variables preset, use the following command:
+   ```
+   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e COMFYUI_BASE_URL=http://host.docker.internal:7860/ -e IMAGE_GENERATION_ENABLED=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   ```
+
+### Configuring Open WebUI
+
+1. In Open WebUI, navigate to **Settings > Images**.
+2. In the API URL field, enter the address where ComfyUI's API is accessible:
+   ```
+   http://<your_comfyui_address>:7860/
+   ```
+   Set the environment variable `COMFYUI_BASE_URL` to this address to ensure proper integration.
 
 ## OpenAI DALL·E
 
-Open WebUI also supports image generation through the **OpenAI DALL·E APIs**. This option now includes a selector for choosing between DALL·E 2 and DALL·E 3, each supporting different image sizes.
+Open WebUI also supports image generation through the **OpenAI DALL·E APIs**. This option includes a selector for choosing between DALL·E 2 and DALL·E 3, each supporting different image sizes.
 
 ### Initial Setup
 
