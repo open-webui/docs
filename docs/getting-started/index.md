@@ -179,6 +179,41 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
 
 - After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
+### GPU Support
+
+#### Nvidia CUDA
+
+To run Ollama with Nvidia GPU support, utilize the Nvidia-docker tool for GPU access, and set the appropriate environment variables for CUDA support:
+
+```bash
+docker run -d -p 3000:8080 \
+--gpus all \
+--add-host=host.docker.internal:host-gateway \
+--volume open-webui:/app/backend/data \
+--name open-webui \
+--restart always \
+ghcr.io/open-webui/open-webui:main
+```
+
+#### AMD ROCm
+
+To run Ollama with AMD GPU support, set the `HSA_OVERRIDE_GFX_VERSION` environment variable and ensure the Docker container can access the GPU:
+
+```bash
+docker run -d -p 3000:8080 \
+-e HSA_OVERRIDE_GFX_VERSION=11.0.0 \
+--device /dev/kfd \
+--device /dev/dri \
+--group-add video \
+--add-host=host.docker.internal:host-gateway \
+--volume open-webui:/app/backend/data \
+--name open-webui \
+--restart always \
+ghcr.io/open-webui/open-webui:main
+```
+
+Replace `HSA_OVERRIDE_GFX_VERSION=11.0.0` with the version appropriate for your AMD GPU model as described in the earlier sections. This command ensures compatibility and optimal performance with AMD GPUs.
+
 #### Open WebUI: Server Connection Error
 
 Encountering connection issues between the Open WebUI Docker container and the Ollama server? This problem often arises because distro-packaged versions of Docker—like those from the Ubuntu repository—do not support the `host.docker.internal` alias for reaching the host directly. Inside a container, referring to `localhost` or `127.0.0.1` typically points back to the container itself, not the host machine.
