@@ -25,9 +25,11 @@ title: "🚀 Getting Started"
 - Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
 
 #### For Ubuntu Users:
+
 1. **Open your terminal.**
 
 2. **Set up Docker's apt repository:**
+
    - Update your package index:
      ```bash
      sudo apt-get update
@@ -55,6 +57,7 @@ title: "🚀 Getting Started"
      Note: If you're using an Ubuntu derivative distro, such as Linux Mint, you might need to use `UBUNTU_CODENAME` instead of `VERSION_CODENAME`.
 
 3. **Install Docker Engine:**
+
    - Update your package index again:
      ```bash
      sudo apt-get update
@@ -85,78 +88,6 @@ title: "🚀 Getting Started"
 
 </details>
 
-## One-line Command to Install Ollama and Open WebUI Together
-
-#### Using Docker Compose
-
-- If you don't have Ollama yet, use Docker Compose for easy installation. Run this command:
-
-  ```bash
-  docker compose up -d --build
-  ```
-
-- **For GPU Support:** Use an additional Docker Compose file:
-
-  ```bash
-  docker compose -f docker-compose.yaml -f docker-compose.gpu.yaml up -d --build
-  ```
-
-- **For AMD GPU Support:** Some AMD GPUs require setting an environment variable for proper functionality:
-
-  ```bash
-  HSA_OVERRIDE_GFX_VERSION=11.0.0 docker compose -f docker-compose.yaml -f docker-compose.amdgpu.yaml up -d --build
-  ```
-
-  <details>
-  <summary>AMD GPU Support with HSA_OVERRIDE_GFX_VERSION</summary>
-
-  For AMD GPU users encountering compatibility issues, setting the `HSA_OVERRIDE_GFX_VERSION` environment variable is crucial. This variable instructs the ROCm platform to emulate a specific GPU architecture, ensuring compatibility with various AMD GPUs not officially supported. Depending on your GPU model, adjust the `HSA_OVERRIDE_GFX_VERSION` as follows:
-
-  - **For RDNA1 & RDNA2 GPUs** (e.g., RX 6700, RX 680M): Use `HSA_OVERRIDE_GFX_VERSION=10.3.0`.
-  - **For RDNA3 GPUs**: Set `HSA_OVERRIDE_GFX_VERSION=11.0.0`.
-  - **For older GCN (Graphics Core Next) GPUs**: The version to use varies. GCN 4th gen and earlier might require different settings, such as `ROC_ENABLE_PRE_VEGA=1` for GCN4, or `HSA_OVERRIDE_GFX_VERSION=9.0.0` for Vega (GCN5.0) emulation.
-
-  Ensure to replace `<version>` with the appropriate version number based on your GPU model and the guidelines above. For a detailed list of compatible versions and more in-depth instructions, refer to the [ROCm documentation](https://rocm.docs.amd.com) and the [openSUSE Wiki on AMD GPGPU](https://en.opensuse.org/SDB:AMD_GPGPU).
-
-  Example command for RDNA1 & RDNA2 GPUs:
-  ```bash
-  HSA_OVERRIDE_GFX_VERSION=10.3.0 docker compose -f docker-compose.yaml -f docker-compose.amdgpu.yaml up -d --build
-  ```
-
-  </details>
-
-- **To Expose Ollama API:** Use another Docker Compose file:
-
-  ```bash
-  docker compose -f docker-compose.yaml -f docker-compose.api.yaml up -d --build
-  ```
-
-#### Using `run-compose.sh` Script (Linux or Docker-Enabled WSL2 on Windows)
-
-- Give execute permission to the script:
-
-  ```bash
-  chmod +x run-compose.sh
-  ```
-
-- For CPU-only container:
-
-  ```bash
-  ./run-compose.sh
-  ```
-
-- For GPU support (read the note about GPU compatibility):
-
-  ```bash
-  ./run-compose.sh --enable-gpu
-  ```
-
-- To build the latest local version, add `--build`:
-
-  ```bash
-  ./run-compose.sh --enable-gpu --build
-  ```
-
 ## Quick Start with Docker 🐳
 
 :::info
@@ -171,10 +102,24 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
 
 - **If Ollama is on a Different Server**, use this command:
 
-- To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL:
+  To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL:
 
   ```bash
   docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+  ```
+
+### Installing Both Open WebUI and Ollama Together
+
+- **With GPU Support**, Use this command:
+
+  ```bash
+  docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+  ```
+
+- **For CPU Only**, Use this command:
+
+  ```bash
+  docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
   ```
 
 - After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
@@ -227,6 +172,79 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 
 For more details on networking in Docker and addressing common connectivity issues, visit our [FAQ page](/faq/). This page provides additional context and solutions for frequently encountered problems, ensuring a smoother operation of Open WebUI in various environments.
+
+## One-line Command to Install Ollama and Open WebUI Together
+
+#### Using Docker Compose
+
+- If you don't have Ollama yet, use Docker Compose for easy installation. Run this command:
+
+  ```bash
+  docker compose up -d --build
+  ```
+
+- **For GPU Support:** Use an additional Docker Compose file:
+
+  ```bash
+  docker compose -f docker-compose.yaml -f docker-compose.gpu.yaml up -d --build
+  ```
+
+- **For AMD GPU Support:** Some AMD GPUs require setting an environment variable for proper functionality:
+
+  ```bash
+  HSA_OVERRIDE_GFX_VERSION=11.0.0 docker compose -f docker-compose.yaml -f docker-compose.amdgpu.yaml up -d --build
+  ```
+
+  <details>
+  <summary>AMD GPU Support with HSA_OVERRIDE_GFX_VERSION</summary>
+
+  For AMD GPU users encountering compatibility issues, setting the `HSA_OVERRIDE_GFX_VERSION` environment variable is crucial. This variable instructs the ROCm platform to emulate a specific GPU architecture, ensuring compatibility with various AMD GPUs not officially supported. Depending on your GPU model, adjust the `HSA_OVERRIDE_GFX_VERSION` as follows:
+
+  - **For RDNA1 & RDNA2 GPUs** (e.g., RX 6700, RX 680M): Use `HSA_OVERRIDE_GFX_VERSION=10.3.0`.
+  - **For RDNA3 GPUs**: Set `HSA_OVERRIDE_GFX_VERSION=11.0.0`.
+  - **For older GCN (Graphics Core Next) GPUs**: The version to use varies. GCN 4th gen and earlier might require different settings, such as `ROC_ENABLE_PRE_VEGA=1` for GCN4, or `HSA_OVERRIDE_GFX_VERSION=9.0.0` for Vega (GCN5.0) emulation.
+
+  Ensure to replace `<version>` with the appropriate version number based on your GPU model and the guidelines above. For a detailed list of compatible versions and more in-depth instructions, refer to the [ROCm documentation](https://rocm.docs.amd.com) and the [openSUSE Wiki on AMD GPGPU](https://en.opensuse.org/SDB:AMD_GPGPU).
+
+  Example command for RDNA1 & RDNA2 GPUs:
+
+  ```bash
+  HSA_OVERRIDE_GFX_VERSION=10.3.0 docker compose -f docker-compose.yaml -f docker-compose.amdgpu.yaml up -d --build
+  ```
+
+  </details>
+
+- **To Expose Ollama API:** Use another Docker Compose file:
+
+  ```bash
+  docker compose -f docker-compose.yaml -f docker-compose.api.yaml up -d --build
+  ```
+
+#### Using `run-compose.sh` Script (Linux or Docker-Enabled WSL2 on Windows)
+
+- Give execute permission to the script:
+
+  ```bash
+  chmod +x run-compose.sh
+  ```
+
+- For CPU-only container:
+
+  ```bash
+  ./run-compose.sh
+  ```
+
+- For GPU support (read the note about GPU compatibility):
+
+  ```bash
+  ./run-compose.sh --enable-gpu
+  ```
+
+- To build the latest local version, add `--build`:
+
+  ```bash
+  ./run-compose.sh --enable-gpu --build
+  ```
 
 ## Installing with Podman
 
