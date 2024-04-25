@@ -19,12 +19,12 @@ Here is a list of supported environment variables used by `backend/config.py` in
 | `FRONTEND_BUILD_DIR`              | Location of the built frontend files, default: `../build`                                                        |
 | `K8S_FLAG`                        | Support Kubernetes style Ollama hostname `.svc.cluster.local`                                                    |
 | `MODEL_FILTER_ENABLED`            | Toggle Language Model filtering, default: `"False"`                                                              |
-| `MODEL_FILTER_LIST`               | Set Language Model filter list                                                                                   |
+| `MODEL_FILTER_LIST`               | Set Language Model filter list, semicolon separated: `"llama3:instruct;gemma:instruct"`                          |
 | `OLLAMA_API_BASE_URL`             | Deprecated, see `OLLAMA_BASE_URL`                                                                                |
 | `OLLAMA_BASE_URL`                 | Configure Ollama backend URL, default: `"http://localhost:11434"`                                                |
 | `OLLAMA_BASE_URLS`                | Configure load balanced Ollama backend hosts, see `OLLAMA_BASE_URL`                                              |
 | `OPENAI_API_BASE_URL`             | Configure OpenAI base API URL                                                                                    |
-| `OPENAI_API_BASE_URLS`            | Support balanced OpenAI base API URLs                                                                            |
+| `OPENAI_API_BASE_URLS`            | Support balanced OpenAI base API URLs, semicolon separated: `"http://host-one:11434;http://host-two:11434"`      |
 | `OPENAI_API_KEY`                  | Set OpenAI API key                                                                                               |
 | `OPENAI_API_KEYS`                 | Support multiple Open API keys                                                                                   |
 | `PORT`                            | Port to run Open WebUI from, default: `8080`                                                                     |
