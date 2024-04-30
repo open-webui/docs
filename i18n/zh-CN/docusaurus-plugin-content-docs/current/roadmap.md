@@ -1,42 +1,42 @@
 ---
 sidebar_position: 6
 # title: "🛣️ Roadmap"
-title: "🛣️ 产品路线图"
+title: "🛣️ 路线图"
 ---
 
-# 🎯 Our Mission
+# 🎯 我们的使命
 
-Our mission is founded on the belief that AI technologies hold transformative potential for society, yet their benefits have been narrowly confined due to complex setup requirements. Recognizing this, we are dedicated to democratizing AI by developing an easy-to-install, feature-rich local WebUI that is designed to operate locally without internet access. Enabling anyone with basic technical skills to tap into the power of AI, effectively bringing its capabilities to communities far and wide.
+我们的使命建立在 AI 技术具有对社会的变革潜力的信念基础上，然而由于复杂的设置要求，其好处一直被狭窄地限制。认识到这一点，我们致力于通过开发一个易于安装、功能丰富的本地 WebUI 来使 AI 民主化，该 WebUI 设计为在没有互联网访问的情况下在本地运行。使任何具备基本技术技能的人都能利用 AI 的强大功能，有效地将其能力带给遥远的社区。
 
-At the heart of our efforts is the creation of an open-sourced ecosystem of AI tools. Our commitment lies in making AI not only accessible but also beneficial for everyone. We envision a future where AI acts as a lever for societal advancement, driving progress, and technological breakthroughs across all communities.
+我们的努力的核心是创建一个 AI 工具的开源生态系统。我们的承诺在于使 AI 不仅易于访问，而且对每个人都有益。我们设想未来 AI 作为社会进步的杠杆，推动进步和技术突破，促进所有社区的发展。
 
-By eliminating technological barriers and making AI's advantages universally accessible, we aim to foster a positive impact worldwide. Our ultimate goal is to ensure that AI serves as a catalyst for positive change, helping to bridge gaps and create a more equitable society where everyone can benefit from the advancements in technology.
+通过消除技术障碍并使 AI 的优势普遍可及，我们旨在在全球范围内产生积极影响。我们的最终目标是确保 AI 作为促进积极变革的催化剂，帮助弥合差距，创造一个更加公平的社会，让每个人都能从技术进步中受益。
 
-### Our Vision: Shaping the Future Together
+### 我们的愿景：共同塑造未来
 
-At the heart of our mission lies a profound commitment not just to envision a future where advanced AI technology is universally accessible, but to actively build towards it. Our efforts extend beyond the development of our WebUI; We are at the forefront of creating an ecosystem that embodies the democratization of AI technology. This ecosystem, envisioned as a vibrant, community-driven platform, will be a repository of shared knowledge—ranging from model presets and custom prompts to valuable chat logs. A space where the collective intelligence of our community acts as the driving force for the continuous evolution and refinement of AIs, ensuring these advancements serve us, the actual users of these technologies.
+我们的使命的核心是一种深厚的承诺，不仅是设想一个未来，其中先进的 AI 技术是普遍可访问的，而且是积极地朝着这个目标努力。我们的努力不仅仅局限于开发我们的 WebUI；我们正处于创建一个体现 AI 技术民主化的生态系统的最前沿。这个生态系统被设想为一个充满活力的、社区驱动的平台，将是一个共享知识的库——从模型预设和自定义提示到有价值的聊天记录。一个地方，我们社区的集体智慧作为持续演进和精炼 AI 的驱动力，确保这些进步服务于我们，这些技术的实际用户。
 
-Our strategy aims to tackle the complex challenges of AI, such as model fine-tuning and dataset curation, head-on. Leveraging the collective skills and insights of our community, we'll forge innovative pathways that not only enhance the precision and relevance of AI models but also guarantee these improvements are shared openly. Our objective is unequivocal: to democratize access to refined, user-curated datasets, thereby eliminating barriers to advancing AI for all.
+我们的战略旨在直面 AI 的复杂挑战，如模型微调和数据集策划。利用我们社区的集体技能和见解，我们将开辟创新的途径，不仅增强 AI 模型的精确性和相关性，而且确保这些改进是公开共享的。我们的目标是明确的：民主化对精细、用户策划的数据集的访问，从而消除所有人推进 AI 的障碍。
 
-As we navigate this journey, our vision serves as our north star, guiding our efforts to turn bold ambitions into reality. We extend an invitation for you to join us in this endeavor, as we work diligently to ensure AI technology becomes an empowering resource for individuals and communities across the globe.
+在我们航行这段旅程时，我们的愿景是我们的北极星，引导我们努力将大胆的抱负变为现实。我们邀请您加入我们的努力，努力确保 AI 技术成为全球各地个人和社区的一种有力资源。
 
-# 🛣️ Roadmap
+# 🛣️ 产品路线图
 
-Here are some exciting tasks on our roadmap:
+以下是我们路线图上一些令人兴奋的任务：
 
-- 🔊 **Local Text-to-Speech Integration**: Seamlessly incorporate text-to-speech functionality directly within the platform, allowing for a smoother and more immersive user experience.
-- 🛡️ **Granular Permissions and User Groups**: Empower administrators to finely control access levels and group users according to their roles and responsibilities. This feature ensures robust security measures and streamlined management of user privileges, enhancing overall platform functionality.
-- 🔄 **Function Calling**: Empower your interactions by running code directly within the chat. Execute functions and commands effortlessly, enhancing the functionality of your conversations.
-- ⚙️ **Custom Python Backend Actions**: Empower your Open WebUI by creating or downloading custom Python backend actions. Unleash the full potential of your web interface with tailored actions that suit your specific needs, enhancing functionality and versatility.
-- 🔧 **Fine-tune Model (LoRA)**: Fine-tune your model directly from the user interface. This feature allows for precise customization and optimization of the chat experience to better suit your needs and preferences.
-- 🧠 **Long-Term Memory**: Witness the power of persistent memory in our agents. Enjoy conversations that feel continuous as agents remember and reference past interactions, creating a more cohesive and personalized user experience.
-- 📚 **Enhanced Documentation**: Elevate your setup and customization experience with improved, comprehensive documentation.
+- 🔊 **本地文本转语音集成**：在平台内部无缝整合文本转语音功能，使用户体验更加流畅和沉浸。
+- 🛡️ **细粒度权限和用户组**：赋予管理员精细控制访问级别，并根据用户的角色和职责对用户进行分组。这一功能确保了强大的安全措施和用户权限的简化管理，增强了整体平台功能。
+- 🔄 **函数调用**：通过在聊天中直接运行代码来增强您的交互。轻松执行功能和命令，增强您对话的功能。
+- ⚙️ **自定义 Python 后端操作**：通过创建或下载自定义 Python 后端操作来增强您的 Open WebUI。使用适合您特定需求的定制操作，释放您的 Web 界面的全部潜力，增强功能性和多功能性。
+- 🔧 **微调模型（LoRA）**：直接从用户界面微调您的模型。此功能允许精确定制和优化聊天体验，以更好地满足您的需求和偏好。
+- 🧠 **长期记忆**：在我们的代理中见证持久记忆的力量。享受感觉连续的对话，因为代理记住并引用过去的互动，为用户提供更连贯和个性化的体验。
+- 📚 **增强文档**：通过改进的、全面的文档提升您的设置和定制体验。
 
-### 🧑‍🔬 Research Tools
+### 🧑‍🔬 研究工具
 
-- 🧪 **Research-Centric Features**: Empower researchers in the fields of LLM and HCI with a comprehensive web UI for conducting user studies. Stay tuned for ongoing feature enhancements (e.g., surveys, analytics, and participant tracking) to facilitate their research.
-- 📈 **User Study Tools**: Providing specialized tools, like heat maps and behavior tracking modules, to empower researchers in capturing and analyzing user behavior patterns with precision and accuracy.
+- 🧪 **面向研究的功能**：为 LLM 和 HCI 领域的研究人员提供一个全面的 Web UI，用于进行用户研究。敬请期待持续的功能增强（例如，调查、分析和参与者跟踪）以促进他们的研究。
+- 📈 **用户研究工具**：提供专门的工具，如热图和行为跟踪模块，以赋予研究人员捕获和分析用户行为模式的精确度和准确性。
 
-Read more about our [research offerings](/research)
+阅读更多关于我们的[研究提供](/research)
 
-Join us in our mission to make Open WebUI even better and more accessible to all! 🙌
+加入我们，使 Open WebUI 变得更好，更容易访问！ 🙌

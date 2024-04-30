@@ -1,26 +1,26 @@
-# Retrieval Augmented Generation (RAG)
+# 检索增强生成 （RAG）
 
-Retrieval Augmented Generation (RAG) allows context from other diverse sources to be included in chats. Text from different sources is combined with the RAG template and prefixed to the user's prompt.
+检索增强生成 （RAG） 允许在聊天中包含来自其他不同来源的上下文。来自不同来源的文本与 RAG 模板相结合，并以用户提示为前缀。
 
-## Including external sources in chats
-Activate RAG by starting the prompt with a `#` symbol. A list of sources will appear.
+## 在聊天中包含外部来源
+通过以 `#` 符号开头的提示激活 RAG。将显示来源列表。
 
-Once selected, a document icon appears at the top of the prompt, indicating successful retrieval. 
+选择后，提示顶部会出现一个文档图标，表示检索成功。
 
-### Local sources
+### 本地来源
 
-Local documents must first be uploaded via the Documents section.
- 
-### Sourcing  from the Web
+首先通过“文档”部分上传本地文档。
 
-Remote sources acheived with `#` followed by the target URL. Open WebUI fetches and parses the URL.
+### 从网络获取
 
-> **Tip:** Webpages often include extraneous information such as navigation and footer. Link to a raw or reader-friendly version of the page for better results.
+使用 `#` 后跟目标 URL 获取远程来源。Open WebUI 会获取并解析 URL。
 
-## Document parsing
+> **提示：** 网页通常包含导航和页脚等多余信息。为了获得更好的结果，请链接到页面的原始或易读版本。
 
-Local and remote documents have content extract with a variety of parsers. For more, see [https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328]
+## 文档解析
 
-## RAG Template Customisation
+本地和远程文档使用各种解析器提取内容。有关更多信息，请参见 [https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328]
 
-Modify the RAG template by accessing the 'settings' icon housed within the 'Documents' section.
+## RAG 模板自定义
+
+通过访问 'Documents' 部分中的 'settings' 图标修改 RAG 模板。

@@ -1,15 +1,15 @@
 ---
 sidebar_position: 2
-title: "OpenAI API Endpoints"
+title: "OpenAI API 接入"
 ---
 
-# OpenAI API Endpoints
+# OpenAI API 接入
 
-In this tutorial, we will demonstrate how to configure multiple OpenAI (or compatible) API endpoints using environment variables. This setup allows you to easily switch between different API providers or use multiple providers simultaneously, while keeping your configuration between container updates, rebuilds or redeployments.
+在本教程中，我们将演示如何使用环境变量配置多个 OpenAI（或 `OpenAI Like API`）API 端点。此设置使您可以轻松在不同的 API 提供商之间切换或同时使用多个提供商，同时在容器更新、重建或重新部署之间保持配置。
 
 ## Docker Run
 
-Here's an example `docker run` command similar to what you might use for Open WebUI:
+以下是类似于您可能用于 Open WebUI 的 `docker run` 命令示例：
 ```bash
 docker run -d -p 3000:8080 \
   -v open-webui:/app/backend/data \
@@ -19,16 +19,16 @@ docker run -d -p 3000:8080 \
   --restart always \
   ghcr.io/open-webui/open-webui:main
 ```
-This command sets the following environment variables:
+此命令设置以下环境变量：
 
-* `OPENAI_API_BASE_URLS`: A list of API base URLs separated by semicolons (;). In this example, we use OpenAI and Mistral.
-* `OPENAI_API_KEYS`: A list of API keys corresponding to the base URLs specified in `OPENAI_API_BASE_URLS`. Make sure to replace `<OPENAI_API_KEY_1>` and `<OPENAI_API_KEY_2>` with your actual API keys.
+* `OPENAI_API_BASE_URLS`：由分号（;）分隔的 API 基本 URL 列表。在此示例中，我们使用 OpenAI 和 Mistral。
+* `OPENAI_API_KEYS`：与 `OPENAI_API_BASE_URLS` 中指定的基本 URL 相对应的 API 密钥列表。请确保将 `<OPENAI_API_KEY_1>` 和 `<OPENAI_API_KEY_2>` 替换为您的实际 API 密钥。
 
-You can adapt this command to your own needs, and add even more endpoint/key pairs, but make sure to include the environment variables as shown above.
+您可以根据自己的需求调整此命令，并添加更多端点/密钥对，但请确保按照上述示例包含环境变量。
 
 ## Docker Compose
 
-Alternatively, you can use a `docker-compose.yaml` file to define and run the Open WebUI container. Here's an abridged version of what that might look like:
+或者，您可以使用 `docker-compose.yaml` 文件来定义和运行 Open WebUI 容器。以下是可能的简化版本：
 ```yaml
 services:
   open-webui:
@@ -36,7 +36,7 @@ services:
       - 'OPENAI_API_BASE_URLS=${OPENAI_API_BASE_URLS}'
       - 'OPENAI_API_KEYS=${OPENAI_API_KEYS}'
 ```
-You can edit the `${VARIABLES}` directly, or optionally define the values of these variables in an `.env` file, which should be placed in the same directory as the `docker-compose.yaml` file:
+您可以直接编辑 `${VARIABLES}`，或者选择在 `.env` 文件中定义这些变量的值，该文件应放置在与 `docker-compose.yaml` 文件相同的目录中：
 ```ini
 OPENAI_API_BASE_URLS="https://api.openai.com/v1;https://api.mistral.ai/v1"
 OPENAI_API_KEYS="<OPENAI_API_KEY_1>;<OPENAI_API_KEY_2>"

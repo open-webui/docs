@@ -3,264 +3,244 @@ sidebar_position: 2
 title: "🚀 Getting Started"
 ---
 
-## How to Install 🚀
+## 如何安装 🚀
 
-:::info **Important Note on User Roles and Privacy**
+:::info **用户角色和隐私的重要说明**
 
-- **Admin Creation:** The very first account to sign up on Open WebUI will be granted **Administrator privileges**. This account will have comprehensive control over the platform, including user management and system settings.
+- **管理员创建：** Open WebUI 上注册的第一个帐户将被授予**管理员权限**。此帐户将对平台拥有全面控制权，包括用户管理和系统设置。
 
-- **User Registrations:** All subsequent users signing up will initially have their accounts set to **Pending** status by default. These accounts will require approval from the Administrator to gain access to the platform functionalities.
+- **用户注册：** 所有随后注册的用户将默认将其帐户状态设置为**待定**。这些帐户需要管理员批准才能访问平台功能。
 
-- **Privacy and Data Security:** We prioritize your privacy and data security above all. Please be reassured that all data entered into Open WebUI is stored locally on your device. Our system is designed to be privacy-first, ensuring that no external requests are made, and your data does not leave your local environment. We are committed to maintaining the highest standards of data privacy and security, ensuring that your information remains confidential and under your control.
+- **隐私和数据安全：** 我们将您的隐私和数据安全置于首位。请放心，所有输入到 Open WebUI 中的数据都存储在您的设备上。我们的系统旨在以隐私为先，确保不进行任何外部请求，且您的数据不会离开您的本地环境。我们致力于维护最高标准的数据隐私和安全，确保您的信息保持机密并在您的控制之下。
 
 :::
 
 <details>
-<summary>Before You Begin</summary>
-### Installing Docker
+<summary>开始之前</summary>
+### 安装 Docker
 
-#### For Windows and Mac Users:
+#### Windows 和 Mac 用户：
 
-- Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
-- Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
+- 从 [Docker 的官方网站](https://www.docker.com/products/docker-desktop) 下载 Docker Desktop。
+- 按照网站上提供的安装说明进行操作。安装完成后，打开 Docker Desktop 确保它正常运行。
 
-#### For Ubuntu Users:
-1. **Open your terminal.**
+#### Ubuntu 用户：
+1. **打开终端。**
 
-2. **Set up Docker's apt repository:**
-   - Update your package index:
+2. **设置 Docker 的 apt 仓库：**
+   - 更新您的软件包索引：
      ```bash
      sudo apt-get update
      ```
-   - Install packages to allow apt to use a repository over HTTPS:
+   - 安装允许 apt 使用 HTTPS 仓库的软件包：
      ```bash
      sudo apt-get install ca-certificates curl
      ```
-   - Create a directory for the Docker apt keyring:
+   - 为 Docker apt 密钥环创建一个目录：
      ```bash
      sudo install -m 0755 -d /etc/apt/keyrings
      ```
-   - Add Docker's official GPG key:
+   - 添加 Docker 的官方 GPG 密钥：
      ```bash
      sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
      sudo chmod a+r /etc/apt/keyrings/docker.asc
      ```
-   - Add the Docker repository to Apt sources:
+   - 将 Docker 仓库添加到 Apt 源中：
      ```bash
      echo \
        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
      ```
-     Note: If you're using an Ubuntu derivative distro, such as Linux Mint, you might need to use `UBUNTU_CODENAME` instead of `VERSION_CODENAME`.
-
-3. **Install Docker Engine:**
-   - Update your package index again:
+     注意：如果您使用 Ubuntu 派生版，例如 Linux Mint，您可能需要使用 `UBUNTU_CODENAME` 代替 `VERSION_CODENAME`。
+3. **安装 Docker 引擎：**
+   - 再次更新软件包索引：
      ```bash
      sudo apt-get update
      ```
-   - Install Docker Engine, CLI, and containerd:
+   - 安装 Docker 引擎、CLI 和 containerd：
      ```bash
      sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
      ```
 
-4. **Verify the Docker installation:**
-   - Use the following command to run a test image:
+4. **验证 Docker 安装：**
+   - 使用以下命令运行一个测试镜像：
      ```bash
      sudo docker run hello-world
      ```
-     This command downloads a test image and runs it in a container. If successful, it prints an informational message confirming that Docker is installed and working correctly.
+     此命令下载一个测试镜像并在容器中运行。如果成功，它将打印一个信息消息，确认 Docker 安装并正常工作。
 
-#### Other Linux Distributions:
+#### 其他 Linux 发行版：
 
-- For other Linux distributions, please refer to the [official Docker documentation](https://docs.docker.com/engine/install/) for installation instructions specific to your distro.
+- 对于其他 Linux 发行版，请参考 [官方 Docker 文档](https://docs.docker.com/engine/install/) 以获取特定于您的发行版的安装说明。
 
-### Ensure You Have the Latest Version of Ollama:
+### 确保您拥有最新版本的 Ollama：
 
-- Download the latest version from [https://ollama.com/](https://ollama.com/).
+- 从 [https://ollama.com/](https://ollama.com/) 下载最新版本。
 
-### Verify Ollama Installation:
+### 验证 Ollama 安装：
 
-- After installing Ollama, verify its functionality by accessing [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Note that the port number might be different based on your installation.
+- 安装 Ollama 后，请通过访问 [http://127.0.0.1:11434/](http://127.0.0.1:11434/) 在您的 Web 浏览器中验证其功能。请注意，端口号可能会根据您的安装而有所不同。
 
 </details>
 
-## One-line Command to Install Ollama and Open WebUI Together
+## 一行命令安装 Ollama 和 Open WebUI
 
-#### Using Docker Compose
+#### 使用 Docker Compose
 
-- If you don't have Ollama yet, use Docker Compose for easy installation. Run this command:
+- 如果您尚未安装 Ollama，请使用 Docker Compose 进行简单安装。运行以下命令：
 
   ```bash
   docker compose up -d --build
   ```
 
-- **For GPU Support:** Use an additional Docker Compose file:
+- **对于 GPU 支持：** 使用另一个 Docker Compose 文件：
 
   ```bash
   docker compose -f docker-compose.yaml -f docker-compose.gpu.yaml up -d --build
   ```
 
-- **To Expose Ollama API:** Use another Docker Compose file:
+- **公开 Ollama API：** 使用另一个 Docker Compose 文件：
 
   ```bash
   docker compose -f docker-compose.yaml -f docker-compose.api.yaml up -d --build
   ```
 
-#### Using `run-compose.sh` Script (Linux or Docker-Enabled WSL2 on Windows)
+#### 使用 `run-compose.sh` 脚本（Linux 或 Docker-Enabled WSL2 on Windows）
 
-- Give execute permission to the script:
+- 为脚本添加执行权限：
 
   ```bash
   chmod +x run-compose.sh
   ```
 
-- For CPU-only container:
+- 对于仅 CPU 的容器：
 
   ```bash
   ./run-compose.sh
   ```
 
-- For GPU support (read the note about GPU compatibility):
+- 对于 GPU 支持（请阅读关于 GPU 兼容性的注意事项）：
 
   ```bash
   ./run-compose.sh --enable-gpu
   ```
 
-- To build the latest local version, add `--build`:
+- 要构建最新的本地版本，请添加 `--build`：
 
   ```bash
   ./run-compose.sh --enable-gpu --build
   ```
 
-## Quick Start with Docker 🐳
+## 使用 Docker 快速开始 🐳
 
 :::info
-When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
+使用 Docker 安装 Open WebUI 时，请确保在 Docker 命令中包含 `-v open-webui:/app/backend/data`。这一步骤至关重要，因为它确保您的数据库正确挂载，避免数据丢失。
 :::
 
-- **If Ollama is on your computer**, use this command:
+- **如果 Ollama 在您的计算机上**，请使用此命令：
 
   ```bash
   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-- **If Ollama is on a Different Server**, use this command:
+- **如果 Ollama 在另一台服务器上**，请使用此命令：
 
-- To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL:
+- 要连接到另一台服务器上的 Ollama，请将 `OLLAMA_BASE_URL` 更改为服务器的 URL：
 
   ```bash
   docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-- After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+- 安装完成后，您可以在 [http://localhost:3000](http://localhost:3000) 访问 Open WebUI。享受！ 😄
 
-#### Open WebUI: Server Connection Error
+#### Open WebUI：服务器连接错误
 
-Encountering connection issues between the Open WebUI Docker container and the Ollama server? This problem often arises because distro-packaged versions of Docker—like those from the Ubuntu repository—do not support the `host.docker.internal` alias for reaching the host directly. Inside a container, referring to `localhost` or `127.0.0.1` typically points back to the container itself, not the host machine.
+在 Open WebUI Docker 容器和 Ollama 服务器之间遇到连接问题？这个问题经常出现，因为像来自 Ubuntu 仓库的 Docker 的打包版本不支持 `host.docker.internal` 别名直接访问主机。在容器内，引用 `localhost` 或 `127.0.0.1` 通常指向容器本身，而不是主机机器。
 
-To address this, we recommend using the `--network=host` flag in your Docker command. This flag allows the container to use the host's networking stack, effectively making `localhost` or `127.0.0.1` in the container refer to the host machine. As a result, the WebUI can successfully connect to the Ollama server at `127.0.0.1:11434`. Please note, with `--network=host`, the container's port configuration aligns directly with the host, changing the access link to `http://localhost:8080`.
+为解决此问题，我们建议在 Docker 命令中使用 `--network=host` 标志。此标志允许容器使用主机的网络堆栈，从而使容器中的 `localhost` 或 `127.0.0.1` 指向主机机器。结果，WebUI 可以成功连接到 `127.0.0.1:11434` 上的 Ollama 服务器。请注意，使用 `--network=host`，容器的端口配置直接与主机对齐，将访问链接更改为 `http://localhost:8080`。
 
-**Here's how you can modify your Docker command**:
+**以下是您如何修改 Docker 命令**：
 
 ```bash
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-For more details on networking in Docker and addressing common connectivity issues, visit our [FAQ page](/faq/). This page provides additional context and solutions for frequently encountered problems, ensuring a smoother operation of Open WebUI in various environments.
+有关 Docker 中的网络和解决常见连接问题的详细信息，请访问我们的 [FAQ 页面](/faq/)。此页面为不同环境中 Open WebUI 的顺利运行提供了额外的背景和解决方案。
 
-## Installing with Podman
+## 使用 Podman 安装
 
 <details>
-<summary>Rootless (Podman) local-only Open WebUI with Systemd service and auto-update</summary>
+<summary>Rootless（Podman）本地 Open WebUI 与 Systemd 服务和自动更新</summary>
 
-- **Important:** Consult the Docker documentation because much of the configuration and syntax is interchangeable with [Podman](https://github.com/containers/podman). See also [rootless_tutorial](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md). This example requires the [slirp4netns](https://github.com/rootless-containers/slirp4netns) network backend to facilitate server listen and Ollama communication over localhost only.
+- **重要提示：** 请参考 Docker 文档，因为很多配置和语法与 [Podman](https://github.com/containers/podman) 可互换。另请参阅 [rootless_tutorial](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md)。此示例需要 [slirp4netns](https://github.com/rootless-containers/slirp4netns) 网络后端，以便在仅限于 localhost 时促进服务器监听和 Ollama 通信。
 
-1. Pull the latest image:
+1. 拉取最新镜像：
    ```bash
    podman pull ghcr.io/open-webui/open-webui:main
    ```
-2. Create a new container using desired configuration:
+2. 使用所需配置创建新容器：
 
-   **Note:** `-p 127.0.0.1:3000:8080` ensures that we listen only on localhost, `--network slirp4netns:allow_host_loopback=true` permits the container to access Ollama when it also listens strictly on localhost. `--add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434'` adds a hosts record to the container and configures open-webui to use the friendly hostname. `10.0.2.2` is the default slirp4netns address used for localhost mapping. `--env 'ANONYMIZED_TELEMETRY=False'` isn't necessary since Chroma telemetry has been disabled in the code but is included as an example.
+   **注意：** `-p 127.0.0.1:3000:8080` 确保我们仅在 localhost 上监听，`--network slirp4netns:allow_host_loopback=true` 允许容器在 Ollama 也严格监听 localhost 时访问 Ollama。`--add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434'` 为容器添加主机记录并配置 open-webui 使用友好的主机名。`10.0.2.2` 是用于 localhost 映射的默认 slirp4netns 地址。`--env 'ANONYMIZED_TELEMETRY=False'` 不是必需的，因为 Chroma 遥测已在代码中禁用，但作为示例包含在内。
 
    ```bash
-   podman create -p 127.0.0.1:3000:8080 --network slirp4netns:allow_host_loopback=true --add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
+    podman create -p 127.0.0.1:3000:8080 --network slirp4netns:allow_host_loopback=true --add-host=ollama.local:10.0.2.2 --env 'OLLAMA_BASE_URL=http://ollama.local:11434' --env 'ANONYMIZED_TELEMETRY=False' -v open-webui:/app/backend/data --label io.containers.autoupdate=registry --name open-webui ghcr.io/open-webui/open-webui:main
    ```
-
-3. Prepare for systemd user service:
+3. 为 systemd 用户服务准备：
    ```bash
-   mkdir -p ~/.config/systemd/user/
-   ```
-4. Generate user service with Podman:
-   ```bash
-   podman generate systemd --new open-webui > ~/.config/systemd/user/open-webui.service
-   ```
-5. Reload systemd configuration:
-   ```bash
-   systemctl --user daemon-reload
-   ```
-6. Enable and validate new service:
-   ```bash
-   systemctl --user enable open-webui.service
-   systemctl --user start open-webui.service
-   systemctl --user status open-webui.service
-   ```
-7. Enable and validate Podman auto-update:
-   ```bash
-   systemctl --user enable podman-auto-update.timer
-   systemctl --user enable podman-auto-update.service
-   systemctl --user status podman-auto-update.timer
-   ```
-   Dry run with the following command (omit `--dry-run` to force an update):
-   ```bash
-   podman auto-update --dry-run
-   ```
-
+    mkdir -p ~/.config/systemd/user/
+    ```
+4. 使用 Podman 生成用户服务：
+    ```bash
+      podman generate systemd --new open-webui > ~/.config/systemd/user/open-webui.service
+    ```
+5. 重新加载 systemd 配置：
+    ```bash
+    systemctl --user daemon-reload
+    ```
+6. 启用和验证新服务：
+    ```bash
+    systemctl --user enable open-webui.service
+    systemctl --user start open-webui.service
+    systemctl --user status open-webui.service
+    ```
+7. 启用和验证 Podman 自动更新：
+    ```bash
+    systemctl --user enable podman-auto-update.timer
+    systemctl --user enable podman-auto-update.service
+    systemctl --user status podman-auto-update
+    ```
+    使用以下命令进行干预运行（省略 `--dry-run` 以强制更新）：
+    ```bash
+    podman auto-update --dry-run
+    ```
 </details>
 
-### Alternative Installation Methods
+### 其他安装方法
 
-For other ways to install, like using Kustomize or Helm, check out [INSTALLATION](/getting-started/installation). Join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s) for more help and information.
+要了解其他安装方法，例如使用 Kustomize 或 Helm，请查看 [INSTALLATION](/getting-started/installation)。加入我们的 [Open WebUI Discord 社区](https://discord.gg/5rJgQTnV4s) 获取更多帮助和信息。
 
-### Updating your Docker Installation
+### 更新 Docker 安装
 
-For detailed instructions on manually updating your local Docker installation of Open WebUI, including steps for those not using Watchtower and updates via Docker Compose, please refer to our dedicated guide: [UPDATING](/getting-started/updating).
+有关手动更新本地 Docker 安装的详细说明，包括不使用 Watchtower 和通过 Docker Compose 进行更新的步骤，请参考我们的专门指南：[UPDATING](/getting-started/updating)。
 
-For a quick update with Watchtower, use the command below. Remember to replace `open-webui` with your actual container name if it differs.
+要使用 Watchtower 进行快速更新，请使用以下命令。请记住，如果容器名称不同，请将 `open-webui` 替换为实际容器名称。
 
 ```bash
 docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
 ```
 
-In the last part of the command, replace `open-webui` with your container name if it is different.
+在命令的最后部分，如果您的容器名称不同，请用您的容器名称替换 `open-webui`。
 
 :::info
 
-After updating Open WebUI, you might need to refresh your browser cache to see the changes.
+更新 Open WebUI 后，您可能需要刷新浏览器缓存以查看更改。
 
 :::
 
-## How to Install Without Docker
+### 构建和安装 🛠️
 
-While we strongly recommend using our convenient Docker container installation for optimal support, we understand that some situations may require a non-Docker setup, especially for development purposes. Please note that non-Docker installations are not officially supported, and you might need to troubleshoot on your own.
-
-### Project Components
-
-Open WebUI consists of two primary components: the frontend and the backend (which serves as a reverse proxy, handling static frontend files, and additional features). Both need to be running concurrently for the development environment.
-
-:::info
-The backend is required for proper functionality
-:::
-
-### Requirements 📦
-
-- 🐰 [Node.js](https://nodejs.org/en) >= 20.10 or [Bun](https://bun.sh) >= 1.0.21
-- 🐍 [Python](https://python.org) >= 3.11
-
-### Build and Install 🛠️
-
-Run the following commands to install:
+运行以下命令以安装：
 
 ```sh
 git clone https://github.com/open-webui/open-webui.git
@@ -279,4 +259,4 @@ pip install -r requirements.txt -U
 bash start.sh
 ```
 
-You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
+您应该在 http://localhost:8080/ 上成功运行了 Open WebUI。享受！ 😄

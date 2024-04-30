@@ -1,54 +1,54 @@
 ---
 sidebar_position: 3
-title: "Image Generation"
+title: "图像生成"
 ---
 
-# Image Generation
+# 图像生成
 
-Open WebUI now supports image generation through two backends: **AUTOMATIC1111** and **OpenAI DALL·E**. This guide will help you set up and use both options.
+Open WebUI 现在通过两个后端支持图像生成：**AUTOMATIC1111** 和 **OpenAI DALL·E** 。本指南将帮助您设置和使用这两个选项。
 
 ## AUTOMATIC1111
 
-Open WebUI supports image generation through the **AUTOMATIC1111** [API](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API). Follow these steps to get started:
+Open WebUI 支持通过 **AUTOMATIC1111** [API](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API)进行图像生成。请按照以下步骤开始：
 
-### Initial Setup
+### 初始设置
 
-1. Ensure that you have [AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) installed.
-2. Launch AUTOMATIC1111 with additional flags to enable API access:
+1. 确保已安装 [AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) 。
+2. 使用附加标志启动 AUTOMATIC1111 以启用 API 访问：
    ```
    ./webui.sh --api --listen
    ```
-   For Docker installations of Open WebUI, use the `--listen` flag to allow connections outside of localhost.
+   对于 Open WebUI 的 Docker 安装，请使用 `--listen` 标志以允许 localhost 之外的连接。
 
-### Configuring Open WebUI
+### 配置 Open WebUI
 
-1. In Open WebUI, navigate to **Settings > Images**.
-2. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
+1. 在 Open WebUI 中，导航到 **设置 > 图像** 。 
+2. 在 API URL 字段中，输入 AUTOMATIC1111 的 API 可访问地址：
    ```
    http://<your_automatic1111_address>:7860
    ```
-   If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, use `host.docker.internal` as your address.
+   如果您在同一主机上运行 Open WebUI 和 AUTOMATIC1111 的 Docker 安装，请使用 `host.docker.internal` 作为地址。
 
 ## OpenAI DALL·E
 
-Open WebUI also supports image generation through the **OpenAI DALL·E APIs**. This option now includes a selector for choosing between DALL·E 2 and DALL·E 3, each supporting different image sizes.
+Open WebUI 也支持通过 **OpenAI DALL·E APIs** 进行图像生成。此选项现在包括一个选择器，可在 DALL·E 2 和 DALL·E 3 之间进行选择，每个选择支持不同的图像大小。
 
-### Initial Setup
+### 初始设置
 
-1. Obtain an [API key](https://platform.openai.com/api-keys) from OpenAI.
+1. 从 OpenAI 获取 [API 密钥](https://platform.openai.com/api-keys) 。
 
-### Configuring Open WebUI
+### 配置 Open WebUI
 
-1. In Open WebUI, navigate to **Settings > Images**.
-2. Select **OpenAI** as your image generation backend.
-3. Enter your OpenAI API key.
-4. Choose the DALL·E model you wish to use. Note that image size options will depend on the selected model:
-   - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
-   - **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
+1. 在 Open WebUI 中，导航到 **设置 > 图像** 。
+2. 选择 **OpenAI** 作为您的图像生成后端。
+3. 输入您的 OpenAI API 密钥。
+4. 选择您希望使用的 DALL·E 模型。请注意，图像大小选项将取决于所选的模型：
+   - **DALL·E 2**：支持 `256x256`、`512x512` 或 `1024x1024` 图像。
+   - **DALL·E 3**：支持 `1024x1024`、`1792x1024` 或 `1024x1792` 图像。
 
-## Using Image Generation
+## 使用图像生成
 
-![Image Generation Tutorial](/img/tutorial_image_generation.png)
+![图像生成教程](/img/tutorial_image_generation.png)
 
-1. First, use a text generation model to write a prompt for image generation.
-2. After the response has finished, you can click the Picture icon to generate an image.
+1. 首先，使用文本生成模型编写用于图像生成的提示。
+2. 在响应完成后，您可以单击图片图标生成图像。

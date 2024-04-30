@@ -122,16 +122,29 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
 
 #### Open WebUI: 服务器连接错误
 
-If you're experiencing connection issues, it’s often due to the WebUI docker container not being able to reach the Ollama server at 127.0.0.1:11434 (host.docker.internal:11434) inside the container . Use the `--network=host` flag in your docker command to resolve this. Note that the port changes from 3000 to 8080, resulting in the link: `http://localhost:8080`.
+<!-- If you're experiencing connection issues, it’s often due to the WebUI docker container not being able to reach the Ollama server at 127.0.0.1:11434 (host.docker.internal:11434) inside the container . Use the `--network=host` flag in your docker command to resolve this. Note that the port changes from 3000 to 8080, resulting in the link: `http://localhost:8080`. -->
 
-**Example Docker Command**:
+如果您遇到连接问题，通常是由于 WebUI docker 容器无法访问容器内 127.0.0.1：11434 （host.docker.internal：11434） 的 Ollama 服务器。使用 docker 命令中 --network=host 的标志来解决此问题。请注意，端口从 3000 更改为 8080，从而产生链接： `http://localhost:8080` .
+
+
+<!-- **Example Docker Command**: -->
+
+**示例 Docker 命令**：
 
 ```bash
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-## Troubleshooting
+<!-- ## Troubleshooting -->
 
-If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](/getting-started/troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s).
+## 故障排除
 
-Continue with the full [getting started guide](/getting-started).
+<!-- If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](/getting-started/troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s). -->
+
+如果您遇到诸如 "Open WebUI: 服务器连接错误" 等各种问题，请参阅 [TROUBLESHOOTING](/getting-started/troubleshooting) 以获取有关如何排除故障和/或加入我们的 [Open WebUI Discord 社区](https://discord.gg/5rJgQTnV4s) 的信息。
+
+<!-- Continue with the full [getting started guide](/getting-started). -->
+
+继续阅读完整的 [入门指南](/getting-started)。
+
+```

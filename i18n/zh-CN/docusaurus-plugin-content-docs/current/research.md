@@ -1,29 +1,29 @@
 ---
 sidebar_position: 8
 # title: "🧑‍🔬 Open WebUI for Research"
-title: "🧑‍🔬 用于研究的 Open WebUI"
+title: "🧑‍🔬 将 Open WebUI 用于研究"
 ---
 
-# 🧑‍🔬 Open WebUI for Research
+# Open WebUI 研究
 
-## Interested in Using Open WebUI for Research?
+## 感兴趣使用 Open WebUI 进行 研究？
 
-🔍 **Are you interested in leveraging Open WebUI for your research?** We're excited about the prospect of collaborating with you! Alongside our continuous work on maintaining the Open WebUI repository, we're keen on developing a customized pipeline featuring a tailored UI crafted specifically to fulfill your research needs.
+🔍 **您是否有兴趣利用 Open WebUI 进行研究？** 我们对与您合作的前景感到兴奋！除了我们持续维护 Open WebUI 存储库的工作外，我们还热衷于开发一个定制的流水线，其中包含专门为满足您的研究需求而设计的 UI。
 
-🧪 **Research-Centric Features:**
+🧪 **以研究为中心的功能：**
 
-- Our goal is to provide a comprehensive web UI catering to the demands of conducting user studies, especially in the dynamic fields of AI and HCI.
-- Features include surveys, analytics, and participant tracking, all meticulously crafted to streamline your research processes.
+- 我们的目标是提供一个全面的 Web UI，以满足进行用户研究的需求，特别是在 AI 和 HCI 领域。
+- 功能包括调查、分析和参与者跟踪，所有这些都经过精心设计，以简化您的研究流程。
 
-📈 **User Study Tools:**
+📈 **用户学习工具：**
 
-- We empower researchers with precision and accuracy by offering specialized tools such as heat maps and behavior tracking modules.
-- These tools are indispensable in capturing and analyzing intricate user behavior patterns.
+- 我们通过提供专业工具，如热图和行为跟踪模块，为研究人员提供精确度和准确性。
+- 这些工具是捕获和分析复杂用户行为模式的不可或缺的工具。
 
-Moreover, we are committed to supporting survey and analytics features. Our approach involves building custom pipelines, complete with an intuitive UI, tailored to the unique requirements of each project. We understand that one size does not fit all when it comes to research, and thus, our solutions are custom-made and exclusive to each case.
+此外，我们致力于支持调查和分析功能。我们的方法涉及构建定制流水线，配备直观的 UI，专门为每个项目的独特要求量身定制。我们理解，当涉及研究时，一刀切并不适用，因此，我们的解决方案是定制的，专为每种情况量身定制。
 
-Please note that for custom projects, we adhere to our regular rate as listed on the sponsorship page. Additionally, we kindly request being listed as one of the co-authors. This ensures that our collaboration yields the best possible outcome, leveraging my expertise as a core maintainer to deliver high-quality results. We provide continuous support throughout the project lifecycle to ensure smooth integration and satisfaction with the final deliverables.
+请注意，对于定制项目，我们遵循赞助页面上列出的常规费率。此外，我们要求被列为共同作者之一。这确保了我们的合作能够充分利用我的核心维护者专业知识，提供高质量的结果。我们在整个项目生命周期中提供持续支持，以确保最终交付物的顺利集成和满意度。
 
-However, we are open to exploring collaborative opportunities free of charge under certain circumstances, such as projects with significant potential for mutual benefit or those aligned with our research interests. So, don't hesitate to reach out if you're interested in collaborating!
+但是，在某些情况下，例如具有潜在互惠益处或与我们的研究兴趣相一致的项目，我们愿意探讨免费的合作机会。因此，如果您有兴趣合作，请随时联系！
 
-**Contact:** [jaeryang_baek[at]sfu[dot]ca](mailto:jaeryang_baek@sfu.ca)
+**联系方式：** [jaeryang_baek[at]sfu[dot]ca](mailto:jaeryang_baek@sfu.ca)

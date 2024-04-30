@@ -1,41 +1,41 @@
 ---
 sidebar_position: 4
-title: "LiteLLM Configuration"
+title: "LiteLLM 配置"
 ---
 
-# LiteLLM Configuration
+# LiteLLM 配置
 
-[LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
+[LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) 支持各种 API，包括 OpenAI 兼容和其他 API。要集成新的 API 模型，请按照以下说明：
 
-## Initial Setup
+## 初始设置
 
-To allow editing of your `config.yaml` file, use `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` to bind-mount it with your `docker run` command:
+要允许编辑您的 `config.yaml` 文件，请使用 `-v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml` 将其与 `docker run` 命令绑定挂载：
 
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -v /path/to/litellm/config.yaml:/app/backend/data/litellm/config.yaml --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-_Note: `config.yaml` does not need to exist on the host before running for the first time._
+_注意：在首次运行之前，主机上不需要存在 `config.yaml` 文件。_
 
-## Configuring Open WebUI
+## 配置 Open WebUI
 
-1. Go to the **Settings > Models > Manage LiteLLM Models**.
-2. In 'Simple' mode, you will only see the option to enter a **Model**.
-3. For additional configuration options, click on the 'Simple' toggle to switch to 'Advanced' mode. Here you can enter:
+1. 转到 **设置 > 模型 > 管理 LiteLLM 模型**。
+2. 在“简单”模式中，您只会看到输入 **模型** 的选项。
+3. 要获取附加配置选项，请单击“简单”切换以切换到“高级”模式。在这里，您可以输入：
 
-   - **Model Name**: The name of the model as you want it to appear in the models list.
-   - **API Base URL**: The base URL for your API provider. This field can usually be left blank unless your provider specifies a custom endpoint URL.
-   - **API Key**: Your unique API key. Replace with the key provided by your API provider.
-   - **API RPM**: The allowed requests per minute for your API. Replace with the appropriate value for your API plan.
+   - **模型名称**：您希望模型在模型列表中显示的名称。
+   - **API 基本 URL**：API 供应商的基本 URL。除非您的供应商指定自定义端点 URL，否则通常可以将此字段留空。
+   - **API 密钥**：您的唯一 API 密钥。用 API 供应商提供的密钥替换。
+   - **API RPM**：您的 API 允许的每分钟请求。用适用于您的 API 计划的适当值替换。
 
-4. After entering all the required information, click the '+' button to add the new model to LiteLLM.
+4. 在输入所有必需信息后，单击“+”按钮将新模型添加到 LiteLLM。
 
-## Examples
+## 示例
 
-_Ollama API (from inside Docker):_
+_Ollama API（从 Docker 内部）：_
 ![LiteLLM Config Ollama](/img/tutorial_litellm_ollama.png)
 
-_Gemini API (MakerSuite/AI Studio):_
+_Gemini API（MakerSuite/AI Studio）：_
 ![LiteLLM Config Gemini](/img/tutorial_litellm_gemini.png)
 
-Advanced configuration options not covered in the settings interface can be edited in the `config.yaml` file manually. For more information on the specific providers and advanced settings, consult the [LiteLLM Providers Documentation](https://litellm.vercel.app/docs/providers).
+在设置界面中未涵盖的高级配置选项可以在 `config.yaml` 文件中手动编辑。有关特定提供商和高级设置的更多信息，请参考 [LiteLLM 提供商文档](https://litellm.vercel.app/docs/providers)。

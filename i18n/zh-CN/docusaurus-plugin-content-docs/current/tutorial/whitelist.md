@@ -1,27 +1,27 @@
 ---
 sidebar_position: 5
-title: "Model Whitelisting"
+title: "模型白名单"
 ---
 
-# Model Whitelisting
+# 模型白名单
 
-Open WebUI allows you to filter specific models for use in your instance. This feature is especially useful for administrators who want to control which models are available to users. Filtering can be done through the WebUI or by adding environment variables to the backend.
+Open WebUI 允许您过滤特定模型以在您的实例中使用。此功能对于希望控制哪些模型对用户可用的管理员特别有用。可以通过 WebUI 进行过滤，也可以通过向后端添加环境变量来完成。
 
-## Filtering via WebUI
+## 通过 WebUI 进行过滤
 
-![Model Filter Configuration](/img/tutorial_model_filter.png)
+![模型过滤配置](/img/tutorial_model_filter.png)
 
-1. Go to **Admin Panel > Admin Settings**.
-2. In the **Manage Models** section, you can enable or disable the feature, and add or remove models from the whitelist.
-3. Click **Save** to apply your changes.
+1. 转到 **管理面板 > 管理设置**。
+2. 在 **管理模型** 部分，您可以启用或禁用该功能，并添加或从白名单中删除模型。
+3. 单击 **保存** 以应用更改。
 
-## Filtering via Environment Variables
+## 通过环境变量进行过滤
 
-You can also whitelist models by adding environment variables to the backend. This method is useful for automated deployments and can be done by adding the following environment variables to your `docker run` command:
+您还可以通过向后端添加环境变量来将模型添加到白名单中。此方法对于自动化部署非常有用，可以通过将以下环境变量添加到您的 `docker run` 命令来完成：
 
 ```bash
 -e MODEL_FILTER_ENABLED=True \
 -e MODEL_FILTER_LIST="llama2:13b;mistral:latest;gpt-3.5-turbo" \
 ```
 
-In this example, the `MODEL_FILTER_ENABLED` variable is set to `True` to enable the feature, and the `MODEL_FILTER_LIST` variable lists the models to be whitelisted. The format for the `MODEL_FILTER_LIST` variable is `model_name:version;model_name:version;...`.
+在此示例中，`MODEL_FILTER_ENABLED` 变量设置为 `True` 以启用该功能，`MODEL_FILTER_LIST` 变量列出要列入白名单的模型。`MODEL_FILTER_LIST` 变量的格式为 `model_name:version;model_name:version;...`。

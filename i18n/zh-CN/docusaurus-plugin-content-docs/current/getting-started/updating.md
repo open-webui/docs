@@ -1,120 +1,121 @@
-# Updating
+# 更新
 
-## Updating your Docker Installation
+## 更新您的 Docker 镜像
 
-Keeping your Open WebUI Docker installation up-to-date ensures you have the latest features and security updates. You can update your installation manually or use [Watchtower](https://containrrr.dev/watchtower/) for automatic updates.
+确保您的 Open WebUI Docker 镜像安装保持最新，以确保您拥有最新的功能和安全更新。您可以手动更新您的安装，或使用 [Watchtower](https://containrrr.dev/watchtower/) 进行自动更新。
 
-### Manual Update
+### 手动更新
 
-Follow these steps to manually update your Open WebUI:
+按照以下步骤手动更新您的 Open WebUI：
 
-1. **Pull the Latest Docker Image**:
+1. **拉取最新的 Docker 镜像**：
    ```bash
    docker pull ghcr.io/open-webui/open-webui:main
    ```
 
-2. **Stop and Remove the Existing Container**:
-   - This step ensures that you can create a new container from the updated image.
+2. **停止并删除现有容器**：
+   - 此步骤确保您可以从更新后的镜像创建新容器。
    ```bash
    docker stop open-webui
    docker rm open-webui
    ```
 
-3. **Create a New Container with the Updated Image**:
-   - Use the same `docker run` command you used initially to create the container, ensuring all your configurations remain the same.
+3. **使用更新后的镜像创建新容器**：
+   - 使用您最初用来创建容器的相同 `docker run` 命令，确保所有配置保持不变。
    ```bash
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
-This process updates your Open WebUI container to the latest version while preserving your data stored in Docker volumes.
+这个过程将您的 Open WebUI 容器更新到最新版本，同时保留您存储在 Docker 卷中的数据。
 
-### Updating with Watchtower
+### 使用 Watchtower 更新
 
-For those who prefer automated updates, Watchtower can monitor your Open WebUI container and automatically update it to the latest version. You have two options with Watchtower: running it once for an immediate update, or deploying it persistently to automate future updates.
+对于那些喜欢自动更新的人，Watchtower 可以监视您的 Open WebUI 容器并自动更新到最新版本。您有两种选择：运行一次以立即更新，或部署为持续自动化未来更新。
 
-#### Running Watchtower Once
+#### 运行一次 Watchtower
 
-To update your container immediately without keeping Watchtower running continuously, use the following command. Replace `open-webui` with your container name if it differs.
+要立即更新容器而不持续运行 Watchtower，请使用以下命令。如果容器名称不同，请将 `open-webui` 替换为您的容器名称。
 
 ```bash
 docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
 ```
 
-#### Deploying Watchtower Persistently
+#### 持续部署 Watchtower
 
-If you prefer Watchtower to continuously monitor and update your container whenever a new version is available, you can run Watchtower as a persistent service. This method ensures your Open WebUI always stays up to date without any manual intervention. Use the command below to deploy Watchtower in this manner:
+如果您希望 Watchtower 持续监视并更新容器，无论何时有新版本可用，您可以将 Watchtower 作为持续服务运行。这种方法确保您的 Open WebUI 始终保持最新，无需任何手动干预。使用以下命令以这种方式部署 Watchtower：
 
 ```bash
 docker run -d --name watchtower --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower open-webui
 ```
 
-Remember to replace `open-webui` with the name of your container if you have named it differently. This configuration allows you to benefit from the latest improvements and security patches with minimal downtime and manual effort.
+请记住，如果您的容器名称不同，请将 `open-webui` 替换为您的容器名称。这种配置允许您从最新的改进和安全补丁中获益，同时最大限度地减少停机时间和手动工作。
 
-### Updating Docker Compose Installation
+### 更新 Docker Compose 安装
 
-If you installed Open WebUI using Docker Compose, follow these steps to update:
+如果您使用 Docker Compose 安装 Open WebUI，请按照以下步骤更新：
 
-1. **Pull the Latest Images**:
-   - This command fetches the latest versions of the images specified in your `docker-compose.yml` files.
+1. **拉取最新镜像**：
+   - 此命令获取 `docker-compose.yml` 文件中指定的镜像的最新版本。
    ```bash
    docker compose pull
    ```
 
-2. **Recreate the Containers with the Latest Images**:
-   - This command recreates the containers based on the newly pulled images, ensuring your installation is up-to-date. No build step is required for updates.
+2. **使用最新镜像重新创建容器**：
+   - 此命令基于新拉取的镜像重新创建容器，确保您的安装是最新的。更新不需要构建步骤。
    ```bash
    docker compose up -d
    ```
 
-This method ensures your Docker Compose-based installation of Open WebUI (and any associated services, like Ollama) is updated efficiently and without the need for manual container management.
+这种方法确保您的 Open WebUI 的 Docker Compose 安装（以及任何相关服务，如 Ollama）高效更新，无需手动管理容器。
 
-## Updating Your Direct Install
+## 更新您的直接安装
 
-For those who have installed Open WebUI directly without using Docker, updates are just as important to ensure access to the latest features and security patches. Remember, direct installations are not officially supported, and you might need to troubleshoot on your own. Here's how to update your installation:
+对于直接安装 Open WebUI 而未使用 Docker 的用户，更新同样重要，以确保访问最新功能和安全补丁。请记住，直接安装不受官方支持，您可能需要自行解决问题。以下是更新安装的方法：
 
-### Pull the Latest Changes
+### 拉取最新更改
 
-Navigate to your Open WebUI project directory and pull the latest changes from the repository:
+导航到您的 Open WebUI 项目目录，并从存储库中拉取最新更改：
 
 ```sh
 cd path/to/open-webui/
 git pull origin main
 ```
 
-Replace `path/to/open-webui/` with the actual path to your Open WebUI installation.
+将 `path/to/open-webui/` 替换为您的 Open WebUI 安装的实际路径。
 
-### Update Dependencies
+### 更新依赖项
 
-After pulling the latest changes, update your project dependencies. This step ensures that both frontend and backend dependencies are up to date.
+拉取最新更改后，更新项目依赖项。此步骤确保前端和后端依赖项都是最新的。
 
-- **For Node.js (Frontend):**
+- **对于 Node.js（前端）**：
 
 ```sh
 npm install
 npm run build
 ```
 
-- **For Python (Backend):**
+- **对于 Python（后端）**：
 
 ```sh
 cd backend
 pip install -r requirements.txt -U
 ```
 
-### Restart the Backend Server
+### 重新启动后端服务器
 
-To apply the updates, you need to restart the backend server. If you have a running instance, stop it first and then start it again using the provided script.
+为了应用更新，您需要重新启动后端服务器。如果有正在运行的实例，请先停止它，然后再使用提供的脚本启动它。
 
 ```sh
 bash start.sh
 ```
 
-This command should be run from within the `backend` directory of your Open WebUI project.
+此命令应该在您的 Open WebUI 项目的 `backend` 目录中运行。
 
 :::info
 
-Direct installations require more manual effort to update compared to Docker-based installations. If you frequently need updates and want to streamline the process, consider transitioning to a Docker-based setup for easier management.
+与基于 Docker 的安装相比，直接安装需要更多手动工作来更新。如果您经常需要更新并希望简化流程，请考虑过渡到基于 Docker 的设置以更轻松地管理。
 
 :::
 
-By following these steps, you can update your direct installation of Open WebUI, ensuring you're running the latest version with all its benefits. Remember to back up any critical data or custom configurations before starting the update process to prevent any unintended loss.
+通过按照这些步骤，您可以更新 Open WebUI 的直接安装，确保您运行最新版本并获得所有好处。在开始更新过程之前，请记得备份任何关键数据或自定义配置，以防发生意外损失。
+

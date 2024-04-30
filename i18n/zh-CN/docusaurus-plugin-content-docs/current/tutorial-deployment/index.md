@@ -10,7 +10,7 @@ title: "☁️  部署"
 
 # **Seeking Contributors!**
 
-👋 Calling all youtubers! Want to showcase Open WebUI's features in a video? We'll feature it at the top of our guide section!
+👋 呼叫所有的 YouTuber！想要在视频中展示 Open WebUI 的功能？我们将在我们的指南部分顶部展示它！
 :::
 
 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/syR0fT0rkgY?si=UusLnKSvU1HGjtyc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>

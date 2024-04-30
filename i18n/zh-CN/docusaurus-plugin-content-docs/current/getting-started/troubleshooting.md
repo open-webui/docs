@@ -1,70 +1,70 @@
-# Troubleshooting
+# 故障排除
 
-## Understanding the Open WebUI Architecture
+## 理解 Open WebUI 架构
 
-The Open WebUI system is designed to streamline interactions between the client (your browser) and the Ollama API. At the heart of this design is a backend reverse proxy, enhancing security and resolving CORS issues.
+Open WebUI 系统旨在简化客户端（您的浏览器）与 Ollama API 之间的交互。这一设计的核心是后端反向代理，可增强安全性并解决 CORS 问题。
 
-- **How it Works**: The Open WebUI is designed to interact with the Ollama API through a specific route. When a request is made from the WebUI to Ollama, it is not directly sent to the Ollama API. Initially, the request is sent to the Open WebUI backend via `/ollama` route. From there, the backend is responsible for forwarding the request to the Ollama API. This forwarding is accomplished by using the route specified in the `OLLAMA_BASE_URL` environment variable. Therefore, a request made to `/ollama` in the WebUI is effectively the same as making a request to `OLLAMA_BASE_URL` in the backend. For instance, a request to `/ollama/api/tags` in the WebUI is equivalent to `OLLAMA_BASE_URL/api/tags` in the backend.
+- **工作原理**：Open WebUI 旨在通过特定路由与 Ollama API 进行交互。当 WebUI 向 Ollama 发出请求时，请求不会直接发送到 Ollama API。最初，请求将通过 `/ollama` 路由发送到 Open WebUI 后端。从那里，后端负责将请求转发到 Ollama API。这通过使用 `OLLAMA_BASE_URL` 环境变量中指定的路由来完成。因此，在 WebUI 中对 `/ollama` 的请求实际上等同于在后端中对 `OLLAMA_BASE_URL` 的请求。例如，WebUI 中对 `/ollama/api/tags` 的请求等同于在后端中对 `OLLAMA_BASE_URL/api/tags` 的请求。
 
-- **Security Benefits**: This design prevents direct exposure of the Ollama API to the frontend, safeguarding against potential CORS (Cross-Origin Resource Sharing) issues and unauthorized access. Requiring authentication to access the Ollama API further enhances this security layer.
+- **安全性优势**：此设计防止了直接将 Ollama API 暴露给前端，从而防止潜在的 CORS（跨源资源共享）问题和未经授权的访问。要求进行身份验证以访问 Ollama API 进一步增强了此安全层。
 
-## Open WebUI: Server Connection Error
+## Open WebUI：服务器连接错误
 
-If you're experiencing connection issues, it’s often due to the WebUI docker container not being able to reach the Ollama server at 127.0.0.1:11434 (host.docker.internal:11434) inside the container . Use the `--network=host` flag in your docker command to resolve this. Note that the port changes from 3000 to 8080, resulting in the link: `http://localhost:8080`.
+如果您遇到连接问题，通常是由于 WebUI docker 容器无法访问容器内 127.0.0.1：11434 （host.docker.internal：11434） 的 Ollama 服务器。使用 docker 命令中 --network=host 的标志来解决此问题。请注意，端口从 3000 更改为 8080，从而产生链接： http://localhost:8080 .
 
-**Example Docker Command**:
+**示例 Docker 命令**：
 
 ```bash
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-If you're experiencing connection issues with the SSL error of huggingface.co, please checked the huggingface server, if it is down, you could set the `HF_ENDPOINT` to `https://hf-mirror.com/` in the `docker run` command.
+如果您遇到 SSL 错误的连接问题 huggingface.co，请检查 huggingface 服务器，如果它宕机，您可以在 `docker run` 命令中将 `HF_ENDPOINT` 设置为 `https://hf-mirror.com/`。
 
 ```bash
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-### General Connection Errors
+### 通用连接错误
 
-**Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
+**确保 Ollama 版本是最新的**：始终从 Ollama 的官方网站查看您是否具有最新版本。获取最新更新。
 
-**Troubleshooting Steps**:
+**故障排除步骤**：
 
-1. **Verify Ollama URL Format**:
-   - When running the Web UI container, ensure the `OLLAMA_BASE_URL` is correctly set. (e.g., `http://192.168.1.1:11434` for different host setups).
-   - In the Open WebUI, navigate to "Settings" > "General".
-   - Confirm that the Ollama Server URL is correctly set to `[OLLAMA URL]` (e.g., `http://localhost:11434`).
+1. **验证 Ollama URL 格式**：
+   - 运行 Web UI 容器时，请确保正确设置。 OLLAMA_BASE_URL （例如， `http://192.168.1.1:11434` 对于不同的主机设置）。
+   - 在 Open WebUI 中，导航到“设置”>“常规”。
+   - 确认 Ollama 服务器 URL 已正确设置为 `[OLLAMA URL]` （例如， `http://localhost:11434` ）。
 
-By following these enhanced troubleshooting steps, connection issues should be effectively resolved. For further assistance or queries, feel free to reach out to us on our community Discord.
+通过遵循这些增强的故障排除步骤，连接问题应有效解决。如需进一步协助或查询，请随时在我们的社区 Discord 上与我们联系。
 
-## Reset Admin Password
+## 重置管理员密码
 
-If you've forgotten your admin password, you can reset it by following these steps:
+如果您忘记了管理员密码，可以按照以下步骤重置密码：
 
-### Reset Admin Password in Docker
+### 在 Docker 中重置管理员密码
 
-To reset the admin password for Open WebUI in a Docker deployment, generate a bcrypt hash of your new password and run a Docker command to update the database. Replace `your-new-password` with the desired password and execute:
+要在 Docker 部署中重置 Open WebUI 的管理员密码，请生成新密码的 bcrypt 哈希并运行 Docker 命令以更新数据库。用所需的密码替换 `your-new-password` 并执行：
 
-1. **Generate bcrypt hash** (local machine):
+1. **生成 bcrypt 哈希**（本地机器）：
    ```bash
    htpasswd -bnBC 10 "" your-new-password | tr -d ':\n'
    ```
 
-2. **Update password in Docker** (replace `HASH` and `admin@example.com`):
+2. **在 Docker 中更新密码**（替换 `HASH` 和 `admin@example.com` ）：
    ```bash
    docker run --rm -v open-webui:/data alpine/socat EXEC:"bash -c 'apk add sqlite && echo UPDATE auth SET password='\''HASH'\'' WHERE email='\''admin@example.com'\''; | sqlite3 /data/webui.db'", STDIO
    ```
 
-### Reset Admin Password Locally
+### 本地重置管理员密码
 
-For local installations of Open WebUI, navigate to the `open-webui` directory and update the password in the `backend/data/webui.db` database.
+对于 Open WebUI 的本地安装，请转到 `open-webui` 目录并在 `backend/data/webui.db` 数据库中更新密码。
 
-1. **Generate bcrypt hash** (local machine):
+1. **生成 bcrypt 哈希**（本地机器）：
    ```bash
    htpasswd -bnBC 10 "" your-new-password | tr -d ':\n'
    ```
 
-2. **Update password locally** (replace `HASH` and `admin@example.com`):
+2. **在本地更新密码**（替换 `HASH` 和 `admin@example.com`）：
    ```bash
    sqlite3 backend/data/webui.db "UPDATE auth SET password='HASH' WHERE email='admin@example.com';"
    ```
