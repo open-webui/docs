@@ -128,36 +128,11 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
 
 #### Nvidia CUDA
 
-To run Ollama with Nvidia GPU support, utilize the Nvidia-docker tool for GPU access, and set the appropriate environment variables for CUDA support:
+To run Open WebUI with Nvidia GPU support:
 
 ```bash
-docker run -d -p 3000:8080 \
---gpus all \
---add-host=host.docker.internal:host-gateway \
---volume open-webui:/app/backend/data \
---name open-webui \
---restart always \
-ghcr.io/open-webui/open-webui:main
+docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
 ```
-
-#### AMD ROCm
-
-To run Ollama with AMD GPU support, set the `HSA_OVERRIDE_GFX_VERSION` environment variable and ensure the Docker container can access the GPU:
-
-```bash
-docker run -d -p 3000:8080 \
--e HSA_OVERRIDE_GFX_VERSION=11.0.0 \
---device /dev/kfd \
---device /dev/dri \
---group-add video \
---add-host=host.docker.internal:host-gateway \
---volume open-webui:/app/backend/data \
---name open-webui \
---restart always \
-ghcr.io/open-webui/open-webui:main
-```
-
-Replace `HSA_OVERRIDE_GFX_VERSION=11.0.0` with the version appropriate for your AMD GPU model as described in the earlier sections. This command ensures compatibility and optimal performance with AMD GPUs.
 
 #### Open WebUI: Server Connection Error
 
