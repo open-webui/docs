@@ -108,7 +108,13 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-### Installing Both Open WebUI and Ollama Together
+- **To run Open WebUI with Nvidia GPU support**, use this command:
+
+  ```bash
+  docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+  ```
+
+### Installing Ollama
 
 - **With GPU Support**, Use this command:
 
@@ -122,19 +128,9 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
   ```
 
-- After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
-### GPU Support
-
-#### Nvidia CUDA
-
-To run Open WebUI with Nvidia GPU support:
-
-```bash
-docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
-```
-
-#### Open WebUI: Server Connection Error
+### Open WebUI: Server Connection Error
 
 Encountering connection issues between the Open WebUI Docker container and the Ollama server? This problem often arises because distro-packaged versions of Docker—like those from the Ubuntu repository—do not support the `host.docker.internal` alias for reaching the host directly. Inside a container, referring to `localhost` or `127.0.0.1` typically points back to the container itself, not the host machine.
 
@@ -158,7 +154,7 @@ For more details on networking in Docker and addressing common connectivity issu
   docker compose up -d --build
   ```
 
-- **For GPU Support:** Use an additional Docker Compose file:
+- **For Nvidia GPU Support:** Use an additional Docker Compose file:
 
   ```bash
   docker compose -f docker-compose.yaml -f docker-compose.gpu.yaml up -d --build
