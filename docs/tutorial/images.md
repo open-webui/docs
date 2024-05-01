@@ -20,7 +20,7 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
    ```
 3. For Docker installation of WebUI with the environment variables preset, use the following command:
    ```
-   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e IMAGE_GENERATION_ENABLED=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
 ### Configuring Open WebUI
@@ -49,7 +49,7 @@ ComfyUI provides an alternative interface for managing and interacting with imag
    ```
 3. For Docker installation of WebUI with the environment variables preset, use the following command:
    ```
-   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e COMFYUI_BASE_URL=http://host.docker.internal:7860/ -e IMAGE_GENERATION_ENABLED=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e COMFYUI_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
 ### Configuring Open WebUI
