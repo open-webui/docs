@@ -5,7 +5,7 @@
 Here is a list of supported environment variables used by `backend/config.py` intended to provide Open WebUI startup configurability. See also the [logging environment variables](/getting-started/logging#appbackend).
 
 | Environment Variable              | App/Backend                                                                                                      |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+|-----------------------------------|------------------------------------------------------------------------------------------------------------------|
 | `AUTOMATIC1111_BASE_URL`          | URL to Automatic1111's Stable Diffusion API.                                                                     |
 | `COMFYUI_BASE_URL`                | URL to ComfyUI image generation API.                                                                             |
 | `CUSTOM_NAME`                     | Sets `WEBUI_NAME` but polls _api.openwebui.com_ for metadata                                                     |
@@ -18,7 +18,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 | `ENV`                             | Environment setting, default: `"dev"`                                                                            |
 | `FRONTEND_BUILD_DIR`              | Location of the built frontend files, default: `../build`                                                        |
 | `K8S_FLAG`                        | Support Kubernetes style Ollama hostname `.svc.cluster.local`                                                    |
-| `ENABLE_MODEL_FILTER`            | Toggle Language Model filtering, default: `"False"`                                                              |
+| `ENABLE_MODEL_FILTER`             | Toggle Language Model filtering, default: `"False"`                                                              |
 | `MODEL_FILTER_LIST`               | Set Language Model filter list, semicolon separated: `"llama3:instruct;gemma:instruct"`                          |
 | `OLLAMA_API_BASE_URL`             | Deprecated, see `OLLAMA_BASE_URL`                                                                                |
 | `OLLAMA_BASE_URL`                 | Configure Ollama backend URL, default: `"http://localhost:11434"`                                                |
@@ -30,6 +30,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 | `PORT`                            | Port to run Open WebUI from, default: `8080`                                                                     |
 | `RAG_EMBEDDING_MODEL_AUTO_UPDATE` | Toggle automatic update of the Sentence-Transformer model, default: `False`                                      |
 | `RAG_EMBEDDING_MODEL`             | Configure a Sentence-Transformer model, default: `"all-MiniLM-L6-v2"`                                            |
+| `RAG_BYPASS_SSL_VERIFY`           | Bypass SSL Verification for RAG on Websites, default: `False`                                                    |
 | `USE_CUDA_DOCKER`                 | Build docker image with NVIDIA CUDA support, default: `False`                                                    |
 | `USE_OLLAMA_DOCKER`               | Build Docker image with bundled Ollama instance, default: `"false"`                                              |
 | `USER_PERMISSIONS_CHAT_DELETION`  | Toggle user permission to delete chats, default: `"True"`                                                        |
