@@ -24,6 +24,14 @@ If you're experiencing connection issues with the SSL error of huggingface.co, p
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+If you're using Podman on MacOS, to reach Ollama running on your computer you must enable the host loopback with `--network slirp4netns:allow_host_loopback=true` and override `OLLAMA_BASE_URL` to `http://host.containers.internal:11434`. The Open WebUI link remains the default: `http://localhost:3000`.
+
+**Example Podman Command**:
+
+```bash
+podman run -d --network slirp4netns:allow_host_loopback=true -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
 ### General Connection Errors
 
 **Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
