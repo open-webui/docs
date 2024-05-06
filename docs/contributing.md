@@ -38,6 +38,8 @@ Help us make Open WebUI more accessible by improving documentation, writing tuto
 
 Help us make Open WebUI available to a wider audience. In this section, we'll guide you through the process of adding new translations to the project.
 
+#### Translations and Internationalization of Open WebUI
+
 We use JSON files to store translations. You can find the existing translation files in the `src/lib/i18n/locales` directory. Each directory corresponds to a specific language, for example, `en-US` for English (US), `fr-FR` for French (France) and so on. You can refer to [ISO 639 Language Codes](http://www.lingoes.net/en/translator/langcode.htm) to find the appropriate code for a specific language.
 
 To add a new language:
@@ -45,6 +47,22 @@ To add a new language:
 - Create a new directory in the `src/lib/i18n/locales` path with the appropriate language code as its name. For instance, if you're adding translations for Spanish (Spain), create a new directory named `es-ES`.
 - Copy the American English translation file(s) (from `en-US` directory in `src/lib/i18n/locale`) to this new directory and update the string values in JSON format according to your language. Make sure to preserve the structure of the JSON object.
 - Add the language code and its respective title to languages file at `src/lib/i18n/locales/languages.json`.
+
+#### Translations and Internationalization of Open WebUI Documentation
+
+:::tip 📚 TIPS
+
+For the latest version of doc, only the english version will be monitored and kept up-to-date by the maintainers.
+
+:::
+
+You can find the existing translation files in the `i18n` directory. Each directory corresponds to a specific language, for example, `zh-CN` for Simple Chinese. You can refer to [ISO 639 Language Codes](http://www.lingoes.net/en/translator/langcode.htm) to find the appropriate code for a specific language.
+
+To add a new language:
+
+- Create a new directory in the `i18n` path with the appropriate language code as its name. For instance, if you're adding translations for Spanish (Spain), create a new directory named `es-ES`.
+- Copy the English version file(s) (from `docs` directory) to this new directory and update the string values in JSON format according to your language. Make sure to preserve the structure of the JSON object.
+- Add the language code and its respective title to `config.i18n` at `docusaurus.config.js`.
 
 ### 🤔 Questions & Feedback
 
