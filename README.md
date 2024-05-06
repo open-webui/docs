@@ -16,6 +16,12 @@ $ yarn start
 
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
+```
+yarn start --locale zh-CN
+```
+
+To run the website in a specific language, use the `--locale` flag. For example, to run the website in Simple Chinese:
+
 ### Build
 
 ```
