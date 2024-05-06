@@ -19,7 +19,7 @@ Remote sources acheived with `#` followed by the target URL. Open WebUI fetches 
 
 ## Document parsing
 
-Local and remote documents have content extract with a variety of parsers. For more, see the (get_loader function code)[https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328].
+A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
 
 ## RAG Template Customisation
 
