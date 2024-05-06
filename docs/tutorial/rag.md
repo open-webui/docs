@@ -13,7 +13,7 @@ Local documents must first be uploaded via the Documents section.
  
 ### Sourcing  from the Web
 
-Remote sources acheived with `#` followed by the target URL. Open WebUI fetches and parses the URL.
+Remote sources are achieved with `#` followed by the target URL. Open WebUI fetches and parses the URL.
 
 > **Tip:** Webpages often include extraneous information such as navigation and footer. Link to a raw or reader-friendly version of the page for better results.
 
