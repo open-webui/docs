@@ -114,19 +114,25 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
   ```
 
-### Installing Ollama
+### Installing Open WebUI with Bundled Ollama Support
 
-- **With GPU Support**, Use this command:
+This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
+
+- **With GPU Support**:
+  Utilize GPU resources by running the following command:
 
   ```bash
   docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
   ```
 
-- **For CPU Only**, Use this command:
+- **For CPU Only**:
+  If you're not using a GPU, use this command instead:
 
   ```bash
   docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
   ```
+
+Both commands facilitate a built-in, hassle-free installation of both Open WebUI and Ollama, ensuring that you can get everything up and running swiftly.
 
 After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
