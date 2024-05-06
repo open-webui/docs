@@ -20,7 +20,7 @@ This command starts a local development server and opens up a browser window. Mo
 yarn start --locale zh-CN
 ```
 
-To run the website in a specific language, use the `--locale` flag. For example, to run the website in Simple Chinese:
+To run the website in a specific language, use the `--locale` flag. For example, to run the website in Simple Chinese.
 
 ### Build
 
