@@ -6,6 +6,14 @@ title: 🏡 Open WebUI 介绍
 hide_title: true
 ---
 
+:::tip 📚 文档说明
+
+本文档是 Open WebUI 的中文翻译版本。请注意，Open WebUI 的最新版本的文档只有英文版本会由维护者监控并保持最新。
+
+简体中文版本由 [ArthurDarkstone](https://github.com/ArthurDarkstone) 翻译，由于翻译者水平有限，可能会有翻译错误或不准确的地方，欢迎提交 PR 或 Issue 进行改进。
+
+:::
+
 # Open WebUI
 
 **Open WebUI 是一个可扩展、功能丰富且用户友好的自托管 WebUI，完全离线运行。** 它支持各种 LLM 运行器，包括 Ollama 和兼容 OpenAI 的 API。
@@ -146,5 +154,3 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 <!-- Continue with the full [getting started guide](/getting-started). -->
 
 继续阅读完整的 [入门指南](/getting-started)。
-
-```
