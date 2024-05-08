@@ -125,8 +125,8 @@ volumes:
 
 [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) is an authenticating reverse proxy that implements social OAuth providers and OIDC support.
 
-Given the large number of potential configurations, below is only an toy example and should not be used in production.
-Please refer to `oauth2-proxy`'s documentation for detailed setup.
+Given the large number of potential configurations, below is an example of a potential setup with Google OAuth.
+Please refer to `oauth2-proxy`'s documentation for detailed setup and any potential security gotchas.
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -140,36 +140,19 @@ services:
     restart: unless-stopped
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
-    command: --config /oauth2-proxy.cfg --alpha-config /oauth2-proxy.yaml
-    hostname: oauth2-proxy
-    volumes:
-      - "./oauth2-proxy.yaml:/oauth2-proxy.yaml"
-      - "./oauth2-proxy.cfg:/oauth2-proxy.cfg"
+    environment:
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_UPSTREAMS: http://open-webui:8080/
+      OAUTH2_PROXY_PROVIDER: google
+      OAUTH2_PROXY_CLIENT_ID: REPLACEME_OAUTH_CLIENT_ID
+      OAUTH2_PROXY_CLIENT_SECRET: REPLACEME_OAUTH_CLIENT_ID
+      OAUTH2_PROXY_EMAIL_DOMAINS: REPLACEME_ALLOWED_EMAIL_DOMAINS
+      OAUTH2_PROXY_REDIRECT_URL: REPLACEME_OAUTH_CALLBACK_URL
+      OAUTH2_PROXY_COOKIE_SECRET: REPLACEME_COOKIE_SECRET
+      OAUTH2_PROXY_COOKIE_SECURE: "false"
     restart: unless-stopped
     ports:
       - 4180:4180/tcp
-```
-
-```yaml title="oauth2-proxy.yaml"
-upstreams:
-  - id: open-webui
-    path: /
-    uri: http://open-webui:8080
-injectRequestHeaders:
-  - name: X-Forwarded-Email
-    values:
-      - claim: email
-providers:
-# Provide a list of providers to use for authentication
-# https://oauth2-proxy.github.io/oauth2-proxy/configuration/providers/
-```
-
-```cfg title="oauth2-proxy.cfg"
-http_address="0.0.0.0:4180"
-cookie_secret="REPLACE_ME_WITH_A_REAL_SECRET"
-email_domains="example.com"
-cookie_secure="false"
-redirect_url="http://localhost:4180/oauth2/callback"
 ```
 
 ## Authelia
