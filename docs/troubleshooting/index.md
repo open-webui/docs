@@ -37,7 +37,36 @@ If you're using Podman on MacOS, to reach Ollama running on your computer you mu
 podman run -d --network slirp4netns:allow_host_loopback=true -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-### Network Diagrams of different deployments
+## Difficulty Accessing Ollama from Open WebUI
+
+If you're encountering difficulties accessing Ollama from the Open WebUI interface, it could be due to Ollama being configured to listen on a restricted network interface by default. To enable access from the Open WebUI, you need to configure Ollama to listen on a broader range of network interfaces.
+
+Follow these steps to adjust the Ollama configuration:
+
+1. **Configure Ollama Host**: Set the `OLLAMA_HOST` environment variable to `0.0.0.0`. This tells Ollama to listen on all available network interfaces, enabling connections from external sources, including the Open WebUI.
+
+2. **Modify Ollama Environment Variables**: Depending on how you're running Ollama, you may need to adjust the environment variables accordingly. If you're running Ollama in a Docker container, ensure that the `OLLAMA_HOST` variable is correctly set within the container environment. For other deployment methods, refer to the respective documentation for instructions on setting environment variables.
+
+3. **Restart Ollama**: After modifying the environment variables, restart the Ollama service to apply the changes. This ensures that Ollama begins listening on the specified network interfaces.
+
+Once Ollama is configured to listen on `0.0.0.0`, you should be able to access it from the Open WebUI without any issues.
+
+For detailed instructions on setting environment variables for Ollama, refer to the [official Ollama documentation](https://github.com/ollama/ollama/blob/main/docs/faq.md#setting-environment-variables-on-linux).
+
+## General Connection Errors
+
+**Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
+
+**Troubleshooting Steps**:
+
+1. **Verify Ollama URL Format**:
+   - When running the Web UI container, ensure the `OLLAMA_BASE_URL` is correctly set. (e.g., `http://192.168.1.1:11434` for different host setups).
+   - In the Open WebUI, navigate to "Settings" > "General".
+   - Confirm that the Ollama Server URL is correctly set to `[OLLAMA URL]` (e.g., `http://localhost:11434`).
+
+By following these enhanced troubleshooting steps, connection issues should be effectively resolved. For further assistance or queries, feel free to reach out to us on our community Discord.
+
+## Network Diagrams of different deployments
 
 #### Mac OS/Windows - Ollama on Host, Open WebUI in container
 
@@ -205,19 +234,6 @@ C4Context
    UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 
 ```
-
-### General Connection Errors
-
-**Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
-
-**Troubleshooting Steps**:
-
-1. **Verify Ollama URL Format**:
-   - When running the Web UI container, ensure the `OLLAMA_BASE_URL` is correctly set. (e.g., `http://192.168.1.1:11434` for different host setups).
-   - In the Open WebUI, navigate to "Settings" > "General".
-   - Confirm that the Ollama Server URL is correctly set to `[OLLAMA URL]` (e.g., `http://localhost:11434`).
-
-By following these enhanced troubleshooting steps, connection issues should be effectively resolved. For further assistance or queries, feel free to reach out to us on our community Discord.
 
 ## Reset Admin Password
 
