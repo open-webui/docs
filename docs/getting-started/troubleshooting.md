@@ -32,6 +32,176 @@ If you're using Podman on MacOS, to reach Ollama running on your computer you mu
 podman run -d --network slirp4netns:allow_host_loopback=true -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+### Network Diagrams of different deployments
+
+#### Mac OS/Windows - Ollama on Host, Open WebUI in container
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Mac OS/Windows") {
+      Person(user, "User")
+
+      Boundary(b1, "Docker Desktop's Linux VM") {
+         Component(openwebui, "Open WebUI", "Listening on port 8080")
+      }
+
+      Component(ollama, "Ollama", "Listening on port 11434")
+   }
+   
+   Rel(openwebui, ollama, "Makes API calls via Docker proxy", "http://host.docker.internal:11434")
+   Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Mac OS/Windows - Ollama and Open WebUI in the same Compose stack
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Mac OS/Windows") {
+      Person(user, "User")
+
+      Boundary(b1, "Docker Desktop's Linux VM") {
+         Boundary(b2, "Compose Stack") {
+            Component(openwebui, "Open WebUI", "Listening on port 8080")
+            Component(ollama, "Ollama", "Listening on port 11434")
+         }
+      }
+   }
+
+   
+   Rel(openwebui, ollama, "Makes API calls via inter-container networking", "http://ollama:11434")
+   UpdateRelStyle(openwebui, ollama, $offsetX="-100", $offsetY="-50")
+   Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Mac OS/Windows - Ollama and Open WebUI in containers, in different networks
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Mac OS/Windows") {
+      Person(user, "User")
+
+      Boundary(b1, "Docker Desktop's Linux VM") {
+         Boundary(b2, "Network A") {
+            Component(openwebui, "Open WebUI", "Listening on port 8080")
+         }
+         Boundary(b3, "Network B") {
+            Component(ollama, "Ollama", "Listening on port 11434")
+         }
+      }
+   }
+
+   
+   Rel(openwebui, ollama, "Unable to connect")
+   Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Mac OS/Windows - Open WebUI in host network
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Mac OS/Windows") {
+      Person(user, "User")
+
+      Boundary(b1, "Docker Desktop's Linux VM") {
+        Component(openwebui, "Open WebUI", "Listening on port 8080")
+      }
+   }
+
+   
+   Rel(user, openwebui, "Unable to connect, host network is the VM's network")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Linux - Ollama on Host, Open WebUI in container
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Linux") {
+      Person(user, "User")
+
+      Boundary(b1, "Container Network") {
+         Component(openwebui, "Open WebUI", "Listening on port 8080")
+      }
+
+      Component(ollama, "Ollama", "Listening on port 11434")
+   }
+   
+   Rel(openwebui, ollama, "Makes API calls via Docker proxy", "http://host.docker.internal:11434")
+   Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Linux - Ollama and Open WebUI in the same Compose stack
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Linux") {
+      Person(user, "User")
+
+      Boundary(b1, "Container Network") {
+         Boundary(b2, "Compose Stack") {
+            Component(openwebui, "Open WebUI", "Listening on port 8080")
+            Component(ollama, "Ollama", "Listening on port 11434")
+         }
+      }
+   }
+
+   
+   Rel(openwebui, ollama, "Makes API calls via inter-container networking", "http://ollama:11434")
+   UpdateRelStyle(openwebui, ollama, $offsetX="-100", $offsetY="-50")
+   Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Linux - Ollama and Open WebUI in containers, in different networks
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Linux") {
+      Person(user, "User")
+
+      Boundary(b2, "Container Network A") {
+         Component(openwebui, "Open WebUI", "Listening on port 8080")
+      }
+      Boundary(b3, "Container Network B") {
+         Component(ollama, "Ollama", "Listening on port 11434")
+      }
+   }
+
+   
+   Rel(openwebui, ollama, "Unable to connect")
+   Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+#### Linux - Open WebUI in host network, Ollama on host
+
+```mermaid
+C4Context
+   Boundary(b0, "Hosting Machine - Linux") {
+      Person(user, "User")
+
+      Component(openwebui, "Open WebUI", "Listening on port 8080")
+      Component(ollama, "Ollama", "Listening on port 11434")
+   }
+
+   Rel(openwebui, ollama, "Makes API calls via localhost", "http://localhost:11434")
+   Rel(user, openwebui, "Makes requests via listening port", "http://localhost:8080")
+   UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+
+```
+
+
 ### General Connection Errors
 
 **Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
