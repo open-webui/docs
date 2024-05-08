@@ -39,3 +39,21 @@ Here is a list of supported environment variables used by `backend/config.py` in
 | `WEBUI_SECRET_KEY`                | Override randomly generated string used for JSON Web Token                                                       |
 | `WEBUI_VERSION`                   | Override WebUI version, default: `"v1.0.0-alpha.100"`                                                            |
 | `WHISPER_MODEL_AUTO_UPDATE`       | Toggle automatic update of the Whisper model, default: `False`                                                   |
+
+### Mail-related
+
+| Environment Variable              | App/Backend/Mail                                                                                                 |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `FRONTEND_URL`                    | URL to the frontend app, example: `https://mydomain.com`. Required for the "forgot your password" flow.          |
+| `ENABLE_MAIL`                     | Toggle mail-based communication. It requires the following env variables to be defined, default: `False`         |
+| `MAIL_USERNAME`                   | Username for email, some email hosts separates username from the default sender(AWS). (If you service does not provide username use sender address for connection.) |
+| `MAIL_PASSWORD`                   | Password for authentication                                                                                      |
+| `MAIL_SERVER`                     | SMTP Mail server.                                                                                                |
+| `MAIL_STARTTLS`                   | For STARTTLS connections                                                                                         |
+| `MAIL_SSL_TLS`                    | For connecting over TLS/SSL                                                                                      |
+| `MAIL_DEBUG`                      | Debug mode for while sending mails, defaults 0.                                                                  |
+| `MAIL_FROM`                       | Sender address                                                                                                   |
+| `MAIL_FROM_NAME`                  | Title for Mail                                                                                                   |
+| `SUPPRESS_SEND`                   | To mock sending out mail, defaults 0.                                                                            |
+| `USE_CREDENTIALS`                 | Defaults to True. However it enables users to choose whether or not to login to their SMTP server.               |
+| `VALIDATE_CERTS`                  | Defaults to True. It enables to choose whether to verify the mail server's certificate                           |
