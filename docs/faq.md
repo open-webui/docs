@@ -7,7 +7,7 @@ title: "📋 FAQ"
 
 ### Table of Contents
 
-- [Q:  Why am I asked to sign up? Where are my data being sent to?](#q-why-am-i-asked-to-sign-up-where-are-my-data-being-sent-to)
+- [Q: Why am I asked to sign up? Where are my data being sent to?](#q-why-am-i-asked-to-sign-up-where-are-my-data-being-sent-to)
 - [Q: Why can't my Docker container connect to services on the host using `localhost`?](#q-why-cant-my-docker-container-connect-to-services-on-the-host-using-localhost)
 - [Q: How do I make my host's services accessible to Docker containers?](#q-how-do-i-make-my-hosts-services-accessible-to-docker-containers)
 - [Q: Why isn't my Open WebUI updating? I've re-pulled/restarted the container, and nothing changed.](#q-why-isnt-my-open-webui-updating-ive-re-pulledrestarted-the-container-and-nothing-changed)
@@ -26,11 +26,11 @@ title: "📋 FAQ"
 
 **A:** We require you to sign up to become the admin user for enhanced security. This ensures that if the Open WebUI is ever exposed to external access, your data remains secure. It's important to note that everything is kept local. We do not collect your data. When you sign up, all information stays within your server and never leaves your device. Your privacy and security are our top priorities, ensuring that your data remains under your control at all times.
 
-#### **Q: Why can't my Docker container connect to services on the host using `localhost`?**  
+#### **Q: Why can't my Docker container connect to services on the host using `localhost`?**
 
 **A:** Inside a Docker container, `localhost` refers to the container itself, not the host machine. This distinction is crucial for networking. To establish a connection from your container to services running on the host, you should use the DNS name `host.docker.internal` instead of `localhost`. This DNS name is specially recognized by Docker to facilitate such connections, effectively treating the host as a reachable entity from within the container, thus bypassing the usual `localhost` scope limitation.
 
-#### **Q: How do I make my host's services accessible to Docker containers?**  
+#### **Q: How do I make my host's services accessible to Docker containers?**
 
 **A:** To make services running on the host accessible to Docker containers, configure these services to listen on all network interfaces, using the IP address `0.0.0.0`, instead of `127.0.0.1` which is limited to `localhost` only. This configuration allows the services to accept connections from any IP address, including Docker containers. It's important to be aware of the security implications of this setup, especially when operating in environments with potential external access. Implementing appropriate security measures, such as firewalls and authentication, can help mitigate risks.
 
@@ -87,7 +87,7 @@ Everything you need to run Open WebUI, including your data, remains within your 
 
 #### **Q: I tried to login and couldn't, made a new account and now I'm being told my account needs to be activated by an admin.**
 
-**A:** This situation occurs when you forget the password for the initial admin account created during the first setup. The first account is automatically designated as the admin account. Creating a new account without access to the admin account will result in the need for admin activation. Avoiding the loss of the initial admin account credentials is crucial for seamless access and management of Open WebUI. See the [Resetting the Admin Password](getting-started/troubleshooting#reset-admin-password) guide for instructions on recovering the admin account.
+**A:** This situation occurs when you forget the password for the initial admin account created during the first setup. The first account is automatically designated as the admin account. Creating a new account without access to the admin account will result in the need for admin activation. Avoiding the loss of the initial admin account credentials is crucial for seamless access and management of Open WebUI. See the [Resetting the Admin Password](troubleshooting#reset-admin-password) guide for instructions on recovering the admin account.
 
 #### **Q: Why does the WebUI project can't be started with ssl error?**
 
