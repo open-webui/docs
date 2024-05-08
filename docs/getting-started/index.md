@@ -341,7 +341,7 @@ The backend is required for proper functionality
 
 ### Requirements 📦
 
-- 🐰 [Node.js](https://nodejs.org/en) >= 20.10 or [Bun](https://bun.sh) >= 1.0.21
+- 🐰 [Node.js](https://nodejs.org/en) >= 20.10
 - 🐍 [Python](https://python.org) >= 3.11
 
 ### Build and Install 🛠️
