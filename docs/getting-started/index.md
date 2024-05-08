@@ -5,19 +5,9 @@ title: "🚀 Getting Started"
 
 ## How to Install 🚀
 
-:::info **Important Note on User Roles and Privacy**
-
-- **Admin Creation:** The very first account to sign up on Open WebUI will be granted **Administrator privileges**. This account will have comprehensive control over the platform, including user management and system settings.
-
-- **User Registrations:** All subsequent users signing up will initially have their accounts set to **Pending** status by default. These accounts will require approval from the Administrator to gain access to the platform functionalities.
-
-- **Privacy and Data Security:** We prioritize your privacy and data security above all. Please be reassured that all data entered into Open WebUI is stored locally on your device. Our system is designed to be privacy-first, ensuring that no external requests are made, and your data does not leave your local environment. We are committed to maintaining the highest standards of data privacy and security, ensuring that your information remains confidential and under your control.
-
-:::
-
 <details>
 <summary>Before You Begin</summary>
-### Installing Docker
+#### Installing Docker
 
 #### For Windows and Mac Users:
 
@@ -78,21 +68,33 @@ title: "🚀 Getting Started"
 
 - For other Linux distributions, please refer to the [official Docker documentation](https://docs.docker.com/engine/install/) for installation instructions specific to your distro.
 
-### Ensure You Have the Latest Version of Ollama:
+#### Ensure You Have the Latest Version of Ollama:
 
 - Download the latest version from [https://ollama.com/](https://ollama.com/).
 
-### Verify Ollama Installation:
+#### Verify Ollama Installation:
 
 - After installing Ollama, verify its functionality by accessing [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Note that the port number might be different based on your installation.
 
 </details>
 
+:::info **Important Note on User Roles and Privacy**
+
+- **Admin Creation:** The very first account to sign up on Open WebUI will be granted **Administrator privileges**. This account will have comprehensive control over the platform, including user management and system settings.
+
+- **User Registrations:** All subsequent users signing up will initially have their accounts set to **Pending** status by default. These accounts will require approval from the Administrator to gain access to the platform functionalities.
+
+- **Privacy and Data Security:** We prioritize your privacy and data security above all. Please be reassured that all data entered into Open WebUI is stored locally on your device. Our system is designed to be privacy-first, ensuring that no external requests are made, and your data does not leave your local environment. We are committed to maintaining the highest standards of data privacy and security, ensuring that your information remains confidential and under your control.
+
+:::
+
 ## Quick Start with Docker 🐳
 
-:::info
+:::warning
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 :::
+
+### Installation with Default Configuration
 
 - **If Ollama is on your computer**, use this command:
 
@@ -108,10 +110,18 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-- **To run Open WebUI with Nvidia GPU support**, use this command:
+  - **To run Open WebUI with Nvidia GPU support**, use this command:
 
   ```bash
   docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+  ```
+
+### Installation for OpenAI API Usage Only
+
+- **If you're only using OpenAI API**, use this command:
+
+  ```bash
+  docker run -d -p 3000:8080 -e OPENAI_API_KEY=your_secret_key -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
 ### Installing Open WebUI with Bundled Ollama Support
