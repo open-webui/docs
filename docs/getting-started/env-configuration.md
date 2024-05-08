@@ -19,7 +19,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 ### `WEBUI_AUTH`
 
 - Default Setting: `True`
-- Description: This setting enables or disables authentication. It's important to note that it only work on fresh installations without any existing users. If you attempt to disable authentication when users already exist, you'll encounter an error message indicating that it's not possible. Ensure that no users are present in the database if you intend to turn off `WEBUI_AUTH`.
+- Description: This setting enables or disables authentication. If set to False, authentication is disabled. However, it's important to note that turning off authentication is only possible for fresh installations without any existing users. If there are already users registered, you cannot disable authentication directly. Ensure that no users are present in the database if you intend to turn off `WEBUI_AUTH`.
 
 #### `WEBUI_NAME`
 
