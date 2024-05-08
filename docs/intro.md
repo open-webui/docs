@@ -80,8 +80,22 @@ Both commands facilitate a built-in, hassle-free installation of both Open WebUI
 
 After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
+### Other Installation Methods
+
+We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
+
 ## Troubleshooting
 
 If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s).
+
+## Keeping Your Docker Installation Up-to-Date
+
+In case you want to update your local Docker installation to the latest version, you can do it with [Watchtower](https://containrrr.dev/watchtower/):
+
+```bash
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+```
+
+In the last part of the command, replace `open-webui` with your container name if it is different.
 
 Continue with the full [getting started guide](/getting-started).
