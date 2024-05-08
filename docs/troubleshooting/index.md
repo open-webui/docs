@@ -1,3 +1,8 @@
+---
+sidebar_position: 3
+title: "🛠️ Troubleshooting"
+---
+
 # Troubleshooting
 
 ## Understanding the Open WebUI Architecture
@@ -47,7 +52,7 @@ C4Context
 
       Component(ollama, "Ollama", "Listening on port 11434")
    }
-   
+
    Rel(openwebui, ollama, "Makes API calls via Docker proxy", "http://host.docker.internal:11434")
    Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
    UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
@@ -69,7 +74,7 @@ C4Context
       }
    }
 
-   
+
    Rel(openwebui, ollama, "Makes API calls via inter-container networking", "http://ollama:11434")
    UpdateRelStyle(openwebui, ollama, $offsetX="-100", $offsetY="-50")
    Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
@@ -94,7 +99,7 @@ C4Context
       }
    }
 
-   
+
    Rel(openwebui, ollama, "Unable to connect")
    Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
    UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
@@ -113,7 +118,7 @@ C4Context
       }
    }
 
-   
+
    Rel(user, openwebui, "Unable to connect, host network is the VM's network")
    UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 
@@ -132,7 +137,7 @@ C4Context
 
       Component(ollama, "Ollama", "Listening on port 11434")
    }
-   
+
    Rel(openwebui, ollama, "Makes API calls via Docker proxy", "http://host.docker.internal:11434")
    Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
    UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
@@ -154,7 +159,7 @@ C4Context
       }
    }
 
-   
+
    Rel(openwebui, ollama, "Makes API calls via inter-container networking", "http://ollama:11434")
    UpdateRelStyle(openwebui, ollama, $offsetX="-100", $offsetY="-50")
    Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
@@ -177,7 +182,7 @@ C4Context
       }
    }
 
-   
+
    Rel(openwebui, ollama, "Unable to connect")
    Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://localhost:3000")
    UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
@@ -201,7 +206,6 @@ C4Context
 
 ```
 
-
 ### General Connection Errors
 
 **Ensure Ollama Version is Up-to-Date**: Always start by checking that you have the latest version of Ollama. Visit [Ollama's official site](https://ollama.com/) for the latest updates.
@@ -224,6 +228,7 @@ If you've forgotten your admin password, you can reset it by following these ste
 To reset the admin password for Open WebUI in a Docker deployment, generate a bcrypt hash of your new password and run a Docker command to update the database. Replace `your-new-password` with the desired password and execute:
 
 1. **Generate bcrypt hash** (local machine):
+
    ```bash
    htpasswd -bnBC 10 "" your-new-password | tr -d ':\n'
    ```
@@ -238,6 +243,7 @@ To reset the admin password for Open WebUI in a Docker deployment, generate a bc
 For local installations of Open WebUI, navigate to the `open-webui` directory and update the password in the `backend/data/webui.db` database.
 
 1. **Generate bcrypt hash** (local machine):
+
    ```bash
    htpasswd -bnBC 10 "" your-new-password | tr -d ':\n'
    ```

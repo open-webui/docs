@@ -150,7 +150,7 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 
 For more details on networking in Docker and addressing common connectivity issues, visit our [FAQ page](/faq/). This page provides additional context and solutions for frequently encountered problems, ensuring a smoother operation of Open WebUI in various environments.
 
-## One-line Command to Install Ollama and Open WebUI Together
+## Docker Compose
 
 #### Using Docker Compose
 
