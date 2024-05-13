@@ -55,6 +55,11 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `True`
 - Description: Toggles user account creation.
 
+#### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
+
+- Default: `True`
+- Description: Bypass SSL Verification for RAG on Websites.
+
 #### `DEFAULT_MODELS`
 
 - Description: Sets a default Language Model.
