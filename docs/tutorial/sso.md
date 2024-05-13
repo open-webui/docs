@@ -107,7 +107,7 @@ services:
       - open-webui:/app/backend/data
     environment:
       - HOST=127.0.0.1
-      - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=Tailscale-User-Login
+      - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=Cf-Access-Authenticated-User-Email
     restart: unless-stopped
   cloudflared:
     image: cloudflare/cloudflared:latest
