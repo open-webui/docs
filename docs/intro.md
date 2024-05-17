@@ -88,7 +88,9 @@ We offer various installation alternatives, including non-Docker native installa
 
 If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s).
 
-## Keeping Your Docker Installation Up-to-Date
+## Updating
+
+Check out our full [updating guide](/getting-started/updating).
 
 In case you want to update your local Docker installation to the latest version, you can do it with [Watchtower](https://containrrr.dev/watchtower/):
 
