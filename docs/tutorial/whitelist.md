@@ -20,7 +20,7 @@ Open WebUI allows you to filter specific models for use in your instance. This f
 You can also whitelist models by adding environment variables to the backend. This method is useful for automated deployments and can be done by adding the following environment variables to your `docker run` command:
 
 ```bash
--e MODEL_FILTER_ENABLED=True \
+-e ENABLE_MODEL_FILTER=True \
 -e MODEL_FILTER_LIST="llama2:13b;mistral:latest;gpt-3.5-turbo" \
 ```
 
