@@ -24,4 +24,4 @@ You can also whitelist models by adding environment variables to the backend. Th
 -e MODEL_FILTER_LIST="llama2:13b;mistral:latest;gpt-3.5-turbo" \
 ```
 
-In this example, the `MODEL_FILTER_ENABLED` variable is set to `True` to enable the feature, and the `MODEL_FILTER_LIST` variable lists the models to be whitelisted. The format for the `MODEL_FILTER_LIST` variable is `model_name:version;model_name:version;...`.
+In this example, the `ENABLE_MODEL_FILTER` variable is set to `True` to enable the feature, and the `MODEL_FILTER_LIST` variable lists the models to be whitelisted. The format for the `MODEL_FILTER_LIST` variable is `model_name:version;model_name:version;...`.
