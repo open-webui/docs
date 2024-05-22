@@ -365,14 +365,18 @@ cd open-webui/
 # Copying required .env file
 cp -RPp .env.example .env
 
-# Building Frontend Using Node
-npm i
-npm run build
+# Building Frontend and Backend
+pip install .
 
-# Serving Frontend with the Backend
-cd ./backend
-pip install -r requirements.txt -U
-bash start.sh
+# Serve the backend
+open-webui serve
+```
+
+Or you can install from Pypi.org
+
+```sh
+pip install open-webui
+open-webui serve
 ```
 
 You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
