@@ -25,4 +25,4 @@ Please note that for custom projects, we adhere to our regular rate as listed on
 
 However, we are open to exploring collaborative opportunities free of charge under certain circumstances, such as projects with significant potential for mutual benefit or those aligned with our research interests. So, don't hesitate to reach out if you're interested in collaborating!
 
-**Contact:** [jaeryang_baek[at]sfu[dot]ca](mailto:jaeryang_baek@sfu.ca)
+**Contact:** [tim[at]openwebui[dot]com](mailto:tim@openwebui.com)
