@@ -58,6 +58,10 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 -e OPENAI_API_KEY=your_secret_key -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
+#### Disabling Login for Single User
+
+If you want to disable login for a single-user setup, set `WEBUI_AUTH` to `False`. This will bypass the login page. (Note: you cannot switch between single-user mode and multi-account mode after this change.)
+
 ### Installing Open WebUI with Bundled Ollama Support
 
 This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
