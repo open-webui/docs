@@ -22,20 +22,30 @@ hide_title: true
 
 ![Open WebUI Demo](/img/demo.gif)
 
-## Quick Start with Docker 🐳 (Recommended)
+:::info **Important Note on User Roles and Privacy:**
 
-:::warning
-When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
+- **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
+
+- **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
+
+- **Privacy and Data Security:** **All your data**, including login details, is **locally stored** on your device. Open WebUI ensures **strict confidentiality** and **no external requests** for enhanced privacy and security.
+
 :::
 
-:::info
+## Quick Start with Docker 🐳 (Recommended)
+
+:::tip
 
 #### Disabling Login for Single User
 
-If you want to disable login for a single-user setup, set `WEBUI_AUTH` to `False`. This will bypass the login page.
+If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](/getting-started/env-configuration) to `False`. This will bypass the login page.
 
-**Important**: You cannot switch between single-user mode and multi-account mode after this change.
+:::warning
+You cannot switch between single-user mode and multi-account mode after this change.
+:::
 
+:::danger
+When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 :::
 
 ### Installation with Default Configuration
