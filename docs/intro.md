@@ -22,7 +22,7 @@ hide_title: true
 
 ![Open WebUI Demo](/img/demo.gif)
 
-## Quick Start with Docker 🐳
+## Quick Start with Docker 🐳 (Recommended)
 
 :::warning
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
@@ -83,6 +83,26 @@ This installation method uses a single container image that bundles Open WebUI w
 Both commands facilitate a built-in, hassle-free installation of both Open WebUI and Ollama, ensuring that you can get everything up and running swiftly.
 
 After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+
+## Installation with `pip` (Beta)
+
+For users who prefer to use Python's package manager `pip`, Open WebUI offers a installation method. Python 3.11 is required for this method.
+
+1. **Install Open WebUI**:
+   Open your terminal and run the following command:
+
+   ```bash
+   pip install open-webui
+   ```
+
+2. **Start Open WebUI**:
+   Once installed, start the server using:
+
+   ```bash
+   open-webui serve
+   ```
+
+This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
 
 ### Other Installation Methods
 
