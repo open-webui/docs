@@ -88,7 +88,7 @@ title: "🚀 Getting Started"
 
 :::
 
-## Quick Start with Docker 🐳
+## Quick Start with Docker 🐳 (Recommended)
 
 :::warning
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
@@ -146,19 +146,61 @@ Both commands facilitate a built-in, hassle-free installation of both Open WebUI
 
 After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
-### Open WebUI: Server Connection Error
+## Manual Installation
 
-Encountering connection issues between the Open WebUI Docker container and the Ollama server? This problem often arises because distro-packaged versions of Docker—like those from the Ubuntu repository—do not support the `host.docker.internal` alias for reaching the host directly. Inside a container, referring to `localhost` or `127.0.0.1` typically points back to the container itself, not the host machine.
+### Installation with `pip` (Beta)
 
-To address this, we recommend using the `--network=host` flag in your Docker command. This flag allows the container to use the host's networking stack, effectively making `localhost` or `127.0.0.1` in the container refer to the host machine. As a result, the WebUI can successfully connect to the Ollama server at `127.0.0.1:11434`. Please note, with `--network=host`, the container's port configuration aligns directly with the host, changing the access link to `http://localhost:8080`.
+For users who prefer to use Python's package manager `pip`, Open WebUI offers a installation method. Python 3.11 is required for this method.
 
-**Here's how you can modify your Docker command**:
+1. **Install Open WebUI**:
+   Open your terminal and run the following command:
 
-```bash
-docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   ```bash
+   pip install open-webui
+   ```
+
+2. **Start Open WebUI**:
+   Once installed, start the server using:
+
+   ```bash
+   open-webui serve
+   ```
+
+This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
+
+### Install from Github Repo
+
+:::info
+Open WebUI consists of two primary components: the frontend and the backend (which serves as a reverse proxy, handling static frontend files, and additional features). Both need to be running concurrently for the development environment.
+:::
+
+#### Requirements 📦
+
+- 🐰 [Node.js](https://nodejs.org/en) >= 20.10
+- 🐍 [Python](https://python.org) >= 3.11
+
+#### Build and Install 🛠️
+
+Run the following commands to install:
+
+```sh
+git clone https://github.com/open-webui/open-webui.git
+cd open-webui/
+
+# Copying required .env file
+cp -RPp .env.example .env
+
+# Building Frontend Using Node
+npm i
+npm run build
+
+# Serving Frontend with the Backend
+cd ./backend
+pip install -r requirements.txt -U
+bash start.sh
 ```
 
-For more details on networking in Docker and addressing common connectivity issues, visit our [FAQ page](/faq/). This page provides additional context and solutions for frequently encountered problems, ensuring a smoother operation of Open WebUI in various environments.
+You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
 
 ## Docker Compose
 
@@ -336,43 +378,3 @@ In the last part of the command, replace `open-webui` with your container name i
 After updating Open WebUI, you might need to refresh your browser cache to see the changes.
 
 :::
-
-## How to Install Without Docker
-
-While we strongly recommend using our convenient Docker container installation for optimal support, we understand that some situations may require a non-Docker setup, especially for development purposes. Please note that non-Docker installations are not officially supported, and you might need to troubleshoot on your own.
-
-### Project Components
-
-Open WebUI consists of two primary components: the frontend and the backend (which serves as a reverse proxy, handling static frontend files, and additional features). Both need to be running concurrently for the development environment.
-
-:::info
-The backend is required for proper functionality
-:::
-
-### Requirements 📦
-
-- 🐰 [Node.js](https://nodejs.org/en) >= 20.10
-- 🐍 [Python](https://python.org) >= 3.11
-
-### Build and Install 🛠️
-
-Run the following commands to install:
-
-```sh
-git clone https://github.com/open-webui/open-webui.git
-cd open-webui/
-
-# Copying required .env file
-cp -RPp .env.example .env
-
-# Building Frontend Using Node
-npm i
-npm run build
-
-# Serving Frontend with the Backend
-cd ./backend
-pip install -r requirements.txt -U
-bash start.sh
-```
-
-You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄

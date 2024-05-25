@@ -28,6 +28,16 @@ hide_title: true
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 :::
 
+:::info
+
+#### Disabling Login for Single User
+
+If you want to disable login for a single-user setup, set `WEBUI_AUTH` to `False`. This will bypass the login page.
+
+**Important**: You cannot switch between single-user mode and multi-account mode after this change.
+
+:::
+
 ### Installation with Default Configuration
 
 - **If Ollama is on your computer**, use this command:
@@ -58,10 +68,6 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
   docker run -d -p 3000:8080 -e OPENAI_API_KEY=your_secret_key -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-#### Disabling Login for Single User
-
-If you want to disable login for a single-user setup, set `WEBUI_AUTH` to `False`. This will bypass the login page. (Note: you cannot switch between single-user mode and multi-account mode after this change.)
-
 ### Installing Open WebUI with Bundled Ollama Support
 
 This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
@@ -84,7 +90,9 @@ Both commands facilitate a built-in, hassle-free installation of both Open WebUI
 
 After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
-## Installation with `pip` (Beta)
+## Manual Installation
+
+### Installation with `pip` (Beta)
 
 For users who prefer to use Python's package manager `pip`, Open WebUI offers a installation method. Python 3.11 is required for this method.
 
@@ -104,7 +112,7 @@ For users who prefer to use Python's package manager `pip`, Open WebUI offers a 
 
 This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
 
-### Other Installation Methods
+## Other Installation Methods
 
 We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
 
