@@ -5,6 +5,32 @@ title: "🚀 Getting Started"
 
 ## How to Install 🚀
 
+:::info **Important Note on User Roles and Privacy:**
+
+- **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
+
+- **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
+
+- **Privacy and Data Security:** **All your data**, including login details, is **locally stored** on your device. Open WebUI ensures **strict confidentiality** and **no external requests** for enhanced privacy and security.
+
+:::
+
+## Quick Start with Docker 🐳 (Recommended)
+
+:::tip
+
+#### Disabling Login for Single User
+
+If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](/getting-started/env-configuration) to `False`. This will bypass the login page.
+
+:::warning
+You cannot switch between single-user mode and multi-account mode after this change.
+:::
+
+:::danger
+When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
+:::
+
 <details>
 <summary>Before You Begin</summary>
 #### Installing Docker
@@ -77,22 +103,6 @@ title: "🚀 Getting Started"
 - After installing Ollama, verify its functionality by accessing [http://127.0.0.1:11434/](http://127.0.0.1:11434/) in your web browser. Note that the port number might be different based on your installation.
 
 </details>
-
-:::info **Important Note on User Roles and Privacy**
-
-- **Admin Creation:** The very first account to sign up on Open WebUI will be granted **Administrator privileges**. This account will have comprehensive control over the platform, including user management and system settings.
-
-- **User Registrations:** All subsequent users signing up will initially have their accounts set to **Pending** status by default. These accounts will require approval from the Administrator to gain access to the platform functionalities.
-
-- **Privacy and Data Security:** We prioritize your privacy and data security above all. Please be reassured that all data entered into Open WebUI is stored locally on your device. Our system is designed to be privacy-first, ensuring that no external requests are made, and your data does not leave your local environment. We are committed to maintaining the highest standards of data privacy and security, ensuring that your information remains confidential and under your control.
-
-:::
-
-## Quick Start with Docker 🐳 (Recommended)
-
-:::warning
-When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
-:::
 
 ### Installation with Default Configuration
 
@@ -168,7 +178,7 @@ For users who prefer to use Python's package manager `pip`, Open WebUI offers a 
 
 This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
 
-### Install from Github Repo
+### Install from Open WebUI Github Repo
 
 :::info
 Open WebUI consists of two primary components: the frontend and the backend (which serves as a reverse proxy, handling static frontend files, and additional features). Both need to be running concurrently for the development environment.
