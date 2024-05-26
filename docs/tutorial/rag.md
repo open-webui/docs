@@ -1,3 +1,8 @@
+---
+sidebar_position: 8
+title: "Retrieval Augmented Generation (RAG)"
+---
+
 # Retrieval Augmented Generation (RAG)
 
 Retrieval Augmented Generation (RAG) allows context from other diverse sources to be included in chats. Text from different sources is combined with the RAG template and prefixed to the user's prompt.
