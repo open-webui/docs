@@ -1,3 +1,8 @@
+---
+sidebar_position: #
+title: "⭐ Features"
+---
+
 ## Key Features of Open WebUI ⭐
 
 - 📚 **Local RAG Integration**: Dive into the future of chat interactions with the groundbreaking Retrieval Augmented Generation (RAG) support. This feature seamlessly integrates document interactions into your chat experience. You can load documents directly into the chat or add files to your document library, effortlessly accessing them using `#` command in the prompt. In its alpha phase, occasional issues may arise as we actively refine and enhance this feature to ensure optimal performance and reliability. **Revolutionize chat interactions with RAG support**.
