@@ -38,19 +38,13 @@ title: "⭐ Features"
 
 - 🖥️ **Intuitive Interface**: Our chat interface takes inspiration from ChatGPT user interface, ensuring a user-friendly experience.
 
-- 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
-
 - ⚡ **Swift Responsiveness**: Enjoy reliably fast and responsive performance.
-
-- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience.
 
 - 📦 **Pip Install Method (Soon/WIP)**: Install Open WebUI using pip, simplifying the installation process and making it even easier for newcomers to get started.
 
 - 🌈 **Theme Customization**: Choose from a variety of solid, yet sleek themes to personalize your Open WebUI experience. Choose between either Light, Dark, or OLED Dark mode; or simply let your device choose for you!
 
 - 💻 **Code Syntax Highlighting**: Enjoy enhanced code readability with our syntax highlighting feature.
-
-- ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
 - ↕️ **Bi-Directional Chat Support**: Easily switch between left-to-right and right-to-left chat directions to accommodate various language preferences.
 
@@ -161,8 +155,6 @@ title: "⭐ Features"
 - 🛡️ **Model Whitelisting**: Enhance security and access control by allowing admins to whitelist models for users with the `user` role, ensuring that only authorized models can be accessed.
 
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
-
-- 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions; only authorized individuals can access your Ollama, and exclusive model creation/pulling rights are reserved for administrators.
 
 - 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the '/ollama/api' route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
 
