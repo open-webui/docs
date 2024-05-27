@@ -118,7 +118,7 @@ title: "⭐ Features"
 
 - 📤📥 **Import/Export Chat History**: Seamlessly move your chat data in and out of the platform.
 
-- 📄 **Chat Download as PDF**: Easily download chats in PDF format.
+- 📄 **Chat Download as PDF/TXT**: Easily download chats in .PDF or .txt format.
 
 </details>
 
