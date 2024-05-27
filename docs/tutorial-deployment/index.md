@@ -12,7 +12,7 @@ title: "☁️  Deployment"
 👋 Calling all youtubers! Want to showcase Open WebUI's features in a video? We'll feature it at the top of our guide section!
 :::
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Gyvy9JpDVBw?si=qUf0DVd4bnp_ndzH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Gyvy9JpDVBw?si=qUf0DVd4bnp_ndzH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Ic5BRW_nLok?si=zhQXPqb0PuKqg3u1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
