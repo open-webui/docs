@@ -78,6 +78,8 @@ title: "⭐ Features"
 <details>
   <summary>💻 Model Management</summary>
 
+- 🔍 **Model Selector**: Easily find and select custom models with search filter and detailed model information.
+
 - 📥🗑️ **Download/Delete Models**: Easily download or delete models directly from Open WebUI.
 
 - 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
