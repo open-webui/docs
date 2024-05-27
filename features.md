@@ -6,7 +6,7 @@ title: "⭐ Features"
 ## Key Features of Open WebUI ⭐
 
 
-- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience.
+- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both ':ollama' and ':cuda' tagged images.
 
 - 🤝 **Ollama/OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. Customize the Ollama API URL to link with **LMStudio, GroqCloud, Mistral, OpenRouter, and more**.
 
@@ -40,18 +40,26 @@ title: "⭐ Features"
 
 - ⚡ **Swift Responsiveness**: Enjoy reliably fast and responsive performance.
 
+- 🎨 **Splash Screen**: A simple loading splash screen for a smoother user experience.
+
 - 📦 **Pip Install Method (Soon/WIP)**: Install Open WebUI using pip, simplifying the installation process and making it even easier for newcomers to get started.
 
-- 🌈 **Theme Customization**: Choose from a variety of solid, yet sleek themes to personalize your Open WebUI experience. Choose between either Light, Dark, or OLED Dark mode; or simply let your device choose for you!
+- 🌈 **Theme Customization**: Choose from a variety of solid, yet sleek themes to personalize your Open WebUI experience. Choose between either Light, Dark, or OLED Dark mode; or simply let your system choose for you!
 
 - 💻 **Code Syntax Highlighting**: Enjoy enhanced code readability with our syntax highlighting feature.
 
 - ↕️ **Bi-Directional Chat Support**: Easily switch between left-to-right and right-to-left chat directions to accommodate various language preferences.
 
+- 📱 **Mobile Accessibility**: Seamlessly open and close the sidebar on mobile devices with intuitive swipe gestures.
+
+- 💾 **Persistent Settings**: Enjoy the convenience of saved settings, stored in a config.json file for easy access and reuse.
+
 </details>
 
 <details>
   <summary>💬 Conversations</summary>
+
+- 📂 **Unified Workspace**: Access all your model files, documents, prompts, and playground in one convenient location, streamlining your workflow.
 
 - 🔍 **RAG Embedding Support**: Change the RAG embedding model directly in document settings, enhancing document processing. This feature supports Ollama and OpenAI models.
 
@@ -71,7 +79,9 @@ title: "⭐ Features"
 
 - 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the RAG feature.
 
-- 📹 **Youtube RAG Pipeline**: Dedicated RAG pipeline for Youtube videos, enabling interaction with video transcriptions directly.
+- 🌟 **Enhanced RAG Pipeline**: With hybrid searching via 'BM25', reranking powered by 'CrossEncoder', and configurable relevance score thresholds.
+
+- 📹 **Youtube RAG Pipeline**: Dedicated RAG pipeline for YouTube videos, enabling interaction with video transcriptions directly.
 
 </details>
 
@@ -81,6 +91,8 @@ title: "⭐ Features"
 - 🔍 **Model Selector**: Easily find and select custom models with search filter and detailed model information.
 
 - 📥🗑️ **Download/Delete Models**: Easily download or delete models directly from Open WebUI.
+
+- 🔄 **Seamless Integration**: Copy `ollama run {model:tag}` directly from a model's page on [Ollama library](https://ollama.com/library/) to easily select and pull models.
 
 - 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
 
@@ -102,9 +114,11 @@ title: "⭐ Features"
 
 - 📜 **Chat History**: Effortlessly access and manage your conversation history.
 
-- 📬 **Archive Chats**: Effortlessly store away completed conversations with LLMs for future reference, maintaining a tidy and clutter-free chat interface while allowing for easy retrieval and reference.
+- 📬 **Archive Chats**: Effortlessly store away completed conversations with LLMs for future reference or interaction, maintaining a tidy and clutter-free chat interface while allowing for easy retrieval.
 
 - 📤📥 **Import/Export Chat History**: Seamlessly move your chat data in and out of the platform.
+
+- 📄 **Chat Download as PDF**: Easily download chats in PDF format.
 
 </details>
 
@@ -137,6 +151,10 @@ title: "⭐ Features"
 
 - 🌐🔗 **External Ollama Server Connectivity**: Seamlessly link to an external Ollama server hosted on a different address by configuring the environment variable.
 
+- 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the 'DATABASE_URL' environment variable.
+
+- 🌐 **Remote ChromaDB Support**: Expand your database capabilities with the ability to connect to remote ChromaDB servers.
+
 - 🔀 **Multiple Ollama Instance Load Balancing**: Effortlessly distribute chat requests across multiple Ollama instances for enhanced performance and reliability.
 
 </details>
@@ -148,7 +166,7 @@ title: "⭐ Features"
 
 - 🛡️ **Granular User Permissions**: Restrict user actions and access with customizable role-based permissions, ensuring that only authorized individuals can perform specific tasks.
 
-- 👥 **Multi-User Management**: Seamlessly manage multiple users through our intuitive admin panel, streamlining user administration and simplifying user lifecycle management.
+- 👥 **Multi-User Management**: Seamlessly manage multiple users through our intuitive admin panel with pagination, streamlining user administration and simplifying user lifecycle management.
 
 - 🔧 **Admin Panel**: Streamlined user management with options to add users directly or in bulk via CSV import, making user onboarding and management efficient.
 
