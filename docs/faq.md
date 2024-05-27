@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 600
 title: "📋 FAQ"
 ---
 

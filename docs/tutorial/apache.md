@@ -1,3 +1,8 @@
+---
+sidebar_position: 7
+title: "Hosting UI and Models separately"
+---
+
 # Hosting UI and Models separately
 
 :::note
