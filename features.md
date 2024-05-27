@@ -52,30 +52,26 @@ title: "⭐ Features"
 
 - ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
+- ↕️ **Bi-Directional Chat Support**: Easily switch between left-to-right and right-to-left chat directions to accommodate various language preferences.
+
 </details>
 
 <details>
   <summary>💬 Conversations</summary>
 
-- 📚 **Local RAG Integration**: Dive into the future of chat interactions with the groundbreaking Retrieval Augmented Generation (RAG) support. This feature seamlessly integrates document interactions into your chat experience. You can load documents directly into the chat or add files to your document library, effortlessly accessing them using `#` command in the prompt. In its alpha phase, occasional issues may arise as we actively refine and enhance this feature to ensure optimal performance and reliability.
-
-- 👥 **'@' Model Integration**: Harness the collective intelligence of multiple models in a single chat by seamlessly switching to any acessible local or external model during conversations by using the `@` command to specify the model by name.
+- 📚 **Local RAG Integration**: Dive into the future of chat interactions with the groundbreaking Retrieval Augmented Generation (RAG) support. This feature seamlessly integrates document interactions into your chat experience. You can load documents directly into the chat or add files to your document library, effortlessly accessing them using `#` command in the prompt.
 
 - 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multimodal interactions, including images (e.g., LLava).
 
+- ⚙️ **Many Models Conversations**: Effortlessly engage with various models simultaneously, harnessing their unique strengths for optimal responses. Enhance your experience by leveraging a diverse set of models in parallel.
+
 - ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting parameters such as temperature, context length, and seed, and define your system prompts to tailor the conversation to your specific preferences and needs.
-
-- ↕️ **Bi-Directional Chat Support**: Easily switch between left-to-right and right-to-left chat directions to accommodate various language preferences.
-
-- 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
-
-- 👍👎 **RLHF Annotation**: Empower your messages by rating them with thumbs up and thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (RLHF). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
 - 🏷️ **Conversation Tagging**: Effortlessly categorize and locate specific chats for quick reference and streamlined data collection.
 
-- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from the Web UI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
+- 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
 
-- ⚙️ **Many Models Conversations**: Effortlessly engage with various models simultaneously, harnessing their unique strengths for optimal responses. Enhance your experience by leveraging a diverse set of models in parallel.
+- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from the Web UI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
 
 - 🧠 **Experimental Memory Feature**: Manually input personal information you want LLMs to remember via Settings > Personalization > Memory.
 
@@ -99,6 +95,8 @@ title: "⭐ Features"
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links seamlessly between users, enhancing collaboration and communication.
 
+- 👍👎 **RLHF Annotation**: Empower your messages by rating them with thumbs up and thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (RLHF). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
+
 </details>
 
 <details>
@@ -118,6 +116,8 @@ title: "⭐ Features"
   <summary>🎙️ Accessibility</summary>
 
 - 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
+
+- 👥 **'@' Model Integration**: Harness the collective intelligence of multiple models in a single chat by seamlessly switching to any acessible local or external model during conversations by using the `@` command to specify the model by name.
 
 - 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI endpoints.
 
