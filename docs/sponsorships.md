@@ -13,7 +13,7 @@ These are the non-negotiable rules for sponsors:
 
 - Sponsors will always be clearly identified as sponsors.
 - Aggressive sales tactics directed at our community members are strictly prohibited.
-- We will never sell our user information to sponsors or any third parties.
+- We don’t sell personal information about our community members to sponsors (e.g., to add to their mailing list).
 
 ## Soft Rules
 
