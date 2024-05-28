@@ -1,10 +1,9 @@
 ---
-sidebar_position: 200
+sidebar_position: 3
 title: "⭐ Features"
 ---
 
 ## Key Features of Open WebUI ⭐
-
 
 - 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both ':ollama' and ':cuda' tagged images.
 
