@@ -16,7 +16,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
   - **Docker Default**: `prod`
 - Description: Environment setting.
 
-### `WEBUI_AUTH`
+#### `WEBUI_AUTH`
 
 - Default Setting: `True`
 - Description: This setting enables or disables authentication. If set to False, authentication is disabled. However, it's important to note that turning off authentication is only possible for fresh installations without any existing users. If there are already users registered, you cannot disable authentication directly. Ensure that no users are present in the database if you intend to turn off `WEBUI_AUTH`.
@@ -108,6 +108,12 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `t0p-s3cr3t`
 - Docker Default: Randomly generated on first start
 - Description: Overrides the randomly generated string used for JSON Web Token.
+
+#### `JWT_EXPIRES_IN`
+
+- Default: `-1`
+- Description: Sets the JWT expiration time in seconds. A value of -1 disables expiration.
+
 
 #### `USE_CUDA_DOCKER`
 
@@ -280,6 +286,41 @@ Query: [query]
 
 - Description: Template to use when injecting RAG documents into chat completion
 
+#### `RAG_RERANKING_MODEL`
+
+- Default: ``
+- Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
+
+#### `RAG_RERANKING_MODEL_AUTO_UPDATE`
+
+- Default: `False`
+- Description: Toggles automatic update of the reranking model.
+
+#### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
+
+- Default: `False`
+- Description: Determines whether or not to allow custom models defined on the Hub in their own modeling files for reranking.
+
+#### `RAG_OPENAI_API_BASE_URL`
+
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI base API URL to use for RAG embeddings.
+
+#### `RAG_OPENAI_API_KEY`
+
+- Default: `${OPENAI_API_KEY}`
+- Description: Sets the OpenAI API key to use for RAG embeddings.
+
+#### `ENABLE_RAG_LOCAL_WEB_FETCH`
+
+- Default: `False`
+- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request Forgery attacks against local network resources.
+
+#### `YOUTUBE_LOADER_LANGUAGE`
+
+- Default: `en`
+- Description: Sets the language to use for YouTube video loading.
+
 #### `CHUNK_SIZE`
 
 - Default: `1500`
@@ -318,6 +359,16 @@ Query: [query]
 
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for text-to-speech.
+
+#### `AUDIO_OPENAI_API_MODEL`
+
+- Default: `tts-1`
+- Description: Specifies the OpenAI text-to-speech model to use.
+
+#### `AUDIO_OPENAI_API_VOICE`
+
+- Default: `alloy`
+- Description: Sets the OpenAI text-to-speech voice to use.
 
 ### Image Generation
 
