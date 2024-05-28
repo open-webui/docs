@@ -33,9 +33,9 @@ title: "⭐ Features"
 
 ## And many more remarkable features including... ⚡️
 
-### 🌈 User Experience
-<details>
-  <summary></summary>
+---
+
+### 🖥️ User Experience
 
 - 🖥️ **Intuitive Interface**: Our chat interface takes inspiration from ChatGPT user interface, ensuring a user-friendly experience.
 
@@ -55,11 +55,9 @@ title: "⭐ Features"
 
 - 💾 **Persistent Settings**: Enjoy the convenience of saved settings, stored in a config.json file for easy access and reuse.
 
-</details>
+---
 
 ### 💬 Conversations
-<details>
-  <summary></summary>
 
 - 📂 **Unified Workspace**: Access all your model files, documents, prompts, and playground in one convenient location, streamlining your workflow.
 
@@ -85,11 +83,9 @@ title: "⭐ Features"
 
 - 📹 **Youtube RAG Pipeline**: Dedicated RAG pipeline for YouTube videos, enabling interaction with video transcriptions directly.
 
-</details>
+---
 
 ### 💻 Model Management
-<details>
-  <summary></summary>
 
 - 🔍 **Model Selector**: Easily find and select custom models with search filter and detailed model information.
 
@@ -99,21 +95,17 @@ title: "⭐ Features"
 
 - 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
 
-</details>
+---
 
 ### 👥 Collaboration
-<details>
-  <summary></summary>
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links seamlessly between users, enhancing collaboration and communication.
 
 - 👍👎 **RLHF Annotation**: Empower your messages by rating them with thumbs up and thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (RLHF). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
-</details>
+---
 
 ### 📚 History and Archive
-<details>
-  <summary></summary>
 
 - 🔄 **Regeneration History Access**: Easily revisit and explore your entire regeneration history.
 
@@ -125,11 +117,9 @@ title: "⭐ Features"
 
 - 📄 **Chat Download as PDF/TXT**: Easily download chats in .PDF or .txt format.
 
-</details>
+---
 
 ### 🎙️ Accessibility
-<details>
-  <summary></summary>
 
 - 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
 
@@ -137,21 +127,17 @@ title: "⭐ Features"
 
 - 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI endpoints.
 
-</details>
+---
 
 ### 🐍 Code Execution
-<details>
-  <summary></summary>
 
 - 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with libraries like `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, & `regex`.
 
 - 🚀 **Flexible, UI-Agnostic OpenAI-Compatible Pipelines (WIP)**: Seamlessly integrate and customize pipelines for efficient data processing and model training, ensuring ultimate flexibility and scalability.
 
-</details>
+---
 
-### 🔓 Integration and Security
-<details>
-  <summary></summary>
+### 🔒 Integration and Security
 
 - ✨ **Multiple OpenAI-Compatible API Support**: Seamlessly integrate and customize various OpenAI-compatible APIs, enhancing the versatility of your chat interactions.
 
@@ -165,11 +151,9 @@ title: "⭐ Features"
 
 - 🔀 **Multiple Ollama Instance Load Balancing**: Effortlessly distribute chat requests across multiple Ollama instances for enhanced performance and reliability.
 
-</details>
+---
 
 ### 👑 Administration
-<details>
-  <summary></summary>
 
 - 👑 **Super Admin Assignment**: Automatically assign the first signup as a super admin as an unchangeable role that cannot be modified by other admins.
 
@@ -188,5 +172,3 @@ title: "⭐ Features"
 - 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility to disable authentication by setting WEBUI_AUTH to False, ideal for fresh installations without existing users.
-
-</details>
