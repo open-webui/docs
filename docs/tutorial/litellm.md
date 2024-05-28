@@ -3,6 +3,10 @@ sidebar_position: 4
 title: "LiteLLM Configuration"
 ---
 
+:::warning
+Bundled LiteLLM support has been deprecated from 0.2.0
+:::
+
 # LiteLLM Configuration
 
 [LiteLLM](https://litellm.vercel.app/docs/proxy/configs#quick-start) supports a variety of APIs, both OpenAI-compatible and others. To integrate a new API model, follow these instructions:
