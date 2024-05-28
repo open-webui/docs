@@ -1,4 +1,5 @@
 ---
+sidebar_position: 9
 title: "Federated Authentication Support"
 ---
 
