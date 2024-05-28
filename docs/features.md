@@ -169,6 +169,8 @@ title: "⭐ Features"
 
 - 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with Discord, Google Chat and Microsoft Teams), providing real-time notifications and automation capabilities.
 
+- 📣 **Configurable Notification Banners**: Admins can create customizable banners with persistence in config.json, featuring options for content, background color (info, warning, error, or success), and dismissibility. These banners are only accessible to logged-in users, ensuring sensitive information remains private.
+
 - 🛡️ **Model Whitelisting**: Enhance security and access control by allowing admins to whitelist models for users with the `user` role, ensuring that only authorized models can be accessed.
 
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
