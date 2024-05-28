@@ -5,11 +5,13 @@ title: "⭐ Features"
 
 ## Key Features of Open WebUI ⭐
 
-- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both ':ollama' and ':cuda' tagged images.
+- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both `:ollama` and `:cuda` tagged images.
 
 - 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. Customize the OpenAI API URL to link with **LMStudio, GroqCloud, Mistral, OpenRouter, and more**.
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
+
+- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native app-like experience on your mobile device with our PWA, providing offline access on localhost and a seamless user interface.
 
 - ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
@@ -78,7 +80,7 @@ title: "⭐ Features"
 
 - 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the RAG feature.
 
-- 🌟 **Enhanced RAG Pipeline**: With hybrid searching via 'BM25', reranking powered by 'CrossEncoder', and configurable relevance score thresholds.
+- 🌟 **Enhanced RAG Pipeline**: With hybrid searching via `BM25`, reranking powered by `CrossEncoder`, and configurable relevance score thresholds.
 
 - 📹 **Youtube RAG Pipeline**: Dedicated RAG pipeline for YouTube videos, enabling interaction with video transcriptions directly.
 
@@ -135,7 +137,7 @@ title: "⭐ Features"
 <details>
   <summary>🐍 Code Execution</summary>
 
-- 🐍 **Python Code Execution**: Execute Python code locally in the browser with libraries like 'requests', 'beautifulsoup4', 'numpy', 'pandas', 'seaborn', 'matplotlib', 'scikit-learn', 'scipy', 'regex'.
+- 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with libraries like `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, & `regex`.
 
 - 🚀 **Flexible, UI-Agnostic OpenAI-Compatible Pipelines (WIP)**: Seamlessly integrate and customize pipelines for efficient data processing and model training, ensuring ultimate flexibility and scalability.
 
@@ -150,7 +152,7 @@ title: "⭐ Features"
 
 - 🌐🔗 **External Ollama Server Connectivity**: Seamlessly link to an external Ollama server hosted on a different address by configuring the environment variable.
 
-- 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the 'DATABASE_URL' environment variable.
+- 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the `DATABASE_URL` environment variable.
 
 - 🌐 **Remote ChromaDB Support**: Expand your database capabilities with the ability to connect to remote ChromaDB servers.
 
@@ -175,7 +177,7 @@ title: "⭐ Features"
 
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
 
-- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the '/ollama/api' route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
+- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility to disable authentication by setting WEBUI_AUTH to False, ideal for fresh installations without existing users.
 
