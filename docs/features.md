@@ -5,11 +5,13 @@ title: "⭐ Features"
 
 ## Key Features of Open WebUI ⭐
 
-- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both ':ollama' and ':cuda' tagged images.
+- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both `:ollama` and `:cuda` tagged images.
 
 - 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. Customize the OpenAI API URL to link with **LMStudio, GroqCloud, Mistral, OpenRouter, and more**.
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
+
+- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native app-like experience on your mobile device with our PWA, providing offline access on localhost and a seamless user interface.
 
 - ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
@@ -29,11 +31,11 @@ title: "⭐ Features"
 
 - 🌟 **Continuous Updates**: We are committed to improving Open WebUI with regular updates, fixes, and new features.
 
-<details>
-  <summary>And many more remarkable features including... ⚡️</summary>
+## And many more remarkable features including... ⚡️
 
+### 🌈 User Experience
 <details>
-  <summary>🌈 User Experience</summary>
+  <summary></summary>
 
 - 🖥️ **Intuitive Interface**: Our chat interface takes inspiration from ChatGPT user interface, ensuring a user-friendly experience.
 
@@ -55,8 +57,9 @@ title: "⭐ Features"
 
 </details>
 
+### 💬 Conversations
 <details>
-  <summary>💬 Conversations</summary>
+  <summary></summary>
 
 - 📂 **Unified Workspace**: Access all your model files, documents, prompts, and playground in one convenient location, streamlining your workflow.
 
@@ -78,14 +81,15 @@ title: "⭐ Features"
 
 - 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the RAG feature.
 
-- 🌟 **Enhanced RAG Pipeline**: With hybrid searching via 'BM25', reranking powered by 'CrossEncoder', and configurable relevance score thresholds.
+- 🌟 **Enhanced RAG Pipeline**: With hybrid searching via `BM25`, reranking powered by `CrossEncoder`, and configurable relevance score thresholds.
 
 - 📹 **Youtube RAG Pipeline**: Dedicated RAG pipeline for YouTube videos, enabling interaction with video transcriptions directly.
 
 </details>
 
+### 💻 Model Management
 <details>
-  <summary>💻 Model Management</summary>
+  <summary></summary>
 
 - 🔍 **Model Selector**: Easily find and select custom models with search filter and detailed model information.
 
@@ -97,8 +101,9 @@ title: "⭐ Features"
 
 </details>
 
+### 👥 Collaboration
 <details>
-  <summary>👥 Collaboration</summary>
+  <summary></summary>
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links seamlessly between users, enhancing collaboration and communication.
 
@@ -106,8 +111,9 @@ title: "⭐ Features"
 
 </details>
 
+### 📚 History and Archive
 <details>
-  <summary>📚 History and Archive</summary>
+  <summary></summary>
 
 - 🔄 **Regeneration History Access**: Easily revisit and explore your entire regeneration history.
 
@@ -121,8 +127,9 @@ title: "⭐ Features"
 
 </details>
 
+### 🎙️ Accessibility
 <details>
-  <summary>🎙️ Accessibility</summary>
+  <summary></summary>
 
 - 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
 
@@ -132,17 +139,19 @@ title: "⭐ Features"
 
 </details>
 
+### 🐍 Code Execution
 <details>
-  <summary>🐍 Code Execution</summary>
+  <summary></summary>
 
-- 🐍 **Python Code Execution**: Execute Python code locally in the browser with libraries like 'requests', 'beautifulsoup4', 'numpy', 'pandas', 'seaborn', 'matplotlib', 'scikit-learn', 'scipy', 'regex'.
+- 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with libraries like `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, & `regex`.
 
 - 🚀 **Flexible, UI-Agnostic OpenAI-Compatible Pipelines (WIP)**: Seamlessly integrate and customize pipelines for efficient data processing and model training, ensuring ultimate flexibility and scalability.
 
 </details>
 
+### 🔓 Integration and Security
 <details>
-  <summary>🔓 Integration and Security</summary>
+  <summary></summary>
 
 - ✨ **Multiple OpenAI-Compatible API Support**: Seamlessly integrate and customize various OpenAI-compatible APIs, enhancing the versatility of your chat interactions.
 
@@ -150,7 +159,7 @@ title: "⭐ Features"
 
 - 🌐🔗 **External Ollama Server Connectivity**: Seamlessly link to an external Ollama server hosted on a different address by configuring the environment variable.
 
-- 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the 'DATABASE_URL' environment variable.
+- 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the `DATABASE_URL` environment variable.
 
 - 🌐 **Remote ChromaDB Support**: Expand your database capabilities with the ability to connect to remote ChromaDB servers.
 
@@ -158,8 +167,9 @@ title: "⭐ Features"
 
 </details>
 
+### 👑 Administration
 <details>
-  <summary>👑 Administration</summary>
+  <summary></summary>
 
 - 👑 **Super Admin Assignment**: Automatically assign the first signup as a super admin as an unchangeable role that cannot be modified by other admins.
 
@@ -175,10 +185,8 @@ title: "⭐ Features"
 
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
 
-- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the '/ollama/api' route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
+- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility to disable authentication by setting WEBUI_AUTH to False, ideal for fresh installations without existing users.
-
-</details>
 
 </details>
