@@ -61,7 +61,7 @@ title: "⭐ Features"
 
 ### 💬 Conversations
 
-- 📂 **Unified Workspace**: Access all your model files, documents, prompts, and playground in one convenient location, streamlining your workflow.
+- 📂 **Unified Workspace**: Access all your model files, prompts, documents, and a playground in one convenient location, streamlining your workflow.
 
 - 🔍 **RAG Embedding Support**: Change the RAG embedding model directly in document settings, enhancing document processing. This feature supports Ollama and OpenAI models.
 
@@ -96,6 +96,8 @@ title: "⭐ Features"
 - 🔄 **Seamless Integration**: Copy `ollama run {model:tag}` directly from a model's page on [Ollama library](https://ollama.com/library/) to easily select and pull models.
 
 - 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
+
+- 💡 **LLM Response Insights**: View generation details for every response, including external model API insights and comprehensive local model info.
 
 ---
 
