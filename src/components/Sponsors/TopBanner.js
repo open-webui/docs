@@ -10,14 +10,21 @@ export const TopBanner = ({ items }) => {
 
             <a href={item.url} target="_blank">
               <img
-                className="w-full rounded-xl"
+                className="w-full rounded-xl hidden md:block"
                 loading="lazy"
                 alt={item.name}
                 src={item.imgSrc}
               />
+
+              <img
+                className="w-full rounded-xl block md:hidden"
+                loading="lazy"
+                alt={item.name}
+                src={item?.mobileImgSrc || item.imgSrc}
+              />
             </a>
 
-            <div className="text-right text-[0.6rem] text-gray-500 dark:text-gray-400 font-bold -mt-1 line-clamp-1">
+            <div className="text-right text-[0.6rem] text-gray-500 dark:text-gray-400 font-bold  line-clamp-1">
               {item.description}
             </div>
           </div>
