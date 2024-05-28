@@ -3,6 +3,10 @@ sidebar_position: 6
 title: "Monitoring with Langfuse"
 ---
 
+:::warning
+Bundled LiteLLM support has been deprecated from 0.2.0
+:::
+
 # Monitoring with Langfuse
 
 Integrating [Langfuse](https://cloud.langfuse.com) with LiteLLM allows for detailed observation and recording of API calls.
