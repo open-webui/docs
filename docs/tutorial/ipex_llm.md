@@ -4,7 +4,7 @@ title: "Local LLM Setup with IPEX-LLM on Intel GPU"
 ---
 
 :::note
-This guide is verified with Open WebUI setup through [Mannual Installation](../getting-started/index.mdx#manual-installation).
+This guide is verified with Open WebUI setup through [Manual Installation](../getting-started/index.mdx#manual-installation).
 :::
 
 # Local LLM Setup with IPEX-LLM on Intel GPU
@@ -13,7 +13,7 @@ This guide is verified with Open WebUI setup through [Mannual Installation](../g
 [**IPEX-LLM**](https://github.com/intel-analytics/ipex-llm) is a PyTorch library for running LLM on Intel CPU and GPU (e.g., local PC with iGPU, discrete GPU such as Arc A-Series, Flex and Max) with very low latency.
 :::
 
-This tutorial demonstrates how to setup Open WebUI with **IPEX-LLM accelerated Ollama backend hosted on Intel GPU**. By following this guide, you will be able to setup Open WebUI even on a low-cost PC (i.e. only with integrated GPU), and achieve a smooth experience.
+This tutorial demonstrates how to setup Open WebUI with **IPEX-LLM accelerated Ollama backend hosted on Intel GPU**. By following this guide, you will be able to setup Open WebUI even on a low-cost PC (i.e. only with integrated GPU) with a smooth experience.
 
 ## Start Ollama Serve on Intel GPU
 
