@@ -22,3 +22,17 @@ Refer to [this guide](https://ipex-llm.readthedocs.io/en/latest/doc/LLM/Quicksta
 :::tip
 If you would like to reach the Ollama serve from another machine, make sure you set or export the environment variable `OLLAMA_HOST=0.0.0.0` before executing the command `ollama serve`.
 :::
+
+## Configure Open WebUI
+
+Access the Ollama settings through **Settings -> Connections** in the menu. By default, the **Ollama Base URL** is preset to https://localhost:11434, as illustrated in the snapshot below. To verify the status of the Ollama service connection, click the **Refresh button** located next to the textbox. If the WebUI is unable to establish a connection with the Ollama server, you will see an error message stating, `WebUI could not connect to Ollama`.
+
+![Open WebUI Ollama Setting Failure](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings_0.png)
+
+If the connection is successful, you will see a message stating `Service Connection Verified`, as illustrated below.
+
+![Open WebUI Ollama Setting Success](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings.png)
+
+:::tip
+If you want to use an Ollama server hosted at a different URL, simply update the **Ollama Base URL** to the new URL and press the **Refresh** button to re-confirm the connection to Ollama. 
+:::
