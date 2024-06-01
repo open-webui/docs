@@ -94,10 +94,31 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `True`
 - Description: Controls whether admin users can export data.
 
-#### `WEBUI_VERSION`
+#### `ENABLE_COMMUNITY_SHARING`
 
-- Default: `v1.0.0-alpha.100`
-- Description: Overrides the WebUI version. Currently unused.
+- Default: `True`
+- Description: Controls whether users are shown the share to community button.
+
+#### `WEBUI_BUILD_HASH`
+
+- Default: `dev-build`
+- Description: Used for identifying the Git SHA of the build for releases.
+
+#### `WEBUI_BANNERS`
+
+- Default: `[]`
+- Description: List of banners to show to users. Format of banners are:
+
+```json
+{
+  "id": "string",
+  "type": "string [info, success, warning, error]",
+  "title": "string",
+  "content": "string",
+  "dismissible": false, # controls if the banner can be dismissed by users
+  "timestamp": 1000 # created at timestamp
+}
+```
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
@@ -131,6 +152,11 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Description: Sets the port to run Open WebUI from.
 
 ### Ollama
+
+#### `ENABLE_OLLAMA_API`
+
+- Default: `true`
+- Description: Enables the use of Ollama APIs.
 
 #### `OLLAMA_BASE_URL`
 
@@ -331,6 +357,55 @@ Query: [query]
 - Default: `100`
 - Description: Specifies how much overlap there should be between chunks.
 
+### Web Search
+
+Web search currently uses a precedence list based on the configured providers, in the order listed in this doc.
+
+#### `SEARXNG_QUERY_URL`
+
+- Default: ` `
+- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with the search query. Example: `http://searxng.local/search?q=<query>`
+
+#### `GOOGLE_PSE_API_KEY`
+
+- Default: ` `
+- Description: The API key for the Google Programmable Search Engine (PSE) service.
+
+#### `GOOGLE_PSE_ENGINE_ID`
+
+- Default: ` `
+- Description: The engine ID for the Google Programmable Search Engine (PSE) service.
+
+#### `BRAVE_SEARCH_API_KEY`
+
+- Default: ` `
+- Description: The API key for the Brave Search API.
+
+#### `SERPSTACK_API_KEY`
+
+- Default: ` `
+- Description: The API key for Serpstack search API.
+
+#### `SERPSTACK_HTTPS`
+
+- Default: `True`
+- Description: Configures the use of HTTPS for Serpstack requests. Free tier requests are restricted to HTTP only. 
+
+#### `SERPER_API_KEY`
+
+- Default: ` `
+- Description: The API key for the Serper search API.
+
+#### `RAG_WEB_SEARCH_RESULT_COUNT`
+
+- Default: `3`
+- Description: Maximum number of search results to crawl.
+
+#### `RAG_WEB_SEARCH_CONCURRENT_REQUESTS`
+
+- Default: `10`
+- Description: Number of concurrent requests to crawl web pages returned from search results.
+
 ### Speech to Text
 
 #### `WHISPER_MODEL`
@@ -416,6 +491,13 @@ Query: [query]
 - Description: Default model to use for image generation
 
 ### LiteLLM
+
+:::warning
+
+The bundled LiteLLM instance has been removed as of v0.2.0.
+You will need to either migrate to [pipelines](https://github.com/open-webui/pipelines), or self host your own LiteLLM proxy.
+
+:::
 
 #### `ENABLE_LITELLM`
 
