@@ -20,7 +20,7 @@ This tutorial demonstrates how to setup Open WebUI with **IPEX-LLM accelerated O
 Refer to [this guide](https://ipex-llm.readthedocs.io/en/latest/doc/LLM/Quickstart/ollama_quickstart.html) from IPEX-LLM official documentation about how to install and run Ollama serve accelerated by IPEX-LLM on Intel GPU.
 
 :::tip
-If you would like to reach the Ollama serve from another machine, make sure you set or export the environment variable `OLLAMA_HOST=0.0.0.0` before executing the command `ollama serve`.
+If you would like to reach the Ollama service from another machine, make sure you set or export the environment variable `OLLAMA_HOST=0.0.0.0` before executing the command `ollama serve`.
 :::
 
 ## Configure Open WebUI
