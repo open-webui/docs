@@ -46,3 +46,42 @@ Once you verify that all the data has been migrated you can erase the old volume
 ```bash
 docker volume rm ollama-webui
 ```
+
+## Migrating from Internal to External LiteLLM
+
+Previous versions of Open WebUI ran `litellm` internally. To improve modularity and flexibility, we recommend running `litellm` in its own dedicated container. This guide will walk you through the migration process.
+
+### 1. Download Your `config.yaml` File
+
+Before making any changes, download your existing `config.yaml` file from the Open WebUI Admin Settings window. This file contains your current `litellm` configuration.
+
+![LiteLLM config.yaml Download](/img/migration_litellm_config.png)
+
+### 2. Run a Standalone `litellm` Container
+
+Use the following `docker run` command to launch a dedicated `litellm` container:
+
+```bash
+docker run -d \
+  -p 4000:4000 \
+  --name litellm \
+  -v ./config.yaml:/app/config.yaml \
+  -e LITELLM_MASTER_KEY=your_secret_key \
+  --restart always \
+  ghcr.io/berriai/litellm:main-latest \
+  --config /app/config.yaml --port 4000
+```
+
+* Replace `./config.yaml` with the actual path to the downloaded `config.yaml` file.
+* Set a secure API key for `LITELLM_MASTER_KEY`. This ensures controlled access to your `litellm` instance.
+
+### 3. Connect `litellm` to Open WebUI
+
+Once the `litellm` container is up and running:
+
+1. Go to the Open WebUI settings.
+2. Under "Connections," add a new "OpenAI" connection.
+3. Set the Base URL to `http://host.docker.internal:4000/v1` (adjust the port if necessary).
+4. For the API Key, use the `LITELLM_MASTER_KEY` value you defined in step 2 (e.g., `your_secret_key`).
+
+Congratulations! You've successfully migrated to an external `litellm` setup, enhancing the flexibility and maintainability of your Open WebUI installation. 
