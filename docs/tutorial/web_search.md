@@ -7,7 +7,7 @@ title: "Web Search"
 
 ## SearXNG (Docker)
 
-This guide outlines how to connect Searxng to Open-WebUI for web search capabilities.
+This guide outlines how to connect SearXNG to Open WebUI for web search capabilities.
 
 ### 1. Searxng Configuration
 
@@ -139,7 +139,7 @@ docker compose -f docker-compose.yaml -f docker-compose.searxng.yaml up -d
 
 ### 3. Alternative: Docker Run
 
-You can run Searxng directly using `docker run`:
+You can run SearXNG directly using `docker run`:
 
 ```bash
 docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
