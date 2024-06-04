@@ -28,25 +28,6 @@ docker volume rm ollama-webui
 
 For example, for local installation it would be `docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main`. For other installation commands, check the relevant parts of this README document.
 
-## Migrating your contents from Ollama WebUI to Open WebUI
-
-If you want to update to the new image migrating all your previous settings like conversations, prompts, documents, etc. you can perform the following steps:
-
-```bash
-docker rm -f ollama-webui
-docker pull ghcr.io/open-webui/open-webui:main
-# Creates a new volume and uses a temporary container to copy from one volume to another as per https://github.com/moby/moby/issues/31154#issuecomment-360531460
-docker volume create --name open-webui
-docker run --rm -v ollama-webui:/from -v open-webui:/to alpine ash -c "cd /from ; cp -av . /to"
-[insert the equivalent command that you used to install with the new Docker image name]
-```
-
-Once you verify that all the data has been migrated you can erase the old volume using the following command:
-
-```bash
-docker volume rm ollama-webui
-```
-
 ## Migrating from Internal to External LiteLLM
 
 Previous versions of Open WebUI ran `litellm` internally. To improve modularity and flexibility, we recommend running `litellm` in its own dedicated container. This guide will walk you through the migration process.
@@ -72,8 +53,8 @@ docker run -d \
   --config /app/config.yaml --port 4000
 ```
 
-* Replace `./config.yaml` with the actual path to the downloaded `config.yaml` file.
-* Set a secure API key for `LITELLM_MASTER_KEY`. This ensures controlled access to your `litellm` instance.
+- Replace `./config.yaml` with the actual path to the downloaded `config.yaml` file.
+- Set a secure API key for `LITELLM_MASTER_KEY`. This ensures controlled access to your `litellm` instance.
 
 ### 3. Connect `litellm` to Open WebUI
 
@@ -84,4 +65,23 @@ Once the `litellm` container is up and running:
 3. Set the Base URL to `http://host.docker.internal:4000/v1` (adjust the port if necessary).
 4. For the API Key, use the `LITELLM_MASTER_KEY` value you defined in step 2 (e.g., `your_secret_key`).
 
-Congratulations! You've successfully migrated to an external `litellm` setup, enhancing the flexibility and maintainability of your Open WebUI installation. 
+Congratulations! You've successfully migrated to an external `litellm` setup, enhancing the flexibility and maintainability of your Open WebUI installation.
+
+## Migrating your contents from Ollama WebUI to Open WebUI
+
+If you want to update to the new image migrating all your previous settings like conversations, prompts, documents, etc. you can perform the following steps:
+
+```bash
+docker rm -f ollama-webui
+docker pull ghcr.io/open-webui/open-webui:main
+# Creates a new volume and uses a temporary container to copy from one volume to another as per https://github.com/moby/moby/issues/31154#issuecomment-360531460
+docker volume create --name open-webui
+docker run --rm -v ollama-webui:/from -v open-webui:/to alpine ash -c "cd /from ; cp -av . /to"
+[insert the equivalent command that you used to install with the new Docker image name]
+```
+
+Once you verify that all the data has been migrated you can erase the old volume using the following command:
+
+```bash
+docker volume rm ollama-webui
+```
