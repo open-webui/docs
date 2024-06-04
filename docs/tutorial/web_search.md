@@ -117,8 +117,10 @@ Add the following to a file named `docker-compose.searxng.yaml` alongside your e
 services:
   open-webui:
     environment:
+      ENABLE_RAG_WEB_SEARCH: True
+      RAG_WEB_SEARCH_ENGINE: "searxng"
       RAG_WEB_SEARCH_RESULT_COUNT: 3
-      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 3
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
       SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
 
   searxng:
@@ -144,6 +146,11 @@ You can run SearXNG directly using `docker run`:
 ```bash
 docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
 ```
+
+### 4. GUI configuration
+
+Navigate to **Workspace > Documents > Document Settings > Web Params**:
+![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
 
 ## Google PSE API
 
