@@ -359,21 +359,26 @@ Query: [query]
 
 ### Web Search
 
-Web search currently uses a precedence list based on the configured providers, in the order listed in this doc.
+#### `ENABLE_RAG_WEB_SEARCH`
+
+- Default: `false`
+- Description: Enable web search toggle
+
+#### `RAG_WEB_SEARCH_ENGINE`
+
+- Options: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`
+- Description: Select engine for performing searches
 
 #### `SEARXNG_QUERY_URL`
 
-- Default: ` `
 - Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with the search query. Example: `http://searxng.local/search?q=<query>`
 
 #### `GOOGLE_PSE_API_KEY`
 
-- Default: ` `
 - Description: The API key for the Google Programmable Search Engine (PSE) service.
 
 #### `GOOGLE_PSE_ENGINE_ID`
 
-- Default: ` `
 - Description: The engine ID for the Google Programmable Search Engine (PSE) service.
 
 #### `BRAVE_SEARCH_API_KEY`
@@ -383,7 +388,6 @@ Web search currently uses a precedence list based on the configured providers, i
 
 #### `SERPSTACK_API_KEY`
 
-- Default: ` `
 - Description: The API key for Serpstack search API.
 
 #### `SERPSTACK_HTTPS`
@@ -393,7 +397,6 @@ Web search currently uses a precedence list based on the configured providers, i
 
 #### `SERPER_API_KEY`
 
-- Default: ` `
 - Description: The API key for the Serper search API.
 
 #### `RAG_WEB_SEARCH_RESULT_COUNT`
