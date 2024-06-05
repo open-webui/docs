@@ -26,6 +26,6 @@ Remote sources are achieved with `#` followed by the target URL. Open WebUI fetc
 
 A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
 
-## RAG Template Customisation
+## RAG Template Customization
 
 Modify the RAG template by accessing the 'settings' icon housed within the 'Documents' section.
