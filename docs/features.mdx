@@ -55,6 +55,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛡️ **Toxic Message Filtering**: Automatically filter out toxic messages to maintain a safe environment.
 
+- 🌍 **LibreTranslate Translation**: Seamlessly translate chat conversations using LibreTranslate, enabling cross-lingual communication.
+
 - 📈 **OpenAI Generation Stats**: Access detailed generation statistics for OpenAI models.
 
 ---
@@ -79,7 +81,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 💾 **Persistent Settings**: Enjoy the convenience of saved settings, stored in a config.json file for easy access and reuse.
 
-- ❓ **Quick Access to Documentation**: Access Open WebUI documentation page easily via a question mark button at the bottom right-hand side of the UI.
+- ❓ **Quick Access to Documentation**: Easily access Open WebUI documentation page easily via a question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like PCs).
 
 ---
 
@@ -96,6 +98,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting parameters such as temperature, context length, and seed, and define your system prompts to tailor the conversation to your specific preferences and needs.
 
 - 🏷️ **Conversation Tagging**: Effortlessly categorize and locate specific chats for quick reference and streamlined data collection.
+
+- 👶 **Chat Cloning**: Easily clone and save a snapshot of your current session for future reference or continuation. This feature makes it easy to pick up where you left off or share your session with others. Simply click on the `Clone` button in the dropdown menu of your chat to create a copy of your chat.
 
 - 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
 
@@ -130,7 +134,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔄 **Seamless Integration**: Copy `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
 
-- 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in the Settings.
+- 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in the Settings, making it easier to manage your models.
 
 - 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
 
@@ -145,21 +149,29 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links seamlessly between users, enhancing collaboration and communication.
 
+- 🌐 **Community Sharing**: Expand your collaboration and communication by sharing your chat sessions with the wider community on [Open WebUI Community](https://openwebui.com/). This feature enables you to share your chat links with other users, allowing them to access and engage with your session directly on the platform. By sharing your chats on the Open WebUI Community, you can contribute to a vibrant community of users, facilitating discussion, knowledge sharing, and joint problem-solving. Simply click on the `Share to Open WebUI Community` button to make your chat session available to the community, fostering a collaborative and engaging environment for all. Ensure you have an account on Open WebUI Community and are signed in for this feature to work.
+
 - 👍👎 **RLHF Annotation**: Empower your messages by rating them with thumbs up and thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (RLHF). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
 ---
 
 ### 📚 History and Archive
 
+- 📜 **Chat History**: Effortlessly access and manage your conversation history in the chat navagation sidebar.
+
 - 🔄 **Regeneration History Access**: Easily revisit and explore your entire regeneration history.
 
-- 📜 **Chat History**: Effortlessly access and manage your conversation history.
+- 📬 **Archive Chats**: Effortlessly store away completed conversations you've had with models for future reference or interaction, maintaining a tidy and clutter-free chat interface while allowing for easy retrieval, with the ability to search and export archived chats easily.
 
-- 📬 **Archive Chats**: Effortlessly store away completed conversations with LLMs for future reference or interaction, maintaining a tidy and clutter-free chat interface while allowing for easy retrieval, with the ability to search and export archived chats easily. You can even archive all your chats with the click of a button!
+- 🗃️ **Archive All Chats**: Quickly archive all of your chats at once.
 
-- 📤📥 **Import/Export Chat History**: Seamlessly move your chat data in and out of the platform.
+- 📦 **Export All Archived Chats (JSON format only)**: Easily export all your archived chats in a single JSON file for easy backup or transfer.
 
-- 📄 **Chat Download as JSON/PDF/TXT**: Easily download chats in `.json`, `.pdf`, or `.txt` format.
+- 📄 **Download Chats as JSON/PDF/TXT**: Easily download your chats individually in your choice of `.json`, `.pdf`, or `.txt` format.
+
+- 📤📥 **Import/Export Chat History**: Seamlessly move your chat data in and out of the platform via `Import Chats` and `Export Chats` options.
+
+- 🗑️ **Delete All Chats**: Permanently delete all of your chats for a clean slate.
 
 ---
 
@@ -169,7 +181,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 👥 **'@' Model Integration**: Harness the collective intelligence of multiple models in a single chat by seamlessly switching to any accessible local or external model during conversations by using the `@` command to specify the model by name.
 
-- 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI endpoints.
+- 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI-compatible endpoints.
 
 ---
 
@@ -203,7 +215,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 👑 Administration
 
-- 👑 **Super Admin Assignment**: Automatically assign the first sign up as a super admin as an unchangeable role that cannot be modified by other admins.
+- 👑 **Super Admin Assignment**: Automatically assign the first sign up as a super admin with an unchangeable role that cannot be modified by anyone else, not even other admins.
 
 - 🛡️ **Granular User Permissions**: Restrict user actions and access with customizable role-based permissions, ensuring that only authorized individuals can perform specific tasks.
 
@@ -211,7 +223,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔧 **Admin Panel**: Streamlined user management with options to add users directly or in bulk via CSV import, making user on-boarding and management efficient.
 
-- 👥 **Active Users Indicator**: Track active users count and which models are actively being used by whom.
+- 👥 **Active Users Indicator**: Track active users count and which models are actively being used by whom to help you gauge when performance might be impacted due to a high number of users.
 
 - 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with Discord, Google Chat and Microsoft Teams), providing real-time notifications and automation capabilities.
 
@@ -219,8 +231,12 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛡️ **Model Whitelisting**: Enhance security and access control by allowing admins to whitelist models for users with the `user` role, ensuring that only authorized models can be accessed.
 
+- 🌐🔒 **Admin Control for Community Sharing**: Empower admins with a toggle within admin settings to enable or disable the community sharing feature for all users. This toggle allows admins to manage the accessibility and privacy of chat sessions, ensuring a secure and controlled environment for users. Admins can choose to enable or disable the 'Share on Community' button for all users, giving them the flexibility to determine the level of community engagement and collaboration within their platform.
+
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
 
 - 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
 
-- 🔓 **Optional Authentication**: Enjoy the flexibility to disable authentication by setting WEBUI_AUTH to False, ideal for fresh installations without existing users.
+- 🔒 **Authentication**: Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (SSO) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
+
+- 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to False, ideal for fresh installations without existing users and demo purposes.
