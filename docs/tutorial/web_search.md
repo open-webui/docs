@@ -16,7 +16,7 @@ Create a folder named `searxng` in the same directory as your compose files. Thi
 #### Configuration Files:
 
 <details>
-<summary>searchxng/settings.yml</summary>
+<summary>searxng/settings.yml</summary>
 
 ```yaml
 # see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
