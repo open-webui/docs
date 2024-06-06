@@ -516,3 +516,17 @@ You will need to either migrate to [pipelines](https://github.com/open-webui/pip
 
 - Default: `127.0.0.1`
 - Description: Sets the address to run the bundled LiteLLM instance on.
+
+## Misc Environment Variables
+These variables are not specific to Open-Webui but can still be valuable in certain contexts.
+
+### Proxy Settings
+Open-Webui supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings, Open-Webui uses the following environment variables:
+
+#### `http_proxy`
+#### `https_proxy`
+- These variables, if set, should contain the URLs for HTTP and HTTPS proxies, respectively.
+
+#### `no_proxy`
+- This variable lists domain extensions (or IP addresses) for which the proxy should not be used, separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is bypassed when accessing documents from MIT.
+
