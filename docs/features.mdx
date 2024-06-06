@@ -11,7 +11,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both `:ollama` and `:cuda` tagged images.
 
-- 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. Customize the OpenAI API URL to link with **LMStudio, GroqCloud, Mistral, OpenRouter, and more**.
+- 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. Customize the OpenAI API URL to link with `LMStudio`, `GroqCloud`, `Mistral`, `OpenRouter`, **and more**.
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
 
@@ -23,7 +23,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📚 **Local RAG Integration**: Dive into the future of chat interactions with groundbreaking Retrieval Augmented Generation (RAG) support. This feature seamlessly integrates document interactions into your chat experience. You can load documents directly into the chat or add files to your document library, effortlessly accessing them using the `#` command before a query.
 
-- 🔍 **Web Search for RAG**: Perform web searches using providers like `SearXNG`, `Google PSE`, `Brave Search`, `serpstack`, and `serper`, and inject the results directly into your chat experience.
+- 🔍 **Web Search for RAG**: Perform web searches using providers like `SearXNG`, `Google PSE`, `Brave Search`, `serpstack`, and `serper`, and inject the results directly into your local Retrieval Augmented Generation (RAG) experience.
 
 - 🌐 **Web Browsing Capability**: Seamlessly integrate websites into your chat experience using the `#` command followed by a URL. This feature allows you to incorporate web content directly into your conversations, enhancing the richness and depth of your interactions.
 
@@ -45,19 +45,23 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔧 **Pipelines Framework**: Seamlessly integrate and customize your Open WebUI experience with our modular plugin framework for enhanced customization and functionality (https://github.com/open-webui/pipelines). Easily add custom logic and integrate Python libraries, from AI agents to home automation APIs.
 
-- 🔗 **Function Calling**: Integrate function calling seamlessly through Pipelines.
+- 🔗 **Function Calling**: Integrate function calling seamlessly through Pipelines and enhance your applications with custom logic.
 
-- ⚖️ **User Rate Limiting**: Manage API usage efficiently with user-specific rate limits.
+- 📚 **Custom RAG**: Seamlessly integrate a custom Retrieval Augmented Generation (RAG) pipeline to enhance your applications with advanced AI capabilities.
 
-- 📊 **Usage Monitoring with Langfuse**: Track and analyze usage statistics with Langfuse integration.
+- 📊 **Message Monitoring with Langfuse**: Monitor and analyze message interactions in real-time usage statistics via Langfuse integration.
 
-- 🕒 **Conversation Turn Limits**: Manage interactions better with set limits on conversation turns.
+- ⚖️ **User Rate Limiting**: Manage API usage efficiently by controlling the flow of requests to prevent exceeding rate limits.
+
+- 🌍 **Real-Time LibreTranslate Translation**: Seamlessly integrate real-time translations into your LLM interactions using LibreTranslate, enabling cross-lingual communication.
 
 - 🛡️ **Toxic Message Filtering**: Automatically filter out toxic messages to maintain a safe environment.
 
-- 🌍 **LibreTranslate Translation**: Seamlessly translate chat conversations using LibreTranslate, enabling cross-lingual communication.
+- 🕒 **Conversation Turn Limits**: Manage interactions better with set limits on conversation turns.
 
 - 📈 **OpenAI Generation Stats**: Access detailed generation statistics for OpenAI models.
+
+#### In addition to the extensive features and customization options, we also provide a [library of example pipelines ready to use](https://github.com/open-webui/pipelines/tree/main/examples) along with [a practical example scaffold pipeline](https://github.com/open-webui/pipelines/blob/main/examples/scaffolds/example_pipeline_scaffold.py) to help you get started. These resources will streamline your development process and enable you to quickly create powerful applications using Pipelines and Python. Happy coding! 💡
 
 ---
 
@@ -89,7 +93,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📂 **Unified Workspace**: Access all your model files, prompts, documents, and a playground in one convenient location, streamlining your workflow.
 
-- 🔍 **RAG Embedding Support**: Change the RAG embedding model directly in document settings, enhancing document processing. This feature supports Ollama and OpenAI models.
+- 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in document settings, enhancing document processing. This feature supports Ollama and OpenAI models.
 
 - 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multi-modal interactions, including images (e.g., LLava).
 
@@ -109,11 +113,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🧠 **Experimental Memory Feature**: Manually input personal information you want LLMs to remember via Settings > Personalization > Memory.
 
-- 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the RAG feature.
+- 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the Retrieval Augmented Generation (RAG) feature.
 
 - 🌟 **Enhanced RAG Pipeline**: With hybrid searching via `BM25`, re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
 
-- 📹 **YouTube RAG Pipeline**: Dedicated RAG pipeline for YouTube videos, enabling interaction with video transcriptions directly.
+- 📹 **YouTube RAG Pipeline**: Dedicated Retrieval Augmented Generation (RAG) pipeline for YouTube videos, enabling interaction with video transcriptions directly.
 
 ---
 
@@ -122,25 +126,25 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛠️ **Model Builder**: Build and edit all models with a persistent model builder mode within the models workspace.
 
+- 🗂️ **Model Presets**: Create and manage model presets for both Ollama/OpenAI API.
+
 - 🏷️ **Model Tagging**: Organize models in the models workspace with tagging.
 
 - 📋 **Model Selector Dropdown Ordering**: Effortlessly organize models by dragging and dropping them into desired positions within the models workspace, reflecting it's changes in the model dropdown menu.
 
 - 🔍 **Model Selector Dropdown**: Easily find and select your models with an included search filter and detailed model information with model tags and model descriptions.
 
-- ⚙️ **Default Model Setting**: Easily set the default model in `Settings` > `Interface`.
-
-- 📥🗑️ **Download/Delete Models**: Easily download or delete models directly from Open WebUI.
-
-- 🔄 **Seamless Integration**: Copy `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
+- 🔄 **Seamless Integration**: Copy any `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
 
 - 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in the Settings, making it easier to manage your models.
 
-- 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
+- ⚙️ **Default Model Setting**: Easily set the default model in `Settings` > `Interface` for mobile devices, or set it easily in a new chat under the model selector dropdown on PCs.
 
 - 💡 **LLM Response Insights**: View generation details for every response, including external model API insights and comprehensive local model info.
 
-- 🗂️ **Model Presets**: Create and manage model presets for both Ollama/OpenAI API.
+- 📥🗑️ **Download/Delete Models**: Easily download or delete models directly from Open WebUI.
+
+- 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
 
 ---
 
@@ -148,7 +152,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links seamlessly between users, enhancing collaboration and communication.
 
-- 🌐 **Community Sharing**: Expand your collaboration and communication by sharing your chat sessions with the wider community on [Open WebUI Community](https://openwebui.com/). This feature enables you to share your chat links with other users, allowing them to access and engage with your session directly on the platform. By sharing your chats on the Open WebUI Community, you can contribute to a vibrant community of users, facilitating discussion, knowledge sharing, and joint problem-solving. Simply click on the `Share to Open WebUI Community` button to make your chat session available to the community, fostering a collaborative and engaging environment for all. Ensure you have an account on Open WebUI Community and are signed in for this feature to work.
+- 🤝 **Community Sharing**: Share your chat sessions with the [Open WebUI Community](https://openwebui.com/) by clicking the `Share to Open WebUI Community` button. This feature allows you to engage with other users and collaborate on the platform. To use this feature, sign in to your Open WebUI Community account. Sharing your chats fosters a vibrant community, encourages knowledge sharing, and facilitates joint problem-solving. 
 
 - 👍👎 **RLHF Annotation**: Empower your messages by rating them with thumbs up and thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (RLHF). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
@@ -186,11 +190,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 🐍 Code Execution
 
+- 🚀 **Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework**: Seamlessly integrate and customize [Open WebUI Pipelines](https://github.com/open-webui/pipelines) for efficient data processing and model training, ensuring ultimate flexibility and scalability.
+
 - 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with libraries like `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, & `regex`.
 
 - 🌊 **Mermaid Rendering**: Create beautiful diagrams and flowcharts directly within Open WebUI.
-
-- 🚀 **Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework**: Seamlessly integrate and customize [Open WebUI Pipelines](https://github.com/open-webui/pipelines) for efficient data processing and model training, ensuring ultimate flexibility and scalability.
 
 ---
 
@@ -230,7 +234,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛡️ **Model Whitelisting**: Enhance security and access control by allowing admins to whitelist models for users with the `user` role, ensuring that only authorized models can be accessed.
 
-- 🌐🔒 **Admin Control for Community Sharing**: Empower admins with a toggle within admin settings to enable or disable the community sharing feature for all users. This toggle allows admins to manage the accessibility and privacy of chat sessions, ensuring a secure and controlled environment for users. Admins can choose to enable or disable the 'Share on Community' button for all users, giving them the flexibility to determine the level of community engagement and collaboration within their platform.
+- 🔑 **Admin Control for Community Sharing**: Admins can enable or disable community sharing for all users via a toggle in admin settings. This toggle allows admins to manage accessibility and privacy, ensuring a secure environment. Admins can choose to enable or disable the `Share on Community` button for all users, controlling community engagement and collaboration.
 
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
 
@@ -238,4 +242,4 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔒 **Authentication**: Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (SSO) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
 
-- 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to False, ideal for fresh installations without existing users and demo purposes.
+- 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`, ideal for fresh installations without existing users and demo purposes.
