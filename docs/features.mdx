@@ -87,13 +87,15 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - ❓ **Quick Access to Documentation**: Easily access Open WebUI documentation page easily via a question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like PCs).
 
+- 📜 **Changelog**: Access a comprehensive changelog in `Settings` > `About` > `See What's New`, providing a quick overview of the latest features, improvements, and bug fixes.
+
 ---
 
 ### 💬 Conversations
 
 - 📂 **Unified Workspace**: Access all your model files, prompts, documents, and a playground in one convenient location, streamlining your workflow.
 
-- 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in document settings, enhancing document processing. This feature supports Ollama and OpenAI models.
+- 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in `Workspace` > `Documents` > `Document Settings`, enhancing document processing. This feature supports Ollama and OpenAI models.
 
 - 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multi-modal interactions, including images (e.g., LLava).
 
@@ -108,6 +110,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
 
 - 📅 **Prompt Variables Support**: Variables for dynamic prompts, such as `{{CURRENT_DATE}}` and `{{USER_NAME}}`.
+
+- 🔒 **Toggle Chat History**: Toggle chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions when toggled off.
 
 - ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from the Web UI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
 
@@ -136,7 +140,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔄 **Seamless Integration**: Copy any `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
 
-- 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in the Settings, making it easier to manage your models.
+- 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in `Settings` > `Models` > `Create a model`, making it easier to manage your models.
 
 - ⚙️ **Default Model Setting**: Easily set the default model in `Settings` > `Interface` for mobile devices, or set it easily in a new chat under the model selector dropdown on PCs.
 
@@ -227,6 +231,12 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🔧 **Admin Panel**: Streamlined user management with options to add users directly or in bulk via CSV import, making user on-boarding and management efficient.
 
 - 👥 **Active Users Indicator**: Track active users count and which models are actively being used by whom to help you gauge when performance might be impacted due to a high number of users.
+
+- 🔒 **Default Sign-Up Role**: Set the default role for new sign-ups to pending, user, or admin, providing flexibility in managing user permissions and access levels for new users.
+
+- 🔒 **Prevent New Sign Ups**: Ability to disable new user sign-ups, restricting access to the platform and maintaining a fixed number of users.
+
+- 🔒 **Prevent Chat Deletion**: Ability for admins to toggle a setting that prevents all users from deleting their chat messages, ensuring that all chat messages are retained for audit or compliance purposes.
 
 - 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with Discord, Google Chat and Microsoft Teams), providing real-time notifications and automation capabilities.
 
