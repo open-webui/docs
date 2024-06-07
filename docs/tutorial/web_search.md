@@ -154,6 +154,13 @@ Navigate to **Workspace > Documents > Document Settings > Web Params**:
 
 ## Google PSE API
 
+Generate your Search Engine ID and API Key through the [Google dashboard](https://developers.google.com/custom-search/v1/overview).
+
+Through Open WebUI, via Workspaces > Documents > Document Settings > Web Search, you can activate Web Search and select Google PSE.
+Fill the forme with your Search Engine ID and your API Key.
+
+Save and Enjoy.
+
 ## Serper API
 
 ## Serpstack API
