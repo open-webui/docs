@@ -53,6 +53,10 @@ You cannot switch between single-user mode and multi-account mode after this cha
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 :::
 
+:::note
+When using docker via Rancher Desktop, do not pass the flag `--add-host=host.docker.internal:host-gateway` with the `docker run` command as this configuration is Docker Desktop specific and doesn't work with Rancher Desktop.
+:::
+
 ### Installation with Default Configuration
 
 - **If Ollama is on your computer**, use this command:

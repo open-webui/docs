@@ -35,14 +35,18 @@ You cannot switch between single-user mode and multi-account mode after this cha
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
 :::
 
+:::note
+When using docker via Rancher Desktop, do not pass the flag `--add-host=host.docker.internal:host-gateway` with the `docker run` command as this configuration is Docker Desktop specific and doesn't work with Rancher Desktop.
+:::
+
 <details>
 <summary>Before You Begin</summary>
 #### Installing Docker
 
 #### For Windows and Mac Users:
 
-- Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
-- Follow the installation instructions provided on the website. After installation, open Docker Desktop to ensure it's running properly.
+- Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop) or an alternate solution such as [Rancher Desktop](https://www.rancherdesktop.io).
+- Follow the installation instructions provided on the respective website. After installation, open the application to ensure `docker` is running properly.
 
 #### For Ubuntu Users:
 
