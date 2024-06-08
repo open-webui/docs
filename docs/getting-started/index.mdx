@@ -180,7 +180,7 @@ For users who prefer to use Python's package manager `pip`, Open WebUI offers a 
    open-webui serve
    ```
 
-This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
+This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Additionally, the system will print your local IP address, allowing devices on the same network to access the WebUI, typically at http://10.x.x.x:8080 or http://192.x.x.x:8080. Enjoy! 😄
 
 ### Install from Open WebUI Github Repo
 
@@ -239,7 +239,7 @@ You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
   ```
 
   <details>
-  <summary>AMD GPU Support with HSA_OVERRIDE_GFX_VERSION</summary>
+<summary>AMD GPU Support with HSA_OVERRIDE_GFX_VERSION</summary>
 
   For AMD GPU users encountering compatibility issues, setting the `HSA_OVERRIDE_GFX_VERSION` environment variable is crucial. This variable instructs the ROCm platform to emulate a specific GPU architecture, ensuring compatibility with various AMD GPUs not officially supported. Depending on your GPU model, adjust the `HSA_OVERRIDE_GFX_VERSION` as follows:
 
