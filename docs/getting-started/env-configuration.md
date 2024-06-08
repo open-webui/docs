@@ -138,7 +138,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 
 #### `USE_CUDA_DOCKER`
 
-- Default: `False`
+- Default: `false`
 - Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration for local Whisper and embeddings.
 
 #### `DATABASE_URL`
@@ -177,7 +177,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 
 #### `USE_OLLAMA_DOCKER`
 
-- Default: `False`
+- Default: `false`
 - Description: Builds the Docker image with a bundled Ollama instance.
 
 #### `OLLAMA_API_BASE_URL`
