@@ -82,6 +82,11 @@ docker run -d --gpus=all -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/a
 ```bash
 docker run -d -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/app/config --name openedai-speech ghcr.io/matatonic/openedai-speech-min:latest
 ```
+**Configuring Open WebUI**
+-------------------------
+
+For more information on configuring Open WebUI to use `openedai-speech`, including setting environment variables, see the [Open WebUI documentation](https://docs.openwebui.com/getting-started/env-configuration/#text-to-speech).
+
 **Step 5: Configure Open WebUI to use `openedai-speech`**
 ---------------------------------------------------------
 
