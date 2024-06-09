@@ -74,7 +74,7 @@ This will start the `openedai-speech` service in the background.
 
 You can also use the following Docker run commands to start the `openedai-speech` service in detached mode:
 
-**With GPU (Nvidia) support:**
+**With GPU (Nvidia CUDA) support:**
 ```bash
 docker run -d --gpus=all -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/app/config --name openedai-speech ghcr.io/matatonic/openedai-speech:latest
 ```
@@ -90,7 +90,9 @@ For more information on configuring Open WebUI to use `openedai-speech`, includi
 **Step 5: Configure Open WebUI to use `openedai-speech`**
 ---------------------------------------------------------
 
-Open the Open WebUI settings and navigate to the TTS Settings under Admin Panel > Settings > Audio. Add the following configuration:
+Open the Open WebUI settings and navigate to the TTS Settings under Admin Panel > Settings > Audio. Add the following configuration as shown in the following image:
+
+![openedai-tts](https://github.com/silentoplayz/docs/assets/50341825/ea08494f-2ebf-41a2-bb0f-9b48dd3ace79)
 
 * **API Base URL**: `http://host.docker.internal:8000/v1`
 * **API Key**: `sk-111111111` (note: this is a dummy API key, as `openedai-speech` doesn't require an API key; you can use whatever for this field)
@@ -98,20 +100,26 @@ Open the Open WebUI settings and navigate to the TTS Settings under Admin Panel 
 **Step 6: Choose a voice**
 -------------------------
 
-Under Set Voice, you can choose from the following voices:
+Under `TTS Voice` within the same audio settings menu in the admin panel, you can set the `TTS Model` to use from the following choices below that `openedai-speech` supports. The voices of these models are optimized for the English language.
 
-* alloy
-* echo
-* echo-alt
-* fable
-* onyx
-* nova
-* shimmer
+* `tts-1`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer`
+* `tts-1-hd`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer` (configurable, uses OpenAI samples by default)
 
-**Step 7: Enjoy naturally sounding voices**
+**Model Details:**
+
+* `tts-1` via [Piper TTS](https://github.com/rhasspy/piper) (very fast, runs on CPU): You can map your own [Piper voices](https://rhasspy.github.io/piper-samples/) via the `voice_to_speaker.yaml` configuration file.
+* `tts-1-hd` via [Coqui AI/TTS](https://github.com/coqui-ai/TTS) XTTS v2 voice cloning (fast, but requires around 4GB GPU VRAM & Nvidia GPU with CUDA): Custom cloned voices can be used for `tts-1-hd`. See: [Custom Voices Howto](https://github.com/matatonic/openedai-speech/blob/main/docs/custom_voices.md)
+	+ [Multilingual Support](https://github.com/matatonic/openedai-speech#multilingual) with XTTS voices
+
+**Step 7: Press `Save` to apply the changes**
 -----------------------------------------
 
-You should now be able to use the `openedai-speech` integration with Open WebUI to generate naturally sounding voices.
+Press the `Save` button to apply the changes to your Open WebUI settings.
+
+**Step 8: Enjoy naturally sounding voices**
+-----------------------------------------
+
+You should now be able to use the `openedai-speech` integration with Open WebUI to generate naturally sounding voices with text-to-speech throughout Open WebUI.
 
 **Troubleshooting**
 -------------------
@@ -121,6 +129,13 @@ If you encounter any issues, make sure that:
 * The `openedai-speech` service is running and the port you set in the docker-compose.yml file is exposed.
 * The `host.docker.internal` hostname is resolvable from within the Open WebUI container. `host.docker.internal` is required since `openedai-speech` is exposed via `localhost` on your PC, but `open-webui` cannot normally access this from within its container.
 * The API key is set to a dummy value, as `openedai-speech` doesn't require an API key.
+
+**FAQ**
+----
+
+**How can I control the emotional range of the generated audio?**
+
+There is no direct mechanism to control the emotional output of the audio generated. Certain factors may influence the output audio like capitalization or grammar, but internal tests have yielded mixed results.
 
 **Additional Resources**
 -------------------------
