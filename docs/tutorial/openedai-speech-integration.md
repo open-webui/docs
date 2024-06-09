@@ -9,7 +9,7 @@ Integrating `openedai-speech` into Open WebUI using Docker Desktop
 **What is `openedai-speech`?**
 -----------------------------
 
-`openedai-speech` is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API.
+[openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API.
 
 **Prerequisites**
 ---------------
@@ -113,9 +113,8 @@ You should now be able to use the `openedai-speech` integration with Open WebUI 
 
 If you encounter any issues, make sure that:
 
-* The `openedai-speech` service is running and exposed on port 8000.
-* The `host.docker.internal` hostname is resolvable from within the Open WebUI container.
-* `host.docker.internal` is required since `openedai-speech` is exposed via `localhost` on your PC, but `open-webui` cannot normally access this from within its container.
+* The `openedai-speech` service is running and the port you set in the docker-compose.yml file is exposed.
+* The `host.docker.internal` hostname is resolvable from within the Open WebUI container. `host.docker.internal` is required since `openedai-speech` is exposed via `localhost` on your PC, but `open-webui` cannot normally access this from within its container.
 * The API key is set to a dummy value, as `openedai-speech` doesn't require an API key.
 
 **Additional Resources**
