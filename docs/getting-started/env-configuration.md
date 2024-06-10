@@ -399,6 +399,10 @@ Query: [query]
 
 - Description: The API key for the Serper search API.
 
+#### `SERPLY_API_KEY`
+
+- Description: The API key for the Serply search API.
+
 #### `RAG_WEB_SEARCH_RESULT_COUNT`
 
 - Default: `3`

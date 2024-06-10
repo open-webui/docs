@@ -159,3 +159,5 @@ Navigate to **Workspace > Documents > Document Settings > Web Params**:
 ## Serpstack API
 
 ## Brave API
+
+## Serply API
