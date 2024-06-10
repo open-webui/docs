@@ -9,7 +9,9 @@ Integrating `openedai-speech` into Open WebUI using Docker Desktop
 **What is `openedai-speech`?**
 -----------------------------
 
-:::info: [openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API. :::
+:::info
+[openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API.
+:::
 
 **Prerequisites**
 ---------------
@@ -85,12 +87,14 @@ docker run -d -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/app/config -
 **Configuring Open WebUI**
 -------------------------
 
-:::tip: For more information on configuring Open WebUI to use `openedai-speech`, including setting environment variables, see the [Open WebUI documentation](https://docs.openwebui.com/getting-started/env-configuration/#text-to-speech). :::
+:::tip
+For more information on configuring Open WebUI to use `openedai-speech`, including setting environment variables, see the [Open WebUI documentation](https://docs.openwebui.com/getting-started/env-configuration/#text-to-speech).
+:::
 
 **Step 5: Configure Open WebUI to use `openedai-speech`**
 ---------------------------------------------------------
 
-Open the Open WebUI settings and navigate to the TTS Settings under Admin Panel > Settings > Audio. Add the following configuration as shown in the following image:
+Open the Open WebUI settings and navigate to the TTS Settings under **Admin Panel > Settings > Audio**. Add the following configuration as shown in the following image:
 
 ![openedai-tts](https://github.com/silentoplayz/docs/assets/50341825/ea08494f-2ebf-41a2-bb0f-9b48dd3ace79)
 
@@ -112,15 +116,10 @@ Under `TTS Voice` within the same audio settings menu in the admin panel, you ca
 
 * Beta [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) support (you can describe very basic features of the speaker voice), See: (https://www.text-description-to-speech.com/) for some examples of how to describe voices. Voices can be defined in the `voice_to_speaker.default.yaml`. Two example [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) voices are included in the `voice_to_speaker.default.yaml` file. `parler-tts` is experimental software and is on the slower side. The exact voice will be slightly different each generation but should be similar to the basic description.
 
-**Step 7: Press `Save` to apply the changes**
------------------------------------------
+**Step 7: Press `Save` to apply the changes and start enjoying naturally sounding voices**
+--------------------------------------------------------------------------------------------
 
-Press the `Save` button to apply the changes to your Open WebUI settings.
-
-**Step 8: Enjoy naturally sounding voices**
------------------------------------------
-
-You should now be able to use the `openedai-speech` integration with Open WebUI to generate naturally sounding voices with text-to-speech throughout Open WebUI.
+Press the `Save` button to apply the changes to your Open WebUI settings and enjoy using `openedai-speech` integration within Open WebUI to generate naturally sounding voice responses with text-to-speech.
 
 **Troubleshooting**
 -------------------
@@ -143,4 +142,6 @@ There is no direct mechanism to control the emotional output of the audio genera
 
 For more information on `openedai-speech`, please visit the [GitHub repository](https://github.com/matatonic/openedai-speech).
 
-:::note: You can change the port number in the `docker-compose.yml` file to any open and usable port, but make sure to update the **API Base URL** in Open WebUI Admin Audio settings accordingly. :::
+:::note
+You can change the port number in the `docker-compose.yml` file to any open and usable port, but make sure to update the **API Base URL** in Open WebUI Admin Audio settings accordingly.
+:::
