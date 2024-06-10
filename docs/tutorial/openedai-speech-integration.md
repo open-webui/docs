@@ -9,7 +9,7 @@ Integrating `openedai-speech` into Open WebUI using Docker Desktop
 **What is `openedai-speech`?**
 -----------------------------
 
-:::info:
+:::info
 [openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API.
 :::
 
@@ -87,7 +87,7 @@ docker run -d -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/app/config -
 **Configuring Open WebUI**
 -------------------------
 
-:::tip:
+:::tip
 For more information on configuring Open WebUI to use `openedai-speech`, including setting environment variables, see the [Open WebUI documentation](https://docs.openwebui.com/getting-started/env-configuration/#text-to-speech).
 :::
 
@@ -142,6 +142,6 @@ There is no direct mechanism to control the emotional output of the audio genera
 
 For more information on `openedai-speech`, please visit the [GitHub repository](https://github.com/matatonic/openedai-speech).
 
-:::note:
+:::note
 You can change the port number in the `docker-compose.yml` file to any open and usable port, but make sure to update the **API Base URL** in Open WebUI Admin Audio settings accordingly.
 :::
