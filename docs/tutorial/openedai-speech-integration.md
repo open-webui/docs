@@ -102,13 +102,15 @@ Open the Open WebUI settings and navigate to the TTS Settings under Admin Panel 
 
 Under `TTS Voice` within the same audio settings menu in the admin panel, you can set the `TTS Model` to use from the following choices below that `openedai-speech` supports. The voices of these models are optimized for the English language.
 
-* `tts-1` or `tts-1-hd`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer` (`tts-1-hd` is configurable; uses OpenAI samples by default) 
+* `tts-1` or `tts-1-hd`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer` (`tts-1-hd` is configurable; uses OpenAI samples by default)
 
 **Model Details:**
 
 * `tts-1` via [Piper TTS](https://github.com/rhasspy/piper) (very fast, runs on CPU): You can map your own [Piper voices](https://rhasspy.github.io/piper-samples/) via the `voice_to_speaker.yaml` configuration file.
 * `tts-1-hd` via [Coqui AI/TTS](https://github.com/coqui-ai/TTS) XTTS v2 voice cloning (fast, but requires around 4GB GPU VRAM & Nvidia GPU with CUDA): Custom cloned voices can be used for `tts-1-hd`. See: [Custom Voices Howto](https://github.com/matatonic/openedai-speech/blob/main/docs/custom_voices.md)
 	+ [Multilingual Support](https://github.com/matatonic/openedai-speech#multilingual) with XTTS voices
+
+* Beta [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) support (you can describe very basic features of the speaker voice), See: (https://www.text-description-to-speech.com/) for some examples of how to describe voices. Voices can be defined in the `voice_to_speaker.default.yaml`. Two example [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) voices are included in the `voice_to_speaker.default.yaml` file. `parler-tts` is experimental software and is on the slower side. The exact voice will be slightly different each generation but should be similar to the basic description.
 
 **Step 7: Press `Save` to apply the changes**
 -----------------------------------------
