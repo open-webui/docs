@@ -9,7 +9,7 @@ Integrating `openedai-speech` into Open WebUI using Docker Desktop
 **What is `openedai-speech`?**
 -----------------------------
 
-[openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API.
+:::info: [openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI API compatible text-to-speech server that uses Coqui AI's `xtts_v2` and/or `Piper TTS` as the backend. It's a free, private, text-to-speech server that allows for custom voice cloning and is compatible with the OpenAI audio/speech API. :::
 
 **Prerequisites**
 ---------------
@@ -53,7 +53,7 @@ volumes:
 -----------------------------------------
 
 In the same `openedai-speech-service` folder, create a new file named `.env` with the following contents:
-```
+```yaml
 TTS_HOME=voices
 HF_HOME=voices
 #PRELOAD_MODEL=xtts
@@ -64,7 +64,7 @@ HF_HOME=voices
 ---------------------------------------------------------
 
 Run the following command in the `openedai-speech-service` folder to start the `openedai-speech` service in detached mode:
-```
+```yaml
 docker compose up -d
 ```
 This will start the `openedai-speech` service in the background.
@@ -75,17 +75,17 @@ This will start the `openedai-speech` service in the background.
 You can also use the following Docker run commands to start the `openedai-speech` service in detached mode:
 
 **With GPU (Nvidia CUDA) support:**
-```bash
+```yaml
 docker run -d --gpus=all -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/app/config --name openedai-speech ghcr.io/matatonic/openedai-speech:latest
 ```
 **Alternative without GPU support:**
-```bash
+```yaml
 docker run -d -p 8000:8000 -v tts-voices:/app/voices -v tts-config:/app/config --name openedai-speech ghcr.io/matatonic/openedai-speech-min:latest
 ```
 **Configuring Open WebUI**
 -------------------------
 
-For more information on configuring Open WebUI to use `openedai-speech`, including setting environment variables, see the [Open WebUI documentation](https://docs.openwebui.com/getting-started/env-configuration/#text-to-speech).
+:::tip: For more information on configuring Open WebUI to use `openedai-speech`, including setting environment variables, see the [Open WebUI documentation](https://docs.openwebui.com/getting-started/env-configuration/#text-to-speech). :::
 
 **Step 5: Configure Open WebUI to use `openedai-speech`**
 ---------------------------------------------------------
@@ -102,8 +102,7 @@ Open the Open WebUI settings and navigate to the TTS Settings under Admin Panel 
 
 Under `TTS Voice` within the same audio settings menu in the admin panel, you can set the `TTS Model` to use from the following choices below that `openedai-speech` supports. The voices of these models are optimized for the English language.
 
-* `tts-1`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer`
-* `tts-1-hd`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer` (configurable, uses OpenAI samples by default)
+* `tts-1` or `tts-1-hd`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer` (`tts-1-hd` is configurable; uses OpenAI samples by default) 
 
 **Model Details:**
 
@@ -142,4 +141,4 @@ There is no direct mechanism to control the emotional output of the audio genera
 
 For more information on `openedai-speech`, please visit the [GitHub repository](https://github.com/matatonic/openedai-speech).
 
-Note: You can change the port number in the `docker-compose.yml` file to any open and usable port, but make sure to update the **API Base URL** in Open WebUI Admin Audio settings accordingly.
+:::note: You can change the port number in the `docker-compose.yml` file to any open and usable port, but make sure to update the **API Base URL** in Open WebUI Admin Audio settings accordingly. :::
