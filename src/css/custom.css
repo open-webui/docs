@@ -472,6 +472,11 @@ article p a {
   border-top-left-radius: 0px;
 }
 
+.margin-bottom--sm {
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
 .hideTabSwitcher {
   display: none;
 }

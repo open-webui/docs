@@ -38,7 +38,7 @@ const config = {
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: ["@docusaurus/theme-mermaid"],
 
   presets: [
     [
@@ -52,14 +52,13 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/open-webui/docs/blob/main",
         },
-        blog: false,
-        // blog: {
-        //   showReadingTime: true,
-        //   // Please change this to your repo.
-        //   // Remove this to remove the "edit this page" links.
-        //   editUrl:
-        //     "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        // },
+        blog: {
+          showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          // editUrl:
+          // "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+        },
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -81,10 +80,16 @@ const config = {
         items: [
           // {
           //   type: "docSidebar",
-          //   sidebarId: "tutorialSidebar",
+          //   sidebarId: "blog",
           //   position: "left",
-          //   label: "Tutorial",
+          //   label: "Blog",
           // },
+
+          {
+            href: "/blog",
+            label: "Blog",
+            position: "left",
+          },
           {
             href: "https://github.com/open-webui/open-webui",
             label: "GitHub",
