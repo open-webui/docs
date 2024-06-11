@@ -108,6 +108,18 @@ When using Docker to install Open WebUI, make sure to include the `-v open-webui
 
 </details>
 
+<details> 
+<summary>Data Storage in Docker</summary>
+
+This tutorial uses [Docker named volumes](https://docs.docker.com/storage/volumes/) to guarantee the **persistance of your data**. This might make it difficult to know exactly where your data is stored in your machine if this is your first time using Docker. Alternatively, you can replace the volume name with a absolute path on your host machine to link your container data to a folder in your computer using a [bind mount](https://docs.docker.com/storage/bind-mounts/).
+
+**Example**: change `-v open-webui:/app/backend/data` to `-v /path/to/folder:/app/backend/data`
+
+Ensure you have the proper access rights to the folder on your host machine.
+
+Visit the [Docker documentation](https://docs.docker.com/storage/) to understand more about volumes and bind mounts.
+</details>
+
 ### Installation with Default Configuration
 
 - **If Ollama is on your computer**, use this command:
