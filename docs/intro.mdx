@@ -49,8 +49,14 @@ If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](/gettin
 You cannot switch between single-user mode and multi-account mode after this change.
 :::
 
-:::danger
-When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
+:::info
+This tutorial uses [Docker named volumes](https://docs.docker.com/storage/volumes/) to guarantee the **persistance of your data**. This might make it difficult to know exactly **where** your data is stored in your machine if this is your first time using Docker. Alternatively, you can replace the volume name with a absolute path on your host machine to link your container data to a folder in your computer using a [bind mount](https://docs.docker.com/storage/bind-mounts/).
+
+**Example**: change `-v open-webui:/app/backend/data` to `-v /path/to/folder:/app/backend/data`
+
+Ensure you have the proper access rights to the folder on your host machine.
+
+Visit the [Docker documentation](https://docs.docker.com/storage/) to understand more about volumes and bind mounts.
 :::
 
 ### Installation with Default Configuration
