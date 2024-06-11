@@ -1,9 +1,9 @@
 ---
 sidebar_position: 11
-title: "Integrating OpenedAI-Speech with Open WebUI using Docker Desktop"
+title: "TTS - OpenedAI-Speech using Docker"
 ---
 
-Integrating `openedai-speech` into Open WebUI using Docker Desktop
+Integrating `openedai-speech` into Open WebUI using Docker
 ================================================================
 
 **What is `openedai-speech`?**
@@ -16,7 +16,7 @@ Integrating `openedai-speech` into Open WebUI using Docker Desktop
 **Prerequisites**
 ---------------
 
-* Docker Desktop installed on your system
+* Docker installed on your system
 * Open WebUI running in a Docker container
 * A basic understanding of Docker and Docker Compose
 
@@ -62,7 +62,7 @@ HF_HOME=voices
 #PRELOAD_MODEL=xtts_v2.0.2
 #PRELOAD_MODEL=parler-tts/parler_tts_mini_v0.1
 ```
-**Step 4: Run `docker-compose` to start the `openedai-speech` service**
+**Step 4: Run `docker compose` to start the `openedai-speech` service**
 ---------------------------------------------------------
 
 Run the following command in the `openedai-speech-service` folder to start the `openedai-speech` service in detached mode:
