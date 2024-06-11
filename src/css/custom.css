@@ -472,6 +472,10 @@ article p a {
   border-top-left-radius: 0px;
 }
 
+.margin-bottom--xl {
+  margin-bottom: 20px !important;
+}
+
 .margin-bottom--sm {
   margin-top: 10px !important;
   margin-bottom: 10px !important;
