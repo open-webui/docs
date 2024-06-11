@@ -152,6 +152,22 @@ docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart al
 Navigate to **Workspace > Documents > Document Settings > Web Params**:
 ![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
 
+
+### 5. Using Web Search in a Chat
+
+To access Web Search, Click on the + next to the message input field.
+
+Here you can toggle Web Search On/Off.
+
+![Web Search UI Toggle](/img/web_search_toggle.png)
+
+#### Note
+You will have to expicitly toggle this On/Off in a chat.
+
+This is enabled on a per session basis eg. reloading the page, changing to another chat will toggle off.
+
+
+
 ## Google PSE API
 
 ## Serper API
