@@ -93,9 +93,10 @@ docker volume rm ollama-webui
 If you came from a git installation where you used `docker compose up` in the project directory, your volumes will be prefixed with the folder name.
 Therefore, if your OpenWebUI path was: `/home/myserver/ollama-webui/`, the volumes would be named "ollama-webui_open-webui" and "ollama-webui_ollama".
 
-To copy the contents over to a conventional docker installation, you may run the same migration commands, but replacing them with the prefixed volume names and creating an additional volume for ollama. In our particular case, the commands would be:
+To copy the contents over to a conventional docker installation, you may run similar migration commands. In our particular case, the commands would be:
 ```bash
-docker rm -f ollama-webui
+docker rm -f open-webui
+docker rm -f ollama
 docker pull ghcr.io/open-webui/open-webui:main
 docker pull ghcr.io/open-webui/open-webui:ollama
 docker volume create --name open-webui
