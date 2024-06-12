@@ -104,6 +104,9 @@ docker volume create --name ollama
 docker run --rm -v ollama-webui_open-webui:/from -v open-webui:/to alpine ash -c "cd /from ; cp -av . /to"
 docker run --rm -v ollama-webui_ollama:/from -v ollama:/to alpine ash -c "cd /from ; cp -av . /to"
 ```
+
+Depending on whether you had ollama installed, or already had the same volume names in place, some of the commands **might throw errors**, but they can usually be safely ignored since we're overwriting.
+
 Then, start both containers as usual, as described in the Getting started guide. 
 
 Once you verify that all the data has been migrated you can erase the old volume using the command `docker volume rm` mentioned above.
