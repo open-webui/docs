@@ -69,6 +69,8 @@ docker volume rm ollama-webui
 
 For example, for local installation it would be `docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main`. For other installation commands, check the relevant parts of this README document.
 
+## Updating to Open WebUI while keeping your data
+
 If you want to update to the new image migrating all your previous settings like conversations, prompts, documents, etc. you can perform the following steps:
 
 ```bash
@@ -85,3 +87,22 @@ Once you verify that all the data has been migrated you can erase the old volume
 ```bash
 docker volume rm ollama-webui
 ```
+
+### Coming from a local Git repository
+
+If you came from a git installation where you used `docker compose up` in the project directory, your volumes will be prefixed with the folder name.
+Therefore, if your OpenWebUI path was: `/home/myserver/ollama-webui/`, the volumes would be named "ollama-webui_open-webui" and "ollama-webui_ollama".
+
+To copy the contents over to a conventional docker installation, you may run the same migration commands, but replacing them with the prefixed volume names and creating an additional volume for ollama. In our particular case, the commands would be:
+```bash
+docker rm -f ollama-webui
+docker pull ghcr.io/open-webui/open-webui:main
+docker pull ghcr.io/open-webui/open-webui:ollama
+docker volume create --name open-webui
+docker volume create --name ollama
+docker run --rm -v ollama-webui_open-webui:/from -v open-webui:/to alpine ash -c "cd /from ; cp -av . /to"
+docker run --rm -v ollama-webui_ollama:/from -v ollama:/to alpine ash -c "cd /from ; cp -av . /to"
+```
+Then, start both containers as usual, as described in the Getting started guide. 
+
+Once you verify that all the data has been migrated you can erase the old volume using the command `docker volume rm` mentioned above.
