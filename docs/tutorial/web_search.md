@@ -176,3 +176,19 @@ This is enabled on a per session basis eg. reloading the page, changing to anoth
 ## Serpstack API
 
 ## Brave API
+
+###  Docker Compose Setup
+
+Add the following to a file named `docker-compose.yaml`:
+
+```yaml
+services:
+  open-webui:
+    environment:
+      ENABLE_RAG_WEB_SEARCH: True
+      RAG_WEB_SEARCH_ENGINE: "brave"
+      BRAVE_SEARCH_API_KEY: "YOUR_API_KEY"
+      RAG_WEB_SEARCH_RESULT_COUNT: 3
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
+```
+
