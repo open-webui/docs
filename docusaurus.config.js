@@ -52,6 +52,7 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/open-webui/docs/blob/main",
         },
+        // blog: false,
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
@@ -85,11 +86,11 @@ const config = {
           //   label: "Blog",
           // },
 
-          {
-            href: "/blog",
-            label: "Blog",
-            position: "left",
-          },
+          // {
+          //   href: "/blog",
+          //   label: "Blog",
+          //   position: "left",
+          // },
           {
             href: "https://github.com/open-webui/open-webui",
             label: "GitHub",
