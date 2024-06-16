@@ -469,6 +469,26 @@ Query: [query]
 
 - Description: Specifies the URL to the ComfyUI image generation API.
 
+#### `COMFYUI_CFG_SCALE`
+
+- Default: `7`
+- Description: Specifies a `cfg_scale` value to use with ComfyUI. If you are using Stable Diffusion 3, the recommended value is `5.5`.
+
+#### `COMFYUI_SAMPLER`
+
+- Default: `euler`
+- Description: Specifies a sampler to use with ComfyUI.
+
+#### `COMFYUI_SCHEDULER`
+
+- Default: `normal`
+- Description: Specifies a scheduler to use with ComfyUI. If you are using Stable Diffusion 3, the recommended value is `sgm_uniform`.
+
+#### `COMFYUI_SD3`
+
+- Default: `False`
+- Description: Sets ComfyUI to Stable Diffusion 3 mode. SD3 will work without this set, but the image quality will be significantly lower. Requires a recent version of ComfyUI.
+
 #### `IMAGES_OPENAI_API_KEY`
 
 - Default: `${OPENAI_API_KEY}`
