@@ -4,13 +4,13 @@ This website is built using [Docusaurus](https://docusaurus.io/), a modern stati
 
 ## Installation
 
-```
+```sh
 npm i
 ```
 
 ## Local Development
 
-```
+```sh
 npm start
 ```
 
@@ -18,7 +18,7 @@ This command starts a local development server and opens up a browser window. Mo
 
 ## Build
 
-```
+```sh
 npm run build
 ```
 
@@ -28,13 +28,13 @@ This command generates static content into the `build` directory and can be serv
 
 Using SSH:
 
-```
+```sh
 USE_SSH=true npm run deploy
 ```
 
 Not using SSH:
 
-```
+```sh
 GIT_USER=<Your GitHub username> npm run deploy
 ```
 
