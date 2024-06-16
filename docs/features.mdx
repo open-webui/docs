@@ -253,3 +253,19 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🔒 **Authentication**: Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (SSO) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`, ideal for fresh installations without existing users and demo purposes.
+
+
+---
+
+### 📄 Swagger Documentation
+
+-  📄  **Comprehensive Swagger documentation**: providing detailed information on endpoints, parameters, and responses. This feature streamlines API integration and development, ensuring seamless communication between Open WebUI and external systems.
+
+    | App  | Docs Path           |
+    |--------------|---------------------|
+    | WebUI    | /api/v1/docs        | 
+    | Ollama   | /ollama/docs        |
+    | OpenAI   | /openai/api/docs    | 
+    | Images   | /images/api/v1/docs | 
+    | Audio    | /audio/api/v1/docs  |
+    | RAG      | /rag/api/v1/docs    |
