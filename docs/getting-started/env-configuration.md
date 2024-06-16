@@ -124,6 +124,10 @@ Here is a list of supported environment variables used by `backend/config.py` in
 
 - Description: Defines the trusted request header for authentication. See [SSO docs](/tutorial/sso).
 
+#### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
+
+- Description: Defines the trusted request header for the username of anyone registering with the `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorial/sso).
+
 #### `WEBUI_SECRET_KEY`
 
 - Default: `t0p-s3cr3t`

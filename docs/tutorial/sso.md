@@ -22,6 +22,8 @@ When the `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` environment variable is set, Open Web
 
 For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing a HTTP header of `X-User-Email: example@example.com` would authenticate the request with the email `example@example.com`.
 
+Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
+
 ## Tailscale Serve
 
 [Tailscale Serve](https://tailscale.com/kb/1242/tailscale-serve) allows you to share a service within your tailnet, and Tailscale will set the header `Tailscale-User-Login` with the email address of the requester.
