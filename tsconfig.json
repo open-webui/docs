@@ -1,0 +1,17 @@
+// https://docusaurus.io/docs/typescript-support
+// This file is not used in compilation. It is here just for a nice editor experience.
+{
+  "extends": "@docusaurus/tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    // https://miyoon.medium.com/array-parameters-in-tsconfig-json-are-always-overwritten-11c80bb514e1
+    // https://github.com/microsoft/TypeScript/issues/20110
+    "types": [
+      "node",
+      "@docusaurus/module-type-aliases",
+      "@docusaurus/theme-classic",
+      "docusaurus-plugin-sass"
+    ]
+  },
+  "exclude": ["node_modules", "build", ".docusaurus"]
+}

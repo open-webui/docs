@@ -8,7 +8,7 @@ export const Sponsor = ({ sponsor }) => {
 					</a>
 				</div>
 
-				<a a href={sponsor.url} target="_blank">
+				<a href={sponsor.url} target="_blank">
 					<div className="flex w-32 md:w-48 gap-2.5 items-start">
 						<div className=" basis-1/2">
 							<img
