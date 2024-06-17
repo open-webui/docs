@@ -86,8 +86,9 @@ const config: Config = {
 				// },
 				{
 					href: "https://github.com/open-webui/open-webui",
-					label: "GitHub",
 					position: "right",
+					className: "header-github-link",
+					"aria-label": "GitHub repository",
 				},
 			],
 		},
