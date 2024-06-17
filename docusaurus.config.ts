@@ -85,6 +85,12 @@ const config: Config = {
 				//   position: "left",
 				// },
 				{
+					href: "https://discord.com/invite/5rJgQTnV4s",
+					position: "right",
+					className: "header-discord-link",
+					"aria-label": "Discord server",
+				},
+				{
 					href: "https://github.com/open-webui/open-webui",
 					position: "right",
 					className: "header-github-link",
