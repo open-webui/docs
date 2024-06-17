@@ -108,15 +108,31 @@ Under `TTS Voice` within the same audio settings menu in the admin panel, you ca
 
 * `tts-1` or `tts-1-hd`: `alloy`, `echo`, `echo-alt`, `fable`, `onyx`, `nova`, and `shimmer` (`tts-1-hd` is configurable; uses OpenAI samples by default)
 
+**Step 7 (optional): Adding new voices**
+-------------------------
+
+The voice wave files are stored in the `tts-voices` volume and the configuration files are in the `tts-config` volume. Default voices are defined in `voice_to_speaker.default.yaml`. 
+
+In order to add an additional voice, you need to:
+1. Add an appropriate wave file/voice (*.wav) into the `tts-voices` volume, for example `example.wav`.
+2. Reference the newly added wave file in the `voice_to_speaker.yaml` configuration file, under the appropriate model (either `tts1` or `tts-1-hd`), eg:
+``` 
+  example:
+    model: xtts
+    speaker: voices/example.wav
+```
+To use this new voice, simply use the string of the voice name (in this case `example`) in the Audio configuration settings for your user (or set this voice as the system default). 
+
 **Model Details:**
 
-* `tts-1` via [Piper TTS](https://github.com/rhasspy/piper) (very fast, runs on CPU): You can map your own [Piper voices](https://rhasspy.github.io/piper-samples/) via the `voice_to_speaker.yaml` configuration file.
-* `tts-1-hd` via [Coqui AI/TTS](https://github.com/coqui-ai/TTS) XTTS v2 voice cloning (fast, but requires around 4GB GPU VRAM & Nvidia GPU with CUDA): Custom cloned voices can be used for `tts-1-hd`. See: [Custom Voices Howto](https://github.com/matatonic/openedai-speech/blob/main/docs/custom_voices.md)
+Two example [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) voices are included in the `voice_to_speaker.default.yaml` file. `parler-tts` is experimental software and is on the slower side. The exact voice will be slightly different each generation but should be similar to the basic description.
+
+* `tts-1` via [Piper TTS](https://github.com/rhasspy/piper) (very fast, runs on CPU): You can map your own [Piper voices](https://rhasspy.github.io/piper-samples/) via the `voice_to_speaker.yaml` configuration file, as per the instructions above.
+* `tts-1-hd` via [Coqui AI/TTS](https://github.com/coqui-ai/TTS) XTTS v2 voice cloning (fast, but requires around 4GB GPU VRAM & Nvidia GPU with CUDA).
 	+ [Multilingual Support](https://github.com/matatonic/openedai-speech#multilingual) with XTTS voices
+* Beta [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) support (you can describe very basic features of the speaker voice), See: (https://www.text-description-to-speech.com/) for some examples of how to describe voices. 
 
-* Beta [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) support (you can describe very basic features of the speaker voice), See: (https://www.text-description-to-speech.com/) for some examples of how to describe voices. Voices can be defined in the `voice_to_speaker.default.yaml`. Two example [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) voices are included in the `voice_to_speaker.default.yaml` file. `parler-tts` is experimental software and is on the slower side. The exact voice will be slightly different each generation but should be similar to the basic description.
-
-**Step 7: Press `Save` to apply the changes and start enjoying naturally sounding voices**
+**Step 8: Press `Save` to apply the changes and start enjoying naturally sounding voices**
 --------------------------------------------------------------------------------------------
 
 Press the `Save` button to apply the changes to your Open WebUI settings and enjoy using `openedai-speech` integration within Open WebUI to generate naturally sounding voice responses with text-to-speech.
