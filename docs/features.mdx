@@ -20,7 +20,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
-- 🧩 **Model Builder**: Easily create Ollama models via the Web UI. Create and add custom characters/agents, customize chat elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
+- 🧩 **Model Builder**: Easily create Ollama models directly from Open WebUI. Create and add custom characters/agents, customize chat elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
 
 - 📚 **Local and Remote RAG Integration**: Dive into the future of chat interactions with groundbreaking Retrieval Augmented Generation (RAG) with document interactions in your chat. Load documents or add files to your library, then access them using `#` before a query, or start your prompt with `#`, followed by a URL for web content integration. 
 
@@ -88,7 +88,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📱 **Mobile Accessibility**: Seamlessly open and close the sidebar on mobile devices with intuitive swipe gestures.
 
-- 💾 **Persistent Settings**: Enjoy the convenience of saved and persistent settings within the WebUI, stored in a config.json file for easy access and reuse.
+- 💾 **Persistent Settings**: Enjoy the convenience of saved and persistent settings within Open WebUI, stored in a config.json file for easy access and reuse.
 
 - ❓ **Quick Access to Documentation & Shortcuts**: Easily access Open WebUI documentation page and view available keyboard shortcuts easily via a question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like PCs).
 
@@ -118,7 +118,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔒 **Toggle Chat History**: Toggle chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions when toggled off.
 
-- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from the Web UI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
+- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from Open WebUI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
 
 - 🧠 **Experimental Memory Feature**: Manually add information you want LLMs to remember via `Settings` > `Personalization` > `Memory`. Memories can be added, edited, and deleted.
 
@@ -265,9 +265,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔑 **Admin Control for Community Sharing**: Admins can enable or disable community sharing for all users via a toggle in `Admin Panel` > `Settings`. This toggle allows admins to manage accessibility and privacy, ensuring a secure environment. Admins can choose to enable or disable the `Share on Community` button for all users, controlling community engagement and collaboration.
 
-- 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
+- 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Open WebUI instance.
 
-- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from the Web UI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
+- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from Opeb WebUI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
 
 - 🔒 **Authentication**: Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (SSO) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
 
