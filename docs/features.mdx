@@ -92,6 +92,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📱 **Mobile Accessibility**: Seamlessly open and close the sidebar on mobile devices with intuitive swipe gestures.
 
+- 📂 **Unified Workspace**: Access all your model files, prompts, documents, tools, and functions in one convenient location, streamlining your workflow.
+
 - 💾 **Persistent Settings**: Enjoy the convenience of saved and persistent settings within Open WebUI, stored in a config.json file for easy access and reuse.
 
 - ❓ **Quick Access to Documentation & Shortcuts**: Easily access Open WebUI documentation page and view available keyboard shortcuts easily via a question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like PCs).
@@ -102,35 +104,33 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 💬 Conversations
 
-- 📂 **Unified Workspace**: Access all your model files, prompts, documents, and a playground in one convenient location, streamlining your workflow.
-
 - 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in `Admin Panel` > `Settings` > `Documents`, enhancing document processing. This feature supports Ollama and OpenAI models.
 
 - 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multi-modal interactions, including images (e.g., LLaVA).
 
-- 🤖 **Multiple Model Support**: Seamlessly switch between different chat models for diverse interactions.
+- 🤖 **Multiple Model Support**: Seamlessly switch between different models for diverse chat interactions.
 
-- ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting parameters such as temperature, context length, and seed, and define your system prompts to tailor the conversation to your specific preferences and needs.
+- ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting model parameters such as `seed`, `temperature`, `frequency penalty`, `context length`, `seed`, and more to define your system prompts, bending the conversation to your specific preferences and needs.
 
-- 🏷️ **Conversation Tagging**: Effortlessly categorize and locate specific chats for quick reference and streamlined data collection.
+- 🏷️ **Conversation Tagging**: Effortlessly categorize and locate tagged chats for quick reference and streamlined data collection.
 
-- 👶 **Chat Cloning**: Easily clone and save a snapshot of your current session for future reference or continuation. This feature makes it easy to pick up where you left off or share your session with others. Simply click on the `Clone` button in the dropdown menu of your chat to create a copy of your chat.
+- 👶 **Chat Cloning**: Easily clone and save a snapshot of any chat for future reference or continuation. This feature makes it easy to pick up where you left off or share your session with others. Simply click on the `Clone` button in the dropdown menu of your chat to create a copy of your chat. Can you keep up with your clones?
 
-- 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
+- 📜 **Prompt Preset Support**: Instantly access custom preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration or create your own!
 
-- 📅 **Prompt Variables Support**: Variables such as `{{CURRENT_DATE}}`, `{{CURRENT_DATETIME}}`, `{{CURRENT_TIME}}`, `{{USER_NAME}}`, and `{{USER_LOCATION}}` for system prompts. `{{USER_LOCATION}}` prompt variable requires a secure connection over HTTPS. Ensure `{{USER_LOCATION}}` is toggled on from `Settings` > `Interface` to utilize this particular prompt varibale.
+- 📅 **Prompt Variables Support**: Prompt variables such as `{{CURRENT_DATE}}`, `{{CURRENT_DATETIME}}`, `{{CURRENT_TIME}}`, `{{USER_NAME}}`, and `{{USER_LOCATION}}` can be utilized in the system prompt. `{{USER_LOCATION}}` prompt variable requires a secure connection over HTTPS. Ensure `{{USER_LOCATION}}` is toggled on from `Settings` > `Interface` to utilize this particular prompt varibale.
 
 - 🔒 **Toggle Chat History**: Toggle chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions when toggled off.
 
-- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from Open WebUI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
+- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from Open WebUI from `Admin Settings` > `Settings` > `Model` > `Experimental`. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
 
-- 🧠 **Experimental Memory Feature**: Manually add information you want LLMs to remember via `Settings` > `Personalization` > `Memory`. Memories can be added, edited, and deleted.
+- 🧠 **Memory Feature**: Manually add information you want your LLMs to remember via `Settings` > `Personalization` > `Memory`. Memories can be added, edited, and deleted.
 
-- 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the Retrieval Augmented Generation (RAG) feature.
+- 📜 **Citations in RAG Feature**: Easily track the context from documents fed to LLMs with added citations for reference points via the Retrieval Augmented Generation (RAG) feature.
 
-- 🌟 **Enhanced RAG Pipeline**: With hybrid searching via `BM25`, re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
+- 🌟 **Enhanced RAG Pipeline**: A togglable hybrid search sub-feature for our RAG embedding feature that enhances the RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
 
-- 📹 **YouTube RAG Pipeline**: Dedicated Retrieval Augmented Generation (RAG) pipeline for YouTube videos, enabling interaction with video transcriptions directly.
+- 📹 **YouTube RAG Pipeline**: Dedicated Retrieval Augmented Generation (RAG) pipeline for summaring YouTube videos via video URLs, enabling smooth interaction with video transcriptions directly.
 
 ---
 
@@ -160,6 +160,10 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 📥🗑️ **Download/Delete Models**: Easily download or delete models directly from Open WebUI.
 
 - 🔄 **Update All Ollama Models**: Easily update locally installed models all at once with a convenient button, streamlining model management.
+
+- 🍻 **TavernAI Character Card Integration**: Experience enhanced visual storytelling with TavernAI Character Card Integration in our model builder. Seamlessly incorporate TavernAI character card PNGs directly into your model files, allowing for a more immersive and engaging user experience.
+
+- 🎲 **Model Playground (Beta)**: Try out models in a sandbox environment with the new model playground area (beta). Test and explore model capabilities and settings with ease before deploying them in a live chat environment.
 
 ---
 
