@@ -15,9 +15,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
 
-- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native progressive web app experience on your mobile device, featuring offline access on localhost or a personal domain, and a smooth user interface.
-To set up a PWA, you'll need some understanding of technologies like Linux, Docker, and reverse proxies such as `Nginx`, `Caddy`, or `Traefik`. Using these tools can help streamline the process for creating and deploying your PWA tailored to your needs.
-While there isn't a "one-click install" option available and takes user-experience, using these resources can make it easier to create and deploy a PWA tailored to your needs.
+- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native progressive web app experience on your mobile device, featuring offline access on localhost or a personal domain, and a smooth user interface. For our PWA to be installable on your device, it must be served in a secure context. This usually means that it must be served over HTTPS.
+  - To set up a PWA, you'll need some understanding of technologies like Linux, Docker, and reverse proxies such as `Nginx`, `Caddy`, or `Traefik`. Using these tools can help streamline the process for creating and deploying your PWA tailored to your needs. And while there isn't a "one-click install" option available and your available option for serving your Open WebUI instance securely over HTTPS takes user-experience, using these resources can make it easier to create and deploy a PWA tailored to your needs.
 
 - ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
@@ -49,23 +48,25 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 📥 **Upload Pipeline**: Directly upload pipelines from `Admin Panel` > `Settings` > `Pipelines` section, streamlining the pipeline management process.
 
-- 🔗 **Function Calling**: Integrate function calling seamlessly through Pipelines and enhance your applications with custom logic.
+#### The possibilities with our Pipelines framework knows no bounds. Start with a few pre-built pipelines to help you get started!
 
-- 📚 **Custom RAG**: Seamlessly integrate a custom Retrieval Augmented Generation (RAG) pipeline to enhance your applications with advanced AI capabilities.
+- 🔗 **Function Calling**: Integrate [Function Calling](https://github.com/open-webui/pipelines/blob/main/examples/filters/function_calling_filter_pipeline.py) seamlessly through Pipelines and enhance your applications with custom logic.
 
-- 📊 **Message Monitoring with Langfuse**: Monitor and analyze message interactions in real-time usage statistics via Langfuse integration.
+- 📚 **Custom RAG**: Seamlessly integrate a [custom Retrieval Augmented Generation (RAG)](https://github.com/open-webui/pipelines/tree/main/examples/pipelines/rag) pipeline to enhance your applications with advanced AI capabilities.
 
-- ⚖️ **User Rate Limiting**: Manage API usage efficiently by controlling the flow of requests to prevent exceeding rate limits.
+- 📊 **Message Monitoring with Langfuse**: Monitor and analyze message interactions in real-time usage statistics via our [Langfuse](https://github.com/open-webui/pipelines/blob/main/examples/filters/langfuse_filter_pipeline.py) pipeline.
 
-- 🌍 **Real-Time LibreTranslate Translation**: Seamlessly integrate real-time translations into your LLM interactions using LibreTranslate, enabling cross-lingual communication.
+- ⚖️ **User Rate Limiting**: Manage API usage efficiently by controlling the flow of requests to prevent exceeding rate limits with out [Rate Limit](https://github.com/open-webui/pipelines/blob/main/examples/filters/rate_limit_filter_pipeline.py) pipeline.
 
-- 🛡️ **Toxic Message Filtering**: Automatically filter out toxic messages to maintain a safe environment.
+- 🌍 **Real-Time LibreTranslate Translation**: Seamlessly integrate real-time translations into your LLM interactions using [LibreTranslate](https://github.com/open-webui/pipelines/blob/main/examples/filters/libretranslate_filter_pipeline.py), enabling cross-lingual communication. This pipeline requires further setup with LibreTranslate in a Docker container to work.
 
-- 🕒 **Conversation Turn Limits**: Manage interactions better with set limits on conversation turns.
+- 🛡️ **Toxic Message Filtering**: Automatically filter out toxic messages to maintain a safe environment with our [Detoxify](https://github.com/open-webui/pipelines/blob/main/examples/filters/detoxify_filter_pipeline.py) pipeline.
 
-- 📈 **OpenAI Generation Stats**: Access detailed generation statistics for OpenAI models.
+- 🕒 **Conversation Turn Limits**: Manage interactions better by setting limits on conversation turns with our [Conversation Turn Limit](https://github.com/open-webui/pipelines/blob/main/examples/filters/conversation_turn_limit_filter.py) pipeline.
 
-#### In addition to the extensive features and customization options, we also provide a [library of example pipelines ready to use](https://github.com/open-webui/pipelines/tree/main/examples) along with [a practical example scaffold pipeline](https://github.com/open-webui/pipelines/blob/main/examples/scaffolds/example_pipeline_scaffold.py) to help you get started. These resources will streamline your development process and enable you to quickly create powerful applications using Pipelines and Python. Happy coding! 💡
+- 📈 **OpenAI Generation Stats**: Access detailed generation statistics for OpenAI models with our [OpenAI](https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/openai_manifold_pipeline.py) pipeline.
+
+#### In addition to the extensive features and customization options, we also provide [a library of example pipelines ready to use](https://github.com/open-webui/pipelines/tree/main/examples) along with [a practical example scaffold pipeline](https://github.com/open-webui/pipelines/blob/main/examples/scaffolds/example_pipeline_scaffold.py) to help you get started. These resources will streamline your development process and enable you to quickly create powerful applications using Pipelines and Python. Happy coding! 💡
 
 ---
 
@@ -77,7 +78,7 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 🎨 **Splash Screen**: A simple loading splash screen for a smoother user experience.
 
-- 📦 **Pip Install Method**: Install Open WebUI using `pip install open-webui`, simplifying the installation process and making it even easier for newcomers to get started. Find out more [here](https://pypi.org/project/open-webui/).
+- 📦 **Pip Install Method**: Install Open WebUI using `pip install open-webui`, simplifying the installation process and making it even easier for newcomers to get started. [Find out more here](https://pypi.org/project/open-webui/).
 
 - 🌈 **Theme Customization**: Personalize your Open WebUI experience with a range of options, including a variety of solid, yet sleek themes, customizable chat background images, and three mode options: Light, Dark, or OLED Dark mode - or let your device choose for you!
 
@@ -113,7 +114,7 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
 
-- 📅 **Prompt Variables Support**: Variables such as `{{CURRENT_DATE}}`, `{{CURRENT_DATETIME}}`, `{{CURRENT_TIME}}`, `{{USER_NAME}}`, and `{{USER_LOCATION}}` for system prompts. Ensure `{{USER_LOCATION}}` is toggled on from `Settings` > `Interface` to utilize this particular prompt varibale.
+- 📅 **Prompt Variables Support**: Variables such as `{{CURRENT_DATE}}`, `{{CURRENT_DATETIME}}`, `{{CURRENT_TIME}}`, `{{USER_NAME}}`, and `{{USER_LOCATION}}` for system prompts. `{{USER_LOCATION}}` prompt variable requires a secure connection over HTTPS. Ensure `{{USER_LOCATION}}` is toggled on from `Settings` > `Interface` to utilize this particular prompt varibale.
 
 - 🔒 **Toggle Chat History**: Toggle chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions when toggled off.
 
@@ -162,7 +163,7 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links seamlessly between users, enhancing collaboration and communication.
 
-- 🤝 **Community Sharing**: Share your chat sessions with the [Open WebUI Community](https://openwebui.com/) by clicking the `Share to Open WebUI Community` button. This feature allows you to engage with other users and collaborate on the platform. To use this feature, sign in to your Open WebUI Community account. Sharing your chats fosters a vibrant community, encourages knowledge sharing, and facilitates joint problem-solving. 
+- 🤝 **Community Sharing**: Share your chat sessions with the [Open WebUI Community](https://openwebui.com/) by clicking the `Share to Open WebUI Community` button. This feature allows you to engage with other users and collaborate on the platform. To use this feature, sign in to your Open WebUI Community account. Sharing your chats fosters a vibrant community, encourages knowledge sharing, and facilitates joint problem-solving. Community sharing of chat sessions is an optional feature, but only Admins can toggle this feature On/Off via `Admin Settings` > `Settings` > `General`.
 
 - 👍👎 **RLHF Annotation**: Empower your messages by rating them with thumbs up and thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (RLHF). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
@@ -190,11 +191,11 @@ While there isn't a "one-click install" option available and takes user-experien
 
 ### 🎙️ Accessibility
 
-- 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
+- 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience. Microphone access requires a secure connection over HTTPS for this feature to work.
 
-- 🎙️ **Hands-Free Voice Call Feature**: Initiate voice calls without needing to use your hands, making interactions more seamless.
+- 🎙️ **Hands-Free Voice Call Feature**: Initiate voice calls without needing to use your hands, making interactions more seamless. Microphone access is required using a secure connection over HTTPS for this feature to work.
 
-- 📹 **Video Call Feature**: Enable video calls with supported vision models like LlaVA and GPT-4o, adding a visual dimension to your communications.
+- 📹 **Video Call Feature**: Enable video calls with supported vision models like LlaVA and GPT-4o, adding a visual dimension to your communications. Both Camera & Microphone access is required using a secure connection over HTTPS for this feature to work.
 
 - 👆 **Tap to Interrupt**: Stop the AI’s speech during conversations with a simple tap, ensuring seamless control over the interaction.
 
@@ -210,11 +211,11 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 🚀 **Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework**: Seamlessly integrate and customize [Open WebUI Pipelines](https://github.com/open-webui/pipelines) for efficient data processing and model training, ensuring ultimate flexibility and scalability.
 
--  🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions. We’ve also included a built-in code editor to seamlessly develop and integrate function code within the 'Tools' workspace.
+-  🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions via a built-in code editor to seamlessly develop and integrate function code within the `Tools` and `Functions` workspace.
 
 - 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with libraries like `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, & `regex`.
 
-- 🌊 **Mermaid Rendering**: Create beautiful diagrams and flowcharts directly within Open WebUI.
+- 🌊 **Mermaid Rendering**: Create beautiful diagrams and flowcharts directly within Open WebUI via [Mermaid Diagramming and charting tool](https://mermaid.js.org/intro/) syntax rendering.
 
 ---
 
@@ -224,7 +225,7 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 🔑 **Simplified API Key Management**: Easily generate and manage secret keys to leverage Open WebUI with OpenAI libraries, streamlining integration and development.
 
-- 🌐 **HTTP Proxy Support**: Configure network settings easily using the `http_proxy` environment variable.
+- 🌐 **HTTP/S Proxy Support**: Configure network settings easily using the `http_proxy` or `https_proxy` environment variable. These variables, if set, should contain the URLs for HTTP and HTTPS proxies, respectively.
 
 - 🌐🔗 **External Ollama Server Connectivity**: Seamlessly link to an external Ollama server hosted on a different address by configuring the environment variable.
 
@@ -262,7 +263,7 @@ While there isn't a "one-click install" option available and takes user-experien
 
 - 🛡️ **Model Whitelisting**: Enhance security and access control by allowing admins to whitelist models for users with the `user` role, ensuring that only authorized models can be accessed.
 
-- 🔑 **Admin Control for Community Sharing**: Admins can enable or disable community sharing for all users via a toggle in admin settings. This toggle allows admins to manage accessibility and privacy, ensuring a secure environment. Admins can choose to enable or disable the `Share on Community` button for all users, controlling community engagement and collaboration.
+- 🔑 **Admin Control for Community Sharing**: Admins can enable or disable community sharing for all users via a toggle in `Admin Panel` > `Settings`. This toggle allows admins to manage accessibility and privacy, ensuring a secure environment. Admins can choose to enable or disable the `Share on Community` button for all users, controlling community engagement and collaboration.
 
 - 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Web UI.
 
