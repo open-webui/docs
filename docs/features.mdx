@@ -107,11 +107,17 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in `Admin Panel` > `Settings` > `Documents`, enhancing document processing. This feature supports Ollama and OpenAI models.
 
-- 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multi-modal interactions, including images (`e.g., LLaVA`).
+- 📜 **Citations in RAG Feature**: The Retrieval Augmented Generation (RAG) feature allows users to easily track the context of documents fed to LLMs with added citations for reference points.
 
-- 🤖 **Multiple Model Support**: Seamlessly switch between different models for diverse chat interactions.
+- 🌟 **Enhanced RAG Pipeline**: A togglable hybrid search sub-feature for our RAG embedding feature that enhances the RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
 
-- ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting model parameters such as `seed`, `temperature`, `frequency penalty`, `context length`, `seed`, and more.
+- 📹 **YouTube RAG Pipeline**: The dedicated Retrieval Augmented Generation (RAG) pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly.
+
+- 🔄 **Multi-Modal Support**: Effortlessly engage with models that support multi-modal interactions, including images (`e.g., LLaVA`).
+
+- 🤖 **Multiple Model Support**: Quickly switch between different models for diverse chat interactions.
+
+- 👥 **'@' Model Integration**: By seamlessly switching to any accessible local or external model during conversations, users can harness the collective intelligence of multiple models in a single chat. This can done by using the `@` command to specify the model by name within a chat.
 
 - 🏷️ **Conversation Tagging**: Effortlessly categorize and locate tagged chats for quick reference and streamlined data collection.
 
@@ -122,17 +128,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 📅 **Prompt Variables Support**: Utilize prompt variables such as `{{CURRENT_DATE}}`, `{{CURRENT_DATETIME}}`, `{{CURRENT_TIME}}`, `{{USER_NAME}}`, and `{{USER_LOCATION}}` can be utilized in the system prompt.
   - Please note that the `{{USER_LOCATION}}` prompt variable requires a secure connection over HTTPS. To utilize this particular prompt variable, please ensure that `{{USER_LOCATION}}` is toggled on from `Settings` > `Interface`.
 
-- 🔒 **Toggle Chat History**: Toggle chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions when toggled off.
-
-- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from Open WebUI from `Admin Settings` > `Settings` > `Model` > `Experimental`. The process has been streamlined with the option to upload from your machine or download GGUF files from Hugging Face.
-
 - 🧠 **Memory Feature**: Manually add information you want your LLMs to remember via `Settings` > `Personalization` > `Memory`. Memories can be added, edited, and deleted.
-
-- 📜 **Citations in RAG Feature**: The Retrieval Augmented Generation (RAG) feature allows users to easily track the context of documents fed to LLMs with added citations for reference points.
-
-- 🌟 **Enhanced RAG Pipeline**: A togglable hybrid search sub-feature for our RAG embedding feature that enhances the RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
-
-- 📹 **YouTube RAG Pipeline**: The dedicated Retrieval Augmented Generation (RAG) pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly.
 
 ---
 
@@ -151,11 +147,13 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔍 **Model Selector Dropdown**: Easily find and select your models with an included search filter and detailed model information with model tags and model descriptions.
 
-- 👥 **'@' Model Integration**: By seamlessly switching to any accessible local or external model during conversations, users can harness the collective intelligence of multiple models in a single chat. This can done by using the `@` command to specify the model by name within a chat.
+- ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting model parameters such as `seed`, `temperature`, `frequency penalty`, `context length`, `seed`, and more.
 
 - 🔄 **Seamless Integration**: Copy any `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
 
 - 🗂️ **Create Ollama Modelfile**: To create a model file for Ollama, navagate to the `Admin Panel` > `Settings` > `Models` > `Create a model`.
+
+- ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from Open WebUI from `Admin Settings` > `Settings` > `Model` > `Experimental`. The process has been streamlined with the option to upload from your machine or download GGUF files from Hugging Face.
 
 - ⚙️ **Default Model Setting**: The default model can be set in `Settings` > `Interface` for mobile devices, or be set easier in a new chat under the model selector dropdown on PCs.
 
@@ -167,7 +165,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🍻 **TavernAI Character Card Integration**: Experience enhanced visual storytelling with TavernAI Character Card Integration in our model builder. Users can seamlessly incorporate TavernAI character card PNGs directly into their model files, creating a more immersive and engaging user experience.
 
-- 🎲 **Model Playground (Beta)**: Try out models in a sandbox environment with the new model playground area (`beta`), which enables users to test and explore model capabilities and settings with ease in a sandbox environment before deployment in a live chat environment.
+- 🎲 **Model Playground (Beta)**: Try out models in a sandbox environment with the model playground area (`beta`), which enables users to test and explore model capabilities and settings with ease in a sandbox environment before deployment in a live chat environment.
 
 ---
 
@@ -184,7 +182,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 📚 History & Archive
 
-- 📜 **Chat History**: Access and manage your conversation history with ease via the chat navigation sidebar.
+- 📜 **Chat History**: Access and manage your conversation history with ease via the chat navigation sidebar. Toggle off chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions.
 
 - 🔄 **Regeneration History Access**: Easily revisit and explore your entire regeneration history.
 
@@ -228,9 +226,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 -  🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions via a built-in code editor to seamlessly develop and integrate function code within the `Tools` and `Functions` workspace.
 
-- 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with a range of libraries, including `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, and `regex`.
+- 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with a range of libraries supported by Pyodide.
 
-- 🌊 **Mermaid Rendering**: Create visually appealing diagrams and flowcharts directly within Open WebUI using the [Mermaid Diagramming and charting tool](https://mermaid.js.org/intro/), which supports Mermaid syntax rendering..
+- 🌊 **Mermaid Rendering**: Create visually appealing diagrams and flowcharts directly within Open WebUI using the [Mermaid Diagramming and charting tool](https://mermaid.js.org/intro/), which supports Mermaid syntax rendering.
 
 ---
 
@@ -266,7 +264,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 👥 **Active Users Indicator**: Track active users count and which models are actively being used by whom to help you gauge when performance might be impacted due to a high number of users.
 
-- 🔒 **Default Sign-Up Role**: Set the default role for new sign-ups to pending, user, or admin, providing flexibility in managing user permissions and access levels for new users.
+- 🔒 **Default Sign-Up Role**: Set the default role for new sign-ups to `pending`, `user`, or `admin`, providing flexibility in managing user permissions and access levels for new users.
 
 - 🔒 **Prevent New Sign Ups**: Ability to disable new user sign-ups, restricting access to the platform and maintaining a fixed number of users.
 
