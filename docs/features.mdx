@@ -15,7 +15,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
 
-- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native app-like experience on your mobile device with our PWA, providing offline access on localhost and a seamless user interface.
+- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native progressive web app experience on your mobile device, featuring offline access on localhost or a personal domain, and a smooth user interface.
+To set up a PWA, you'll need some understanding of technologies like Linux, Docker, and reverse proxies such as `Nginx`, `Caddy`, or `Traefik`. Using these tools can help streamline the process for creating and deploying your PWA tailored to your needs.
+While there isn't a "one-click install" option available and takes user-experience, using these resources can make it easier to create and deploy a PWA tailored to your needs.
 
 - ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
 
@@ -23,7 +25,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📚 **Local and Remote RAG Integration**: Dive into the future of chat interactions with groundbreaking Retrieval Augmented Generation (RAG) with document interactions in your chat. Load documents or add files to your library, then access them using `#` before a query, or start your prompt with `#`, followed by a URL for web content integration. 
 
-- 🔍 **Web Search for RAG**: Perform web searches using providers like `SearXNG`, `Google PSE`, `Brave Search`, `serpstack`, and `serper`, and inject the results directly into your local Retrieval Augmented Generation (RAG) experience.
+- 🔍 **Web Search for RAG**: Perform web searches using providers like `Brave Search`, `DuckDuckGo`, `Google Programmatic Search Engine`, `Serpstack`, `Serper`, `Serply`, `SearXNG`, and `Tavily`, and inject the results directly into your local Retrieval Augmented Generation (RAG) experience.
 
 - 🌐 **Web Browsing Capability**: Seamlessly integrate websites into your chat experience using the `#` command followed by a URL. This feature allows you to incorporate web content directly into your conversations, enhancing the richness and depth of your interactions.
 
@@ -44,6 +46,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 ### 🔧 Pipelines Support
 
 - 🔧 **Pipelines Framework**: Seamlessly integrate and customize your Open WebUI experience with our modular plugin framework for enhanced customization and functionality (https://github.com/open-webui/pipelines). Easily add custom logic and integrate Python libraries, from AI agents to home automation APIs.
+
+- 📥 **Upload Pipeline**: Directly upload pipelines from `Admin Panel` > `Settings` > `Pipelines` section, streamlining the pipeline management process.
 
 - 🔗 **Function Calling**: Integrate function calling seamlessly through Pipelines and enhance your applications with custom logic.
 
@@ -75,7 +79,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📦 **Pip Install Method**: Install Open WebUI using `pip install open-webui`, simplifying the installation process and making it even easier for newcomers to get started. Find out more [here](https://pypi.org/project/open-webui/).
 
-- 🌈 **Theme Customization**: Choose from a variety of solid, yet sleek themes to personalize your Open WebUI experience. Choose between either Light, Dark, or OLED Dark mode; or simply let your system choose for you!
+- 🌈 **Theme Customization**: Personalize your Open WebUI experience with a range of options, including a variety of solid, yet sleek themes, customizable chat background images, and three mode options: Light, Dark, or OLED Dark mode - or let your device choose for you!
 
 - 💻 **Code Syntax Highlighting**: Enjoy enhanced code readability with our syntax highlighting feature.
 
@@ -83,11 +87,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📱 **Mobile Accessibility**: Seamlessly open and close the sidebar on mobile devices with intuitive swipe gestures.
 
-- 💾 **Persistent Settings**: Enjoy the convenience of saved settings, stored in a config.json file for easy access and reuse.
+- 💾 **Persistent Settings**: Enjoy the convenience of saved and persistent settings within the WebUI, stored in a config.json file for easy access and reuse.
 
-- ❓ **Quick Access to Documentation**: Easily access Open WebUI documentation page easily via a question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like PCs).
+- ❓ **Quick Access to Documentation & Shortcuts**: Easily access Open WebUI documentation page and view available keyboard shortcuts easily via a question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like PCs).
 
-- 📜 **Changelog**: Access a comprehensive changelog in `Settings` > `About` > `See What's New`, providing a quick overview of the latest features, improvements, and bug fixes.
+- 📜 **Changelog & Check for Updates**: Access a comprehensive changelog and check for updates in `Settings` > `About` > `See What's New`, providing a quick overview of the latest features, improvements, and bug fixes.
 
 ---
 
@@ -95,9 +99,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📂 **Unified Workspace**: Access all your model files, prompts, documents, and a playground in one convenient location, streamlining your workflow.
 
-- 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in `Workspace` > `Documents` > `Document Settings`, enhancing document processing. This feature supports Ollama and OpenAI models.
+- 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in `Admin Panel` > `Settings` > `Documents`, enhancing document processing. This feature supports Ollama and OpenAI models.
 
-- 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multi-modal interactions, including images (e.g., LLava).
+- 🔄 **Multi-Modal Support**: Seamlessly engage with models that support multi-modal interactions, including images (e.g., LLaVA).
 
 - 🤖 **Multiple Model Support**: Seamlessly switch between different chat models for diverse interactions.
 
@@ -109,13 +113,13 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📜 **Prompt Preset Support**: Instantly access preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Effortlessly import prompts through [Open WebUI Community](https://openwebui.com/) integration.
 
-- 📅 **Prompt Variables Support**: Variables for dynamic prompts, such as `{{CURRENT_DATE}}` and `{{USER_NAME}}`.
+- 📅 **Prompt Variables Support**: Variables such as `{{CURRENT_DATE}}`, `{{CURRENT_DATETIME}}`, `{{CURRENT_TIME}}`, `{{USER_NAME}}`, and `{{USER_LOCATION}}` for system prompts. Ensure `{{USER_LOCATION}}` is toggled on from `Settings` > `Interface` to utilize this particular prompt varibale.
 
 - 🔒 **Toggle Chat History**: Toggle chat history in `Settings` > `Chats` to prevent chat history from being created with new interactions when toggled off.
 
 - ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from the Web UI. Streamlined process with options to upload from your machine or download GGUF files from Hugging Face.
 
-- 🧠 **Experimental Memory Feature**: Manually input personal information you want LLMs to remember via `Settings` > `Personalization` > `Memory`.
+- 🧠 **Experimental Memory Feature**: Manually add information you want LLMs to remember via `Settings` > `Personalization` > `Memory`. Memories can be added, edited, and deleted.
 
 - 📜 **Citations in RAG Feature**: Easily track the context fed to the LLM with added citations in the Retrieval Augmented Generation (RAG) feature.
 
@@ -130,6 +134,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛠️ **Model Builder**: Build and edit all models with a persistent model builder mode within the models workspace.
 
+- 📚 **Knowledge Support for Models**: Attach functions and documents directly to models from the models workspace, enhancing the information available to each model.
+
 - 🗂️ **Model Presets**: Create and manage model presets for both Ollama/OpenAI API.
 
 - 🏷️ **Model Tagging**: Organize models in the models workspace with tagging.
@@ -140,7 +146,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔄 **Seamless Integration**: Copy any `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
 
-- 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in `Settings` > `Models` > `Create a model`, making it easier to manage your models.
+- 🗂️ **Create Ollama Modelfile**: Create a modelfile for Ollama in `Admin Panel` > `Settings` > `Models` > `Create a model`, making it easier to manage your models.
 
 - ⚙️ **Default Model Setting**: Easily set the default model in `Settings` > `Interface` for mobile devices, or set it easily in a new chat under the model selector dropdown on PCs.
 
@@ -186,6 +192,14 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
 
+- 🎙️ **Hands-Free Voice Call Feature**: Initiate voice calls without needing to use your hands, making interactions more seamless.
+
+- 📹 **Video Call Feature**: Enable video calls with supported vision models like LlaVA and GPT-4o, adding a visual dimension to your communications.
+
+- 👆 **Tap to Interrupt**: Stop the AI’s speech during conversations with a simple tap, ensuring seamless control over the interaction.
+
+- 😊 **Emoji Call**: Toggle this feature on from the `Settings` > `Interface`, allowing LLMs to express emotions using emojis during voice calls for a more dynamic interaction.
+
 - 👥 **'@' Model Integration**: Harness the collective intelligence of multiple models in a single chat by seamlessly switching to any accessible local or external model during conversations by using the `@` command to specify the model by name.
 
 - 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI-compatible endpoints.
@@ -195,6 +209,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 ### 🐍 Code Execution
 
 - 🚀 **Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework**: Seamlessly integrate and customize [Open WebUI Pipelines](https://github.com/open-webui/pipelines) for efficient data processing and model training, ensuring ultimate flexibility and scalability.
+
+-  🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions. We’ve also included a built-in code editor to seamlessly develop and integrate function code within the 'Tools' workspace.
 
 - 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with libraries like `requests`, `beautifulsoup4`, `numpy`, `pandas`, `seaborn`, `matplotlib`, `scikit-learn`, `scipy`, & `regex`.
 
@@ -213,6 +229,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🌐🔗 **External Ollama Server Connectivity**: Seamlessly link to an external Ollama server hosted on a different address by configuring the environment variable.
 
 - 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the `DATABASE_URL` environment variable.
+
+- 🌐🗣️ **External Speech-to-Text Support**: Enjoy enhanced flexibility with the addition of external Speech-To-Text (STT) services, allowing you to choose your preferred provider for seamless interaction.
 
 - 🌐 **Remote ChromaDB Support**: Expand your database capabilities with the ability to connect to remote ChromaDB servers.
 
