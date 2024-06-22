@@ -32,7 +32,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - ⚙️ **Concurrent Model Utilization**: Effortlessly engage with multiple models simultaneously, harnessing their unique strengths for optimal responses. Leverage a diverse set of model modalities in parallel to enhance your experience.
 
-- 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions;. Only authorized individuals can access your Ollama, while model creation and pulling rights are exclusively reserved for administrators.
+- 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions. Only authorized individuals can access your Ollama, while model creation and pulling rights are exclusively reserved for administrators.
 
 - 🌐🌍 **Multilingual Support**: Experience Open WebUI in your preferred language with our internationalization (`i18n`) support. We invite you to join us in expanding our supported languages! We're actively seeking contributors!
 
@@ -176,7 +176,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 👍👎 **RLHF Annotation**: Enhance the impact of your messages by rating them with either a thumbs up or thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (`RLHF`). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
 - 🤝 **Community Sharing**: Share your chat sessions with the [Open WebUI Community](https://openwebui.com/) by clicking the `Share to Open WebUI Community` button. This feature allows you to engage with other users and collaborate on the platform.
-  - To utilize this feature, please sign in to your Open WebUI Community account. Sharing your chats fosters a vibrant community, encourages knowledge sharing, and facilitates joint problem-solving. Please note that community sharing of chat sessions is an optional feature. Only Admins can toggle this feature on or off via the `Admin Settings` > `Settings` > `General` menu.
+  - To utilize this feature, please sign-in to your Open WebUI Community account. Sharing your chats fosters a vibrant community, encourages knowledge sharing, and facilitates joint problem-solving. Please note that community sharing of chat sessions is an optional feature. Only Admins can toggle this feature on or off via the `Admin Settings` > `Settings` > `General` menu.
 
 ---
 
@@ -244,9 +244,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the `DATABASE_URL` environment variable.
 
-- 🌐🗣️ **External Speech-to-Text Support**: Enjoy enhanced flexibility with the addition of external Speech-To-Text (`STT`) services, allowing you to choose your preferred provider for seamless interaction.
+- 🌐🗣️ **External Speech-to-Text Support**: The addition of external speech-to-text (`STT`) services provides enhanced flexibility, allowing users to choose their preferred provider for seamless interaction.
 
-- 🌐 **Remote ChromaDB Support**: Expand your database capabilities with the ability to connect to remote ChromaDB servers.
+- 🌐 **Remote ChromaDB Support**: Extend the capabilities of your database by connecting to remote ChromaDB servers.
 
 - 🔀 **Multiple Ollama Instance Load Balancing**: Effortlessly distribute chat requests across multiple Ollama instances for enhanced performance and reliability.
 
@@ -254,39 +254,37 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 👑 Administration
 
-- 👑 **Super Admin Assignment**: Automatically assign the first sign up as a super admin with an unchangeable role that cannot be modified by anyone else, not even other admins.
+- 👑 **Super Admin Assignment**: Automatically assigns the first sign-up as a super admin with an unchangeable role that cannot be modified by anyone else, not even other admins.
 
 - 🛡️ **Granular User Permissions**: Restrict user actions and access with customizable role-based permissions, ensuring that only authorized individuals can perform specific tasks.
 
-- 👥 **Multi-User Management**: Seamlessly manage multiple users through our intuitive admin panel with pagination, streamlining user administration and simplifying user life-cycle management.
+- 👥 **Multi-User Management**: Intuitive admin panel with pagination allows you to seamlessly manage multiple users, streamlining user administration and simplifying user life-cycle management.
 
-- 🔧 **Admin Panel**: Streamlined user management with options to add users directly or in bulk via CSV import, making user on-boarding and management efficient.
+- 🔧 **Admin Panel**: The user management system is designed to streamline the onboarding and management of users, offering the option to add users directly or in bulk via CSV import.
 
-- 👥 **Active Users Indicator**: Track active users count and which models are actively being used by whom to help you gauge when performance might be impacted due to a high number of users.
+- 👥 **Active Users Indicator**: Monitor the number of active users and which models are being utilized by whom to assist in gauging when performance may be impacted due to a high number of users.
 
-- 🔒 **Default Sign-Up Role**: Set the default role for new sign-ups to `pending`, `user`, or `admin`, providing flexibility in managing user permissions and access levels for new users.
+- 🔒 **Default Sign-Up Role**: Specify the default role for new sign-ups to `pending`, `user`, or `admin`, providing flexibility in managing user permissions and access levels for new users.
 
-- 🔒 **Prevent New Sign Ups**: Ability to disable new user sign-ups, restricting access to the platform and maintaining a fixed number of users.
+- 🔒 **Prevent New Sign-Ups**: Enable the option to disable new user sign-ups, restricting access to the platform and maintaining a fixed number of users.
 
 - 🔒 **Prevent Chat Deletion**: Ability for admins to toggle a setting that prevents all users from deleting their chat messages, ensuring that all chat messages are retained for audit or compliance purposes.
 
 - 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with `Discord`, `Google Chat` and `Microsoft Teams`), providing real-time notifications and automation capabilities.
 
-- 📣 **Configurable Notification Banners**: Admins can create customizable banners with persistence in config.json, featuring options for content, background color (`info`, `warning`, `error`, or `success`), and dismissibility. These banners are only accessible to logged-in users, ensuring sensitive information remains private.
+- 📣 **Configurable Notification Banners**: Admins can create customizable banners with persistence in config.json, featuring options for content, background color (`info`, `warning`, `error`, or `success`), and dismissibility. Banners are accessible only to logged-in users, ensuring the confidentiality of sensitive information.
 
 - 🛡️ **Model Whitelisting**: Enhance security and access control by allowing admins to whitelist models for users with the `user` role, ensuring that only authorized models can be accessed.
 
-- 🔑 **Admin Control for Community Sharing**: Admins can enable or disable community sharing for all users via a toggle in `Admin Panel` > `Settings`. This toggle allows admins to manage accessibility and privacy, ensuring a secure environment. Admins can choose to enable or disable the `Share on Community` button for all users, controlling community engagement and collaboration.
+- 🔑 **Admin Control for Community Sharing**: Admins can enable or disable community sharing for all users via a toggle in the `Admin Panel` > `Settings` menu. This toggle allows admins to manage accessibility and privacy, ensuring a secure environment. Admins have the option of enabling or disabling the `Share on Community` button for all users, which allows them to control community engagement and collaboration.
 
-- 📧 **Trusted Email Authentication**: Authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Open WebUI instance.
+- 📧 **Trusted Email Authentication**: Optionally authenticate using a trusted email header, adding an extra layer of security and authentication to protect your Open WebUI instance.
 
-- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI backend and Ollama. This key feature eliminates the need to expose Ollama over LAN. Requests made to the `/ollama/api` route from Opeb WebUI are seamlessly redirected to Ollama from the backend, enhancing overall system security.
+- 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI's backend and Ollama. This key feature eliminates the need to expose Ollama over the local area network (LAN). Requests made to the `/ollama/api` route from Open WebUI are seamlessly redirected to Ollama from the backend, enhancing overall system security and providing an additional layer of protection.
 
-- 🔒 **Authentication**: Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
+- 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
 
-- 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`, ideal for fresh installations without existing users and demo purposes.
-
-
+- 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`. This is an ideal solution for fresh installations without existing users or can be useful for demonstration purposes.
 ---
 
 ### 📄 Swagger Documentation
