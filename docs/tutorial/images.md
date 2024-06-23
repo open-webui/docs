@@ -5,7 +5,7 @@ title: "Image Generation"
 
 # Image Generation
 
-Open WebUI now supports image generation through two backends: **AUTOMATIC1111** and **OpenAI DALL·E**. This guide will help you set up and use both options.
+Open WebUI now supports image generation through two backends: **AUTOMATIC1111**, **ComfyUI** and **OpenAI DALL·E**. This guide will help you set up and use both options.
 
 ## AUTOMATIC1111
 
