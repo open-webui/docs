@@ -5,7 +5,7 @@ title: "Image Generation"
 
 # Image Generation
 
-Open WebUI now supports image generation through two backends: **AUTOMATIC1111** and **OpenAI DALL·E**. This guide will help you set up and use both options.
+Open WebUI supports image generation through three backends: **AUTOMATIC1111**, **ComfyUI**, and **OpenAI DALL·E**. This guide will help you set up and use either of these options.
 
 ## AUTOMATIC1111
 
@@ -25,8 +25,9 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, navigate to **Settings > Images**.
-2. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
+1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+2. Set the `Image Generation Engine` field to `Default (Automatic1111)`.
+3. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
    ```
    http://<your_automatic1111_address>:7860/
    ```
@@ -54,10 +55,11 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, navigate to **Settings > Images**.
-2. In the API URL field, enter the address where ComfyUI's API is accessible:
+1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+2. Set the `Image Generation Engine` field to `ComfyUI`.
+3. In the API URL field, enter the address where ComfyUI's API is accessible:
    ```
-   http://<your_comfyui_address>:7860/
+   http://<your_comfyui_address>:8188/
    ```
    Set the environment variable `COMFYUI_BASE_URL` to this address to ensure proper integration.
 
@@ -71,8 +73,8 @@ Open WebUI also supports image generation through the **OpenAI DALL·E APIs**. T
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, navigate to **Settings > Images**.
-2. Select **OpenAI** as your image generation backend.
+1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+2. Set the `Image Generation Engine` field to `Open AI (Dall-E)`.
 3. Enter your OpenAI API key.
 4. Choose the DALL·E model you wish to use. Note that image size options will depend on the selected model:
    - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
