@@ -31,6 +31,11 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `http://localhost:3000`
 - Description: Specifies the URL where the Open WebUI is reachable. Currently used for search engine support.
 
+#### `AIOHTTP_CLIENT_TIMEOUT`
+
+- Default: `300`
+- Description: Specifies the timeout duration in seconds for the aiohttp client. This is the maximum amount of time the client will wait for a response before timing out. If set to an empty string (''), the timeout will be set to None, effectively disabling the timeout and allowing the client to wait indefinitely.
+
 #### `DATA_DIR`
 
 - Default: `./data`
