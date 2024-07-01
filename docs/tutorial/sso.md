@@ -7,10 +7,10 @@ title: "Federated Authentication Support"
 
 Open WebUI supports several forms of federated authentication:
 
-1. OAuth
-  1. Google
-  1. Microsoft
-  1. OIDC
+1. OAuth2
+    1. Google
+    1. Microsoft
+    1. OIDC
 1. Trusted Header
 
 ## OAuth
