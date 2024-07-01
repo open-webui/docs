@@ -144,7 +144,6 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `-1`
 - Description: Sets the JWT expiration time in seconds. A value of -1 disables expiration.
 
-
 #### `USE_CUDA_DOCKER`
 
 - Default: `False`
@@ -159,6 +158,39 @@ Here is a list of supported environment variables used by `backend/config.py` in
 
 - Default: `8080`
 - Description: Sets the port to run Open WebUI from.
+
+#### `RESET_CONFIG_ON_START`
+
+- Default: `False`
+- Description: Resets the `config.json` file on startup.
+
+#### `SHOW_ADMIN_DETAILS`
+
+- Default: `True`
+- Description: Toggles whether to show admin user details in the interface.
+
+#### `ADMIN_EMAIL`
+
+- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
+
+#### `SAFE_MODE`
+
+- Default: `false`
+- Description: Enables safe mode, which disables potentially unsafe features.
+
+#### `WEBUI_SESSION_COOKIE_SAME_SITE`
+
+- Default: `lax`
+- Description: Sets the `SameSite` attribute for session cookies.
+
+#### `WEBUI_SESSION_COOKIE_SECURE`
+
+- Default: `false`
+- Description: Sets the `Secure` attribute for session cookies if set to `true`.
+
+#### `AIOHTTP_CLIENT_TIMEOUT`
+
+- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things such as connections to Ollama and OpenAI endpoints.
 
 ### Ollama
 
@@ -214,6 +246,63 @@ Here is a list of supported environment variables used by `backend/config.py` in
 
 - Description: Supports multiple OpenAI API keys, semicolon-separated.
 - Example: `sk-124781258123;sk-4389759834759834`
+
+### Tasks
+
+#### `TASK_MODEL`
+
+- Description: The default model to use for tasks such as title and web search query generation when using Ollama models.
+
+#### `TASK_MODEL_EXTERNAL`
+
+- Description: The default model to use for tasks such as title and web search query generation when using OpenAI-compatible endpoints.
+
+#### `TITLE_GENERATION_PROMPT_TEMPLATE`
+
+- Description: Prompt to use when generating chat titles.
+- Default:
+
+```
+Here is the query:
+{{prompt:middletruncate:8000}}
+
+Create a concise, 3-5 word phrase with an emoji as a title for the previous query. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+
+Examples of titles:
+📉 Stock Market Trends
+🍪 Perfect Chocolate Chip Recipe
+Evolution of Music Streaming
+Remote Work Productivity Tips
+Artificial Intelligence in Healthcare
+🎮 Video Game Development Insights
+```
+
+#### `SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE`
+
+- Description: Prompt to use when generating search queries.
+- Default:
+
+```
+You are tasked with generating web search queries. Give me an appropriate query to answer my question for google search. Answer with only the query. Today is {{CURRENT_DATE}}.
+        
+Question:
+{{prompt:end:4000}}
+```
+
+#### `SEARCH_QUERY_PROMPT_LENGTH_THRESHOLD`
+
+- Default: `100`
+- Description: Sets the minimum length of a prompt before a model is used to synthesize a web search query when web search is enabled.
+
+#### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
+
+- Description: Prompt to use when calling tools.
+- Default:
+
+```
+Tools: {{TOOLS}}
+If a function tool doesn't match the query, return an empty string. Else, pick a function tool, fill in the parameters from the function tool's schema, and return it in the format { "name": \"functionName\", "parameters": { "key": "value" } }. Only pick a function if the user asks.  Only return the object. Do not return any other text.
+```
 
 ### RAG
 
@@ -274,7 +363,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 #### `RAG_EMBEDDING_ENGINE`
 
 - Options:
-  - ` ` (empty for local model)
+  - `` (empty for local model)
   - `ollama`
   - `openai`
 - Description: Selects an embedding engine to use for RAG.
@@ -346,6 +435,11 @@ Query: [query]
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the OpenAI API key to use for RAG embeddings.
 
+#### `RAG_EMBEDDING_OPENAI_BATCH_SIZE`
+
+- Default: `1`
+- Description: Sets the batch size for OpenAI embeddings.
+
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
 - Default: `False`
@@ -375,7 +469,7 @@ Query: [query]
 
 #### `RAG_WEB_SEARCH_ENGINE`
 
-- Options: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`
+- Options: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`, `duckduckgo`, `tavily`, `jina`
 - Description: Select engine for performing searches
 
 #### `SEARXNG_QUERY_URL`
@@ -392,7 +486,7 @@ Query: [query]
 
 #### `BRAVE_SEARCH_API_KEY`
 
-- Default: ` `
+- Default: ``
 - Description: The API key for the Brave Search API.
 
 #### `SERPSTACK_API_KEY`
@@ -402,11 +496,19 @@ Query: [query]
 #### `SERPSTACK_HTTPS`
 
 - Default: `True`
-- Description: Configures the use of HTTPS for Serpstack requests. Free tier requests are restricted to HTTP only. 
+- Description: Configures the use of HTTPS for Serpstack requests. Free tier requests are restricted to HTTP only.
 
 #### `SERPER_API_KEY`
 
 - Description: The API key for the Serper search API.
+
+#### `SERPLY_API_KEY`
+
+- Description: The API key for the Serply search API.
+
+#### `TAVILY_API_KEY`
+
+- Description: The API key for the Tavily search API.
 
 #### `RAG_WEB_SEARCH_RESULT_COUNT`
 
@@ -418,7 +520,34 @@ Query: [query]
 - Default: `10`
 - Description: Number of concurrent requests to crawl web pages returned from search results.
 
+#### `RAG_WEB_SEARCH_DOMAIN_FILTER_LIST`
+
+- Default: `[]`
+- Description: You can provide a list of your own websites to filter after performing a web search. This ensures the highest level of safety and reliability of the information sources.
+
 ### Speech to Text
+
+#### `AUDIO_STT_ENGINE`
+
+- Options:
+  - `` - empty for local Whisper
+  - `openai` - OpenAI-compatible transcription
+- Description: Specifies the Speech-to-Text engine to use.
+
+#### `AUDIO_STT_OPENAI_API_BASE_URL`
+
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI-compatible base URL to use for Speech-to-Text.
+
+#### `AUDIO_STT_OPENAI_API_KEY`
+
+- Default: `${OPENAI_API_KEY}`
+- Description: Sets the OpenAI API key to use for Speech-to-Text.
+
+#### `AUDIO_STT_MODEL`
+
+- Default: `whisper-1`
+- Description: Specifies the Speech-to-Text model to use for OpenAI-compatible endpoints.
 
 #### `WHISPER_MODEL`
 
@@ -522,6 +651,70 @@ Query: [query]
 
 - Description: Default model to use for image generation
 
+### OAuth
+
+#### `ENABLE_OAUTH_SIGNUP`
+
+- Default: `False`
+- Description: Enables user account creation via OAuth.
+
+#### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
+
+- Default: `False`
+- Description: If enabled, merges OAuth accounts with existing accounts using the same email address. This is considered unsafe as providers may not verify email addresses and can lead account takeovers.
+
+#### `GOOGLE_CLIENT_ID`
+
+- Description: Sets the client ID for Google OAuth
+
+#### `GOOGLE_CLIENT_SECRET`
+
+- Description: Sets the client secret for Google OAuth
+
+#### `GOOGLE_OAUTH_SCOPE`
+
+- Default: `openid email profile`
+- Description: Sets the scope for Google OAuth authentication.
+
+#### `MICROSOFT_CLIENT_ID`
+
+- Description: Sets the client ID for Microsoft OAuth
+
+#### `MICROSOFT_CLIENT_SECRET`
+
+- Description: Sets the client secret for Microsoft OAuth
+
+#### `MICROSOFT_CLIENT_TENANT_ID`
+
+- Description: Sets the tenant ID for Microsoft OAuth
+
+#### `MICROSOFT_OAUTH_SCOPE`
+
+- Default: `openid email profile`
+- Description: Sets the scope for Microsoft OAuth authentication.
+
+#### `OAUTH_CLIENT_ID`
+
+- Description: Sets the client ID for OIDC
+
+#### `OAUTH_CLIENT_SECRET`
+
+- Description: Sets the client secret for OIDC
+
+#### `OPENID_PROVIDER_URL`
+
+- Description: Path to the `.well-known/openid-configuration` endpoint
+
+#### `OAUTH_SCOPES`
+
+- Default: `openid email profile`
+- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
+
+#### `OAUTH_PROVIDER_NAME`
+
+- Default: `SSO`
+- Description: Sets the name for the OIDC provider.
+
 ### LiteLLM
 
 :::warning
@@ -547,15 +740,19 @@ You will need to either migrate to [pipelines](https://github.com/open-webui/pip
 - Description: Sets the address to run the bundled LiteLLM instance on.
 
 ## Misc Environment Variables
+
 These variables are not specific to Open-Webui but can still be valuable in certain contexts.
 
 ### Proxy Settings
+
 Open-Webui supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings, Open-Webui uses the following environment variables:
 
 #### `http_proxy`
+
 #### `https_proxy`
+
 - These variables, if set, should contain the URLs for HTTP and HTTPS proxies, respectively.
 
 #### `no_proxy`
-- This variable lists domain extensions (or IP addresses) for which the proxy should not be used, separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is bypassed when accessing documents from MIT.
 
+- This variable lists domain extensions (or IP addresses) for which the proxy should not be used, separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is bypassed when accessing documents from MIT.
