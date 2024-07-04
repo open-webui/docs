@@ -663,6 +663,16 @@ Query: [query]
 - Default: `False`
 - Description: If enabled, merges OAuth accounts with existing accounts using the same email address. This is considered unsafe as providers may not verify email addresses and can lead account takeovers.
 
+#### `OAUTH_USERNAME_CLAIM`
+
+- Default: `name`
+- Description: Set username claim for OpenID.
+
+#### `OAUTH_PICTURE_CLAIM`
+
+- Default: `picture`
+- Description: Set picture (avatar) claim for OpenID.
+
 #### `GOOGLE_CLIENT_ID`
 
 - Description: Sets the client ID for Google OAuth
