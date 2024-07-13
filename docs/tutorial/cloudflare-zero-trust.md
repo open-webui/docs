@@ -106,23 +106,7 @@ Configure your tunnel in the Cloudflare Zero Trust dashboard.
 
 *Configuring the Cloudflare Tunnel*
 
-### Step 6: Update Open-WebUI Configuration
-
-Modify the open-webui service in your Docker Compose file to work behind the Cloudflare tunnel.
-
-```yaml
-open-webui:
-  # ... (keep existing configuration)
-  environment:
-    - 'OLLAMA_BASE_URL=http://ollama:11434'
-    - 'WEBUI_SECRET_KEY='
-    - 'WEBUI_SSL=false'
-    - 'WEBUI_ROOT_PATH='
-  networks:
-    - app-network
-```
-
-### Step 7: Deploy Your Services
+### Step 6: Deploy Your Services
 
 Deploy your services using Docker Compose.
 
