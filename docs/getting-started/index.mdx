@@ -222,8 +222,12 @@ npm run build
 
 # Serving Frontend with the Backend
 cd ./backend
-python -m venv
-./venv/Scripts/activate
+
+# Optional, you can enable venv with to avoid pollute system packages
+# python -m venv
+# ./venv/Scripts/activate
+
+# Install dependencies
 pip install -r requirements.txt -U
 bash start.sh
 ```
