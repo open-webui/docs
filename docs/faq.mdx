@@ -98,5 +98,27 @@ Everything you need to run Open WebUI, including your data, remains within your 
 ```bash
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
+#### **Q: Why I can't see any model shown in the model list even I've installed models in ollama? (models list is empty)?**
+
+**A:** You need to modify the system service to add the proper environmental variable to serve ollama over the lan network.
+1. Edit the service file: 
+```bash
+sudo nano /etc/systemd/system/ollama.service 
+```
+2. Then add the following line inside the **[Service]** section:
+```bash
+Environment="OLLAMA_HOST=0.0.0.0"
+```
+3. reload the daemons using the command, then restart the service 
+```bash
+sudo systemctl daemon-reload 
+```
+```bash
+sudo systemctl restart ollama
+```
+4. Enjoy Open WebUI! ✨
+
+credits: @Unsaidpaper
+
 
 #### If you have any further questions or concerns, please out our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
