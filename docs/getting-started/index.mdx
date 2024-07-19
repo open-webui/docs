@@ -209,6 +209,7 @@ Open WebUI consists of two primary components: the frontend and the backend (whi
 
 Run the following commands to install:
 
+For Linux/macOS:
 ```sh
 git clone https://github.com/open-webui/open-webui.git
 cd open-webui/
@@ -217,13 +218,43 @@ cd open-webui/
 cp -RPp .env.example .env
 
 # Building Frontend Using Node
-npm i
+npm install
 npm run build
 
-# Serving Frontend with the Backend
 cd ./backend
+
+# Optional: To install using Conda as your development environment, follow these instructions:
+# Create and activate a Conda environment
+conda create --name open-webui-env python=3.11
+conda activate open-webui-env
+
+# Install dependencies
 pip install -r requirements.txt -U
+
+# Start the application
 bash start.sh
+```
+
+For Windows:
+```powershell
+git clone https://github.com/open-webui/open-webui.git
+cd open-webui
+
+copy .env.example .env
+
+npm install
+npm run build
+
+cd .\backend
+
+# Optional: To install using Conda as your development environment, follow these instructions:
+# Create and activate a Conda environment
+conda create --name open-webui-env python=3.11
+conda activate open-webui-env
+
+pip install -r requirements.txt -U
+
+start.bat
 ```
 
 You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
