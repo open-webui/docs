@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 title: "Filter Pipelines"
 ---
 
@@ -8,7 +8,7 @@ Filters are used to perform actions against incoming user messages and outgoing 
 
 <p align="center">
   <a href="#">
-    <img src="/static/img/pipelines/filters.png" alt="Filter Workflow" />
+    <img src="/img/pipelines/filters.png" alt="Filter Workflow" />
   </a>
 </p>
 
