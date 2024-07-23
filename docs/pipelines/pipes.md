@@ -8,6 +8,6 @@ Pipes are functions that can be used to perform actions prior to returning LLM m
 
 <p align="center">
   <a href="#">
-    <img src="/static/img/pipelines/pipes.png" alt="Pipe Workflow" />
+    <img src="/img/pipelines/pipes.png" alt="Pipe Workflow" />
   </a>
 </p>
