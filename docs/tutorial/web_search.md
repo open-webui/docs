@@ -172,15 +172,15 @@ This is enabled on a per session basis eg. reloading the page, changing to anoth
 ## Google PSE API
 
 1. Go to Google Developers, use [Programmable Search Engine](https://developers.google.com/custom-search), and log on or create account.
-2. Go to [control pannel](https://programmablesearchengine.google.com/controlpanel/all) and click `Add` button
+2. Go to [control panel](https://programmablesearchengine.google.com/controlpanel/all) and click `Add` button
 3. Enter a search engine name, set the other properties to suit your needs, verify you're not a robot and click `Create` button.
 4. Generate `API key` and get the `Search engine ID`. (Available after the engine is created)
-5. With `API key` and `Search engine ID`, open `Open WebUI Admin pannel` and click `Settings` tab, and then click `Web Search`
+5. With `API key` and `Search engine ID`, open `Open WebUI Admin panel` and click `Settings` tab, and then click `Web Search`
 6. Enable `Web search` and Set `Web Search Engine` to `google_pse`
 7. Fill `Google PSE API Key` with the `API key` and `Google PSE Engine Id` (# 4)
 8. click `Save`
 
-![Open WebUI Admin pannel](../../static/img/tutorial_google_pse1.png)
+![Open WebUI Admin panel](../../static/img/tutorial_google_pse1.png)
 
 
 #### Note
