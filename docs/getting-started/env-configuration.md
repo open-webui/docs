@@ -60,7 +60,7 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `True`
 - Description: Toggles user account creation.
 
-### `ENABLE_USERNAME_PASSWORD_LOGIN`
+### `ENABLE_LOGIN_FORM`
 
 - Default: `True`
 - Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to true) elements.
