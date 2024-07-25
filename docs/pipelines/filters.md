@@ -1,9 +1,9 @@
 ---
-sidebar_position: 3
-title: "Filter Pipelines"
+sidebar_position: 1
+title: "Filters"
 ---
 
-# Filter Pipelines
+# Filters
 Filters are used to perform actions against incoming user messages and outgoing assistant (LLM) messages. Potential actions that can be taken in a filter include sending messages to monitoring platforms (such as Langfuse or DataDog), modifying message contents, blocking toxic messages, translating messages to another language, or rate limiting messages from certain users. A list of examples is maintained in the [Pipelines repo](https://github.com/open-webui/pipelines/tree/main/examples/filters). The general workflow can be seen in the image below.
 
 <p align="center">
