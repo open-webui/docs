@@ -7,7 +7,7 @@ title: "Slimming down RAM usage"
 
 If you deploy this image in a RAM constrained environment, there are a few things you can do do slim down the image.
 
-On a Raspberry Pi 4 (arm64) with version v0.3.10 this was able to reduce idle memory consumption from >1GB to ~200MB.
+On a Raspberry Pi 4 (arm64) with version v0.3.10 this was able to reduce idle memory consumption from >1GB to ~200MB (as observed with `docker container stats`).
 
 ## TLDR
 
