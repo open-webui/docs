@@ -60,6 +60,12 @@ Here is a list of supported environment variables used by `backend/config.py` in
 - Default: `True`
 - Description: Toggles user account creation.
 
+### `ENABLE_LOGIN_FORM`
+
+- Default: `True`
+- Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to true) elements.
+- **Important Note:** This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup) is also being used and set to `True`. Failure to do so will result in the inability to login.
+
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
 
 - Default: `True`
