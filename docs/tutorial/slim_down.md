@@ -11,7 +11,7 @@ On a Raspberry Pi 4 (arm64) with version v0.3.10, this was able to reduce idle m
 
 ## TLDR
 
-Set the following environment variables: `RAG_EMBEDDING_ENGINE: ollama`, `AUDIO_STT_ENGINE: openai`.
+Set the following environment variables (or the respective UI settings for an existing deployment): `RAG_EMBEDDING_ENGINE: ollama`, `AUDIO_STT_ENGINE: openai`.
 
 ## Longer explanation
 
@@ -23,4 +23,4 @@ As of v0.3.10 this includes:
 * Image generation engine (disabled by default)
 
 The first 2 are enabled and set to local models by default. You can change the models in the admin panel (RAG: Documents category, set it to Ollama or OpenAI, Speech-to-text: Audio section, work with OpenAI or WebAPI).
-If you deploy via Docker, you can also set them with the following environment variables: `RAG_EMBEDDING_ENGINE: ollama`, `AUDIO_STT_ENGINE: openai`.
+If you are deploying a fresh Docker image, you can also set them with the following environment variables: `RAG_EMBEDDING_ENGINE: ollama`, `AUDIO_STT_ENGINE: openai`. Note that these environment variables have no effect if a `config.json` already exists.
