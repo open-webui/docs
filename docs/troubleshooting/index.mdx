@@ -91,6 +91,8 @@ services:
       - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 ```
 
+The `ro` flag mounts the CA store as read-only
+
 **For local development**:
 
 You can also add the certificates in the build process by modifying the `Dockerfile`. This is useful if you want to make changes to the UI, for instance.
