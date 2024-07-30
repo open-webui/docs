@@ -1,0 +1,130 @@
+---
+sidebar_position: 500
+title: "️🔨  Development"
+---
+
+import { TopBanners } from "@site/src/components/TopBanners";
+
+# ️🔨 Deployment
+
+<TopBanners />
+
+# Development
+
+## Using [devcontainers](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/adding-a-dev-container-configuration/introduction-to-dev-containers)
+Coming soon.
+
+## On host
+Run the following commands to install:
+
+For Linux/macOS:
+```sh
+git clone https://github.com/open-webui/open-webui.git
+cd open-webui/
+
+# Copying required .env file
+cp -RPp .env.example .env
+
+# Start frontend server
+npm install
+npm run dev
+
+cd ./backend
+
+# Optional: To install using Conda as your development environment, follow these instructions:
+# Create and activate a Conda environment
+conda create --name open-webui-env python=3.11
+conda activate open-webui-env
+
+# Install dependencies
+pip install -r requirements.txt -U
+
+# Start the application
+bash dev.sh
+```
+
+## In docker container
+Assuming you have already cloned the repo and created a `.env`.
+
+1. Create a new file `compose-dev.yaml`. The following uses [Docker compose watch](https://docs.docker.com/compose/file-watch/) to automatically detect changes in the host filesystem and sync them to the container. 
+
+```yaml
+name: open-webui-dev
+
+services:
+  ollama:
+    volumes:
+      - ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+
+  frontend:
+    build:
+      context: .
+      target: build
+    command: ["npm", "run", "dev"]
+    depends_on:
+      - backend
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "3000:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: package.json
+
+  backend:
+    build:
+      context: .
+      target: base
+    command: ["bash", "dev.sh"]
+    env_file: ".env"
+    volumes:
+      - data:/app/backend/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "8080:8080"
+    restart: always
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app/backend
+          ignore:
+            - backend/data
+        - action: rebuild
+          path: backend/requirements.txt
+
+volumes:
+  data: {}
+```
+2. To start the containers, run `docker compose -f compose-dev.yaml up --watch`. 
+3. To stop, hit `ctrl-c` or run `docker compose -f compose-dev.yaml down
+
+### Pipelines 
+If you are using [pipelines](https://docs.openwebui.com/pipelines/), you can add the following:
+
+:::info
+This uses volume bind-mounts, which are distinct from named volumes. You can read more about the difference [here](https://docs.docker.com/storage/bind-mounts/)
+:::
+
+```yaml
+services:
+  pipelines:
+    ports:
+      - "9099:9099"
+    volumes:
+      - ./pipelines:/app/pipelines
+      - ./blueprints:/app/blueprints
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+```
