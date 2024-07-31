@@ -80,6 +80,10 @@ Open WebUI also supports image generation through the **OpenAI DALL·E APIs**. T
    - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
    - **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
 
+### Azure OpenAI
+
+Using Azure OpenAI Dall-E directly is unsupported, but you can [set up a LiteLLM proxy](https://litellm.vercel.app/docs/image_generation) which is compatible with the `Open AI (Dall-E)` Image Generation Engine.
+
 ## Using Image Generation
 
 ![Image Generation Tutorial](/img/tutorial_image_generation.png)
