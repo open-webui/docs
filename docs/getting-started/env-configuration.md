@@ -576,7 +576,7 @@ Query: [query]
 
 - Options:
   - `` - empty for Web API
-  - `openai` - OpenAI-compatible transcription
+  - `openai` - OpenAI-compatible text-to-speech.
 - Description: Specifies the Text-to-Speech engine to use.
 
 #### `AUDIO_TTS_OPENAI_API_BASE_URL`
