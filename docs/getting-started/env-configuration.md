@@ -572,22 +572,29 @@ Query: [query]
 
 ### Text to Speech
 
-#### `AUDIO_OPENAI_API_BASE_URL`
+#### `AUDIO_TTS_ENGINE`
+
+- Options:
+  - `` - empty for Web API
+  - `openai` - OpenAI-compatible text-to-speech.
+- Description: Specifies the Text-to-Speech engine to use.
+
+#### `AUDIO_TTS_OPENAI_API_BASE_URL`
 
 - Default: `${OPENAI_API_BASE_URL}`
 - Description: Sets the OpenAI-compatible base URL to use for text-to-speech.
 
-#### `AUDIO_OPENAI_API_KEY`
+#### `AUDIO_TTS_OPENAI_API_KEY`
 
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for text-to-speech.
 
-#### `AUDIO_OPENAI_API_MODEL`
+#### `AUDIO_TTS_MODEL`
 
 - Default: `tts-1`
 - Description: Specifies the OpenAI text-to-speech model to use.
 
-#### `AUDIO_OPENAI_API_VOICE`
+#### `AUDIO_TTS_VOICE`
 
 - Default: `alloy`
 - Description: Sets the OpenAI text-to-speech voice to use.
