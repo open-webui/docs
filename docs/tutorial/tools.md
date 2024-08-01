@@ -25,8 +25,6 @@ Please note, that when using the AutoTool Filter, you will still need to take th
 <details>
 <summary>Installation Instructions</summary>
 
-Screenshots/Video of getting tool from community, importing or copying, activating, enabling for models, etc
-
 The Tools import process is quite simple. You will have two options:
 
 ### Download and import manually
