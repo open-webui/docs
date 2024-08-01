@@ -14,7 +14,7 @@ Open WebUI allows you to integrate directly into your web browser. This tutorial
 Before you begin, ensure that:
 
 - You have Chrome or another supported browser installed.
-- The `WEBUI_URL` environment variable is set correctly, either using Docker environment variables or in the `.env` file as specified in the [Getting Started](getting-started/env-configuration) guide.
+- The `WEBUI_URL` environment variable is set correctly, either using Docker environment variables or in the `.env` file as specified in the [Getting Started](/getting-started/env-configuration) guide.
 
 ### Step 1: Set the WEBUI_URL Environment Variable
 
@@ -56,8 +56,6 @@ WEBUI_URL=https://<your-open-webui-url>
       https://<your-open-webui-url>/?q=%s
       ```
 5. Click **Add** to save the configuration.
-
-![Add Custom Search Engine](/img/tutorial_add_search_engine.png)
 
 ### Optional: Using Specific Models
 
