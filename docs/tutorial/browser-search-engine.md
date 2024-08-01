@@ -1,6 +1,6 @@
 ---
 sidebar_position: 16
-title: "Browser Search Engine Integration"
+title: "Browser Search Engine"
 ---
 
 # Browser Search Engine Integration
