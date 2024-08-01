@@ -36,10 +36,10 @@ Filters are used to manipulate the user input and/or the LLM output to add, remo
 
 Filters have a few main components:
 
-#### Inlet
+#### Inlet Function
 The inlet is user to pre-process a user input before it is send to the LLM for processing. 
 
-#### Outlet
+#### Outlet Function
 The outlet is used to post-process the output from the LLM. It is important to note that when you perform actions such as stripping/replacing content, this will happen after the output is rendered to the UI.
 
 <details>
@@ -91,7 +91,10 @@ class Filter:
 ### Action
 Actions are used to create a button in the Message UI (the small buttons found directly underneath individual chat messages).
 
-Actions have a single main component called an action. This component takes an object defining the type of action and the data being processed.
+Actions have a single main component called an action function. This component takes an object defining the type of action and the data being processed.
+
+<details>
+<summary>Example</summary>
 
 ```
 async def action(
@@ -115,10 +118,108 @@ async def action(
         )
         print(response)
 ```
+</details>
 
-### Pipe
+#### Pipes
 
-### Manifold
+#### Pipe
+A Pipe is used to create a "Model" with custom logic and processing. A Pipe will always show up as it's own singular model in the OpenWebUI interface and will, much like a filter
+
+A Pipe has a single main component called a pipe function. This component encapsulates all of the primary logic that the Pipe will perform.
+
+<details>
+<summary>Example</summary>
+
+```
+class Pipe:
+    class Valves(BaseModel):
+        RANDOM_CONFIG_OPTION: str = Field(default="")
+
+    def __init__(self):
+        self.type = "pipe"
+        self.id = "blah"
+        self.name = "Testing"
+        self.valves = self.Valves(
+            **{"RANDOM_CONFIG_OPTION": os.getenv("RANDOM_CONFIG_OPTION", "")}
+        )
+        pass
+
+    def get_provider_models(self):
+        return [
+            {"id": "model_id_1", "name": "model_1"},
+            {"id": "model_id_2", "name": "model_2"},
+            {"id": "model_id_3", "name": "model_3"},
+        ]
+
+    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
+      # Logic goes here
+      return body
+```
+</details>
+
+#### Manifold
+A Manifold is used to create a collection of Pipes. If a Pipe creates a singular "Model", a Manifold creates a set of "Models." Manifolds are typically used to create integrations with other providers.
+
+A Manifold has two main components:
+
+##### Pipes Function
+This is used to simply initiate a dictionary to hold all of the Pipes created by the manifold
+
+##### Pipe Function
+As referenced above, this component encapsulates all of the primary logic that the Pipe will perform.
+
+
+<details>
+<summary>Example</summary>
+
+```
+class Pipe:
+    class Valves(BaseModel):
+        PROVIDER_API_KEY: str = Field(default="")
+
+    def __init__(self):
+        self.type = "manifold"
+        self.id = "blah"
+        self.name = "Testing"
+        self.valves = self.Valves(
+            **{"PROVIDER_API_KEY": os.getenv("PROVIDER_API_KEY", "")}
+        )
+        pass
+
+    def get_provider_models(self):
+        return [
+            {"id": "model_id_1", "name": "model_1"},
+            {"id": "model_id_2", "name": "model_2"},
+            {"id": "model_id_3", "name": "model_3"},
+        ]
+
+    def pipes(self) -> List[dict]:
+        return self.get_provider_models()
+
+    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
+      # Logic goes here
+      return body
+```
+</details>
+
+Note: To differentiate between a Pipe and a Manifold you will need to specify the type in def init:
+```
+def __init__(self):
+        self.type = "pipe"
+        self.id = "blah"
+        self.name = "Testing"
+        pass
+```
+
+or
+
+```
+def __init__(self):
+        self.type = "manifold"
+        self.id = "blah"
+        self.name = "Testing/"
+        pass
+```
 
 ## Shared Function Components
 
@@ -127,6 +228,43 @@ async def action(
 Valves and UserValves are used to allow users to provide dyanmic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function.
 
 Valves are configurable by admins alone and UserValves are configurable by any users.
+
+<details>
+<summary>Example</summary>
+
+```
+# Define and Valves
+    class Valves(BaseModel):
+        priority: int = Field(
+            default=0, description="Priority level for the filter operations."
+        )
+        test_valve: int = Field(
+            default=4, description="A valve controlling a numberical value"
+        )
+        pass
+
+    # Define any UserValves
+    class UserValves(BaseModel):
+        test_user_valve: bool = Field(
+            default=False, description="A user valve controlling a True/False (on/off) switch"
+        )
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+        pass
+```
+</details>
+
+### Event Emitters
+
+<details>
+<summary>Example</summary>
+
+```
+
+```
+</details>
 
 ### Event Emitters
 
