@@ -5,11 +5,9 @@ title: "️🔨  Development"
 
 import { TopBanners } from "@site/src/components/TopBanners";
 
-# ️🔨 Deployment
-
 <TopBanners />
 
-# Development
+# ️🔨 Development
 
 ## Using [devcontainers](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/adding-a-dev-container-configuration/introduction-to-dev-containers)
 Coming soon.
@@ -86,6 +84,8 @@ services:
       target: base
     command: ["bash", "dev.sh"]
     env_file: ".env"
+    environment:
+     - ENV: dev
     volumes:
       - data:/app/backend/data
     extra_hosts:
@@ -106,8 +106,13 @@ services:
 volumes:
   data: {}
 ```
-2. To start the containers, run `docker compose -f compose-dev.yaml up --watch`. 
+2. To start the containers, run `docker compose -f compose-dev.yaml up --watch`. The webapp will be available at `http://localhost:3000`
 3. To stop, hit `ctrl-c` or run `docker compose -f compose-dev.yaml down
+
+**What this does:**
+- Exposes port `3000` on the host for frontend, and port `8000` for the api, enables FastAPI API docs at `http://localhost:8080/docs`
+- Starts both the frontend Vite server and the backend server in hot reload mode, so changes trigger an automatic refresh
+- Syncs `/backend` and `/src` on the host machine with their respective directories in the containers
 
 ### Pipelines 
 If you are using [pipelines](https://docs.openwebui.com/pipelines/), you can add the following:
