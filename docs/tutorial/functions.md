@@ -3,12 +3,361 @@ sidebar_position: 2
 title: "Functions"
 ---
 
-# Functions
+## What are Functions?
+Tools are scripts, written in python, that are provided to an LLM at the time of the request. Tools allow LLMs to perform actions and receive additional context as a result. Generally speaking, your LLM of choice will need to support function calling for tools to be reliably utilized.
 
-## WIP 🚧
+## How can I use Functions?
+Functions can be used, [once installed](#how-to-install-functions), by assigning them to an LLM or enabling them globally. Some function types will always be enabled globally, such as manifolds. To assign a function to a model, you simply need to navigate to Workspace => Models. Here you can select the model for which you’d like to enable any Functinos. 
 
-<p align="center">
-  <a href="#">
-    <img src="/img/oi/cat.png" alt="Under Construction" />
-  </a>
-</p>
+Once you click the pencil icon to edit the model settings, scroll down to the Functions section and check any Functions you wish to enable. Once done you must click save.
+
+You also have the ability to enable Functions globally for ALL models. In order to do this, navigate to Workspace => Functions and click the "..." menu. Once the menu opens, simply enable the "Global" switch and your function will be enabled for every model in your OpenWebUI instance.
+## How to install Functions
+The Functions import process is quite simple. You will have two options:
+
+### Download and import manually
+Navigate to the community site: https://openwebui.com/functions/
+1) Click on the Function you wish to import
+2) Click the blue “Get” button in the top right-hand corner of the page
+3) Click “Download as JSON export”
+4) You can now upload the Funtion into OpenWebUI by navigating to Workspace => Functions and clicking “Import Functions
+
+### Import via your OpenWebUI URL
+1) Navigate to the community site: https://openwebui.com/functions/
+2) Click on the Function you wish to import
+3) Click the blue “Get” button in the top right-hand corner of the page
+4) Enter the IP address of your OpenWebUI instance and click “Import to WebUI” which will automatically open your instance and allow you to import the Function.
+
+Note: You can install your own Function and other Functions not tracked on the community site using the manual import method. Please do not import Functions you do not understand or are not from a trustworthy source. Running unknown code is ALWAYS a risk.
+
+## What are the support types of functions
+### Filter
+Filters are used to manipulate the user input and/or the LLM output to add, remove, format, or otherwise adjust the content of the body object.
+
+Filters have a few main components:
+
+#### Inlet Function
+The inlet is user to pre-process a user input before it is send to the LLM for processing. 
+
+#### Outlet Function
+The outlet is used to post-process the output from the LLM. It is important to note that when you perform actions such as stripping/replacing content, this will happen after the output is rendered to the UI.
+
+<details>
+<summary>Example</summary>
+
+```
+class Filter:
+    # Define and Valves
+    class Valves(BaseModel):
+        priority: int = Field(
+            default=0, description="Priority level for the filter operations."
+        )
+        test_valve: int = Field(
+            default=4, description="A valve controlling a numberical value"
+        )
+        pass
+
+    # Define any UserValves
+    class UserValves(BaseModel):
+        test_user_valve: bool = Field(
+            default=False, description="A user valve controlling a True/False (on/off) switch"
+        )
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+        pass
+
+    def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+        print(f"inlet:{__name__}")
+        print(f"inlet:body:{body}")
+        print(f"inlet:user:{__user__}")
+
+        # Pre-processing logic here
+
+        return body
+
+    def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+        print(f"outlet:{__name__}")
+        print(f"outlet:body:{body}")
+        print(f"outlet:user:{__user__}")
+
+        # Post-processing logic here
+
+        return body
+```
+</details>
+
+### Action
+Actions are used to create a button in the Message UI (the small buttons found directly underneath individual chat messages).
+
+Actions have a single main component called an action function. This component takes an object defining the type of action and the data being processed.
+
+<details>
+<summary>Example</summary>
+
+```
+async def action(
+        self,
+        body: dict,
+        __user__=None,
+        __event_emitter__=None,
+        __event_call__=None,
+    ) -> Optional[dict]:
+        print(f"action:{__name__}")
+
+        response = await __event_call__(
+            {
+                "type": "input",
+                "data": {
+                    "title": "write a message",
+                    "message": "here write a message to append",
+                    "placeholder": "enter your message",
+                },
+            }
+        )
+        print(response)
+```
+</details>
+
+#### Pipes
+
+#### Pipe
+A Pipe is used to create a "Model" with custom logic and processing. A Pipe will always show up as it's own singular model in the OpenWebUI interface and will, much like a filter
+
+A Pipe has a single main component called a pipe function. This component encapsulates all of the primary logic that the Pipe will perform.
+
+<details>
+<summary>Example</summary>
+
+```
+class Pipe:
+    class Valves(BaseModel):
+        RANDOM_CONFIG_OPTION: str = Field(default="")
+
+    def __init__(self):
+        self.type = "pipe"
+        self.id = "blah"
+        self.name = "Testing"
+        self.valves = self.Valves(
+            **{"RANDOM_CONFIG_OPTION": os.getenv("RANDOM_CONFIG_OPTION", "")}
+        )
+        pass
+
+    def get_provider_models(self):
+        return [
+            {"id": "model_id_1", "name": "model_1"},
+            {"id": "model_id_2", "name": "model_2"},
+            {"id": "model_id_3", "name": "model_3"},
+        ]
+
+    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
+      # Logic goes here
+      return body
+```
+</details>
+
+#### Manifold
+A Manifold is used to create a collection of Pipes. If a Pipe creates a singular "Model", a Manifold creates a set of "Models." Manifolds are typically used to create integrations with other providers.
+
+A Manifold has two main components:
+
+##### Pipes Function
+This is used to simply initiate a dictionary to hold all of the Pipes created by the manifold
+
+##### Pipe Function
+As referenced above, this component encapsulates all of the primary logic that the Pipe will perform.
+
+
+<details>
+<summary>Example</summary>
+
+```
+class Pipe:
+    class Valves(BaseModel):
+        PROVIDER_API_KEY: str = Field(default="")
+
+    def __init__(self):
+        self.type = "manifold"
+        self.id = "blah"
+        self.name = "Testing"
+        self.valves = self.Valves(
+            **{"PROVIDER_API_KEY": os.getenv("PROVIDER_API_KEY", "")}
+        )
+        pass
+
+    def get_provider_models(self):
+        return [
+            {"id": "model_id_1", "name": "model_1"},
+            {"id": "model_id_2", "name": "model_2"},
+            {"id": "model_id_3", "name": "model_3"},
+        ]
+
+    def pipes(self) -> List[dict]:
+        return self.get_provider_models()
+
+    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
+      # Logic goes here
+      return body
+```
+</details>
+
+Note: To differentiate between a Pipe and a Manifold you will need to specify the type in def init:
+```
+def __init__(self):
+        self.type = "pipe"
+        self.id = "blah"
+        self.name = "Testing"
+        pass
+```
+
+or
+
+```
+def __init__(self):
+        self.type = "manifold"
+        self.id = "blah"
+        self.name = "Testing/"
+        pass
+```
+
+## Shared Function Components
+
+### Valves and UserValves - (optional, but HIGHLY encouraged)
+
+Valves and UserValves are used to allow users to provide dyanmic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function.
+
+Valves are configurable by admins alone and UserValves are configurable by any users.
+
+<details>
+<summary>Example</summary>
+
+```
+# Define and Valves
+    class Valves(BaseModel):
+        priority: int = Field(
+            default=0, description="Priority level for the filter operations."
+        )
+        test_valve: int = Field(
+            default=4, description="A valve controlling a numberical value"
+        )
+        pass
+
+    # Define any UserValves
+    class UserValves(BaseModel):
+        test_user_valve: bool = Field(
+            default=False, description="A user valve controlling a True/False (on/off) switch"
+        )
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+        pass
+```
+</details>
+
+### Event Emitters
+Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the function.
+
+There are two different types of Event Emitters:
+
+#### Status
+This is used to add statuses to a message while it is performing steps. These can be done at any stage during the Function. These statuses appear right above the message content. These are very useful for Functions that delay the LLM response or process large amounts of information. This allows you to inform users what is being processed in real-time.
+
+```
+await __event_emitter__(
+            {
+                "type": "status", # We set the type here
+                "data": {"description": "Message that shows up in the chat", "done": False}, 
+                # Note done is False here indicating we are still emitting statuses
+            }
+        )
+```
+
+<details>
+<summary>Example</summary>
+
+```
+async def test_function(
+        self, prompt: str, __user__: dict, __event_emitter__=None
+    ) -> str:
+        """
+        This is a demo
+
+        :param test: this is a test parameter
+        """
+
+        await __event_emitter__(
+            {
+                "type": "status", # We set the type here
+                "data": {"description": "Message that shows up in the chat", "done": False}, 
+                # Note done is False here indicating we are still emitting statuses
+            }
+        )
+
+        # Do some other logic here
+        await __event_emitter__(
+            {
+                "type": "status",
+                "data": {"description": "Completed a task message", "done": True},
+                # Note done is True here indicating we are done emitting statuses
+            }
+        )
+
+        except Exception as e:
+            await __event_emitter__(
+                {
+                    "type": "status",
+                    "data": {"description": f"An error occured: {e}", "done": True},
+                }
+            )
+
+            return f"Tell the user: {e}"
+```
+</details>
+
+#### Message
+This type is used to append a message to the LLM at any stage in the Function. This means that you can append messages, embed images, and even render web pages before, or after, or during the LLM response.
+
+```
+await __event_emitter__(
+                    {
+                        "type": "message", # We set the type here
+                        "data": {"content": "This message will be appended to the chat."},
+                        # Note that with message types we do NOT have to set a done condition
+                    }
+                )
+```
+
+<details>
+<summary>Example</summary>
+
+```
+async def test_function(
+        self, prompt: str, __user__: dict, __event_emitter__=None
+    ) -> str:
+        """
+        This is a demo
+
+        :param test: this is a test parameter
+        """
+
+        await __event_emitter__(
+                    {
+                        "type": "message", # We set the type here
+                        "data": {"content": "This message will be appended to the chat."},
+                        # Note that with message types we do NOT have to set a done condition
+                    }
+                )
+
+        except Exception as e:
+            await __event_emitter__(
+                {
+                    "type": "status",
+                    "data": {"description": f"An error occured: {e}", "done": True},
+                }
+            )
+
+            return f"Tell the user: {e}"
+```
+</details>
