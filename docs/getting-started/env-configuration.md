@@ -640,6 +640,21 @@ Query: [query]
 - Default: `False`
 - Description: Sets ComfyUI to Stable Diffusion 3 mode. SD3 will work without this set, but the image quality will be significantly lower. Requires a recent version of ComfyUI.
 
+#### `COMFYUI_FLUX`
+
+- Default: `False`
+- Description: Sets ComfyUI to Flux mode. Only set if Flux is required, as the workflow is completely different and is not at all compatible with other models. Requires a recent version of ComfyUI. Flux currently does not support custom cfg_scale settings.
+
+#### `COMFYUI_FLUX_WEIGHT_DTYPE`
+
+- Default: `default`
+- Description: Ignored if Flux is not enabled. Sets the weight precision for Flux. Available options are `default` and `fp8_e4m3fn`. The latter is recommended if you don't have lots of spare VRAM.
+
+#### `COMFYUI_FLUX_FP8_CLIP`
+
+- Default: `False`
+- Description: Ignored if Flux is not enabled. Sets the Flux CLIP model to 8-bit precision, saving VRAM. Recommended to enable if you don't have lots of spare VRAM.
+
 #### `IMAGES_OPENAI_API_KEY`
 
 - Default: `${OPENAI_API_KEY}`
