@@ -643,7 +643,15 @@ Query: [query]
 #### `COMFYUI_FLUX`
 
 - Default: `False`
-- Description: Sets ComfyUI to Flux mode. Only set if Flux is required, as the workflow is completely different and is not at all compatible with other models. Requires a recent version of ComfyUI. Flux currently does not support custom cfg_scale settings.
+- Description: Sets ComfyUI to Flux mode. Only set if Flux is required, as the workflow is completely different and is not at all compatible with other models. Requires a recent version of ComfyUI. Flux currently does not support custom cfg_scale settings. Requires a recent version of ComfyUI and the following files to be present in your ComfyUI installation:
+
+    - The model checkpoints, with the `sft` extension, located at **both** `models/checkpoints` and `models/unet`. In order to avoid duplicates wasting disk space, the `mklink` command can be used for Windows (or `ln` with the `-s` option for macOS/Linux). The model checkpoints can be found in [the black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs) - simply choose the Flux variant you want to run and download the big file with the `sft` extension.
+
+    - `clip_l.safetensors` located at `models/clip`. It can be downloaded [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+
+    - `t5xxl_fp16.safetensors` located at `models/clip`, unless `COMFYUI_FLUX_FP8_CLIP` is enabled. It can be downloaded [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+
+    - `ae.sft` located at `models/vae`. It can be downloaded [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.sft) for Schnell and [here](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/ae.sft) for dev.
 
 #### `COMFYUI_FLUX_WEIGHT_DTYPE`
 
@@ -653,7 +661,7 @@ Query: [query]
 #### `COMFYUI_FLUX_FP8_CLIP`
 
 - Default: `False`
-- Description: Ignored if Flux is not enabled. Sets the Flux CLIP model to 8-bit precision, saving VRAM. Recommended to enable if you don't have lots of spare VRAM.
+- Description: Ignored if Flux is not enabled. Sets the Flux text encoder to 8-bit precision, saving VRAM. Recommended to enable if you don't have lots of spare VRAM. If enabled, the `t5xxl_fp8_e4m3fn.safetensors` file (can be downloaded [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main)) must exist in the `models/clip` directory in your ComfyUI installation.
 
 #### `IMAGES_OPENAI_API_KEY`
 
