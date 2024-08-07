@@ -709,6 +709,11 @@ Query: [query]
 - Default: `picture`
 - Description: Set picture (avatar) claim for OpenID.
 
+#### `OAUTH_EMAIL_CLAIM`
+
+- Default: `email`
+- Description: Set email claim for OpenID.
+
 #### `GOOGLE_CLIENT_ID`
 
 - Description: Sets the client ID for Google OAuth
