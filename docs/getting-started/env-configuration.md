@@ -722,6 +722,10 @@ Query: [query]
 - Default: `openid email profile`
 - Description: Sets the scope for Google OAuth authentication.
 
+### `GOOGLE_REDIRECT_URI`
+
+- Description: Sets the redirect URI for Google OAuth
+
 #### `MICROSOFT_CLIENT_ID`
 
 - Description: Sets the client ID for Microsoft OAuth
@@ -738,6 +742,10 @@ Query: [query]
 
 - Default: `openid email profile`
 - Description: Sets the scope for Microsoft OAuth authentication.
+
+#### `MICROSOFT_REDIRECT_URI`
+
+- Description: Sets the redirect URI for Microsoft OAuth
 
 #### `OAUTH_CLIENT_ID`
 
@@ -760,6 +768,10 @@ Query: [query]
 
 - Default: `SSO`
 - Description: Sets the name for the OIDC provider.
+
+#### `OPENID_REDIRECT_URI`
+
+- Description: Sets the redirect URI for OIDC
 
 ### LiteLLM
 
