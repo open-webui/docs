@@ -63,6 +63,7 @@ ComfyUI provides an alternative interface for managing and interacting with imag
    ```
    Set the environment variable `COMFYUI_BASE_URL` to this address to ensure proper integration.
 4. Verify the connection.
+5. Save changes.
 
 ## Configuring for FLUX-Schnell & Flux-Dev models:
 To enable ComfyUI Flux mode, add the following environment variables to your Docker-compose.yml file for Open WebUI: 
