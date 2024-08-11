@@ -56,7 +56,7 @@ services:
     container_name: ollama
     pull_policy: always
     tty: true
-    restart: always
+    restart: no
     image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
 
   frontend:
@@ -85,14 +85,15 @@ services:
     command: ["bash", "dev.sh"]
     env_file: ".env"
     environment:
-     - ENV: dev
+     - ENV=dev
+     - WEBUI_AUTH=False
     volumes:
       - data:/app/backend/data
     extra_hosts:
       - host.docker.internal:host-gateway
     ports:
       - "8080:8080"
-    restart: always
+    restart: no
     develop:
       watch:
         - action: sync
@@ -105,6 +106,7 @@ services:
 
 volumes:
   data: {}
+  ollama: {}
 ```
 2. To start the containers, run `docker compose -f compose-dev.yaml up --watch`. The webapp will be available at `http://localhost:3000`
 3. To stop, hit `ctrl-c` or run `docker compose -f compose-dev.yaml down
