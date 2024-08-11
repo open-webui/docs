@@ -5,11 +5,15 @@ title: "Web Search"
 
 # Web Search
 
+## Overview
+
+This guide provides instructions on how to set up web search capabilities in Open WebUI using various search engines.
+
 ## SearXNG (Docker)
 
-This guide outlines how to connect SearXNG to Open WebUI for web search capabilities.
+SearXNG is a metasearch engine that aggregates results from multiple search engines.
 
-### 1. Searxng Configuration
+### 1. SearXNG Configuration
 
 Create a folder named `searxng` in the same directory as your compose files. This folder will contain your Searxng configuration files. Refer to the [Searxng documentation](https://docs.searxng.org/) for configuration instructions.
 
@@ -150,9 +154,15 @@ You can run SearXNG directly using `docker run`:
 docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
 ```
 
-### 4. GUI configuration
+### 4. GUI Configuration
 
-Navigate to **Admin Settings > Web Search**:
+1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
+2. Toggle `Enable Web Search`
+3. Set `Web Search Engine` from dropdown menu to `searxng`
+4. Set `Searxng Query URL` to examples given: `https://<search.domain.com>/search?q=<query>` or `http://<searxng.local>/search?q=<query>`. **Do note the `/search?q=<query>` part is mandatory.**
+5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
+6. Save changes
+
 ![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
 
 ### 5. Using Web Search in a Chat
@@ -165,11 +175,13 @@ Here you can toggle Web Search On/Off.
 
 #### Note
 
-You will have to expicitly toggle this On/Off in a chat.
+You will have to explicitly toggle this On/Off in a chat.
 
 This is enabled on a per session basis eg. reloading the page, changing to another chat will toggle off.
 
 ## Google PSE API
+
+### Setup
 
 1. Go to Google Developers, use [Programmable Search Engine](https://developers.google.com/custom-search), and log on or create account.
 2. Go to [control panel](https://programmablesearchengine.google.com/controlpanel/all) and click `Add` button
@@ -178,7 +190,7 @@ This is enabled on a per session basis eg. reloading the page, changing to anoth
 5. With `API key` and `Search engine ID`, open `Open WebUI Admin panel` and click `Settings` tab, and then click `Web Search`
 6. Enable `Web search` and Set `Web Search Engine` to `google_pse`
 7. Fill `Google PSE API Key` with the `API key` and `Google PSE Engine Id` (# 4)
-8. click `Save`
+8. Click `Save`
 
 ![Open WebUI Admin panel](../../static/img/tutorial_google_pse1.png)
 
@@ -195,7 +207,7 @@ Search the web ;-)
 
 ## Brave API
 
-###  Docker Compose Setup
+### Docker Compose Setup
 
 Add the following to a file named `docker-compose.yaml`:
 
