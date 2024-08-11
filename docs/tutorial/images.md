@@ -55,13 +55,47 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+1. Navigate to the **Admin Panel** > **Settings** > **Images** menu in Open WebUI.
 2. Set the `Image Generation Engine` field to `ComfyUI`.
 3. In the API URL field, enter the address where ComfyUI's API is accessible:
    ```
    http://<your_comfyui_address>:8188/
    ```
    Set the environment variable `COMFYUI_BASE_URL` to this address to ensure proper integration.
+4. Verify the connection.
+5. Save changes.
+
+## Configuring for FLUX-Schnell & Flux-Dev models:
+To enable ComfyUI Flux mode, add the following environment variables to your Docker-compose.yml file for Open WebUI: 
+```yaml
+COMFYUI_BASE_URL="http://host.docker.internal:8188"
+COMFYUI_CFG_SCALE="3.5"
+COMFYUI_SAMPLER="euler"
+COMFYUI_SCHEDULER="simple"
+COMFYUI_SD3="false"
+COMFYUI_FLUX="true" # Enables ComfyUI Flux mode.
+COMFYUI_FLUX_WEIGHT_DTYPE="fp8_e4m3fn" # Ignored if Flux is not enabled. Sets the weight precision for Flux.
+COMFYUI_FLUX_FP8_CLIP="true # Enable 8-bit precision for the Flux text encoder.
+```
+
+**Important Notes:**
+
+* Flux mode has a completely different workflow that is not compatible with other models. Make sure you understand the implications before enabling it.
+* A recent version of ComfyUI is required.
+* Specific model checkpoints and files must be present in your ComfyUI installation.
+
+### Model Checkpoints and Files
+
+The following files are required for Flux mode:
+
+* Model checkpoints (sft extension) in both `models/checkpoints` and `models/unet` directories. You can download the Flux variant from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
+* `clip_l.safetensors` in the `models/clip` directory. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+* `t5xxl_fp16.safetensors` in the `models/clip` directory, unless `COMFYUI_FLUX_FP8_CLIP` is enabled. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+* `ae.sft` in the `models/vae` directory. Download from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+
+**Additional Requirements:**
+
+* If `COMFYUI_FLUX_FP8_CLIP` is set to `true`, the `t5xxl_fp8_e4m3fn.safetensors` file must exist in the `models/clip` directory. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
 
 ## OpenAI DALL·E
 
