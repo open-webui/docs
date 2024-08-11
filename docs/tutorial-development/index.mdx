@@ -56,7 +56,7 @@ services:
     container_name: ollama
     pull_policy: always
     tty: true
-    restart: no
+    restart: always
     image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
 
   frontend:
@@ -93,7 +93,7 @@ services:
       - host.docker.internal:host-gateway
     ports:
       - "8080:8080"
-    restart: no
+    restart: always
     develop:
       watch:
         - action: sync
