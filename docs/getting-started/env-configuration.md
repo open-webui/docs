@@ -234,6 +234,11 @@ Here is a list of supported environment variables used by `backend/config.py` in
 
 ### OpenAI
 
+#### `ENABLE_OPENAI_API`
+
+- Default: `true`
+- Description: Enables the use of OpenAI APIs.
+
 #### `OPENAI_API_KEY`
 
 - Description: Sets the OpenAI API key.
