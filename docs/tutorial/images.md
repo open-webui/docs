@@ -124,3 +124,12 @@ Using Azure OpenAI Dall-E directly is unsupported, but you can [set up a LiteLLM
 
 1. First, use a text generation model to write a prompt for image generation.
 2. After the response has finished, you can click the Picture icon to generate an image.
+3. After the image has finished generating, it will be returned automatically in chat.
+
+:::tip
+
+    You can also edit the LLM's response and enter your image generation prompt as the message
+    to send off for image generation instead of using the actual response provided by the
+    LLM.
+
+:::
