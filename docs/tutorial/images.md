@@ -81,17 +81,17 @@ COMFYUI_FLUX_FP8_CLIP="true # Enable 8-bit precision for the Flux text encoder.
 **Important Notes:**
 
 * Flux mode has a completely different workflow that is not compatible with other models. Make sure you understand the implications before enabling it.
-* A recent version of ComfyUI is required.
+* An updated version of ComfyUI is required.
 * Specific model checkpoints and files must be present in your ComfyUI installation.
 
 ### Model Checkpoints and Files
 
 The following files are required for Flux mode:
 
-* Model checkpoints (sft extension) in both `models/checkpoints` and `models/unet` directories. You can download the Flux variant from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
+* Model checkpoints in both `models/checkpoints` and `models/unet` directories. You can download the Flux model(s) from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
 * `clip_l.safetensors` in the `models/clip` directory. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
 * `t5xxl_fp16.safetensors` in the `models/clip` directory, unless `COMFYUI_FLUX_FP8_CLIP` is enabled. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* `ae.sft` in the `models/vae` directory. Download from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+* `ae.safetensors` in the `models/vae` directory. Download from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
 
 **Additional Requirements:**
 
@@ -124,3 +124,12 @@ Using Azure OpenAI Dall-E directly is unsupported, but you can [set up a LiteLLM
 
 1. First, use a text generation model to write a prompt for image generation.
 2. After the response has finished, you can click the Picture icon to generate an image.
+3. After the image has finished generating, it will be returned automatically in chat.
+
+:::tip
+
+    You can also edit the LLM's response and enter your image generation prompt as the message
+    to send off for image generation instead of using the actual response provided by the
+    LLM.
+
+:::
