@@ -32,11 +32,11 @@ podman run -d --network slirp4netns:allow_host_loopback=true -p 3000:8080 -e OLL
 ```
 
 ## Microphone access and other permission issues with non-HTTPS connections
-Chromium-based (Chrome, Brave, MS Edge, Opera, Vivaldi,  ...) and firefox-based browsers often restrict site-level permissions on non-HTTPS URLs. This is most obvious when running an instance on your local network and reaching it from another device (example: a phone) of the same network: the microphone permission will most likely get denied right away without a clear way to whitelist the URL. Solutions for this include manually setting up HTTPS or adding an exception to the URL to flag it at secure. Use this at your own risk and we strongly recommend thinking carefully about the security implications before jumping into this.
+Chromium-based (Chrome, Brave, MS Edge, Opera, Vivaldi,  ...) and firefox-based browsers often restrict site-level permissions on non-HTTPS URLs. This is most obvious when running an instance on your local network and reaching it from another device (example: a phone) of the same network: the microphone permission will most likely get denied right away without a clear way to whitelist the URL. Solutions for this include manually setting up HTTPS or adding an exception to the URL to flag it at secure. Use this at your own risk and we strongly recommend thinking carefully about the security implications before jumping into this. To flag a URL as secure:
 
-- To flag a URL as secure on chromium based browsers (Chrome, Brave, MS Edge, Opera, Vivaldi, ...): open `chrome://flags/#unsafely-treat-insecure-origin-as-secure` and add your non HTTPS address (for example: `http://192.168.1.35:3000`) then restart the app.
+-  On chromium based browsers (Chrome, Brave, MS Edge, Opera, Vivaldi, ...): open `chrome://flags/#unsafely-treat-insecure-origin-as-secure` and add your non HTTPS address (for example: `http://192.168.1.35:3000`) then restart the app.
 
-- On firefox-based browsers: we are not aware of a way to whitelist a URL as easily. You can try clicking on the padlock at the left of the address bar then "Connection is not secure" -> "More information" -> "Permissions" and manually allow the microphone. Alternatively, setting `media.devices.insecure.enabled` to `True` might help.
+- On firefox-based browsers: Open `about:config`, and modify or add as a string the property `dom.securecontext.allowlist`, where one or more IPs can be defined split between commas. (Eg: http://127.0.0.1:8080 for a openwebui service provided locally, using port 8080).
 
 ## Difficulty Accessing Ollama from Open WebUI
 
