@@ -43,7 +43,7 @@ WEBUI_URL=https://<your-open-webui-url>
 
 ### Step 2: Add Open WebUI as a Custom Search Engine
 
-#### For Chrome:
+### For Chrome:
 
 1. Open Chrome and navigate to **Settings**.
 2. Select **Search engine** from the sidebar, then click on **Manage search engines**.
@@ -56,6 +56,17 @@ WEBUI_URL=https://<your-open-webui-url>
       https://<your-open-webui-url>/?q=%s
       ```
 5. Click **Add** to save the configuration.
+
+### For Firefox:
+
+1. Open Open WebUI in Firefox.
+2. Expand the address bar by clicking on it.
+3. Click the plus icon that is enclosed in a green circle at the bottom of the expanded address bar. This adds Open WebUI's search to the search engines in your preferences.
+
+Alternatively:
+1. Open Open WebUI in Firefox.
+2. Right-click on the address bar.
+3. Select "Add Open WebUI" (or similar) from the context menu.
 
 ### Optional: Using Specific Models
 
