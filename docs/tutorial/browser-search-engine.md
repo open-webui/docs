@@ -59,12 +59,12 @@ WEBUI_URL=https://<your-open-webui-url>
 
 ### For Firefox:
 
-1. Open Open WebUI in Firefox.
+1. Go to Open WebUI in Firefox.
 2. Expand the address bar by clicking on it.
 3. Click the plus icon that is enclosed in a green circle at the bottom of the expanded address bar. This adds Open WebUI's search to the search engines in your preferences.
 
 Alternatively:
-1. Open Open WebUI in Firefox.
+1. Go to Open WebUI in Firefox.
 2. Right-click on the address bar.
 3. Select "Add Open WebUI" (or similar) from the context menu.
 
