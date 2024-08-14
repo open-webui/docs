@@ -4,7 +4,7 @@ export const TopBanner = ({ items }) => {
 			{items.map((item) => (
 				<>
 					<div className="mb-2">
-						<div className="text-xs text-gray-500 dark:text-gray-400 font-bold underline mb-1">
+						<div className="text-xs text-gray-600 dark:text-gray-300 font-semibold underline mb-1">
 							Sponsored by {item.name}
 						</div>
 
@@ -24,7 +24,7 @@ export const TopBanner = ({ items }) => {
 							/>
 						</a>
 
-						<div className="text-right text-[0.6rem] text-gray-500 dark:text-gray-400 font-bold  line-clamp-1">
+						<div className="text-right text-xs mt-1 text-gray-600 dark:text-gray-300 font-semibold  line-clamp-1">
 							{item.description}
 						</div>
 					</div>
