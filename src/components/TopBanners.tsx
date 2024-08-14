@@ -11,28 +11,12 @@ export const TopBanners = () => {
 				"Pipelines: Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework",
 		},
 		{
-			imgSrc: "/ads/pipelines-banner.png",
-			mobileImgSrc: "/ads/pipelines-banner-mobile.png",
-			url: "https://github.com/open-webui/pipelines",
-			name: "Open WebUI Pipelines",
+			imgSrc: "/ads/sponsor-banner-1.png",
+			mobileImgSrc: "/ads/sponsor-banner-small-1.png",
+			url: "https://davewaring.com/tag/digital-brain-building/",
+			name: "Dave Waring",
 			description:
-				"Pipelines: Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework",
-		},
-		{
-			imgSrc: "/ads/pipelines-banner.png",
-			mobileImgSrc: "/ads/pipelines-banner-mobile.png",
-			url: "https://github.com/open-webui/pipelines",
-			name: "Open WebUI Pipelines",
-			description:
-				"Pipelines: Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework",
-		},
-		{
-			imgSrc: "/ads/placeholder.png",
-			mobileImgSrc: "/ads/placeholder-mobile.png",
-			url: "https://github.com/sponsors/tjbck",
-			name: "Open WebUI",
-			description:
-				"The top banner spot is reserved for only two Enterprise Diamond sponsors on a first-come, first-served basis",
+				"Follow along as I build my own AI powered digital brain.",
 		},
 	];
 
