@@ -814,6 +814,21 @@ Query: [query]
 - Default: `False`
 - Description: Sets ComfyUI to Flux mode. Only set if Flux is required, as the workflow is completely different and is not at all compatible with other models.
 
+#### `COMFYUI_CUSTOM_WORKFLOW_PATH`
+
+- Type: `str`
+- Description: Provides a path to read a ComfyUI workflow in JSON format, instead of using the default inlined templates. You can obtain the workflow formatted exactly as needed by opening your browser Developer Tools, navigating to ComfyUI, queueing a prompt, and copying the "Request" field in the respective entry. If used, all ComfyUI-related options except for `COMFYUI_BASE_URL` are ignored. If you are running in Docker, don't forget to mount the configuration into the container!
+
+#### `COMFYUI_CUSTOM_WORKFLOW_PROMPT_INDEX`
+
+- Type: `str`
+- Description: Optional, but _strongly recommended_ if you have `COMFYUI_CUSTOM_WORKFLOW_PATH` set. Specifies the node index in which your input prompt is located. For example, if your input prompt is inside a key named "6", you would set this environment variable to 6. If unset, all images will be generated will completely ignore the prompt altogether.
+
+#### `COMFYUI_CUSTOM_WORKFLOW_SEED_INDEX`
+
+- Type: `str`
+- Description: Optional, but recommended if you have `COMFYUI_CUSTOM_WORKFLOW_PATH` set. Specifies the node index in which your seed is input. If unset, every image generated will have the exact same seed.
+
 :::info
 
     [Find out more here](https://docs.openwebui.com/tutorial/images)
