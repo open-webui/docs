@@ -10,9 +10,7 @@ Tools are python scripts that are provided to an LLM at the time of the request.
 Using tools in this context might require a direct connection to the server for websocket functionality.
 
 Furthermore, tool compatibility varies depending on the specific AI model. Even with a system prompt instructing the tool's usage, it may not work reliably across all models.
-
-Let me know if you would like me to elaborate further on any aspect!
-
+ 
 ## How can I use Tools?
 [Once installed](#how-to-install-tools), Tools can be used by assigning them to any LLM that supports function calling and then enabling that Tool. To assign a Tool to a model, you need to navigate to Workspace => Models. Here you can select the model for which you’d like to enable any Tools. 
 
