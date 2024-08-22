@@ -53,9 +53,9 @@ ComfyUI provides an alternative interface for managing and interacting with imag
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e COMFYUI_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
-## Setting Up Open WebUI with ComfyUI
+### Setting Up Open WebUI with ComfyUI
 
-### Setting Up Flux.1 Models:
+#### Setting Up Flux.1 Models:
 
 1. **Model Checkpoints**:
 	* Download the Flux model(s) from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
@@ -72,7 +72,7 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 
 To integrate ComfyUI into Open WebUI, follow these steps:
 
-### Step 1: Configure Open WebUI Settings
+#### Step 1: Configure Open WebUI Settings
 
 1. Navigate to the **Admin Panel** in Open WebUI.
 2. Click on **Settings** and then select the **Images** tab.
@@ -80,13 +80,13 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 4. In the **API URL** field, enter the address where ComfyUI's API is accessible, following this format: `http://<your_comfyui_address>:8188/`. 
    - Set the environment variable `COMFYUI_BASE_URL` to this address to ensure it persists within the WebUI.
 
-### Step 2: Verify the Connection and Enable Image Generation
+#### Step 2: Verify the Connection and Enable Image Generation
 
 1. Ensure ComfyUI is running and verify the connection to Open WebUI. You won't be able to proceed without a successful connection.
 2. Once the connection is verified, toggle on **Image Generation (Experimental)**. More options will be presented to you.
 3. Continue to step 3 for the final configuration steps.
 
-### Step 3: Configure ComfyUI Settings and Import Workflow
+#### Step 3: Configure ComfyUI Settings and Import Workflow
 
 1. Enable developer mode within ComfyUI.
 2. Export the desired workflow from ComfyUI in `API format`. The file will be downloaded as `workflow_api.json` if done correctly.
