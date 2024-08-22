@@ -84,7 +84,7 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 
 1. Ensure ComfyUI is running and verify the connection to Open WebUI. You won't be able to proceed without a successful connection.
 2. Once the connection is verified, toggle on **Image Generation (Experimental)**. More options will be presented to you.
-3. Continuye to step 3 for the final configuration steps.
+3. Continue to step 3 for the final configuration steps.
 
 ### Step 3: Configure ComfyUI Settings and Import Workflow
 
