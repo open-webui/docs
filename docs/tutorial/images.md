@@ -53,49 +53,49 @@ ComfyUI provides an alternative interface for managing and interacting with imag
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e COMFYUI_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
-### Configuring Open WebUI
+### Setting Up Open WebUI with ComfyUI
 
-1. Navigate to the **Admin Panel** > **Settings** > **Images** menu in Open WebUI.
-2. Set the `Image Generation Engine` field to `ComfyUI`.
-3. In the API URL field, enter the address where ComfyUI's API is accessible:
-   ```
-   http://<your_comfyui_address>:8188/
-   ```
-   Set the environment variable `COMFYUI_BASE_URL` to this address to ensure proper integration.
-4. Verify the connection.
-5. Save changes.
+#### Setting Up Flux.1 Models:
 
-## Configuring for FLUX-Schnell & Flux-Dev models:
-To enable ComfyUI Flux mode, add the following environment variables to your Docker-compose.yml file for Open WebUI: 
-```yaml
-COMFYUI_BASE_URL="http://host.docker.internal:8188"
-COMFYUI_CFG_SCALE="3.5"
-COMFYUI_SAMPLER="euler"
-COMFYUI_SCHEDULER="simple"
-COMFYUI_SD3="false"
-COMFYUI_FLUX="true" # Enables ComfyUI Flux mode.
-COMFYUI_FLUX_WEIGHT_DTYPE="fp8_e4m3fn" # Ignored if Flux is not enabled. Sets the weight precision for Flux.
-COMFYUI_FLUX_FP8_CLIP="true # Enable 8-bit precision for the Flux text encoder.
-```
+1. **Model Checkpoints**:
+	* Download the Flux model(s) from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
+	* Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI.
+2. **CLIP Model**:
+	* Download `clip_l.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+	* Place it in the `models/clip` ComfyUI directory.
+3. **T5XXL Model** (optional):
+	* Download `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main)
+	* Place it in the `models/clip` ComfyUI directory.
+4. **AE Model**:
+	* Download `ae.safetensors` from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+	* Place it in the `models/vae` ComfyUI directory.
 
-**Important Notes:**
+To integrate ComfyUI into Open WebUI, follow these steps:
 
-* Flux mode has a completely different workflow that is not compatible with other models. Make sure you understand the implications before enabling it.
-* An updated version of ComfyUI is required.
-* Specific model checkpoints and files must be present in your ComfyUI installation.
+#### Step 1: Configure Open WebUI Settings
 
-### Model Checkpoints and Files
+1. Navigate to the **Admin Panel** in Open WebUI.
+2. Click on **Settings** and then select the **Images** tab.
+3. In the `Image Generation Engine` field, choose `ComfyUI`.
+4. In the **API URL** field, enter the address where ComfyUI's API is accessible, following this format: `http://<your_comfyui_address>:8188/`. 
+   - Set the environment variable `COMFYUI_BASE_URL` to this address to ensure it persists within the WebUI.
 
-The following files are required for Flux mode:
+#### Step 2: Verify the Connection and Enable Image Generation
 
-* Model checkpoints in both `models/checkpoints` and `models/unet` directories. You can download the Flux model(s) from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
-* `clip_l.safetensors` in the `models/clip` directory. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* `t5xxl_fp16.safetensors` in the `models/clip` directory, unless `COMFYUI_FLUX_FP8_CLIP` is enabled. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* `ae.safetensors` in the `models/vae` directory. Download from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+1. Ensure ComfyUI is running and verify the connection to Open WebUI. You won't be able to proceed without a successful connection.
+2. Once the connection is verified, toggle on **Image Generation (Experimental)**. More options will be presented to you.
+3. Continue to step 3 for the final configuration steps.
 
-**Additional Requirements:**
+#### Step 3: Configure ComfyUI Settings and Import Workflow
 
-* If `COMFYUI_FLUX_FP8_CLIP` is set to `true`, the `t5xxl_fp8_e4m3fn.safetensors` file must exist in the `models/clip` directory. Download from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+1. Enable developer mode within ComfyUI.
+2. Export the desired workflow from ComfyUI in `API format`. The file will be downloaded as `workflow_api.json` if done correctly.
+3. Return to Open WebUI and click the **Click here to upload a workflow.json file** button.
+4. Select the `workflow_api.json` file to import.
+5. After importing the workflow, you must map the `ComfyUI Workflow Nodes` according to the imported workflow node IDs. Note that some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
+7. Click `Save` to apply the settings and enjoy image generation with ComfyUI integrated into Open WebUI!
+
+After completing these steps, your ComfyUI setup should be integrated with Open WebUI, and you can use the Flux.1 models for image generation.
 
 ## OpenAI DALL·E
 
