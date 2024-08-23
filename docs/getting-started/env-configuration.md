@@ -416,40 +416,59 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 - Default: `${DATA_DIR}/docs`
 - Description: Specifies the directory scanned for documents to add to the RAG database when triggered.
 
+#### `VECTOR_STORE_TYPE`
+
+- Type: `str` (enum: `persistent_chroma`, `chroma`, `pgvector`, `milvus`)
+- Default: `persistent_chroma`
+- Description: Sets the type of VectorStore to use. Except for `persistent_chroma` that is based on local storage, all other are server VectorStores.
+
 #### `CHROMA_TENANT`
 
 - Type: `str`
 - Default: `default_tenant`
-- Description: Sets the tenant for ChromaDB to use for RAG embeddings.
+- Description: Sets the tenant for ChromaDB to use for RAG embeddings. Used only for VectorStoreType(s): `persistent_chroma`, `chroma`.
 
 #### `CHROMA_DATABASE`
 
 - Type: `str`
 - Default: `default_database`
-- Description: Sets the database in the ChromaDB tenant to use for RAG embeddings.
+- Description: Sets the database in the ChromaDB tenant to use for RAG embeddings. Used only for VectorStoreType(s): `persistent_chroma`, `chroma`.
 
 #### `CHROMA_HTTP_HOST`
 
 - Type: `str`
-- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set.
+- Default: `localhost`
+- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. Used only for VectorStoreType(s): `chroma`.
 
 #### `CHROMA_HTTP_PORT`
 
 - Type: `int`
 - Default: `8000`
-- Description: Specifies the port of a remote ChromaDB Server.
+- Description: Specifies the port of a remote ChromaDB Server. Used only for VectorStoreType(s): `chroma`.
 
 #### `CHROMA_HTTP_HEADERS`
 
 - Type: `str`
-- Description: Comma-separated list of HTTP headers to include with every ChromaDB request.
+- Description: Comma-separated list of HTTP headers to include with every ChromaDB request. Used only for VectorStoreType(s): `chroma`.
 - Example: `Authorization=Bearer heuhagfuahefj,User-Agent=OpenWebUI`.
 
 #### `CHROMA_HTTP_SSL`
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether or not SSL is used for ChromaDB Server connections.
+- Description: Controls whether or not SSL is used for ChromaDB Server connections. Used only for VectorStoreType(s): `chroma`.
+
+#### `PGVECTOR_CONNECTION_STR`
+
+- Type: `str`
+- Description: Specifies the Postgres connection string. Use postgresql+psycopg prefix to use psycopg3. Used only for VectorStoreType(s): `pgvector`.
+- Example: `postgresql+psycopg://postgres:my_password@localhost:5432/my_database`.
+
+#### `MILVUS_CONNECTION_URI`
+
+- Type: `str`
+- Default: `http://localhost:19530`
+- Description: Specifies the Milvus connection URI. Used only for VectorStoreType(s): `milvus`.
 
 #### `RAG_TOP_K`
 
@@ -467,7 +486,7 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models.
+- Description: Enables the use of ensemble search with `BM25` + `<Your VectorStore>`, with reranking using `sentence_transformers` models.
 
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
 
