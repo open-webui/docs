@@ -129,8 +129,9 @@ Two example [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1)
 
 * `tts-1` via [Piper TTS](https://github.com/rhasspy/piper) (very fast, runs on CPU): You can map your own [Piper voices](https://rhasspy.github.io/piper-samples/) via the `voice_to_speaker.yaml` configuration file, as per the instructions above.
 * `tts-1-hd` via [Coqui AI/TTS](https://github.com/coqui-ai/TTS) XTTS v2 voice cloning (fast, but requires around 4GB GPU VRAM & Nvidia GPU with CUDA).
-	+ [Multilingual Support](https://github.com/matatonic/openedai-speech#multilingual) with XTTS voices
 * Beta [parler-tts](https://huggingface.co/parler-tts/parler_tts_mini_v0.1) support (you can describe very basic features of the speaker voice), See: (https://www.text-description-to-speech.com/) for some examples of how to describe voices. 
+
+Note that both Piper and Coqui support [multilingual](https://github.com/matatonic/openedai-speech#multilingual) voices.
 
 **Step 8: Press `Save` to apply the changes and start enjoying naturally sounding voices**
 --------------------------------------------------------------------------------------------
