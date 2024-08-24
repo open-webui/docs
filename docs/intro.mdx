@@ -39,6 +39,8 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 ## Quick Start with Docker 🐳 (Recommended)
 
+### Docker Run Commands
+
 :::tip
 
 #### Disabling Login for Single User
@@ -67,13 +69,13 @@ Visit the [Docker documentation](https://docs.docker.com/storage/) to understand
 
 ### Installation with Default Configuration
 
-- **If Ollama is on your computer**, use this command:
+- **If Ollama is already installed on your computer**, use this command:
 
   ```bash
   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-- **If Ollama is on a Different Server**, use this command:
+- **If Ollama is installed on a different server**, use this command:
 
   To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL:
 
@@ -99,14 +101,14 @@ Visit the [Docker documentation](https://docs.docker.com/storage/) to understand
 
 This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
 
-- **With GPU Support**:
+- **Bundled Installation for Nvidia GPU Support**:
   Utilize GPU resources by running the following command:
 
   ```bash
   docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
   ```
 
-- **For CPU Only**:
+- **Bundled Installation for CPU Support Only**:
   If you're not using a GPU, use this command instead:
 
   ```bash
@@ -115,7 +117,157 @@ This installation method uses a single container image that bundles Open WebUI w
 
 Both commands facilitate a built-in, hassle-free installation of both Open WebUI and Ollama, ensuring that you can get everything up and running swiftly.
 
-After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+### Installation Using Docker Compose
+
+Alternatively, you can use Docker Compose to manage your Open WebUI containers. Here's an example `docker-compose.yml` file for each of the above scenarios:
+
+#### If Ollama is already installed on your computer
+
+```yml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    environment:
+      - WEBUI_AUTH=True
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+#### If Ollama is installed on a different server
+
+```yml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    environment:
+      - OLLAMA_BASE_URL=http://localhost:11434
+      - WEBUI_AUTH=True
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+#### Install With Nvidia GPU Support
+
+```yml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:cuda
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    deploy:
+        resources:
+            reservations:
+                devices:
+                    - driver: nvidia
+                      count: all
+                      capabilities:
+                          - gpu
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+#### Install For OpenAI API Usage Only
+
+```yml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    environment:
+      - OPENAI_API_KEY=your_secret_key
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+#### Install For Ollama + Nvidia GPU Support
+
+```yml
+services:
+    open-webui:
+        ports:
+            - 3000:8080
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities:
+                              - gpu
+        volumes:
+            - ollama:/root/.ollama
+            - open-webui:/app/backend/data
+        container_name: open-webui
+        restart: always
+        image: ghcr.io/open-webui/open-webui:ollama
+volumes:
+    ollama:
+    open-webui:
+```
+
+
+#### Install For Ollama + CPU Only
+
+```yml
+services:
+    open-webui:
+        ports:
+            - 3000:8080
+        volumes:
+            - ollama:/root/.ollama
+            - open-webui:/app/backend/data
+        container_name: open-webui
+        restart: always
+        image: ghcr.io/open-webui/open-webui:ollama
+volumes:
+    ollama:
+    open-webui:
+```
+
+
+### Starting the Containers
+
+Once you've created the `docker-compose.yml` file, you can start the containers using the following command. However, to ensure that you're using the latest images, run `docker-compose pull` first:
+
+```bash
+docker-compose pull
+docker-compose up -d
+```
+
+This will download any updates to the images and then start the containers in detached mode. You can then access Open WebUI at [http://localhost:3000](http://localhost:3000).
 
 ### Using the Dev Branch 🌙
 
@@ -128,6 +280,55 @@ If you want to try out the latest bleeding-edge features and are okay with occas
 ```bash
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
 ```
+
+## Updating
+
+Check out our full [updating guide](/getting-started/updating).
+
+If you want to update your local Docker installation to the latest version, you can use the following `docker-compose.yml` file and Watchtower:
+
+```yml
+services:
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    environment:
+      - WEBUI_AUTH=True
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+You can update your containers by running the following command:
+
+```bash
+docker-compose pull open-webui
+docker-compose up -d
+```
+
+This will update the `open-webui` container to the latest version. Note that you will need to update the `image` in the `docker-compose.yml` file to the latest tag.
+
+Docker run command:
+
+```bash
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+```
+
+In the last part of the command, replace `open-webui` with your container name if it is different.
 
 ## Manual Installation
 
@@ -158,20 +359,6 @@ We offer various installation alternatives, including non-Docker native installa
 ## Troubleshooting
 
 If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s).
-
-## Updating
-
-Check out our full [updating guide](/getting-started/updating).
-
-In case you want to update your local Docker installation to the latest version, you can do it with [Watchtower](https://containrrr.dev/watchtower/):
-
-```bash
-docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
-```
-
-In the last part of the command, replace `open-webui` with your container name if it is different.
-
-Continue with the full [getting started guide](/getting-started).
 
 ## Sponsors 🙌
 
