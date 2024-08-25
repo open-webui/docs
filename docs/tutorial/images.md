@@ -55,20 +55,20 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 
 ### Setting Up Open WebUI with ComfyUI
 
-#### Setting Up Flux.1 Models:
+#### Setting Up FLUX.1 Models:
 
 1. **Model Checkpoints**:
-	* Download the Flux model(s) from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
-	* Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI.
-2. **CLIP Model**:
+	* Download either the `FLUX.1-schnell` or `FLUX.1-dev` model from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
+	* Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI. Alternatively, you can create a symbolic link between `models/checkpoints` and `models/unet` to ensure both directories contain the same model checkpoints.
+2. **VAE Model**:
+	* Download `ae.safetensors` VAE from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+	* Place it in the `models/vae` ComfyUI directory.
+3. **CLIP Model**:
 	* Download `clip_l.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
 	* Place it in the `models/clip` ComfyUI directory.
-3. **T5XXL Model** (optional):
-	* Download `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main)
+4. **T5XXL Model**:
+	* Download either the `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` model from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
 	* Place it in the `models/clip` ComfyUI directory.
-4. **AE Model**:
-	* Download `ae.safetensors` from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
-	* Place it in the `models/vae` ComfyUI directory.
 
 To integrate ComfyUI into Open WebUI, follow these steps:
 
@@ -82,18 +82,22 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 
 #### Step 2: Verify the Connection and Enable Image Generation
 
-1. Ensure ComfyUI is running and verify the connection to Open WebUI. You won't be able to proceed without a successful connection.
+1. Ensure ComfyUI is running and that you've successfully verified the connection to Open WebUI. You won't be able to proceed without a successful connection.
 2. Once the connection is verified, toggle on **Image Generation (Experimental)**. More options will be presented to you.
 3. Continue to step 3 for the final configuration steps.
 
 #### Step 3: Configure ComfyUI Settings and Import Workflow
 
-1. Enable developer mode within ComfyUI.
-2. Export the desired workflow from ComfyUI in `API format`. The file will be downloaded as `workflow_api.json` if done correctly.
+1. Enable developer mode within ComfyUI. To do this, look for the gear icon above the **Queue Prompt** button within ComfyUI and enable the `Dev Mode` toggle.
+2. Export the desired workflow from ComfyUI in `API format` using the `Save (API Format)` button. The file will be downloaded as `workflow_api.json` if done correctly.
 3. Return to Open WebUI and click the **Click here to upload a workflow.json file** button.
-4. Select the `workflow_api.json` file to import.
-5. After importing the workflow, you must map the `ComfyUI Workflow Nodes` according to the imported workflow node IDs. Note that some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
-7. Click `Save` to apply the settings and enjoy image generation with ComfyUI integrated into Open WebUI!
+4. Select the `workflow_api.json` file to import the exported workflow from ComfyUI into Open WebUI.
+5. After importing the workflow, you must map the `ComfyUI Workflow Nodes` according to the imported workflow node IDs.
+:::
+tip
+Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
+:::
+6. Click `Save` to apply the settings and enjoy image generation with ComfyUI integrated into Open WebUI!
 
 After completing these steps, your ComfyUI setup should be integrated with Open WebUI, and you can use the Flux.1 models for image generation.
 
