@@ -47,7 +47,7 @@ If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](/gettin
 You cannot switch between single-user mode and multi-account mode after this change.
 :::
 
-## Quick Start with Docker 🐳 (Recommended)
+## Quick Start With Docker 🐳 (Recommended)
 
 :::danger
 When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
@@ -80,7 +80,7 @@ Visit the [Docker documentation](https://docs.docker.com/storage/) to understand
   ```
   To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL.
 
-- **To run Open WebUI with Nvidia GPU support**, use this command:
+- **To run Open WebUI With Nvidia GPU support**, use this command:
 
   ```bash
   docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
@@ -98,7 +98,7 @@ Visit the [Docker documentation](https://docs.docker.com/storage/) to understand
 
 This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
 
-- **Bundled Ollama Installation with Nvidia GPU Support**:
+- **Bundled Ollama Installation With Nvidia GPU Support**:
   Utilize GPU resources by running the following command:
 
   ```bash
@@ -373,7 +373,7 @@ Replace `open-webui` with your specified container name if it is different.
 
 ## Manual Installation
 
-### Installation with `pip` (Beta)
+### Installation With `pip` (Beta)
 
 For users who prefer to use Python's package manager `pip`, Open WebUI offers a installation method. Python 3.11 is required for this method.
 
