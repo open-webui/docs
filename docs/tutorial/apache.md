@@ -27,6 +27,10 @@ For the UI configuration, you can set up the Apache VirtualHost as follows:
     ProxyPass / http://server.com:3000/ nocanon
     ProxyPassReverse / http://server.com:3000/
 
+    RewriteEngine on
+    RewriteCond %{HTTP:Upgrade} websocket [NC]
+    RewriteCond %{HTTP:Connection} upgrade [NC]
+    RewriteRule ^/?(.*) "ws://server.com:3000/$1" [P,L]
 </VirtualHost>
 ```
 
@@ -47,6 +51,11 @@ _Normally, mod_proxy will canonicalise ProxyPassed URLs. But this may be incompa
 
     ProxyPass / http://server.com:3000/ nocanon
     ProxyPassReverse / http://server.com:3000/
+
+    RewriteEngine on
+    RewriteCond %{HTTP:Upgrade} websocket [NC]
+    RewriteCond %{HTTP:Connection} upgrade [NC]
+    RewriteRule ^/?(.*) "ws://server.com:3000/$1" [P,L]
 
     SSLEngine on
     SSLCertificateFile /etc/ssl/virtualmin/170514456861234/ssl.cert
