@@ -32,7 +32,7 @@ podman run -d --network slirp4netns:allow_host_loopback=true -p 3000:8080 -e OLL
 ```
 
 ## Microphone access and other permission issues with non-HTTPS connections
-Chromium-based (Chrome, Brave, MS Edge, Opera, Vivaldi,  ...) and firefox-based browsers often restrict site-level permissions on non-HTTPS URLs. This is most obvious when running an instance on your local network and reaching it from another device (example: a phone) of the same network: the microphone permission will most likely get denied right away without a clear way to whitelist the URL. Solutions for this include manually setting up HTTPS or adding an exception to the URL to flag it at secure. Use this at your own risk and we strongly recommend thinking carefully about the security implications before jumping into this. To flag a URL as secure:
+Chromium-based (Chrome, Brave, MS Edge, Opera, Vivaldi,  ...) and firefox-based browsers often restrict site-level permissions on non-HTTPS URLs. This is most obvious when running an instance on your local network and reaching it from another device (example: a phone) of the same network: the microphone permission will most likely get denied right away without a clear way to allowlist the URL. Solutions for this include manually setting up HTTPS or adding an exception to the URL to flag it at secure. Use this at your own risk and we strongly recommend thinking carefully about the security implications before jumping into this. To flag a URL as secure:
 
 -  On chromium based browsers (Chrome, Brave, MS Edge, Opera, Vivaldi, ...): open `chrome://flags/#unsafely-treat-insecure-origin-as-secure` and add your non HTTPS address (for example: `http://192.168.1.35:3000`) then restart the app.
 
