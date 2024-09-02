@@ -48,6 +48,7 @@ TTS_HOME=voices
 HF_HOME=voices
 #PRELOAD_MODEL=xtts
 #PRELOAD_MODEL=xtts_v2.0.2
+#PRELOAD_MODEL=parler-tts/parler_tts_mini_v0.1
 #EXTRA_ARGS=--log-level DEBUG --unload-timer 300
 #USE_ROCM=1
 ```
