@@ -96,7 +96,7 @@ docker compose -f docker-compose.rocm.yml up -d
 ```bash
 docker compose -f docker-compose.min.yml up -d
 ```
-* **CPU only, No GPU (Piper only)**: For a minimal docker image with only Piper support (<1GB vs. 8GB):
+* **CPU only, No GPU (Piper only)**: For a minimal docker image with only Piper support (< 1GB vs. 8GB):
 ```bash
 docker compose -f docker-compose.min.yml up -d
 ```
