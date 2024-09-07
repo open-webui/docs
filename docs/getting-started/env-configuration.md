@@ -4,6 +4,12 @@
 
 Open WebUI provides a range of environment variables that allow you to customize and configure various aspects of the application. This page serves as a comprehensive reference for all available environment variables, including their types, default values, and descriptions.
 
+:::info
+
+  Last updated: v0.3.20
+
+:::
+
 ## App/Backend
 
 The following environment variables are used by `backend/config.py` to provide Open WebUI startup configurability. Please note that some variables may have different default values depending on whether you're running Open WebUI directly or via Docker. For more information on logging environment variables, see our [logging documentation](/getting-started/logging#appbackend).
@@ -130,6 +136,18 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default: `True`
 - Description: Toggles user permission to delete chats.
 
+#### `USER_PERMISSIONS_CHAT_EDITING`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles user permission to edit chats.
+
+#### `USER_PERMISSIONS_CHAT_TEMPORARY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles user permission to create temporary chats.
+
 #### `ENABLE_MODEL_FILTER`
 
 - Type: `bool`
@@ -153,11 +171,23 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default: `True`
 - Description: Controls whether admin users can export data.
 
+#### `ENABLE_ADMIN_CHAT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables admin users to access all chats.
+
 #### `ENABLE_COMMUNITY_SHARING`
 
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether users are shown the share to community button.
+
+#### `ENABLE_MESSAGE_RATING`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables message rating feature.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -236,6 +266,18 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default: `False`
 - Description: Resets the `config.json` file on startup.
 
+#### `DEFAULT_LOCALE`
+
+- Type: `str`
+- Default: `en`
+- Description: Sets the default locale for the application.
+
+#### `FUNCTIONS_DIR`
+
+- Type: `str`
+- Default: `./functions`
+- Description: Specifies the directory for custom functions.
+
 #### `SHOW_ADMIN_DETAILS`
 
 - Type: `bool`
@@ -273,6 +315,11 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `int`
 - Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things such as connections to Ollama and OpenAI endpoints.
+
+#### `FONTS_DIR`
+
+- Type: `str`
+- Description: Specifies the directory for fonts.
 
 ### Ollama
 
@@ -391,12 +438,6 @@ Question:
 {{prompt:end:4000}}
 ```
 
-#### `SEARCH_QUERY_PROMPT_LENGTH_THRESHOLD`
-
-- Type: `int`
-- Default: `100`
-- Description: Sets the minimum length of a prompt before a model is used to synthesize a web search query when web search is enabled.
-
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
 - Type: `str`
@@ -407,6 +448,12 @@ Question:
 Tools: {{TOOLS}}
 If a function tool doesn't match the query, return an empty string. Else, pick a function tool, fill in the parameters from the function tool's schema, and return it in the format { "name": \"functionName\", "parameters": { "key": "value" } }. Only pick a function if the user asks.  Only return the object. Do not return any other text.
 ```
+
+#### `CORS_ALLOW_ORIGIN`
+
+- Type: `str`
+- Default: `*`
+- Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
 ### RAG
 
@@ -590,6 +637,30 @@ Query: [query]
 - Default: `100`
 - Description: Specifies how much overlap there should be between chunks.
 
+#### `CONTENT_EXTRACTION_ENGINE`
+
+- Type: `str` (` `, `tika`)
+- Default: ` ` (empty)
+- Description: Sets the content extraction engine to use for document ingestion.
+
+#### `TIKA_SERVER_URL`
+
+- Type: `str`
+- Default: `http://localhost:9998`
+- Description: Sets the URL for the Apache Tika server.
+
+#### `RAG_FILE_MAX_COUNT`
+
+- Type: `int`
+- Default: `10`
+- Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
+
+#### `RAG_FILE_MAX_SIZE`
+
+- Type: `int`
+- Default: `104857600` (100MB)
+- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
+
 ### Web Search
 
 #### `ENABLE_RAG_WEB_SEARCH`
@@ -597,6 +668,12 @@ Query: [query]
 - Type: `bool`
 - Default: `false`
 - Description: Enable web search toggle
+
+#### `ENABLE_SEARCH_QUERY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the generation of search queries from prompts
 
 #### `RAG_WEB_SEARCH_ENGINE`
 
@@ -670,11 +747,15 @@ Query: [query]
 - Default: `10`
 - Description: Number of concurrent requests to crawl web pages returned from search results.
 
-#### `RAG_WEB_SEARCH_DOMAIN_FILTER_LIST`
+#### `SEARCHAPI_API_KEY`
 
-- Type: `list` of `str`
-- Default: `[]`
-- Description: You can provide a list of your own websites to filter after performing a web search. This ensures the highest level of safety and reliability of the information sources.
+- Type: `str`
+- Description: Sets the SearchAPI API key.
+
+#### `SEARCHAPI_ENGINE`
+
+- Type: `str`
+- Description: Sets the SearchAPI engine.
 
 ### Speech to Text
 
@@ -726,11 +807,17 @@ Query: [query]
 
 #### `AUDIO_TTS_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for Web API), `openai`)
+- Type: `str` (enum: ` ` (empty for Web API), `openai`, `elevenlabs`)
 - Options:
   - (empty) - Uses Web API engine for Text-to-Speech.
   - `openai` - Uses OpenAI engine for Text-to-Speech.
+  - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech.
 - Description: Specifies the Text-to-Speech engine to use.
+
+#### `AUDIO_TTS_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Text-to-Speech.
 
 #### `AUDIO_TTS_OPENAI_API_BASE_URL`
 
@@ -756,6 +843,12 @@ Query: [query]
 - Default: `alloy`
 - Description: Sets the OpenAI text-to-speech voice to use.
 
+#### `AUDIO_TTS_SPLIT_ON`
+
+- Type: `str`
+- Default: `punctuation`
+- Description: Sets the OpenAI text-to-speech split on to use.
+
 ### Image Generation
 
 #### `ENABLE_IMAGE_GENERATION`
@@ -763,6 +856,16 @@ Query: [query]
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables image generation features.
+
+#### `AUTOMATIC1111_API_AUTH`
+
+- Type: `str`
+- Description: Sets the Automatic1111 API authentication.
+
+#### `COMFYUI_WORKFLOW`
+
+- Type: `str`
+- Description: Sets the ComfyUI workflow.
 
 #### `IMAGE_GENERATION_ENGINE`
 
@@ -924,40 +1027,21 @@ Query: [query]
 - Type: `str`
 - Description: Sets the redirect URI for OIDC
 
-### LiteLLM
+### Tools
 
-:::warning
-
-The bundled LiteLLM instance has been removed as of v0.2.0.
-You will need to either migrate to [pipelines](https://github.com/open-webui/pipelines), or self host your own LiteLLM proxy.
-
-:::
-
-#### `ENABLE_LITELLM`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables the bundled LiteLLM instance.
-
-#### `LITELLM_PROXY_PORT`
-
-- Type: `int`
-- Default: `14365`
-- Description: Sets the port to run the bundled LiteLLM instance on.
-
-#### `LITELLM_PROXY_HOST`
+#### `TOOLS_DIR`
 
 - Type: `str`
-- Default: `127.0.0.1`
-- Description: Sets the address to run the bundled LiteLLM instance on.
+- Default: `${DATA_DIR}/tools`
+- Description: Specifies the directory for custom tools.
 
 ## Misc Environment Variables
 
-These variables are not specific to Open-Webui but can still be valuable in certain contexts.
+These variables are not specific to Open WebUI but can still be valuable in certain contexts.
 
 ### Proxy Settings
 
-Open-Webui supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings, Open-Webui uses the following environment variables:
+Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings, Open WebUI uses the following environment variables:
 
 #### `http_proxy`
 
