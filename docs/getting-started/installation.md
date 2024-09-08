@@ -5,13 +5,13 @@
 For cpu-only pod
 
 ```bash
-kubectl apply -f ./kubernetes/manifest/base
+kubectl apply -k ./kubernetes/manifest/base
 ```
 
 For gpu-enabled pod
 
 ```bash
-kubectl apply -k ./kubernetes/manifest
+kubectl apply -k ./kubernetes/manifest/gpu
 ```
 
 ### Installing Both Ollama and Open WebUI Using Helm
