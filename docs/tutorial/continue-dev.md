@@ -68,6 +68,7 @@ Make sure you pull the model into your ollama instance/s beforehand.
       "title": "Granite Code",
       "provider": "openai",
       "model": "granite-code:latest",
+      "useLegacyCompletionsEndpoint": false,
       "apiBase": "http://YOUROPENWEBUI/ollama/v1",
       "apiKey": "sk-YOUR-API-KEY"
     }
@@ -83,6 +84,7 @@ Make sure you pull the model into your ollama instance/s beforehand.
     "title": "Granite Code",
     "provider": "openai",
     "model": "granite-code:latest",
+    "useLegacyCompletionsEndpoint": false,
     "apiBase": "http://localhost:3000/ollama/v1",
     "apiKey": "sk-YOUR-API-KEY"
   }
