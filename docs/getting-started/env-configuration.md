@@ -493,7 +493,7 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 #### `RAG_EMBEDDING_MODEL`
 
 - Type: `str`
-- Default: `sentence-transformers/all-MiniLM-L6`
+- Default: `sentence-transformers/all-MiniLM-L6-v2`
 - Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
 
 #### `RAG_EMBEDDING_MODEL_AUTO_UPDATE`
