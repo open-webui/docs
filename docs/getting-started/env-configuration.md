@@ -622,8 +622,10 @@ Query: [query]
 
 #### `CONTENT_EXTRACTION_ENGINE`
 
-- Type: `str` (` `, `tika`)
-- Default: ` ` (empty)
+- Type: `str` (`tika`)
+- Options:
+  - Leave empty to use default
+  - `tika` - Use a local Apache Tika server
 - Description: Sets the content extraction engine to use for document ingestion.
 
 #### `TIKA_SERVER_URL`
@@ -748,7 +750,7 @@ Query: [query]
 
 - Type: `str` (enum: `openai`)
 - Options:
-  - (empty) - Uses local Whisper engine for Speech-to-Text.
+  - Leave empty to use local Whisper engine for Speech-to-Text.
   - `openai` - Uses OpenAI engine for Speech-to-Text.
 - Description: Specifies the Speech-to-Text engine to use.
 
@@ -794,7 +796,7 @@ Query: [query]
 
 - Type: `str` (enum: `elevenlabs`, `openai`)
 - Options:
-  - (empty) - Uses Web API engine for Text-to-Speech.
+  - Leave empty to use built-in WebAPI engine for Text-to-Speech.
   - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech
   - `openai` - Uses OpenAI engine for Text-to-Speech.
 - Description: Specifies the Text-to-Speech engine to use.
