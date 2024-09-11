@@ -2,7 +2,9 @@
 
 ## Overview
 
-Open WebUI provides a range of environment variables that allow you to customize and configure various aspects of the application. This page serves as a comprehensive reference for all available environment variables, including their types, default values, and descriptions.
+Open WebUI provides a range of environment variables that allow you to customize and configure 
+various aspects of the application. This page serves as a comprehensive reference for all available 
+environment variables, including their types, default values, and descriptions.
 
 :::info
 
@@ -12,7 +14,10 @@ Open WebUI provides a range of environment variables that allow you to customize
 
 ## App/Backend
 
-The following environment variables are used by `backend/config.py` to provide Open WebUI startup configuration. Please note that some variables may have different default values depending on whether you're running Open WebUI directly or via Docker. For more information on logging environment variables, see our [logging documentation](/getting-started/logging#appbackend).
+The following environment variables are used by `backend/config.py` to provide Open WebUI startup 
+configuration. Please note that some variables may have different default values depending on 
+whether you're running Open WebUI directly or via Docker. For more information on logging 
+environment variables, see our [logging documentation](/getting-started/logging#appbackend).
 
 ### General
 
@@ -214,7 +219,8 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for the username of anyone registering with the `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorial/sso).
+- Description: Defines the trusted request header for the username of anyone registering with the 
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorial/sso).
 
 #### `WEBUI_SECRET_KEY`
 
@@ -233,7 +239,8 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `bool`
 - Default: `False`
-- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration for local Whisper and embeddings.
+- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration 
+for local Whisper and embeddings.
 
 #### `DATABASE_URL`
 
@@ -247,6 +254,12 @@ The following environment variables are used by `backend/config.py` to provide O
     Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
 
 :::
+
+#### `PORT`
+
+- Type: `int`
+- Default: `8080`
+- Description: Sets the port to run Open WebUI from.
 
 #### `RESET_CONFIG_ON_START`
 
@@ -287,9 +300,12 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `str` (enum: `lax`, `strict`, `none`)
 - Options:
-  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with requests initiated by third-party websites.
-  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent with requests initiated by third-party websites.
-  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with requests initiated by third-party websites, but only over HTTPS.
+  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with 
+requests initiated by third-party websites.
+  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent 
+with requests initiated by third-party websites.
+  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with 
+requests initiated by third-party websites, but only over HTTPS.
 - Default: `lax`
 - Description: Sets the `SameSite` attribute for session cookies.
 
@@ -302,7 +318,8 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
 - Type: `int`
-- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things such as connections to Ollama and OpenAI endpoints.
+- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things 
+such as connections to Ollama and OpenAI endpoints.
 
 #### `FONTS_DIR`
 
@@ -330,7 +347,8 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `OLLAMA_BASE_URLS`
 
 - Type: `str`
-- Description: Configures load-balanced Ollama backend hosts, separated by `;`. See [`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
+- Description: Configures load-balanced Ollama backend hosts, separated by `;`. See 
+[`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
 
 #### `USE_OLLAMA_DOCKER`
 
@@ -379,12 +397,14 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `TASK_MODEL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation when using Ollama models.
+- Description: The default model to use for tasks such as title and web search query generation 
+when using Ollama models.
 
 #### `TASK_MODEL_EXTERNAL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation when using OpenAI-compatible endpoints.
+- Description: The default model to use for tasks such as title and web search query generation 
+when using OpenAI-compatible endpoints.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
 
@@ -497,7 +517,8 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models.
+- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using 
+`sentence_transformers` models.
 
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
 
@@ -576,7 +597,8 @@ Query: [query]
 
 - Type: `bool`
 - Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own modeling files for reranking.
+- Description: Determines whether or not to allow custom models defined on the Hub in their own 
+modeling files for reranking.
 
 #### `RAG_OPENAI_API_BASE_URL`
 
@@ -600,7 +622,8 @@ Query: [query]
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request Forgery attacks against local network resources.
+- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request 
+Forgery attacks against local network resources.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
 
@@ -679,7 +702,8 @@ Query: [query]
 #### `SEARXNG_QUERY_URL`
 
 - Type: `str`
-- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with the search query. Example: `http://searxng.local/search?q=<query>`
+- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with 
+the search query. Example: `http://searxng.local/search?q=<query>`
 
 #### `GOOGLE_PSE_API_KEY`
 
@@ -916,7 +940,9 @@ Query: [query]
 
 - Type: `bool`
 - Default: `False`
-- Description: If enabled, merges OAuth accounts with existing accounts using the same email address. This is considered unsafe as providers may not verify email addresses and can lead account takeovers.
+- Description: If enabled, merges OAuth accounts with existing accounts using the same email 
+address. This is considered unsafe as providers may not verify email addresses and can lead to 
+account takeovers.
 
 #### `OAUTH_USERNAME_CLAIM`
 
@@ -1022,3 +1048,29 @@ Query: [query]
 - Type: `str`
 - Default: `${DATA_DIR}/tools`
 - Description: Specifies the directory for custom tools.
+
+## Misc Environment Variables
+
+These variables are not specific to Open WebUI but can still be valuable in certain contexts.
+
+### Proxy Settings
+
+Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
+Open WebUI uses the following environment variables:
+
+#### `http_proxy`
+
+- Type: `str`
+- Description: Sets the URL for the HTTP proxy.
+
+#### `https_proxy`
+
+- Type: `str`
+- Description: Sets the URL for the HTTPS proxy.
+
+#### `no_proxy`
+
+- Type: `str`
+- Description: Lists domain extensions (or IP addresses) for which the proxy should not be used,
+separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
+bypassed when accessing documents from MIT.
