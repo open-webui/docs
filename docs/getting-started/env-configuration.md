@@ -7,9 +7,7 @@ various aspects of the application. This page serves as a comprehensive referenc
 environment variables, including their types, default values, and descriptions.
 
 :::info
-
-  Last updated: v0.3.20
-
+Last updated: v0.3.20
 :::
 
 ## App/Backend
@@ -39,12 +37,10 @@ environment variables, see our [logging documentation](/getting-started/logging#
 - Description: This setting enables or disables authentication.
 
 :::danger
-
-    If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
-    important to note that turning off authentication is only possible for fresh installations without
-    any existing users. If there are already users registered, you cannot disable authentication
-    directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
-
+If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's 
+important to note that turning off authentication is only possible for fresh installations without 
+any existing users. If there are already users registered, you cannot disable authentication 
+directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
 :::
 
 #### `WEBUI_NAME`
@@ -66,11 +62,9 @@ environment variables, see our [logging documentation](/getting-started/logging#
 - Description: Specifies the timeout duration in seconds for the aiohttp client.
 
 :::info
-
-    This is the maximum amount of time the client will wait for a response before timing out.
-    If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
-    allowing the client to wait indefinitely.
-
+This is the maximum amount of time the client will wait for a response before timing out.
+If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and 
+allowing the client to wait indefinitely.
 :::
 
 #### `DATA_DIR`
@@ -109,10 +103,8 @@ environment variables, see our [logging documentation](/getting-started/logging#
 - Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to true) elements.
 
 :::danger
-
-    This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup)
-    is also being used and set to `True`. Failure to do so will result in the inability to login.
-
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup) 
+is also being used and set to `True`. Failure to do so will result in the inability to login.
 :::
 
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
@@ -249,10 +241,8 @@ for local Whisper and embeddings.
 - Description: Specifies the database URL to connect to.
 
 :::info
-
-    Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-    Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
-
+Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
+Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
 :::
 
 #### `PORT`
