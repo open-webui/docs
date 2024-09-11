@@ -6,7 +6,7 @@ Open WebUI provides a range of environment variables that allow you to customize
 
 ## App/Backend
 
-The following environment variables are used by `backend/config.py` to provide Open WebUI startup configurability. Please note that some variables may have different default values depending on whether you're running Open WebUI directly or via Docker. For more information on logging environment variables, see our [logging documentation](/getting-started/logging#appbackend).
+The following environment variables are used by `backend/config.py` to provide Open WebUI startup configuration. Please note that some variables may have different default values depending on whether you're running Open WebUI directly or via Docker. For more information on logging environment variables, see our [logging documentation](/getting-started/logging#appbackend).
 
 ### General
 
@@ -29,10 +29,10 @@ The following environment variables are used by `backend/config.py` to provide O
 
 :::danger
 
-    If set to `False`, authentication will be disabled for your Open WebUI instance. However,
-    it's important to note that turning off authentication is only possible for fresh installations without any existing users.
-    If there are already users registered, you cannot disable authentication directly. Ensure that no users are present in the database,
-    if you intend to turn off `WEBUI_AUTH`.
+    If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
+    important to note that turning off authentication is only possible for fresh installations without
+    any existing users. If there are already users registered, you cannot disable authentication
+    directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
 
 :::
 
@@ -56,8 +56,9 @@ The following environment variables are used by `backend/config.py` to provide O
 
 :::info
 
-    This is the maximum amount of time the client will wait for a response before timing out. If set to an empty string (' '),
-    the timeout will be set to `None`, effectively disabling the timeout and allowing the client to wait indefinitely.
+    This is the maximum amount of time the client will wait for a response before timing out.
+    If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
+    allowing the client to wait indefinitely.
 
 :::
 
@@ -82,7 +83,7 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `CUSTOM_NAME`
 
 - Type: `str`
-- Description: Sets `WEBUI_NAME` but polls _api.openwebui.com_ for metadata.
+- Description: Sets `WEBUI_NAME` but polls **api.openwebui.com** for metadata.
 
 #### `ENABLE_SIGNUP`
 
@@ -140,7 +141,7 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `str`
 - Description: Sets the Language Model filter list, semicolon-separated
-- Example: `llama3:instruct;gemma:instruct`
+- Example: `llama3.1:instruct;gemma2:latest`
 
 #### `WEBHOOK_URL`
 
@@ -172,14 +173,7 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: List of banners to show to users. Format of banners are:
 
 ```json
-{
-  "id": "string",
-  "type": "string [info, success, warning, error]",
-  "title": "string",
-  "content": "string",
-  "dismissible": false, # controls if the banner can be dismissed by users
-  "timestamp": 1000 # created at timestamp
-}
+[{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": false,"timestamp": 1000}]
 ```
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
@@ -223,12 +217,6 @@ The following environment variables are used by `backend/config.py` to provide O
     Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
 
 :::
-
-#### `PORT`
-
-- Type: `int`
-- Default: `8080`
-- Description: Sets the port to run Open WebUI from.
 
 #### `RESET_CONFIG_ON_START`
 
@@ -297,22 +285,16 @@ The following environment variables are used by `backend/config.py` to provide O
 - Type: `str`
 - Description: Configures load-balanced Ollama backend hosts, separated by `;`. See [`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
 
-#### `K8S_FLAG`
-
-- Type: `bool`
-- Description: If set, assumes Helm chart deployment and sets [`OLLAMA_BASE_URL`](#ollama_base_url) to `http://ollama-service.open-webui.svc.cluster.local:11434`
-
 #### `USE_OLLAMA_DOCKER`
 
 - Type: `bool`
 - Default: `False`
 - Description: Builds the Docker image with a bundled Ollama instance.
 
-#### `OLLAMA_API_BASE_URL`
+#### `K8S_FLAG`
 
-- Type: `str`
-- Default: `http://localhost:11434/api`
-- Description: Deprecated, see [`OLLAMA_BASE_URL`](#ollama_base_url).
+- Type: `bool`
+- Description: If set, assumes Helm chart deployment and sets [`OLLAMA_BASE_URL`](#ollama_base_url) to `http://ollama-service.open-webui.svc.cluster.local:11434`
 
 ### OpenAI
 
@@ -321,11 +303,6 @@ The following environment variables are used by `backend/config.py` to provide O
 - Type: `bool`
 - Default: `true`
 - Description: Enables the use of OpenAI APIs.
-
-#### `OPENAI_API_KEY`
-
-- Type: `str`
-- Description: Sets the OpenAI API key.
 
 #### `OPENAI_API_BASE_URL`
 
@@ -338,6 +315,11 @@ The following environment variables are used by `backend/config.py` to provide O
 - Type: `str`
 - Description: Supports balanced OpenAI base API URLs, semicolon-separated.
 - Example: `http://host-one:11434;http://host-two:11434`
+
+#### `OPENAI_API_KEY`
+
+- Type: `str`
+- Description: Sets the OpenAI API key.
 
 #### `OPENAI_API_KEYS`
 
@@ -364,10 +346,7 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default:
 
 ```
-Here is the query:
-{{prompt:middletruncate:8000}}
-
-Create a concise, 3-5 word phrase with an emoji as a title for the previous query. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+Create a concise, 3-5 word title with an emoji as a title for the prompt in the given language. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
 
 Examples of titles:
 📉 Stock Market Trends
@@ -376,6 +355,8 @@ Evolution of Music Streaming
 Remote Work Productivity Tips
 Artificial Intelligence in Healthcare
 🎮 Video Game Development Insights
+
+Prompt: {{prompt:middletruncate:8000}}
 ```
 
 #### `SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE`
@@ -385,17 +366,14 @@ Artificial Intelligence in Healthcare
 - Default:
 
 ```
-You are tasked with generating web search queries. Give me an appropriate query to answer my question for google search. Answer with only the query. Today is {{CURRENT_DATE}}.
-        
-Question:
+Assess the need for a web search based on the current question and prior interactions, but lean towards suggesting a Google search query if uncertain. Generate a Google search query even when the answer might be straightforward, as additional information may enhance comprehension or provide updated data. If absolutely certain that no further information is required, return an empty string. Default to a search query if unsure or in doubt. Today's date is {{CURRENT_DATE}}.
+
+Current Question:
 {{prompt:end:4000}}
+
+Interaction History:
+{{MESSAGES:END:6}}
 ```
-
-#### `SEARCH_QUERY_PROMPT_LENGTH_THRESHOLD`
-
-- Type: `int`
-- Default: `100`
-- Description: Sets the minimum length of a prompt before a model is used to synthesize a web search query when web search is enabled.
 
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
@@ -404,8 +382,7 @@ Question:
 - Default:
 
 ```
-Tools: {{TOOLS}}
-If a function tool doesn't match the query, return an empty string. Else, pick a function tool, fill in the parameters from the function tool's schema, and return it in the format { "name": \"functionName\", "parameters": { "key": "value" } }. Only pick a function if the user asks.  Only return the object. Do not return any other text.
+Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. If a function tool matches, construct and return a JSON object in the format {\"name\": \"functionName\", \"parameters\": {\"requiredFunctionParamKey\": \"requiredFunctionParamValue\"}} using the appropriate tool and its parameters. Only return the object and limit the response to the JSON object without additional text.
 ```
 
 ### RAG
@@ -477,9 +454,9 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 
 #### `RAG_EMBEDDING_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for local model), `ollama`, `openai`)
+- Type: `str` (enum: `ollama`, `openai`)
 - Options:
-  - (empty) - Uses a local model for embeddings.
+  - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
   - `ollama` - Uses the Ollama API for embeddings.
   - `openai` - Uses the OpenAI API for embeddings.
 - Description: Selects an embedding engine to use for RAG.
@@ -493,7 +470,7 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 #### `RAG_EMBEDDING_MODEL`
 
 - Type: `str`
-- Default: `sentence-transformers/all-MiniLM-L6`
+- Default: `sentence-transformers/all-MiniLM-L6-v2`
 - Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
 
 #### `RAG_EMBEDDING_MODEL_AUTO_UPDATE`
@@ -600,16 +577,18 @@ Query: [query]
 
 #### `RAG_WEB_SEARCH_ENGINE`
 
-- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`, `duckduckgo`, `tavily`, `jina`)
+- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`, `serply`, `searchapi`, `duckduckgo`, `tavily`, `jina`)
 - Options:
-  - `searxng` - Uses the SearXNG search engine.
-  - `google_pse` - Uses the Google Programmable Search Engine.
-  - `brave` - Uses the Brave search engine.
-  - `serpstack` - Uses the Serpstack search engine.
-  - `serper` - Uses the Serper search engine.
-  - `duckduckgo` - Uses the DuckDuckGo search engine.
-  - `tavily` - Uses the Tavily search engine.
-  - `jina` - Uses the Jina search engine.
+  - `searxng` - Uses the [SearXNG](https://github.com/searxng/searxng) search engine.
+  - `google_pse` - Uses the [Google Programmable Search Engine](https://programmablesearchengine.google.com/about/).
+  - `brave` - Uses the [Brave search engine](https://brave.com/search/api/).
+  - `serpstack` - Uses the [Serpstack search engine](https://serpstack.com/).
+  - `serper` - Uses the [Serper search engine](https://serper.dev/).
+  - `serply` - Uses the [Serply search engine](https://serply.io/).
+  - `searchapi` - Uses the [SearchAPI search engine](https://www.searchapi.io/).
+  - `duckduckgo` - Uses the [DuckDuckGo search engine](https://duckduckgo.com/).
+  - `tavily` - Uses the [Tavily search engine](https://tavily.com/).
+  - `jina` - Uses the [Jina search engine](https://jina.ai/).
 - Description: Select engine for performing searches
 
 #### `SEARXNG_QUERY_URL`
@@ -670,17 +649,11 @@ Query: [query]
 - Default: `10`
 - Description: Number of concurrent requests to crawl web pages returned from search results.
 
-#### `RAG_WEB_SEARCH_DOMAIN_FILTER_LIST`
-
-- Type: `list` of `str`
-- Default: `[]`
-- Description: You can provide a list of your own websites to filter after performing a web search. This ensures the highest level of safety and reliability of the information sources.
-
 ### Speech to Text
 
 #### `AUDIO_STT_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for local Whisper), `openai`)
+- Type: `str` (enum: `openai`)
 - Options:
   - (empty) - Uses local Whisper engine for Speech-to-Text.
   - `openai` - Uses OpenAI engine for Speech-to-Text.
@@ -726,9 +699,10 @@ Query: [query]
 
 #### `AUDIO_TTS_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for Web API), `openai`)
+- Type: `str` (enum: `elevenlabs`, `openai`)
 - Options:
   - (empty) - Uses Web API engine for Text-to-Speech.
+  - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech
   - `openai` - Uses OpenAI engine for Text-to-Speech.
 - Description: Specifies the Text-to-Speech engine to use.
 
@@ -768,7 +742,7 @@ Query: [query]
 
 - Type: `str` (enum: `openai`, `comfyui`, `automatic1111`)
 - Options:
-  - `openai` - Uses OpenAI engine for image generation.
+  - `openai` - Uses OpenAI DALL-E for image generation.
   - `comfyui` - Uses ComfyUI engine for image generation.
   - `automatic1111` - Uses Automatic1111 engine for image generation (default).
 - Default: `automatic1111`
@@ -784,17 +758,23 @@ Query: [query]
 - Type: `str`
 - Description: Specifies the URL to the ComfyUI image generation API.
 
+#### `IMAGES_OPENAI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+
+
 #### `IMAGES_OPENAI_API_KEY`
 
 - Type: `str`
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for DALL-E image generation.
 
-#### `IMAGES_OPENAI_API_BASE_URL`
+#### `IMAGE_GENERATION_MODEL`
 
 - Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+- Description: Default model to use for image generation
 
 #### `IMAGE_SIZE`
 
@@ -807,11 +787,6 @@ Query: [query]
 - Type: `int`
 - Default: `50`
 - Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111.
-
-#### `IMAGE_GENERATION_MODEL`
-
-- Type: `str`
-- Description: Default model to use for image generation
 
 ### OAuth
 
@@ -833,17 +808,39 @@ Query: [query]
 - Default: `name`
 - Description: Set username claim for OpenID.
 
+#### `OAUTH_EMAIL_CLAIM`
+
+- Type: `str`
+- Default: `email`
+- Description: Set email claim for OpenID.
+
 #### `OAUTH_PICTURE_CLAIM`
 
 - Type: `str`
 - Default: `picture`
 - Description: Set picture (avatar) claim for OpenID.
 
-#### `OAUTH_EMAIL_CLAIM`
+#### `OAUTH_CLIENT_ID`
 
 - Type: `str`
-- Default: `email`
-- Description: Set email claim for OpenID.
+- Description: Sets the client ID for OIDC
+
+#### `OAUTH_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for OIDC
+
+#### `OAUTH_SCOPES`
+
+- Type: `str`
+- Default: `openid email profile`
+- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
+
+#### `OAUTH_PROVIDER_NAME`
+
+- Type: `str`
+- Default: `SSO`
+- Description: Sets the name for the OIDC provider.
 
 #### `GOOGLE_CLIENT_ID`
 
@@ -892,84 +889,12 @@ Query: [query]
 - Type: `str`
 - Description: Sets the redirect URI for Microsoft OAuth
 
-#### `OAUTH_CLIENT_ID`
-
-- Type: `str`
-- Description: Sets the client ID for OIDC
-
-#### `OAUTH_CLIENT_SECRET`
-
-- Type: `str`
-- Description: Sets the client secret for OIDC
-
 #### `OPENID_PROVIDER_URL`
 
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 
-#### `OAUTH_SCOPES`
-
-- Type: `str`
-- Default: `openid email profile`
-- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
-
-#### `OAUTH_PROVIDER_NAME`
-
-- Type: `str`
-- Default: `SSO`
-- Description: Sets the name for the OIDC provider.
-
 #### `OPENID_REDIRECT_URI`
 
 - Type: `str`
 - Description: Sets the redirect URI for OIDC
-
-### LiteLLM
-
-:::warning
-
-The bundled LiteLLM instance has been removed as of v0.2.0.
-You will need to either migrate to [pipelines](https://github.com/open-webui/pipelines), or self host your own LiteLLM proxy.
-
-:::
-
-#### `ENABLE_LITELLM`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables the bundled LiteLLM instance.
-
-#### `LITELLM_PROXY_PORT`
-
-- Type: `int`
-- Default: `14365`
-- Description: Sets the port to run the bundled LiteLLM instance on.
-
-#### `LITELLM_PROXY_HOST`
-
-- Type: `str`
-- Default: `127.0.0.1`
-- Description: Sets the address to run the bundled LiteLLM instance on.
-
-## Misc Environment Variables
-
-These variables are not specific to Open-Webui but can still be valuable in certain contexts.
-
-### Proxy Settings
-
-Open-Webui supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings, Open-Webui uses the following environment variables:
-
-#### `http_proxy`
-
-- Type: `str`
-- Description: Sets the URL for the HTTP proxy.
-
-#### `https_proxy`
-
-- Type: `str`
-- Description: Sets the URL for the HTTPS proxy.
-
-#### `no_proxy`
-
-- Type: `str`
-- Description: Lists domain extensions (or IP addresses) for which the proxy should not be used, separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is bypassed when accessing documents from MIT.
