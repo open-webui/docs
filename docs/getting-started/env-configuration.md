@@ -2,11 +2,20 @@
 
 ## Overview
 
-Open WebUI provides a range of environment variables that allow you to customize and configure various aspects of the application. This page serves as a comprehensive reference for all available environment variables, including their types, default values, and descriptions.
+Open WebUI provides a range of environment variables that allow you to customize and configure 
+various aspects of the application. This page serves as a comprehensive reference for all available 
+environment variables, including their types, default values, and descriptions.
+
+:::info
+Last updated: v0.3.20
+:::
 
 ## App/Backend
 
-The following environment variables are used by `backend/config.py` to provide Open WebUI startup configurability. Please note that some variables may have different default values depending on whether you're running Open WebUI directly or via Docker. For more information on logging environment variables, see our [logging documentation](/getting-started/logging#appbackend).
+The following environment variables are used by `backend/config.py` to provide Open WebUI startup 
+configuration. Please note that some variables may have different default values depending on 
+whether you're running Open WebUI directly or via Docker. For more information on logging 
+environment variables, see our [logging documentation](/getting-started/logging#appbackend).
 
 ### General
 
@@ -28,12 +37,10 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: This setting enables or disables authentication.
 
 :::danger
-
-    If set to `False`, authentication will be disabled for your Open WebUI instance. However,
-    it's important to note that turning off authentication is only possible for fresh installations without any existing users.
-    If there are already users registered, you cannot disable authentication directly. Ensure that no users are present in the database,
-    if you intend to turn off `WEBUI_AUTH`.
-
+If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's 
+important to note that turning off authentication is only possible for fresh installations without 
+any existing users. If there are already users registered, you cannot disable authentication 
+directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
 :::
 
 #### `WEBUI_NAME`
@@ -55,10 +62,9 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: Specifies the timeout duration in seconds for the aiohttp client.
 
 :::info
-
-    This is the maximum amount of time the client will wait for a response before timing out. If set to an empty string (' '),
-    the timeout will be set to `None`, effectively disabling the timeout and allowing the client to wait indefinitely.
-
+This is the maximum amount of time the client will wait for a response before timing out.
+If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and 
+allowing the client to wait indefinitely.
 :::
 
 #### `DATA_DIR`
@@ -82,7 +88,7 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `CUSTOM_NAME`
 
 - Type: `str`
-- Description: Sets `WEBUI_NAME` but polls _api.openwebui.com_ for metadata.
+- Description: Sets `WEBUI_NAME` but polls **api.openwebui.com** for metadata.
 
 #### `ENABLE_SIGNUP`
 
@@ -97,10 +103,8 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to true) elements.
 
 :::danger
-
-    This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup)
-    is also being used and set to `True`. Failure to do so will result in the inability to login.
-
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup) 
+is also being used and set to `True`. Failure to do so will result in the inability to login.
 :::
 
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
@@ -130,6 +134,18 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default: `True`
 - Description: Toggles user permission to delete chats.
 
+#### `USER_PERMISSIONS_CHAT_EDITING`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles user permission to edit chats.
+
+#### `USER_PERMISSIONS_CHAT_TEMPORARY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles user permission to create temporary chats.
+
 #### `ENABLE_MODEL_FILTER`
 
 - Type: `bool`
@@ -140,7 +156,7 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `str`
 - Description: Sets the Language Model filter list, semicolon-separated
-- Example: `llama3:instruct;gemma:instruct`
+- Example: `llama3.1:instruct;gemma2:latest`
 
 #### `WEBHOOK_URL`
 
@@ -153,11 +169,23 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default: `True`
 - Description: Controls whether admin users can export data.
 
+#### `ENABLE_ADMIN_CHAT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables admin users to access all chats.
+
 #### `ENABLE_COMMUNITY_SHARING`
 
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether users are shown the share to community button.
+
+#### `ENABLE_MESSAGE_RATING`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables message rating feature.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -172,14 +200,7 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: List of banners to show to users. Format of banners are:
 
 ```json
-{
-  "id": "string",
-  "type": "string [info, success, warning, error]",
-  "title": "string",
-  "content": "string",
-  "dismissible": false, # controls if the banner can be dismissed by users
-  "timestamp": 1000 # created at timestamp
-}
+[{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": false,"timestamp": 1000}]
 ```
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
@@ -190,7 +211,8 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for the username of anyone registering with the `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorial/sso).
+- Description: Defines the trusted request header for the username of anyone registering with the 
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorial/sso).
 
 #### `WEBUI_SECRET_KEY`
 
@@ -209,7 +231,8 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `bool`
 - Default: `False`
-- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration for local Whisper and embeddings.
+- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration 
+for local Whisper and embeddings.
 
 #### `DATABASE_URL`
 
@@ -218,10 +241,8 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: Specifies the database URL to connect to.
 
 :::info
-
-    Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-    Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
-
+Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
+Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
 :::
 
 #### `PORT`
@@ -235,6 +256,18 @@ The following environment variables are used by `backend/config.py` to provide O
 - Type: `bool`
 - Default: `False`
 - Description: Resets the `config.json` file on startup.
+
+#### `DEFAULT_LOCALE`
+
+- Type: `str`
+- Default: `en`
+- Description: Sets the default locale for the application.
+
+#### `FUNCTIONS_DIR`
+
+- Type: `str`
+- Default: `./functions`
+- Description: Specifies the directory for custom functions.
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -257,9 +290,12 @@ The following environment variables are used by `backend/config.py` to provide O
 
 - Type: `str` (enum: `lax`, `strict`, `none`)
 - Options:
-  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with requests initiated by third-party websites.
-  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent with requests initiated by third-party websites.
-  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with requests initiated by third-party websites, but only over HTTPS.
+  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with 
+requests initiated by third-party websites.
+  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent 
+with requests initiated by third-party websites.
+  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with 
+requests initiated by third-party websites, but only over HTTPS.
 - Default: `lax`
 - Description: Sets the `SameSite` attribute for session cookies.
 
@@ -272,7 +308,13 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
 - Type: `int`
-- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things such as connections to Ollama and OpenAI endpoints.
+- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things 
+such as connections to Ollama and OpenAI endpoints.
+
+#### `FONTS_DIR`
+
+- Type: `str`
+- Description: Specifies the directory for fonts.
 
 ### Ollama
 
@@ -295,12 +337,8 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `OLLAMA_BASE_URLS`
 
 - Type: `str`
-- Description: Configures load-balanced Ollama backend hosts, separated by `;`. See [`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
-
-#### `K8S_FLAG`
-
-- Type: `bool`
-- Description: If set, assumes Helm chart deployment and sets [`OLLAMA_BASE_URL`](#ollama_base_url) to `http://ollama-service.open-webui.svc.cluster.local:11434`
+- Description: Configures load-balanced Ollama backend hosts, separated by `;`. See 
+[`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
 
 #### `USE_OLLAMA_DOCKER`
 
@@ -308,11 +346,10 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default: `False`
 - Description: Builds the Docker image with a bundled Ollama instance.
 
-#### `OLLAMA_API_BASE_URL`
+#### `K8S_FLAG`
 
-- Type: `str`
-- Default: `http://localhost:11434/api`
-- Description: Deprecated, see [`OLLAMA_BASE_URL`](#ollama_base_url).
+- Type: `bool`
+- Description: If set, assumes Helm chart deployment and sets [`OLLAMA_BASE_URL`](#ollama_base_url) to `http://ollama-service.open-webui.svc.cluster.local:11434`
 
 ### OpenAI
 
@@ -321,11 +358,6 @@ The following environment variables are used by `backend/config.py` to provide O
 - Type: `bool`
 - Default: `true`
 - Description: Enables the use of OpenAI APIs.
-
-#### `OPENAI_API_KEY`
-
-- Type: `str`
-- Description: Sets the OpenAI API key.
 
 #### `OPENAI_API_BASE_URL`
 
@@ -339,6 +371,11 @@ The following environment variables are used by `backend/config.py` to provide O
 - Description: Supports balanced OpenAI base API URLs, semicolon-separated.
 - Example: `http://host-one:11434;http://host-two:11434`
 
+#### `OPENAI_API_KEY`
+
+- Type: `str`
+- Description: Sets the OpenAI API key.
+
 #### `OPENAI_API_KEYS`
 
 - Type: `str`
@@ -350,12 +387,14 @@ The following environment variables are used by `backend/config.py` to provide O
 #### `TASK_MODEL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation when using Ollama models.
+- Description: The default model to use for tasks such as title and web search query generation 
+when using Ollama models.
 
 #### `TASK_MODEL_EXTERNAL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation when using OpenAI-compatible endpoints.
+- Description: The default model to use for tasks such as title and web search query generation 
+when using OpenAI-compatible endpoints.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
 
@@ -364,10 +403,7 @@ The following environment variables are used by `backend/config.py` to provide O
 - Default:
 
 ```
-Here is the query:
-{{prompt:middletruncate:8000}}
-
-Create a concise, 3-5 word phrase with an emoji as a title for the previous query. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+Create a concise, 3-5 word title with an emoji as a title for the prompt in the given language. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
 
 Examples of titles:
 📉 Stock Market Trends
@@ -376,6 +412,8 @@ Evolution of Music Streaming
 Remote Work Productivity Tips
 Artificial Intelligence in Healthcare
 🎮 Video Game Development Insights
+
+Prompt: {{prompt:middletruncate:8000}}
 ```
 
 #### `SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE`
@@ -385,17 +423,14 @@ Artificial Intelligence in Healthcare
 - Default:
 
 ```
-You are tasked with generating web search queries. Give me an appropriate query to answer my question for google search. Answer with only the query. Today is {{CURRENT_DATE}}.
-        
-Question:
+Assess the need for a web search based on the current question and prior interactions, but lean towards suggesting a Google search query if uncertain. Generate a Google search query even when the answer might be straightforward, as additional information may enhance comprehension or provide updated data. If absolutely certain that no further information is required, return an empty string. Default to a search query if unsure or in doubt. Today's date is {{CURRENT_DATE}}.
+
+Current Question:
 {{prompt:end:4000}}
+
+Interaction History:
+{{MESSAGES:END:6}}
 ```
-
-#### `SEARCH_QUERY_PROMPT_LENGTH_THRESHOLD`
-
-- Type: `int`
-- Default: `100`
-- Description: Sets the minimum length of a prompt before a model is used to synthesize a web search query when web search is enabled.
 
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
@@ -404,9 +439,14 @@ Question:
 - Default:
 
 ```
-Tools: {{TOOLS}}
-If a function tool doesn't match the query, return an empty string. Else, pick a function tool, fill in the parameters from the function tool's schema, and return it in the format { "name": \"functionName\", "parameters": { "key": "value" } }. Only pick a function if the user asks.  Only return the object. Do not return any other text.
+Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. If a function tool matches, construct and return a JSON object in the format {\"name\": \"functionName\", \"parameters\": {\"requiredFunctionParamKey\": \"requiredFunctionParamValue\"}} using the appropriate tool and its parameters. Only return the object and limit the response to the JSON object without additional text.
 ```
+
+#### `CORS_ALLOW_ORIGIN`
+
+- Type: `str`
+- Default: `*`
+- Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
 ### RAG
 
@@ -467,7 +507,8 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models.
+- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using 
+`sentence_transformers` models.
 
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
 
@@ -477,9 +518,9 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 
 #### `RAG_EMBEDDING_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for local model), `ollama`, `openai`)
+- Type: `str` (enum: `ollama`, `openai`)
 - Options:
-  - (empty) - Uses a local model for embeddings.
+  - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
   - `ollama` - Uses the Ollama API for embeddings.
   - `openai` - Uses the OpenAI API for embeddings.
 - Description: Selects an embedding engine to use for RAG.
@@ -493,7 +534,7 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 #### `RAG_EMBEDDING_MODEL`
 
 - Type: `str`
-- Default: `sentence-transformers/all-MiniLM-L6`
+- Default: `sentence-transformers/all-MiniLM-L6-v2`
 - Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
 
 #### `RAG_EMBEDDING_MODEL_AUTO_UPDATE`
@@ -546,7 +587,8 @@ Query: [query]
 
 - Type: `bool`
 - Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own modeling files for reranking.
+- Description: Determines whether or not to allow custom models defined on the Hub in their own 
+modeling files for reranking.
 
 #### `RAG_OPENAI_API_BASE_URL`
 
@@ -570,7 +612,8 @@ Query: [query]
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request Forgery attacks against local network resources.
+- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request 
+Forgery attacks against local network resources.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
 
@@ -590,6 +633,32 @@ Query: [query]
 - Default: `100`
 - Description: Specifies how much overlap there should be between chunks.
 
+#### `CONTENT_EXTRACTION_ENGINE`
+
+- Type: `str` (`tika`)
+- Options:
+  - Leave empty to use default
+  - `tika` - Use a local Apache Tika server
+- Description: Sets the content extraction engine to use for document ingestion.
+
+#### `TIKA_SERVER_URL`
+
+- Type: `str`
+- Default: `http://localhost:9998`
+- Description: Sets the URL for the Apache Tika server.
+
+#### `RAG_FILE_MAX_COUNT`
+
+- Type: `int`
+- Default: `10`
+- Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
+
+#### `RAG_FILE_MAX_SIZE`
+
+- Type: `int`
+- Default: `104857600` (100MB)
+- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
+
 ### Web Search
 
 #### `ENABLE_RAG_WEB_SEARCH`
@@ -598,24 +667,33 @@ Query: [query]
 - Default: `false`
 - Description: Enable web search toggle
 
+#### `ENABLE_SEARCH_QUERY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the generation of search queries from prompts
+
 #### `RAG_WEB_SEARCH_ENGINE`
 
-- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`, `duckduckgo`, `tavily`, `jina`)
+- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`, `serply`, `searchapi`, `duckduckgo`, `tavily`, `jina`)
 - Options:
-  - `searxng` - Uses the SearXNG search engine.
-  - `google_pse` - Uses the Google Programmable Search Engine.
-  - `brave` - Uses the Brave search engine.
-  - `serpstack` - Uses the Serpstack search engine.
-  - `serper` - Uses the Serper search engine.
-  - `duckduckgo` - Uses the DuckDuckGo search engine.
-  - `tavily` - Uses the Tavily search engine.
-  - `jina` - Uses the Jina search engine.
+  - `searxng` - Uses the [SearXNG](https://github.com/searxng/searxng) search engine.
+  - `google_pse` - Uses the [Google Programmable Search Engine](https://programmablesearchengine.google.com/about/).
+  - `brave` - Uses the [Brave search engine](https://brave.com/search/api/).
+  - `serpstack` - Uses the [Serpstack search engine](https://serpstack.com/).
+  - `serper` - Uses the [Serper search engine](https://serper.dev/).
+  - `serply` - Uses the [Serply search engine](https://serply.io/).
+  - `searchapi` - Uses the [SearchAPI search engine](https://www.searchapi.io/).
+  - `duckduckgo` - Uses the [DuckDuckGo search engine](https://duckduckgo.com/).
+  - `tavily` - Uses the [Tavily search engine](https://tavily.com/).
+  - `jina` - Uses the [Jina search engine](https://jina.ai/).
 - Description: Select engine for performing searches
 
 #### `SEARXNG_QUERY_URL`
 
 - Type: `str`
-- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with the search query. Example: `http://searxng.local/search?q=<query>`
+- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with 
+the search query. Example: `http://searxng.local/search?q=<query>`
 
 #### `GOOGLE_PSE_API_KEY`
 
@@ -670,19 +748,23 @@ Query: [query]
 - Default: `10`
 - Description: Number of concurrent requests to crawl web pages returned from search results.
 
-#### `RAG_WEB_SEARCH_DOMAIN_FILTER_LIST`
+#### `SEARCHAPI_API_KEY`
 
-- Type: `list` of `str`
-- Default: `[]`
-- Description: You can provide a list of your own websites to filter after performing a web search. This ensures the highest level of safety and reliability of the information sources.
+- Type: `str`
+- Description: Sets the SearchAPI API key.
+
+#### `SEARCHAPI_ENGINE`
+
+- Type: `str`
+- Description: Sets the SearchAPI engine.
 
 ### Speech to Text
 
 #### `AUDIO_STT_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for local Whisper), `openai`)
+- Type: `str` (enum: `openai`)
 - Options:
-  - (empty) - Uses local Whisper engine for Speech-to-Text.
+  - Leave empty to use local Whisper engine for Speech-to-Text.
   - `openai` - Uses OpenAI engine for Speech-to-Text.
 - Description: Specifies the Speech-to-Text engine to use.
 
@@ -726,11 +808,17 @@ Query: [query]
 
 #### `AUDIO_TTS_ENGINE`
 
-- Type: `str` (enum: ` ` (empty for Web API), `openai`)
+- Type: `str` (enum: `elevenlabs`, `openai`)
 - Options:
-  - (empty) - Uses Web API engine for Text-to-Speech.
+  - Leave empty to use built-in WebAPI engine for Text-to-Speech.
+  - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech
   - `openai` - Uses OpenAI engine for Text-to-Speech.
 - Description: Specifies the Text-to-Speech engine to use.
+
+#### `AUDIO_TTS_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Text-to-Speech.
 
 #### `AUDIO_TTS_OPENAI_API_BASE_URL`
 
@@ -756,6 +844,12 @@ Query: [query]
 - Default: `alloy`
 - Description: Sets the OpenAI text-to-speech voice to use.
 
+#### `AUDIO_TTS_SPLIT_ON`
+
+- Type: `str`
+- Default: `punctuation`
+- Description: Sets the OpenAI text-to-speech split on to use.
+
 ### Image Generation
 
 #### `ENABLE_IMAGE_GENERATION`
@@ -768,7 +862,7 @@ Query: [query]
 
 - Type: `str` (enum: `openai`, `comfyui`, `automatic1111`)
 - Options:
-  - `openai` - Uses OpenAI engine for image generation.
+  - `openai` - Uses OpenAI DALL-E for image generation.
   - `comfyui` - Uses ComfyUI engine for image generation.
   - `automatic1111` - Uses Automatic1111 engine for image generation (default).
 - Default: `automatic1111`
@@ -779,10 +873,27 @@ Query: [query]
 - Type: `str`
 - Description: Specifies the URL to Automatic1111's Stable Diffusion API.
 
+#### `AUTOMATIC1111_API_AUTH`
+
+- Type: `str`
+- Description: Sets the Automatic1111 API authentication.
+
 #### `COMFYUI_BASE_URL`
 
 - Type: `str`
 - Description: Specifies the URL to the ComfyUI image generation API.
+
+#### `COMFYUI_WORKFLOW`
+
+- Type: `str`
+- Description: Sets the ComfyUI workflow.
+
+#### `IMAGES_OPENAI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+
 
 #### `IMAGES_OPENAI_API_KEY`
 
@@ -790,11 +901,10 @@ Query: [query]
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for DALL-E image generation.
 
-#### `IMAGES_OPENAI_API_BASE_URL`
+#### `IMAGE_GENERATION_MODEL`
 
 - Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+- Description: Default model to use for image generation
 
 #### `IMAGE_SIZE`
 
@@ -808,11 +918,6 @@ Query: [query]
 - Default: `50`
 - Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111.
 
-#### `IMAGE_GENERATION_MODEL`
-
-- Type: `str`
-- Description: Default model to use for image generation
-
 ### OAuth
 
 #### `ENABLE_OAUTH_SIGNUP`
@@ -825,7 +930,9 @@ Query: [query]
 
 - Type: `bool`
 - Default: `False`
-- Description: If enabled, merges OAuth accounts with existing accounts using the same email address. This is considered unsafe as providers may not verify email addresses and can lead account takeovers.
+- Description: If enabled, merges OAuth accounts with existing accounts using the same email 
+address. This is considered unsafe as providers may not verify email addresses and can lead to 
+account takeovers.
 
 #### `OAUTH_USERNAME_CLAIM`
 
@@ -833,17 +940,39 @@ Query: [query]
 - Default: `name`
 - Description: Set username claim for OpenID.
 
+#### `OAUTH_EMAIL_CLAIM`
+
+- Type: `str`
+- Default: `email`
+- Description: Set email claim for OpenID.
+
 #### `OAUTH_PICTURE_CLAIM`
 
 - Type: `str`
 - Default: `picture`
 - Description: Set picture (avatar) claim for OpenID.
 
-#### `OAUTH_EMAIL_CLAIM`
+#### `OAUTH_CLIENT_ID`
 
 - Type: `str`
-- Default: `email`
-- Description: Set email claim for OpenID.
+- Description: Sets the client ID for OIDC
+
+#### `OAUTH_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for OIDC
+
+#### `OAUTH_SCOPES`
+
+- Type: `str`
+- Default: `openid email profile`
+- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
+
+#### `OAUTH_PROVIDER_NAME`
+
+- Type: `str`
+- Default: `SSO`
+- Description: Sets the name for the OIDC provider.
 
 #### `GOOGLE_CLIENT_ID`
 
@@ -892,72 +1021,32 @@ Query: [query]
 - Type: `str`
 - Description: Sets the redirect URI for Microsoft OAuth
 
-#### `OAUTH_CLIENT_ID`
-
-- Type: `str`
-- Description: Sets the client ID for OIDC
-
-#### `OAUTH_CLIENT_SECRET`
-
-- Type: `str`
-- Description: Sets the client secret for OIDC
-
 #### `OPENID_PROVIDER_URL`
 
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
-
-#### `OAUTH_SCOPES`
-
-- Type: `str`
-- Default: `openid email profile`
-- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
-
-#### `OAUTH_PROVIDER_NAME`
-
-- Type: `str`
-- Default: `SSO`
-- Description: Sets the name for the OIDC provider.
 
 #### `OPENID_REDIRECT_URI`
 
 - Type: `str`
 - Description: Sets the redirect URI for OIDC
 
-### LiteLLM
+### Tools
 
-:::warning
-
-The bundled LiteLLM instance has been removed as of v0.2.0.
-You will need to either migrate to [pipelines](https://github.com/open-webui/pipelines), or self host your own LiteLLM proxy.
-
-:::
-
-#### `ENABLE_LITELLM`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables the bundled LiteLLM instance.
-
-#### `LITELLM_PROXY_PORT`
-
-- Type: `int`
-- Default: `14365`
-- Description: Sets the port to run the bundled LiteLLM instance on.
-
-#### `LITELLM_PROXY_HOST`
+#### `TOOLS_DIR`
 
 - Type: `str`
-- Default: `127.0.0.1`
-- Description: Sets the address to run the bundled LiteLLM instance on.
+- Default: `${DATA_DIR}/tools`
+- Description: Specifies the directory for custom tools.
 
 ## Misc Environment Variables
 
-These variables are not specific to Open-Webui but can still be valuable in certain contexts.
+These variables are not specific to Open WebUI but can still be valuable in certain contexts.
 
 ### Proxy Settings
 
-Open-Webui supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings, Open-Webui uses the following environment variables:
+Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
+Open WebUI uses the following environment variables:
 
 #### `http_proxy`
 
@@ -972,4 +1061,6 @@ Open-Webui supports using proxies for HTTP and HTTPS retrievals. To specify prox
 #### `no_proxy`
 
 - Type: `str`
-- Description: Lists domain extensions (or IP addresses) for which the proxy should not be used, separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is bypassed when accessing documents from MIT.
+- Description: Lists domain extensions (or IP addresses) for which the proxy should not be used,
+separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
+bypassed when accessing documents from MIT.
