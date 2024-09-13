@@ -23,7 +23,7 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
-### Configuring Open WebUI
+### Setting Up Open WebUI with AUTOMATIC1111
 
 1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Default (Automatic1111)`.
@@ -93,9 +93,12 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 3. Return to Open WebUI and click the **Click here to upload a workflow.json file** button.
 4. Select the `workflow_api.json` file to import the exported workflow from ComfyUI into Open WebUI.
 5. After importing the workflow, you must map the `ComfyUI Workflow Nodes` according to the imported workflow node IDs.
+:::info
+You may need to adjust an `Input Key` or two within Open WebUI's `ComfyUI Workflow Nodes` section to match a node within your workflow.
+For example, `seed` may need to be renamed to `noise_seed` to match a node ID within your imported workflow.
 :::
-tip
-Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
+:::tip
+Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
 :::
 6. Click `Save` to apply the settings and enjoy image generation with ComfyUI integrated into Open WebUI!
 
