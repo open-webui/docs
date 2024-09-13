@@ -130,7 +130,6 @@ services:
       - "9099:9099"
     volumes:
       - ./pipelines:/app/pipelines
-      - ./blueprints:/app/blueprints
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
