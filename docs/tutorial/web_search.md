@@ -146,15 +146,13 @@ Launch your updated stack with:
 docker compose -f docker-compose.yaml -f docker-compose.searxng.yaml up -d
 ```
 
-### 3. Alternative: Docker Run
-
-You can run SearXNG directly using `docker run`:
+Alternatively, you can run SearXNG directly using `docker run`:
 
 ```bash
 docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
 ```
 
-### 4. GUI Configuration
+### 3. GUI Configuration
 
 1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
 2. Toggle `Enable Web Search`
@@ -165,7 +163,7 @@ docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart al
 
 ![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
 
-### 5. Using Web Search in a Chat
+### 4. Using Web Search in a Chat
 
 To access Web Search, Click on the + next to the message input field.
 
@@ -222,10 +220,6 @@ Search the web ;-)
 
 ![enable Web search](../../static/img/tutorial_google_pse2.png)
 
-## Serper API
-
-## Serpstack API
-
 ## Brave API
 
 ### Docker Compose Setup
@@ -243,3 +237,20 @@ services:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
 ```
 
+## Serpstack API
+Coming Soon
+
+## Serper API
+Coming Soon
+
+## Serply API
+Coming Soon
+
+## DuckDuckGo API
+Coming Soon
+
+## Tavily API
+Coming Soon
+
+## Jina API
+Coming Soon
