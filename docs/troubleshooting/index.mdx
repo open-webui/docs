@@ -255,6 +255,40 @@ To reset the admin password for Open WebUI in a Docker deployment, generate a bc
    docker run --rm -v open-webui:/data alpine/socat EXEC:"bash -c 'apk add sqlite && echo UPDATE auth SET password='\''HASH'\'' WHERE email='\''admin@example.com'\''; | sqlite3 /data/webui.db'", STDIO
    ```
 
+#### Alternate Docker Method
+
+_If you have issues with the above._  I had issues chaining the `bash` commands in `alpine/socat`, _since `bash` doesn't exist._
+
+1. **Run `alpine` linux connected to the open-webui volume.**
+
+    ```bash
+    docker run -it --rm -v open-webui:/path/to/data alpine
+    ```
+    _`/path/to/data` depends on __your__ volume settings._
+    
+    1. Install `apache2-utils` and `sqlite`:
+    
+        ```sh
+        apk add apache2-utils sqlite
+        ```
+    1. Generate `bcrypt` hash:
+    
+        ```sh
+        htpasswd -bnBC 10 "" your-new-password | tr -d ':'
+        ```
+        
+    1. Update password:
+    
+        ```sh
+        sqlite3 /path/to/data/webui.db
+        ```
+        
+        ```sql
+        UPDATE auth SET password='HASH' WHERE email='admin@example.com';
+        -- exit sqlite: [Ctrl + d]
+        ```
+
+
 ### Reset Admin Password Locally
 
 For local installations of Open WebUI, navigate to the `open-webui` directory and update the password in the `backend/data/webui.db` database.
