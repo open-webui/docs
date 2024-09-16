@@ -11,8 +11,8 @@ Open WebUI allows you to filter specific models for use in your instance. This f
 
 ![Model Filter Configuration](/img/tutorial_model_filter.png)
 
-1. Go to **Admin Panel > Admin Settings**.
-2. In the **Manage Models** section, you can enable or disable the feature, and add or remove models from the whitelist.
+1. Go to **Admin Panel > Settings > Users**.
+2. In the **Manage Models** section, you can enable or disable the model whitelisting feature, and add or remove models from the whitelist.
 3. Click **Save** to apply your changes.
 
 ## Filtering via Environment Variables
