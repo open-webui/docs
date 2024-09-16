@@ -53,6 +53,6 @@ Once setup is complete, your Langfuse dashboard should start recording every API
 
 ![Langfuse Dashboard](/img/tutorial_langfuse.png)
 
-## Note
-
+:::note
 Ensure that all configurations are correctly set, and environment variables are properly passed to avoid integration issues.
+:::
