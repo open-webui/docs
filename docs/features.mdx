@@ -109,7 +109,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📜 **Citations in RAG Feature**: The Retrieval Augmented Generation (RAG) feature allows users to easily track the context of documents fed to LLMs with added citations for reference points.
 
-- 🌟 **Enhanced RAG Pipeline**: A togglable hybrid search sub-feature for our RAG embedding feature that enhances the RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
+- 🌟 **Enhanced RAG Pipeline**: A toggle-able hybrid search sub-feature for our RAG embedding feature that enhances the RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds.
 
 - 📹 **YouTube RAG Pipeline**: The dedicated Retrieval Augmented Generation (RAG) pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly.
 
@@ -151,7 +151,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔄 **Seamless Integration**: Copy any `ollama run {model:tag}` CLI command directly from a model's page on [Ollama library](https://ollama.com/library/) and paste it into the model dropdown to easily select and pull models.
 
-- 🗂️ **Create Ollama Modelfile**: To create a model file for Ollama, navagate to the `Admin Panel` > `Settings` > `Models` > `Create a model` menu.
+- 🗂️ **Create Ollama Modelfile**: To create a model file for Ollama, navigate to the `Admin Panel` > `Settings` > `Models` > `Create a model` menu.
 
 - ⬆️ **GGUF File Model Creation**: Effortlessly create Ollama models by uploading GGUF files directly from Open WebUI from the `Admin Settings` > `Settings` > `Model` > `Experimental` menu. The process has been streamlined with the option to upload from your machine or download GGUF files from Hugging Face.
 
@@ -192,7 +192,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📦 **Export All Archived Chats as JSON**: This feature enables users to easily export all their archived chats in a single JSON file, which can be used for backup or transfer purposes.
 
-- 📄 **Download Chats as JSON/PDF/TXT**: Easily download your chats individually in your preffered format of `.json`, `.pdf`, or `.txt` format.
+- 📄 **Download Chats as JSON/PDF/TXT**: Easily download your chats individually in your preferred format of `.json`, `.pdf`, or `.txt` format.
 
 - 📤📥 **Import/Export Chat History**: Seamlessly move your chat data in and out of the platform via `Import Chats` and `Export Chats` options.
 
@@ -224,7 +224,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🚀 **Versatile, UI-Agnostic, OpenAI-Compatible Plugin Framework**: Seamlessly integrate and customize [Open WebUI Pipelines](https://github.com/open-webui/pipelines) for efficient data processing and model training, ensuring ultimate flexibility and scalability.
 
--  🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions via a built-in code editor to seamlessly develop and integrate function code within the `Tools` and `Functions` workspace.
+- 🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions via a built-in code editor to seamlessly develop and integrate function code within the `Tools` and `Functions` workspace.
 
 - 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with a range of libraries supported by Pyodide.
 
@@ -260,7 +260,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 👥 **Multi-User Management**: Intuitive admin panel with pagination allows you to seamlessly manage multiple users, streamlining user administration and simplifying user life-cycle management.
 
-- 🔧 **Admin Panel**: The user management system is designed to streamline the onboarding and management of users, offering the option to add users directly or in bulk via CSV import.
+- 🔧 **Admin Panel**: The user management system is designed to streamline the on-boarding and management of users, offering the option to add users directly or in bulk via CSV import.
 
 - 👥 **Active Users Indicator**: Monitor the number of active users and which models are being utilized by whom to assist in gauging when performance may be impacted due to a high number of users.
 
@@ -270,7 +270,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔒 **Prevent Chat Deletion**: Ability for admins to toggle a setting that prevents all users from deleting their chat messages, ensuring that all chat messages are retained for audit or compliance purposes.
 
-- 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with `Discord`, `Google Chat`, `Slack` and `Microsoft Teams`), providing real-time notifications and automation capabilities.
+- 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with `Discord`, `Google Chat` and `Microsoft Teams`), providing real-time notifications and automation capabilities.
 
 - 📣 **Configurable Notification Banners**: Admins can create customizable banners with persistence in config.json, featuring options for content, background color (`info`, `warning`, `error`, or `success`), and dismissibility. Banners are accessible only to logged-in users, ensuring the confidentiality of sensitive information.
 
@@ -285,17 +285,5 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/tutorial/sso).
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`. This is an ideal solution for fresh installations without existing users or can be useful for demonstration purposes.
+
 ---
-
-### 📄 Swagger Documentation
-
--  📄  **Comprehensive Swagger documentation**: providing detailed information on endpoints, parameters, and responses. This feature streamlines API integration and development, ensuring seamless communication between Open WebUI and external systems.
-
-    | App  | Docs Path           |
-    |--------------|---------------------|
-    | WebUI    | /api/v1/docs        | 
-    | Ollama   | /ollama/docs        |
-    | OpenAI   | /openai/docs        | 
-    | Images   | /images/api/v1/docs | 
-    | Audio    | /audio/api/v1/docs  |
-    | RAG      | /rag/api/v1/docs    |
