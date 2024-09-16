@@ -70,7 +70,7 @@ _Normally, mod_proxy will canonicalise ProxyPassed URLs. But this may be incompa
 
 I'm using virtualmin here for my SSL clusters, but you can also use certbot directly or your preferred SSL method. To use SSL:
 
-### Prerequisites.
+### Prerequisites
 
 Run the following commands:
 
