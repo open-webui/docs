@@ -153,10 +153,6 @@ const config: Config = {
 							label: "About",
 							to: "https://openwebui.com",
 						},
-						{
-							label: "Research",
-							to: "research",
-						},
 					],
 				},
 			],
