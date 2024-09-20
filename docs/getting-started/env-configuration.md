@@ -456,6 +456,12 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Default: `${DATA_DIR}/docs`
 - Description: Specifies the directory scanned for documents to add to the RAG database when triggered.
 
+#### `VECTOR_DB`
+
+- Type: `str`
+- Default: `chroma`
+- Description: Specifies which vector database system to use, either 'chroma' for ChromaDB or 'milvus' for Milvus. This setting determines which vector storage system will be used for managing embeddings.
+
 #### `CHROMA_TENANT`
 
 - Type: `str`
@@ -490,6 +496,12 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Type: `bool`
 - Default: `False`
 - Description: Controls whether or not SSL is used for ChromaDB Server connections.
+
+#### `MILVUS_URI`
+
+- Type: `str`
+- Default: `${DATA_DIR}/vector_db/milvus.db`
+- Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
 
 #### `RAG_TOP_K`
 
