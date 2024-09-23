@@ -23,8 +23,9 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 
 <details>
 <summary>Example Use Case</summary>
-
+:::tip **Per-chat basis**:
 Suppose a user wants to set a custom system prompt for a specific conversation. They can do so by accessing the **Chat Controls** section and modifying the **System Prompt** field. These changes will only apply to the current chat session.
+:::
 </details>
 
 ### 2. **Per-model basis**
@@ -37,8 +38,9 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 
 <details>
 <summary>Example Use Case</summary>
-
+:::tip **Per-model basis**:
 Suppose an administrator wants to set a default system prompt for a specific model. They can do so by accessing the **Models** section and modifying the **System Prompt** field for the corresponding model. Any chat instances using this model will automatically use the model's system prompt and advanced parameters.
+:::
 </details>
 
 ### 3. **Per-account basis**
@@ -49,8 +51,9 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 <details>
 <summary>Example Use Case</summary>
-
+:::tip **Per-account basis**:
 Suppose a user wants to set their own system prompt for their account. They can do so by accessing the **Settings** menu and modifying the **System Prompt** field.
+:::
 </details>
 
 ## **Bonus Tips: Optimize System Prompt Settings for Maximum Flexibility**
