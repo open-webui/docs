@@ -100,7 +100,7 @@ allowing the client to wait indefinitely.
 
 - Type: `bool`
 - Default: `True`
-- Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to true) elements.
+- Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
 
 :::danger
 This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup) 
@@ -200,7 +200,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: List of banners to show to users. Format of banners are:
 
 ```json
-[{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": false,"timestamp": 1000}]
+[{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
 ```
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
@@ -283,7 +283,7 @@ Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/late
 #### `SAFE_MODE`
 
 - Type: `bool`
-- Default: `false`
+- Default: `False`
 - Description: Enables safe mode, which disables potentially unsafe features.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
@@ -302,8 +302,8 @@ requests initiated by third-party websites, but only over HTTPS.
 #### `WEBUI_SESSION_COOKIE_SECURE`
 
 - Type: `bool`
-- Default: `false`
-- Description: Sets the `Secure` attribute for session cookies if set to `true`.
+- Default: `False`
+- Description: Sets the `Secure` attribute for session cookies if set to `True`.
 
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
@@ -321,7 +321,7 @@ such as connections to Ollama and OpenAI endpoints.
 #### `ENABLE_OLLAMA_API`
 
 - Type: `bool`
-- Default: `true`
+- Default: `True`
 - Description: Enables the use of Ollama APIs.
 
 #### `OLLAMA_BASE_URL`
@@ -330,7 +330,7 @@ such as connections to Ollama and OpenAI endpoints.
 - Default: `http://localhost:11434`
 - Docker Default:
   - If `K8S_FLAG` is set: `http://ollama-service.open-webui.svc.cluster.local:11434`
-  - If `USE_OLLAMA_DOCKER=true`: `http://localhost:11434`
+  - If `USE_OLLAMA_DOCKER=True`: `http://localhost:11434`
   - Else `http://host.docker.internal:11434`
 - Description: Configures the Ollama backend URL.
 
@@ -356,7 +356,7 @@ such as connections to Ollama and OpenAI endpoints.
 #### `ENABLE_OPENAI_API`
 
 - Type: `bool`
-- Default: `true`
+- Default: `True`
 - Description: Enables the use of OpenAI APIs.
 
 #### `OPENAI_API_BASE_URL`
@@ -676,7 +676,7 @@ Forgery attacks against local network resources.
 #### `ENABLE_RAG_WEB_SEARCH`
 
 - Type: `bool`
-- Default: `false`
+- Default: `False`
 - Description: Enable web search toggle
 
 #### `ENABLE_SEARCH_QUERY`
