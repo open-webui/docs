@@ -3,11 +3,9 @@ sidebar_position: 20
 title: "System Prompt & Advanced Parameters"
 ---
 
-## System Prompt and Advanced Parameters Hierarchy
-
 Within Open WebUI, there are three levels to setting a **System Prompt** and **Advanced Parameters**: per-chat basis, per-model basis, and per-account basis. This hierarchical system allows for flexibility while maintaining structured administration and control.
 
-### System Prompt and Advanced Parameters Hierarchy Chart
+## System Prompt and Advanced Parameters Hierarchy Chart
 
 | **Level** | **Definition** | **Modification Permissions** | **Override Capabilities** |
 | --- | --- | --- | --- |
