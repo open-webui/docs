@@ -807,7 +807,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `str`
 - Default: `base`
-- Description: Sets the Whisper model to use for Speech-to-Text.
+- Description: Sets the Whisper model to use for Speech-to-Text. The backend used is faster_whisper with quantization to `int8`.
 
 #### `WHISPER_MODEL_DIR`
 
