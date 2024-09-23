@@ -145,6 +145,8 @@ Visit the [Docker documentation](https://docs.docker.com/storage/) to understand
   docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
   ```
 
+  This will result in a faster Bundled Ollama, faster Speech-To-Text and faster RAG embeddings if using SentenceTransformers.
+
 ### Installation for OpenAI API Usage Only
 
 - **If you're only using OpenAI API**, use this command:
