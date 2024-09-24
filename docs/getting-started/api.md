@@ -1,7 +1,13 @@
-# Swagger Docs
+---
+sidebar_position: 5
+title: "Open WebUI API Endpoints"
+---
+
+## Swagger Docs
 
     | App      | Docs Path           |
     |----------|---------------------|
+    | Main     | /docs               | 
     | WebUI    | /api/v1/docs        | 
     | Ollama   | /ollama/docs        |
     | OpenAI   | /openai/docs        | 
