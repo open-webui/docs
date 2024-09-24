@@ -1,4 +1,7 @@
-# Updating
+---
+sidebar_position: 2
+title: "Updating Open WebUI"
+---
 
 ## Updating your Docker Installation
 

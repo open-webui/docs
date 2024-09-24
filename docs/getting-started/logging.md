@@ -1,4 +1,7 @@
-# Logging
+---
+sidebar_position: 3
+title: "Open WebUI Logging"
+---
 
 ## Browser Client Logging ##
 
