@@ -1,26 +1,26 @@
 export const Sponsor = ({ sponsor }) => {
 	return (
 		<>
-			<div className="flex flex-col mb-2 ">
-				<div className="text-[0.6rem] text-gray-500 dark:text-gray-400 font-bold underline mb-1.5">
+			<div className="mb-2 flex flex-col">
+				<div className="mb-1.5 text-[0.6rem] font-bold text-gray-500 underline dark:text-gray-400">
 					<a href={sponsor.url} target="_blank">
 						{sponsor.name}
 					</a>
 				</div>
 
 				<a href={sponsor.url} target="_blank">
-					<div className="flex w-32 md:w-48 gap-2.5 items-start">
-						<div className=" basis-1/2">
+					<div className="flex w-32 items-start gap-2.5 md:w-48">
+						<div className="basis-1/2">
 							<img
-								className="rounded-xl "
+								className="rounded-xl"
 								loading="lazy"
 								alt={sponsor.name}
 								src={sponsor.imgSrc}
 							/>
 						</div>
 
-						<div className=" basis-1/2 flex">
-							<div className=" text-[0.6rem] text-gray-500 dark:text-gray-400 font-bold  line-clamp-4 md:line-clamp-5 no-underline">
+						<div className="flex basis-1/2">
+							<div className="line-clamp-4 text-[0.6rem] font-bold text-gray-500 no-underline dark:text-gray-400 md:line-clamp-5">
 								{sponsor.description}
 							</div>
 						</div>
