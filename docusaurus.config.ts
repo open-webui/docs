@@ -137,8 +137,8 @@ const config: Config = {
 							href: "https://discord.gg/5rJgQTnV4s",
 						},
 						{
-							label: "Twitter",
-							href: "https://twitter.com/OpenWebUI",
+							label: "𝕏",
+							href: "https://x.com/OpenWebUI",
 						},
 					],
 				},
