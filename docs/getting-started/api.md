@@ -20,7 +20,7 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
 
 #### Chat Completions
 - **Endpoint**: `POST /api/chat/completions`
-- **Description**: Serves as a chat completion endpoint compatible with various models including Ollama models, OpenAI models, and Open WebUI Function models.
+- **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 - **Example**:
   ```bash
   curl -X POST http://localhost:3000/api/chat/completions \
