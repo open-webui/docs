@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "Alternative Installation"
+title: "🔧 Alternative Installation"
 ---
 
 ### Installing Both Ollama and Open WebUI Using Kustomize
