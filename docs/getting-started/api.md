@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "Open WebUI API Endpoints"
+title: "🔗 Open WebUI API Endpoints"
 ---
 
 ## Swagger Docs

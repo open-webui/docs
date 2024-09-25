@@ -1,0 +1,38 @@
+---
+sidebar_position: 1
+title: "🎙️ Troubleshooting Microphone Access"
+---
+
+Ensuring your application has the proper microphone access is crucial for functionality that depends on audio input. This guide covers how to manage and troubleshoot microphone permissions, particularly under secure contexts.
+
+## Understanding Secure Contexts 🔒
+
+For security reasons, accessing the microphone is restricted to pages served over HTTPS or locally from `localhost`. This requirement is meant to safeguard your data by ensuring it is transmitted over secure channels.
+
+## Common Permission Issues 🚫
+
+Browsers like Chrome, Brave, Microsoft Edge, Opera, and Vivaldi, as well as Firefox, restrict microphone access on non-HTTPS URLs. This typically becomes an issue when accessing a site from another device within the same network (e.g., using a mobile phone to access a desktop server). Here's how you can manage these issues:
+
+### Solutions for Non-HTTPS Connections
+
+1. **Set Up HTTPS:**
+   - It is highly recommended to configure your server to support HTTPS. This not only resolves permission issues but also enhances the security of your data transmissions.
+
+2. **Temporary Browser Flags (Use with caution):**
+   - These settings force your browser to treat certain insecure URLs as secure. This is useful for development purposes but poses significant security risks. Here's how to adjust these settings for major browsers:
+
+   #### Chromium-based Browsers (e.g., Chrome, Brave)
+   - Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`.
+   - Enter your non-HTTPS address (e.g., `http://192.168.1.35:3000`).
+   - Restart the browser to apply the changes.
+
+   #### Firefox-based Browsers
+   - Open `about:config`.
+   - Search and modify (or create) the string value `dom.securecontext.allowlist`.
+   - Add your IP addresses separated by commas (e.g., `http://127.0.0.1:8080`).
+
+### Considerations and Risks 🚨
+
+While browser flags offer a quick fix, they bypass important security checks which can expose your device and data to vulnerabilities. Always prioritize proper security measures, especially when planning for a production environment.
+
+By following these best practices, you can ensure that your application properly accesses the microphone while maintaining the security and integrity of your data.
