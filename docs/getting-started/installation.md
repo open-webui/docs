@@ -8,13 +8,13 @@ title: "🔧 Alternative Installation"
 For a CPU-only Pod:
 
 ```bash
-kubectl apply -f ./kubernetes/manifest/base
+kubectl apply -k ./kubernetes/manifest/base
 ```
 
 For a GPU-enabled Pod:
 
 ```bash
-kubectl apply -k ./kubernetes/manifest
+kubectl apply -k ./kubernetes/manifest/gpu
 ```
 
 ### Installing Both Ollama and Open WebUI Using Helm
