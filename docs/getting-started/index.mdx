@@ -337,6 +337,22 @@ You should have Open WebUI up and running at http://localhost:8080/. Enjoy! 😄
   ./run-compose.sh --enable-gpu --build
   ```
 
+## Updating your Docker Installation
+
+For detailed instructions on manually updating your local Docker installation of Open WebUI, including steps for those not using Watchtower and updates via Docker Compose, please refer to our dedicated guide: [UPDATING](/getting-started/updating).
+
+For a quick update with Watchtower, use the command below. Remember to replace `open-webui` with your actual container name if it differs.
+
+```bash
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+```
+
+In the last part of the command, replace `open-webui` with your container name if it is different.
+
+:::info
+After updating Open WebUI, you might need to refresh your browser cache to see the changes.
+:::
+
 ## Installing with Podman
 
 <details>
@@ -419,22 +435,8 @@ This process is compatible with Windows 11 WSL deployments when using Ollama wit
 
 </details>
 
-### Alternative Installation Methods
+## Alternative Installation Methods
 
 For other ways to install, like using Kustomize or Helm, check out [INSTALLATION](/getting-started/installation). Join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s) for more help and information.
 
-### Updating your Docker Installation
 
-For detailed instructions on manually updating your local Docker installation of Open WebUI, including steps for those not using Watchtower and updates via Docker Compose, please refer to our dedicated guide: [UPDATING](/getting-started/updating).
-
-For a quick update with Watchtower, use the command below. Remember to replace `open-webui` with your actual container name if it differs.
-
-```bash
-docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
-```
-
-In the last part of the command, replace `open-webui` with your container name if it is different.
-
-:::info
-After updating Open WebUI, you might need to refresh your browser cache to see the changes.
-:::
