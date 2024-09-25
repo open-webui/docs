@@ -1,60 +1,107 @@
 ---
 sidebar_position: 6
-title: "️🔨  Development"
+title: "🛠️ Development Guide"
 ---
-
 import { TopBanners } from "@site/src/components/TopBanners";
 
 <TopBanners />
 
-# ️🔨 Development
+Welcome to the Open WebUI Development Setup Guide! 🌟 Whether you're a novice or a veteran in the software development world, this guide is designed to assist you in establishing a functional local development environment for both the frontend and backend components of Open WebUI. Let's get started and set up your development environment swiftly! 🚀
 
-Run the following commands to install:
+## System Requirements
 
-For Linux/macOS:
+Before diving into the setup, make sure your system meets the following requirements:
+- **Operating System**: Linux (WSL) or macOS (Instructions provided here specifically cater to these operating systems)
+- **Python Version**: Python 3.11
+
+## 🐧 Linux/macOS Setup Guide
+
+This section provides a step-by-step process to get your development environment ready on Linux (WSL) or macOS platforms.
+
+### 📡 Cloning the Repository
+
+First, you'll need to clone the Open WebUI repository and switch to the directory:
+
 ```sh
 git clone https://github.com/open-webui/open-webui.git
-cd open-webui/
-
-# Copying required .env file
-cp -RPp .env.example .env
-
-# Start frontend server
-npm install
-npm run dev
-
-cd ./backend
-
-# Optional: To install using Conda as your development environment, follow these instructions:
-# Create and activate a Conda environment
-conda create --name open-webui-env python=3.11
-conda activate open-webui-env
-
-# Install dependencies
-pip install -r requirements.txt -U
-
-# Start the application
-bash dev.sh
+cd open-webui
 ```
 
-## In docker container
-Assuming you have already cloned the repo and created a `.env`.
+### 🖥️ Frontend Server Setup
 
-1. Create a new file `compose-dev.yaml`. The following uses [Docker compose watch](https://docs.docker.com/compose/file-watch/) to automatically detect changes in the host filesystem and sync them to the container. 
+To set up the frontend server, follow these instructions:
+
+1. **Environment Configuration**:
+   Duplicate the environment configuration file:
+
+   ```sh
+   cp -RPp .env.example .env
+   ```
+
+2. **Install Dependencies**:
+   Run the following commands to install necessary dependencies:
+
+   ```sh
+   npm install
+   ```
+
+3. **Launch the Server**:
+   Start the server with:
+
+   ```sh
+   npm run dev
+   ```
+
+   🌐 The frontend server will be available at: http://localhost:5173. Please note that for the frontend server to function correctly, the backend server should be running concurrently.
+
+### 🖥️ Backend Server Setup
+
+Setting up the backend server involves a few more steps, Python 3.11 is required for Open WebUI:
+
+1. **Change Directory**:
+   Open a new terminal window and navigate to the backend directory:
+
+   ```sh
+   cd open-webui/backend
+   ```
+
+2. **Python Environment Setup** (Using Conda Recommended):
+    - Create and activate a Conda environment with Python 3.11:
+
+      ```sh
+      conda create --name open-webui python=3.11
+      conda activate open-webui
+      ```
+
+3. **Install Backend Dependencies**:
+   Install all the required Python libraries:
+
+   ```sh
+   pip install -r requirements.txt -U
+   ```
+
+4. **Start the Backend Application**:
+   Launch the backend application with:
+
+   ```sh
+   sh dev.sh
+   ```
+
+   📄 Access the backend API documentation at: http://localhost:8080/docs. The backend supports hot reloading, making your development process smoother by automatically reflecting changes.
+
+That's it! You now have both the frontend and backend servers running. Explore the API documentation and start developing features for Open WebUI. Happy coding! 🎉
+
+## 🐳 Running in a Docker Container
+
+For those who prefer using Docker, here's how you can set things up:
+
+1. **Initialize Configuration:**
+   Assuming you have already cloned the repository and created a `.env` file, create a new file named `compose-dev.yaml`. This configuration uses Docker Compose to ease the development setup.
 
 ```yaml
 name: open-webui-dev
 
 services:
-  ollama:
-    volumes:
-      - ollama:/root/.ollama
-    container_name: ollama
-    pull_policy: always
-    tty: true
-    restart: always
-    image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
-
   frontend:
     build:
       context: .
@@ -68,11 +115,8 @@ services:
       - "3000:5173"
     develop:
       watch:
-        - action: sync
-          path: ./src
-          target: /app/src
-        - action: rebuild
-          path: package.json
+        path: ./src
+        action: sync
 
   backend:
     build:
@@ -81,8 +125,8 @@ services:
     command: ["bash", "dev.sh"]
     env_file: ".env"
     environment:
-     - ENV=dev
-     - WEBUI_AUTH=False
+      - ENV=dev
+      - WEBUI_AUTH=False
     volumes:
       - data:/app/backend/data
     extra_hosts:
@@ -92,32 +136,33 @@ services:
     restart: always
     develop:
       watch:
-        - action: sync
-          path: ./backend
-          target: /app/backend
-          ignore:
-            - backend/data
-        - action: rebuild
-          path: backend/requirements.txt
+        path: ./backend
+        action: sync
 
 volumes:
   data: {}
-  ollama: {}
+
 ```
-2. To start the containers, run `docker compose -f compose-dev.yaml up --watch`. The webapp will be available at `http://localhost:3000`
-3. To stop, hit `ctrl-c` or run `docker compose -f compose-dev.yaml down
 
-**What this does:**
-- Exposes port `3000` on the host for frontend, and port `8000` for the api, enables FastAPI API docs at `http://localhost:8080/docs`
-- Starts both the frontend Vite server and the backend server in hot reload mode, so changes trigger an automatic refresh
-- Syncs `/backend` and `/src` on the host machine with their respective directories in the containers
+2. **Start Development Containers:**
 
-### Pipelines 
-If you are using [pipelines](https://docs.openwebui.com/pipelines/), you can add the following:
+```sh
+docker compose -f compose-dev.yaml up --watch
+```
 
-:::info
-This uses volume bind-mounts, which are distinct from named volumes. You can read more about the difference [here](https://docs.docker.com/storage/bind-mounts/)
-:::
+This command will start the frontend and backend servers in hot reload mode. Changes in your source files will trigger an automatic refresh. The web app will be available at http://localhost:3000 and Backend API docs at http://localhost:8080/docs.
+
+3. **Stopping the Containers:**
+
+To stop the containers, you can use:
+
+```sh
+docker compose -f compose-dev.yaml down
+```
+
+### 🔄 Integration with Pipelines
+
+If your development involves [Pipelines](https://docs.openwebui.com/pipelines/), you can enhance your Docker setup:
 
 ```yaml
 services:
@@ -127,6 +172,14 @@ services:
     volumes:
       - ./pipelines:/app/pipelines
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - host.docker.internal:host-gateway
     restart: always
 ```
+
+This setup involves mounting the `pipelines` directory to ensure any changes reflect immediately, maintaining high development agility.
+
+:::note
+This configuration uses volume bind-mounts. Learn more about how they differ from named volumes [here](https://docs.docker.com/storage/bind-mounts/).
+:::
+
+Through these setup steps, both new and experienced contributors can seamlessly integrate into the development workflow of Open WebUI. Happy coding! 🎉
