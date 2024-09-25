@@ -210,13 +210,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for authentication. See [SSO docs](/tutorial/sso).
+- Description: Defines the trusted request header for authentication. See [SSO docs](/tutorials/features/sso).
 
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
 - Description: Defines the trusted request header for the username of anyone registering with the 
-`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorial/sso).
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/tutorials/features/sso).
 
 #### `WEBUI_SECRET_KEY`
 
