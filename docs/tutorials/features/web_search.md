@@ -191,12 +191,12 @@ This is enabled on a per session basis eg. reloading the page, changing to anoth
 6. [Optional] Enter the `SearchApi engine` name you want to query. Example, `google`, `bing`, `baidu`, `google_news`, `bing_news`, `google_videos`, `google_scholar` and `google_patents.` By default, it is set to `google`.
 7. Click `Save`.
 
-![Open WebUI Admin panel](../../static/img/tutorial_searchapi_search.png)
+![Open WebUI Admin panel](/img/tutorial_searchapi_search.png)
 
 #### Note
 You have to enable `Web search` in the prompt field, using plus (`+`) button to search the web using [SearchApi](https://www.searchapi.io/) engines.
 
-![enable Web search](../../static/img/enable_web_search.png)
+![enable Web search](/img/enable_web_search.png)
 
 ## Google PSE API
 
@@ -211,14 +211,14 @@ You have to enable `Web search` in the prompt field, using plus (`+`) button to 
 7. Fill `Google PSE API Key` with the `API key` and `Google PSE Engine Id` (# 4)
 8. Click `Save`
 
-![Open WebUI Admin panel](../../static/img/tutorial_google_pse1.png)
+![Open WebUI Admin panel](/img/tutorial_google_pse1.png)
 
 
 #### Note
 You have to enable `Web search` in the prompt field, using plus (`+`) button.
 Search the web ;-)
 
-![enable Web search](../../static/img/tutorial_google_pse2.png)
+![enable Web search](/img/tutorial_google_pse2.png)
 
 ## Brave API
 
