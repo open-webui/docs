@@ -10,7 +10,7 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
 
 ### Notable API Endpoints
 
-#### Retrieve All Models
+#### 📜 Retrieve All Models
 - **Endpoint**: `GET /api/models`
 - **Description**: Fetches all models created or added via Open WebUI.
 - **Example**:
@@ -18,7 +18,7 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
 
-#### Chat Completions
+#### 💬 Chat Completions
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 - **Example**:
@@ -36,6 +36,10 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
         ]
       }'
   ```
+
+#### 🧩 Retrival Augmented Generation (RAG)
+- **Endpoint Info**: Currently available with limited functionality as it undergoes significant refinements. Use of the RAG API remains possible but certain operations may be limited until the integration of our ongoing improvements.
+- **Note**: Anticipate enhanced functionality upon completion of [Issue #3527](https://github.com/open-webui/open-webui/issues/3527). We're working hard to streamline processes and include exciting new features. Thank you for your patience as we ensure that the RAG API will be easier and more efficient to use.
 
 ## Advantages of Using Open WebUI as a Unified LLM Provider
 Open WebUI offers a myriad of benefits, making it an essential tool for developers and businesses alike:
