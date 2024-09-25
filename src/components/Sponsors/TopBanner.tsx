@@ -4,27 +4,27 @@ export const TopBanner = ({ items }) => {
 			{items.map((item) => (
 				<>
 					<div className="mb-2">
-						<div className="text-xs text-gray-600 dark:text-gray-300 font-semibold underline mb-1">
+						<div className="mb-1 text-xs font-semibold text-gray-600 underline dark:text-gray-300">
 							Sponsored by {item.name}
 						</div>
 
 						<a href={item.url} target="_blank">
 							<img
-								className="w-full rounded-xl hidden md:block"
+								className="hidden w-full rounded-xl md:block"
 								loading="lazy"
 								alt={item.name}
 								src={item.imgSrc}
 							/>
 
 							<img
-								className="w-full rounded-xl block md:hidden"
+								className="block w-full rounded-xl md:hidden"
 								loading="lazy"
 								alt={item.name}
 								src={item?.mobileImgSrc || item.imgSrc}
 							/>
 						</a>
 
-						<div className="text-right text-xs mt-1 text-gray-600 dark:text-gray-300 font-semibold  line-clamp-1">
+						<div className="mt-1 line-clamp-1 text-right text-xs font-semibold text-gray-600 dark:text-gray-300">
 							{item.description}
 						</div>
 					</div>
