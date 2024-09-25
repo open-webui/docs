@@ -182,4 +182,18 @@ This setup involves mounting the `pipelines` directory to ensure any changes ref
 This configuration uses volume bind-mounts. Learn more about how they differ from named volumes [here](https://docs.docker.com/storage/bind-mounts/).
 :::
 
+## 🐛 Troubleshooting
+
+### FATAL ERROR: Reached heap limit
+
+When you encounter a memory-related error during the Docker build process—especially while executing `npm run build`—it typically indicates that the JavaScript heap has exceeded its memory limit. One effective solution is to increase the memory allocated to Node.js by adjusting the `NODE_OPTIONS` environment variable. This allows you to set a higher maximum heap size, which can help prevent out-of-memory errors during the build process. If you encounter this issue, try to allocate at least 4 GB of RAM, or higher if you have enough RAM.
+
+You can increase the memory allocated to Node.js by adding the following line just before `npm run build` in the `Dockerfile`.
+
+```docker title=/Dockerfile
+ENV NODE_OPTIONS=--max-old-space-size=4096
+```
+
+---
+
 Through these setup steps, both new and experienced contributors can seamlessly integrate into the development workflow of Open WebUI. Happy coding! 🎉
