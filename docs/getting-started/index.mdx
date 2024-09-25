@@ -355,8 +355,7 @@ After updating Open WebUI, you might need to refresh your browser cache to see t
 
 ## Installing with Podman
 
-<details>
-<summary>Rootless (Podman) local-only Open WebUI with Systemd service and auto-update</summary>
+Rootless (Podman) local-only Open WebUI with Systemd service and auto-update
 
 :::note
 Consult the Docker documentation because much of the configuration and syntax is interchangeable with [Podman](https://github.com/containers/podman). See also [rootless_tutorial](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md). This example requires the [slirp4netns](https://github.com/rootless-containers/slirp4netns) network backend to facilitate server listen and Ollama communication over localhost only.
@@ -365,6 +364,49 @@ Consult the Docker documentation because much of the configuration and syntax is
 :::warning
 Rootless container execution with Podman (and Docker/ContainerD) does **not** support [AppArmor confinment](https://github.com/containers/podman/pull/19303). This may increase the attack vector due to [requirement of user namespace](https://rootlesscontaine.rs/caveats). Caution should be exercised and judement (in contrast to the root daemon) rendered based on threat model.
 :::
+
+<details>
+<summary>New method: Using Podman Quadlet</summary>
+
+Since `podman generate systemd` is getting deprecated, we recommende installing the container using [Podman Quadlet](https://www.redhat.com/sysadmin/quadlet-podman)
+
+1. Create a new `open-webui.container` file in `~/.config/containers/systemd/`:
+    ```service
+    [Unit]
+    Description=Open WebUI container
+
+    [Container]
+    AutoUpdate=registry
+    ContainerName=open-webui
+    Image=ghcr.io/open-webui/open-webui:main
+    Network=pasta:-T,11434
+    PublishPort=3000:8080
+    PodmanArgs=--add-host ollama.local:127.0.0.1
+    Volume=open-webui:/app/backend/data
+    Environment=OLLAMA_BASE_URL=http://ollama.local:11434
+
+    [Install]
+    WantedBy=multi-user.target default.target
+    ```
+:::note
+In future versions of Podman, the line `PodmanArgs=--add-host ollama.local:127.0.0.1` should be replaced by `AddHost=ollama.local:127.0.0.1`
+:::
+
+2. Reload systemd configuration:
+   ```bash
+   systemctl --user daemon-reload
+   ```
+
+3. Start the container:
+    ```bash
+    systemctl --user start open-webui
+    ```
+
+Podman will automatically start the container after each reboot and will auto-update when a new image is available.
+</details>
+
+<details>
+<summary>Old method: [Deprecated] Generate systemd service file</summary>
 
 1. Pull the latest image:
    ```bash
@@ -421,6 +463,8 @@ Rootless container execution with Podman (and Docker/ContainerD) does **not** su
 This process is compatible with Windows 11 WSL deployments when using Ollama within the WSL environment or using the Ollama Windows Preview. When using the native Ollama Windows Preview version, one additional step is required: enable [mirrored networking mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking).
 :::
 
+</details>
+
 ### Enabling Windows 11 mirrored networking
 
 1. Populate `%UserProfile%\.wslconfig` with:
@@ -432,8 +476,6 @@ This process is compatible with Windows 11 WSL deployments when using Ollama wit
    ```
    wsl --shutdown
    ```
-
-</details>
 
 ## Alternative Installation Methods
 
