@@ -1,0 +1,11 @@
+{
+	"extends": ["stylelint-config-standard", "stylelint-config-html/html"],
+	"rules": {
+		"at-rule-no-unknown": [
+			true,
+			{
+				"ignoreAtRules": ["tailwind"]
+			}
+		]
+	}
+}
