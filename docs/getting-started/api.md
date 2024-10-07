@@ -49,15 +49,15 @@ Open WebUI offers a myriad of benefits, making it an essential tool for develope
 ## Swagger Documentation Links
 Access detailed API documentation for different services provided by Open WebUI:
 
-| Application | Documentation Path   |
-|-------------|----------------------|
-| Main        | `/docs`              |
-| WebUI       | `/api/v1/docs`       |
-| Ollama      | `/ollama/docs`       |
-| OpenAI      | `/openai/docs`       |
-| Images      | `/images/api/v1/docs`|
-| Audio       | `/audio/api/v1/docs` |
-| RAG         | `/rag/api/v1/docs`   |
+| Application | Documentation Path      |
+|-------------|-------------------------|
+| Main        | `/docs`                 |
+| WebUI       | `/api/v1/docs`          |
+| Ollama      | `/ollama/docs`          |
+| OpenAI      | `/openai/docs`          |
+| Images      | `/images/api/v1/docs`   |
+| Audio       | `/audio/api/v1/docs`    |
+| RAG         | `/retrieval/api/v1/docs`|
 
 Each documentation portal offers interactive examples, schema descriptions, and testing capabilities to enhance your understanding and ease of use.
 
