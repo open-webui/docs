@@ -246,7 +246,43 @@ for local Whisper and embeddings.
 
 :::info
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
+Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+:::
+
+#### `DATABASE_POOL_SIZE`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the size of the database pool. A value of `0` disables pooling. 
+
+#### `DATABASE_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the database pool max overflow.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
+:::
+
+#### `DATABASE_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Specifies the database pool timeout in seconds to get a connection.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
+:::
+
+#### `DATABASE_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the database pool recycle time in seconds.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
 :::
 
 #### `PORT`
