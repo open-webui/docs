@@ -713,7 +713,7 @@ Forgery attacks against local network resources.
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Default: `104857600` (100MB)
+- Default: `100` (100MB)
 - Description: Sets the maximum size of a file that can be uploaded for document ingestion.
 
 ### Web Search
