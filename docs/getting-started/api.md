@@ -37,9 +37,147 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
       }'
   ```
 
-### 🧩 Retrival Augmented Generation (RAG)
-- **Endpoint Info**: Currently available with limited functionality as it undergoes significant refinements. Use of the RAG API remains possible but certain operations may be limited until the integration of our ongoing improvements.
-- **Note**: Anticipate enhanced functionality upon completion of [Issue #3527](https://github.com/open-webui/open-webui/issues/3527). We're working hard to streamline processes and include exciting new features. Thank you for your patience as we ensure that the RAG API will be easier and more efficient to use.
+### 🧩 Retrieval Augmented Generation (RAG)
+
+The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
+
+#### Uploading Files
+
+To utilize external data in RAG responses, you first need to upload the files. The content of the uploaded file is automatically extracted and stored in a vector database.
+
+- **Endpoint**: `POST /api/files/`
+- **Curl Example**:
+  ```bash
+  curl -X POST -H "Authorization: Bearer YOUR_API_KEY" -H "Accept: application/json" \
+  -F "file=@/path/to/your/file" http://localhost:3000/api/files/
+  ```
+- **Python Example**:
+  ```python
+  import requests
+  
+  def upload_file(token, file_path):
+      url = 'http://localhost:3000/api/files/'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Accept': 'application/json'
+      }
+      files = {'file': open(file_path, 'rb')}
+      response = requests.post(url, headers=headers, files=files)
+      return response.json()
+  ```
+
+#### Adding Files to Knowledge Collections
+
+After uploading, you can group files into a knowledge collection or reference them individually in chats.
+
+- **Endpoint**: `POST /api/knowledge/{id}/file/add`
+- **Curl Example**:
+  ```bash
+  curl -X POST http://localhost:3000/api/knowledge/{knowledge_id}/file/add \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"file_id": "your-file-id-here"}'
+  ```
+- **Python Example**:
+  ```python
+  import requests
+
+  def add_file_to_knowledge(token, knowledge_id, file_id):
+      url = f'http://localhost:3000/api/knowledge/{knowledge_id}/file/add'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Content-Type': 'application/json'
+      }
+      data = {'file_id': file_id}
+      response = requests.post(url, headers=headers, json=data)
+      return response.json()
+  ```
+
+#### Using Files and Collections in Chat Completions
+
+You can reference both individual files or entire collections in your RAG queries for enriched responses.
+
+##### Using an Individual File in Chat Completions
+
+This method is beneficial when you want to focus the chat model's response on the content of a specific file.
+
+- **Endpoint**: `POST /api/chat/completions`
+- **Curl Example**:
+  ```bash
+  curl -X POST http://localhost:3000/api/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "gpt-4-turbo",
+        "messages": [
+          {"role": "user", "content": "Explain the concepts in this document."}
+        ],
+        "files": [
+          {"type": "file", "id": "your-file-id-here"}
+        ]
+      }'
+  ```
+
+- **Python Example**:
+  ```python
+  import requests
+
+  def chat_with_file(token, model, query, file_id):
+      url = 'http://localhost:3000/api/chat/completions'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Content-Type': 'application/json'
+      }
+      payload = {
+          'model': model,
+          'messages': [{'role': 'user', 'content': query}],
+          'files': [{'type': 'file', 'id': file_id}]
+      }
+      response = requests.post(url, headers=headers, json=payload)
+      return response.json()
+  ```
+
+##### Using a Knowledge Collection in Chat Completions
+
+Leverage a knowledge collection to enhance the response when the inquiry may benefit from a broader context or multiple documents.
+
+- **Endpoint**: `POST /api/chat/completions`
+- **Curl Example**:
+  ```bash
+  curl -X POST http://localhost:3000/api/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "gpt-4-turbo",
+        "messages": [
+          {"role": "user", "content": "Provide insights on the historical perspectives covered in the collection."}
+        ],
+        "files": [
+          {"type": "collection", "id": "your-collection-id-here"}
+        ]
+      }'
+  ```
+
+- **Python Example**:
+  ```python
+  import requests
+  
+  def chat_with_collection(token, model, query, collection_id):
+      url = 'http://localhost:3000/api/chat/completions'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Content-Type': 'application/json'
+      }
+      payload = {
+          'model': model,
+          'messages': [{'role': 'user', 'content': query}],
+          'files': [{'type': 'collection', 'id': collection_id}]
+      }
+      response = requests.post(url, headers=headers, json=payload)
+      return response.json()
+  ```
+
+These methods enable effective utilization of external knowledge via uploaded files and curated knowledge collections, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within collections, you can customize the integration based on your specific needs.
 
 ## Advantages of Using Open WebUI as a Unified LLM Provider
 Open WebUI offers a myriad of benefits, making it an essential tool for developers and businesses alike:
