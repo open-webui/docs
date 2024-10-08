@@ -1,9 +1,9 @@
 ---
-sidebar_position: 5
-title: "🔗 Open WebUI API Endpoints"
+sidebar_position: 400
+title: "🔗 API Endpoints"
 ---
 
-Welcome to the Open WebUI API! 🚀 This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.
+This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.
 
 ## Authentication
 To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication.
