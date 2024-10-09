@@ -45,18 +45,18 @@ The Retrieval Augmented Generation (RAG) feature allows you to enhance responses
 
 To utilize external data in RAG responses, you first need to upload the files. The content of the uploaded file is automatically extracted and stored in a vector database.
 
-- **Endpoint**: `POST /api/files/`
+- **Endpoint**: `POST /api/v1/files/`
 - **Curl Example**:
   ```bash
   curl -X POST -H "Authorization: Bearer YOUR_API_KEY" -H "Accept: application/json" \
-  -F "file=@/path/to/your/file" http://localhost:3000/api/files/
+  -F "file=@/path/to/your/file" http://localhost:3000/api/v1/files/
   ```
 - **Python Example**:
   ```python
   import requests
   
   def upload_file(token, file_path):
-      url = 'http://localhost:3000/api/files/'
+      url = 'http://localhost:3000/api/v1/files/'
       headers = {
           'Authorization': f'Bearer {token}',
           'Accept': 'application/json'
@@ -70,10 +70,10 @@ To utilize external data in RAG responses, you first need to upload the files. T
 
 After uploading, you can group files into a knowledge collection or reference them individually in chats.
 
-- **Endpoint**: `POST /api/knowledge/{id}/file/add`
+- **Endpoint**: `POST /api/v1/knowledge/{id}/file/add`
 - **Curl Example**:
   ```bash
-  curl -X POST http://localhost:3000/api/knowledge/{knowledge_id}/file/add \
+  curl -X POST http://localhost:3000/api/v1/knowledge/{knowledge_id}/file/add \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"file_id": "your-file-id-here"}'
@@ -83,7 +83,7 @@ After uploading, you can group files into a knowledge collection or reference th
   import requests
 
   def add_file_to_knowledge(token, knowledge_id, file_id):
-      url = f'http://localhost:3000/api/knowledge/{knowledge_id}/file/add'
+      url = f'http://localhost:3000/api/v1/knowledge/{knowledge_id}/file/add'
       headers = {
           'Authorization': f'Bearer {token}',
           'Content-Type': 'application/json'
