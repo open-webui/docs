@@ -326,6 +326,30 @@ such as connections to Ollama and OpenAI endpoints.
 - Type: `str`
 - Description: Specifies the directory for fonts.
 
+#### `ENABLE_AUDIT_LOGS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables audit logging to both the database and an output file.
+
+#### `AUDIT_LOG_RETENTION_PERIOD`
+
+- Type: `str`
+- Default: `P30D`
+- Description: Specifies the retention period for audit logs in ISO 8601 duration format.
+
+#### `AUDIT_LOGS_FILE_PATH`
+
+- Type: `str`
+- Default: `./data/audit.log`
+- Description: The file path where the audit log will be generated.
+
+#### `AUDIT_LOG_FILE_ROTATION_SIZE`
+
+- Type: `str`
+- Default: `10MB`
+- Description: The maximum size of the log file before it is rotated.
+
 ### Ollama
 
 #### `ENABLE_OLLAMA_API`
