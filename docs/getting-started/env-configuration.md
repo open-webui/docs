@@ -1031,6 +1031,30 @@ account takeovers.
 - Default: `SSO`
 - Description: Sets the name for the OIDC provider.
 
+#### `ENABLE_OAUTH_ROLE_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables role management to oauth delegation.
+
+#### `OAUTH_ROLES_CLAIM`
+
+- Type: `str`
+- Default: `roles`
+- Description: Sets the roles claim to look for in the OIDC token.
+
+#### `OAUTH_ALLOWED_ROLES`
+
+- Type: `str`
+- Default: `user,admin`
+- Description: Sets the roles that are allowed access to the platform.
+
+#### `OAUTH_ADMIN_ROLES`
+
+- Type: `str`
+- Default: `admin`
+- Description: Sets the roles that are considered administrators.
+
 #### `GOOGLE_CLIENT_ID`
 
 - Type: `str`
