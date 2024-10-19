@@ -39,9 +39,9 @@ This will run the service at port 5050 with all the default configs
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoQ2AnPhUlTDGtR4B2v7E9JZN1PU5nAseoaXIc)
 
-::info
+:::info
 The default API key is the string `your_api_key_here`. You do not have to change that value if you do not need the added security.
-::
+:::
 
 **And that's it! You can end here**
 
