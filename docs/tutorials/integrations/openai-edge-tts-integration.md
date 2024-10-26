@@ -138,7 +138,7 @@ Generates audio from the input text. Available parameters:
 - **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
 
 :::tip
-You can browse available voices and listen to sample previews at [tts.travisvn.com](tts.travisvn.com)
+You can browse available voices and listen to sample previews at [tts.travisvn.com](https://tts.travisvn.com)
 :::
 
 Example request with `curl` and saving the output to an mp3 file:
