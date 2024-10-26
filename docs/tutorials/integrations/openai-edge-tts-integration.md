@@ -137,6 +137,10 @@ Generates audio from the input text. Available parameters:
 - **response_format** (string): Audio format. Options: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm` (default: `mp3`).
 - **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
 
+:::tip
+You can browse available voices and listen to sample previews at [tts.travisvn.com](tts.travisvn.com)
+:::
+
 Example request with `curl` and saving the output to an mp3 file:
 
 ```bash
@@ -206,3 +210,6 @@ docker run -d -p 5050:5050 \
 
 For more information on `openai-edge-tts`, you can visit the [GitHub repo](https://github.com/travisvn/openai-edge-tts)
 
+
+## 🎙️ Voice Samples
+[Play voice samples and see all available Edge TTS voices](https://tts.travisvn.com/)
