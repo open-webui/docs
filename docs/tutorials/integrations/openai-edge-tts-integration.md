@@ -3,7 +3,7 @@ sidebar_position: 18
 title: "Edge TTS"
 ---
 
-# Integrating `openai-edge-tts` with Open WebUI
+# Integrating `openai-edge-tts` 🗣️ with Open WebUI
 
 ## What is `openai-edge-tts`, and how is it different from `openedai-speech`?
 
@@ -13,7 +13,7 @@ Similar to [openedai-speech](https://github.com/matatonic/openedai-speech), [ope
 
 `openai-edge-tts` is a simpler option that uses a Python package called `edge-tts` to generate the audio. 
 
-`edge-tts` leverages the Edge browser's free "Read Aloud" feature to emulate a request to Microsoft / Azure in order to receive very high quality text-to-speech for free.
+`edge-tts` ([repo](https://github.com/rany2/edge-tts)) leverages the Edge browser's free "Read Aloud" feature to emulate a request to Microsoft / Azure in order to receive very high quality text-to-speech for free.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ Similar to [openedai-speech](https://github.com/matatonic/openedai-speech), [ope
 - Open WebUI running
 - ffmpeg installed (required for audio format conversion and playback speed adjustments)
 
-## Quick start
+## ⚡️ Quick start
 
 The simplest way to get started without having to configure anything is to run the command below
 
@@ -47,9 +47,15 @@ The default API key is the string `your_api_key_here`. You do not have to change
 
 See the [Usage](#usage) section for request examples.
 
+# Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
+
+:::tip 
+You can define the environment variables directly in the `docker run` command. See [Quick Config for Docker](#-quick-config-for-docker) below.
+:::
+
 ## Alternative Options
 
-### Running with Python
+### 🐍 Running with Python
 
 If you prefer to run this project directly with Python, follow these steps to set up a virtual environment, install dependencies, and start the server.
 
@@ -131,6 +137,10 @@ Generates audio from the input text. Available parameters:
 - **response_format** (string): Audio format. Options: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm` (default: `mp3`).
 - **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
 
+:::tip
+You can browse available voices and listen to sample previews at [tts.travisvn.com](https://tts.travisvn.com)
+:::
+
 Example request with `curl` and saving the output to an mp3 file:
 
 ```bash
@@ -176,12 +186,30 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 
 ##### Additional Endpoints
 
-- **GET /v1/models**: Lists available TTS models.
-- **GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
-- **GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
+- **POST/GET /v1/models**: Lists available TTS models.
+- **POST/GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
+- **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
+## 🐳 Quick Config for Docker
+
+You can configure the environment variables in the command used to run the project
+
+```bash
+docker run -d -p 5050:5050 \
+  -e API_KEY=your_api_key_here \
+  -e PORT=5050 \
+  -e DEFAULT_VOICE=en-US-AndrewNeural \
+  -e DEFAULT_RESPONSE_FORMAT=mp3 \
+  -e DEFAULT_SPEED=1.0 \
+  -e DEFAULT_LANGUAGE=en-US \
+  -e REQUIRE_API_KEY=True \
+  travisvn/openai-edge-tts:latest
+```
 
 ## Additional Resources
 
 For more information on `openai-edge-tts`, you can visit the [GitHub repo](https://github.com/travisvn/openai-edge-tts)
 
+
+## 🎙️ Voice Samples
+[Play voice samples and see all available Edge TTS voices](https://tts.travisvn.com/)
