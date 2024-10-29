@@ -290,12 +290,6 @@ Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/late
 - Default: `False`
 - Description: Enables safe mode, which disables potentially unsafe features.
 
-#### `OFFLINE_MODE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables offline mode, which disables features requires internet and recommended for Air-gapped enviornment.
-
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
 - Type: `str` (enum: `lax`, `strict`, `none`)
