@@ -33,7 +33,7 @@ This tutorial demonstrates how to:
 Follow these steps to set up RAG with **OpenWebUI Documentation**:
 
 1. **Download the Documentation**:
-   - Download the latest documentation:  
+   - Download the latest documentation:
      [https://github.com/open-webui/docs/archive/refs/heads/main.zip](https://github.com/open-webui/docs/archive/refs/heads/main.zip)
 
 2. **Extract the Files**:
@@ -44,7 +44,7 @@ Follow these steps to set up RAG with **OpenWebUI Documentation**:
 
 4. **Create a Knowledge Base**:
    - Navigate to **Workspace** > **Knowledge** > **+ Create a Knowledge Base**.
-   - Name it: `OpenWebUI Documentation`  
+   - Name it: `OpenWebUI Documentation`
    - Purpose: **Assistance**
 
    > Click **Create Knowledge**.
@@ -62,8 +62,8 @@ Follow these steps to set up RAG with **OpenWebUI Documentation**:
    - Go to **Workspace** > **Models** > **+ Add New Model**.
 
 2. **Configure the Model**:
-   - **Name**: `OpenWebUI`  
-   - **Base Model**: *(Select the appropriate Llama or other available model)*  
+   - **Name**: `OpenWebUI`
+   - **Base Model**: *(Select the appropriate Llama or other available model)*
    - **Knowledge Source**: Select **OpenWebUI Documentation** from the dropdown.
 
 3. **Save the Model**.
