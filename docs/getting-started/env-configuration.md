@@ -422,6 +422,17 @@ such as connections to Ollama and OpenAI endpoints.
 - Description: Supports multiple OpenAI API keys, semicolon-separated.
 - Example: `sk-124781258123;sk-4389759834759834`
 
+#### `OPENAI_FORWARD_USER_INFO_AS_HEADERS`
+
+- type: `bool`
+- Default: `False`
+- Description: Forwards user information (name, email, id, and role) as X-headers to OpenAI API.
+If enabled, the following headers are forwarded:
+    - `X-OpenWebUI-User-Name`
+    - `X-OpenWebUI-User-Id`
+    - `X-OpenWebUI-User-Email`
+    - `X-OpenWebUI-User-Role`
+
 ### Tasks
 
 #### `TASK_MODEL`
