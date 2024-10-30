@@ -46,7 +46,7 @@ const config: Config = {
 					// Please change this to your repo.
 					// Remove this to remove the "edit this page" links.
 					editUrl: "https://github.com/open-webui/docs/blob/main",
-					exclude: ['**/tab-**/**'],
+					exclude: ["**/tab-**/**"],
 				},
 				// blog: false,
 				blog: {
