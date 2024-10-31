@@ -231,13 +231,13 @@ services:
 ### Authentik
 
 To configure a [Authentik](https://goauthentik.io/) OAuth client, please refer to [documentation](https://docs.goauthentik.io/docs/applications) on how to create an application and `OAuth2/OpenID Provider`.
-The allowed redirect URI should include `<open-webui>/oauth/google/callback`.
+The allowed redirect URI should include `<open-webui>/oauth/oidc/callback`.
 
 While creating provider, please note `App-name`, `Client-ID` and `Client-Secret` and use it for open-webui environment variables:
 
 ```
       - 'ENABLE_OAUTH_SIGNUP=true'
-      - 'OAUTH_MERGE_ACCOUNTS_BY_EMAIL=false'
+      - 'OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true'
       - 'OAUTH_PROVIDER_NAME=Authentik'
       - 'OPENID_PROVIDER_URL=https://<authentik-url>/application/o/<App-name>/.well-known/openid-configuration'
       - 'OAUTH_CLIENT_ID=<Client-ID>'
