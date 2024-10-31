@@ -525,6 +525,18 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Default: `8000`
 - Description: Specifies the port of a remote ChromaDB Server.
 
+#### `CHROMA_CLIENT_AUTH_PROVIDER`
+
+- Type: `str`
+- Description: Specifies auth provider for remote ChromaDB Server.
+- Example: `chromadb.auth.basic_authn.BasicAuthClientProvider`
+
+#### `CHROMA_CLIENT_AUTH_CREDENTIALS`
+
+- Type: `str`
+- Description: Specifies auth credentials for remote ChromaDB Server.
+- Example: `username:password`
+
 #### `CHROMA_HTTP_HEADERS`
 
 - Type: `str`
