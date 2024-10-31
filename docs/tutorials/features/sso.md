@@ -227,16 +227,28 @@ services:
       - 4180:4180/tcp
 ```
 
+
+### Authentik
+
+To configure a [Authentik](https://goauthentik.io/) OAuth client, please refer to [documentation](https://docs.goauthentik.io/docs/applications) on how to create an application and `OAuth2/OpenID Provider`.
+The allowed redirect URI should include `<open-webui>/oauth/google/callback`.
+
+While creating provider, please note `App-name`, `Client-ID` and `Client-Secret` and use it for open-webui environment variables:
+
+```
+      - 'ENABLE_OAUTH_SIGNUP=true'
+      - 'OAUTH_MERGE_ACCOUNTS_BY_EMAIL=false'
+      - 'OAUTH_PROVIDER_NAME=Authentik'
+      - 'OPENID_PROVIDER_URL=https://<authentik-url>/application/o/<App-name>/.well-known/openid-configuration'
+      - 'OAUTH_CLIENT_ID=<Client-ID>'
+      - 'OAUTH_CLIENT_SECRET=<Client-Secret>'
+      - 'OAUTH_SCOPES=openid email profile'
+      - 'OPENID_REDIRECT_URI=https://<open-webui>/oauth/oidc/callback'
+```
+
 ### Authelia
 
 [Authelia](https://www.authelia.com/) can be configured to return a header for use with trusted header authentication.
 Documentation is available [here](https://www.authelia.com/integration/trusted-header-sso/introduction/).
 
 No example configs are provided due to the complexity of deploying Authelia.
-
-### Authentik
-
-[Authentik](https://goauthentik.io/) can be configured to return a header for use with trusted header authentication.
-Documentation is available [here](https://docs.goauthentik.io/docs/providers/proxy/). 
-
-No example configs are provided due to the complexity of deploying Authentik.
