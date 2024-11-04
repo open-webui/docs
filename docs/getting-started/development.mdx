@@ -115,8 +115,9 @@ services:
       - "3000:5173"
     develop:
       watch:
-        path: ./src
-        action: sync
+        - action: sync
+          path: ./src
+          target: /app/src
 
   backend:
     build:
@@ -136,8 +137,9 @@ services:
     restart: always
     develop:
       watch:
-        path: ./backend
-        action: sync
+        - action: sync
+          path: ./backend
+          target: /app/backend
 
 volumes:
   data: {}
