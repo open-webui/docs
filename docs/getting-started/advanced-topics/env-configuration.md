@@ -19,7 +19,7 @@ Last updated: v0.3.20
 The following environment variables are used by `backend/config.py` to provide Open WebUI startup 
 configuration. Please note that some variables may have different default values depending on 
 whether you're running Open WebUI directly or via Docker. For more information on logging 
-environment variables, see our [logging documentation](/getting-started/logging#appbackend).
+environment variables, see our [logging documentation](./logging#appbackend).
 
 ### General
 
