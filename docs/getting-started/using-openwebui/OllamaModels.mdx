@@ -1,0 +1,81 @@
+---
+title: "🤖Ollama Models"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Ollama Models
+
+Explore how to download, load, and use models with Ollama, both via **Docker** and **Remote** setups.
+
+---
+
+<Tabs groupId="ollama-setup">
+  <TabItem value="docker-ollama" label="Ollama Inside Docker">
+    ## 🐳 Ollama Inside Docker
+
+    If **Ollama is deployed inside Docker** (e.g., using Docker Compose or Kubernetes), the service will be available:
+
+    - **Inside the container**: `http://127.0.0.1:11434`
+    - **From the host**: `http://localhost:11435` (if exposed via host network)
+
+    ### Step 1: Check Available Models
+    ```bash
+    docker exec -it openwebui curl http://ollama:11434/v1/models
+    ```
+
+    From the host (if exposed):
+    ```bash
+    curl http://localhost:11435/v1/models
+    ```
+
+    ### Step 2: Download Llama 3.2
+    ```bash
+    docker exec -it ollama ollama pull llama3.2
+    ```
+
+    You can also download a higher-quality version (8-bit) from Hugging Face:
+    ```bash
+    docker exec -it ollama ollama pull hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:Q8_0
+    ```
+
+  </TabItem>
+
+  <TabItem value="byo-ollama" label="BYO Ollama (External Ollama)">
+    ## 🛠️ Bring Your Own Ollama (BYO Ollama)
+
+    If Ollama is running on the **host machine** or another server on your network, follow these steps.
+
+    ### Step 1: Check Available Models
+    Local:
+    ```bash
+    curl http://localhost:11434/v1/models
+    ```
+
+    Remote:
+    ```bash
+    curl http://<remote-ip>:11434/v1/models
+    ```
+
+    ### Step 2: Set the OLLAMA_BASE_URL
+    ```bash
+    export OLLAMA_HOST=<remote-ip>:11434
+    ```
+
+    ### Step 3: Download Llama 3.2
+    ```bash
+    ollama pull llama3.2
+    ```
+
+    Or download the 8-bit version from Hugging Face:
+    ```bash
+    ollama pull hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:Q8_0
+    ```
+
+  </TabItem>
+</Tabs>
+
+---
+
+You now have everything you need to download and run models with **Ollama**. Happy exploring!
