@@ -4,7 +4,7 @@ title: "Local LLM Setup with IPEX-LLM on Intel GPU"
 ---
 
 :::note
-This guide is verified with Open WebUI setup through [Manual Installation](/getting-started/index.mdx#manual-installation).
+This guide is verified with Open WebUI setup through [Manual Installation](/getting-started/index.md#manual-installation).
 :::
 
 # Local LLM Setup with IPEX-LLM on Intel GPU
