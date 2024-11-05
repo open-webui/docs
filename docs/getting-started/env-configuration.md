@@ -246,7 +246,43 @@ for local Whisper and embeddings.
 
 :::info
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#db-url).
+Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+:::
+
+#### `DATABASE_POOL_SIZE`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the size of the database pool. A value of `0` disables pooling. 
+
+#### `DATABASE_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the database pool max overflow.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
+:::
+
+#### `DATABASE_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Specifies the database pool timeout in seconds to get a connection.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
+:::
+
+#### `DATABASE_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the database pool recycle time in seconds.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
 :::
 
 #### `PORT`
@@ -289,12 +325,6 @@ Documentation on URL scheme available [here](https://docs.peewee-orm.com/en/late
 - Type: `bool`
 - Default: `False`
 - Description: Enables safe mode, which disables potentially unsafe features.
-
-#### `OFFLINE_MODE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables offline mode, which disables features requires internet and recommended for Air-gapped enviornment.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
@@ -495,6 +525,18 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Default: `8000`
 - Description: Specifies the port of a remote ChromaDB Server.
 
+#### `CHROMA_CLIENT_AUTH_PROVIDER`
+
+- Type: `str`
+- Description: Specifies auth provider for remote ChromaDB Server.
+- Example: `chromadb.auth.basic_authn.BasicAuthClientProvider`
+
+#### `CHROMA_CLIENT_AUTH_CREDENTIALS`
+
+- Type: `str`
+- Description: Specifies auth credentials for remote ChromaDB Server.
+- Example: `username:password`
+
 #### `CHROMA_HTTP_HEADERS`
 
 - Type: `str`
@@ -683,7 +725,7 @@ Forgery attacks against local network resources.
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Default: `104857600` (100MB)
+- Default: `100` (100MB)
 - Description: Sets the maximum size of a file that can be uploaded for document ingestion.
 
 ### Web Search
@@ -1000,6 +1042,30 @@ account takeovers.
 - Type: `str`
 - Default: `SSO`
 - Description: Sets the name for the OIDC provider.
+
+#### `ENABLE_OAUTH_ROLE_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables role management to oauth delegation.
+
+#### `OAUTH_ROLES_CLAIM`
+
+- Type: `str`
+- Default: `roles`
+- Description: Sets the roles claim to look for in the OIDC token.
+
+#### `OAUTH_ALLOWED_ROLES`
+
+- Type: `str`
+- Default: `user,admin`
+- Description: Sets the roles that are allowed access to the platform.
+
+#### `OAUTH_ADMIN_ROLES`
+
+- Type: `str`
+- Default: `admin`
+- Description: Sets the roles that are considered administrators.
 
 #### `GOOGLE_CLIENT_ID`
 

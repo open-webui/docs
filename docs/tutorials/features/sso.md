@@ -59,6 +59,18 @@ The following environment variables are used:
 1. `OAUTH_PROVIDER_NAME` - Name of the provider to show on the UI, defaults to SSO
 1. `OAUTH_SCOPES` - Scopes to request. Defaults to `openid email profile`
 
+### OAuth Role Management
+
+Any OAuth provider that can be configured to return roles in the access token can be used to manage roles in Open WebUI.
+To use this feature set `ENABLE_OAUTH_ROLE_MANAGEMENT` to `true`.
+You can configure the following environment variables to match the roles returned by the OAuth provider:
+
+1. `OAUTH_ROLES_CLAIM` - The claim that contains the roles. Defaults to `roles`. Can also be nested, for example `user.roles`.
+1. `OAUTH_ALLOWED_ROLES` - A comma-separated list of roles that are allowed to log in (receive open webui role `user`).
+1. `OAUTH_ADMIN_ROLES` - A comma-separated list of roles that are allowed to log in as an admin (receive open webui role `admin`).
+
+:::info If changing the role of a logged in user, they will need to log out and log back in to receive the new role. :::
+
 ## Trusted Header
 
 Open WebUI is able to delegate authentication to an authenticating reverse proxy that passes in the user's details in HTTP headers.
