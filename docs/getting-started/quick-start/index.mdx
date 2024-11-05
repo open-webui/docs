@@ -1,0 +1,155 @@
+---
+sidebar_position: 2
+title: "⏱️ Quick Start"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { TopBanners } from "@site/src/components/TopBanners";
+
+import DockerCompose from './tab-docker/DockerCompose.md';
+import Podman from './tab-docker/Podman.md';
+import ManualDocker from './tab-docker/ManualDocker.md';
+import DockerSwarm from './tab-docker/DockerSwarm.md';
+import DataStorage from './tab-docker/DataStorage.md';
+import DockerUpdating from './tab-docker/DockerUpdating.md';
+import Helm from './tab-kubernetes/Helm.md';
+import Kustomize from './tab-kubernetes/Kustomize.md';
+import Venv from './tab-python/Venv.md';
+import CondaUnix from './tab-python/CondaUnix.md';
+import CondaWindows from './tab-python/CondaWindows.md';
+
+<TopBanners />
+
+## How to Install ⏱️
+
+:::info **Important Note on User Roles and Privacy:**
+
+- **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
+- **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
+- **Privacy and Data Security:** **All your data**, including login details, is **locally stored** on your device. Open WebUI ensures **strict confidentiality** and **no external requests** for enhanced privacy and security.
+
+:::
+
+Choose your preferred installation method below:
+
+- **Docker:** Recommended for most users due to ease of setup and flexibility.
+- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration.
+- **Python:** Suitable for low-resource environments or those wanting a manual setup.
+
+<Tabs>
+  <TabItem value="docker" label="Docker">
+
+    <Tabs>
+      <TabItem value="docker-compose" label="Docker Compose">
+        <DockerCompose />
+        <DataStorage />  
+        <DockerUpdating />
+      </TabItem>
+
+      <TabItem value="podman" label="Podman">
+        <Podman />
+      </TabItem>
+
+      <TabItem value="manual-docker" label="Manual Docker">
+        <ManualDocker />
+        <DataStorage />  
+        <DockerUpdating />
+      </TabItem>
+
+      <TabItem value="swarm" label="Docker Swarm">
+        <DockerSwarm />
+      </TabItem>
+
+    </Tabs>
+
+  </TabItem>
+
+  <TabItem value="kubernetes" label="Kubernetes">
+
+    <Tabs>
+
+      <TabItem value="helm" label="Helm">
+        <Helm />
+      </TabItem>
+
+      <TabItem value="kustomize" label="Kustomize">
+        <Kustomize />
+      </TabItem>
+
+    </Tabs>
+
+  </TabItem>
+
+  <TabItem value="python" label="Python">
+
+    <Tabs>
+
+      <TabItem value="venv" label="Venv">
+        <Venv />
+      </TabItem>
+
+      <TabItem value="conda" label="Conda">
+        <h3>Choose Your Platform</h3>
+        <Tabs groupId="platform-conda">
+          <TabItem value="unix-conda" label="Linux/macOS">
+            <CondaUnix />
+          </TabItem>
+
+          <TabItem value="windows-conda" label="Windows">
+            <CondaWindows />
+          </TabItem>
+        </Tabs>
+      </TabItem>
+
+      <TabItem value="development" label="Development">
+        <h3>Development Setup</h3>
+        <p>
+          For developers who want to contribute, check the Development Guide in <a href="../advanced-topics">Advanced Topics</a>.
+        </p>
+      </TabItem>
+    </Tabs>
+  </TabItem>
+
+  <TabItem value="third-party" label="Third Party">
+    <Tabs>
+      <TabItem value="pinokio-computer" label="Pinokio.computer">
+        ### Pinokio.computer Installation
+
+        For installation via Pinokio.computer, please visit their website:
+
+        [https://pinokio.computer/](https://pinokio.computer/)
+
+        Support for this installation method is provided through their website.
+      </TabItem>
+    </Tabs>
+
+    ### Additional Third-Party Integrations
+
+    *(Add information about third-party integrations as they become available.)*
+  </TabItem>
+</Tabs>
+
+## Next Steps
+
+After installing, visit:
+
+- [http://localhost:3000](http://localhost:3000) to access OpenWebUI.
+- or [http://localhost:8080/](http://localhost:8080/) when using a Python deployment.
+
+You are now ready to start **[Using OpenWebUI](../using-openwebui/index.mdx)**!
+
+## Join the Community
+
+Need help? Have questions? Join our community:
+
+- [Open WebUI Discord](https://discord.gg/5rJgQTnV4s)
+- [GitHub Issues](https://github.com/open-webui/open-webui/issues)
+
+Stay updated with the latest features, troubleshooting tips, and announcements!
+
+## Conclusion
+
+Thank you for choosing Open WebUI! We are committed to providing a powerful, privacy-focused interface for your LLM needs. If you encounter any issues, refer to the [Troubleshooting Guide](../../troubleshooting/index.mdx).
+
+Happy exploring! 🎉
