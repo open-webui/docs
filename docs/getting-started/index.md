@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🚀Getting Started"
+title: "🚀 Getting Started"
 ---
 
 # Getting Started with Open WebUI

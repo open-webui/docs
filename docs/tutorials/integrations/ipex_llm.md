@@ -3,6 +3,11 @@ sidebar_position: 11
 title: "Local LLM Setup with IPEX-LLM on Intel GPU"
 ---
 
+:::warning
+This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+:::
+
+
 :::note
 This guide is verified with Open WebUI setup through [Manual Installation](/getting-started/index.md).
 :::
