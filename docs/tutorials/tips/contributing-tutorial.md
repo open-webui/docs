@@ -25,6 +25,34 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
      - `BASE_URL` set to `/docs` (or your chosen base URL for the fork).
      - `SITE_URL` set to `https://<your-github-username>.github.io/`.
 
+### 📝 Updating the GitHub Pages Workflow and Config File
+
+If you need to adjust deployment settings to fit your custom setup, here’s what to do:
+
+a. **Update `.github/workflows/gh-pages.yml`**
+   - Add environment variables for `BASE_URL` and `SITE_URL` to the build step if necessary:
+     ```yaml
+       - name: Build
+         env:
+           BASE_URL: ${{ vars.BASE_URL }}
+           SITE_URL: ${{ vars.SITE_URL }}
+         run: npm run build
+     ```
+
+b. **Modify `docusaurus.config.ts` to Use Environment Variables**
+   - Update `docusaurus.config.ts` to use these environment variables, with default values for local or direct deployment:
+     ```typescript
+     const config: Config = {
+       title: "Open WebUI",
+       tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
+       favicon: "img/favicon.png",
+       url: process.env.SITE_URL || "https://openwebui.com",
+       baseUrl: process.env.BASE_URL || "/",
+       ...
+     };
+     ```
+   - This setup ensures consistent deployment behavior for forks and custom setups.
+
 3. **Enable GitHub Actions**
 
    - In your forked repository, navigate to the **Actions** tab.
@@ -43,7 +71,7 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 
 6. **Browse to Your Forked Copy**
 
-   - Visit `https://<your-github-username>.github.io/docs` to view your forked documentation.
+   - Visit `https://<your-github-username>.github.io/<BASE_URL>` to view your forked documentation.
 
 7. **Draft Your Changes**
 
