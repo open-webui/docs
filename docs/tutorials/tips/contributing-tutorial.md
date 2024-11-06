@@ -18,7 +18,19 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
    - Navigate to the [Open WebUI Docs Repository](https://github.com/open-webui/docs) on GitHub.
    - Click the **Fork** button at the top-right corner to create a copy under your GitHub account.
 
-2. **Configure GitHub Environment Variables**
+2. **Enable GitHub Actions**
+
+   - In your forked repository, navigate to the **Actions** tab.
+   - If prompted, enable GitHub Actions by following the on-screen instructions.
+
+3. **Enable GitHub Pages**
+
+   - Go to **Settings** > **Pages** in your forked repository.
+   - Under **Source**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
+   - Click **Save** to enable GitHub Pages.
+
+
+4. **Configure GitHub Environment Variables**
 
    - In your forked repository, go to **Settings** > **Secrets and variables** > **Actions** > **Variables**.
    - Add the following environment variables:
@@ -52,17 +64,6 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
      };
      ```
    - This setup ensures consistent deployment behavior for forks and custom setups.
-
-3. **Enable GitHub Actions**
-
-   - In your forked repository, navigate to the **Actions** tab.
-   - If prompted, enable GitHub Actions by following the on-screen instructions.
-
-4. **Enable GitHub Pages**
-
-   - Go to **Settings** > **Pages** in your forked repository.
-   - Under **Source**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
-   - Click **Save** to enable GitHub Pages.
 
 5. **Run the `gh-pages` GitHub Workflow**
 
