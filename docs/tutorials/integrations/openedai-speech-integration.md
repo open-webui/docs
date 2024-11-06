@@ -3,6 +3,11 @@ sidebar_position: 12
 title: "TTS - OpenedAI-Speech using Docker"
 ---
 
+:::warning
+This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+:::
+
+
 **Integrating `openedai-speech` into Open WebUI using Docker**
 ==============================================================
 
