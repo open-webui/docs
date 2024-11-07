@@ -18,23 +18,52 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
    - Navigate to the [Open WebUI Docs Repository](https://github.com/open-webui/docs) on GitHub.
    - Click the **Fork** button at the top-right corner to create a copy under your GitHub account.
 
-2. **Configure GitHub Environment Variables**
+2. **Enable GitHub Actions**
+
+   - In your forked repository, navigate to the **Actions** tab.
+   - If prompted, enable GitHub Actions by following the on-screen instructions.
+
+3. **Enable GitHub Pages**
+
+   - Go to **Settings** > **Pages** in your forked repository.
+   - Under **Source**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
+   - Click **Save** to enable GitHub Pages.
+
+
+4. **Configure GitHub Environment Variables**
 
    - In your forked repository, go to **Settings** > **Secrets and variables** > **Actions** > **Variables**.
    - Add the following environment variables:
      - `BASE_URL` set to `/docs` (or your chosen base URL for the fork).
      - `SITE_URL` set to `https://<your-github-username>.github.io/`.
 
-3. **Enable GitHub Actions**
+### 📝 Updating the GitHub Pages Workflow and Config File
 
-   - In your forked repository, navigate to the **Actions** tab.
-   - If prompted, enable GitHub Actions by following the on-screen instructions.
+If you need to adjust deployment settings to fit your custom setup, here’s what to do:
 
-4. **Enable GitHub Pages**
+a. **Update `.github/workflows/gh-pages.yml`**
+   - Add environment variables for `BASE_URL` and `SITE_URL` to the build step if necessary:
+     ```yaml
+       - name: Build
+         env:
+           BASE_URL: ${{ vars.BASE_URL }}
+           SITE_URL: ${{ vars.SITE_URL }}
+         run: npm run build
+     ```
 
-   - Go to **Settings** > **Pages** in your forked repository.
-   - Under **Source**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
-   - Click **Save** to enable GitHub Pages.
+b. **Modify `docusaurus.config.ts` to Use Environment Variables**
+   - Update `docusaurus.config.ts` to use these environment variables, with default values for local or direct deployment:
+     ```typescript
+     const config: Config = {
+       title: "Open WebUI",
+       tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
+       favicon: "img/favicon.png",
+       url: process.env.SITE_URL || "https://openwebui.com",
+       baseUrl: process.env.BASE_URL || "/",
+       ...
+     };
+     ```
+   - This setup ensures consistent deployment behavior for forks and custom setups.
 
 5. **Run the `gh-pages` GitHub Workflow**
 
@@ -43,7 +72,7 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 
 6. **Browse to Your Forked Copy**
 
-   - Visit `https://<your-github-username>.github.io/docs` to view your forked documentation.
+   - Visit `https://<your-github-username>.github.io/<BASE_URL>` to view your forked documentation.
 
 7. **Draft Your Changes**
 
