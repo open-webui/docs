@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: "Image Generation"
+title: "🎨 Image Generation"
 ---
 
 # Image Generation
