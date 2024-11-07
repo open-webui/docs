@@ -22,7 +22,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 1. **Models and Model Selection**
 
-- **Description**: The `models` and `model` parameters allow you to specify which [language models](./workspace/models.md) should be used for a particular chat session.
+- **Description**: The `models` and `model` parameters allow you to specify which [language models](/features/workspace/models.md) should be used for a particular chat session.
 - **How to Set**: You can use either `models` for multiple models or `model` for a single model.
 - **Example**: 
   - `/?models=model1,model2` – This initializes the chat with `model1` and `model2`.
@@ -37,14 +37,14 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 3. **Web Search**
 
-- **Description**: Enabling `web-search` allows the chat session to access [web search](web_search.md) functionality.
+- **Description**: Enabling `web-search` allows the chat session to access [web search](/features/web_search) functionality.
 - **How to Set**: Set this parameter to `true` to enable web search.
 - **Example**: `/?web-search=true`
 - **Behavior**: If enabled, the chat can retrieve web search results as part of its responses.
 
 ### 4. **Tool Selection**
 
-- **Description**: The `tools` or `tool-ids` parameters specify which [tools](../plugin/tools/index.mdx) to activate within the chat.
+- **Description**: The `tools` or `tool-ids` parameters specify which [tools](/features/plugin/tools) to activate within the chat.
 - **How to Set**: Provide a comma-separated list of tool IDs as the parameter’s value.
 - **Example**: `/?tools=tool1,tool2` or `/?tool-ids=tool1,tool2`
 - **Behavior**: Each tool ID is matched and activated within the session for user interaction.
