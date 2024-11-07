@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "Ollama Load Balancing"
+title: "⚖️ Ollama Load Balancing"
 ---
 
 # Ollama Load Balancing Setup
