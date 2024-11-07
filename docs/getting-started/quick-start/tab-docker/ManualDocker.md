@@ -1,24 +1,12 @@
-
-# Manual Docker Setup
-
-If you prefer to set up Docker manually, follow these steps.
-
-## Step 1: Pull the Open WebUI Image
-
-```bash
-docker pull ghcr.io/open-webui/open-webui:main
-```
-
-## Step 2: Run the Container
-
+# Docker Setup
 ```bash
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 ```
+**Note:** For Nvidia GPU support, add `--gpus all`. You can also use the `:cuda` tag for CUDA or `:ollama` for the bundled Ollama variant.
 
-**Note:** For Nvidia GPU support, add `--gpus all` to the `docker run` command.
+For the latest bleeding-edge features, with potential bugs or occasional instability, use the `:dev` tag:
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:dev
+```
 
-## Access the WebUI
-
-After the container is running, access Open WebUI at:
-
-[http://localhost:3000](http://localhost:3000)
+Access Open WebUI at: [http://localhost:3000](http://localhost:3000)
