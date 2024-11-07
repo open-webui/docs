@@ -351,6 +351,11 @@ requests initiated by third-party websites, but only over HTTPS.
 - Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things 
 such as connections to Ollama and OpenAI endpoints.
 
+### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
+
+- Type: `int`
+- Description: Sets the timeout in seconds for fetching the OpenAI model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+
 #### `FONTS_DIR`
 
 - Type: `str`
