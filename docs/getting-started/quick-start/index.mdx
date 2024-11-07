@@ -21,7 +21,7 @@ import CondaWindows from './tab-python/CondaWindows.md';
 
 <TopBanners />
 
-## How to Install ⏱️
+# How to Install ⏱️
 
 :::info **Important Note on User Roles and Privacy:**
 
@@ -33,15 +33,15 @@ import CondaWindows from './tab-python/CondaWindows.md';
 
 Choose your preferred installation method below:
 
-- **Docker:** **Recommended for most users** due to ease of setup and flexibility.
-- **Python:** Suitable for low-resource environments or those wanting a manual setup.
-- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration.
+- **Docker:** **Officially supported and recommended for most users**
+- **Python:** Suitable for low-resource environments or those wanting a manual setup
+- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration
 
 
 <Tabs>
   <TabItem value="docker" label="Docker">
     <Tabs>
-      <TabItem value="manual-docker" label="Docker">
+      <TabItem value="docker" label="Docker">
         <div className='mt-5'>
           <ManualDocker />
           <DataStorage />  
@@ -49,11 +49,9 @@ Choose your preferred installation method below:
         </div>
       </TabItem>
 
-      <TabItem value="docker-compose" label="Docker Compose">
+      <TabItem value="compose" label="Docker Compose">
         <div className='mt-5'>
           <DockerCompose />
-          <DataStorage />  
-          <DockerUpdating />
         </div>
       </TabItem>
 
@@ -156,8 +154,3 @@ Need help? Have questions? Join our community:
 
 Stay updated with the latest features, troubleshooting tips, and announcements!
 
-## Conclusion
-
-Thank you for choosing Open WebUI! We are committed to providing a powerful, privacy-focused interface for your LLM needs. If you encounter any issues, refer to the [Troubleshooting Guide](../../troubleshooting/index.mdx).
-
-Happy exploring! 🎉
