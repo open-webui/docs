@@ -21,7 +21,7 @@ import CondaWindows from './tab-python/CondaWindows.md';
 
 <TopBanners />
 
-## How to Install ⏱️
+# How to Install ⏱️
 
 :::info **Important Note on User Roles and Privacy:**
 
@@ -33,42 +33,79 @@ import CondaWindows from './tab-python/CondaWindows.md';
 
 Choose your preferred installation method below:
 
-- **Docker:** Recommended for most users due to ease of setup and flexibility.
-- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration.
-- **Python:** Suitable for low-resource environments or those wanting a manual setup.
+- **Docker:** **Officially supported and recommended for most users**
+- **Python:** Suitable for low-resource environments or those wanting a manual setup
+- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration
+
 
 <Tabs>
   <TabItem value="docker" label="Docker">
-
     <Tabs>
-      <TabItem value="docker-compose" label="Docker Compose">
-        <DockerCompose />
-        <DataStorage />  
-        <DockerUpdating />
+      <TabItem value="docker" label="Docker">
+        <div className='mt-5'>
+          <ManualDocker />
+          <DataStorage />  
+          <DockerUpdating />
+        </div>
+      </TabItem>
+
+      <TabItem value="compose" label="Docker Compose">
+        <div className='mt-5'>
+          <DockerCompose />
+        </div>
       </TabItem>
 
       <TabItem value="podman" label="Podman">
-        <Podman />
-      </TabItem>
-
-      <TabItem value="manual-docker" label="Manual Docker">
-        <ManualDocker />
-        <DataStorage />  
-        <DockerUpdating />
+        <div className='mt-5'>
+          <Podman />
+        </div>
       </TabItem>
 
       <TabItem value="swarm" label="Docker Swarm">
-        <DockerSwarm />
+        <div className='mt-5'>
+          <DockerSwarm />
+        </div>
       </TabItem>
-
     </Tabs>
 
   </TabItem>
+  <TabItem value="python" label="Python">
+    <Tabs>
+      <TabItem value="conda" label="Conda">
+        <div className='mt-5'>
+          <div className='text-lg font-semibold mb-1'>Choose Your Platform</div>
+          <Tabs groupId="platform-conda">
+            <TabItem value="unix-conda" label="Linux/macOS">
+              <CondaUnix />
+            </TabItem>
+
+            <TabItem value="windows-conda" label="Windows">
+              <CondaWindows />
+            </TabItem>
+          </Tabs>
+        </div>
+      </TabItem>
+
+      <TabItem value="venv" label="Venv">
+        <div className='mt-5'>
+          <Venv />
+        </div>
+      </TabItem>
+
+
+      <TabItem value="development" label="Development">
+        <div className='mt-5'>
+          <h3>Development Setup</h3>
+          <p>
+            For developers who want to contribute, check the Development Guide in <a href="/getting-started/advanced-topics">Advanced Topics</a>.
+          </p>
+        </div>
+      </TabItem>
+    </Tabs>
+  </TabItem>
 
   <TabItem value="kubernetes" label="Kubernetes">
-
     <Tabs>
-
       <TabItem value="helm" label="Helm">
         <Helm />
       </TabItem>
@@ -76,40 +113,9 @@ Choose your preferred installation method below:
       <TabItem value="kustomize" label="Kustomize">
         <Kustomize />
       </TabItem>
-
-    </Tabs>
-
-  </TabItem>
-
-  <TabItem value="python" label="Python">
-
-    <Tabs>
-
-      <TabItem value="venv" label="Venv">
-        <Venv />
-      </TabItem>
-
-      <TabItem value="conda" label="Conda">
-        <h3>Choose Your Platform</h3>
-        <Tabs groupId="platform-conda">
-          <TabItem value="unix-conda" label="Linux/macOS">
-            <CondaUnix />
-          </TabItem>
-
-          <TabItem value="windows-conda" label="Windows">
-            <CondaWindows />
-          </TabItem>
-        </Tabs>
-      </TabItem>
-
-      <TabItem value="development" label="Development">
-        <h3>Development Setup</h3>
-        <p>
-          For developers who want to contribute, check the Development Guide in <a href="../advanced-topics">Advanced Topics</a>.
-        </p>
-      </TabItem>
     </Tabs>
   </TabItem>
+
 
   <TabItem value="third-party" label="Third Party">
     <Tabs>
@@ -148,8 +154,3 @@ Need help? Have questions? Join our community:
 
 Stay updated with the latest features, troubleshooting tips, and announcements!
 
-## Conclusion
-
-Thank you for choosing Open WebUI! We are committed to providing a powerful, privacy-focused interface for your LLM needs. If you encounter any issues, refer to the [Troubleshooting Guide](../../troubleshooting/index.mdx).
-
-Happy exploring! 🎉
