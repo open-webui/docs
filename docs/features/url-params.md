@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "URL Parameters"
+title: "🔗 URL Parameters"
 ---
 
 In Open WebUI, chat sessions can be customized through various URL parameters. These parameters allow you to set specific configurations, enable features, and define model settings on a per-chat basis. This approach provides flexibility and control over individual chat sessions directly from the URL.
