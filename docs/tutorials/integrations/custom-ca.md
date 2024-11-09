@@ -17,6 +17,8 @@ To fix this, you will need to add the new cert into OI's truststore.
 1. Mount the certificiate store from your host machine into the container by passing `--volume=/etc/ssl/certs/ca-certificiate.crt:/etc/ssl/certs/ca-certificiates.crt:ro` as a command-line option to `docker run`
 2. Force python to use the system truststore by setting `REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt` (see https://docs.docker.com/reference/cli/docker/container/run/#env)
 
+If the environment variable `REQUESTS_CA_BUNDLE` does not work try to set `SSL_CERT_FILE` (as per the [httpx documentation](https://www.python-httpx.org/environment_variables/#ssl_cert_file)) instead with the same value. 
+
 Example `compose.yaml` from [@KizzyCode](https://github.com/open-webui/open-webui/issues/1398#issuecomment-2258463210):
 
 ```yaml
