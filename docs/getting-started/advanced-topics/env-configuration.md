@@ -324,7 +324,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables safe mode, which disables potentially unsafe features.
+- Description: Enables safe mode, which disables potentially unsafe features, deactivating all functions.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
