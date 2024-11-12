@@ -495,12 +495,6 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 
 ### RAG
 
-#### `DOCS_DIR`
-
-- Type: `str`
-- Default: `${DATA_DIR}/docs`
-- Description: Specifies the directory scanned for documents to add to the RAG database when triggered.
-
 #### `VECTOR_DB`
 
 - Type: `str`
