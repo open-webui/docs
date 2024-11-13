@@ -1,9 +1,9 @@
 ---
 sidebar_position: 5
-title: "🔧 Coding Functions"
+title: "🔧 Shared Components"
 ---
 
-# 🔧 Coding Functions
+# 🔧 Shared Components
 
 Alright, so you're ready to dive into coding custom functions in Open WebUI! Whether you're here to enhance the WebUI experience, enable new AI capabilities, or automate tasks, this guide will make sure you know exactly how to get started. We’ll walk through the essentials of setting up a function, configuring user input options, and using real-time updates in the chat interface.
 

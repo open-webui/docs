@@ -5,11 +5,11 @@ title: "💬 Actions "
 
 # 💬 Actions
 
-Ever wanted a 🔘 button that lets you quickly do something with the 🤖 AI’s response? That’s where **Actions** come in. Actions in Open WebUI are mini-interactive elements you can attach to individual chat messages, making interactions smoother and more efficient. ⚡
+Ever wanted a 🔘 button that lets you quickly do something with the AI’s response? That’s where **Actions** come in. Actions in Open WebUI are mini-interactive elements you can attach to individual chat messages, making interactions smoother and more efficient. ⚡
 
 ## TL;DR
 - **Actions** are 🛠️ buttons or interactive elements you can add to chat messages.
-- They allow users to interact with messages—such as ✅ confirming, 📝 adding notes, or 🔄 triggering additional responses.
+- They allow users to interact with messages—such as confirming, adding notes, or triggering additional responses.
 
 ### What Are Actions? 🤔
 Actions allow you to place buttons right below any chat message, making it super easy for users to respond to prompts, confirm information, or trigger a new task based on the conversation.
@@ -20,7 +20,7 @@ Actions are created with a primary component, the **action function**, which def
 ### Examples of Actions:
 1. **Confirm Action** ✅ – Users click to confirm an instruction or agreement.
 2. **Add Feedback** 📝 – Opens a text box to input additional information.
-3. **Quick Reply** ⚡ – Buttons for fast responses like “Yes” 👍 or “No” 👎.
+3. **Quick Reply** ⚡ – Buttons for fast responses like “Yes” or “No”.
 
 By making interactions intuitive, Actions create a better user experience within Open WebUI, helping users stay engaged and making workflows faster and easier to manage.
 
@@ -49,7 +49,7 @@ Explore and experiment to make your interactions more dynamic and engaging with 
 
 ## 📝 Starting with Code
 
-If you’re ready to dive into writing code, start with reading this [document](../start_coding.md). You can also use the **Action code scaffold** available in [the community section](https://openwebui.com/f/hub/custom_action/).
+If you’re ready to dive into writing code, start with reading this [document](../getting_started.md). You can also use the **Action code scaffold** available in [the community section](https://openwebui.com/f/hub/custom_action/).
 
 Actions have a single main component called an action function. This component takes an object defining the type of action and the data being processed.
 

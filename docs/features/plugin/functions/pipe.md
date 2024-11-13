@@ -37,7 +37,7 @@ To start using pipes functions you can start by checking the [community function
 
 ## 📝 Starting with Code
 
-If you’re ready to dive into writing code, start with reading this [document](../start_coding.md).
+If you’re ready to dive into writing code, start with reading this [document](../getting_started.md).
 <summary>Example</summary>
 
 ```

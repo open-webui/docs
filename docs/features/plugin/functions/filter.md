@@ -5,11 +5,11 @@ title: "🚦 Filters"
 
 # 🚦 Filters
 
-When using Open WebUI, not all user messages or model outputs might be perfectly suited for every conversation—this is where **Filters** come to the rescue 🛠️. Filters let you control what goes in and out, ensuring that only the most relevant content reaches your chat or model. 🎯
+When using Open WebUI, not all user messages or model outputs might be perfectly suited for every conversation—this is where **Filters** come to the rescue. Filters let you control what goes in and out, ensuring that only the most relevant content reaches your chat or model.
 
 ## TL;DR
-- **Filters** are used to pre-process (edit) incoming user messages or post-process (tweak) the AI’s responses. ✍️
-- Filters help you adjust content on the fly, adding flexibility for sensitive topics, formatting, or message simplification. 🔧
+- **Filters** are used to pre-process (edit) incoming user messages or post-process (tweak) the AI’s responses. 
+- Filters help you adjust content on the fly, adding flexibility for sensitive topics, formatting, or message simplification. 
 
 ### Why Use Filters? 🤔
 Filters are ideal for adding rules to chat interactions, like removing specific keywords or reformatting text.
@@ -20,7 +20,7 @@ Filters are ideal for adding rules to chat interactions, like removing specific 
 3. **Spam Blocker** 🛑 – Filters out repetitive or unwanted messages.
 4. **Resize Pictures** 📷 - Make the image smaller in size before giving it to the model.
 
-By setting up Filters, you control the flow of your conversation, ensuring that interactions are smooth, clean, and always relevant! 💬
+By setting up Filters, you control the flow of your conversation, ensuring that interactions are smooth, clean, and always relevant!
 
 ## 💻 Getting Started with Filters
 To start using filter functions you can start by checking the [community functions](https://openwebui.com).[This guide](index.mdx#how-to-install-functions) provides a foundation for setting up a filter.
@@ -48,7 +48,7 @@ Filters are used to perform actions against incoming user messages and outgoing 
 
 ## 📝 Starting with Code
 
-If you’re ready to dive into writing code, start with reading this [document](../start_coding.md).
+If you’re ready to dive into writing code, start with reading this [document](../getting_started.md).
 
 
 <summary>Example</summary>
