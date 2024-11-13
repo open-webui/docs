@@ -1,187 +1,68 @@
 ---
-sidebar_position: 0
-title: "Tools"
+sidebar_position: 4
+title: "🛠️ Tools"
 ---
 
-## What are Tools?
-Tools are python scripts that are provided to an LLM at the time of the request. Tools allow LLMs to perform actions and receive additional context as a result. Generally speaking, your LLM of choice will need to support function calling for tools to be reliably utilized.
+# 🛠️ Tools in Open WebUI
 
-Tools enable many use cases for chats, including web search, web scraping, and API interactions within the chat. 
+Welcome to the world of **Tools** in Open WebUI! Whether you’re just starting with Open WebUI or exploring new ways to expand its capabilities, this guide will introduce you to the exciting concept of **Tools** and how they can enhance your interactions with large language models (LLMs). Let’s break down what Tools are, how they work, and why they’re easier to use than you might think.
 
-Many Tools are available to use on the [Community Website](https://openwebui.com/tools) and can easily be imported into your Open WebUI instance. 
+## 🔍 TL;DR
 
-## How can I use Tools?
-[Once installed](#how-to-install-tools), Tools can be used by assigning them to any LLM that supports function calling and then enabling that Tool. To assign a Tool to a model, you need to navigate to Workspace => Models. Here you can select the model for which you’d like to enable any Tools. 
+- **Tools** 🛠️ extend LLM abilities by enabling real-time actions and dynamic data gathering.
+- Once enabled, **Tools** can be selected for use in chats, allowing LLMs to call specific functions, such as web searches 🔎 or API integrations 🌐.
+- Tools can be installed easily from the community, with options for custom tools.
 
-Once you click the pencil icon to edit the model settings, scroll down to the Tools section and check any Tools you wish to enable. Once done you must click save.
+## 🤔 What are "Tools"?
 
-Now that Tools are enabled for the model, you can click the “+” icon when chatting with an LLM to use various Tools. Please keep in mind that enabling a Tool does not force it to be used. It means the LLM will be provided the option to call this Tool.
+Think of **Open WebUI** as a powerful base platform for LLMs. However, to interact with real-world data or execute dynamic tasks, the LLM needs a bit of extra functionality—this is where **Tools** come in.
 
-Lastly, we do provide a filter function on the community site that allows LLMs to autoselect Tools without you needing to enable them in the “+” icon menu: https://openwebui.com/f/hub/autotool_filter/
+### 🔧 Tools Overview
 
-Please note: when using the AutoTool Filter, you will still need to take the steps above to enable the Tools per model.
+**Tools** are essentially **Python scripts** 🐍 that add abilities to an LLM beyond text-based responses. They enable actions like web searches, data retrieval, and integration with external APIs.
 
-## How to install Tools
-The Tools import process is quite simple. You will have two options:
+#### 💡 Example of Using a Tool:
 
-### Download and import manually
-Navigate to the community site: https://openwebui.com/tools/
-1) Click on the Tool you wish to import
-2) Click the blue “Get” button in the top right-hand corner of the page
-3) Click “Download as JSON export”
-4) You can now upload the Tool into OpenWebUI by navigating to Workspace => Tools and clicking “Import Tools”
+Imagine you’re chatting with an LLM and want it to give you the current weather 🌦️. Normally, an LLM wouldn’t have access to live data, but with a **weather tool** enabled, the LLM can fetch and display this real-time information in the chat.
 
-### Import via your OpenWebUI URL
-1) Navigate to the community site: https://openwebui.com/tools/
-2) Click on the Tool you wish to import
-3) Click the blue “Get” button in the top right-hand corner of the page
-4) Enter the IP address of your OpenWebUI instance and click “Import to WebUI” which will automatically open your instance and allow you to import the Tool.
+**Tools** make this possible by allowing the LLM to **call external functions** and **retrieve relevant information** or **perform specific actions** during a conversation.
 
-Note: You can install your own Tools and other Tools not tracked on the community site using the manual import method. Please do not import Tools you do not understand or are not from a trustworthy source. Running unknown code is ALWAYS a risk.
+#### 📝 Examples of Tools:
 
-## What sorts of things can Tools do?
-Tools enable diverse use cases for interactive conversations by providing a wide range of functionality such as:
+1. **Web Search** 🔍: Get real-time answers from live web searches.
+2. **Image Generation** 🖼️: Create images based on user prompts.
+3. **Voice Synthesis** 🎙️: Integrate with an API like ElevenLabs to generate audio.
 
-- [**Web Search**](https://openwebui.com/t/constliakos/web_search/): Perform live web searches to fetch real-time information.
-- [**Image Generation**](https://openwebui.com/t/justinrahb/image_gen/): Generate images based on the user prompt
-- [**External Voice Synthesis**](https://openwebui.com/t/justinrahb/elevenlabs_tts/): Make API requests within the chat to integrate external voice synthesis service ElevenLabs and generate audio based on the LLM output.
+## 🔑 How to Enable and Use Tools
 
-## Important Tools Components
-### Valves and UserValves - (optional, but HIGHLY encouraged)
+Once installed, **Tools** can be assigned to any LLM supporting function calling:
 
-Valves and UserValves are used to allow users to provide dyanmic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given Tool.
+1. **Navigate to Workspace => Models** in Open WebUI.
+2. **Edit the Model Settings** ✏️: Click the pencil icon, scroll to the Tools section, and check the boxes next to the Tools you want to enable.
+3. **Start a Chat** 💬: Now, when chatting, you can click the “+” icon to access available Tools and allow the LLM to call them if necessary.
 
-Valves are configurable by admins alone and UserValves are configurable by any users.
+Enabling a Tool does not mean it’s forced to be used; it simply makes it available for use in that chat. To simplify access, the **AutoTool Filter** on the community site allows automatic Tool selection, but you still need to manually enable Tools per model.
 
-<details>
-<summary>Example</summary>
+## 📥 Installing Tools
 
-```
-# Define and Valves
-    class Valves(BaseModel):
-        priority: int = Field(
-            default=0, description="Priority level for the filter operations."
-        )
-        test_valve: int = Field(
-            default=4, description="A valve controlling a numberical value"
-        )
-        pass
+You can install Tools from the community in two ways:
 
-    # Define any UserValves
-    class UserValves(BaseModel):
-        test_user_valve: bool = Field(
-            default=False, description="A user valve controlling a True/False (on/off) switch"
-        )
-        pass
+1. **Manual Download and Import**
+   - Visit the community site: [https://openwebui.com/tools/](https://openwebui.com/tools/) 🌐
+   - Select a Tool, download it as a JSON export 📄, and then import it in Open WebUI by going to Workspace => Tools and clicking “Import Tools.”
 
-    def __init__(self):
-        self.valves = self.Valves()
-        pass
-```
-</details>
+2. **Direct Import via Open WebUI URL**
+   - Go to [https://openwebui.com/tools/](https://openwebui.com/tools/) 🌐, select the Tool you want, and enter the IP of your Open WebUI instance. Click “Import to WebUI” to automatically open your instance and begin the import.
 
-### Event Emitters
-Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
+### ⚠️ Important: Only Import Trusted Tools
+Avoid importing Tools from unknown sources, as they may introduce risks.
 
-There are two different types of Event Emitters:
 
-#### Status
-This is used to add statuses to a message while it is performing steps. These can be done at any stage during the Tool. These statuses appear right above the message content. These are very useful for Tools that delay the LLM response or process large amounts of information. This allows you to inform users what is being processed in real-time.
 
-```
-await __event_emitter__(
-            {
-                "type": "status", # We set the type here
-                "data": {"description": "Message that shows up in the chat", "done": False}, 
-                # Note done is False here indicating we are still emitting statuses
-            }
-        )
-```
+## 📝 Starting with Code
 
-<details>
-<summary>Example</summary>
+If you’re ready to dive into writing code, start with reading this [document](../start_coding.md).
 
-```
-async def test_function(
-        self, prompt: str, __user__: dict, __event_emitter__=None
-    ) -> str:
-        """
-        This is a demo
 
-        :param test: this is a test parameter
-        """
 
-        await __event_emitter__(
-            {
-                "type": "status", # We set the type here
-                "data": {"description": "Message that shows up in the chat", "done": False}, 
-                # Note done is False here indicating we are still emitting statuses
-            }
-        )
-
-        # Do some other logic here
-        await __event_emitter__(
-            {
-                "type": "status",
-                "data": {"description": "Completed a task message", "done": True},
-                # Note done is True here indicating we are done emitting statuses
-            }
-        )
-
-        except Exception as e:
-            await __event_emitter__(
-                {
-                    "type": "status",
-                    "data": {"description": f"An error occured: {e}", "done": True},
-                }
-            )
-
-            return f"Tell the user: {e}"
-```
-</details>
-
-#### Message
-This type is used to append a message to the LLM at any stage in the Tool. This means that you can append messages, embed images, and even render web pages before, or after, or during the LLM response.
-
-```
-await __event_emitter__(
-                    {
-                        "type": "message", # We set the type here
-                        "data": {"content": "This message will be appended to the chat."},
-                        # Note that with message types we do NOT have to set a done condition
-                    }
-                )
-```
-
-<details>
-<summary>Example</summary>
-
-```
-async def test_function(
-        self, prompt: str, __user__: dict, __event_emitter__=None
-    ) -> str:
-        """
-        This is a demo
-
-        :param test: this is a test parameter
-        """
-
-        await __event_emitter__(
-                    {
-                        "type": "message", # We set the type here
-                        "data": {"content": "This message will be appended to the chat."},
-                        # Note that with message types we do NOT have to set a done condition
-                    }
-                )
-
-        except Exception as e:
-            await __event_emitter__(
-                {
-                    "type": "status",
-                    "data": {"description": f"An error occured: {e}", "done": True},
-                }
-            )
-
-            return f"Tell the user: {e}"
-```
-</details>
+ 

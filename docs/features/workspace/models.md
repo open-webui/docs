@@ -1,6 +1,6 @@
 ---
-sidebar_position: 16
-title: "Models"
+sidebar_position: 3
+title: "🤖 Models"
 ---
 
 **Models**
