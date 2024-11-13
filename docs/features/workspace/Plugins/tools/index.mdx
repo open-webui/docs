@@ -1,0 +1,68 @@
+---
+sidebar_position: 4
+title: "🛠️ Tools"
+---
+
+# 🛠️ Tools in Open WebUI
+
+Welcome to the world of **Tools** in Open WebUI! Whether you’re just starting with Open WebUI or exploring new ways to expand its capabilities, this guide will introduce you to the exciting concept of **Tools** and how they can enhance your interactions with large language models (LLMs). Let’s break down what Tools are, how they work, and why they’re easier to use than you might think.
+
+## 🔍 TL;DR
+
+- **Tools** 🛠️ extend LLM abilities by enabling real-time actions and dynamic data gathering.
+- Once enabled, **Tools** can be selected for use in chats, allowing LLMs to call specific functions, such as web searches 🔎 or API integrations 🌐.
+- Tools can be installed easily from the community, with options for custom tools.
+
+## 🤔 What are "Tools"?
+
+Think of **Open WebUI** as a powerful base platform for LLMs. However, to interact with real-world data or execute dynamic tasks, the LLM needs a bit of extra functionality—this is where **Tools** come in.
+
+### 🔧 Tools Overview
+
+**Tools** are essentially **Python scripts** 🐍 that add abilities to an LLM beyond text-based responses. They enable actions like web searches, data retrieval, and integration with external APIs.
+
+#### 💡 Example of Using a Tool:
+
+Imagine you’re chatting with an LLM and want it to give you the current weather 🌦️. Normally, an LLM wouldn’t have access to live data, but with a **weather tool** enabled, the LLM can fetch and display this real-time information in the chat.
+
+**Tools** make this possible by allowing the LLM to **call external functions** and **retrieve relevant information** or **perform specific actions** during a conversation.
+
+#### 📝 Examples of Tools:
+
+1. **Web Search** 🔍: Get real-time answers from live web searches.
+2. **Image Generation** 🖼️: Create images based on user prompts.
+3. **Voice Synthesis** 🎙️: Integrate with an API like ElevenLabs to generate audio.
+
+## 🔑 How to Enable and Use Tools
+
+Once installed, **Tools** can be assigned to any LLM supporting function calling:
+
+1. **Navigate to Workspace => Models** in Open WebUI.
+2. **Edit the Model Settings** ✏️: Click the pencil icon, scroll to the Tools section, and check the boxes next to the Tools you want to enable.
+3. **Start a Chat** 💬: Now, when chatting, you can click the “+” icon to access available Tools and allow the LLM to call them if necessary.
+
+Enabling a Tool does not mean it’s forced to be used; it simply makes it available for use in that chat. To simplify access, the **AutoTool Filter** on the community site allows automatic Tool selection, but you still need to manually enable Tools per model.
+
+## 📥 Installing Tools
+
+You can install Tools from the community in two ways:
+
+1. **Manual Download and Import**
+   - Visit the community site: [https://openwebui.com/tools/](https://openwebui.com/tools/) 🌐
+   - Select a Tool, download it as a JSON export 📄, and then import it in Open WebUI by going to Workspace => Tools and clicking “Import Tools.”
+
+2. **Direct Import via Open WebUI URL**
+   - Go to [https://openwebui.com/tools/](https://openwebui.com/tools/) 🌐, select the Tool you want, and enter the IP of your Open WebUI instance. Click “Import to WebUI” to automatically open your instance and begin the import.
+
+### ⚠️ Important: Only Import Trusted Tools
+Avoid importing Tools from unknown sources, as they may introduce risks.
+
+
+
+## 📝 Starting with Code
+
+If you’re ready to dive into writing code, start with reading this [document](../start_coding.md).
+
+
+
+ 
