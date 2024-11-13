@@ -14,11 +14,11 @@ When using Open WebUI, not all user messages or model outputs might be perfectly
 ### Why Use Filters? 🤔
 Filters are ideal for adding rules to chat interactions, like removing specific keywords or reformatting text.
 
-### Examples of Filters:
-1. **Profanity Filter** 🚫 – Screens and removes inappropriate words from user messages.
-2. **Format Adjuster** ✨ – Automatically reformats incoming or outgoing text for consistency.
-3. **Spam Blocker** 🛑 – Filters out repetitive or unwanted messages.
-4. **Resize Pictures** 📷 - Make the image smaller in size before giving it to the model.
+### ✨ Examples of Filters:
+1. **Profanity Filter** – Screens and removes inappropriate words from user messages.
+2. **Format Adjuster** – Automatically reformats incoming or outgoing text for consistency.
+3. **Spam Blocker** – Filters out repetitive or unwanted messages.
+4. **Resize Pictures** - Make the image smaller in size before giving it to the model.
 
 By setting up Filters, you control the flow of your conversation, ensuring that interactions are smooth, clean, and always relevant!
 

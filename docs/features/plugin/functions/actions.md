@@ -8,7 +8,7 @@ title: "💬 Actions "
 Ever wanted a 🔘 button that lets you quickly do something with the AI’s response? That’s where **Actions** come in. Actions in Open WebUI are mini-interactive elements you can attach to individual chat messages, making interactions smoother and more efficient. ⚡
 
 ## TL;DR
-- **Actions** are 🛠️ buttons or interactive elements you can add to chat messages.
+- **Actions** are buttons or interactive elements you can add to chat messages.
 - They allow users to interact with messages—such as confirming, adding notes, or triggering additional responses.
 
 ### What Are Actions? 🤔
@@ -18,16 +18,16 @@ Actions allow you to place buttons right below any chat message, making it super
 Actions are created with a primary component, the **action function**, which defines what happens when the button is clicked. For instance, an action might open a small text input where users can add feedback or perform a secondary task.
 
 ### Examples of Actions:
-1. **Confirm Action** ✅ – Users click to confirm an instruction or agreement.
-2. **Add Feedback** 📝 – Opens a text box to input additional information.
-3. **Quick Reply** ⚡ – Buttons for fast responses like “Yes” or “No”.
+1. **Confirm Action**  – Users click to confirm an instruction or agreement.
+2. **Add Feedback**  – Opens a text box to input additional information.
+3. **Quick Reply**  – Buttons for fast responses like “Yes” or “No”.
 
 By making interactions intuitive, Actions create a better user experience within Open WebUI, helping users stay engaged and making workflows faster and easier to manage.
 
 Some of the actual usecases includes:
 - Grant permission before performing a specific task
-- Generate visualizations of structured data 📊
-- Download audio snippets of chats 🎧
+- Generate visualizations of structured data 
+- Download audio snippets of chats 
 - Enable other interactive use cases for a richer messaging experience
 
 ## 💻 Getting Started with Actions
