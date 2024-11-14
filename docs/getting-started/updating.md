@@ -25,10 +25,13 @@ Follow these steps to manually update your Open WebUI:
 
 3. **Create a New Container with the Updated Image**:
    - **For non-CUDA (CPU-bound) users**, use the same `docker run` command you used initially to create the container, ensuring all your configurations remain the same:
-   ```bash
-   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart
 
- - **For CUDA (GPU-enabled) users**, if you want to leverage GPU acceleration, use the following command instead:
+   ```bash
+   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   ```
+
+   - **For CUDA (GPU-enabled) users**, if you want to leverage GPU acceleration, use the following command instead:
+
    ```bash
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always --gpus all ghcr.io/open-webui/open-webui:main
    ```
