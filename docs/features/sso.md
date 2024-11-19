@@ -69,11 +69,7 @@ You can configure the following environment variables to match the roles returne
 1. `OAUTH_ALLOWED_ROLES` - A comma-separated list of roles that are allowed to log in (receive open webui role `user`).
 1. `OAUTH_ADMIN_ROLES` - A comma-separated list of roles that are allowed to log in as an admin (receive open webui role `admin`).
 
-:::info
-
-If changing the role of a logged in user, they will need to log out and log back in to receive the new role.
-
-:::
+:::info If changing the role of a logged in user, they will need to log out and log back in to receive the new role. :::
 
 ## Trusted Header
 
