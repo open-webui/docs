@@ -105,8 +105,4 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
     ./enable_letsencrypt.sh
     ```
 
-#### Access the WebUI
-
-Access Open WebUI via HTTPS at:
-
-[https://your_domain_or_IP](https://your_domain_or_IP)
+---
