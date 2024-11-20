@@ -22,6 +22,8 @@ import TabItem from '@theme/TabItem';
 
 import SelfSigned from './tab-nginx/SelfSigned.md';
 import LetsEncrypt from './tab-nginx/LetsEncrypt.md';
+import CustomizeSplashLocal from './tab-nginx/CustomizeSplashLocal.md';
+import CustomizeSplashExternal from './tab-nginx/CustomizeSplashExternal.md';
 
 <Tabs>
   <TabItem value="self-signed" label="Self-Signed Certificate">
@@ -48,12 +50,6 @@ Add this directive inside your `server` block, above the `location /` block.
 ## Customize Splash Screen and Favicon
 
 Override the default splash screen and favicon by configuring Nginx to serve custom files. Choose one of the following methods:
-
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-import CustomizeSplashLocal from './tab-nginx/CustomizeSplashLocal.md';
-import CustomizeSplashExternal from './tab-nginx/CustomizeSplashExternal.md';
 
 <Tabs>
   <TabItem value="local" label="Host Locally">
