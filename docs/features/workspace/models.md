@@ -39,3 +39,19 @@ The `Models` section also includes features for discovering, importing, and expo
 * **Discover a Model**: Click this button to explore and download model presets from the Open WebUI community.
 * **Import Models**: Use this button to import models from a `.json` file or other sources.
 * **Export Models**: Use this button to export all your modelfiles in a single `.json` file.
+
+
+### Model Switching
+
+   **Example**: Switching between **Mistral**, **LLaVA**, and **GPT-3.5** in a Multi-Stage Task
+
+   - **Scenario**: A multi-stage conversation involves different task types, such as starting with a simple FAQ, interpreting an image, and then generating a creative response.
+   - **Reason for Switching**: The user can leverage each model's specific strengths for each stage:
+      - **Mistral** for general questions to reduce computation time and costs.
+      - **LLaVA** for visual tasks to gain insights from image-based data.
+      - **GPT-3.5** for generating more sophisticated and nuanced language output.
+   - **Process**: The user switches between models, depending on the task type, to maximize efficiency and response quality.
+
+    **How To**:
+    1. **Select the Model**: Within the chat interface, select the desired models from the model switcher dropdown. You can select up to two models simultaneously, and both responses will be generated. You can then navigate between them by using the back and forth arrows.
+    2. **Context Preservation**: Open WebUI retains the conversation context across model switches, allowing smooth transitions.

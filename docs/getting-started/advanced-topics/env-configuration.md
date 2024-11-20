@@ -324,7 +324,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables safe mode, which disables potentially unsafe features.
+- Description: Enables safe mode, which disables potentially unsafe features, deactivating all functions.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
@@ -494,12 +494,6 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
 ### RAG
-
-#### `DOCS_DIR`
-
-- Type: `str`
-- Default: `${DATA_DIR}/docs`
-- Description: Specifies the directory scanned for documents to add to the RAG database when triggered.
 
 #### `VECTOR_DB`
 
