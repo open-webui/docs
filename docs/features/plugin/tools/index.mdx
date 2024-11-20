@@ -28,21 +28,21 @@ Navigate to the [community site](https://openwebui.com/tools/):
 3) Click “Download as JSON export”
 4) You can now upload the Tool into OpenWebUI by navigating to Workspace => Tools and clicking “Import Tools”
 
-Note: You can install your own Tools and other Tools not tracked on the community site using the manual import method. Please do not import Tools you do not understand or are not from a trustworthy source. Running unknown code is ALWAYS a risk.
-
+:::danger
+You can install your own Tools and other Tools not tracked on the community site using the manual import method. Please do not import Tools you do not understand or are not from a trustworthy source. Running unknown code is ALWAYS a risk.
+:::
 ## How to set Valves and User Valves
 Valves and User Valves are configuration options that allow admins and users to customize how Tools behave.
 
 ### Valves
-Valves are variables set by **admin** to adjust Tool behavior globally. You can use valves to set default configurations, such as rate limits, API keys, or specific parameters relevant to your Tool.
+Valves are variables set by **admin** or **user who added the tool** to adjust Tool behavior globally. You can use valves to set default configurations, such as rate limits, API keys, or specific parameters relevant to your Tool.
 ### How to Configure Valves?
->**Note:** Only admins can chabge the values for Valves
 1. Open the **Tool** section in your **Workspace** instance.
 2. Locate the Valves section (⚙️).
 3. Adjust the default values based on your requirements.
 
 ### User Valves:
-User Valves are customizable variables that can be modified by individual users to tailor the Tool to their needs.
+User Valves are customizable variables that can be modified by individual users to modified the Tool to their needs.
 ### How to Configure User Valves?
 1. In the main interface, locate the Control Panel in the top corner.
 2. In the valve section, choose the Tool you want to configure. If the Tool has User Valves, they will appear here.
@@ -51,8 +51,9 @@ User Valves are customizable variables that can be modified by individual users 
 ## How to use the tools?
 [**After installation**](#how-to-install-tools), to enabled Tools during a chat, click the “+” icon in the chat interface to access and use available Tools.
 
->**Note:** Enabling a Tool doesn't force it to be used but allows the LLM to call it as needed.
-
+:::note
+ Enabling a Tool doesn't force it to be used but allows the LLM to call it as needed.
+:::
 It is possible to assign a tool to a model, which ensures that the tool is automatically enabled by default whenever the model is selected. 
 To assign the tool to the model:
 1. Navigate to Admin Panel => setting => Models in OpenWebUI.
@@ -61,6 +62,9 @@ To assign the tool to the model:
 4. Scroll to the Tools section and check the boxes for the Tools you wish to enable.
 5. Save your changes.
 
+:::note
+Users without admin status cannot access the admin panel; however, they can attach the tool to models (if they have access to the models) within the Workspace.
+:::
 
 ![Attach tool to model Demo](/img/tool-model.gif)
 

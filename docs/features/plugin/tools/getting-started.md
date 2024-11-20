@@ -59,7 +59,7 @@ Each tool should define its requirements and parameters in the frontmatter. The 
 2. Start with a description (optional), followed by key-value pairs for parameters.
 
 ### Requirements: 
-A list of Python packages that the tool depends on. These are specified as a comma-separated string and are installed using pip. Example:
+A list of Python packages that the tool depends on. These are specified as a comma-separated string and are **automatically** installed using pip. Example:
 
 ```python
 requirements: numpy, pandas
@@ -74,26 +74,57 @@ required_open_webui_version: 1.2.3
 ## Function Documentation
 All functions must use [**Sphinx-style docstrings**](https://sphinx-rtd-tutorial.readthedocs.io/en/latest/docstrings.html) for documentation. This ensures clarity, consistency, and compatibility for generating tool specifications. The docstring will be used to communicate to the model about the tool.
 
+:::info
 Guidelines:
 1. Use Sphinx-style Format: The docstrings should include parameter and return type information.
 2. Description: Begin with a brief description of the function.
 3. Parameters: Document each parameter with its name and description (except for __user__)
-
+:::
 >**Note:** The session user object will be passed automatically when the function is called. 
 ```python 
-"""
-Calculate the result of an equation.
+    def get_current_weather(self, city: str) -> str:
+        """
+        Get the current weather for a given city.
+        :param city: The name of the city to get the weather for.
+        :return: The current weather information or an error message.
+        """
+        api_key = os.getenv("OPENWEATHER_API_KEY")
+        if not api_key:
+            return (
+                "API key is not set in the environment variable 'OPENWEATHER_API_KEY'."
+            )
 
-:param equation: The equation to calculate.
-:type equation: str
-:return: The result of the calculation.
-:rtype: float
-"""
+        base_url = "http://api.openweathermap.org/data/2.5/weather"
+        params = {
+            "q": city,
+            "appid": api_key,
+            "units": "metric",  # Optional: Use 'imperial' for Fahrenheit
+        }
+
+        try:
+            response = requests.get(base_url, params=params)
+            response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
+            data = response.json()
+
+            if data.get("cod") != 200:
+                return f"Error fetching weather data: {data.get('message')}"
+
+            weather_description = data["weather"][0]["description"]
+            temperature = data["main"]["temp"]
+            humidity = data["main"]["humidity"]
+            wind_speed = data["wind"]["speed"]
+
+            return f"Weather in {city}: {temperature}°C"
+        except requests.RequestException as e:
+            return f"Error fetching weather data: {str(e)}"
+
 ```
 ---
 ## Parameters
 To use parameters, you need to use type hints for all parameters directly in the function definition.
->**Note:**: Reserved params do not require type hints.
+:::tip
+ Reserved params do not require type hints.
+:::
 ### Some of the supported types for tool parameters: String, Integer, Number, Boolean, Array, Object, Null, Literal, Optional.
 ```python
  async def get_bbc_news_content(
@@ -136,9 +167,10 @@ They can be defined as follows:
         pass
 ```
 > **Note:** As you can see, you can give default value to valves and user valves.
-
 ## Event Emitters
 Event emitters provide a simple and effective way to communicate messages, status updates, and errors to users during the execution of your tool. By including event emitter calls in your function, you can ensure that important updates are displayed in real-time while the final response is being generated.
+
+![Event_emitter Demo](/img/demo-event-emit.gif)
 
 You can pass event emitter directly to your function as input, and use it as follow:
 ```python
@@ -210,8 +242,29 @@ await __event_emitter__(
 ```
 
 
+## Event Calls
+Event Calls are a powerful way to communicate with users while your tool is running. They let you share messages, update progress, handle errors, and even gather user feedback in real time, making your workflows more interactive and adaptable.
 
+![Even_call Demo](/img/demo-event-call.gif)
 
+You can pass event call directly to your function as input, and use it as follow:
 
+```
+response = await __event_call__(
+            {
+                "type": "confirmation",
+                "data": {
+                    "title": "Permission Request",
+                    "message": "We need to access your user details including your name, email, and ID. Do you allow us to proceed with this action?",
+                },
+            }
+        )
+        print("User response: ", response)
 
+```
 
+you can use two different types in yout event call:
+| **Type**       | **Description**                                                                                     |
+|-----------------|-----------------------------------------------------------------------------------------------------|                
+| `confirmation` | Displays a confirmation dialog to the user.                                                                                                                |
+| `input`        | Displays an input prompt with optional placeholders and pre-filled values.                          |
