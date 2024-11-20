@@ -17,8 +17,8 @@ Open WebUI offers a flexible interface for creating custom prompts. The prompt c
 4. **Save the Prompt**: Store the prompt for future use, ensuring it is easily accessible.
 
 ### Who Can Access and Use Prompts?
-- **Admins**: Have the ability to create and manage prompts within a shared workspace, making them available to all users in the organization.
-- **Users**: Can access these prompts but cannot directly modify the workspace content.
+- **Admins**: Have the ability to create and manage prompts within a shared workspace.
+- **Users**: They can use the prompts added by the admin , however, they can add and edit prompts if granted the necessary [access by the admin](../user-group.md).
 
 This structured approach ensures that prompts remain standardized and accessible to relevant team members.
 
