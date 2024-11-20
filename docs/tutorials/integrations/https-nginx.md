@@ -11,6 +11,7 @@ This tutorial is a community contribution and is not supported by the OpenWebUI 
 Ensuring secure communication between your users and the Open WebUI is paramount. HTTPS (HyperText Transfer Protocol Secure) encrypts the data transmitted, protecting it from eavesdroppers and tampering. By configuring Nginx as a reverse proxy, you can seamlessly add HTTPS to your Open WebUI deployment, enhancing both security and trustworthiness.
 
 This guide provides two methods to set up HTTPS:
+
 - **Self-Signed Certificates**: Ideal for development and internal use.
 - **Let's Encrypt**: Perfect for production environments requiring trusted SSL certificates.
 
@@ -32,13 +33,56 @@ import LetsEncrypt from './tab-nginx/LetsEncrypt.md';
   </TabItem>
 </Tabs>
 
-## Next Steps
+## Additional Tips
 
-After setting up HTTPS, access Open WebUI securely at:
+### Increase Upload Size
 
-- [https://localhost](https://localhost)
+To allow users to upload larger files to OpenWebUI, increase the default upload size limit in your Nginx configuration:
 
-Ensure that your DNS records are correctly configured if you're using a domain name. For production environments, it's recommended to use Let's Encrypt for trusted SSL certificates.
+```nginx
+client_max_body_size 20M;  # Increase upload size limit to 20MB
+```
+
+Add this directive inside your `server` block, above the `location /` block.
+
+## Customize Splash Screen and Favicon
+
+Override the default splash screen and favicon by configuring Nginx to serve custom files. Choose one of the following methods:
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+import CustomizeSplashLocal from './tab-nginx/CustomizeSplashLocal.md';
+import CustomizeSplashExternal from './tab-nginx/CustomizeSplashExternal.md';
+
+<Tabs>
+  <TabItem value="local" label="Host Locally">
+    <CustomizeSplashLocal />
+  </TabItem>
+
+  <TabItem value="external" label="Host Externally">
+    <CustomizeSplashExternal />
+  </TabItem>
+</Tabs>
+
+## Applying Changes
+
+To apply any changes made to the Nginx configuration, follow these steps:
+
+```bash
+sudo systemctl reload nginx  # If running Nginx directly
+```
+
+Or, if using Docker Compose:
+
+```bash
+docker compose restart nginx
+```
+
+### Access the WebUI
+
+After reloading Nginx, your custom splash screen and favicon will be served from the external website:
+
+- [https://your_domain_or_IP](https://your_domain_or_IP)
 
 ---
-

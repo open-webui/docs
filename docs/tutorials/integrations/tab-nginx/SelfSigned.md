@@ -23,6 +23,8 @@ Using self-signed certificates is suitable for development or internal use where
         ssl_certificate_key /etc/nginx/ssl/nginx.key;
         ssl_protocols TLSv1.2 TLSv1.3;
 
+        client_max_body_size 20M;  # Increase upload size limit to 20MB
+
         location / {
             proxy_pass http://host.docker.internal:3000;
             proxy_set_header Host $host;
@@ -30,6 +32,9 @@ Using self-signed certificates is suitable for development or internal use where
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
         }
+
+        # Include custom splash screen and favicon configuration if needed
+        # See the Customize Splash Screen and Favicon section
     }
     ```
 
