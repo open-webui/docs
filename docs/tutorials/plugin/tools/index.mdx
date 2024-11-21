@@ -46,7 +46,53 @@ Tools enable diverse use cases for interactive conversations by providing a wide
 - [**Image Generation**](https://openwebui.com/t/justinrahb/image_gen/): Generate images based on the user prompt
 - [**External Voice Synthesis**](https://openwebui.com/t/justinrahb/elevenlabs_tts/): Make API requests within the chat to integrate external voice synthesis service ElevenLabs and generate audio based on the LLM output.
 
-## Important Tools Components
+## Writing A Custom Toolkit
+
+Toolkits are defined in a single Python file, with a top level docstring with metadata and a `Tools` class.
+
+### Example Top-Level Docstring
+
+```python
+"""
+title: String Inverse
+author: Your Name
+author_url: https://website.com
+git_url: https://github.com/username/string-reverse.git
+description: This tool calculates the inverse of a string
+required_open_webui_version: 0.4.0
+requirements: langchain-openai, langgraph, ollama, langchain_ollama
+version: 0.4.0
+licence: MIT
+"""
+```
+
+### Tools Class
+
+Tools have to be defined as methods withing a class called `Tools`, with optional subclasses called `Valves` and `UserValves`, for example:
+
+```python
+class Tools:
+    def __init__(self):
+        """Initialize the Tool."""
+        self.valves = self.Valves()
+
+    class Valves(BaseModel):
+        api_key: str = Field("", description="Your API key here")
+
+    def reverse_string(self, string: str) -> str:
+        """
+        Reverses the input string.
+        :param string: The string to reverse
+        """
+        # example usage of valves
+        if self.valves.api_key != "42":
+            return "Wrong API key"
+        return string[::-1] 
+```
+
+### Type Hints
+Each tool must have type hints for arguments. As of version OpenWebUI version 0.4.3, the types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
+
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
 Valves and UserValves are used to allow users to provide dyanmic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given Tool.
@@ -76,9 +122,18 @@ Valves are configurable by admins alone and UserValves are configurable by any u
 
     def __init__(self):
         self.valves = self.Valves()
-        pass
 ```
 </details>
+
+### Optional Arguments
+Below is a list of optional arguments your tools can depend on:
+- `__event_emitter__`: Emit events (see following section)
+- `__event_call__`: Same as event emitter but can be used for user interactions
+- `__user__`: A dictionary with user information
+- `__metadata__`: Dictionary with chat metadata
+- `__messages__`: List of previous messages
+- `__files__`: Attached files
+- `__model__`: Model name
 
 ### Event Emitters
 Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
