@@ -45,10 +45,10 @@ In `config.json` all you will need to do is add/change the following options.
 
 ### Add or update apiBase.
 
-Set this to your Open Web UI domain + /ollama/v1 on the end.
+Set this to your Open Web UI domain + /api/ on the end.
 
 ```json
-"apiBase": "http://localhost:3000/ollama/v1" #If you followed Getting Started Docker
+"apiBase": "http://localhost:3000/api/" #If you followed Getting Started Docker
 ```
 
 ### Add apiKey 
@@ -75,7 +75,7 @@ Make sure you pull the model into your ollama instance/s beforehand.
       "provider": "openai",
       "model": "granite-code:latest",
       "useLegacyCompletionsEndpoint": false,
-      "apiBase": "http://YOUROPENWEBUI/ollama/v1",
+      "apiBase": "http://YOUROPENWEBUI/api/",
       "apiKey": "sk-YOUR-API-KEY"
     }
   ],
@@ -91,7 +91,7 @@ Make sure you pull the model into your ollama instance/s beforehand.
     "provider": "openai",
     "model": "granite-code:latest",
     "useLegacyCompletionsEndpoint": false,
-    "apiBase": "http://localhost:3000/ollama/v1",
+    "apiBase": "http://localhost:3000/api/",
     "apiKey": "sk-YOUR-API-KEY"
   }
 }
