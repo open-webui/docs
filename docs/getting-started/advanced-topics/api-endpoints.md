@@ -185,6 +185,11 @@ Open WebUI offers a myriad of benefits, making it an essential tool for develope
 - **Ease of Implementation**: Quick start integration with comprehensive documentation and community support.
 
 ## Swagger Documentation Links
+
+:::important
+Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
+:::
+
 Access detailed API documentation for different services provided by Open WebUI:
 
 | Application | Documentation Path      |
