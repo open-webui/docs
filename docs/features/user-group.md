@@ -2,11 +2,9 @@
 sidebar_position: 3
 title: "👥 User Groups"
 ---
-## Overview
-
 The User Group feature introduced in Open WebUI allows users with admin access to define and manage access levels for different groups of users. This feature enhances flexibility by providing the ability to assign varying permissions and roles to users based on their needs and responsibilities.
 
-Administrators can manage users and groups directly from the **Admin Panel**, which includes two main sections: **Users** and **Groups**.
+Administrators can manage users and groups directly from the User page from the **Admin Panel**, which includes two main sections: **Users** and **Groups**.
 
 ## Managing User Groups
 
@@ -19,7 +17,7 @@ There are three default roles for users within a group:
 :::note
 Admins can view the chat history of users, including those with pending access.
 :::
-### Admin Panel: Groups 
+### Groups 
 
 The **Groups** section in the Admin Panel enables administrators to:
 - **Define Access Levels**: Adjust the default permission levels for normal users.
@@ -28,7 +26,7 @@ The **Groups** section in the Admin Panel enables administrators to:
 - **Assign Users to Groups**: Assign users to specific groups.
 
 :::note
-To add new tools, users must have access to **Tools**. The same applies to managing **Knowledge** and **Prompts**.
+To add new tools, users must have **workspace permission** and access to **Tools**. The same applies to managing **Knowledge** and **Prompts**.
 :::
 :::info
 Users cannot view tools, prompts, or knowledge items added by others. However, admins have full visibility and can access all tools, prompts, and knowledge items, regardless of who added them.
@@ -51,7 +49,7 @@ Users cannot view tools, prompts, or knowledge items added by others. However, a
    - Define the default permissions for users in the group by navigating to the **Groups** => **Edit User Group** => **Permissions**.
    - Use the setting to give access to Workspace sections (Model, Tools, Promps, Knowledge), and Chat Permissions(File Upload, Chat Edit, Chat Delete, Temporary Chat).
    :::tip 
-    Admins are unable to grant users direct access to Functions.
+    Admins cannot grant users direct access to Functions, as they are advanced features that can only be managed through the admin panel.
    :::
 
 4. **Manage Users**:
