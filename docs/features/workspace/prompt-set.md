@@ -29,24 +29,24 @@ This structured approach ensures that prompts remain standardized and accessible
 ## How Do Variables Work in Prompts?
 
 Open WebUI allows the use of **variables** in prompts. Variables act as placeholders that can be dynamically replaced with specific content during prompt execution. They are defined by enclosing text within double curly braces, such as `{{VARIABLE_NAME}}`.
----
+
 ---
 
 ## What Reserved Variables Are Available?
 
 Open WebUI includes a set of **reserved variables** designed to facilitate the creation of context-aware and interactive prompts. These variables provide dynamic content, such as dates, times, and user-specific information.
 
-| **Reserved Variable**          | **Description**                                                                                | **Requirements**                                                               |
-|--------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| `{{CLIPBOARD}}`                | Inserts the content of the user's clipboard.                                                   | Requires device clipboard access.                                              |
-| `{{CURRENT_DATE}}`             | Inserts the current date in `YYYY-MM-DD` format.                                               | None                                                                           |
-| `{{CURRENT_DATETIME}}`         | Inserts the current date and time in `YYYY-MM-DD HH:MM:SS` format.                             | None                                                                           |
-| `{{CURRENT_TIME}}`             | Inserts the current time in `HH:MM:SS` format.                                                 | None                                                                           |
-| `{{CURRENT_TIMEZONE}}`         | Inserts the user's current timezone.                                                           | None                                                                           |
-| `{{CURRENT_WEEKDAY}}`          | Inserts the current day of the week (e.g., Monday, Tuesday).                                   | None                                                                           |
-| `{{USER_NAME}}`                | Inserts the user’s name.                                                                       | None                                                                           |
-| `{{USER_LANGUAGE}}`            | Inserts the user’s language preference.                                                        | None                                                                           |
-| `{{USER_LOCATION}}`            | Inserts the user’s geographic location (e.g., city, country).                                  | Requires HTTPS and must be enabled via `Settings > Interface`.                |
+| **Reserved Variable**          | **Description**                                                                                | **Requirements**                                                               | **Real-Life Example**                                                         |
+|--------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `{{CLIPBOARD}}`                | Inserts the content of the user's clipboard.                                                   | Requires device clipboard access.                                              | `You pasted: {{CLIPBOARD}}` displays `You pasted: test.`    |
+| `{{CURRENT_DATE}}`             | Inserts the current date in `YYYY-MM-DD` format.                                               | None                                                                           | `Today's date is {{CURRENT_DATE}}` displays `Today's date is 2024-11-25.`     |
+| `{{CURRENT_DATETIME}}`         | Inserts the current date and time in `YYYY-MM-DD HH:MM:SS` format.                             | None                                                                           | `Event logged at {{CURRENT_DATETIME}}` displays `Event logged at 2024-11-25 14:30:00.` |
+| `{{CURRENT_TIME}}`             | Inserts the current time in `HH:MM:SS` format.                                                 | None                                                                           | `Current time: {{CURRENT_TIME}}` displays `Current time: 14:30:00.`           |
+| `{{CURRENT_TIMEZONE}}`         | Inserts the user's current timezone.                                                           | None                                                                           | `Timezone: {{CURRENT_TIMEZONE}}` displays `Timezone: America/Vancouver.`                    |
+| `{{CURRENT_WEEKDAY}}`          | Inserts the current day of the week (e.g., Monday, Tuesday).                                   | None                                                                           | `Happy {{CURRENT_WEEKDAY}}!` displays `Happy Monday!`                         |
+| `{{USER_NAME}}`                | Inserts the user’s name.                                                                       | None                                                                           | `Welcome, {{USER_NAME}}!` displays `Welcome, Sam!`                        |
+| `{{USER_LANGUAGE}}`            | Inserts the user’s language preference.                                                        | None                                                                           | `Language set to {{USER_LANGUAGE}}` displays `Language set to en-US.`       |
+| `{{USER_LOCATION}}`            | Inserts the user’s geographic location (e.g., city, country).                                  | Requires HTTPS and must be enabled via `Settings > Interface`.                | `Weather for {{USER_LOCATION}}` displays `Weather for 48.252, -111.965 (lat, long)`     |
 
 ### What Can You Do With Reserved Variables?
 - **Context-Aware Prompts**: Generate location-specific responses using `{{USER_LOCATION}}`.
