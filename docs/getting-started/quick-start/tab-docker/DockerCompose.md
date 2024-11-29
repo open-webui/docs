@@ -8,9 +8,11 @@ Docker Compose requires an additional package, `docker-compose-v2`.
 
 **Warning:** Older Docker Compose tutorials may reference version 1 syntax, which uses commands like `docker-compose build`. Ensure you use version 2 syntax, which uses commands like `docker compose build` (note the space instead of a hyphen).
 
-## Example `docker-compose.yml`
+## Example `docker-compose.yml` 
 
-Here is an example configuration file for setting up Open WebUI with Docker Compose:
+Here are example configuration files for setting up Open WebUI with Docker Compose:
+
+### Ollama already running
 
 ```yaml
 version: '3'
@@ -23,6 +25,45 @@ services:
       - open-webui:/app/backend/data
 volumes:
   open-webui:
+```
+
+### Ollama not yet running, bundled together with Webui
+
+```yaml
+services:
+  ollama:
+    volumes:
+      - ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+
+  open-webui:
+    build:
+      context: .
+      args:
+        OLLAMA_BASE_URL: '/ollama'
+      dockerfile: Dockerfile
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - ${OPEN_WEBUI_PORT-3000}:8080
+    environment:
+      - 'OLLAMA_BASE_URL=http://ollama:11434'
+      - 'WEBUI_SECRET_KEY='
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+volumes:
+  ollama: {}
+  open-webui: {}
 ```
 
 ## Starting the Services
