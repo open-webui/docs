@@ -31,6 +31,9 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            # (Optional) Disable proxy buffering for better streaming response from models
+            proxy_buffering off;
         }
     }
     ```
