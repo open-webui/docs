@@ -349,7 +349,7 @@ requests initiated by third-party websites, but only over HTTPS.
 
 - Type: `str`
 - Description: Sets the `content-security-policy` HTTP header
-- Example: `default-src 'self' 'unsafe-inline'; img-src 'self' https://* data:; child-src 'none'; font-src 'self' data:;`
+- Example: `default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' https://* data:; child-src 'none'; font-src 'self' data:; worker-src 'self';`
 
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
