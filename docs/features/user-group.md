@@ -20,23 +20,25 @@ Admins can view the chat history of users, including those with pending access.
 ### Groups 
 
 The **Groups** section in the Admin Panel enables administrators to:
-- **Define Access Levels**: Adjust the default permission levels for normal users.
-- **Create New User Groups**: Introduce custom user levels with specific permissions.
+- **Define Access Levels**: Adjust the default permission levels for members with a **user** role.
+- **Create New User Groups**: Introduce custom user access levels with specific permissions.
 - **Assign Permissions**: Control access to workspace, tools, models, and other features for each group.
 - **Assign Users to Groups**: Assign users to specific groups.
 
 :::note
-To add new tools, users must have **workspace permission** and access to **Tools**. The same applies to managing **Knowledge** and **Prompts**.
+For example, to add new tools, users must have **workspace permission** and access to **Tools**. The same applies to managing **Knowledge** and **Prompts**. 
 :::
 :::info
-Users cannot view tools, prompts, or knowledge items added by others. However, admins have full visibility and can access all tools, prompts, and knowledge items, regardless of who added them.
+Admins have full visibility and can access all tools, prompts, and knowledge items, regardless of who added them, however, Users cannot view tools, prompts, or knowledge items added by others. 
 
 ![User Tools Permission Demo](/img/tools-user.png)
-#### Users can only view the tools they have added themselves.
+**Figure 1**: Users can only view the tools they have added themselves.
 ![Admin Tools Permission Demo](/img/tools-admin.png )
-#### Admins can view all the tools.
+**Figure 2**: Admins can view all the tools.
 :::
-
+:::info
+Members with any access level (Admin, User) have access to use the tools, knowledge, and prompts.
+:::
 ## Steps to Manage User Groups
 
 1. **Navigate to the Admin Panel**:
