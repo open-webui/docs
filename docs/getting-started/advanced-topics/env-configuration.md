@@ -1030,6 +1030,11 @@ account takeovers.
 - Default: `SSO`
 - Description: Sets the name for the OIDC provider.
 
+#### `OAUTH_LOGOUT_URL`
+
+- Type: `str`
+- Description: Sets the logout url for the OIDC provider, at the moment only works for keycloak i.e. when `OAUTH_PROVIDER_NAME` is set to `keycloak`.
+
 #### `ENABLE_OAUTH_ROLE_MANAGEMENT`
 
 - Type: `bool`
