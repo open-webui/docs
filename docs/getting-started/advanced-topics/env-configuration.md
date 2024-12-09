@@ -291,6 +291,10 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `8080`
 - Description: Sets the port to run Open WebUI from.
 
+:::info
+If installed via Python, you must instead pass `--port` as a command line argument.
+:::
+
 #### `RESET_CONFIG_ON_START`
 
 - Type: `bool`
