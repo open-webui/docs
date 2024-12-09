@@ -349,6 +349,12 @@ requests initiated by third-party websites, but only over HTTPS.
 - Default: `False`
 - Description: Sets the `Secure` attribute for session cookies if set to `True`.
 
+#### `CONTENT_SECURITY_POLICY`
+
+- Type: `str`
+- Description: Sets the `content-security-policy` HTTP header
+- Example: `default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' https://* data:; child-src 'none'; font-src 'self' data:; worker-src 'self';`
+
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
 - Type: `int`
