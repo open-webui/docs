@@ -16,8 +16,8 @@ import DockerUpdating from './tab-docker/DockerUpdating.md';
 import Helm from './tab-kubernetes/Helm.md';
 import Kustomize from './tab-kubernetes/Kustomize.md';
 import Venv from './tab-python/Venv.md';
-import CondaUnix from './tab-python/CondaUnix.md';
-import CondaWindows from './tab-python/CondaWindows.md';
+import Conda from './tab-python/Conda.md';
+import PythonUpdating from './tab-python/PythonUpdating.md';
 
 <TopBanners />
 
@@ -74,23 +74,17 @@ Choose your preferred installation method below:
     <Tabs>
       <TabItem value="conda" label="Conda">
         <div className='mt-5'>
-          <div className='text-lg font-semibold mb-1'>Choose Your Platform</div>
-          <Tabs groupId="platform-conda">
-            <TabItem value="unix-conda" label="Linux/macOS">
-              <CondaUnix />
-            </TabItem>
-
-            <TabItem value="windows-conda" label="Windows">
-              <CondaWindows />
-            </TabItem>
-          </Tabs>
+          <Conda />
         </div>
+        <PythonUpdating />
       </TabItem>
 
       <TabItem value="venv" label="Venv">
         <div className='mt-5'>
           <Venv />
         </div>
+        <PythonUpdating />
+
       </TabItem>
 
 
@@ -102,6 +96,8 @@ Choose your preferred installation method below:
           </p>
         </div>
       </TabItem>
+
+
     </Tabs>
   </TabItem>
 
