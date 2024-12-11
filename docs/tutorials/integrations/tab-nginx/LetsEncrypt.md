@@ -1,4 +1,3 @@
-
 ### Let's Encrypt
 
 Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for production environments.
@@ -25,6 +24,8 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
         listen 80;
         server_name your_domain_or_IP;
 
+        client_max_body_size 20M;  # Increase upload size limit to 20MB
+
         location / {
             proxy_pass http://host.docker.internal:3000;
             proxy_set_header Host $host;
@@ -35,6 +36,9 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
             # (Optional) Disable proxy buffering for better streaming response from models
             proxy_buffering off;
         }
+
+        # Include custom splash screen and favicon configuration if needed
+        # See the Customize Splash Screen and Favicon section
     }
     ```
 
@@ -104,8 +108,4 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
     ./enable_letsencrypt.sh
     ```
 
-#### Access the WebUI
-
-Access Open WebUI via HTTPS at:
-
-[https://your_domain_or_IP](https://your_domain_or_IP)
+---
