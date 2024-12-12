@@ -29,14 +29,6 @@ The **Groups** section in the Admin Panel enables administrators to:
 For example, to add new tools, users must have **workspace permission** and access to **Tools**. The same applies to managing **Knowledge** and **Prompts**. 
 :::
 :::info
-Admins have full visibility and can access all tools, prompts, and knowledge items, regardless of who added them, however, Users cannot view tools, prompts, or knowledge items added by others. 
-
-![User Tools Permission Demo](/img/tools-user.png)
-**Figure 1**: Users can only view the tools they have added themselves.
-![Admin Tools Permission Demo](/img/tools-admin.png )
-**Figure 2**: Admins can view all the tools.
-:::
-:::info
 Members with any access level (Admin, User) have access to use the tools, knowledge, and prompts.
 :::
 ## Steps to Manage User Groups
@@ -46,6 +38,8 @@ Members with any access level (Admin, User) have access to use the tools, knowle
 2. **Create or Modify Groups**:
    - To create a new group, click **Creat Group** and specify the group name and description.
    - To modify an existing group, select it from the list and adjust the settings.
+
+![admin managing user groups](/img/user-group-admin.gif)
 
 3. **Assign Permissions**:
    - Define the default permissions for users in the group by navigating to the **Groups** => **Edit User Group** => **Permissions**.
