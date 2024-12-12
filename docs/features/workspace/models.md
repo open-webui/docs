@@ -34,12 +34,14 @@ When editing a modelfile, you can customize the following settings:
 
 ### Model Discovery and Import/Export
 
-The `Models` section also includes features for discovering, importing, and exporting models:
+The `Models` section also includes features for importing and exporting models:
 
-* **Discover a Model**: Click this button to explore and download model presets from the Open WebUI community.
-* **Import Models**: Use this button to import models from a `.json` file or other sources.
-* **Export Models**: Use this button to export all your modelfiles in a single `.json` file.
+* **Import Models**: Use this button to import models from a .json file or other sources.
+* **Export Models**: Use this button to export all your modelfiles in a single .json file.
 
+To download models, navigate to the **Ollama Settings** in the Connections tab. 
+Alternatively, you can also download models directly by typing a command like `ollama run hf.co/[model creator]/[model name]` in the model selection dropdown.
+This action will create a button labeled "Pull [Model Name]" for downloading.
 
 ### Model Switching
 
