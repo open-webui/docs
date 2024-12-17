@@ -1,6 +1,6 @@
 ---
 sidebar_position: 10
-title: "🪝 Webhooks in Open WebUI"
+title: "🪝 Webhook for New Sign Ups"
 ---
 
 Overview
