@@ -37,6 +37,43 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
       }'
   ```
 
+### 💬 Chat Completions With Structured Output (ollama)
+- **Endpoint**: `POST /api/chat/completions`
+- **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
+- **Example**:
+  ```bash
+  curl -X POST http://localhost:3000/api/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3.1",
+    "messages": [{"role": "user", "content": "Tell me about Canada."}],
+    "stream": false,
+    "format": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "capital": {
+          "type": "string"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "capital", 
+        "languages"
+      ]
+    }
+  }'
+  ```
+
 ### 🧩 Retrieval Augmented Generation (RAG)
 
 The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
