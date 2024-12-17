@@ -330,6 +330,19 @@ If installed via Python, you must instead pass `--port` as a command line argume
 - Default: `False`
 - Description: Enables safe mode, which disables potentially unsafe features, deactivating all functions.
 
+
+#### `ENABLE_FORWARD_USER_INFO_HEADERS`
+
+- type: `bool`
+- Default: `False`
+- Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API.
+If enabled, the following headers are forwarded:
+    - `X-OpenWebUI-User-Name`
+    - `X-OpenWebUI-User-Id`
+    - `X-OpenWebUI-User-Email`
+    - `X-OpenWebUI-User-Role`
+
+
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
 - Type: `str` (enum: `lax`, `strict`, `none`)
@@ -545,6 +558,20 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Type: `bool`
 - Default: `False`
 - Description: Controls whether or not SSL is used for ChromaDB Server connections.
+
+
+#### `CHROMA_CLIENT_AUTH_PROVIDER`
+
+- Type: `str`
+- Description: Specifies auth provider for remote ChromaDB Server.
+- Example: `chromadb.auth.basic_authn.BasicAuthClientProvider`
+
+#### `CHROMA_CLIENT_AUTH_CREDENTIALS`
+
+- Type: `str`
+- Description: Specifies auth credentials for remote ChromaDB Server.
+- Example: `username:password`
+
 
 #### `MILVUS_URI`
 
