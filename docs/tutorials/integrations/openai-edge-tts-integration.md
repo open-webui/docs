@@ -7,16 +7,15 @@ title: "Edge TTS"
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
 # Integrating `openai-edge-tts` 🗣️ with Open WebUI
 
 ## What is `openai-edge-tts`, and how is it different from `openedai-speech`?
 
 Similar to [openedai-speech](https://github.com/matatonic/openedai-speech), [openai-edge-tts](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API endpoint that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where the OpenAI Speech endpoint is callable and the server endpoint URL can be configured.
 
-`openedai-speech` is a more comprehensive option that allows for entirely offline generation of speech with many modalities to choose from. 
+`openedai-speech` is a more comprehensive option that allows for entirely offline generation of speech with many modalities to choose from.
 
-`openai-edge-tts` is a simpler option that uses a Python package called `edge-tts` to generate the audio. 
+`openai-edge-tts` is a simpler option that uses a Python package called `edge-tts` to generate the audio.
 
 `edge-tts` ([repo](https://github.com/rany2/edge-tts)) leverages the Edge browser's free "Read Aloud" feature to emulate a request to Microsoft / Azure in order to receive very high quality text-to-speech for free.
 
@@ -54,7 +53,7 @@ See the [Usage](#usage) section for request examples.
 
 # Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
 
-:::tip 
+:::tip
 You can define the environment variables directly in the `docker run` command. See [Quick Config for Docker](#-quick-config-for-docker) below.
 :::
 
@@ -123,7 +122,6 @@ The server will start running at `http://localhost:5050`.
 #### 6. Test the API
 
 You can now interact with the API at `http://localhost:5050/v1/audio/speech` and other available endpoints. See the [Usage](#usage) section for request examples.
-    
 
 #### Usage
 
@@ -217,6 +215,6 @@ For more information on `openai-edge-tts`, you can visit the [GitHub repo](https
 
 For direct support, you can visit the [Voice AI & TTS Discord](https://discord.gg/GkFbBCBqJ6)
 
-
 ## 🎙️ Voice Samples
+
 [Play voice samples and see all available Edge TTS voices](https://tts.travisvn.com/)

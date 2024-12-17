@@ -8,6 +8,7 @@ In this tutorial, we will demonstrate how to configure multiple OpenAI (or compa
 ## Docker Run
 
 Here's an example `docker run` command similar to what you might use for Open WebUI:
+
 ```bash
 docker run -d -p 3000:8080 \
   -v open-webui:/app/backend/data \
@@ -17,6 +18,7 @@ docker run -d -p 3000:8080 \
   --restart always \
   ghcr.io/open-webui/open-webui:main
 ```
+
 This command sets the following environment variables:
 
 * `OPENAI_API_BASE_URLS`: A list of API base URLs separated by semicolons (;). In this example, we use OpenAI and Mistral.
@@ -27,6 +29,7 @@ You can adapt this command to your own needs, and add even more endpoint/key pai
 ## Docker Compose
 
 Alternatively, you can use a `docker-compose.yaml` file to define and run the Open WebUI container. Here's an abridged version of what that might look like:
+
 ```yaml
 services:
   open-webui:
@@ -34,7 +37,9 @@ services:
       - 'OPENAI_API_BASE_URLS=${OPENAI_API_BASE_URLS}'
       - 'OPENAI_API_KEYS=${OPENAI_API_KEYS}'
 ```
+
 You can edit the `${VARIABLES}` directly, or optionally define the values of these variables in an `.env` file, which should be placed in the same directory as the `docker-compose.yaml` file:
+
 ```ini
 OPENAI_API_BASE_URLS="https://api.openai.com/v1;https://api.mistral.ai/v1"
 OPENAI_API_KEYS="<OPENAI_API_KEY_1>;<OPENAI_API_KEY_2>"

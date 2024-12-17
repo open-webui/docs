@@ -37,9 +37,9 @@ Environment Variable Description
 ---------------------------------
 
 * `WEBUI_BANNERS`:
-	+ Type: list of dict
-	+ Default: `[]`
-	+ Description: List of banners to show to users.
+  * Type: list of dict
+  * Default: `[]`
+  * Description: List of banners to show to users.
 
 Banner Options
 ----------------

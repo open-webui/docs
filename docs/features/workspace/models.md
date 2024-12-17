@@ -1,10 +1,7 @@
 ---
-sidebar_position: 16
-title: "Models"
+sidebar_position: 0
+title: "🤖 Models"
 ---
-
-**Models**
-=======================
 
 The `Models` section of the `Workspace` within Open WebUI is a powerful tool that allows you to create and manage custom models tailored to specific purposes. This section serves as a central hub for all your modelfiles, providing a range of features to edit, clone, share, export, and hide your models.
 
@@ -39,7 +36,7 @@ The `Models` section also includes features for importing and exporting models:
 * **Import Models**: Use this button to import models from a .json file or other sources.
 * **Export Models**: Use this button to export all your modelfiles in a single .json file.
 
-To download models, navigate to the **Ollama Settings** in the Connections tab. 
+To download models, navigate to the **Ollama Settings** in the Connections tab.
 Alternatively, you can also download models directly by typing a command like `ollama run hf.co/[model creator]/[model name]` in the model selection dropdown.
 This action will create a button labeled "Pull [Model Name]" for downloading.
 
@@ -47,12 +44,12 @@ This action will create a button labeled "Pull [Model Name]" for downloading.
 
    **Example**: Switching between **Mistral**, **LLaVA**, and **GPT-3.5** in a Multi-Stage Task
 
-   - **Scenario**: A multi-stage conversation involves different task types, such as starting with a simple FAQ, interpreting an image, and then generating a creative response.
-   - **Reason for Switching**: The user can leverage each model's specific strengths for each stage:
-      - **Mistral** for general questions to reduce computation time and costs.
-      - **LLaVA** for visual tasks to gain insights from image-based data.
-      - **GPT-3.5** for generating more sophisticated and nuanced language output.
-   - **Process**: The user switches between models, depending on the task type, to maximize efficiency and response quality.
+* **Scenario**: A multi-stage conversation involves different task types, such as starting with a simple FAQ, interpreting an image, and then generating a creative response.
+* **Reason for Switching**: The user can leverage each model's specific strengths for each stage:
+  * **Mistral** for general questions to reduce computation time and costs.
+  * **LLaVA** for visual tasks to gain insights from image-based data.
+  * **GPT-3.5** for generating more sophisticated and nuanced language output.
+* **Process**: The user switches between models, depending on the task type, to maximize efficiency and response quality.
 
     **How To**:
     1. **Select the Model**: Within the chat interface, select the desired models from the model switcher dropdown. You can select up to two models simultaneously, and both responses will be generated. You can then navigate between them by using the back and forth arrows.

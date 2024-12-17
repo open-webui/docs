@@ -36,14 +36,14 @@ Environment Variable Descriptions
 ---------------------------------
 
 * `JWT_EXPIRES_IN`:
-	+ Type: int
-	+ Default: -1
-	+ Description: Sets the JWT expiration time in seconds. A value of -1 disables expiration.
+  * Type: int
+  * Default: -1
+  * Description: Sets the JWT expiration time in seconds. A value of -1 disables expiration.
 * `WEBUI_SECRET_KEY`:
-	+ Type: str
-	+ Default: t0p-s3cr3t
-	+ Docker Default: Randomly generated on first start
-	+ Description: Overrides the randomly generated string used for JSON Web Token.
+  * Type: str
+  * Default: t0p-s3cr3t
+  * Docker Default: Randomly generated on first start
+  * Description: Overrides the randomly generated string used for JSON Web Token.
 
 Valid Time Units
 -----------------

@@ -7,7 +7,6 @@ title: "Hosting UI and Models separately"
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
 # Hosting UI and Models separately
 
 :::note
@@ -139,7 +138,7 @@ When your computer restarts, the Ollama server will now be listening on the IP:P
 
 # Ollama Model Configuration
 
-## For the Ollama model configuration, use the following Apache VirtualHost setup:
+## For the Ollama model configuration, use the following Apache VirtualHost setup
 
 Navigate to the apache sites-available directory:
 
