@@ -23,6 +23,8 @@ Using self-signed certificates is suitable for development or internal use where
         ssl_certificate_key /etc/nginx/ssl/nginx.key;
         ssl_protocols TLSv1.2 TLSv1.3;
 
+        client_max_body_size 20M;  # Increase upload size limit to 20MB
+
         location / {
             proxy_pass http://host.docker.internal:3000;
             proxy_set_header Host $host;
@@ -33,6 +35,9 @@ Using self-signed certificates is suitable for development or internal use where
             # (Optional) Disable proxy buffering for better streaming response from models
             proxy_buffering off;
         }
+
+        # Include custom splash screen and favicon configuration if needed
+        # See the Customize Splash Screen and Favicon section
     }
     ```
 
@@ -67,11 +72,5 @@ Using self-signed certificates is suitable for development or internal use where
     ```bash
     docker compose up -d nginx
     ```
-
-#### Access the WebUI
-
-Access Open WebUI via HTTPS at:
-
-[https://your_domain_or_IP](https://your_domain_or_IP)
 
 ---
