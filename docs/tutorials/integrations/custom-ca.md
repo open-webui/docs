@@ -7,7 +7,6 @@ title: Setting up with custom CA store
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
 If you get an `[SSL: CERTIFICATE_VERIFY_FAILED]` error when trying to run OI, most likely the issue is that you are on a network which intercepts HTTPS traffic (e.g. a corporate network).
 
 To fix this, you will need to add the new cert into OI's truststore.
@@ -17,7 +16,7 @@ To fix this, you will need to add the new cert into OI's truststore.
 1. Mount the certificiate store from your host machine into the container by passing `--volume=/etc/ssl/certs/ca-certificiate.crt:/etc/ssl/certs/ca-certificiates.crt:ro` as a command-line option to `docker run`
 2. Force python to use the system truststore by setting `REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt` (see https://docs.docker.com/reference/cli/docker/container/run/#env)
 
-If the environment variable `REQUESTS_CA_BUNDLE` does not work try to set `SSL_CERT_FILE` (as per the [httpx documentation](https://www.python-httpx.org/environment_variables/#ssl_cert_file)) instead with the same value. 
+If the environment variable `REQUESTS_CA_BUNDLE` does not work try to set `SSL_CERT_FILE` (as per the [httpx documentation](https://www.python-httpx.org/environment_variables/#ssl_cert_file)) instead with the same value.
 
 Example `compose.yaml` from [@KizzyCode](https://github.com/open-webui/open-webui/issues/1398#issuecomment-2258463210):
 
@@ -45,13 +44,17 @@ The `ro` flag mounts the CA store as read-only and prevents accidental changes t
 
 You can also add the certificates in the build process by modifying the `Dockerfile`. This is useful if you want to make changes to the UI, for instance.
 Since the build happens in [multiple stages](https://docs.docker.com/build/building/multi-stage/), you have to add the cert into both
-1. Frontend (`build` stage): 
+
+1. Frontend (`build` stage):
+
 ```dockerfile
 COPY package.json package-lock.json <YourRootCert>.crt ./
 ENV NODE_EXTRA_CA_CERTS=/app/<YourRootCert>.crt
 RUN npm ci
 ```
+
 2. Backend (`base` stage):
+
 ```dockerfile
 COPY <CorporateSSL.crt> /usr/local/share/ca-certificates/
 RUN update-ca-certificates

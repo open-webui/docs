@@ -6,22 +6,27 @@ title: "🔗 API Endpoints"
 This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.
 
 ## Authentication
+
 To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication.
 
 ## Notable API Endpoints
 
 ### 📜 Retrieve All Models
+
 - **Endpoint**: `GET /api/models`
 - **Description**: Fetches all models created or added via Open WebUI.
 - **Example**:
+
   ```bash
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
 
 ### 💬 Chat Completions
+
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 - **Example**:
+
   ```bash
   curl -X POST http://localhost:3000/api/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
@@ -47,11 +52,14 @@ To utilize external data in RAG responses, you first need to upload the files. T
 
 - **Endpoint**: `POST /api/v1/files/`
 - **Curl Example**:
+
   ```bash
   curl -X POST -H "Authorization: Bearer YOUR_API_KEY" -H "Accept: application/json" \
   -F "file=@/path/to/your/file" http://localhost:3000/api/v1/files/
   ```
+
 - **Python Example**:
+
   ```python
   import requests
   
@@ -72,13 +80,16 @@ After uploading, you can group files into a knowledge collection or reference th
 
 - **Endpoint**: `POST /api/v1/knowledge/{id}/file/add`
 - **Curl Example**:
+
   ```bash
   curl -X POST http://localhost:3000/api/v1/knowledge/{knowledge_id}/file/add \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"file_id": "your-file-id-here"}'
   ```
+
 - **Python Example**:
+
   ```python
   import requests
 
@@ -103,6 +114,7 @@ This method is beneficial when you want to focus the chat model's response on th
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Curl Example**:
+
   ```bash
   curl -X POST http://localhost:3000/api/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
@@ -119,6 +131,7 @@ This method is beneficial when you want to focus the chat model's response on th
   ```
 
 - **Python Example**:
+
   ```python
   import requests
 
@@ -143,6 +156,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Curl Example**:
+
   ```bash
   curl -X POST http://localhost:3000/api/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
@@ -159,6 +173,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
   ```
 
 - **Python Example**:
+
   ```python
   import requests
   
@@ -180,7 +195,9 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
 These methods enable effective utilization of external knowledge via uploaded files and curated knowledge collections, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within collections, you can customize the integration based on your specific needs.
 
 ## Advantages of Using Open WebUI as a Unified LLM Provider
+
 Open WebUI offers a myriad of benefits, making it an essential tool for developers and businesses alike:
+
 - **Unified Interface**: Simplify your interactions with different LLMs through a single, integrated platform.
 - **Ease of Implementation**: Quick start integration with comprehensive documentation and community support.
 

@@ -7,7 +7,6 @@ title: "Local LLM Setup with IPEX-LLM on Intel GPU"
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
 :::note
 This guide is verified with Open WebUI setup through [Manual Installation](/getting-started/index.md).
 :::
@@ -39,5 +38,5 @@ If the connection is successful, you will see a message stating `Service Connect
 ![Open WebUI Ollama Setting Success](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings.png)
 
 :::tip
-If you want to use an Ollama server hosted at a different URL, simply update the **Ollama Base URL** to the new URL and press the **Refresh** button to re-confirm the connection to Ollama. 
+If you want to use an Ollama server hosted at a different URL, simply update the **Ollama Base URL** to the new URL and press the **Refresh** button to re-confirm the connection to Ollama.
 :::

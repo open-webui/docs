@@ -19,10 +19,12 @@ docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghc
 ```
 
 ### Important Flags
+
 - **Volume Mapping (`-v open-webui:/app/backend/data`)**: Ensures persistent storage of your data. This prevents data loss between container restarts.
 - **Port Mapping (`-p 3000:8080`)**: Exposes the WebUI on port 3000 of your local machine.
 
 ### Using GPU Support
+
 For Nvidia GPU support, add `--gpus all` to the `docker run` command:
 
 ```bash

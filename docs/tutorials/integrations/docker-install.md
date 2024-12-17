@@ -7,7 +7,6 @@ title: Installing Docker
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
 # Installing Docker
 
 ## For Windows and Mac Users
@@ -23,6 +22,7 @@ This tutorial is a community contribution and is not supported by the OpenWebUI 
 1. **Open your terminal.**
 
 2. **Set up Docker’s apt repository:**
+
    ```bash
    sudo apt-get update
    sudo apt-get install ca-certificates curl
@@ -40,12 +40,14 @@ If using an **Ubuntu derivative** (e.g., Linux Mint), use `UBUNTU_CODENAME` inst
 :::
 
 3. **Install Docker Engine:**
+
    ```bash
    sudo apt-get update
    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
    ```
 
 4. **Verify Docker Installation:**
+
    ```bash
    sudo docker run hello-world
    ```
