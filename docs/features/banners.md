@@ -1,6 +1,6 @@
 ---
 sidebar_position: 11
-title: "🔰 Customizable Banners in Open WebUI"
+title: "🔰 Customizable Banners"
 ---
 
 Overview
