@@ -1,6 +1,6 @@
 ---
 sidebar_position: 12
-title: "📎 Configuring JWT Expiration"
+title: "📎 JWT Expiration"
 ---
 
 Overview
