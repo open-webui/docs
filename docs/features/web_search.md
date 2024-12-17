@@ -1,9 +1,7 @@
 ---
 sidebar_position: 5
-title: "Web Search"
+title: "🌐 Web Search"
 ---
-
-# Web Search
 
 ## Overview
 
@@ -11,23 +9,88 @@ This guide provides instructions on how to set up web search capabilities in Ope
 
 ## SearXNG (Docker)
 
-SearXNG is a metasearch engine that aggregates results from multiple search engines.
+> "**SearXNG is a free internet metasearch engine which aggregates results from various search services and databases. Users are neither tracked nor profiled.**"
 
 ### 1. SearXNG Configuration
 
-Create a folder named `searxng` in the same directory as your compose files. This folder will contain your Searxng configuration files. Refer to the [Searxng documentation](https://docs.searxng.org/) for configuration instructions.
+If you want to modify the default configuration, follow these steps:
 
-#### Configuration Files:
+1. Create a new directory `searxng-docker` by cloning the searxng-docker repository. This folder will contain your SearXNG configuration files. Refer to the [SearXNG documentation](https://docs.searxng.org/) for configuration instructions.
+
+```bash
+git clone https://github.com/searxng/searxng-docker.git
+```
+
+1. Navigate to the `searxng-docker` repository:
+
+```bash
+cd searxng-docker
+```
+
+3. Remove the `localhost` restriction and define a less used port by modifying the `docker-compose.yaml` file:
+
+```bash
+sed -i "s/127.0.0.1:8080/1337/" docker-compose.yaml
+```
+
+4. Allow the container to create new config files:
+
+```bash
+sudo chmod a+rwx searxng-docker/
+```
+
+5. Create a non-restrictive `searxng-docker/limiter.toml` config file:
 
 <details>
-<summary>searxng/settings.yml</summary>
+<summary>searxng-docker/limiter.toml</summary>
+
+```bash
+cat > searxng-docker/limiter.toml << EOF
+[botdetection.ip_limit]
+# activate link_token method in the ip_limit method
+link_token = false
+
+[botdetection.ip_lists]
+block_ip = []
+pass_ip = []
+EOF
+```
+
+</details>
+
+6. Delete the default `searxng-docker/settings.yml` file, it will be regenerated on first launch:
+
+```bash
+rm searxng-docker/settings.yml
+```
+
+7. Bring up the container momentarily to generate a fresh settings.yml file:
+
+```bash
+docker compose up searxng-docker -d ; sleep 10 ; docker compose down searxng-docker
+```
+
+8. Add HTML and JSON formats to the `searxng-docker/settings.yml` file:
+
+```bash
+sed -i 's/formats: \[\"html\"\/]/formats: [\"html\", \"json\"]/' searxng-docker/settings.yml
+```
+
+#### Configuration Files
+
+#### searxng/settings.yml (Extract)
+
+The default `settings.yml` file contains many engine settings. Below is an extract of what the default `settings.yml` file might look like:
+
+<details>
+<summary>searxng-docker/settings.yml</summary>
 
 ```yaml
 # see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
 use_default_settings: true
 
 server:
-  secret_key: "f9e603d4191caab069b021fa0568391a33c8a837b470892c64461b5dd12464f4"
+  secret_key: "Generate a secret key and provide it here"
   limiter: false
   image_proxy: true
   port: 8080
@@ -43,23 +106,15 @@ search:
   formats:
     - html
     - json
+    # json is required
 ```
 
 </details>
 
-<details>
-<summary>searxng/limiter.toml</summary>
-
-```toml
-[botdetection.ip_limit]
-# activate link_token method in the ip_limit method
-link_token = true
-```
-
-</details>
+8. Your `searxng-docker/uwsgi.ini` file for SearXNG should look like:
 
 <details>
-<summary>searxng/uwsgi.ini</summary>
+<summary>searxng-docker/uwsgi.ini</summary>
 
 ```ini
 [uwsgi]
@@ -116,9 +171,13 @@ offload-threads = 4
 
 </details>
 
+Now, copy the modified `searxng-docker` folder to the same directory as your compose files.
+
+Alternatively, if you don't want to modify the default configuration, you can simply create an empty `searxng-docker` folder and follow the rest of the setup instructions.
+
 ### 2. Docker Compose Setup
 
-Add the following to a file named `docker-compose.searxng.yaml` alongside your existing `docker-compose.yaml`:
+Add the following to your `docker-compose.yaml` file:
 
 ```yaml
 services:
@@ -128,28 +187,34 @@ services:
       RAG_WEB_SEARCH_ENGINE: "searxng"
       RAG_WEB_SEARCH_RESULT_COUNT: 3
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
-      SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
+      SEARXNG_QUERY_URL: "http://searxng:1337/search?q=<query>"
 
   searxng:
     image: searxng/searxng:latest
     container_name: searxng
     ports:
-      - "8080:8080"
+      - "1337:8080"
     volumes:
       - ./searxng:/etc/searxng
-    restart: always
+    restart: unless-stopped
 ```
 
 Launch your updated stack with:
 
 ```bash
-docker compose -f docker-compose.yaml -f docker-compose.searxng.yaml up -d
+docker compose up -d
 ```
 
 Alternatively, you can run SearXNG directly using `docker run`:
 
 ```bash
-docker run -d --name searxng -p 8080:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
+docker run -d --name searxng -p 1337:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
+```
+
+Confirm connectivity from Open-WebUI container instance:
+
+```bash
+docker exec -it open-webui curl 'http://host.docker.internal:1337/search?q=this+is+a+test+query&format=json'
 ```
 
 ### 3. GUI Configuration
@@ -177,27 +242,6 @@ You will have to explicitly toggle this On/Off in a chat.
 
 This is enabled on a per session basis eg. reloading the page, changing to another chat will toggle off.
 
-## SearchApi API
-
-[SearchApi](https://searchapi.io) is a collection of real-time SERP APIs. Any existing or upcoming SERP engine that returns `organic_results` is supported. The default web search engine is `google`, but it can be changed to `bing`, `baidu`, `google_news`, `bing_news`, `google_scholar`, `google_patents`, and others.
-
-### Setup
-
-1. Go to [SearchApi](https://searchapi.io), and log on or create a new account.
-2. Go to `Dashboard` and copy the API key.
-3. With `API key`, open `Open WebUI Admin panel` and click `Settings` tab, and then click `Web Search`.
-4. Enable `Web search` and set `Web Search Engine` to `searchapi`.
-5. Fill `SearchApi API Key` with the `API key` that you copied in step 2 from [SearchApi](https://www.searchapi.io/) dashboard.
-6. [Optional] Enter the `SearchApi engine` name you want to query. Example, `google`, `bing`, `baidu`, `google_news`, `bing_news`, `google_videos`, `google_scholar` and `google_patents.` By default, it is set to `google`.
-7. Click `Save`.
-
-![Open WebUI Admin panel](/img/tutorial_searchapi_search.png)
-
-#### Note
-You have to enable `Web search` in the prompt field, using plus (`+`) button to search the web using [SearchApi](https://www.searchapi.io/) engines.
-
-![enable Web search](/img/enable_web_search.png)
-
 ## Google PSE API
 
 ### Setup
@@ -213,8 +257,8 @@ You have to enable `Web search` in the prompt field, using plus (`+`) button to 
 
 ![Open WebUI Admin panel](/img/tutorial_google_pse1.png)
 
-
 #### Note
+
 You have to enable `Web search` in the prompt field, using plus (`+`) button.
 Search the web ;-)
 
@@ -237,7 +281,7 @@ services:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
 ```
 
-## Mojeek Search API 
+## Mojeek Search API
 
 ### Setup
 
@@ -250,6 +294,7 @@ services:
 ### Docker Compose Setup
 
 Add the following to a file named `docker-compose.yaml`:
+
 ```yaml
 services:
   open-webui:
@@ -261,20 +306,72 @@ services:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
 ```
 
-## Serpstack API
+## SearchApi API
+
+[SearchApi](https://searchapi.io) is a collection of real-time SERP APIs. Any existing or upcoming SERP engine that returns `organic_results` is supported. The default web search engine is `google`, but it can be changed to `bing`, `baidu`, `google_news`, `bing_news`, `google_scholar`, `google_patents`, and others.
+
+### Setup
+
+1. Go to [SearchApi](https://searchapi.io), and log on or create a new account.
+2. Go to `Dashboard` and copy the API key.
+3. With `API key`, open `Open WebUI Admin panel` and click `Settings` tab, and then click `Web Search`.
+4. Enable `Web search` and set `Web Search Engine` to `searchapi`.
+5. Fill `SearchApi API Key` with the `API key` that you copied in step 2 from [SearchApi](https://www.searchapi.io/) dashboard.
+6. [Optional] Enter the `SearchApi engine` name you want to query. Example, `google`, `bing`, `baidu`, `google_news`, `bing_news`, `google_videos`, `google_scholar` and `google_patents.` By default, it is set to `google`.
+7. Click `Save`.
+
+![Open WebUI Admin panel](/img/tutorial_searchapi_search.png)
+
+#### Note
+
+You have to enable `Web search` in the prompt field, using plus (`+`) button to search the web using [SearchApi](https://www.searchapi.io/) engines.
+
+![enable Web search](/img/enable_web_search.png)
+
+## Kagi API
+
 Coming Soon
+
+### Setup
+
+## Serpstack API
+
+Coming Soon
+
+### Setup
 
 ## Serper API
+
 Coming Soon
+
+### Setup
 
 ## Serply API
+
 Coming Soon
+
+### Setup
 
 ## DuckDuckGo API
-Coming Soon
+
+### Setup
+
+No setup required! DuckDuckGo works out of the box in Open WebUI. Note that there is a possibility of your searches being rate limited.
 
 ## Tavily API
+
 Coming Soon
 
+### Setup
+
 ## Jina API
+
 Coming Soon
+
+### Setup
+
+## Bing API
+
+Coming Soon
+
+### Setup
