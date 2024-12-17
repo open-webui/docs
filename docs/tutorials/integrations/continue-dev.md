@@ -7,8 +7,6 @@ title: "Continue.dev VSCode Extension with Open WebUI"
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
-
 # Integrating Continue.dev VSCode Extension with Open WebUI
 
 ### Download Extension
@@ -20,7 +18,6 @@ Once installed you should now have a 'continue' tab in the side bar.
 Open this. Down at the bottom right you should see a settings icon (looks like a cog).
 
 Once you click on the settings icon a `config.json` should open up in the editor.
-
 
 Here you'll be able to configure continue to use Open WebUI.
 
@@ -35,15 +32,16 @@ We can still setup Continue to use the openai provider which will allow us to us
 ---
 
 ## Config
+
 In `config.json` all you will need to do is add/change the following options.
 
 ### Change provider to openai
+
 ```json
 "provider": "openai"
 ```
 
-
-### Add or update apiBase.
+### Add or update apiBase
 
 Set this to your Open Web UI domain + /ollama/v1 on the end.
 
@@ -51,7 +49,7 @@ Set this to your Open Web UI domain + /ollama/v1 on the end.
 "apiBase": "http://localhost:3000/ollama/v1" #If you followed Getting Started Docker
 ```
 
-### Add apiKey 
+### Add apiKey
 
 ```json
 "apiKey": "sk-79970662256d425eb274fc4563d4525b" # Replace with your API key
@@ -60,7 +58,6 @@ Set this to your Open Web UI domain + /ollama/v1 on the end.
 You can find and generate your api key from Open WebUI -> Settings -> Account -> API Keys
 
 You'll want to copy the "API Key" (this starts with sk-)
-
 
 ## Example Config
 
@@ -97,8 +94,7 @@ Make sure you pull the model into your ollama instance/s beforehand.
 }
 ```
 
-
-Save your `config.json` and thats it! 
+Save your `config.json` and thats it!
 
 You should now see your model in the Continue tab model selection.
 

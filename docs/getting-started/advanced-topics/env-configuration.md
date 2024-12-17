@@ -6,8 +6,8 @@ title: "🌍 Environment Variable Configuration"
 
 ## Overview
 
-Open WebUI provides a range of environment variables that allow you to customize and configure 
-various aspects of the application. This page serves as a comprehensive reference for all available 
+Open WebUI provides a range of environment variables that allow you to customize and configure
+various aspects of the application. This page serves as a comprehensive reference for all available
 environment variables, including their types, default values, and descriptions.
 
 :::info
@@ -16,9 +16,9 @@ Last updated: v0.3.20
 
 ## App/Backend
 
-The following environment variables are used by `backend/config.py` to provide Open WebUI startup 
-configuration. Please note that some variables may have different default values depending on 
-whether you're running Open WebUI directly or via Docker. For more information on logging 
+The following environment variables are used by `backend/config.py` to provide Open WebUI startup
+configuration. Please note that some variables may have different default values depending on
+whether you're running Open WebUI directly or via Docker. For more information on logging
 environment variables, see our [logging documentation](./logging#appbackend).
 
 ### General
@@ -41,9 +41,9 @@ environment variables, see our [logging documentation](./logging#appbackend).
 - Description: This setting enables or disables authentication.
 
 :::danger
-If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's 
-important to note that turning off authentication is only possible for fresh installations without 
-any existing users. If there are already users registered, you cannot disable authentication 
+If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
+important to note that turning off authentication is only possible for fresh installations without
+any existing users. If there are already users registered, you cannot disable authentication
 directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
 :::
 
@@ -67,7 +67,7 @@ directly. Ensure that no users are present in the database, if you intend to tur
 
 :::info
 This is the maximum amount of time the client will wait for a response before timing out.
-If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and 
+If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
 allowing the client to wait indefinitely.
 :::
 
@@ -107,7 +107,7 @@ allowing the client to wait indefinitely.
 - Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
 
 :::danger
-This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup) 
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup)
 is also being used and set to `True`. Failure to do so will result in the inability to login.
 :::
 
@@ -215,7 +215,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for the username of anyone registering with the 
+- Description: Defines the trusted request header for the username of anyone registering with the
 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/sso).
 
 #### `WEBUI_SECRET_KEY`
@@ -235,7 +235,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `False`
-- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration 
+- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration
 for local Whisper and embeddings.
 
 #### `DATABASE_URL`
@@ -253,7 +253,7 @@ Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/c
 
 - Type: `int`
 - Default: `0`
-- Description: Specifies the size of the database pool. A value of `0` disables pooling. 
+- Description: Specifies the size of the database pool. A value of `0` disables pooling.
 
 #### `DATABASE_POOL_MAX_OVERFLOW`
 
@@ -347,11 +347,11 @@ If enabled, the following headers are forwarded:
 
 - Type: `str` (enum: `lax`, `strict`, `none`)
 - Options:
-  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with 
+  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with
 requests initiated by third-party websites.
-  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent 
+  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent
 with requests initiated by third-party websites.
-  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with 
+  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with
 requests initiated by third-party websites, but only over HTTPS.
 - Default: `lax`
 - Description: Sets the `SameSite` attribute for session cookies.
@@ -371,7 +371,7 @@ requests initiated by third-party websites, but only over HTTPS.
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
 - Type: `int`
-- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things 
+- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things
 such as connections to Ollama and OpenAI endpoints.
 
 ### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
@@ -405,7 +405,7 @@ such as connections to Ollama and OpenAI endpoints.
 #### `OLLAMA_BASE_URLS`
 
 - Type: `str`
-- Description: Configures load-balanced Ollama backend hosts, separated by `;`. See 
+- Description: Configures load-balanced Ollama backend hosts, separated by `;`. See
 [`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
 
 #### `USE_OLLAMA_DOCKER`
@@ -455,13 +455,13 @@ such as connections to Ollama and OpenAI endpoints.
 #### `TASK_MODEL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation 
+- Description: The default model to use for tasks such as title and web search query generation
 when using Ollama models.
 
 #### `TASK_MODEL_EXTERNAL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation 
+- Description: The default model to use for tasks such as title and web search query generation
 when using OpenAI-compatible endpoints.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
@@ -595,7 +595,7 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using 
+- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using
 `sentence_transformers` models.
 
 #### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
@@ -680,7 +680,7 @@ You are given a user query, some textual context and rules, all inside xml tags.
 
 - Type: `bool`
 - Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own 
+- Description: Determines whether or not to allow custom models defined on the Hub in their own
 modeling files for reranking.
 
 #### `RAG_OPENAI_API_BASE_URL`
@@ -705,7 +705,7 @@ modeling files for reranking.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request 
+- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request
 Forgery attacks against local network resources.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
@@ -785,7 +785,7 @@ Forgery attacks against local network resources.
 #### `SEARXNG_QUERY_URL`
 
 - Type: `str`
-- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with 
+- Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with
 the search query. Example: `http://searxng.local/search?q=<query>`
 
 #### `GOOGLE_PSE_API_KEY`
@@ -987,7 +987,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `${OPENAI_API_BASE_URL}`
 - Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
 
-
 #### `IMAGES_OPENAI_API_KEY`
 
 - Type: `str`
@@ -1023,8 +1022,8 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `bool`
 - Default: `False`
-- Description: If enabled, merges OAuth accounts with existing accounts using the same email 
-address. This is considered unsafe as providers may not verify email addresses and can lead to 
+- Description: If enabled, merges OAuth accounts with existing accounts using the same email
+address. This is considered unsafe as providers may not verify email addresses and can lead to
 account takeovers.
 
 #### `OAUTH_USERNAME_CLAIM`

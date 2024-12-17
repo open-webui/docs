@@ -7,7 +7,6 @@ title: "TTS - OpenedAI-Speech using Docker"
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-
 **Integrating `openedai-speech` into Open WebUI using Docker**
 ==============================================================
 
@@ -48,6 +47,7 @@ This will download the `openedai-speech` repository to your local machine, which
 ------------------------------------------------------------------------------
 
 In the `openedai-speech` repository folder, create a new file named `speech.env` with the following contents:
+
 ```yaml
 TTS_HOME=voices
 HF_HOME=voices
@@ -74,14 +74,19 @@ You can use any of the following Docker Compose files:
 Before running the Docker Compose file, you need to build the Docker image:
 
 * **Nvidia GPU (CUDA support)**:
+
 ```bash
 docker build -t ghcr.io/matatonic/openedai-speech .
 ```
+
 * **AMD GPU (ROCm support)**:
+
 ```bash
 docker build -f Dockerfile --build-arg USE_ROCM=1 -t ghcr.io/matatonic/openedai-speech-rocm .
 ```
+
 * **CPU only, No GPU (Piper only)**:
+
 ```bash
 docker build -f Dockerfile.min -t ghcr.io/matatonic/openedai-speech-min .
 ```
@@ -90,21 +95,29 @@ docker build -f Dockerfile.min -t ghcr.io/matatonic/openedai-speech-min .
 ----------------------------------------------------------
 
 * **Nvidia GPU (CUDA support)**: Run the following command to start the `openedai-speech` service in detached mode:
+
 ```bash
 docker compose up -d
 ```
+
 * **AMD GPU (ROCm support)**: Run the following command to start the `openedai-speech` service in detached mode:
+
 ```bash
 docker compose -f docker-compose.rocm.yml up -d
 ```
+
 * **ARM64 (Apple M-series, Raspberry Pi)**: XTTS only has CPU support here and will be very slow. You can use the Nvidia image for XTTS with CPU (slow), or use the Piper only image (recommended):
+
 ```bash
 docker compose -f docker-compose.min.yml up -d
 ```
+
 * **CPU only, No GPU (Piper only)**: For a minimal docker image with only Piper support (< 1GB vs. 8GB):
+
 ```bash
 docker compose -f docker-compose.min.yml up -d
 ```
+
 This will start the `openedai-speech` service in detached mode.
 
 **Option 2: Using Docker Run Commands**
@@ -113,17 +126,23 @@ This will start the `openedai-speech` service in detached mode.
 You can also use the following Docker run commands to start the `openedai-speech` service in detached mode:
 
 * **Nvidia GPU (CUDA)**: Run the following command to build and start the `openedai-speech` service:
+
 ```bash
 docker build -t ghcr.io/matatonic/openedai-speech .
 docker run -d --gpus=all -p 8000:8000 -v voices:/app/voices -v config:/app/config --name openedai-speech ghcr.io/matatonic/openedai-speech
 ```
+
 * **ROCm (AMD GPU)**: Run the following command to build and start the `openedai-speech` service:
+
 > To enable ROCm support, uncomment the `#USE_ROCM=1` line in the `speech.env` file.
+
 ```bash
 docker build -f Dockerfile --build-arg USE_ROCM=1 -t ghcr.io/matatonic/openedai-speech-rocm .
 docker run -d --privileged --init --name openedai-speech -p 8000:8000 -v voices:/app/voices -v config:/app/config ghcr.io/matatonic/openedai-speech-rocm
 ```
+
 * **CPU only, No GPU (Piper only)**: Run the following command to build and start the `openedai-speech` service:
+
 ```bash
 docker build -f Dockerfile.min -t ghcr.io/matatonic/openedai-speech-min .
 docker run -d -p 8000:8000 -v voices:/app/voices -v config:/app/config --name openedai-speech ghcr.io/matatonic/openedai-speech-min

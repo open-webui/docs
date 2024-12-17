@@ -1,5 +1,4 @@
 
-
 # Kustomize Setup for Kubernetes
 
 Kustomize allows you to customize Kubernetes YAML configurations.

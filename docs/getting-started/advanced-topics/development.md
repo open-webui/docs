@@ -28,6 +28,7 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
 ### 🐧 Local Development Setup
 
 1. **Clone the Repository**:
+
    ```bash
    git clone https://github.com/open-webui/open-webui.git
    cd open-webui
@@ -35,37 +36,51 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
 
 2. **Frontend Setup**:
    - Create a `.env` file:
+
      ```bash
      cp -RPp .env.example .env
      ```
+
    - Install dependencies:
+
      ```bash
      npm install
      ```
+
    - Start the frontend server:
+
      ```bash
      npm run dev
      ```
+
      🌐 Available at: [http://localhost:5173](http://localhost:5173).
 
 3. **Backend Setup**:
    - Navigate to the backend:
+
      ```bash
      cd backend
      ```
+
    - Use **Conda** for environment setup:
+
      ```bash
      conda create --name open-webui python=3.11
      conda activate open-webui
      ```
+
    - Install dependencies:
+
      ```bash
      pip install -r requirements.txt -U
      ```
+
    - Start the backend:
+
      ```bash
      sh dev.sh
      ```
+
      📄 API docs available at: [http://localhost:8080/docs](http://localhost:8080/docs).
 
 </TabItem>
@@ -75,6 +90,7 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
 ### 🐳 Docker-Based Development Setup
 
 1. **Create the Docker Compose File**:
+
    ```yaml
    name: open-webui-dev
 
@@ -115,11 +131,13 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
    ```
 
 2. **Start the Development Containers**:
+
    ```bash
    docker compose -f compose-dev.yaml up --watch
    ```
 
 3. **Stop the Containers**:
+
    ```bash
    docker compose -f compose-dev.yaml down
    ```
@@ -132,22 +150,27 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
 If you prefer using **Conda** for isolation:
 
 1. **Create and Activate the Environment**:
+
    ```bash
    conda create --name open-webui-dev python=3.11
    conda activate open-webui-dev
    ```
 
 2. **Install Dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. **Run the Servers**:
    - Frontend:
+
      ```bash
      npm run dev
      ```
+
    - Backend:
+
      ```bash
      sh dev.sh
      ```
@@ -163,6 +186,7 @@ If you prefer using **Conda** for isolation:
 If you encounter memory-related errors during the build, increase the **Node.js heap size**:
 
 1. **Modify Dockerfile**:
+
    ```dockerfile
    ENV NODE_OPTIONS=--max-old-space-size=4096
    ```
@@ -189,11 +213,13 @@ If you encounter memory-related errors during the build, increase the **Node.js 
 
 1. **Commit Changes Regularly** to track progress.
 2. **Sync with the Main Branch** to avoid conflicts:
+
    ```bash
    git pull origin main
    ```
 
 3. **Run Tests Before Pushing**:
+
    ```bash
    npm run test
    ```
