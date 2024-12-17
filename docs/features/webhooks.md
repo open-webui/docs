@@ -57,25 +57,4 @@ Troubleshooting
 * The webhook server could be temporarily unavailable or experiencing high latency.
 * If provided through the webhook service, verify if the Webhook API key is invalid, expired, or revoked.
 
-FAQ
----
-
-* Q: Is it possible to set a Discord webhook URL at "webhook URL"?
-
-    A: Yes, you can set a Discord webhook URL at the "webhook URL" field in the Open WebUI admin settings.
-
-* Q: What is the purpose of the webhook feature in Open WebUI?
-
-    A: The webhook feature allows you to receive notifications automatically whenever new users sign up to your Open WebUI instance. It is intended to provide a way to setup telemetry and integrate with external services.
-
-* Q: Can I use the webhook feature to receive notifications for other events besides new user sign-ups?
-
-    A: Currently, the webhook feature in Open WebUI is only used for new user account notifications. However, we plan to add more event types in the future.
-
-Limitations
-------------
-
-* Currently, webhooks in Open WebUI are only used for new user account notifications.
-* Additional webhook events and payload formats may be added in future versions of Open WebUI.
-
 Note: The webhook feature in Open WebUI is still evolving, and we plan to add more features and event types in the future.
