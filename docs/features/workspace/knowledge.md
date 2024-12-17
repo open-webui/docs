@@ -1,9 +1,7 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 title: "🧠 Knowledge"
 ---
-
-# 🧠 Knowledge
 
  Knowledge part of Open WebUI is like a memory bank that makes your interactions even more powerful and context-aware. Let's break down what "Knowledge" really means in Open WebUI, how it works, and why it’s incredibly helpful for enhancing your experience.
 
@@ -24,15 +22,17 @@ The **Knowledge section** is a storage area within Open WebUI where you can save
 Imagine you're working on a long-term project and want the system to remember certain parameters, settings, or even key notes about the project without having to remind it every time. Or perhaps, you want it to remember specific personal preferences for chats and responses. The Knowledge section is where you can store this kind of **persistent information** so that Open WebUI can reference it in future conversations, creating a more **coherent, personalized experience**.
 
 Some examples of what you might store in Knowledge:
+
 - Important project parameters or specific data points you’ll frequently reference.
 - Custom commands, workflows, or settings you want to apply.
 - Personal preferences, guidelines, or rules that Open WebUI can follow in every chat.
 
 ### How to Use Knowledge in Chats
 
-Accessing stored Knowledge in your chats is easy! By simply referencing what’s saved(using '#' before the name), Open WebUI can pull in data or follow specific guidelines that you’ve set up in the Knowledge section. 
+Accessing stored Knowledge in your chats is easy! By simply referencing what’s saved(using '#' before the name), Open WebUI can pull in data or follow specific guidelines that you’ve set up in the Knowledge section.
 
 For example:
+
 - When discussing a project, Open WebUI can automatically recall your specified project details.
 - It can apply custom preferences to responses, like formality levels or preferred phrasing.
 
@@ -51,6 +51,5 @@ Admins can add knowledge to the workspace, which users can access and use; howev
 - The Knowledge section is like Open WebUI's "memory bank," where you can store data that you want it to remember and use.
 - **Use Knowledge to keep the system aware** of important details, ensuring a personalized chat experience.
 - You can **directly reference Knowledge in chats** to bring in stored data whenever you need it using '#' + name of the knowlege.
-
 
 🌟 Remember, there’s always more to discover, so dive in and make Open WebUI truly your own!

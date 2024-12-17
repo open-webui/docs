@@ -24,7 +24,7 @@ If you are managing multiple projects, you can create separate folders for each 
 
 Tags provide an additional layer of organization by allowing you to label conversations with keywords or phrases.
 
-- **Adding Tags to Conversations**: Tags can be applied to conversations based on their content or purpose. Tags are flexible and can be added or removed as needed. 
+- **Adding Tags to Conversations**: Tags can be applied to conversations based on their content or purpose. Tags are flexible and can be added or removed as needed.
 ![Tag Demo](/img/tag-demo.gif)
 - **Using Tags for Searching**: Tags make it easy to locate specific conversations by using the search feature. You can filter conversations by tags to quickly find those related to specific topics.
 

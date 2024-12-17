@@ -18,6 +18,7 @@ Set the following environment variables (or the respective UI settings for an ex
 Much of the memory consumption is due to loaded ML models. Even if you are using an external language model (OpenAI or unbundled ollama), many models may be loaded for additional purposes.
 
 As of v0.3.10 this includes:
+
 * Speech-to-text (whisper by default)
 * RAG embedding engine (defaults to local SentenceTransformers model)
 * Image generation engine (disabled by default)

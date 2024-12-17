@@ -20,6 +20,7 @@ In this tutorial, you will learn how to use **Retrieval-Augmented Generation (RA
 Retrieval-Augmented Generation (RAG) combines **LLMs** with **retrieved knowledge** from external sources. The system retrieves relevant data from uploaded documents or knowledge bases, enhancing the quality and accuracy of responses.
 
 This tutorial demonstrates how to:
+
 - Upload the latest OpenWebUI Documentation as a knowledge base.
 - Connect it to a custom model.
 - Query the knowledge base for enhanced assistance.
@@ -102,4 +103,3 @@ Follow these steps to set up RAG with **OpenWebUI Documentation**:
 ---
 
 With this setup, you can effectively use the **OpenWebUI Documentation** to assist users by retrieving relevant information for their queries. Enjoy building and querying your custom knowledge-enhanced models!
-

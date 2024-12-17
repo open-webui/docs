@@ -11,6 +11,7 @@ This tutorial is a community contribution and is not supported by the OpenWebUI 
 Ensuring secure communication between your users and the Open WebUI is paramount. HTTPS (HyperText Transfer Protocol Secure) encrypts the data transmitted, protecting it from eavesdroppers and tampering. By configuring Nginx as a reverse proxy, you can seamlessly add HTTPS to your Open WebUI deployment, enhancing both security and trustworthiness.
 
 This guide provides two methods to set up HTTPS:
+
 - **Self-Signed Certificates**: Ideal for development and internal use.
 - **Let's Encrypt**: Perfect for production environments requiring trusted SSL certificates.
 
@@ -41,4 +42,3 @@ After setting up HTTPS, access Open WebUI securely at:
 Ensure that your DNS records are correctly configured if you're using a domain name. For production environments, it's recommended to use Let's Encrypt for trusted SSL certificates.
 
 ---
-

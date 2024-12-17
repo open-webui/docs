@@ -3,8 +3,6 @@ sidebar_position: 8
 title: "Model Whitelisting"
 ---
 
-# Model Whitelisting
-
 Open WebUI allows you to filter specific models for use in your instance. This feature is especially useful for administrators who want to control which models are available to users. Filtering can be done through the WebUI or by adding environment variables to the backend.
 
 ## Filtering via WebUI

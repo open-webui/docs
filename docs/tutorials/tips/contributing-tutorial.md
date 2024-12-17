@@ -29,7 +29,6 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
    - Under **Source**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
    - Click **Save** to enable GitHub Pages.
 
-
 4. **Configure GitHub Environment Variables**
 
    - In your forked repository, go to **Settings** > **Secrets and variables** > **Actions** > **Variables**.
@@ -42,7 +41,9 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 If you need to adjust deployment settings to fit your custom setup, here’s what to do:
 
 a. **Update `.github/workflows/gh-pages.yml`**
-   - Add environment variables for `BASE_URL` and `SITE_URL` to the build step if necessary:
+
+- Add environment variables for `BASE_URL` and `SITE_URL` to the build step if necessary:
+
      ```yaml
        - name: Build
          env:
@@ -52,7 +53,9 @@ a. **Update `.github/workflows/gh-pages.yml`**
      ```
 
 b. **Modify `docusaurus.config.ts` to Use Environment Variables**
-   - Update `docusaurus.config.ts` to use these environment variables, with default values for local or direct deployment:
+
+- Update `docusaurus.config.ts` to use these environment variables, with default values for local or direct deployment:
+
      ```typescript
      const config: Config = {
        title: "Open WebUI",
@@ -63,7 +66,8 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
        ...
      };
      ```
-   - This setup ensures consistent deployment behavior for forks and custom setups.
+
+- This setup ensures consistent deployment behavior for forks and custom setups.
 
 5. **Run the `gh-pages` GitHub Workflow**
 
@@ -91,6 +95,7 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
 ## Important
 
 Community-contributed tutorials must include the the following:
+
 ```
 :::warning
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
