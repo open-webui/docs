@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "Contributing Tutorials"
+title: "🤝 Contributing Tutorials"
 ---
 
 :::warning

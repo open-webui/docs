@@ -1,9 +1,9 @@
 ---
 sidebar_position: 10
-title: "Reduce RAM usage"
+title: "✂️ Reduce RAM Usage"
 ---
 
-# Reduce RAM usage
+# Reduce RAM Usage
 
 If you are deploying this image in a RAM-constrained environment, there are a few things you can do to slim down the image.
 
