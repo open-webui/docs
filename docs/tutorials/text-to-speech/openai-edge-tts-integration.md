@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🗨️ Openai-edge-tts using Docker"
+title: "🗨️ Openai-edge-tts Using Docker"
 ---
 
 :::warning
