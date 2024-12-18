@@ -1,6 +1,6 @@
 ---
-sidebar_position: 3
-title: "OpenAI Connections"
+sidebar_position: 9
+title: "🖇 OpenAI Connections"
 ---
 
 In this tutorial, we will demonstrate how to configure multiple OpenAI (or compatible) API endpoints using environment variables. This setup allows you to easily switch between different API providers or use multiple providers simultaneously, while keeping your configuration between container updates, rebuilds or redeployments.

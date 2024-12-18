@@ -1,4 +1,4 @@
-## Updating
+# Updating with Python
 
 To update your locally installed **Open-WebUI** package to the latest version using `pip`, follow these simple steps:
 

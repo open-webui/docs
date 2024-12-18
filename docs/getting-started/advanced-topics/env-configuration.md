@@ -19,7 +19,7 @@ Last updated: v0.3.20
 The following environment variables are used by `backend/config.py` to provide Open WebUI startup
 configuration. Please note that some variables may have different default values depending on
 whether you're running Open WebUI directly or via Docker. For more information on logging
-environment variables, see our [logging documentation](./logging#appbackend).
+environment variables, see our [logging documentation](https://docs.openwebui.com/getting-started/advanced-topics/logging)).
 
 ### General
 
@@ -107,7 +107,7 @@ allowing the client to wait indefinitely.
 - Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
 
 :::danger
-This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration#enable_oauth_signup)
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/advanced-topics/env-configuration/#enable_oauth_signup)
 is also being used and set to `True`. Failure to do so will result in the inability to login.
 :::
 
@@ -330,18 +330,16 @@ If installed via Python, you must instead pass `--port` as a command line argume
 - Default: `False`
 - Description: Enables safe mode, which disables potentially unsafe features, deactivating all functions.
 
-
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
 
 - type: `bool`
 - Default: `False`
 - Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API.
 If enabled, the following headers are forwarded:
-    - `X-OpenWebUI-User-Name`
-    - `X-OpenWebUI-User-Id`
-    - `X-OpenWebUI-User-Email`
-    - `X-OpenWebUI-User-Role`
-
+  - `X-OpenWebUI-User-Name`
+  - `X-OpenWebUI-User-Id`
+  - `X-OpenWebUI-User-Email`
+  - `X-OpenWebUI-User-Role`
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
@@ -374,7 +372,7 @@ requests initiated by third-party websites, but only over HTTPS.
 - Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things
 such as connections to Ollama and OpenAI endpoints.
 
-### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
+#### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
 
 - Type: `int`
 - Description: Sets the timeout in seconds for fetching the OpenAI model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
@@ -559,7 +557,6 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Default: `False`
 - Description: Controls whether or not SSL is used for ChromaDB Server connections.
 
-
 #### `CHROMA_CLIENT_AUTH_PROVIDER`
 
 - Type: `str`
@@ -571,7 +568,6 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Type: `str`
 - Description: Specifies auth credentials for remote ChromaDB Server.
 - Example: `username:password`
-
 
 #### `MILVUS_URI`
 

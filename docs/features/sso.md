@@ -1,6 +1,6 @@
 ---
-sidebar_position: 9
-title: "SSO: Federated Authentication Support"
+sidebar_position: 11
+title: "🔒 SSO: Federated Authentication Support"
 ---
 
 # Federated Authentication Support
