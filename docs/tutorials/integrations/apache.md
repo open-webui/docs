@@ -7,16 +7,12 @@ title: "Hosting UI and Models separately"
 This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-# Hosting UI and Models separately
-
 :::note
 If you plan to expose this to the wide area network, consider implementing security like a [network firewall](https://github.com/chr0mag/geoipsets), [web application firewall](https://github.com/owasp-modsecurity/ModSecurity), and [threat intelligence](https://github.com/crowdsecurity/crowdsec).
 Additionally, it's strongly recommended to enable HSTS possibly like `Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"` within your **HTTPS** configuration and a redirect of some kind to your **HTTPS URL** within your **HTTP** configuration. For free SSL certification, [Let's Encrypt](https://letsencrypt.org/) is a good option coupled with [Certbot](https://github.com/certbot/certbot) management.
 :::
 
 Sometimes, its beneficial to host Ollama, separate from the UI, but retain the RAG and RBAC support features shared across users:
-
-# Open WebUI Configuration
 
 ## UI Configuration
 

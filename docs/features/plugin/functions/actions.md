@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: "Actions"
+title: "🎬 Actions"
 ---
 
 Action functions allow you to write custom buttons to the message toolbar for end users to interact
