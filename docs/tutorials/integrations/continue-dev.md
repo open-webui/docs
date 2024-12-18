@@ -1,6 +1,6 @@
 ---
 sidebar_position: 13
-title: "Continue.dev VSCode Extension with Open WebUI"
+title: "⚛️ Continue.dev VSCode Extension with Open WebUI"
 ---
 
 :::warning
