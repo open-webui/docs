@@ -1,7 +1,4 @@
----
-sidebar_position: 200
-title: "Let's Encrypt"
----
+### Let's Encrypt
 
 Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for production environments.
 
