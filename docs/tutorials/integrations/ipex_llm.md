@@ -1,6 +1,6 @@
 ---
 sidebar_position: 11
-title: "Local LLM Setup with IPEX-LLM on Intel GPU"
+title: "🖥️ Local LLM Setup with IPEX-LLM on Intel GPU"
 ---
 
 :::warning
