@@ -1,6 +1,6 @@
 ---
-sidebar_position: 4
-title: "Retrieval Augmented Generation (RAG)"
+sidebar_position: 8
+title: "🔎 Retrieval Augmented Generation (RAG)"
 ---
 
 Retrieval Augmented Generation (RAG) is a a cutting-edge technology that enhances the conversational capabilities of chatbots by incorporating context from diverse sources. It works by retrieving relevant information from a wide range of sources such as local and remote documents, web content, and even multimedia sources like YouTube videos. The retrieved text is then combined with a predefined RAG template and prefixed to the user's prompt, providing a more informed and contextually relevant response.
