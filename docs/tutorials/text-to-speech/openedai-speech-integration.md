@@ -1,6 +1,6 @@
 ---
-sidebar_position: 12
-title: "TTS - OpenedAI-Speech using Docker"
+sidebar_position: 2
+title: "🗨️ Openedai-speech using Docker"
 ---
 
 :::warning

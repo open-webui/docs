@@ -1,6 +1,6 @@
 ---
 sidebar_position: 16
-title: "Browser Search Engine"
+title: "🌐 Browser Search Engine"
 ---
 
 :::warning

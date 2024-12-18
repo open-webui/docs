@@ -1,5 +1,5 @@
 ---
-title: HTTPS using Nginx
+title: "🔒 HTTPS using Nginx"
 ---
 
 :::warning

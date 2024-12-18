@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-title: "Hosting UI and Models separately"
+title: "🗄️ Hosting UI and Models separately"
 ---
 
 :::warning
