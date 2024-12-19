@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-title: "FAQ"
+title: "❓ FAQ"
 ---
 
 # FAQ
