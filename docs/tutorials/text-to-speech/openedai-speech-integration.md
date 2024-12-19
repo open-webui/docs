@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🗨️ Openedai-speech using Docker"
+title: "🗨️ Openedai-speech Using Docker"
 ---
 
 :::warning
