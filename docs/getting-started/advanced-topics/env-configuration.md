@@ -1086,6 +1086,12 @@ account takeovers.
 - Default: `admin`
 - Description: Sets the roles that are considered administrators.
 
+#### `OAUTH_ALLOWED_DOMAINS`
+
+- Type: `str`
+- Default: `*`
+- Description: Sets the e-mail domains that are allowed access to the platform.
+
 #### `GOOGLE_CLIENT_ID`
 
 - Type: `str`

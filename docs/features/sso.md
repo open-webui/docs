@@ -20,6 +20,7 @@ There are several global configuration options for OAuth:
 1. `ENABLE_OAUTH_SIGNUP` - if `true`, allows accounts to be created when logging in with OAuth. Distinct from `ENABLE_SIGNUP`.
 1. `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` - allows logging into an account that matches the email address provided by the OAuth provider.
     - This is considered insecure as not all OAuth providers verify email addresses, and may allow accounts to be hijacked.
+1. `OAUTH_ALLOWED_DOMAINS` - a comma-separated list of e-mail domains that are allowed to log in with OAuth. If empty, all domains are allowed.
 
 ### Google
 
