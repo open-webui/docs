@@ -21,7 +21,7 @@ If you want to modify the default configuration, follow these steps:
 git clone https://github.com/searxng/searxng-docker.git
 ```
 
-1. Navigate to the `searxng-docker` repository:
+2. Navigate to the `searxng-docker` repository:
 
 ```bash
 cd searxng-docker
@@ -108,6 +108,8 @@ search:
     - json
     # json is required
 ```
+
+The port in the settings.yml file for SearXNG should match that of the port number in your docker-compose.yml file for SearXNG. So if you plan to use port `1337` for example, you'd set both to `1337`. If you want to use port `8080`, keep both on `8080`. Feel free to change the `bind_address` from `0.0.0.0` to `127.0.0.1` instead. Leaving it on `0.0.0.0` means that SearXNG can listen across all interfaces, while `127.0.0.1` just means that its listening on localhost.
 
 </details>
 
