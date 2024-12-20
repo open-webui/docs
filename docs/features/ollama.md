@@ -3,7 +3,7 @@ sidebar_position: 6
 title: "⚖️ Ollama Load Balancing"
 ---
 
-# Ollama Load Balancing Setup
+# ⚖️ Ollama Load Balancing Setup
 
 This guide demonstrates how to configure Open WebUI to connect to multiple Ollama instances for load balancing within your deployment. This approach enables you to distribute processing loads across several nodes, enhancing both performance and reliability. The configuration leverages environment variables to manage connections between container updates, rebuilds, or redeployments seamlessly.
 
