@@ -43,18 +43,22 @@ Welcome to **Pipelines**, an [Open WebUI](https://github.com/open-webui) initiat
 
 Integrating Pipelines with any OpenAI API-compatible UI client is simple. Launch your Pipelines instance and set the OpenAI URL on your client to the Pipelines URL. That's it! You're ready to leverage any Python library for your needs.
 
-## ⚡ Quick Start with Docker
+## ⚡ Quick Start with Docker and Podman
 
 :::warning
 Pipelines are a plugin system with arbitrary code execution — **don't fetch random pipelines from sources you don't trust**.
 :::
 
-For a streamlined setup using Docker:
+For a streamlined setup using Docker or Podman:
 
 1. **Run the Pipelines container:**
 
    ```sh
    docker run -d -p 9099:9099 --add-host=host.docker.internal:host-gateway -v pipelines:/app/pipelines --name pipelines --restart always ghcr.io/open-webui/pipelines:main
+   ```
+
+   ```sh
+   podman run -d -p 9099:9099 --add-host=host.containers.internal:host-gateway -v pipelines:/app/pipelines --name pipelines --restart always ghcr.io/open-webui/pipelines:main
    ```
 
 2. **Connect to Open WebUI:**
@@ -65,7 +69,7 @@ For a streamlined setup using Docker:
    - Once you've added your pipelines connection and verified it, you will see an icon appear within the API Base URL field for the added connection. When hovered over, the icon itself will be labeled `Pipelines`. Your pipelines should now be active.
 
 :::info
-If your Open WebUI is running in a Docker container, replace `localhost` with `host.docker.internal` in the API URL.
+If your Open WebUI is running in a Docker/Podman container, replace `localhost` with `host.docker.internal` for Docker and `host.containers.internal` for Podman in the API URL.
 :::
 
 3. **Manage Configurations:**
@@ -74,16 +78,20 @@ If your Open WebUI is running in a Docker container, replace `localhost` with `h
    - Select your desired pipeline and modify the valve values directly from the WebUI.
 
 :::tip
-If you are unable to connect, it is most likely a Docker networking issue. We encourage you to troubleshoot on your own and share your methods and solutions in the discussions forum.
+If you are unable to connect, it is most likely a Docker or Podman networking issue. We encourage you to troubleshoot on your own and share your methods and solutions in the discussions forum.
 :::
 
 If you need to install a custom pipeline with additional dependencies:
 
 - **Run the following command:**
 
-  ```sh
-  docker run -d -p 9099:9099 --add-host=host.docker.internal:host-gateway -e PIPELINES_URLS="https://github.com/open-webui/pipelines/blob/main/examples/filters/detoxify_filter_pipeline.py" -v pipelines:/app/pipelines --name pipelines --restart always ghcr.io/open-webui/pipelines:main
-  ```
+   ```sh
+   docker run -d -p 9099:9099 --add-host=host.docker.internal:host-gateway -e PIPELINES_URLS="https://github.com/open-webui/pipelines/blob/main/examples/filters/detoxify_filter_pipeline.py" -v pipelines:/app/pipelines --name pipelines --restart always ghcr.io/open-webui/pipelines:main
+   ```
+
+   ```sh
+   podman run -d -p 9099:9099 --add-host=host.containers.internal:host-gateway -e PIPELINES_URLS="https://github.com/open-webui/pipelines/blob/main/examples/filters/detoxify_filter_pipeline.py" -v pipelines:/app/pipelines --name pipelines --restart always ghcr.io/open-webui/pipelines:main
+   ```
 
 Alternatively, you can directly install pipelines from the admin settings by copying and pasting the pipeline URL, provided it doesn't have additional dependencies.
 
