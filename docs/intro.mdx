@@ -43,7 +43,7 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 #### Disabling Login for Single User
 
-If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](./getting-started/advanced-topics/env-configuration) to `False`. This will bypass the login page.
+If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](./getting-started/advanced-topics/env-configuration) to `False`. This will bypass the login page. If you are using docker then under /apps/backend/open_webui/env.py saerch for ```WEBUI_AUTH = os.environ.get("WEBUI_AUTH", "True").lower() == "true"``` replace it with ```WEBUI_AUTH = os.environ.get("WEBUI_AUTH", "True").lower() == "false"```
 
 :::warning
 You cannot switch between single-user mode and multi-account mode after this change.
