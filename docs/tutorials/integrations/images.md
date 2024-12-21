@@ -3,7 +3,11 @@ sidebar_position: 6
 title: "🎨 Image Generation"
 ---
 
-# Image Generation
+:::warning
+This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+:::
+
+# 🎨 Image Generation
 
 Open WebUI supports image generation through three backends: **AUTOMATIC1111**, **ComfyUI**, and **OpenAI DALL·E**. This guide will help you set up and use either of these options.
 
