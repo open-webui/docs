@@ -7,7 +7,7 @@ title: "🌐 Web Search"
 
 This guide provides instructions on how to set up web search capabilities in Open WebUI using various search engines.
 
-## SearXNG (Docker)
+### SearXNG (Docker)
 
 > "**SearXNG is a free internet metasearch engine which aggregates results from various search services and databases. Users are neither tracked nor profiled.**"
 
@@ -15,16 +15,39 @@ This guide provides instructions on how to set up web search capabilities in Ope
 
 If you want to modify the default configuration, follow these steps:
 
-1. Create a new directory `searxng-docker` by cloning the searxng-docker repository. This folder will contain your SearXNG configuration files. Refer to the [SearXNG documentation](https://docs.searxng.org/) for configuration instructions.
+#### Create a New Directory `searxng-docker`
+
+ Clone the searxng-docker repository. This folder will contain your SearXNG configuration files. Refer to the [SearXNG documentation](https://docs.searxng.org/) for configuration instructions.
 
 ```bash
 git clone https://github.com/searxng/searxng-docker.git
 ```
 
-2. Navigate to the `searxng-docker` repository:
+#### Configure SearXNG
+
+Navigate to the `searxng-docker` repository:
 
 ```bash
 cd searxng-docker
+```
+
+Create a new `.env` file:
+
+```bash
+touch .env
+```
+
+Add the following to the `.env` file:
+
+```bash
+# By default listen on https://localhost
+# To change this:
+# * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
+# * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
+
+
+SEARXNG_HOSTNAME=example.locale 
+# LETSENCRYPT_EMAIL=<email>
 ```
 
 3. Remove the `localhost` restriction and define a less used port by modifying the `docker-compose.yaml` file:
@@ -45,7 +68,10 @@ sudo chmod a+rwx searxng-docker/
 <summary>searxng-docker/limiter.toml</summary>
 
 ```bash
+
 cat > searxng-docker/limiter.toml << EOF
+# This configuration file updates the default configuration file See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
+
 [botdetection.ip_limit]
 # activate link_token method in the ip_limit method
 link_token = false
@@ -90,8 +116,9 @@ The default `settings.yml` file contains many engine settings. Below is an extra
 use_default_settings: true
 
 server:
-  secret_key: "Generate a secret key and provide it here"
-  limiter: false
+  # base_url is defined in the SEARXNG_BASE_URL environment variable, see .env and docker-compose.yml
+  secret_key: "xxxxx"  # change this!
+  limiter: false  # can be disabled for a private instance
   image_proxy: true
   port: 8080
   bind_address: "0.0.0.0"
@@ -105,8 +132,13 @@ search:
   default_lang: ""
   formats:
     - html
-    - json
-    # json is required
+    - json # json is required
+  # remove format to deny access, use lower case.
+  # formats: [html, csv, json, rss]
+redis:
+  # URL to connect redis database. Is overwritten by ${SEARXNG_REDIS_URL}.
+  # https://docs.searxng.org/admin/settings/settings_redis.html#settings-redis
+  url: redis://redis:6379/2
 ```
 
 The port in the settings.yml file for SearXNG should match that of the port number in your docker-compose.yml file for SearXNG. So if you plan to use port `1337` for example, you'd set both to `1337`. If you want to use port `8080`, keep both on `8080`. Feel free to change the `bind_address` from `0.0.0.0` to `127.0.0.1` instead. Leaving it on `0.0.0.0` means that SearXNG can listen across all interfaces, while `127.0.0.1` just means that its listening on localhost.
@@ -194,11 +226,25 @@ services:
   searxng:
     image: searxng/searxng:latest
     container_name: searxng
+    env_file:
+      - stack.env
+    volumes:
+      - ./searxng:/etc/searxng:rw
     ports:
       - "1337:8080"
-    volumes:
-      - ./searxng:/etc/searxng
     restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
 ```
 
 Launch your updated stack with:
@@ -210,13 +256,13 @@ docker compose up -d
 Alternatively, you can run SearXNG directly using `docker run`:
 
 ```bash
-docker run -d --name searxng -p 1337:8080 -v ./searxng:/etc/searxng --restart always searxng/searxng:latest
+docker run --name searxng --env-file stack.env -v ./searxng:/etc/searxng:rw -p 1337:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m,max-file=1 searxng/searxng:latest
 ```
 
 Confirm connectivity from Open-WebUI container instance:
 
 ```bash
-docker exec -it open-webui curl 'http://host.docker.internal:1337/search?q=this+is+a+test+query&format=json'
+docker exec -it open-webui curl http://host.docker.internal:1337/search?q=this+is+a+test+query&format=json
 ```
 
 ### 3. GUI Configuration

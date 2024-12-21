@@ -1151,6 +1151,26 @@ account takeovers.
 - Default: `${DATA_DIR}/tools`
 - Description: Specifies the directory for custom tools.
 
+### Redis
+
+#### `ENABLE_WEBSOCKET_SUPPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables websocket support in Open WebUI (used with Redis).
+
+#### `WEBSOCKET_MANAGER`
+
+- Type: `str`
+- Default: `redis`
+- Description: Specifies the websocket manager to use (in this case, Redis).
+
+#### `WEBSOCKET_REDIS_URL`
+
+- Type: `str`
+- Default: `redis://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for websocket communication.
+
 ## Misc Environment Variables
 
 These variables are not specific to Open WebUI but can still be valuable in certain contexts.
