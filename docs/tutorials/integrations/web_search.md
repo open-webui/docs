@@ -3,7 +3,11 @@ sidebar_position: 5
 title: "🌐 Web Search"
 ---
 
-## Overview
+:::warning
+This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+:::
+
+## 🌐 Web Search
 
 This guide provides instructions on how to set up web search capabilities in Open WebUI using various search engines.
 
