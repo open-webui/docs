@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🛝 Playground (Beta)"
+title: "🎛️ Chat Controls"
 ---
 
 COMING SOON!

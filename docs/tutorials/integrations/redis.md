@@ -1,9 +1,13 @@
 ---
 sidebar_position: 30
-title: "🔒 Redis Websocket Support"
+title: "🔗 Redis Websocket Support"
 ---
 
-# 🔒 Redis Websocket Support
+:::warning
+This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+:::
+
+# 🔗 Redis Websocket Support
 
 ## Overview
 

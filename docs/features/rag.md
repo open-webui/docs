@@ -1,5 +1,5 @@
 ---
-sidebar_position: 8
+sidebar_position: 11
 title: "🔎 Retrieval Augmented Generation (RAG)"
 ---
 
