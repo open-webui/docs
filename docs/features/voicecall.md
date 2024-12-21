@@ -1,5 +1,5 @@
 ---
-sidebar_position: 20
+sidebar_position: 9
 title: "🎙️ Hands-Free Voice Call"
 ---
 
