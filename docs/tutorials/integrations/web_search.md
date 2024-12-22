@@ -47,7 +47,7 @@ Add the following to the `.env` file:
 # By default listen on https://localhost
 # To change this:
 # * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
-# * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
+# * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (required to create a Let's Encrypt certificate)
 
 
 SEARXNG_HOSTNAME=example.locale 
@@ -74,7 +74,8 @@ sudo chmod a+rwx searxng-docker/searxng
 ```bash
 
 cat > searxng-docker/searxng/limiter.toml << EOF
-# This configuration file updates the default configuration file See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
+# This configuration file updates the default configuration file
+# See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
 
 [botdetection.ip_limit]
 # activate link_token method in the ip_limit method
@@ -117,6 +118,8 @@ Change the `bind_address` as desired:
 ```bash
 sed -i 's/bind_address: "0.0.0.0"/bind_address: "127.0.0.1"/' searxng-docker/searxng/settings.yml
 ```
+
+Now, copy the modified `searxng` folder to the same directory as your compose file.
 
 #### Configuration Files
 
@@ -220,8 +223,6 @@ offload-threads = 4
 ```
 
 </details>
-
-Now, copy the modified `searxng` folder to the same directory as your compose file.
 
 Alternatively, if you don't want to modify the default configuration, you can simply create an empty `searxng-docker` folder and follow the rest of the setup instructions.
 
