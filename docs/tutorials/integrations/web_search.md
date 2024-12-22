@@ -80,8 +80,6 @@ sudo chmod a+rwx searxng-docker/searxng
 <summary>searxng-docker/searxng/limiter.toml</summary>
 
 ```bash
-
-cat > searxng-docker/searxng/limiter.toml << EOF
 # This configuration file updates the default configuration file
 # See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
 
@@ -92,7 +90,6 @@ link_token = false
 [botdetection.ip_lists]
 block_ip = []
 pass_ip = []
-EOF
 ```
 
 </details>
