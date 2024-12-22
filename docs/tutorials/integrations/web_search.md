@@ -298,26 +298,29 @@ Alternatively, you can run SearXNG directly using `docker run`:
 docker run --name searxng --env-file stack.env -v ./searxng:/etc/searxng:rw -p 1337:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m,max-file=1 searxng/searxng:latest
 ```
 
-**Confirm Connectivity**
+## 3. Confirm Connectivity
 
-Confirm connectivity from Open-WebUI container instance:
+Confirm connectivity to SearXNG from your Open WebUI container instance in your command line interface:
 
 ```bash
 docker exec -it open-webui curl http://host.docker.internal:1337/search?q=this+is+a+test+query&format=json
 ```
 
-## 3. GUI Configuration
+## 4. GUI Configuration
 
 1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
 2. Toggle `Enable Web Search`
 3. Set `Web Search Engine` from dropdown menu to `searxng`
-4. Set `Searxng Query URL` to examples given: `https://<search.domain.com>/search?q=<query>` or `http://<searxng.local>/search?q=<query>`. **Do note the `/search?q=<query>` part is mandatory.**
+4. Set `Searxng Query URL` to either:
+	* `http://searxng:1337/search?q=<query>` (using the container name and exposed port)
+	* `http://host.docker.internal:1337/search?q=<query>` (using the `host.docker.internal` DNS name and the host port)
+	**Do note the `/search?q=<query>` part is mandatory.**
 5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
 6. Save changes
 
 ![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
 
-## 4. Using Web Search in a Chat
+## 5. Using Web Search in a Chat
 
 To access Web Search, Click on the + next to the message input field.
 
