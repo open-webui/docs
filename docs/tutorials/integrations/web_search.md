@@ -4,20 +4,20 @@ title: "🌐 Web Search"
 ---
 
 :::warning
-This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
 ## 🌐 Web Search
 
 This guide provides instructions on how to set up web search capabilities in Open WebUI using various search engines.
 
-### SearXNG (Docker)
+## SearXNG (Docker)
 
 > "**SearXNG is a free internet metasearch engine which aggregates results from various search services and databases. Users are neither tracked nor profiled.**"
 
-### 1. SearXNG Configuration
+## 1. SearXNG Configuration
 
-If you want to modify the default configuration, follow these steps:
+To configure SearXNG optimally for use with Open WebUI, follow these steps:
 
 #### Create a New Directory `searxng-docker`
 
@@ -47,18 +47,28 @@ Add the following to the `.env` file:
 # By default listen on https://localhost
 # To change this:
 # * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
-# * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (required to create a Let's Encrypt certificate)
+# * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
 
-
-SEARXNG_HOSTNAME=example.locale 
+SEARXNG_HOSTNAME=localhost:1337/
 # LETSENCRYPT_EMAIL=<email>
+
+# Optional:
+# If you run a very small or a very large instance, you might want to change the amount of used uwsgi workers and threads per worker
+# More workers (= processes) means that more search requests can be handled at the same time, but it also causes more resource usage
+
+# SEARXNG_UWSGI_WORKERS=4
+# SEARXNG_UWSGI_THREADS=4
 ```
+
+**Step 3: Modify the `docker-compose.yaml` file**
 
 3. Remove the `localhost` restriction and define a less used port by modifying the `docker-compose.yaml` file:
 
 ```bash
-sed -i "s/127.0.0.1:8080/0.0.0.0:1337/" searxng-docker/docker-compose.yaml
+sed -i "s/127.0.0.1:8080/0.0.0.0:1337/"
 ```
+
+**Step 4: Grant Necessary Permissions**
 
 4. Allow the container to create new config files by running the following command in the root directory:
 
@@ -66,7 +76,9 @@ sed -i "s/127.0.0.1:8080/0.0.0.0:1337/" searxng-docker/docker-compose.yaml
 sudo chmod a+rwx searxng-docker/searxng
 ```
 
-1. Create a non-restrictive `searxng-docker/searxng/limiter.toml` config file:
+**Step 5: Create a Less Restrictive `limiter.toml` File**
+
+5. Create a non-restrictive `searxng-docker/searxng/limiter.toml` config file:
 
 <details>
 <summary>searxng-docker/searxng/limiter.toml</summary>
@@ -89,17 +101,23 @@ EOF
 
 </details>
 
+**Step 6: Remove the Default `settings.yml` File**
+
 6. Delete the default `searxng-docker/searxng/settings.yml` file if it exists, as it will be regenerated on the first launch of SearXNG:
 
 ```bash
 rm searxng-docker/searxng/settings.yml
 ```
 
+**Step 7: Create a Fresh `settings.yml` File**
+
 7. Bring up the container momentarily to generate a fresh settings.yml file:
 
 ```bash
-docker compose up searxng-docker -d ; sleep 10 ; docker compose down searxng-docker
+docker compose up -d ; sleep 10 ; docker compose down
 ```
+
+**Step 8: Add Formats and Update Port Number**
 
 8. Add HTML and JSON formats to the `searxng-docker/searxng/settings.yml` file:
 
@@ -107,7 +125,7 @@ docker compose up searxng-docker -d ; sleep 10 ; docker compose down searxng-doc
 sed -i 's/formats: \[\"html\"\/]/formats: [\"html\", \"json\"]/' searxng-docker/searxng/settings.yml
 ```
 
-9. Update the port number in the `server` section to match the one you set earlier (in this case, `1337`):
+Update the port number in the `server` section to match the one you set earlier (in this case, `1337`):
 
 ```bash
 sed -i 's/port: 8080/port: 1337/' searxng-docker/searxng/settings.yml
@@ -136,8 +154,8 @@ use_default_settings: true
 
 server:
   # base_url is defined in the SEARXNG_BASE_URL environment variable, see .env and docker-compose.yml
-  secret_key: "xxxxx"  # change this!
-  limiter: false  # can be disabled for a private instance
+  secret_key: "ultrasecretkey"  # change this!
+  limiter: true  # can be disabled for a private instance
   image_proxy: true
   port: 8080
   bind_address: "0.0.0.0"
@@ -157,14 +175,16 @@ search:
 redis:
   # URL to connect redis database. Is overwritten by ${SEARXNG_REDIS_URL}.
   # https://docs.searxng.org/admin/settings/settings_redis.html#settings-redis
-  url: redis://redis:6379/2
+  url: redis://redis:6379/0
 ```
 
 The port in the settings.yml file for SearXNG should match that of the port number in your docker-compose.yml file for SearXNG. So if you plan to use port `1337` for example, you'd set both to `1337`. If you want to use port `8080`, keep both on `8080`. Feel free to change the `bind_address` from `0.0.0.0` to `127.0.0.1` instead. Leaving it on `0.0.0.0` means that SearXNG can listen across all interfaces, while `127.0.0.1` just means that its listening on localhost.
 
 </details>
 
-10. Your `searxng-docker/searxng/uwsgi.ini` file for SearXNG should look like:
+**Step 9: Update `uwsgi.ini` File**
+
+9. Ensure your `searxng-docker/searxng/uwsgi.ini` file matches the following:
 
 <details>
 <summary>searxng-docker/searxng/uwsgi.ini</summary>
@@ -224,9 +244,11 @@ offload-threads = 4
 
 </details>
 
+## 2. Alternative Configuration
+
 Alternatively, if you don't want to modify the default configuration, you can simply create an empty `searxng-docker` folder and follow the rest of the setup instructions.
 
-### 2. Docker Compose Setup
+### Docker Compose Setup
 
 Add the following to your `docker-compose.yaml` file:
 
@@ -276,13 +298,15 @@ Alternatively, you can run SearXNG directly using `docker run`:
 docker run --name searxng --env-file stack.env -v ./searxng:/etc/searxng:rw -p 1337:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m,max-file=1 searxng/searxng:latest
 ```
 
+**Confirm Connectivity**
+
 Confirm connectivity from Open-WebUI container instance:
 
 ```bash
 docker exec -it open-webui curl http://host.docker.internal:1337/search?q=this+is+a+test+query&format=json
 ```
 
-### 3. GUI Configuration
+## 3. GUI Configuration
 
 1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
 2. Toggle `Enable Web Search`
@@ -293,13 +317,15 @@ docker exec -it open-webui curl http://host.docker.internal:1337/search?q=this+i
 
 ![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
 
-### 4. Using Web Search in a Chat
+## 4. Using Web Search in a Chat
 
 To access Web Search, Click on the + next to the message input field.
 
 Here you can toggle Web Search On/Off.
 
 ![Web Search UI Toggle](/img/web_search_toggle.png)
+
+By following these steps, you will have successfully set up SearXNG with Open WebUI, enabling you to perform web searches using the SearXNG engine.
 
 #### Note
 
