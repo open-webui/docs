@@ -45,7 +45,7 @@ cd searxng-docker
 # * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
 # * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
 
-SEARXNG_HOSTNAME=localhost:1337/
+SEARXNG_HOSTNAME=localhost:8080/
 # LETSENCRYPT_EMAIL=<email>
 
 # Optional:
@@ -58,10 +58,10 @@ SEARXNG_HOSTNAME=localhost:1337/
 
 **Step 3: Modify the `docker-compose.yaml` file**
 
-3. Remove the `localhost` restriction and define a less used port by modifying the `docker-compose.yaml` file:
+3. Remove the `localhost` restriction by modifying the `docker-compose.yaml` file:
 
 ```bash
-sed -i "s/127.0.0.1:8080/0.0.0.0:1337/"
+sed -i "s/127.0.0.1:8080/0.0.0.0:8080/"
 ```
 
 **Step 4: Grant Necessary Permissions**
@@ -137,10 +137,10 @@ $secretKey = -join ($randomBytes | ForEach-Object { "{0:x2}" -f $_ })
 (Get-Content searxng/settings.yml) -replace 'ultrasecretkey', $secretKey | Set-Content searxng/settings.yml
 ```
 
-Update the port number in the `server` section to match the one you set earlier (in this case, `1337`):
+Update the port number in the `server` section to match the one you set earlier (in this case, `8080`):
 
 ```bash
-sed -i 's/port: 8080/port: 1337/' searxng-docker/searxng/settings.yml
+sed -i 's/port: 8080/port: 8080/' searxng-docker/searxng/settings.yml
 ```
 
 Change the `bind_address` as desired:
@@ -188,7 +188,7 @@ redis:
   url: redis://redis:6379/0
 ```
 
-The port in the settings.yml file for SearXNG should match that of the port number in your docker-compose.yml file for SearXNG. So if you plan to use port `1337` for example, you'd set both to `1337`. If you want to use port `8080`, keep both on `8080`. Feel free to change the `bind_address` from `0.0.0.0` to `127.0.0.1` instead. Leaving it on `0.0.0.0` means that SearXNG can listen across all interfaces, while `127.0.0.1` just means that its listening on localhost.
+The port in the settings.yml file for SearXNG should match that of the port number in your docker-compose.yml file for SearXNG.
 
 </details>
 
@@ -270,13 +270,14 @@ services:
       RAG_WEB_SEARCH_ENGINE: "searxng"
       RAG_WEB_SEARCH_RESULT_COUNT: 3
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
-      SEARXNG_QUERY_URL: "http://searxng:1337/search?q=<query>"
+      SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
 ```
 
 Create a `.env` file for SearXNG:
+
 ```
 # SearXNG
-SEARXNG_HOSTNAME=localhost:1337/
+SEARXNG_HOSTNAME=localhost:8080/
 ```
 
 Next, add the following to SearXNG's `docker-compose.yaml` file:
@@ -287,7 +288,7 @@ services:
     container_name: searxng
     image: searxng/searxng:latest
     ports:
-      - "1337:8080"
+      - "8080:8080"
     volumes:
       - ./searxng:/etc/searxng:rw
     env_file:
@@ -320,7 +321,7 @@ On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yam
 Alternatively, you can run SearXNG directly using `docker run`:
 
 ```bash
-docker run --name searxng --env-file .env -v ./searxng:/etc/searxng:rw -p 1337:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m,max-file=1 searxng/searxng:latest
+docker run --name searxng --env-file .env -v ./searxng:/etc/searxng:rw -p 8080:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m,max-file=1 searxng/searxng:latest
 ```
 
 ## 3. Confirm Connectivity
@@ -328,7 +329,7 @@ docker run --name searxng --env-file .env -v ./searxng:/etc/searxng:rw -p 1337:8
 Confirm connectivity to SearXNG from your Open WebUI container instance in your command line interface:
 
 ```bash
-docker exec -it open-webui curl http://host.docker.internal:1337/search?q=this+is+a+test+query&format=json
+docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+is+a+test+query&format=json
 ```
 
 ## 4. GUI Configuration
@@ -338,8 +339,8 @@ docker exec -it open-webui curl http://host.docker.internal:1337/search?q=this+i
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
 
-* `http://searxng:1337/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
-* `http://host.docker.internal:1337/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
+* `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
+* `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
 * `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
 * `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
 
