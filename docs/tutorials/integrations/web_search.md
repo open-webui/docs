@@ -57,23 +57,23 @@ SEARXNG_HOSTNAME=example.locale
 3. Remove the `localhost` restriction and define a less used port by modifying the `docker-compose.yaml` file:
 
 ```bash
-sed -i "s/127.0.0.1:8080/1337/" docker-compose.yaml
+sed -i "s/127.0.0.1:8080/0.0.0.0:1337/" searxng-docker/docker-compose.yaml
 ```
 
-4. Allow the container to create new config files:
+4. Allow the container to create new config files by running the following command in the root directory:
 
 ```bash
-sudo chmod a+rwx searxng-docker/
+sudo chmod a+rwx searxng-docker/searxng
 ```
 
-5. Create a non-restrictive `searxng-docker/limiter.toml` config file:
+1. Create a non-restrictive `searxng-docker/searxng/limiter.toml` config file:
 
 <details>
-<summary>searxng-docker/limiter.toml</summary>
+<summary>searxng-docker/searxng/limiter.toml</summary>
 
 ```bash
 
-cat > searxng-docker/limiter.toml << EOF
+cat > searxng-docker/searxng/limiter.toml << EOF
 # This configuration file updates the default configuration file See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
 
 [botdetection.ip_limit]
@@ -88,10 +88,10 @@ EOF
 
 </details>
 
-6. Delete the default `searxng-docker/settings.yml` file, it will be regenerated on first launch:
+6. Delete the default `searxng-docker/searxng/settings.yml` file if it exists, as it will be regenerated on the first launch of SearXNG:
 
 ```bash
-rm searxng-docker/settings.yml
+rm searxng-docker/searxng/settings.yml
 ```
 
 7. Bring up the container momentarily to generate a fresh settings.yml file:
@@ -100,20 +100,32 @@ rm searxng-docker/settings.yml
 docker compose up searxng-docker -d ; sleep 10 ; docker compose down searxng-docker
 ```
 
-8. Add HTML and JSON formats to the `searxng-docker/settings.yml` file:
+8. Add HTML and JSON formats to the `searxng-docker/searxng/settings.yml` file:
 
 ```bash
-sed -i 's/formats: \[\"html\"\/]/formats: [\"html\", \"json\"]/' searxng-docker/settings.yml
+sed -i 's/formats: \[\"html\"\/]/formats: [\"html\", \"json\"]/' searxng-docker/searxng/settings.yml
+```
+
+9. Update the port number in the `server` section to match the one you set earlier (in this case, `1337`):
+
+```bash
+sed -i 's/port: 8080/port: 1337/' searxng-docker/searxng/settings.yml
+```
+
+Change the `bind_address` as desired:
+
+```bash
+sed -i 's/bind_address: "0.0.0.0"/bind_address: "127.0.0.1"/' searxng-docker/searxng/settings.yml
 ```
 
 #### Configuration Files
 
-#### searxng/settings.yml (Extract)
+#### searxng-docker/searxng/settings.yml (Extract)
 
 The default `settings.yml` file contains many engine settings. Below is an extract of what the default `settings.yml` file might look like:
 
 <details>
-<summary>searxng-docker/settings.yml</summary>
+<summary>searxng-docker/searxng/settings.yml</summary>
 
 ```yaml
 # see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
@@ -149,10 +161,10 @@ The port in the settings.yml file for SearXNG should match that of the port numb
 
 </details>
 
-8. Your `searxng-docker/uwsgi.ini` file for SearXNG should look like:
+10. Your `searxng-docker/searxng/uwsgi.ini` file for SearXNG should look like:
 
 <details>
-<summary>searxng-docker/uwsgi.ini</summary>
+<summary>searxng-docker/searxng/uwsgi.ini</summary>
 
 ```ini
 [uwsgi]
@@ -209,7 +221,7 @@ offload-threads = 4
 
 </details>
 
-Now, copy the modified `searxng-docker` folder to the same directory as your compose files.
+Now, copy the modified `searxng` folder to the same directory as your compose file.
 
 Alternatively, if you don't want to modify the default configuration, you can simply create an empty `searxng-docker` folder and follow the rest of the setup instructions.
 
