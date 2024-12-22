@@ -43,4 +43,4 @@ The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables
 
 ## Document Parsing
 
-A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
+A variety of parsers extract content from local and remote documents. For more, see the [`Loader`](https://github.com/open-webui/open-webui/blob/29a271959556743e6deb4d55a5a982983335d7ab/backend/open_webui/apps/retrieval/loaders/main.py#L116) class.
