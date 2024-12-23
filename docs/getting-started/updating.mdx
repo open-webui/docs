@@ -1,0 +1,111 @@
+---
+sidebar_position: 300 
+title: "🔄 Updating Open WebUI"
+---
+
+
+
+## Why isn't my Open WebUI updating?
+
+To update your local Docker installation of Open WebUI to the latest version available, you can either use **Watchtower** or manually update the container. Follow either of the steps provided below to be guided through updating your existing Open WebUI image.
+
+### Manual Update
+
+1. **Stop and remove the current container**:
+
+   This will stop the running container and remove it, but it won't delete the data stored in the Docker volume. (Replace `open-webui` with your container's name throughout the updating process if it's different for you.)
+
+```bash
+docker rm -f open-webui
+```
+
+2. **Pull the latest Docker image**:
+
+   This will update the Docker image, but it won't update the running container or its data.
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:main
+```
+
+
+:::info
+**Remove any existing data in the Docker volume (NOT RECOMMENDED UNLESS ABSOLUTELY NECCESSARY!)**. Skip this step entirely if not needed and move on to the last step:
+
+   If you want to start with a clean slate, you can remove the existing data in the Docker volume. Be careful, as this will delete all your chat histories and other data.
+
+   The data is stored in a Docker volume named `open-webui`. You can remove it with the following command:
+
+```bash
+docker volume rm open-webui
+```
+:::
+
+3. **Start the container again with the updated image and existing volume attached**:
+
+   If you didn't remove the existing data, this will start the container with the updated image and the existing data. If you removed the existing data, this will start the container with the updated image and a new, empty volume. **For Nvidia GPU support, add `--gpus all` to the docker run command**
+
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+```
+
+## Automatically Updating Open WebUI with Watchtower
+
+You can use [Watchtower](https://containrrr.dev/watchtower/) to automate the update process for Open WebUI. Here are three options:
+
+### Option 1: One-time Update
+
+You can run Watchtower as a one-time update to stop the current container, pull the latest image, and start a new container with the updated image and existing volume attached (**For Nvidia GPU support, add `--gpus all` to the docker run command**):
+
+```bash
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+```
+
+### Option 2: Running Watchtower as a Separate Container
+
+You can run Watchtower as a separate container that watches and updates your Open WebUI container:
+
+```bash
+docker run -d --name watchtower \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  containrrr/watchtower -i 300 open-webui
+```
+
+This will start Watchtower in detached mode, watching your Open WebUI container for updates every 5 minutes.
+
+### Option 3: Integrating Watchtower with a `docker-compose.yml` File
+
+You can also integrate Watchtower with your `docker-compose.yml` file to automate updates for Open WebUI (**For Nvidia GPU support, add `--gpus all` to the docker run command**):
+
+```yml
+version: '3'
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 open-webui
+    depends_on:
+      - open-webui
+
+volumes:
+  open-webui:
+```
+
+In this example, Watchtower is integrated with the `docker-compose.yml` file and watches the Open WebUI container for updates every 5 minutes.
+
+## Persistent Data in Docker Volumes
+
+The data is stored in a Docker volume named `open-webui`. The path to the volume is not directly accessible, but you can inspect the volume with the following command:
+
+```bash
+docker volume inspect open-webui
+```
+
+This will show you the details of the volume, including the mountpoint, which is usually located in `/var/lib/docker/volumes/open-webui/_data`.
