@@ -731,17 +731,17 @@ You are given a user query, some textual context and rules, all inside xml tags.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables Google Drive integration.
+- Description: Enables or disables Google Drive integration. If set to true, and `GOOGLE_DRIVE_CLIENT_ID` & `GOOGLE_DRIVE_API_KEY` are both configured, Google Drive will appear as an upload option in the chat UI.
+
+#### `GOOGLE_DRIVE_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Google Drive (client must be configured with Drive API and Picker API enabled).
 
 #### `GOOGLE_DRIVE_API_KEY`
 
 - Type: `str`
 - Description: Sets the API key for Google Drive integration.
-
-#### `GOOGLE_DRIVE_CLIENT_ID`
-
-- Type: `str`
-- Description: Sets the client ID for Google Drive integration.
 
 ### Milvus
 
