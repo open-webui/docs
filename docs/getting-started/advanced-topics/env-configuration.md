@@ -6,12 +6,13 @@ title: "🌍 Environment Variable Configuration"
 
 ## Overview
 
-Open WebUI provides a range of environment variables that allow you to customize and configure
+Open WebUI provides a large range of environment variables that allow you to customize and configure
 various aspects of the application. This page serves as a comprehensive reference for all available
-environment variables, including their types, default values, and descriptions.
+environment variables, providing their types, default values, and descriptions.
+As new variables are introduced, this page will be updated to reflect the growing configuration options.
 
 :::info
-Last updated: v0.3.20
+This page is up to date with Open Web UI release version [v0.4.8](https://github.com/open-webui/open-webui/releases/tag/v0.4.8), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 :::
 
 ## App/Backend
@@ -37,7 +38,7 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 #### `WEBUI_AUTH`
 
 - Type: `bool`
-- Default Setting: `True`
+- Default: `True`
 - Description: This setting enables or disables authentication.
 
 :::danger
@@ -63,31 +64,14 @@ directly. Ensure that no users are present in the database, if you intend to tur
 
 - Type: `int`
 - Default: `300`
-- Description: Specifies the timeout duration in seconds for the aiohttp client.
+- Description: Specifies the timeout duration in seconds for the aiohttp client. This impacts things
+such as connections to Ollama and OpenAI endpoints.
 
 :::info
 This is the maximum amount of time the client will wait for a response before timing out.
 If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
 allowing the client to wait indefinitely.
 :::
-
-#### `DATA_DIR`
-
-- Type: `str`
-- Default: `./data`
-- Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc.
-
-#### `FRONTEND_BUILD_DIR`
-
-- Type: `str`
-- Default: `../build`
-- Description: Specifies the location of the built frontend files.
-
-#### `STATIC_DIR`
-
-- Type: `str`
-- Default: `./static`
-- Description: Specifies the directory for static files, such as the favicon.
 
 #### `CUSTOM_NAME`
 
@@ -110,62 +94,6 @@ allowing the client to wait indefinitely.
 This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/advanced-topics/env-configuration/#enable_oauth_signup)
 is also being used and set to `True`. Failure to do so will result in the inability to login.
 :::
-
-#### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
-
-- Type: `bool`
-- Default: `True`
-- Description: Bypass SSL Verification for RAG on Websites.
-
-#### `DEFAULT_MODELS`
-
-- Type: `str`
-- Description: Sets a default Language Model.
-
-#### `DEFAULT_USER_ROLE`
-
-- Type: `str` (enum: `pending`, `user`, `admin`)
-- Options:
-  - `pending` - New users are pending until their accounts are manually activated by an admin.
-  - `user` - New users are automatically activated with regular user permissions.
-  - `admin` - New users are automatically activated with administrator permissions.
-- Default: `pending`
-- Description: Sets the default role assigned to new users.
-
-#### `USER_PERMISSIONS_CHAT_DELETION`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles user permission to delete chats.
-
-#### `USER_PERMISSIONS_CHAT_EDITING`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles user permission to edit chats.
-
-#### `USER_PERMISSIONS_CHAT_TEMPORARY`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles user permission to create temporary chats.
-
-#### `ENABLE_MODEL_FILTER`
-
-- Type: `bool`
-- Default: `False`
-- Description: Toggles Language Model filtering.
-
-#### `MODEL_FILTER_LIST`
-
-- Type: `str`
-- Description: Sets the Language Model filter list, semicolon-separated
-- Example: `llama3.1:instruct;gemma2:latest`
-
-#### `WEBHOOK_URL`
-
-- Type: `str`
-- Description: Sets a webhook for integration with Slack/Microsoft Teams.
 
 #### `ENABLE_ADMIN_EXPORT`
 
@@ -190,6 +118,36 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Type: `bool`
 - Default: `True`
 - Description: Enables message rating feature.
+
+#### `OFFLINE_MODE`
+
+- Type: `bool`
+- Description: Enables or disables offline mode.
+
+#### `DEFAULT_MODELS`
+
+- Type: `str`
+- Description: Sets a default Language Model.
+
+#### `BYPASS_MODEL_ACCESS_CONTROL`
+
+- Type: `bool`
+- Description: Bypasses model access control.
+
+#### `DEFAULT_USER_ROLE`
+
+- Type: `str` (enum: `pending`, `user`, `admin`)
+- Options:
+  - `pending` - New users are pending until their accounts are manually activated by an admin.
+  - `user` - New users are automatically activated with regular user permissions.
+  - `admin` - New users are automatically activated with administrator permissions.
+- Default: `pending`
+- Description: Sets the default role assigned to new users.
+
+#### `WEBHOOK_URL`
+
+- Type: `str`
+- Description: Sets a webhook for integration with Slack/Microsoft Teams.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -238,53 +196,6 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration
 for local Whisper and embeddings.
 
-#### `DATABASE_URL`
-
-- Type: `str`
-- Default: `sqlite:///${DATA_DIR}/webui.db`
-- Description: Specifies the database URL to connect to.
-
-:::info
-Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
-:::
-
-#### `DATABASE_POOL_SIZE`
-
-- Type: `int`
-- Default: `0`
-- Description: Specifies the size of the database pool. A value of `0` disables pooling.
-
-#### `DATABASE_POOL_MAX_OVERFLOW`
-
-- Type: `int`
-- Default: `0`
-- Description: Specifies the database pool max overflow.
-
-:::info
-More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
-:::
-
-#### `DATABASE_POOL_TIMEOUT`
-
-- Type: `int`
-- Default: `30`
-- Description: Specifies the database pool timeout in seconds to get a connection.
-
-:::info
-More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
-:::
-
-#### `DATABASE_POOL_RECYCLE`
-
-- Type: `int`
-- Default: `3600`
-- Description: Specifies the database pool recycle time in seconds.
-
-:::info
-More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
-:::
-
 #### `PORT`
 
 - Type: `int`
@@ -295,23 +206,11 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 If installed via Python, you must instead pass `--port` as a command line argument.
 :::
 
-#### `RESET_CONFIG_ON_START`
-
-- Type: `bool`
-- Default: `False`
-- Description: Resets the `config.json` file on startup.
-
 #### `DEFAULT_LOCALE`
 
 - Type: `str`
 - Default: `en`
 - Description: Sets the default locale for the application.
-
-#### `FUNCTIONS_DIR`
-
-- Type: `str`
-- Default: `./functions`
-- Description: Specifies the directory for custom functions.
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -324,63 +223,35 @@ If installed via Python, you must instead pass `--port` as a command line argume
 - Type: `str`
 - Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
 
-#### `SAFE_MODE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables safe mode, which disables potentially unsafe features, deactivating all functions.
-
-#### `ENABLE_FORWARD_USER_INFO_HEADERS`
-
-- type: `bool`
-- Default: `False`
-- Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API.
-If enabled, the following headers are forwarded:
-  - `X-OpenWebUI-User-Name`
-  - `X-OpenWebUI-User-Id`
-  - `X-OpenWebUI-User-Email`
-  - `X-OpenWebUI-User-Role`
-
-#### `WEBUI_SESSION_COOKIE_SAME_SITE`
-
-- Type: `str` (enum: `lax`, `strict`, `none`)
-- Options:
-  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with
-requests initiated by third-party websites.
-  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent
-with requests initiated by third-party websites.
-  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with
-requests initiated by third-party websites, but only over HTTPS.
-- Default: `lax`
-- Description: Sets the `SameSite` attribute for session cookies.
-
-#### `WEBUI_SESSION_COOKIE_SECURE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Sets the `Secure` attribute for session cookies if set to `True`.
-
-#### `CONTENT_SECURITY_POLICY`
-
-- Type: `str`
-- Description: Sets the `content-security-policy` HTTP header
-- Example: `default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' https://* data:; child-src 'none'; font-src 'self' data:; worker-src 'self';`
-
-#### `AIOHTTP_CLIENT_TIMEOUT`
-
-- Type: `int`
-- Description: Sets the timeout in seconds for internal aiohttp connections. This impacts things
-such as connections to Ollama and OpenAI endpoints.
-
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
 
 - Type: `int`
 - Description: Sets the timeout in seconds for fetching the OpenAI model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
+### Directories
+
+#### `DATA_DIR`
+
+- Type: `str`
+- Default: `./data`
+- Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc.
+
 #### `FONTS_DIR`
 
 - Type: `str`
 - Description: Specifies the directory for fonts.
+
+#### `FRONTEND_BUILD_DIR`
+
+- Type: `str`
+- Default: `../build`
+- Description: Specifies the location of the built frontend files.
+
+#### `STATIC_DIR`
+
+- Type: `str`
+- Default: `./static`
+- Description: Specifies the directory for static files, such as the favicon.
 
 ### Ollama
 
@@ -482,22 +353,6 @@ Artificial Intelligence in Healthcare
 Prompt: {{prompt:middletruncate:8000}}
 ```
 
-#### `SEARCH_QUERY_GENERATION_PROMPT_TEMPLATE`
-
-- Type: `str`
-- Description: Prompt to use when generating search queries.
-- Default:
-
-```
-Assess the need for a web search based on the current question and prior interactions, but lean towards suggesting a Google search query if uncertain. Generate a Google search query even when the answer might be straightforward, as additional information may enhance comprehension or provide updated data. If absolutely certain that no further information is required, return an empty string. Default to a search query if unsure or in doubt. Today's date is {{CURRENT_DATE}}.
-
-Current Question:
-{{prompt:end:4000}}
-
-Interaction History:
-{{MESSAGES:END:6}}
-```
-
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
 - Type: `str`
@@ -508,19 +363,314 @@ Interaction History:
 Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. If a function tool matches, construct and return a JSON object in the format {\"name\": \"functionName\", \"parameters\": {\"requiredFunctionParamKey\": \"requiredFunctionParamValue\"}} using the appropriate tool and its parameters. Only return the object and limit the response to the JSON object without additional text.
 ```
 
+### Autocomplete
+
+#### `ENABLE_AUTOCOMPLETE_GENERATION`
+
+- Type: `bool`
+- Description: Enables or disables autocomplete generation.
+
+#### `AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH`
+
+- Type: `int`
+- Description: Sets the maximum input length for autocomplete generation.
+
+#### `AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Description: Sets the prompt template for autocomplete generation.
+
+### Evaluation Arena Model
+
+#### `ENABLE_EVALUATION_ARENA_MODELS`
+
+- Type: `bool`
+- Description: Enables or disables evaluation arena models.
+
+### Tags Generation
+
+#### `ENABLE_TAGS_GENERATION`
+
+- Type: `bool`
+- Description: Enables or disables tags generation.
+
+#### `TAGS_GENERATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Description: Sets the prompt template for tags generation.
+
+## Security Variables
+
+#### `ENABLE_FORWARD_USER_INFO_HEADERS`
+
+- type: `bool`
+- Default: `False`
+- Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API.
+If enabled, the following headers are forwarded:
+  - `X-OpenWebUI-User-Name`
+  - `X-OpenWebUI-User-Id`
+  - `X-OpenWebUI-User-Email`
+  - `X-OpenWebUI-User-Role`
+
+#### `ENABLE_RAG_LOCAL_WEB_FETCH`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request
+Forgery attacks against local network resources.
+
+#### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
+
+- Type: `bool`
+- Default: `True`
+- Description: Bypass SSL Verification for RAG on Websites.
+
+#### `WEBUI_SESSION_COOKIE_SAME_SITE`
+
+- Type: `str` (enum: `lax`, `strict`, `none`)
+- Options:
+  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with
+requests initiated by third-party websites.
+  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent
+with requests initiated by third-party websites.
+  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with
+requests initiated by third-party websites, but only over HTTPS.
+- Default: `lax`
+- Description: Sets the `SameSite` attribute for session cookies.
+
+#### `WEBUI_SESSION_COOKIE_SECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sets the `Secure` attribute for session cookies if set to `True`.
+
+#### `RESET_CONFIG_ON_START`
+
+- Type: `bool`
+- Default: `False`
+- Description: Resets the `config.json` file on startup.
+
+#### `SAFE_MODE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables safe mode, which disables potentially unsafe features, deactivating all functions.
+
 #### `CORS_ALLOW_ORIGIN`
 
 - Type: `str`
 - Default: `*`
 - Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
-### RAG
+#### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Determines whether or not to allow custom models defined on the Hub in their own modeling files.
+
+#### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Determines whether or not to allow custom models defined on the Hub in their own
+modeling files for reranking.
+
+#### `RAG_EMBEDDING_MODEL_AUTO_UPDATE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Toggles automatic update of the Sentence-Transformer model.
+
+#### `RAG_RERANKING_MODEL_AUTO_UPDATE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Toggles automatic update of the reranking model.
+
+#### `WHISPER_MODEL_AUTO_UPDATE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Toggles automatic update of the Whisper model.
+
+## Retrieval Augmented Generation (RAG)
 
 #### `VECTOR_DB`
 
 - Type: `str`
 - Default: `chroma`
 - Description: Specifies which vector database system to use, either 'chroma' for ChromaDB or 'milvus' for Milvus. This setting determines which vector storage system will be used for managing embeddings.
+
+#### `RAG_EMBEDDING_ENGINE`
+
+- Type: `str` (enum: `ollama`, `openai`)
+- Options:
+  - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
+  - `ollama` - Uses the Ollama API for embeddings.
+  - `openai` - Uses the OpenAI API for embeddings.
+- Description: Selects an embedding engine to use for RAG.
+
+#### `RAG_EMBEDDING_MODEL`
+
+- Type: `str`
+- Default: `sentence-transformers/all-MiniLM-L6-v2`
+- Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
+
+#### `ENABLE_RAG_HYBRID_SEARCH`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using
+`sentence_transformers` models.
+
+#### `CONTENT_EXTRACTION_ENGINE`
+
+- Type: `str` (`tika`)
+- Options:
+  - Leave empty to use default
+  - `tika` - Use a local Apache Tika server
+- Description: Sets the content extraction engine to use for document ingestion.
+
+#### `TIKA_SERVER_URL`
+
+- Type: `str`
+- Default: `http://localhost:9998`
+- Description: Sets the URL for the Apache Tika server.
+
+#### `RAG_TOP_K`
+
+- Type: `int`
+- Default: `5`
+- Description: Sets the default number of results to consider when using RAG.
+
+#### `RAG_RELEVANCE_THRESHOLD`
+
+- Type: `float`
+- Default: `0.0`
+- Description: Sets the relevance threshold to consider for documents when used with reranking.
+
+#### `RAG_TEMPLATE`
+
+- Type: `str`
+- Default:
+
+```
+You are given a user query, some textual context and rules, all inside xml tags. You have to answer the query based on the context while respecting the rules.
+
+<context>
+[context]
+</context>
+
+<rules>
+- If you don't know, just say so.
+- If you are not sure, ask for clarification.
+- Answer in the same language as the user query.
+- If the context appears unreadable or of poor quality, tell the user then answer as best as you can.
+- If the answer is not in the context but you think you know the answer, explain that to the user then answer with your own knowledge.
+- Answer directly and without using xml tags.
+</rules>
+
+<user_query>
+[query]
+</user_query>
+```
+
+- Description: Template to use when injecting RAG documents into chat completion
+
+#### `RAG_TEXT_SPLITTER`
+
+- Type: `str`
+- Description: Sets the text splitter for RAG models.
+
+#### `TIKTOKEN_CACHE_DIR`
+
+- Type: `str`
+- Description: Sets the directory for TikiToken cache.
+
+#### `TIKTOKEN_ENCODING_NAME`
+
+- Type: `str`
+- Description: Sets the encoding name for TikiToken.
+
+#### `CHUNK_SIZE`
+
+- Type: `int`
+- Default: `1500`
+- Description: Sets the document chunk size for embeddings.
+
+#### `CHUNK_OVERLAP`
+
+- Type: `int`
+- Default: `100`
+- Description: Specifies how much overlap there should be between chunks.
+
+#### `PDF_EXTRACT_IMAGES`
+
+- Type: `bool`
+- Default: `False`
+- Description: Extracts images from PDFs using OCR when loading documents.
+
+#### `RAG_FILE_MAX_SIZE`
+
+- Type: `int`
+- Default: `100` (100MB)
+- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
+
+#### `RAG_FILE_MAX_COUNT`
+
+- Type: `int`
+- Default: `10`
+- Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
+
+#### `RAG_RERANKING_MODEL`
+
+- Type: `str`
+- Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
+
+#### `RAG_OPENAI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI base API URL to use for RAG embeddings.
+
+#### `RAG_OPENAI_API_KEY`
+
+- Type: `str`
+- Default: `${OPENAI_API_KEY}`
+- Description: Sets the OpenAI API key to use for RAG embeddings.
+
+#### `RAG_EMBEDDING_OPENAI_BATCH_SIZE`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the batch size for OpenAI embeddings.
+
+#### `RAG_EMBEDDING_BATCH_SIZE`
+
+- Type: `int`
+- Description: Sets the batch size for embedding in RAG (Retrieval-Augmented Generator) models.
+
+#### `RAG_OLLAMA_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Ollama API used in RAG models.
+
+#### `RAG_OLLAMA_BASE_URL`
+
+- Type: `str`
+- Description: Sets the base URL for Ollama API used in RAG models.
+
+#### `ENABLE_RETRIEVAL_QUERY_GENERATION`
+
+- Type: `bool`
+- Description: Enables or disables retrieval query generation.
+
+#### `QUERY_GENERATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Description: Sets the prompt template for query generation.
+
+### ChromaDB
 
 #### `CHROMA_TENANT`
 
@@ -569,186 +719,62 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Description: Specifies auth credentials for remote ChromaDB Server.
 - Example: `username:password`
 
+### Milvus
+
 #### `MILVUS_URI`
 
 - Type: `str`
 - Default: `${DATA_DIR}/vector_db/milvus.db`
 - Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
 
-#### `RAG_TOP_K`
+### OpenSearch
 
-- Type: `int`
-- Default: `5`
-- Description: Sets the default number of results to consider when using RAG.
-
-#### `RAG_RELEVANCE_THRESHOLD`
-
-- Type: `float`
-- Default: `0.0`
-- Description: Sets the relevance threshold to consider for documents when used with reranking.
-
-#### `ENABLE_RAG_HYBRID_SEARCH`
+#### `OPENSEARCH_CERT_VERIFY`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using
-`sentence_transformers` models.
+- Description: Enables or disables OpenSearch certificate verification.
 
-#### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables TLS certification verification when browsing web pages for RAG.
-
-#### `RAG_EMBEDDING_ENGINE`
-
-- Type: `str` (enum: `ollama`, `openai`)
-- Options:
-  - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
-  - `ollama` - Uses the Ollama API for embeddings.
-  - `openai` - Uses the OpenAI API for embeddings.
-- Description: Selects an embedding engine to use for RAG.
-
-#### `PDF_EXTRACT_IMAGES`
-
-- Type: `bool`
-- Default: `False`
-- Description: Extracts images from PDFs using OCR when loading documents.
-
-#### `RAG_EMBEDDING_MODEL`
+#### `OPENSEARCH_PASSWORD`
 
 - Type: `str`
-- Default: `sentence-transformers/all-MiniLM-L6-v2`
-- Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
+- Description: Sets the password for OpenSearch.
 
-#### `RAG_EMBEDDING_MODEL_AUTO_UPDATE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Toggles automatic update of the Sentence-Transformer model.
-
-#### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
+#### `OPENSEARCH_SSL`
 
 - Type: `bool`
-- Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own modeling files.
+- Description: Enables or disables SSL for OpenSearch.
 
-#### `RAG_TEMPLATE`
-
-- Type: `str`
-- Default:
-
-```
-You are given a user query, some textual context and rules, all inside xml tags. You have to answer the query based on the context while respecting the rules.
-
-<context>
-[context]
-</context>
-
-<rules>
-- If you don't know, just say so.
-- If you are not sure, ask for clarification.
-- Answer in the same language as the user query.
-- If the context appears unreadable or of poor quality, tell the user then answer as best as you can.
-- If the answer is not in the context but you think you know the answer, explain that to the user then answer with your own knowledge.
-- Answer directly and without using xml tags.
-</rules>
-
-<user_query>
-[query]
-</user_query>
-```
-
-- Description: Template to use when injecting RAG documents into chat completion
-
-#### `RAG_RERANKING_MODEL`
+#### `OPENSEARCH_URI`
 
 - Type: `str`
-- Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
+- Description: Sets the URI for OpenSearch.
 
-#### `RAG_RERANKING_MODEL_AUTO_UPDATE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Toggles automatic update of the reranking model.
-
-#### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own
-modeling files for reranking.
-
-#### `RAG_OPENAI_API_BASE_URL`
+#### `OPENSEARCH_USERNAME`
 
 - Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI base API URL to use for RAG embeddings.
+- Description: Sets the username for OpenSearch.
 
-#### `RAG_OPENAI_API_KEY`
+### PGVector
 
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Sets the OpenAI API key to use for RAG embeddings.
-
-#### `RAG_EMBEDDING_OPENAI_BATCH_SIZE`
-
-- Type: `int`
-- Default: `1`
-- Description: Sets the batch size for OpenAI embeddings.
-
-#### `ENABLE_RAG_LOCAL_WEB_FETCH`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request
-Forgery attacks against local network resources.
-
-#### `YOUTUBE_LOADER_LANGUAGE`
+#### `PGVECTOR_DB_URL`
 
 - Type: `str`
-- Default: `en`
-- Description: Sets the language to use for YouTube video loading.
+- Description: Sets the database URL for model storage.
 
-#### `CHUNK_SIZE`
+### Qdrant
 
-- Type: `int`
-- Default: `1500`
-- Description: Sets the document chunk size for embeddings.
-
-#### `CHUNK_OVERLAP`
-
-- Type: `int`
-- Default: `100`
-- Description: Specifies how much overlap there should be between chunks.
-
-#### `CONTENT_EXTRACTION_ENGINE`
-
-- Type: `str` (`tika`)
-- Options:
-  - Leave empty to use default
-  - `tika` - Use a local Apache Tika server
-- Description: Sets the content extraction engine to use for document ingestion.
-
-#### `TIKA_SERVER_URL`
+#### `QDRANT_API_KEY`
 
 - Type: `str`
-- Default: `http://localhost:9998`
-- Description: Sets the URL for the Apache Tika server.
+- Description: Sets the API key for Qdrant.
 
-#### `RAG_FILE_MAX_COUNT`
+#### `QDRANT_URI`
 
-- Type: `int`
-- Default: `10`
-- Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
+- Type: `str`
+- Description: Sets the URI for Qdrant.
 
-#### `RAG_FILE_MAX_SIZE`
-
-- Type: `int`
-- Default: `100` (100MB)
-- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
-
-### Web Search
+## Web Search
 
 #### `ENABLE_RAG_WEB_SEARCH`
 
@@ -756,27 +782,28 @@ Forgery attacks against local network resources.
 - Default: `False`
 - Description: Enable web search toggle
 
-#### `ENABLE_SEARCH_QUERY`
+#### `ENABLE_SEARCH_QUERY_GENERATION`
 
 - Type: `bool`
-- Default: `False`
-- Description: Enables the generation of search queries from prompts
+- Description: Enables or disables search query generation.
 
 #### `RAG_WEB_SEARCH_ENGINE`
 
-- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `serpstack`, `serper`, `serply`, `searchapi`, `duckduckgo`, `tavily`, `jina`)
+- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `kagi`, `mojeek`, `serpstack`, `serper`, `serply`, `searchapi`, `duckduckgo`, `tavily`, `jina`, `bing`)
 - Options:
   - `searxng` - Uses the [SearXNG](https://github.com/searxng/searxng) search engine.
   - `google_pse` - Uses the [Google Programmable Search Engine](https://programmablesearchengine.google.com/about/).
   - `brave` - Uses the [Brave search engine](https://brave.com/search/api/).
-  - `serpstack` - Uses the [Serpstack search engine](https://serpstack.com/).
-  - `serper` - Uses the [Serper search engine](https://serper.dev/).
-  - `serply` - Uses the [Serply search engine](https://serply.io/).
-  - `searchapi` - Uses the [SearchAPI search engine](https://www.searchapi.io/).
-  - `duckduckgo` - Uses the [DuckDuckGo search engine](https://duckduckgo.com/).
-  - `tavily` - Uses the [Tavily search engine](https://tavily.com/).
-  - `jina` - Uses the [Jina search engine](https://jina.ai/).
-- Description: Select engine for performing searches
+  - `kagi` - Uses the [Kagi](https://www.kagi.com/) search engine.
+  - `mojeek` - Uses the [Mojeek](https://www.mojeek.com/) search engine.
+  - `serpstack` - Uses the [Serpstack](https://serpstack.com/) search engine.
+  - `serper` - Uses the [Serper](https://serper.dev/) search engine.
+  - `serply` - Uses the [Serply](https://serply.io/) search engine.
+  - `searchapi` - Uses the [SearchAPI](https://www.searchapi.io/) search engine.
+  - `duckduckgo` - Uses the [DuckDuckGo](https://duckduckgo.com/) search engine.
+  - `tavily` - Uses the [Tavily](https://tavily.com/) search engine.
+  - `jina` - Uses the [Jina](https://jina.ai/) search engine.
+  - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
 
 #### `SEARXNG_QUERY_URL`
 
@@ -799,6 +826,11 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Description: The API key for the Brave Search API.
 
+#### `MOJEEK_SEARCH_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Mojiek Search API.
+
 #### `SERPSTACK_API_KEY`
 
 - Type: `str`
@@ -820,10 +852,35 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Description: The API key for the Serply search API.
 
+#### `SEARCHAPI_API_KEY`
+
+- Type: `str`
+- Description: Sets the SearchAPI API key.
+
+#### `SEARCHAPI_ENGINE`
+
+- Type: `str`
+- Description: Sets the SearchAPI engine.
+
 #### `TAVILY_API_KEY`
 
 - Type: `str`
 - Description: The API key for the Tavily search API.
+
+#### `JINA_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Jina.
+
+#### `BING_SEARCH_V7_ENDPOINT`
+
+- Type: `str`
+- Description: Sets the endpoint for Bing Search API.
+
+#### `BING_SEARCH_V7_SUBSCRIPTION_KEY`
+
+- Type: `str`
+- Description: Sets the subscription key for Bing Search API.
 
 #### `RAG_WEB_SEARCH_RESULT_COUNT`
 
@@ -837,43 +894,22 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `10`
 - Description: Number of concurrent requests to crawl web pages returned from search results.
 
-#### `SEARCHAPI_API_KEY`
+### YouTube Loader
+
+#### `YOUTUBE_LOADER_PROXY_URL`
 
 - Type: `str`
-- Description: Sets the SearchAPI API key.
+- Description: Sets the proxy URL for YouTube loader.
 
-#### `SEARCHAPI_ENGINE`
-
-- Type: `str`
-- Description: Sets the SearchAPI engine.
-
-### Speech to Text
-
-#### `AUDIO_STT_ENGINE`
-
-- Type: `str` (enum: `openai`)
-- Options:
-  - Leave empty to use local Whisper engine for Speech-to-Text.
-  - `openai` - Uses OpenAI engine for Speech-to-Text.
-- Description: Specifies the Speech-to-Text engine to use.
-
-#### `AUDIO_STT_OPENAI_API_BASE_URL`
+#### `YOUTUBE_LOADER_LANGUAGE`
 
 - Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for Speech-to-Text.
+- Default: `en`
+- Description: Sets the language to use for YouTube video loading.
 
-#### `AUDIO_STT_OPENAI_API_KEY`
+## Audio
 
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Sets the OpenAI API key to use for Speech-to-Text.
-
-#### `AUDIO_STT_MODEL`
-
-- Type: `str`
-- Default: `whisper-1`
-- Description: Specifies the Speech-to-Text model to use for OpenAI-compatible endpoints.
+### Whisper Speech-to-Text (Local)
 
 #### `WHISPER_MODEL`
 
@@ -887,13 +923,40 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `${DATA_DIR}/cache/whisper/models`
 - Description: Specifies the directory to store Whisper model files.
 
-#### `WHISPER_MODEL_AUTO_UPDATE`
+### Speech-to-Text (OpenAI)
 
-- Type: `bool`
-- Default: `False`
-- Description: Toggles automatic update of the Whisper model.
+#### `AUDIO_STT_ENGINE`
 
-### Text to Speech
+- Type: `str` (enum: `openai`)
+- Options:
+  - Leave empty to use local Whisper engine for Speech-to-Text.
+  - `openai` - Uses OpenAI engine for Speech-to-Text.
+- Description: Specifies the Speech-to-Text engine to use.
+
+#### `AUDIO_STT_MODEL`
+
+- Type: `str`
+- Default: `whisper-1`
+- Description: Specifies the Speech-to-Text model to use for OpenAI-compatible endpoints.
+
+#### `AUDIO_STT_OPENAI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI-compatible base URL to use for Speech-to-Text.
+
+#### `AUDIO_STT_OPENAI_API_KEY`
+
+- Type: `str`
+- Default: `${OPENAI_API_KEY}`
+- Description: Sets the OpenAI API key to use for Speech-to-Text.
+
+### Text-to-Speech
+
+#### `AUDIO_TTS_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Text-to-Speech.
 
 #### `AUDIO_TTS_ENGINE`
 
@@ -904,10 +967,25 @@ the search query. Example: `http://searxng.local/search?q=<query>`
   - `openai` - Uses OpenAI engine for Text-to-Speech.
 - Description: Specifies the Text-to-Speech engine to use.
 
-#### `AUDIO_TTS_API_KEY`
+#### `AUDIO_TTS_MODEL`
 
 - Type: `str`
-- Description: Sets the API key for Text-to-Speech.
+- Default: `tts-1`
+- Description: Specifies the OpenAI text-to-speech model to use.
+
+### Azure Text-to-Speech
+
+#### `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT`
+
+- Type: `str`
+- Description: Sets the output format for Azure Text to Speech.
+
+#### `AUDIO_TTS_AZURE_SPEECH_REGION`
+
+- Type: `str`
+- Description: Sets the region for Azure Text to Speech.
+
+### OpenAI Text-to-Speech
 
 #### `AUDIO_TTS_OPENAI_API_BASE_URL`
 
@@ -921,11 +999,11 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for text-to-speech.
 
-#### `AUDIO_TTS_MODEL`
+#### `AUDIO_TTS_SPLIT_ON`
 
 - Type: `str`
-- Default: `tts-1`
-- Description: Specifies the OpenAI text-to-speech model to use.
+- Default: `punctuation`
+- Description: Sets the OpenAI text-to-speech split on to use.
 
 #### `AUDIO_TTS_VOICE`
 
@@ -933,13 +1011,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `alloy`
 - Description: Sets the OpenAI text-to-speech voice to use.
 
-#### `AUDIO_TTS_SPLIT_ON`
-
-- Type: `str`
-- Default: `punctuation`
-- Description: Sets the OpenAI text-to-speech split on to use.
-
-### Image Generation
+## Image Generation
 
 #### `ENABLE_IMAGE_GENERATION`
 
@@ -956,38 +1028,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
   - `automatic1111` - Uses Automatic1111 engine for image generation (default).
 - Default: `automatic1111`
 - Description: Specifies the engine to use for image generation.
-
-#### `AUTOMATIC1111_BASE_URL`
-
-- Type: `str`
-- Description: Specifies the URL to Automatic1111's Stable Diffusion API.
-
-#### `AUTOMATIC1111_API_AUTH`
-
-- Type: `str`
-- Description: Sets the Automatic1111 API authentication.
-
-#### `COMFYUI_BASE_URL`
-
-- Type: `str`
-- Description: Specifies the URL to the ComfyUI image generation API.
-
-#### `COMFYUI_WORKFLOW`
-
-- Type: `str`
-- Description: Sets the ComfyUI workflow.
-
-#### `IMAGES_OPENAI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
-
-#### `IMAGES_OPENAI_API_KEY`
-
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Sets the API key to use for DALL-E image generation.
 
 #### `IMAGE_GENERATION_MODEL`
 
@@ -1006,21 +1046,135 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `50`
 - Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111.
 
-### OAuth
+### AUTOMATIC1111
+
+#### `AUTOMATIC1111_API_AUTH`
+
+- Type: `str`
+- Description: Sets the Automatic1111 API authentication.
+
+#### `AUTOMATIC1111_BASE_URL`
+
+- Type: `str`
+- Description: Specifies the URL to Automatic1111's Stable Diffusion API.
+
+#### `AUTOMATIC1111_CFG_SCALE`
+
+- Type: `float`
+- Description: Sets the scale for Automatic1111 inference.
+
+#### `AUTOMATIC1111_SAMPLER`
+
+- Type: `str`
+- Description: Sets the sampler for Automatic1111 inference.
+
+#### `AUTOMATIC1111_SCHEDULER`
+
+- Type: `str`
+- Description: Sets the scheduler for Automatic1111 inference.
+
+### ComfyUI
+
+#### `COMFYUI_BASE_URL`
+
+- Type: `str`
+- Description: Specifies the URL to the ComfyUI image generation API.
+
+#### `COMFYUI_WORKFLOW`
+
+- Type: `str`
+- Description: Sets the ComfyUI workflow.
+
+### OpenAI DALL-E
+
+#### `IMAGES_OPENAI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+
+#### `IMAGES_OPENAI_API_KEY`
+
+- Type: `str`
+- Default: `${OPENAI_API_KEY}`
+- Description: Sets the API key to use for DALL-E image generation.
+
+## Database Pool
+
+#### `DATABASE_URL`
+
+- Type: `str`
+- Default: `sqlite:///${DATA_DIR}/webui.db`
+- Description: Specifies the database URL to connect to.
+
+:::info
+Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
+Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+:::
+
+#### `DATABASE_POOL_SIZE`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the size of the database pool. A value of `0` disables pooling.
+
+#### `DATABASE_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the database pool max overflow.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
+:::
+
+#### `DATABASE_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Specifies the database pool timeout in seconds to get a connection.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
+:::
+
+#### `DATABASE_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the database pool recycle time in seconds.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
+:::
+
+## OAuth
 
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables user account creation via OAuth.
+- Description: Enables user account creation via OAuth. Distinct from `ENABLE_SIGNUP`.
+
+#### `ENABLE_API_KEY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables API key authentication.
+
+#### `ENABLE_OAUTH_ROLE_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables role management to oauth delegation.
 
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`
 - Default: `False`
 - Description: If enabled, merges OAuth accounts with existing accounts using the same email
-address. This is considered unsafe as providers may not verify email addresses and can lead to
-account takeovers.
+address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to
+potential account takeovers.
 
 #### `OAUTH_USERNAME_CLAIM`
 
@@ -1061,12 +1215,6 @@ account takeovers.
 - Type: `str`
 - Default: `SSO`
 - Description: Sets the name for the OIDC provider.
-
-#### `ENABLE_OAUTH_ROLE_MANAGEMENT`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables role management to oauth delegation.
 
 #### `OAUTH_ROLES_CLAIM`
 
@@ -1143,33 +1291,110 @@ account takeovers.
 - Type: `str`
 - Description: Sets the redirect URI for OIDC
 
-### Tools
+## LDAP
 
-#### `TOOLS_DIR`
-
-- Type: `str`
-- Default: `${DATA_DIR}/tools`
-- Description: Specifies the directory for custom tools.
-
-### Redis
-
-#### `ENABLE_WEBSOCKET_SUPPORT`
+#### `ENABLE_LDAP`
 
 - Type: `bool`
-- Default: `False`
-- Description: Enables websocket support in Open WebUI (used with Redis).
+- Description: Enables or disables LDAP authentication.
 
-#### `WEBSOCKET_MANAGER`
-
-- Type: `str`
-- Default: `redis`
-- Description: Specifies the websocket manager to use (in this case, Redis).
-
-#### `WEBSOCKET_REDIS_URL`
+#### `LDAP_APP_DN`
 
 - Type: `str`
-- Default: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for websocket communication.
+- Description: Sets the distinguished name for LDAP application.
+
+#### `LDAP_APP_PASSWORD`
+
+- Type: `str`
+- Description: Sets the password for LDAP application.
+
+#### `LDAP_ATTRIBUTE_FOR_USERNAME`
+
+- Type: `str`
+- Description: Sets the attribute to use as username for LDAP authentication.
+
+#### `LDAP_CA_CERT_FILE`
+
+- Type: `str`
+- Description: Sets the path to LDAP CA certificate file.
+
+#### `LDAP_CIPHERS`
+
+- Type: `str`
+- Description: Sets the ciphers to use for LDAP connection.
+
+#### `LDAP_SEARCH_BASE`
+
+- Type: `str`
+- Description: Sets the base to search for LDAP authentication.
+
+#### `LDAP_SEARCH_FILTER`
+
+- Type: `str`
+- Description: Sets the filter to use for LDAP search.
+
+#### `LDAP_SERVER_HOST`
+
+- Type: `str`
+- Description: Sets the hostname of LDAP server.
+
+#### `LDAP_SERVER_LABEL`
+
+- Type: `str`
+- Description: Sets the label of LDAP server.
+
+#### `LDAP_SERVER_PORT`
+
+- Type: `int`
+- Description: Sets the port number of LDAP server.
+
+#### `LDAP_USE_TLS`
+
+- Type: `bool`
+- Description: Enables or disables TLS for LDAP connection.
+
+## User Permissions
+
+#### `USER_PERMISSIONS_CHAT_TEMPORARY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to create temporary chats.
+
+#### `USER_PERMISSIONS_CHAT_DELETE`
+
+- Type: `bool`
+- Description: Enables or disables user permission to delete chats.
+
+#### `USER_PERMISSIONS_CHAT_EDIT`
+
+- Type: `bool`
+- Description: Enables or disables user permission to edit chats.
+
+#### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
+
+- Type: `bool`
+- Description: Enables or disables user permission to upload files to chats.
+
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`
+
+- Type: `bool`
+- Description: Enables or disables user permission to access workspace knowledge.
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`
+
+- Type: `bool`
+- Description: Enables or disables user permission to access workspace models.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`
+
+- Type: `bool`
+- Description: Enables or disables user permission to access workspace prompts.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS`
+
+- Type: `bool`
+- Description: Enables or disables user permission to access workspace tools.
 
 ## Misc Environment Variables
 
@@ -1196,3 +1421,55 @@ Open WebUI uses the following environment variables:
 - Description: Lists domain extensions (or IP addresses) for which the proxy should not be used,
 separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
 bypassed when accessing documents from MIT.
+
+### Redis
+
+#### `ENABLE_WEBSOCKET_SUPPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables websocket support in Open WebUI (used with Redis).
+
+#### `WEBSOCKET_MANAGER`
+
+- Type: `str`
+- Default: `redis`
+- Description: Specifies the websocket manager to use (in this case, Redis).
+
+#### `WEBSOCKET_REDIS_URL`
+
+- Type: `str`
+- Default: `redis://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for websocket communication.
+
+### S3 Storage Provider
+
+#### `STORAGE_PROVIDER`
+
+- Type: `str`
+- Description: Sets the storage provider.
+
+#### `S3_ACCESS_KEY_ID`
+
+- Type: `str`
+- Description: Sets the access key ID for S3 storage.
+
+#### `S3_BUCKET_NAME`
+
+- Type: `str`
+- Description: Sets the bucket name for S3 storage.
+
+#### `S3_ENDPOINT_URL`
+
+- Type: `str`
+- Description: Sets the endpoint URL for S3 storage.
+
+#### `S3_REGION_NAME`
+
+- Type: `str`
+- Description: Sets the region name for S3 storage.
+
+#### `S3_SECRET_ACCESS_KEY`
+
+- Type: `str`
+- Description: Sets the secret access key for S3 storage.
