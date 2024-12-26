@@ -117,6 +117,24 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `True`
 - Description: Bypass SSL Verification for RAG on Websites.
 
+#### `ENABLE_GOOGLE_DRIVE_INTEGRATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to true, and GOOGLE_DRIVE_CLIENT_ID & GOOGLE_DRIVE_API_KEY are both configured, Google Drive will appear as an upload option in the chat UI.
+
+
+#### `GOOGLE_DRIVE_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Google Drive (client must be configured with Drive API and Picker API enabled)
+
+
+#### `GOOGLE_DRIVE_API_KEY`
+
+- Type: `str`
+- Description: Sets the client secret for Google Drive integration
+  
 #### `DEFAULT_MODELS`
 
 - Type: `str`
