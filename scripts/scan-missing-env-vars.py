@@ -61,17 +61,22 @@ def main():
     urls = [
         f"https://raw.githubusercontent.com/open-webui/open-webui/{git_ref}/backend/open_webui/config.py",
         f"https://raw.githubusercontent.com/open-webui/open-webui/{git_ref}/backend/open_webui/env.py",
+        f"https://raw.githubusercontent.com/open-webui/open-webui/{git_ref}/backend/open_webui/migrations/env.py",
     ]
-    filenames = ["config.py", "env.py"]
+    filenames = ["config.py", "env.py", "migrations/env.py"]
 
     all_env_vars = set()
 
-    for url, filename in zip(urls, filenames):
-        with urllib.request.urlopen(url) as response:
-            contents = response.read().decode("utf-8")
+    try:
+        for url, filename in zip(urls, filenames):
+            with urllib.request.urlopen(url) as response:
+                contents = response.read().decode("utf-8")
 
-        for env_var in find_env_vars(contents):
-            all_env_vars.add(env_var)
+            for env_var in find_env_vars(contents):
+                all_env_vars.add(env_var)
+    except urllib.error.URLError as e:
+        print(f"Failed to open URL: {e}")
+        sys.exit(1)
 
     ignored_env_vars = {
         "FROM_INIT_PY",
@@ -86,27 +91,31 @@ def main():
     documented_env_vars = set()
     script_dir = os.path.dirname(os.path.abspath(__file__))
     docs_file = os.path.join(
-        script_dir, "..", "docs", "getting-started", "env-configuration.md"
+        script_dir, *[part for part in ["..", "docs", "getting-started", "advanced-topics", "env-configuration.md"]]
     )
-    with open(docs_file, "r") as f:
-        for line in f:
-            if line.startswith("#### `"):
-                env_var = line.split("`")[1]
-                documented_env_vars.add(env_var)
+
+    try:
+        with open(docs_file, "r", encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                if line.startswith("#### `"):
+                    env_var = line.split("`")[1]
+                    documented_env_vars.add(env_var)
+    except FileNotFoundError as e:
+        print(f"Failed to open file: {e}")
+        sys.exit(1)
 
     print("\nEnvironment variables accessed but not documented:")
-    if all_env_vars - documented_env_vars:
-        for env_var in sorted(all_env_vars - documented_env_vars - ignored_env_vars):
-            print(env_var)
-    else:
+    not_documented_env_vars = all_env_vars - documented_env_vars - ignored_env_vars
+    for env_var in sorted(not_documented_env_vars):
+        print(env_var)
+    if not not_documented_env_vars:
         print("None")
 
     print("\nEnvironment variables documented but not accessed:")
     diff = documented_env_vars - all_env_vars - ignored_env_vars
-    if diff:
-        for env_var in sorted(diff):
-            print(env_var)
-    else:
+    for env_var in sorted(diff):
+        print(env_var)
+    if not diff:
         print("None")
 
 
