@@ -61,8 +61,9 @@ def main():
     urls = [
         f"https://raw.githubusercontent.com/open-webui/open-webui/{git_ref}/backend/open_webui/config.py",
         f"https://raw.githubusercontent.com/open-webui/open-webui/{git_ref}/backend/open_webui/env.py",
+        f"https://raw.githubusercontent.com/open-webui/open-webui/{git_ref}/backend/open_webui/migrations/env.py",
     ]
-    filenames = ["config.py", "env.py"]
+    filenames = ["config.py", "env.py", "migrations/env.py"]
 
     all_env_vars = set()
 
