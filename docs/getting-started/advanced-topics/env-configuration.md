@@ -12,7 +12,7 @@ environment variables, providing their types, default values, and descriptions.
 As new variables are introduced, this page will be updated to reflect the growing configuration options.
 
 :::info
-This page is up to date with Open Web UI release version [v0.4.8](https://github.com/open-webui/open-webui/releases/tag/v0.4.8), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up to date with Open WebUI release version [v0.5.1](https://github.com/open-webui/open-webui/releases/tag/v0.5.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 :::
 
 ## App/Backend
@@ -35,18 +35,10 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
   - **Docker Default**: `prod`
 - Description: Environment setting.
 
-#### `WEBUI_AUTH`
+#### `CUSTOM_NAME`
 
-- Type: `bool`
-- Default: `True`
-- Description: This setting enables or disables authentication.
-
-:::danger
-If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
-important to note that turning off authentication is only possible for fresh installations without
-any existing users. If there are already users registered, you cannot disable authentication
-directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
-:::
+- Type: `str`
+- Description: Sets `WEBUI_NAME` but polls **api.openwebui.com** for metadata.
 
 #### `WEBUI_NAME`
 
@@ -60,23 +52,15 @@ directly. Ensure that no users are present in the database, if you intend to tur
 - Default: `http://localhost:3000`
 - Description: Specifies the URL where the Open WebUI is reachable. Currently used for search engine support.
 
-#### `AIOHTTP_CLIENT_TIMEOUT`
+#### `PORT`
 
 - Type: `int`
-- Default: `300`
-- Description: Specifies the timeout duration in seconds for the aiohttp client. This impacts things
-such as connections to Ollama and OpenAI endpoints.
+- Default: `8080`
+- Description: Sets the port to run Open WebUI from.
 
 :::info
-This is the maximum amount of time the client will wait for a response before timing out.
-If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
-allowing the client to wait indefinitely.
+If installed via Python, you must instead pass `--port` as a command line argument.
 :::
-
-#### `CUSTOM_NAME`
-
-- Type: `str`
-- Description: Sets `WEBUI_NAME` but polls **api.openwebui.com** for metadata.
 
 #### `ENABLE_SIGNUP`
 
@@ -107,32 +91,33 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `True`
 - Description: Enables admin users to access all chats.
 
-#### `ENABLE_COMMUNITY_SHARING`
+#### `ENABLE_CHANNELS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables channel support.
+
+#### `ADMIN_EMAIL`
+
+- Type: `str`
+- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
+
+#### `SHOW_ADMIN_DETAILS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether users are shown the share to community button.
+- Description: Toggles whether to show admin user details in the interface.
 
-#### `ENABLE_MESSAGE_RATING`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables message rating feature.
-
-#### `OFFLINE_MODE`
+#### `BYPASS_MODEL_ACCESS_CONTROL`
 
 - Type: `bool`
-- Description: Enables or disables offline mode.
+- Default: `False`
+- Description: Bypasses model access control.
 
 #### `DEFAULT_MODELS`
 
 - Type: `str`
 - Description: Sets a default Language Model.
-
-#### `BYPASS_MODEL_ACCESS_CONTROL`
-
-- Type: `bool`
-- Description: Bypasses model access control.
 
 #### `DEFAULT_USER_ROLE`
 
@@ -143,6 +128,12 @@ is also being used and set to `True`. Failure to do so will result in the inabil
   - `admin` - New users are automatically activated with administrator permissions.
 - Default: `pending`
 - Description: Sets the default role assigned to new users.
+
+#### `DEFAULT_LOCALE`
+
+- Type: `str`
+- Default: `en`
+- Description: Sets the default locale for the application.
 
 #### `WEBHOOK_URL`
 
@@ -165,24 +156,6 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 [{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
 ```
 
-#### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
-
-- Type: `str`
-- Description: Defines the trusted request header for authentication. See [SSO docs](/features/sso).
-
-#### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
-
-- Type: `str`
-- Description: Defines the trusted request header for the username of anyone registering with the
-`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/sso).
-
-#### `WEBUI_SECRET_KEY`
-
-- Type: `str`
-- Default: `t0p-s3cr3t`
-- Docker Default: Randomly generated on first start
-- Description: Overrides the randomly generated string used for JSON Web Token.
-
 #### `JWT_EXPIRES_IN`
 
 - Type: `int`
@@ -196,32 +169,20 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration
 for local Whisper and embeddings.
 
-#### `PORT`
+### AIOHTTP Client
+
+#### `AIOHTTP_CLIENT_TIMEOUT`
 
 - Type: `int`
-- Default: `8080`
-- Description: Sets the port to run Open WebUI from.
+- Default: `300`
+- Description: Specifies the timeout duration in seconds for the aiohttp client. This impacts things
+such as connections to Ollama and OpenAI endpoints.
 
 :::info
-If installed via Python, you must instead pass `--port` as a command line argument.
+This is the maximum amount of time the client will wait for a response before timing out.
+If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
+allowing the client to wait indefinitely.
 :::
-
-#### `DEFAULT_LOCALE`
-
-- Type: `str`
-- Default: `en`
-- Description: Sets the default locale for the application.
-
-#### `SHOW_ADMIN_DETAILS`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles whether to show admin user details in the interface.
-
-#### `ADMIN_EMAIL`
-
-- Type: `str`
-- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
 
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
 
@@ -261,7 +222,7 @@ If installed via Python, you must instead pass `--port` as a command line argume
 - Default: `True`
 - Description: Enables the use of Ollama APIs.
 
-#### `OLLAMA_BASE_URL`
+#### `OLLAMA_BASE_URL` (`OLLAMA_API_BASE_URL` is depreciated)
 
 - Type: `str`
 - Default: `http://localhost:11434`
@@ -286,6 +247,7 @@ If installed via Python, you must instead pass `--port` as a command line argume
 #### `K8S_FLAG`
 
 - Type: `bool`
+- Default: `False`
 - Description: If set, assumes Helm chart deployment and sets [`OLLAMA_BASE_URL`](#ollama_base_url) to `http://ollama-service.open-webui.svc.cluster.local:11434`
 
 ### OpenAI
@@ -368,6 +330,7 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
 
 - Type: `bool`
+- Default: `False`
 - Description: Enables or disables autocomplete generation.
 
 #### `AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH`
@@ -385,13 +348,27 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 #### `ENABLE_EVALUATION_ARENA_MODELS`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables evaluation arena models.
+
+#### `ENABLE_MESSAGE_RATING`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables message rating feature.
+
+#### `ENABLE_COMMUNITY_SHARING`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether users are shown the share to community button.
 
 ### Tags Generation
 
 #### `ENABLE_TAGS_GENERATION`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables tags generation.
 
 #### `TAGS_GENERATION_PROMPT_TEMPLATE`
@@ -443,6 +420,32 @@ requests initiated by third-party websites, but only over HTTPS.
 - Type: `bool`
 - Default: `False`
 - Description: Sets the `Secure` attribute for session cookies if set to `True`.
+
+#### `WEBUI_AUTH`
+
+- Type: `bool`
+- Default: `True`
+- Description: This setting enables or disables authentication.
+
+:::danger
+If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
+important to note that turning off authentication is only possible for fresh installations without
+any existing users. If there are already users registered, you cannot disable authentication
+directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
+:::
+
+#### `WEBUI_SECRET_KEY`
+
+- Type: `str`
+- Default: `t0p-s3cr3t`
+- Docker Default: Randomly generated on first start
+- Description: Overrides the randomly generated string used for JSON Web Token.
+
+#### `OFFLINE_MODE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables offline mode.
 
 #### `RESET_CONFIG_ON_START`
 
@@ -530,12 +533,6 @@ modeling files for reranking.
   - Leave empty to use default
   - `tika` - Use a local Apache Tika server
 - Description: Sets the content extraction engine to use for document ingestion.
-
-#### `TIKA_SERVER_URL`
-
-- Type: `str`
-- Default: `http://localhost:9998`
-- Description: Sets the URL for the Apache Tika server.
 
 #### `RAG_TOP_K`
 
@@ -663,12 +660,21 @@ You are given a user query, some textual context and rules, all inside xml tags.
 #### `ENABLE_RETRIEVAL_QUERY_GENERATION`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables retrieval query generation.
 
 #### `QUERY_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
 - Description: Sets the prompt template for query generation.
+
+### Apache Tika
+
+#### `TIKA_SERVER_URL`
+
+- Type: `str`
+- Default: `http://localhost:9998`
+- Description: Sets the URL for the Apache Tika server.
 
 ### ChromaDB
 
@@ -719,6 +725,24 @@ You are given a user query, some textual context and rules, all inside xml tags.
 - Description: Specifies auth credentials for remote ChromaDB Server.
 - Example: `username:password`
 
+### Google Drive
+
+#### `ENABLE_GOOGLE_DRIVE_INTEGRATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables Google Drive integration.
+
+#### `GOOGLE_DRIVE_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Google Drive integration.
+
+#### `GOOGLE_DRIVE_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Google Drive integration.
+
 ### Milvus
 
 #### `MILVUS_URI`
@@ -743,6 +767,7 @@ You are given a user query, some textual context and rules, all inside xml tags.
 #### `OPENSEARCH_SSL`
 
 - Type: `bool`
+- Default: `False`
 - Description: Enables or disables SSL for OpenSearch.
 
 #### `OPENSEARCH_URI`
@@ -785,7 +810,20 @@ You are given a user query, some textual context and rules, all inside xml tags.
 #### `ENABLE_SEARCH_QUERY_GENERATION`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables search query generation.
+
+#### `RAG_WEB_SEARCH_RESULT_COUNT`
+
+- Type: `int`
+- Default: `3`
+- Description: Maximum number of search results to crawl.
+
+#### `RAG_WEB_SEARCH_CONCURRENT_REQUESTS`
+
+- Type: `int`
+- Default: `10`
+- Description: Number of concurrent requests to crawl web pages returned from search results.
 
 #### `RAG_WEB_SEARCH_ENGINE`
 
@@ -814,7 +852,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `GOOGLE_PSE_API_KEY`
 
 - Type: `str`
-- Description: The API key for the Google Programmable Search Engine (PSE) service.
+- Description: Sets the API key for the Google Programmable Search Engine (PSE) service.
 
 #### `GOOGLE_PSE_ENGINE_ID`
 
@@ -824,7 +862,12 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `BRAVE_SEARCH_API_KEY`
 
 - Type: `str`
-- Description: The API key for the Brave Search API.
+- Description: Sets the API key for the Brave Search API.
+
+#### `KAGI_SEARCH_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Kagi Search API.
 
 #### `MOJEEK_SEARCH_API_KEY`
 
@@ -834,7 +877,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `SERPSTACK_API_KEY`
 
 - Type: `str`
-- Description: The API key for Serpstack search API.
+- Description: Sets the API key for Serpstack search API.
 
 #### `SERPSTACK_HTTPS`
 
@@ -845,17 +888,17 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `SERPER_API_KEY`
 
 - Type: `str`
-- Description: The API key for the Serper search API.
+- Description: Sets the API key for Serper search API.
 
 #### `SERPLY_API_KEY`
 
 - Type: `str`
-- Description: The API key for the Serply search API.
+- Description: Sets the API key for Serply search API.
 
 #### `SEARCHAPI_API_KEY`
 
 - Type: `str`
-- Description: Sets the SearchAPI API key.
+- Description: Sets the API key for SearchAPI.
 
 #### `SEARCHAPI_ENGINE`
 
@@ -865,7 +908,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `TAVILY_API_KEY`
 
 - Type: `str`
-- Description: The API key for the Tavily search API.
+- Description: Sets the API key for Tavily search API.
 
 #### `JINA_API_KEY`
 
@@ -881,18 +924,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `str`
 - Description: Sets the subscription key for Bing Search API.
-
-#### `RAG_WEB_SEARCH_RESULT_COUNT`
-
-- Type: `int`
-- Default: `3`
-- Description: Maximum number of search results to crawl.
-
-#### `RAG_WEB_SEARCH_CONCURRENT_REQUESTS`
-
-- Type: `int`
-- Default: `10`
-- Description: Number of concurrent requests to crawl web pages returned from search results.
 
 ### YouTube Loader
 
@@ -1080,6 +1111,11 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Description: Specifies the URL to the ComfyUI image generation API.
 
+#### `COMFYUI_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for ComfyUI.
+
 #### `COMFYUI_WORKFLOW`
 
 - Type: `str`
@@ -1099,62 +1135,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for DALL-E image generation.
 
-## Database Pool
-
-#### `DATABASE_URL`
-
-- Type: `str`
-- Default: `sqlite:///${DATA_DIR}/webui.db`
-- Description: Specifies the database URL to connect to.
-
-:::info
-Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
-:::
-
-#### `DATABASE_POOL_SIZE`
-
-- Type: `int`
-- Default: `0`
-- Description: Specifies the size of the database pool. A value of `0` disables pooling.
-
-#### `DATABASE_POOL_MAX_OVERFLOW`
-
-- Type: `int`
-- Default: `0`
-- Description: Specifies the database pool max overflow.
-
-:::info
-More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
-:::
-
-#### `DATABASE_POOL_TIMEOUT`
-
-- Type: `int`
-- Default: `30`
-- Description: Specifies the database pool timeout in seconds to get a connection.
-
-:::info
-More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
-:::
-
-#### `DATABASE_POOL_RECYCLE`
-
-- Type: `int`
-- Default: `3600`
-- Description: Specifies the database pool recycle time in seconds.
-
-:::info
-More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
-:::
-
 ## OAuth
 
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables user account creation via OAuth. Distinct from `ENABLE_SIGNUP`.
+- Description: Enables account creation when sighting up via OAuth. Distinct from `ENABLE_SIGNUP`.
 
 #### `ENABLE_API_KEY`
 
@@ -1167,6 +1154,12 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Type: `bool`
 - Default: `False`
 - Description: Enables role management to oauth delegation.
+
+#### `ENABLE_OAUTH_GROUP_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OAUTH group management.
 
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
@@ -1194,15 +1187,16 @@ potential account takeovers.
 - Default: `picture`
 - Description: Set picture (avatar) claim for OpenID.
 
-#### `OAUTH_CLIENT_ID`
+#### `OAUTH_GROUP_CLAIM`
 
 - Type: `str`
-- Description: Sets the client ID for OIDC
+- Description: Specifies the group claim for OAUTH authentication.
 
-#### `OAUTH_CLIENT_SECRET`
+#### `OAUTH_ROLES_CLAIM`
 
 - Type: `str`
-- Description: Sets the client secret for OIDC
+- Default: `roles`
+- Description: Sets the roles claim to look for in the OIDC token.
 
 #### `OAUTH_SCOPES`
 
@@ -1210,17 +1204,10 @@ potential account takeovers.
 - Default: `openid email profile`
 - Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
 
-#### `OAUTH_PROVIDER_NAME`
+#### `OAUTH_ALLOWED_DOMAINS`
 
 - Type: `str`
-- Default: `SSO`
-- Description: Sets the name for the OIDC provider.
-
-#### `OAUTH_ROLES_CLAIM`
-
-- Type: `str`
-- Default: `roles`
-- Description: Sets the roles claim to look for in the OIDC token.
+- Description: Specifies the allowed domains for OAUTH authentication. (e.g. "example1.com,example2.com").
 
 #### `OAUTH_ALLOWED_ROLES`
 
@@ -1233,6 +1220,21 @@ potential account takeovers.
 - Type: `str`
 - Default: `admin`
 - Description: Sets the roles that are considered administrators.
+
+#### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
+
+- Type: `str`
+- Description: Defines the trusted request header for authentication. See [SSO docs](/features/sso).
+
+#### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
+
+- Type: `str`
+- Description: Defines the trusted request header for the username of anyone registering with the
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/sso).
+
+### Google
+
+See https://support.google.com/cloud/answer/6158849?hl=en
 
 #### `GOOGLE_CLIENT_ID`
 
@@ -1253,7 +1255,12 @@ potential account takeovers.
 #### `GOOGLE_REDIRECT_URI`
 
 - Type: `str`
+- Default: `<backend>/oauth/google/callback`
 - Description: Sets the redirect URI for Google OAuth
+
+### Microsoft
+
+See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
 
 #### `MICROSOFT_CLIENT_ID`
 
@@ -1279,16 +1286,36 @@ potential account takeovers.
 #### `MICROSOFT_REDIRECT_URI`
 
 - Type: `str`
+- Default: `<backend>/oauth/microsoft/callback`
 - Description: Sets the redirect URI for Microsoft OAuth
+
+### OpenID (OIDC)
+
+#### `OAUTH_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for OIDC
+
+#### `OAUTH_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for OIDC
 
 #### `OPENID_PROVIDER_URL`
 
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 
+#### `OAUTH_PROVIDER_NAME`
+
+- Type: `str`
+- Default: `SSO`
+- Description: Sets the name for the OIDC provider.
+
 #### `OPENID_REDIRECT_URI`
 
 - Type: `str`
+- Default: `<backend>/oauth/oidc/callback`
 - Description: Sets the redirect URI for OIDC
 
 ## LDAP
@@ -1296,6 +1323,7 @@ potential account takeovers.
 #### `ENABLE_LDAP`
 
 - Type: `bool`
+- Default: `False`
 - Description: Enables or disables LDAP authentication.
 
 #### `LDAP_APP_DN`
@@ -1351,6 +1379,7 @@ potential account takeovers.
 #### `LDAP_USE_TLS`
 
 - Type: `bool`
+- Default: `False`
 - Description: Enables or disables TLS for LDAP connection.
 
 ## User Permissions
@@ -1361,88 +1390,53 @@ potential account takeovers.
 - Default: `True`
 - Description: Enables or disables user permission to create temporary chats.
 
-#### `USER_PERMISSIONS_CHAT_DELETE`
-
-- Type: `bool`
-- Description: Enables or disables user permission to delete chats.
-
 #### `USER_PERMISSIONS_CHAT_EDIT`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables user permission to edit chats.
+
+#### `USER_PERMISSIONS_CHAT_DELETE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to delete chats.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables user permission to upload files to chats.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables user permission to access workspace knowledge.
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables user permission to access workspace models.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables user permission to access workspace prompts.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS`
 
 - Type: `bool`
+- Default: `True`
 - Description: Enables or disables user permission to access workspace tools.
 
 ## Misc Environment Variables
 
 These variables are not specific to Open WebUI but can still be valuable in certain contexts.
 
-### Proxy Settings
-
-Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
-Open WebUI uses the following environment variables:
-
-#### `http_proxy`
-
-- Type: `str`
-- Description: Sets the URL for the HTTP proxy.
-
-#### `https_proxy`
-
-- Type: `str`
-- Description: Sets the URL for the HTTPS proxy.
-
-#### `no_proxy`
-
-- Type: `str`
-- Description: Lists domain extensions (or IP addresses) for which the proxy should not be used,
-separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
-bypassed when accessing documents from MIT.
-
-### Redis
-
-#### `ENABLE_WEBSOCKET_SUPPORT`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables websocket support in Open WebUI (used with Redis).
-
-#### `WEBSOCKET_MANAGER`
-
-- Type: `str`
-- Default: `redis`
-- Description: Specifies the websocket manager to use (in this case, Redis).
-
-#### `WEBSOCKET_REDIS_URL`
-
-- Type: `str`
-- Default: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for websocket communication.
-
-### S3 Storage Provider
+### Amazon S3 Storage
 
 #### `STORAGE_PROVIDER`
 
@@ -1473,3 +1467,94 @@ bypassed when accessing documents from MIT.
 
 - Type: `str`
 - Description: Sets the secret access key for S3 storage.
+
+### Database Pool
+
+#### `DATABASE_URL`
+
+- Type: `str`
+- Default: `sqlite:///${DATA_DIR}/webui.db`
+- Description: Specifies the database URL to connect to.
+
+:::info
+Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
+Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+:::
+
+#### `DATABASE_POOL_SIZE`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the size of the database pool. A value of `0` disables pooling.
+
+#### `DATABASE_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the database pool max overflow.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
+:::
+
+#### `DATABASE_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Specifies the database pool timeout in seconds to get a connection.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
+:::
+
+#### `DATABASE_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the database pool recycle time in seconds.
+
+:::info
+More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
+:::
+
+### Redis
+
+#### `ENABLE_WEBSOCKET_SUPPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables websocket support in Open WebUI (used with Redis).
+
+#### `WEBSOCKET_MANAGER`
+
+- Type: `str`
+- Default: `redis`
+- Description: Specifies the websocket manager to use (in this case, Redis).
+
+#### `WEBSOCKET_REDIS_URL` (`REDIS_URL` exists for potential future use cases. In practice, it is recommended to set both.)
+
+- Type: `str`
+- Default: `redis://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for websocket communication.
+
+### Proxy Settings
+
+Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
+Open WebUI uses the following environment variables:
+
+#### `http_proxy`
+
+- Type: `str`
+- Description: Sets the URL for the HTTP proxy.
+
+#### `https_proxy`
+
+- Type: `str`
+- Description: Sets the URL for the HTTPS proxy.
+
+#### `no_proxy`
+
+- Type: `str`
+- Description: Lists domain extensions (or IP addresses) for which the proxy should not be used,
+separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
+bypassed when accessing documents from MIT.
