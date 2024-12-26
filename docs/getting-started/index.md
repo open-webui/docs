@@ -15,6 +15,12 @@ Get up and running quickly with our [Quick Start Guide](./quick-start).
 
 ---
 
+## 📚 Using OpenWebUI  
+
+Learn the basics and explore key concepts in our [Using OpenWebUI Guide](./using-openwebui).
+
+---
+
 ## 🛠️ Advanced Topics  
 
 Take a deeper dive into configurations and development tips in our [Advanced Topics Guide](./advanced-topics).

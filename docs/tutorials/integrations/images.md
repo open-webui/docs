@@ -114,7 +114,6 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 3. Return to Open WebUI and click the **Click here to upload a workflow.json file** button.
 4. Select the `workflow_api.json` file to import the exported workflow from ComfyUI into Open WebUI.
 5. After importing the workflow, you must map the `ComfyUI Workflow Nodes` according to the imported workflow node IDs.
-6. Set `Set Default Model` to the name of the model file being used, such as `flux1-dev.safetensors`
 
 :::info
 You may need to adjust an `Input Key` or two within Open WebUI's `ComfyUI Workflow Nodes` section to match a node within your workflow.
