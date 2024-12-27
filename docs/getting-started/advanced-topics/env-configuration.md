@@ -1382,43 +1382,19 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Default: `False`
 - Description: Enables or disables TLS for LDAP connection.
 
-## User Permissions
-
-#### `USER_PERMISSIONS_CHAT_TEMPORARY`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to create temporary chats.
-
-#### `USER_PERMISSIONS_CHAT_EDIT`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to edit chats.
-
-#### `USER_PERMISSIONS_CHAT_DELETE`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to delete chats.
-
-#### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to upload files to chats.
-
-#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to access workspace knowledge.
+## Workspace Permissions
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`
 
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to access workspace models.
+
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to access workspace knowledge.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`
 
@@ -1431,6 +1407,32 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to access workspace tools.
+
+## Chat Permissions
+
+#### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to upload files to chats.
+
+#### `USER_PERMISSIONS_CHAT_DELETE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to delete chats.
+
+#### `USER_PERMISSIONS_CHAT_EDIT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to edit chats.
+
+#### `USER_PERMISSIONS_CHAT_TEMPORARY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to create temporary chats.
 
 ## Misc Environment Variables
 
