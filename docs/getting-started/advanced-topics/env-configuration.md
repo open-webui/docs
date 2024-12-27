@@ -156,11 +156,20 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 [{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
 ```
 
+:::note
+When setting this environment variable in a `.env` file, make sure to escape the quotes by wrapping the entire value in double quotes and using escaped quotes (`\"`) for the inner quotes. Example:
+
+```
+WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your messages are stored.\", \"content\": \"Your messages are stored and may be reviewed by human people. LLM's are prone to hallucinations, check sources.\", \"dismissible\": true, \"timestamp\": 1000}]"
+```
+
+:::
+
 #### `JWT_EXPIRES_IN`
 
 - Type: `int`
 - Default: `-1`
-- Description: Sets the JWT expiration time in seconds. A value of -1 disables expiration.
+- Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 
 #### `USE_CUDA_DOCKER`
 
@@ -222,7 +231,7 @@ allowing the client to wait indefinitely.
 - Default: `True`
 - Description: Enables the use of Ollama APIs.
 
-#### `OLLAMA_BASE_URL` (`OLLAMA_API_BASE_URL` is depreciated)
+#### `OLLAMA_BASE_URL` (`OLLAMA_API_BASE_URL` is depreciated) {#ollama_base_url}
 
 - Type: `str`
 - Default: `http://localhost:11434`
