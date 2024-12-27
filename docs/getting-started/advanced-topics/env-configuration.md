@@ -17,6 +17,21 @@ This page is up to date with Open WebUI release version [v0.5.1](https://github.
 
 :::
 
+### Important Note on PersistentConfig Environment Variables
+
+
+:::note
+When launching Open WebUI for the first time, all environment variables are treated equally and can be used to configure the application. However, for environment variables marked as `PersistentConfig`, their values are persisted and stored internally.
+
+After the initial launch, if you restart the container, `PersistentConfig` environment variables will no longer use the external environment variable values. Instead, they will use the internally stored values.
+
+In contrast, regular environment variables will continue to be updated and applied on each subsequent restart.
+
+You can update the values of `PersistentConfig` environment variables directly from within Open WebUI, and these changes will be stored internally. This allows you to manage these configuration settings independently of the external environment variables.
+
+Please note that `PersistentConfig` environment variables are clearly marked as such in the documentation below, so you can be aware of how they will behave.
+:::
+
 ## App/Backend
 
 The following environment variables are used by `backend/config.py` to provide Open WebUI startup
