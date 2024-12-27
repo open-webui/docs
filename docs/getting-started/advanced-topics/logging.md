@@ -56,7 +56,6 @@ Some level of granularity is possible using any of the following combination of 
 | `CONFIG_LOG_LEVEL`   | Configuration handling                                            |
 | `DB_LOG_LEVEL`       | Internal Peewee Database                                          |
 | `IMAGES_LOG_LEVEL`   | AUTOMATIC1111 stable diffusion image generation                   |
-| `LITELLM_LOG_LEVEL`  | LiteLLM proxy                                                     |
 | `MAIN_LOG_LEVEL`     | Main (root) execution                                             |
 | `MODELS_LOG_LEVEL`   | LLM model interaction, authentication, etc.                       |
 | `OLLAMA_LOG_LEVEL`   | Ollama backend interaction                                        |
