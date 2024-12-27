@@ -385,6 +385,23 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Type: `str`
 - Description: Sets the prompt template for tags generation.
 
+### API Key Endpoint Restrictions
+
+#### `ENABLE_API_KEY_ENDPOINT_RESTRICTIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables API key endpoint restrictions for added security and configurability.
+
+#### `API_KEY_ALLOWED_ENDPOINTS`
+
+- Type: `str`
+- Description: Specifies a comma-separated list of allowed API endpoints when API key endpoint restrictions are enabled.
+
+:::note
+The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of endpoint URLs, such as `/api/v1/messages, /api/v1/channels`.
+:::
+
 ## Security Variables
 
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
