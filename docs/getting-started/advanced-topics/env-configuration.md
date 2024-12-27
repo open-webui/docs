@@ -881,7 +881,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `MOJEEK_SEARCH_API_KEY`
 
 - Type: `str`
-- Description: Sets the API key for Mojiek Search API.
+- Description: Sets the API key for Mojeek Search API.
 
 #### `SERPSTACK_API_KEY`
 
