@@ -212,13 +212,6 @@ Access detailed API documentation for different services provided by Open WebUI:
 | Application | Documentation Path      |
 |-------------|-------------------------|
 | Main        | `/docs`                 |
-| WebUI       | `/api/v1/docs`          |
-| Ollama      | `/ollama/docs`          |
-| OpenAI      | `/openai/docs`          |
-| Images      | `/images/api/v1/docs`   |
-| Audio       | `/audio/api/v1/docs`    |
-| RAG         | `/retrieval/api/v1/docs`|
 
-Each documentation portal offers interactive examples, schema descriptions, and testing capabilities to enhance your understanding and ease of use.
 
 By following these guidelines, you can swiftly integrate and begin utilizing the Open WebUI API. Should you encounter any issues or have questions, feel free to reach out through our Discord Community or consult the FAQs. Happy coding! 🌟
