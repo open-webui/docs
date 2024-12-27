@@ -12,7 +12,9 @@ environment variables, providing their types, default values, and descriptions.
 As new variables are introduced, this page will be updated to reflect the growing configuration options.
 
 :::info
+
 This page is up to date with Open WebUI release version [v0.5.1](https://github.com/open-webui/open-webui/releases/tag/v0.5.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+
 :::
 
 ## App/Backend
@@ -59,7 +61,9 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 - Description: Sets the port to run Open WebUI from.
 
 :::info
+
 If installed via Python, you must instead pass `--port` as a command line argument.
+
 :::
 
 #### `ENABLE_SIGNUP`
@@ -75,8 +79,10 @@ If installed via Python, you must instead pass `--port` as a command line argume
 - Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
 
 :::danger
+
 This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/advanced-topics/env-configuration/#enable_oauth_signup)
 is also being used and set to `True`. Failure to do so will result in the inability to login.
+
 :::
 
 #### `ENABLE_ADMIN_EXPORT`
@@ -156,7 +162,8 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 [{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
 ```
 
-:::note
+:::info
+
 When setting this environment variable in a `.env` file, make sure to escape the quotes by wrapping the entire value in double quotes and using escaped quotes (`\"`) for the inner quotes. Example:
 
 ```
@@ -188,9 +195,11 @@ for local Whisper and embeddings.
 such as connections to Ollama and OpenAI endpoints.
 
 :::info
+
 This is the maximum amount of time the client will wait for a response before timing out.
 If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
 allowing the client to wait indefinitely.
+
 :::
 
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
@@ -342,6 +351,12 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Default: `False`
 - Description: Enables or disables autocomplete generation.
 
+:::info
+
+When enabling `ENABLE_AUTOCOMPLETE_GENERATION`, ensure that you also configure `AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH` and `AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE` accordingly.
+
+:::
+
 #### `AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH`
 
 - Type: `int`
@@ -399,7 +414,9 @@ Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. 
 - Description: Specifies a comma-separated list of allowed API endpoints when API key endpoint restrictions are enabled.
 
 :::note
+
 The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of endpoint URLs, such as `/api/v1/messages, /api/v1/channels`.
+
 :::
 
 ## Security Variables
@@ -454,10 +471,12 @@ requests initiated by third-party websites, but only over HTTPS.
 - Description: This setting enables or disables authentication.
 
 :::danger
+
 If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
 important to note that turning off authentication is only possible for fresh installations without
 any existing users. If there are already users registered, you cannot disable authentication
 directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
+
 :::
 
 #### `WEBUI_SECRET_KEY`
@@ -645,6 +664,12 @@ You are given a user query, some textual context and rules, all inside xml tags.
 - Default: `10`
 - Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
 
+:::info
+
+When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the values are reasonable to prevent excessive file uploads and potential performance issues.
+
+:::
+
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
@@ -758,6 +783,12 @@ You are given a user query, some textual context and rules, all inside xml tags.
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables Google Drive integration. If set to true, and `GOOGLE_DRIVE_CLIENT_ID` & `GOOGLE_DRIVE_API_KEY` are both configured, Google Drive will appear as an upload option in the chat UI.
+
+:::info
+
+When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGLE_DRIVE_CLIENT_ID` and `GOOGLE_DRIVE_API_KEY` correctly, and have reviewed Google's terms of service and usage guidelines.
+
+:::
 
 #### `GOOGLE_DRIVE_CLIENT_ID`
 
@@ -1169,6 +1200,12 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `False`
 - Description: Enables account creation when sighting up via OAuth. Distinct from `ENABLE_SIGNUP`.
 
+:::danger
+
+`ENABLE_LOGIN_FORM` must be set to `False` when `ENABLE_OAUTH_SIGNUP` is set to `True`. Failure to do so will result in the inability to login.
+
+:::
+
 #### `ENABLE_API_KEY`
 
 - Type: `bool`
@@ -1505,8 +1542,10 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Description: Specifies the database URL to connect to.
 
 :::info
+
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
 Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+
 :::
 
 #### `DATABASE_POOL_SIZE`
@@ -1522,7 +1561,9 @@ Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/c
 - Description: Specifies the database pool max overflow.
 
 :::info
+
 More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
+
 :::
 
 #### `DATABASE_POOL_TIMEOUT`
@@ -1532,7 +1573,9 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Specifies the database pool timeout in seconds to get a connection.
 
 :::info
+
 More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
+
 :::
 
 #### `DATABASE_POOL_RECYCLE`
@@ -1542,7 +1585,9 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Specifies the database pool recycle time in seconds.
 
 :::info
+
 More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
+
 :::
 
 ### Redis
