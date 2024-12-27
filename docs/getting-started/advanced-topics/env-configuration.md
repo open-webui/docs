@@ -19,8 +19,8 @@ This page is up to date with Open WebUI release version [v0.5.1](https://github.
 
 ### Important Note on PersistentConfig Environment Variables
 
-
 :::note
+
 When launching Open WebUI for the first time, all environment variables are treated equally and can be used to configure the application. However, for environment variables marked as `PersistentConfig`, their values are persisted and stored internally.
 
 After the initial launch, if you restart the container, `PersistentConfig` environment variables will no longer use the external environment variable values. Instead, they will use the internally stored values.
@@ -30,6 +30,7 @@ In contrast, regular environment variables will continue to be updated and appli
 You can update the values of `PersistentConfig` environment variables directly from within Open WebUI, and these changes will be stored internally. This allows you to manage these configuration settings independently of the external environment variables.
 
 Please note that `PersistentConfig` environment variables are clearly marked as such in the documentation below, so you can be aware of how they will behave.
+
 :::
 
 ## App/Backend
@@ -169,7 +170,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 #### `WEBHOOK_URL`
 
 - Type: `str`
-- Description: Sets a webhook for integration with Slack/Microsoft Teams.
+- Description: Sets a webhook for integration with Discord/Slack/Microsoft Teams.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEBUI_BUILD_HASH`
@@ -285,6 +286,7 @@ allowing the client to wait indefinitely.
 - Type: `str`
 - Description: Configures load-balanced Ollama backend hosts, separated by `;`. See
 [`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
+- Example: `http://host-one:11434;http://host-two:11434`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USE_OLLAMA_DOCKER`
@@ -313,6 +315,7 @@ allowing the client to wait indefinitely.
 - Type: `str`
 - Default: `https://api.openai.com/v1`
 - Description: Configures the OpenAI base API URL.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OPENAI_API_BASE_URLS`
 
@@ -325,6 +328,8 @@ allowing the client to wait indefinitely.
 
 - Type: `str`
 - Description: Sets the OpenAI API key.
+- Example: `sk-124781258123`
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OPENAI_API_KEYS`
 
