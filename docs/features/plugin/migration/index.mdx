@@ -1,9 +1,9 @@
 ---
 sidebar_position: 3
-title: "🚀  Migrating Functions: Open WebUI 0.4 to 0.5"
+title: "🚚 Migrating Functions: Open WebUI 0.4 to 0.5"
 ---
 
-# 🚀 Migration Guide: Open WebUI 0.4 to 0.5
+# 🚚 Migration Guide: Open WebUI 0.4 to 0.5
 
 Welcome to the Open WebUI 0.5 migration guide! If you're working on existing projects or building new ones, this guide will walk you through the key changes from **version 0.4 to 0.5** and provide an easy-to-follow roadmap for upgrading your Functions. Let's make this transition as smooth as possible! 😊
 
@@ -57,6 +57,25 @@ Quick changes for import paths:
 | `open_webui.apps.audio`           | `open_webui.routers.audio`        |
 | `open_webui.apps.retrieval`       | `open_webui.routers.retrieval`    |
 | `open_webui.apps.webui`           | `open_webui.main`                 |
+
+
+### 📜 An Important Example  
+
+To clarify the special case of the main app (`webui`), here’s a simple rule of thumb:  
+
+- **Was in `webui`?** It’s now in the project’s root or `open_webui.main`.  
+- For example:  
+    - **Before (0.4):**  
+      ```python  
+      from open_webui.apps.webui.models import SomeModel  
+      ```  
+    - **After (0.5):**  
+      ```python  
+      from open_webui.models import SomeModel  
+      ```  
+
+In general, **just replace `open_webui.apps` with `open_webui.routers`—except for `webui`, which is now `open_webui.main`!**
+
 
 ---
 
