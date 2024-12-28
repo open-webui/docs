@@ -1,0 +1,184 @@
+---
+sidebar_position: 3
+title: "🚀  Migrating Functions: Open WebUI 0.4 to 0.5"
+---
+
+# 🚀 Migration Guide: Open WebUI 0.4 to 0.5
+
+Welcome to the Open WebUI 0.5 migration guide! If you're working on existing projects or building new ones, this guide will walk you through the key changes from **version 0.4 to 0.5** and provide an easy-to-follow roadmap for upgrading your Functions. Let's make this transition as smooth as possible! 😊
+
+---
+
+## 🧐 What Has Changed and Why?
+
+With Open WebUI 0.5, we’ve overhauled the architecture to make the project **simpler, more unified, and scalable**. Here's the big picture:
+
+- **Old Architecture:** 🎯 Previously, Open WebUI was built on a **sub-app architecture** where each app (e.g., `ollama`, `openai`) was a separate FastAPI application. This caused fragmentation and extra complexity when managing apps.
+- **New Architecture:** 🚀 With version 0.5, we have transitioned to a **single FastAPI app** with multiple **routers**. This means better organization, centralized flow, and reduced redundancy.
+
+### Key Changes:
+Here’s an overview of what changed:
+1. **Apps have been moved to Routers.**
+   - Previous: `open_webui.apps`
+   - Now: `open_webui.routers`
+
+2. **Main app structure simplified.**
+   - The old `open_webui.apps.webui` has been transformed into `open_webui.main`, making it the central entry point for the project.
+
+3. **Unified API Endpoint.**
+   - Instead of separate functions for models like `ollama` and `openai`, we now offer a **unified function** (`chat_completion`) in `open_webui.main` for a consistent API experience.
+
+4. **Updated Function Signatures.**
+   - Function signatures now adhere to a new format, requiring a `request` object.
+
+📌 **Why did we make these changes?**
+- To simplify the codebase, making it easier to extend and maintain.
+- To unify APIs for a more streamlined developer experience.
+- To enhance performance by consolidating redundant elements.
+
+---
+
+## ✅ Step-by-Step Migration Guide
+
+Follow this guide to smoothly update your project.
+
+---
+
+### 🔄 1. Shifting from `apps` to `routers` 
+
+All apps have been renamed and relocated under `open_webui.routers`. This affects imports in your codebase.
+
+Quick changes for import paths:
+
+| **Old Path**                      | **New Path**                      |
+|-----------------------------------|-----------------------------------|
+| `open_webui.apps.ollama`          | `open_webui.routers.ollama`       |
+| `open_webui.apps.openai`          | `open_webui.routers.openai`       |
+| `open_webui.apps.audio`           | `open_webui.routers.audio`        |
+| `open_webui.apps.retrieval`       | `open_webui.routers.retrieval`    |
+| `open_webui.apps.webui`           | `open_webui.main`                 |
+
+---
+
+### 👩‍💻 2. Updating Import Statements
+
+Let’s look at what this update looks like in your code:
+
+#### Before:
+```python
+from open_webui.apps.ollama import main as ollama
+from open_webui.apps.openai import main as openai
+```
+
+#### After:
+```python
+# Separate router imports
+from open_webui.routers.ollama import generate_chat_completion
+from open_webui.routers.openai import generate_chat_completion
+
+# Or use the unified endpoint
+from open_webui.main import chat_completion
+```
+
+**💡 Pro Tip:** Prioritize the unified endpoint (`chat_completion`) for simplicity and future compatibility.
+
+---
+
+### 📋 3. Adapting to Updated Function Signatures
+
+We’ve updated the **function signatures** to better fit the new architecture. 
+
+#### Function Signature Changes:
+| **Old**                                 | **New**                                 |
+|-----------------------------------------|-----------------------------------------|
+| `openai.generate_chat_completion(form_data: dict)` | `chat_completion(request: Request, form_data: dict)` |
+
+#### Example:
+
+If you're using `chat_completion`, here’s how your function should look now:
+
+### 🛠️ How to Refactor Your Custom Function
+Let’s rewrite a sample function to match the new structure:
+
+#### Before (0.4):
+```python
+from open_webui.apps.openai import generate_chat_completion
+
+class Pipe:
+    def __init__(self):
+        pass
+
+    async def pipe(self, body: dict) -> str:
+        # Calls OpenAI endpoint
+        return await openai.generate_chat_completion(body)
+```
+
+#### After (0.5):
+```python
+from open_webui.main import chat_completion
+from fastapi import Request
+
+class Pipe:
+    def __init__(self):
+        pass
+
+    async def pipe(
+        self,
+        body: dict,
+        __request__: Request,
+    ) -> str:
+        # Uses the unified endpoint with updated signature
+        return await chat_completion(__request__, body)
+```
+
+### Important Notes:
+- You must pass a `Request` object (`__request__`) in the new function signature.
+- Other optional parameters (like `__user__` and `__event_emitter__`) ensure flexibility for more complex use cases.
+
+---
+
+### 🌟 4. Recap: Key Concepts in Simple Terms
+
+Here’s a quick cheat sheet to remember:
+- **Apps to Routers:** Update all imports from `open_webui.apps` ➡️ `open_webui.routers`.
+- **Unified Endpoint:** Use `open_webui.main.chat_completion` for simplicity if both `ollama` and `openai` are involved.
+- **Adapt Function Signatures:** Ensure your functions pass the required `request` object.
+
+---
+
+### ✍️ Example Project on Open WebUI 0.5
+
+Here’s a simple example to tie everything together:
+
+```python
+from open_webui.main import chat_completion
+from fastapi import Request
+from typing import Any, Optional, Callable
+
+class ChatBotService:
+    def __init__(self):
+        self.name = "ChatBot"
+
+    async def handle_request(
+        self,
+        user_input: dict,
+        __request__: Request,
+        __task__=None,
+    ) -> str:
+        # Call the unified endpoint for chat completion
+        response = await chat_completion(__request__, user_input)
+        return response
+```
+
+---
+
+## 🎉 Hooray! You're Ready!
+
+That's it! You've successfully migrated from **Open WebUI 0.4 to 0.5**. By refactoring your imports, using the unified endpoint, and updating function signatures, you'll be fully equipped to leverage the latest features and improvements in version 0.5.
+
+---
+
+💬 **Questions or Feedback?**
+If you run into any issues or have suggestions, feel free to open a [GitHub issue](https://github.com/open-webui/open-webui) or ask in the community forums!
+
+Happy coding! ✨
