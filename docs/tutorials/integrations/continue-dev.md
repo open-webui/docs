@@ -23,30 +23,22 @@ Here you'll be able to configure continue to use Open WebUI.
 
 ---
 
-Currently the 'ollama' provider does not support authentication so we cannot use this provider with Open WebUI.
-
-However Ollama and Open WebUI both have compatibily with OpenAI API spec. You can see a blog post from Ollama [here](https://ollama.com/blog/openai-compatibility) on this.
-
-We can still setup Continue to use the openai provider which will allow us to use Open WebUI's authentication token.
-
----
-
-## Config
+## Config models
 
 In `config.json` all you will need to do is add/change the following options.
 
-### Change provider to openai
+### Change provider to ollama
 
 ```json
-"provider": "openai"
+"provider": "ollama"
 ```
 
 ### Add or update apiBase
 
-Set this to your Open Web UI domain + /ollama/v1 on the end.
+Set this to your Open Web UI domain + /ollama on the end.
 
 ```json
-"apiBase": "http://localhost:3000/ollama/v1" #If you followed Getting Started Docker
+"apiBase": "http://localhost:3000/ollama" #If you followed Getting Started Docker
 ```
 
 ### Add apiKey
@@ -59,20 +51,30 @@ You can find and generate your api key from Open WebUI -> Settings -> Account ->
 
 You'll want to copy the "API Key" (this starts with sk-)
 
+## Config embeddings provider
+
+```json
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text",
+    "apiBase": "http://localhost:3000/ollama",
+    "apiKey": "sk-79970662256d425eb274fc4563d4525b" # Replace with your API key
+  }
+```
+
 ## Example Config
 
-Here is a base example of config.json using Open WebUI via an openai provider. Using Granite Code as the model.
+Here is a base example of config.json using Open WebUI via an ollama provider.
 Make sure you pull the model into your ollama instance/s beforehand.
 
 ```json
 {
   "models": [
     {
-      "title": "Granite Code",
-      "provider": "openai",
-      "model": "granite-code:latest",
-      "useLegacyCompletionsEndpoint": false,
-      "apiBase": "http://YOUROPENWEBUI/ollama/v1",
+      "title": "qwen2.5-coder",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:32b",
+      "apiBase": "http://YOUROPENWEBUI/ollama",
       "apiKey": "sk-YOUR-API-KEY"
     }
   ],
@@ -84,11 +86,16 @@ Make sure you pull the model into your ollama instance/s beforehand.
     }
   ],
   "tabAutocompleteModel": {
-    "title": "Granite Code",
-    "provider": "openai",
-    "model": "granite-code:latest",
-    "useLegacyCompletionsEndpoint": false,
-    "apiBase": "http://localhost:3000/ollama/v1",
+    "title": "qwen2.5-coder",
+    "provider": "ollama",
+    "model": "qwen2.5-coder:32b",
+    "apiBase": "http://YOUROPENWEBUI/ollama",
+    "apiKey":"sk-YOUR-API-KEY"
+  },
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text",
+    "apiBase": "http://YOUROPENWEBUI/ollama",
     "apiKey": "sk-YOUR-API-KEY"
   }
 }
@@ -102,4 +109,8 @@ Select it and you should now be chatting via Open WebUI (and or any [pipelines](
 
 You can do this for as many models you would like to use, altough any model should work, you should use a model that is designed for code.
 
-See the continue documentation for additional continue configuration, [Continue Documentation](https://docs.continue.dev/reference/Model%20Providers/openai)
+See the continue documentation for additional continue configuration, [Continue Documentation](https://docs.continue.dev/customize/model-providers/ollama)
+
+## Re-ranking
+
+Re-ranking currently not supported by Ollama.
