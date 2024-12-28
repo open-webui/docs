@@ -679,8 +679,10 @@ modeling files for reranking.
 #### `VECTOR_DB`
 
 - Type: `str`
+- Options:
+- `chroma`, `milvus`, `qdrant`, `opensearch`, `pgvector`
 - Default: `chroma`
-- Description: Specifies which vector database system to use, either 'chroma' for ChromaDB or 'milvus' for Milvus. This setting determines which vector storage system will be used for managing embeddings.
+- Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
 #### `RAG_EMBEDDING_ENGINE`
 
@@ -775,6 +777,8 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `RAG_TEXT_SPLITTER`
 
 - Type: `str`
+- Options: `character`, `token`
+- Default: `character`
 - Description: Sets the text splitter for RAG models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1282,11 +1286,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 #### `AUDIO_TTS_ENGINE`
 
-- Type: `str` (enum: `elevenlabs`, `openai`)
+- Type: `str` (enum: `azure`, `elevenlabs`, `openai`, `transformers`)
 - Options:
   - Leave empty to use built-in WebAPI engine for Text-to-Speech.
+  - `azure` - Uses Azure engine for Text-to-Speech.
   - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech
   - `openai` - Uses OpenAI engine for Text-to-Speech.
+  - `transformers` - Uses SentenceTransformers for Text-to-Speech.
 - Description: Specifies the Text-to-Speech engine to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
