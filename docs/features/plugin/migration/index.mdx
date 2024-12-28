@@ -180,12 +180,12 @@ class ChatBotService:
 
     async def handle_request(
         self,
-        user_input: dict,
+        body: dict,
         __request__: Request,
         __task__=None,
     ) -> str:
         # Call the unified endpoint for chat completion
-        response = await chat_completion(__request__, user_input)
+        response = await chat_completion(__request__, body)
         return response
 ```
 
