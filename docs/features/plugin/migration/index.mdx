@@ -121,21 +121,37 @@ Let’s rewrite a sample function to match the new structure:
 
 #### Before (0.4):
 ```python
+from pydantic import BaseModel
 from open_webui.apps.openai import generate_chat_completion
+
+class User(BaseModel):
+    id: str
+    email: str
+    name: str
+    role: str
 
 class Pipe:
     def __init__(self):
         pass
 
-    async def pipe(self, body: dict) -> str:
+    async def pipe(self, body: dict, __user__: dict) -> str:
         # Calls OpenAI endpoint
-        return await openai.generate_chat_completion(body)
+        user = User(**__user__)
+        return await openai.generate_chat_completion(body, user)
 ```
 
 #### After (0.5):
 ```python
-from open_webui.main import chat_completion
+from pydantic import BaseModel
 from fastapi import Request
+
+from open_webui.main import chat_completion
+
+class User(BaseModel):
+    id: str
+    email: str
+    name: str
+    role: str
 
 class Pipe:
     def __init__(self):
@@ -144,10 +160,12 @@ class Pipe:
     async def pipe(
         self,
         body: dict,
+         __user__: dict,
         __request__: Request,
     ) -> str:
         # Uses the unified endpoint with updated signature
-        return await chat_completion(__request__, body)
+        user = User(**__user__)
+        return await chat_completion(__request__, body, user)
 ```
 
 ### Important Notes:
