@@ -25,8 +25,19 @@ Here’s an overview of what changed:
 2. **Main app structure simplified.**
    - The old `open_webui.apps.webui` has been transformed into `open_webui.main`, making it the central entry point for the project.
 
-3. **Unified API Endpoint.**
-   - Instead of separate functions for models like `ollama` and `openai`, we now offer a **unified function** (`chat_completion`) in `open_webui.main` for a consistent API experience.
+3. **Unified API Endpoint**
+   - Open WebUI 0.5 introduces a **unified function**, `chat_completion`, in `open_webui.main`, replacing separate functions for models like `ollama` and `openai`. This offers a consistent and streamlined API experience. However, the **direct successor** of these individual functions is `generate_chat_completion` from `open_webui.utils.chat`. If you prefer a lightweight POST request without handling additional parsing (e.g., files, tools, or misc), this utility function is likely what you want.
+
+#### Example:
+```python
+# Full API flow with parsing (new function):
+from open_webui.main import chat_completion
+
+# Lightweight, direct POST request (direct successor):
+from open_webui.utils.chat import generate_chat_completion
+```
+
+Choose the approach that best fits your use case!
 
 4. **Updated Function Signatures.**
    - Function signatures now adhere to a new format, requiring a `request` object.
