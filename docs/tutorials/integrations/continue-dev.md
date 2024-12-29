@@ -43,10 +43,10 @@ In `config.json` all you will need to do is add/change the following options.
 
 ### Add or update apiBase
 
-Set this to your Open Web UI domain + /ollama/v1 on the end.
+Set this to your Open Web UI domain on the end.
 
 ```json
-"apiBase": "http://localhost:3000/ollama/v1" #If you followed Getting Started Docker
+"apiBase": "http://localhost:3000/" #If you followed Getting Started Docker
 ```
 
 ### Add apiKey
