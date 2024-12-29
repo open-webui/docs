@@ -110,7 +110,7 @@ We’ve updated the **function signatures** to better fit the new architecture.
 #### Function Signature Changes:
 | **Old**                                 | **New**                                 |
 |-----------------------------------------|-----------------------------------------|
-| `openai.generate_chat_completion(form_data: dict)` | `chat_completion(request: Request, form_data: dict)` |
+| `openai.generate_chat_completion(form_data: dict, user: UserModel)` | `chat_completion(request: Request, form_data: dict, user: UserModel)` |
 
 #### Example:
 
