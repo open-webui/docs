@@ -101,6 +101,28 @@ from open_webui.main import chat_completion
 
 **💡 Pro Tip:** Prioritize the unified endpoint (`chat_completion`) for simplicity and future compatibility.
 
+### 📝 **Additional Note: Choosing Between `main.chat_completion` and `utils.chat.generate_chat_completion`**
+
+Depending on your use case, you can choose between:
+
+1. **`open_webui.main.chat_completion`:**
+    - Simulates making a POST request to `/api/chat/completions`.
+    - Processes files, tools, and other miscellaneous tasks.
+    - Best when you want the complete API flow handled automatically.
+
+2. **`open_webui.utils.chat.generate_chat_completion`:**
+    - Directly makes a POST request without handling extra parsing or tasks.
+    - Best for simplified and more lightweight scenarios.
+
+#### Example:
+```python
+# Use this for the full API flow with parsing:
+from open_webui.main import chat_completion
+
+# Use this for a stripped-down, direct POST request:
+from open_webui.utils.chat import generate_chat_completion
+```
+
 ---
 
 ### 📋 3. Adapting to Updated Function Signatures
