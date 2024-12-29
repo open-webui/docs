@@ -41,6 +41,21 @@ Choose the approach that best fits your use case!
 
 4. **Updated Function Signatures.**
    - Function signatures now adhere to a new format, requiring a `request` object.
+   - The `request` object can be obtained using the `__request__` parameter in the function signature. Below is an example:
+
+```python
+class Pipe:
+    def __init__(self):
+        pass
+
+    async def pipe(
+        self,
+        body: dict,
+        __user__: dict,
+        __request__: Request, # New parameter
+    ) -> str:
+        # Write your function here
+```
 
 📌 **Why did we make these changes?**
 - To simplify the codebase, making it easier to extend and maintain.
