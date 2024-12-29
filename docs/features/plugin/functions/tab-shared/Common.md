@@ -2,7 +2,7 @@
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
-Valves and UserValves are used to allow users to provide dyanmic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function.
+Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function.
 
 Valves are configurable by admins alone and UserValves are configurable by any users.
 
