@@ -5,11 +5,7 @@ title: "🛠️ Development Guide"
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import { TopBanners } from "@site/src/components/TopBanners";
 
-<TopBanners />
-
-# 🛠️ Development Setup Guide
 
 Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice or an experienced developer, this guide will help you set up a **local development environment** for both the frontend and backend components. Let’s dive in! 🚀
 
