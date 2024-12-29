@@ -1,0 +1,62 @@
+---
+sidebar_position: 2
+title: "🪄 Filter Function"
+---
+
+
+### Filter
+Filters are used to manipulate the user input and/or the LLM output to add, remove, format, or otherwise adjust the content of the body object.
+
+Filters have a few main components:
+
+#### Inlet Function
+The inlet is user to pre-process a user input before it is send to the LLM for processing. 
+
+#### Outlet Function
+The outlet is used to post-process the output from the LLM. It is important to note that when you perform actions such as stripping/replacing content, this will happen after the output is rendered to the UI.
+
+<details>
+<summary>Example</summary>
+
+```
+class Filter:
+    # Define and Valves
+    class Valves(BaseModel):
+        priority: int = Field(
+            default=0, description="Priority level for the filter operations."
+        )
+        test_valve: int = Field(
+            default=4, description="A valve controlling a numberical value"
+        )
+        pass
+
+    # Define any UserValves
+    class UserValves(BaseModel):
+        test_user_valve: bool = Field(
+            default=False, description="A user valve controlling a True/False (on/off) switch"
+        )
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+        pass
+
+    def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+        print(f"inlet:{__name__}")
+        print(f"inlet:body:{body}")
+        print(f"inlet:user:{__user__}")
+
+        # Pre-processing logic here
+
+        return body
+
+    def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+        print(f"outlet:{__name__}")
+        print(f"outlet:body:{body}")
+        print(f"outlet:user:{__user__}")
+
+        # Post-processing logic here
+
+        return body
+```
+</details>
