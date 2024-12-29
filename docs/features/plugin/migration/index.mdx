@@ -187,32 +187,6 @@ Here’s a quick cheat sheet to remember:
 
 ---
 
-### ✍️ Example Project on Open WebUI 0.5
-
-Here’s a simple example to tie everything together:
-
-```python
-from open_webui.main import chat_completion
-from fastapi import Request
-from typing import Any, Optional, Callable
-
-class Pipe:
-    def __init__(self):
-        pass
-
-    async def handle_request(
-        self,
-        body: dict,
-        __request__: Request,
-        __task__=None,
-    ) -> str:
-        # Call the unified endpoint for chat completion
-        response = await chat_completion(__request__, body)
-        return response
-```
-
----
-
 ## 🎉 Hooray! You're Ready!
 
 That's it! You've successfully migrated from **Open WebUI 0.4 to 0.5**. By refactoring your imports, using the unified endpoint, and updating function signatures, you'll be fully equipped to leverage the latest features and improvements in version 0.5.
