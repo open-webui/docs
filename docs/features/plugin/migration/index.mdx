@@ -199,7 +199,7 @@ class Pipe:
 from pydantic import BaseModel
 from fastapi import Request
 
-from open_webui.main import chat_completion
+from open_webui.utils.chat import generate_chat_completion
 
 
 class User(BaseModel):
@@ -222,7 +222,7 @@ class Pipe:
         # Uses the unified endpoint with updated signature
         user = User(**__user__)
         body["model"] = "llama3.2:latest"
-        return await chat_completion(__request__, body, user)
+        return await generate_chat_completion(__request__, body, user)
 ```
 
 ### Important Notes:
