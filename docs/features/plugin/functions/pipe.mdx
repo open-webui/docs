@@ -8,9 +8,9 @@ import Common from './tab-shared/Common.md';
 
 
 #### Pipe
-A Pipe is used to create a "Model" with custom logic and processing. A Pipe will always show up as it's own singular model in the OpenWebUI interface and will, much like a filter
+A Pipe is used to create a "Model" with custom logic and processing. A Pipe will always show up as its own singular model in the OpenWebUI interface.
 
-A Pipe has a single main component called a pipe function. This component encapsulates all of the primary logic that the Pipe will perform.
+A Pipe has a single main component called a **pipe function**. This component encapsulates all of the primary logic that the Pipe will perform.
 
 <details>
 <summary>Example</summary>
@@ -43,12 +43,12 @@ class Pipe:
 </details>
 
 #### Manifold
-A Manifold is used to create a collection of Pipes. If a Pipe creates a singular "Model", a Manifold creates a set of "Models." Manifolds are typically used to create integrations with other providers.
+A Manifold is used to create a collection of Pipes. If a Pipe creates a singular "Model", a Manifold creates a set of "Models." Manifolds are typically used to create integrations with other model providers, such as Anthropic or Groq.
 
 A Manifold has two main components:
 
 ##### Pipes Function
-This is used to simply initiate a dictionary to hold all of the Pipes created by the manifold
+This is used to simply initiate a dictionary to hold all of the Pipes created by the manifold.
 
 ##### Pipe Function
 As referenced above, this component encapsulates all of the primary logic that the Pipe will perform.

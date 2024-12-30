@@ -95,7 +95,7 @@ Each tool must have type hints for arguments. As of version OpenWebUI version 0.
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
-Valves and UserValves are used to allow users to provide dyanmic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given Tool.
+Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given Tool.
 
 Valves are configurable by admins alone and UserValves are configurable by any users.
 
@@ -147,7 +147,7 @@ This is used to add statuses to a message while it is performing steps. These ca
 await __event_emitter__(
             {
                 "type": "status", # We set the type here
-                "data": {"description": "Message that shows up in the chat", "done": False}, 
+                "data": {"description": "Message that shows up in the chat", "done": False, "hidden": False}, 
                 # Note done is False here indicating we are still emitting statuses
             }
         )
@@ -178,8 +178,9 @@ async def test_function(
         await __event_emitter__(
             {
                 "type": "status",
-                "data": {"description": "Completed a task message", "done": True},
+                "data": {"description": "Completed a task message", "done": True, "hidden": False},
                 # Note done is True here indicating we are done emitting statuses
+                # You can also set "hidden": True if you want to remove the status once the message is returned
             }
         )
 
