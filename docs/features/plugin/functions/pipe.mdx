@@ -3,107 +3,400 @@ sidebar_position: 1
 title: "🚰 Pipe Function"
 ---
 
+# 🚰 Pipe Function: Extending Open WebUI with Custom Logic
 
-import Common from './tab-shared/Common.md';
+Welcome to this guide on creating **Pipes** in Open WebUI! Think of Pipes as a way to **adding** a new model to Open WebUI. In this document, we'll break down what a Pipe is, how it works, and how you can create your own to add custom logic and processing to your Open WebUI models. We'll use clear metaphors and go through every detail to ensure you have a comprehensive understanding.
 
 
-#### Pipe
-A Pipe is used to create a "Model" with custom logic and processing. A Pipe will always show up as its own singular model in the OpenWebUI interface.
+## Introduction to Pipes
 
-A Pipe has a single main component called a **pipe function**. This component encapsulates all of the primary logic that the Pipe will perform.
+Imagine Open WebUI as a **plumbing system** where data flows through pipes and valves. In this analogy:
 
-<details>
-<summary>Example</summary>
+- **Pipes** are like **plugins** that let you introduce new pathways for data to flow, allowing you to inject custom logic and processing.
+- **Valves** are the **configurable parts** of your pipe that control how data flows through it.
 
-```
+By creating a Pipe, you're essentially crafting a custom model with the specific behavior you want, all within the Open WebUI framework.
+
+---
+
+## Understanding the Pipe Structure
+
+Let's start with a basic, barebones version of a Pipe to understand its structure:
+
+```python
+from pydantic import BaseModel, Field
+
 class Pipe:
     class Valves(BaseModel):
-        RANDOM_CONFIG_OPTION: str = Field(default="")
+        MODEL_ID: str = Field(default="")
 
     def __init__(self):
-        self.type = "pipe"
-        self.id = "blah"
-        self.name = "Testing"
-        self.valves = self.Valves(
-            **{"RANDOM_CONFIG_OPTION": os.getenv("RANDOM_CONFIG_OPTION", "")}
-        )
-        pass
+        self.valves = self.Valves()
 
-    def get_provider_models(self):
+    def pipe(self, body: dict):
+        # Logic goes here
+        print(self.valves, body)  # This will print the configuration options and the input body
+        return "Hello, World!"
+```
+
+### The Pipe Class
+
+- **Definition**: The `Pipe` class is where you define your custom logic.
+- **Purpose**: Acts as the blueprint for your plugin, determining how it behaves within Open WebUI.
+
+### Valves: Configuring Your Pipe
+
+- **Definition**: `Valves` is a nested class within `Pipe`, inheriting from `BaseModel`.
+- **Purpose**: It contains the configuration options (parameters) that persist across the use of your Pipe.
+- **Example**: In the above code, `MODEL_ID` is a configuration option with a default empty string.
+
+**Metaphor**: Think of Valves as the knobs on a real-world pipe system that control the flow of water. In your Pipe, Valves allow users to adjust settings that influence how the data flows and is processed.
+
+### The `__init__` Method
+
+- **Definition**: The constructor method for the `Pipe` class.
+- **Purpose**: Initializes the Pipe's state and sets up any necessary components.
+- **Best Practice**: Keep it simple; primarily initialize `self.valves` here.
+
+```python
+def __init__(self):
+    self.valves = self.Valves()
+```
+
+### The `pipe` Function
+
+- **Definition**: The core function where your custom logic resides.
+- **Parameters**:
+  - `body`: A dictionary containing the input data.
+- **Purpose**: Processes the input data using your custom logic and returns the result.
+
+```python
+def pipe(self, body: dict):
+    # Logic goes here
+    print(self.valves, body)  # This will print the configuration options and the input body
+    return "Hello, World!"
+```
+
+**Note**: Always place `Valves` at the top of your `Pipe` class, followed by `__init__`, and then the `pipe` function. This structure ensures clarity and consistency.
+
+---
+
+## Creating Multiple Models with Pipes
+
+What if you want your Pipe to create **multiple models** within Open WebUI? You can achieve this by defining a `pipes` function or variable inside your `Pipe` class. This setup, informally called a **manifold**, allows your Pipe to represent multiple models.
+
+Here's how you can do it:
+
+```python
+from pydantic import BaseModel, Field
+
+class Pipe:
+    class Valves(BaseModel):
+        MODEL_ID: str = Field(default="")
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    def pipes(self):
         return [
             {"id": "model_id_1", "name": "model_1"},
             {"id": "model_id_2", "name": "model_2"},
             {"id": "model_id_3", "name": "model_3"},
         ]
 
-    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
-      # Logic goes here
-      return body
+    def pipe(self, body: dict):
+        # Logic goes here
+        print(self.valves, body)  # Prints the configuration options and the input body
+        model = body.get("model", "")
+        return f"{model}: Hello, World!"
 ```
-</details>
 
-#### Manifold
-A Manifold is used to create a collection of Pipes. If a Pipe creates a singular "Model", a Manifold creates a set of "Models." Manifolds are typically used to create integrations with other model providers, such as Anthropic or Groq.
+### Explanation
 
-A Manifold has two main components:
+- **`pipes` Function**:
+  - Returns a list of dictionaries.
+  - Each dictionary represents a model with unique `id` and `name` keys.
+  - These models will show up individually in the Open WebUI model selector.
 
-##### Pipes Function
-This is used to simply initiate a dictionary to hold all of the Pipes created by the manifold.
+- **Updated `pipe` Function**:
+  - Processes input based on the selected model.
+  - In this example, it includes the model name in the returned string.
 
-##### Pipe Function
-As referenced above, this component encapsulates all of the primary logic that the Pipe will perform.
+---
 
+## Example: OpenAI Proxy Pipe
 
-<details>
-<summary>Example</summary>
+Let's dive into a practical example where we'll create a Pipe that proxies requests to the OpenAI API. This Pipe will fetch available models from OpenAI and allow users to interact with them through Open WebUI.
 
-```
+```python
+from pydantic import BaseModel, Field
+import requests
+
 class Pipe:
     class Valves(BaseModel):
-        PROVIDER_API_KEY: str = Field(default="")
+        NAME_PREFIX: str = Field(
+            default="OPENAI/",
+            description="Prefix to be added before model names.",
+        )
+        OPENAI_API_BASE_URL: str = Field(
+            default="https://api.openai.com/v1",
+            description="Base URL for accessing OpenAI API endpoints.",
+        )
+        OPENAI_API_KEY: str = Field(
+            default="",
+            description="API key for authenticating requests to the OpenAI API.",
+        )
 
     def __init__(self):
-        self.type = "manifold"
-        self.id = "blah"
-        self.name = "Testing"
-        self.valves = self.Valves(
-            **{"PROVIDER_API_KEY": os.getenv("PROVIDER_API_KEY", "")}
-        )
+        self.valves = self.Valves()
+
+    def pipes(self):
+        if self.valves.OPENAI_API_KEY:
+            try:
+                headers = {
+                    "Authorization": f"Bearer {self.valves.OPENAI_API_KEY}",
+                    "Content-Type": "application/json",
+                }
+
+                r = requests.get(
+                    f"{self.valves.OPENAI_API_BASE_URL}/models", headers=headers
+                )
+                models = r.json()
+                return [
+                    {
+                        "id": model["id"],
+                        "name": f'{self.valves.NAME_PREFIX}{model.get("name", model["id"])}',
+                    }
+                    for model in models["data"]
+                    if "gpt" in model["id"]
+                ]
+
+            except Exception as e:
+                return [
+                    {
+                        "id": "error",
+                        "name": "Error fetching models. Please check your API Key.",
+                    },
+                ]
+        else:
+            return [
+                {
+                    "id": "error",
+                    "name": "API Key not provided.",
+                },
+            ]
+
+    def pipe(self, body: dict, __user__: dict):
+        print(f"pipe:{__name__}")
+        headers = {
+            "Authorization": f"Bearer {self.valves.OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        }
+
+        # Extract model id from the model name
+        model_id = body["model"][body["model"].find(".") + 1 :]
+
+        # Update the model id in the body
+        payload = {**body, "model": model_id}
+        try:
+            r = requests.post(
+                url=f"{self.valves.OPENAI_API_BASE_URL}/chat/completions",
+                json=payload,
+                headers=headers,
+                stream=True,
+            )
+
+            r.raise_for_status()
+
+            if body.get("stream", False):
+                return r.iter_lines()
+            else:
+                return r.json()
+        except Exception as e:
+            return f"Error: {e}"
+```
+
+### Detailed Breakdown
+
+#### Valves Configuration
+
+- **`NAME_PREFIX`**:
+  - Adds a prefix to the model names displayed in Open WebUI.
+  - Default: `"OPENAI/"`.
+- **`OPENAI_API_BASE_URL`**:
+  - Specifies the base URL for the OpenAI API.
+  - Default: `"https://api.openai.com/v1"`.
+- **`OPENAI_API_KEY`**:
+  - Your OpenAI API key for authentication.
+  - Default: `""` (empty string; must be provided).
+
+#### The `pipes` Function
+
+- **Purpose**: Fetches available OpenAI models and makes them accessible in Open WebUI.
+
+- **Process**:
+  1. **Check for API Key**: Ensures that an API key is provided.
+  2. **Fetch Models**: Makes a GET request to the OpenAI API to retrieve available models.
+  3. **Filter Models**: Returns models that have `"gpt"` in their `id`.
+  4. **Error Handling**: If there's an issue, returns an error message.
+
+- **Return Format**: A list of dictionaries with `id` and `name` for each model.
+
+#### The `pipe` Function
+
+- **Purpose**: Handles the request to the selected OpenAI model and returns the response.
+
+- **Parameters**:
+  - `body`: Contains the request data.
+  - `__user__`: Contains user information (not used in this example but can be useful for authentication or logging).
+
+- **Process**:
+  1. **Prepare Headers**: Sets up the headers with the API key and content type.
+  2. **Extract Model ID**: Extracts the actual model ID from the selected model name.
+  3. **Prepare Payload**: Updates the body with the correct model ID.
+  4. **Make API Request**: Sends a POST request to the OpenAI API's chat completions endpoint.
+  5. **Handle Streaming**: If `stream` is `True`, returns an iterable of lines.
+  6. **Error Handling**: Catches exceptions and returns an error message.
+
+### Extending the Proxy Pipe
+
+You can modify this proxy Pipe to support additional service providers like Anthropic, Perplexity, and more by adjusting the API endpoints, headers, and logic within the `pipes` and `pipe` functions.
+
+---
+
+## Using Internal Open WebUI Functions
+
+Sometimes, you may want to leverage the internal functions of Open WebUI within your Pipe. You can import these functions directly from the `open_webui` package. Keep in mind that while unlikely, internal functions may change for optimization purposes, so always refer to the latest documentation.
+
+Here's how you can use internal Open WebUI functions:
+
+```python
+from pydantic import BaseModel, Field
+from fastapi import Request
+
+from open_webui.models.user import Users
+from open_webui.utils.chat import generate_chat_completion
+
+class Pipe:
+    def __init__(self):
         pass
 
-    def get_provider_models(self):
-        return [
-            {"id": "model_id_1", "name": "model_1"},
-            {"id": "model_id_2", "name": "model_2"},
-            {"id": "model_id_3", "name": "model_3"},
-        ]
-
-    def pipes(self) -> List[dict]:
-        return self.get_provider_models()
-
-    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
-      # Logic goes here
-      return body
-```
-</details>
-
-Note: To differentiate between a Pipe and a Manifold you will need to specify the type in def init:
-```
-def __init__(self):
-        self.type = "pipe"
-        self.id = "blah"
-        self.name = "Testing"
-        pass
+    async def pipe(
+        self,
+        body: dict,
+        __user__: dict,
+        __request__: Request,
+    ) -> str:
+        # Use the unified endpoint with the updated signature
+        user = Users.get_user_by_id(__user__["id"])
+        body["model"] = "llama3.2:latest"
+        return await generate_chat_completion(__request__, body, user)
 ```
 
-or
+### Explanation
 
-```
-def __init__(self):
-        self.type = "manifold"
-        self.id = "blah"
-        self.name = "Testing/"
-        pass
-```
+- **Imports**:
+  - `Users` from `open_webui.models.user`: To fetch user information.
+  - `generate_chat_completion` from `open_webui.utils.chat`: To generate chat completions using internal logic.
 
-<Common/>
+- **Asynchronous `pipe` Function**:
+  - **Parameters**:
+    - `body`: Input data for the model.
+    - `__user__`: Dictionary containing user information.
+    - `__request__`: The request object from FastAPI (required by `generate_chat_completion`).
+  - **Process**:
+    1. **Fetch User Object**: Retrieves the user object using their ID.
+    2. **Set Model**: Specifies the model to be used.
+    3. **Generate Completion**: Calls `generate_chat_completion` to process the input and produce an output.
+
+### Important Notes
+
+- **Function Signatures**: Refer to the latest Open WebUI codebase or documentation for the most accurate function signatures and parameters.
+- **Best Practices**: Always handle exceptions and errors gracefully to ensure a smooth user experience.
+
+---
+
+## Frequently Asked Questions
+
+### Q1: Why should I use Pipes in Open WebUI?
+
+**A**: Pipes allow you to add new "model" with custom logic and processing to Open WebUI. It's a flexible plugin system that lets you integrate external APIs, customize model behaviors, and create innovative features without altering the core codebase.
+
+---
+
+### Q2: What are Valves, and why are they important?
+
+**A**: Valves are the configurable parameters of your Pipe. They function like settings or controls that determine how your Pipe operates. By adjusting Valves, you can change the behavior of your Pipe without modifying the underlying code.
+
+---
+
+### Q3: Can I create a Pipe without Valves?
+
+**A**: Yes, you can create a simple Pipe without defining a Valves class if your Pipe doesn't require any persistent configuration options. However, including Valves is a good practice for flexibility and future scalability.
+
+---
+
+### Q4: How do I ensure my Pipe is secure when using API keys?
+
+**A**: Never hard-code sensitive information like API keys into your Pipe. Instead, use Valves to input and store API keys securely. Ensure that your code handles these keys appropriately and avoids logging or exposing them.
+
+---
+
+### Q5: What is the difference between the `pipe` and `pipes` functions?
+
+**A**:
+
+- **`pipe` Function**: The primary function where you process the input data and generate an output. It handles the logic for a single model.
+
+- **`pipes` Function**: Allows your Pipe to represent multiple models by returning a list of model definitions. Each model will appear individually in Open WebUI.
+
+---
+
+### Q6: How can I handle errors in my Pipe?
+
+**A**: Use try-except blocks within your `pipe` and `pipes` functions to catch exceptions. Return meaningful error messages or handle the errors gracefully to ensure the user is informed about what went wrong.
+
+---
+
+### Q7: Can I use external libraries in my Pipe?
+
+**A**: Yes, you can import and use external libraries as needed. Ensure that any dependencies are properly installed and managed within your environment.
+
+---
+
+### Q8: How do I test my Pipe?
+
+**A**: Test your Pipe by running Open WebUI in a development environment and selecting your custom model from the interface. Validate that your Pipe behaves as expected with various inputs and configurations.
+
+---
+
+### Q9: Are there any best practices for organizing my Pipe's code?
+
+**A**: Yes, follow these guidelines:
+
+- Keep `Valves` at the top of your `Pipe` class.
+- Initialize variables in the `__init__` method, primarily `self.valves`.
+- Place the `pipe` function after the `__init__` method.
+- Use clear and descriptive variable names.
+- Comment your code for clarity.
+
+---
+
+### Q10: Where can I find the latest Open WebUI documentation?
+
+**A**: Visit the official Open WebUI repository or documentation site for the most up-to-date information, including function signatures, examples, and migration guides if any changes occur.
+
+---
+
+## Conclusion
+
+By now, you should have a thorough understanding of how to create and use Pipes in Open WebUI. Pipes offer a powerful way to extend and customize the capabilities of Open WebUI to suit your specific needs. Whether you're integrating external APIs, adding new models, or injecting complex logic, Pipes provide the flexibility to make it happen.
+
+Remember to:
+
+- **Use clear and consistent structure** in your Pipe classes.
+- **Leverage Valves** for configurable options.
+- **Handle errors gracefully** to improve the user experience.
+- **Consult the latest documentation** for any updates or changes.
+
+Happy coding, and enjoy extending your Open WebUI with Pipes!
