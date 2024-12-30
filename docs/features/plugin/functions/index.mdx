@@ -5,7 +5,7 @@ title: "🧰 Functions"
 
 ## 🚀 What Are Functions?
 
-Functions are like **plugins** for OpenWebUI. They help you **extend its capabilities**—whether it’s adding support for new AI models like Anthropic or Vertex AI, tweaking how messages are processed, or introducing custom buttons to the interface for better usability.  
+Functions are like **plugins** for OpenWebUI. They help you **extend its capabilities**—whether it’s adding support for new AI model providers like Anthropic or Vertex AI, tweaking how messages are processed, or introducing custom buttons to the interface for better usability.  
 
 Unlike external tools that may require complex integrations, **Functions are built-in and run within the OpenWebUI environment.** That means they are fast, modular, and don’t rely on external dependencies.  
 
@@ -29,7 +29,7 @@ A **Pipe Function** is how you create **custom agents/models** or integrations, 
 
 **Use case example:**  
 Imagine you want to query Google Search directly from OpenWebUI. You can create a Pipe Function that:  
-1. Takes your input.  
+1. Takes your message as the search query.  
 2. Sends the query to Google Search’s API.  
 3. Processes the response and returns it to you inside the WebUI like a normal "model" response.  
 
@@ -82,7 +82,7 @@ Learn how to set them up in the [**Action Functions Guide**](./action.mdx).
 Here's how to put Functions to work in OpenWebUI:
 
 ### 1. **Install Functions**  
-You can install Functions via the OpenWebUI interface or by importing them manually.  
+You can install Functions via the OpenWebUI interface or by importing them manually. You can find community-created functions on the [OpenWebUI Community Site](https://openwebui.com/functions).
 
 ⚠️ **Be cautious.** Only install Functions from trusted sources. Running unknown code poses security risks.  
 
