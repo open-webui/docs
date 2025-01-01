@@ -10,7 +10,6 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 # Open WebUI
 
-<TopBanners />
 
 **Open WebUI is an [extensible](https://docs.openwebui.com/features/plugin/), feature-rich, and user-friendly self-hosted AI interface designed to operate entirely offline.** It supports various LLM runners, including Ollama and OpenAI-compatible APIs.
 
@@ -27,43 +26,8 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 ![Open WebUI Demo](/img/demo.gif)
 
-:::info **Important Note on User Roles and Privacy:**
 
-- **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
-
-- **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
-
-- **Privacy and Data Security:** **All your data**, including login details, is **locally stored** on your device. Open WebUI ensures **strict confidentiality** and **no external requests** for enhanced privacy and security.
-
-:::
-
-## Quick Start with Docker 🐳 (Recommended)
-
-:::tip
-
-#### Disabling Login for Single User
-
-If you want to disable login for a single-user setup, set [`WEBUI_AUTH`](./getting-started/advanced-topics/env-configuration) to `False`. This will bypass the login page.
-
-:::warning
-You cannot switch between single-user mode and multi-account mode after this change.
-:::
-
-:::danger
-When using Docker to install Open WebUI, make sure to include the `-v open-webui:/app/backend/data` in your Docker command. This step is crucial as it ensures your database is properly mounted and prevents any loss of data.
-:::
-
-<details> 
-<summary>Data Storage in Docker</summary>
-
-This tutorial uses [Docker named volumes](https://docs.docker.com/storage/volumes/) to guarantee the **persistance of your data**. This might make it difficult to know exactly where your data is stored in your machine if this is your first time using Docker. Alternatively, you can replace the volume name with a absolute path on your host machine to link your container data to a folder in your computer using a [bind mount](https://docs.docker.com/storage/bind-mounts/).
-
-**Example**: change `-v open-webui:/app/backend/data` to `-v /path/to/folder:/app/backend/data`
-
-Ensure you have the proper access rights to the folder on your host machine.
-
-Visit the [Docker documentation](https://docs.docker.com/storage/) to understand more about volumes and bind mounts.
-</details>
+## Quick Start with Docker 🐳
 
 ### Installation with Default Configuration
 
@@ -73,26 +37,10 @@ Visit the [Docker documentation](https://docs.docker.com/storage/) to understand
   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
-- **If Ollama is on a Different Server**, use this command:
-
-  To connect to Ollama on another server, change the `OLLAMA_BASE_URL` to the server's URL:
-
-  ```bash
-  docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=https://example.com -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-  ```
-
-  - **To run Open WebUI with Nvidia GPU support**, use this command:
+- **To run Open WebUI with Nvidia GPU support**, use this command:
 
   ```bash
   docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
-  ```
-
-### Installation for OpenAI API Usage Only
-
-- **If you're only using OpenAI API**, use this command:
-
-  ```bash
-  docker run -d -p 3000:8080 -e OPENAI_API_KEY=your_secret_key -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   ```
 
 ### Installing Open WebUI with Bundled Ollama Support
@@ -155,10 +103,6 @@ This method installs all necessary dependencies and starts Open WebUI, allowing 
 
 We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
 
-## Troubleshooting
-
-If you're facing various issues like "Open WebUI: Server Connection Error", see [TROUBLESHOOTING](troubleshooting) for information on how to troubleshoot and/or join our [Open WebUI Discord community](https://discord.gg/5rJgQTnV4s).
-
 ## Updating
 
 Check out how to update Docker in the [Quick Start guide](./getting-started/quick-start).
@@ -175,6 +119,10 @@ Continue with the full [getting started guide](/getting-started).
 
 ## Sponsors 🙌
 
-We are incredibly grateful for the generous support of our sponsors. Their contributions help us to maintain and improve our project, ensuring we can continue to deliver quality work to our community. Thank you!
+<TopBanners />
 
 <SponsorList />
+
+
+We are incredibly grateful for the generous support of our sponsors. Their contributions help us to maintain and improve our project, ensuring we can continue to deliver quality work to our community. Thank you!
+
