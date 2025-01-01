@@ -11,7 +11,7 @@ import { SponsorList } from "@site/src/components/SponsorList";
 # Open WebUI
 
 
-**Open WebUI is an [extensible](https://docs.openwebui.com/features/plugin/), feature-rich, and user-friendly self-hosted AI interface designed to operate entirely offline.** It supports various LLM runners, including Ollama and OpenAI-compatible APIs.
+**Open WebUI is an [extensible](https://docs.openwebui.com/features/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It supports various LLM runners like Ollama and OpenAI-compatible APIs, with built-in embedding model inference engine for RAG, making it a powerful AI deployment solution.
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
@@ -29,19 +29,17 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 ## Quick Start with Docker 🐳
 
-### Installation with Default Configuration
+**If Ollama is on your computer**, use this command:
 
-- **If Ollama is on your computer**, use this command:
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
 
-  ```bash
-  docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-  ```
+**To run Open WebUI with Nvidia GPU support**, use this command:
 
-- **To run Open WebUI with Nvidia GPU support**, use this command:
-
-  ```bash
-  docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
-  ```
+```bash
+docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+```
 
 ### Installing Open WebUI with Bundled Ollama Support
 
@@ -77,43 +75,61 @@ If you want to try out the latest bleeding-edge features and are okay with occas
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
 ```
 
+### Updating Open WebUI
+
+To update Open WebUI container easily, follow these steps:
+
+### Manual Update
+Use [Watchtower](https://containrrr.dev/watchtower) to update your Docker container manually:
+```bash
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+```
+
+### Automatic Updates
+Keep your container updated automatically every 5 minutes:
+```bash
+docker run -d --name watchtower --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  containrrr/watchtower --interval 300 open-webui
+```
+
+🔧 **Note**: Replace `open-webui` with your container name if it's different.
+
 ## Manual Installation
 
-### Installation with `pip` (Beta)
+### Installation with `pip`
 
-For users who prefer to use Python's package manager `pip`, Open WebUI offers a installation method. Python 3.11 is required for this method.
+For users installing Open WebUI with Python's package manager `pip`, **it is strongly recommended to use Python runtime managers like `uv` or `conda`**. These tools help manage Python environments effectively and avoid conflicts. 
 
-1. **Install Open WebUI**:
-   Open your terminal and run the following command:
+Python 3.11 is the development environment. Python 3.12 seems to work but has not been thoroughly tested. Python 3.13 is entirely untested—**use at your own risk**.
 
+1. **Install Open WebUI**:  
+
+   Open your terminal and run the following command:  
    ```bash
    pip install open-webui
    ```
 
-2. **Start Open WebUI**:
-   Once installed, start the server using:
+2. **Start Open WebUI**:  
 
+   Once installed, start the server using:  
    ```bash
    open-webui serve
    ```
+
+### Updating Open WebUI
+
+To update to the latest version, simply run:  
+
+```bash
+pip install --upgrade open-webui
+```
 
 This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
 
 ## Other Installation Methods
 
 We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
-
-## Updating
-
-Check out how to update Docker in the [Quick Start guide](./getting-started/quick-start).
-
-In case you want to update your local Docker installation to the latest version, you can do it with [Watchtower](https://containrrr.dev/watchtower/):
-
-```bash
-docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
-```
-
-In the last part of the command, replace `open-webui` with your container name if it is different.
 
 Continue with the full [getting started guide](/getting-started).
 
