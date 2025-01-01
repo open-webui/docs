@@ -41,7 +41,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
 ```
 
-### Installing Open WebUI with Bundled Ollama Support
+### Open WebUI Bundled with Ollama
 
 This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
 
@@ -79,13 +79,13 @@ docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --r
 
 To update Open WebUI container easily, follow these steps:
 
-### Manual Update
+#### Manual Update
 Use [Watchtower](https://containrrr.dev/watchtower) to update your Docker container manually:
 ```bash
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
 ```
 
-### Automatic Updates
+#### Automatic Updates
 Keep your container updated automatically every 5 minutes:
 ```bash
 docker run -d --name watchtower --restart unless-stopped \
