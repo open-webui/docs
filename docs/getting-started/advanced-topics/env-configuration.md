@@ -1058,6 +1058,12 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Default: The value of `DATABASE_URL` environment variable
 - Description: Sets the database URL for model storage.
 
+#### `VECTOR_LENGTH`
+
+- Type : int
+- Default : 1536
+- Description : Sets the configurable vector length used for storage operations in the vector database. This was previously hardcoded but is now dynamically read from the environment variable VECTOR_LENGTH. The value must be explicitly set to ensure proper initialization and operation of the vector-related features.
+
 ### Qdrant
 
 #### `QDRANT_API_KEY`
