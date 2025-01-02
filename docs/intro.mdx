@@ -88,9 +88,7 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtow
 #### Automatic Updates
 Keep your container updated automatically every 5 minutes:
 ```bash
-docker run -d --name watchtower --restart unless-stopped \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  containrrr/watchtower --interval 300 open-webui
+docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --interval 300 open-webui
 ```
 
 🔧 **Note**: Replace `open-webui` with your container name if it's different.
