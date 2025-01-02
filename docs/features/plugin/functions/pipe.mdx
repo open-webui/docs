@@ -273,7 +273,7 @@ Here's how you can use internal Open WebUI functions:
 from pydantic import BaseModel, Field
 from fastapi import Request
 
-from open_webui.models.user import Users
+from open_webui.models.users import Users
 from open_webui.utils.chat import generate_chat_completion
 
 class Pipe:
@@ -295,7 +295,7 @@ class Pipe:
 ### Explanation
 
 - **Imports**:
-  - `Users` from `open_webui.models.user`: To fetch user information.
+  - `Users` from `open_webui.models.users`: To fetch user information.
   - `generate_chat_completion` from `open_webui.utils.chat`: To generate chat completions using internal logic.
 
 - **Asynchronous `pipe` Function**:
