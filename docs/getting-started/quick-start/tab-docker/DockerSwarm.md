@@ -1,6 +1,6 @@
 ## Docker Swarm
 
-This installation method requires knowledge on Docker Swarms, as it utilizes a stack file to deploy 3 seperate containers as services in a Docker Swarm.
+This installation method requires knowledge on Docker Swarms, as it utilizes a stack file to deploy 3 separate containers as services in a Docker Swarm.
 
 It includes isolated containers of ChromaDB, Ollama, and OpenWebUI.
 Additionally, there are pre-filled [Environment Variables](../advanced-topics/env-configuration) to further illustrate the setup.
