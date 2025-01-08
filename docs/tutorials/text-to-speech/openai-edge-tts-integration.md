@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🗨️ Openai-edge-tts Using Docker"
+title: "🗨️ Edge TTS Using Docker"
 ---
 
 :::warning
@@ -41,7 +41,7 @@ This will run the service at port 5050 with all the default configs
 - Set your TTS Settings to match the screenshot below
 - _Note: you can specify the TTS Voice here_
 
-![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBo9GgL4WcUbjSRlqi86sV3TXh47KYBJCkdQ20M)
+![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBobmOhsMkrO6Tl2kxX39dbuFiQ8cAoNzysIt7f)
 
 :::info
 The default API key is the string `your_api_key_here`. You do not have to change that value if you do not need the added security.
@@ -107,6 +107,8 @@ DEFAULT_SPEED=1.2
 DEFAULT_LANGUAGE=en-US
 
 REQUIRE_API_KEY=True
+REMOVE_FILTER=False
+EXPAND_API=True
 ```
 
 #### 5. Run the Server
@@ -125,7 +127,7 @@ You can now interact with the API at `http://localhost:5050/v1/audio/speech` and
 
 #### Usage
 
-##### Endpoint: `/v1/audio/speech`
+##### Endpoint: `/v1/audio/speech` (aliased with `/audio/speech`)
 
 Generates audio from the input text. Available parameters:
 
@@ -193,6 +195,14 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 - **POST/GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
 - **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
+:::info
+The `/v1` is now optional. 
+
+Additionally, there are endpoints for **Azure AI Speech** and **ElevenLabs** for potential future support if custom API endpoints are allowed for these options in Open WebUI.
+
+These can be disabled by setting the environment variable `EXPAND_API=False`.
+:::
+
 ## 🐳 Quick Config for Docker
 
 You can configure the environment variables in the command used to run the project
@@ -206,14 +216,22 @@ docker run -d -p 5050:5050 \
   -e DEFAULT_SPEED=1.2 \
   -e DEFAULT_LANGUAGE=en-US \
   -e REQUIRE_API_KEY=True \
+  -e REMOVE_FILTER=False \
+  -e EXPAND_API=True \
   travisvn/openai-edge-tts:latest
 ```
+
+:::note
+The markdown text is now put through a filter for enhanced readability and support. 
+
+You can disable this by setting the environment variable `REMOTE_FILTER=True`.
+:::
 
 ## Additional Resources
 
 For more information on `openai-edge-tts`, you can visit the [GitHub repo](https://github.com/travisvn/openai-edge-tts)
 
-For direct support, you can visit the [Voice AI & TTS Discord](https://discord.gg/GkFbBCBqJ6)
+For direct support, you can visit the [Voice AI & TTS Discord](https://tts.travisvn.com/discord)
 
 ## 🎙️ Voice Samples
 
