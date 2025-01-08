@@ -21,4 +21,10 @@ Take a deeper dive into configurations and development tips in our [Advanced Top
 
 ---
 
+## 🔄 Updating Open WebUI
+
+Stay current with the latest features and security patches with our [Updating Open WebUI](./updating) guide.
+
+---
+
 Happy exploring! 🎉 If you have questions, join our [community](https://discord.gg/5rJgQTnV4s) or raise an issue on [GitHub](https://github.com/open-webui/open-webui).
