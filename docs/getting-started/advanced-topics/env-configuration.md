@@ -107,7 +107,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 #### `ENABLE_REALTIME_CHAT_SAVE`
 
 - Type: `bool`
-- Default: `True`
+- Default: `False`
 - Description: When enabled, the system saves each chunk of streamed chat data to the database in real time to ensure maximum data persistency. This feature provides robust data recovery and allows accurate session tracking. However, the tradeoff is increased latency, as saving to the database introduces a delay. Disabling this feature can improve performance and reduce delays, but it risks potential data loss in the event of a system failure or crash. Use based on your application's requirements and acceptable tradeoffs.
 
 #### `ENABLE_ADMIN_EXPORT`

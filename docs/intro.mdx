@@ -95,35 +95,6 @@ docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock
 
 ## Manual Installation
 
-{/* ### Installation with `uvx`
-It is highly recommended to use **`uv`**, a Python runtime manager, to ensure seamless Python environment management and avoid conflicts. Using `uv` is especially helpful when running multiple Python projects with different dependencies.
-
-#### Install `uv`:
-Visit the official [`uv` documentation](https://docs.astral.sh/uv/getting-started/installation/) for details. Below are the quick commands for installation based on your operating system:
-
-- **macOS/Linux**:
-  ```bash
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  ```
-
-- **Windows**:
-  ```powershell
-  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-  ```
-
-Once `uv` is installed and everything is configured, you can proceed with the following command to install and serve Open WebUI:
-
-```bash
-uvx --python 3.11 open-webui serve
-```
-
-This command will:
-1. Download and install the required Python 3.11 runtime if `uv` doesn't already have it.
-2. Install Open WebUI along with its necessary dependencies.
-3. Start the Open WebUI server.
-
-After running this command, Open WebUI will be served at [http://localhost:8080](http://localhost:8080). Enjoy! 😄 */}
-
 ### Installation with `pip`
 
 For users installing Open WebUI with Python's package manager `pip`, **it is strongly recommended to use Python runtime managers like `uv` or `conda`**. These tools help manage Python environments effectively and avoid conflicts. 
