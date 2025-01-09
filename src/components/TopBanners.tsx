@@ -14,7 +14,7 @@ export const TopBanners = () => {
 			imgSrc: "/ads/sponsor-banner-1.png",
 			mobileImgSrc: "/ads/sponsor-banner-small-1.png",
 			url: "https://davewaring.com/tag/digital-brain-building/",
-			name: "Dave Waring",
+			name: "Dave Warning",
 			description: "Follow along as I build my own AI powered digital brain.",
 		},
 	];
