@@ -1819,6 +1819,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Description: Sets the attribute to use as username for LDAP authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `LDAP_ATTRIBUTE_FOR_MAIL`
+
+- Type: `str`
+- Description: Sets the attribute to use as mail for LDAP authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `LDAP_CA_CERT_FILE`
 
 - Type: `str`
