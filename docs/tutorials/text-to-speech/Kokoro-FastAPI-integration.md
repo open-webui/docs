@@ -25,6 +25,23 @@ Key Features:
 - Web UI interface for easy testing
 - Phoneme endpoints for conversion and generation
 
+Voices:
+ - af
+ - af_bella
+ - af_nicole
+ - af_sarah
+ - af_sky
+ - am_adam
+ - am_michael
+ - bf_emma
+ - bf_isabella
+ - bf_george
+ - bf_lewis
+
+Languages:
+ - en_us
+ - en_uk
+
 ## Requirements
 
 - Docker installed on your system
