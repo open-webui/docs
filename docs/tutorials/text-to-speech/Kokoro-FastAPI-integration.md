@@ -77,6 +77,14 @@ docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi:cpu-latest
 The default API key is the string `not-needed`. You do not have to change that value if you do not need the added security.
 :::
 
+## Building the Docker Container
+
+```bash
+git clone https://github.com/remsky/Kokoro-FastAPI.git
+cd Kokoro-FastAPI
+docker compose up --build
+```
+
 **And that's it!**
 
-# Please see the repo [Kokoro-FastAPI](https://github.com/Sharrnah/Kokoro-FastAPI) for instructions on how to build the docker container. (For chajnging ports etc)
+# Please see the repo [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) for instructions on how to build the docker container. (For chajnging ports etc)
