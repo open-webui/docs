@@ -224,7 +224,7 @@ docker run -d -p 5050:5050 \
 :::note
 The markdown text is now put through a filter for enhanced readability and support. 
 
-You can disable this by setting the environment variable `REMOTE_FILTER=True`.
+You can disable this by setting the environment variable `REMOVE_FILTER=True`.
 :::
 
 ## Additional Resources
