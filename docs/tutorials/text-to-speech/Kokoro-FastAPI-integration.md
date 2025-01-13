@@ -17,30 +17,33 @@ This tutorial is a community contribution and is not supported by the OpenWebUI 
 - 35-50x+ real-time speed via 4060Ti
 - 5x+ real-time speed via M3 Pro CPU
 
-Key Features:
+## Key Features
+
 - OpenAI-compatible Speech endpoint with inline voice combination
 - NVIDIA GPU accelerated or CPU Onnx inference
 - Streaming support with variable chunking
-- Multiple audio format support (mp3, wav, opus, flac, aac, pcm)
-- Web UI interface for easy testing
+- Multiple audio format support (`.mp3`, `.wav`, `.opus`, `.flac`, `.aac`, `.pcm`)
+- Gradio Web UI interface for easy testing
 - Phoneme endpoints for conversion and generation
 
-Voices:
- - af
- - af_bella
- - af_nicole
- - af_sarah
- - af_sky
- - am_adam
- - am_michael
- - bf_emma
- - bf_isabella
- - bf_george
- - bf_lewis
+## Voices
 
-Languages:
- - en_us
- - en_uk
+- af
+- af_bella
+- af_nicole
+- af_sarah
+- af_sky
+- am_adam
+- am_michael
+- bf_emma
+- bf_isabella
+- bf_george
+- bf_lewis
+
+## Languages
+
+- en_us
+- en_uk
 
 ## Requirements
 
@@ -51,27 +54,31 @@ Languages:
 
 ## ⚡️ Quick start
 
-You can choose between GPU or CPU versions:
+### You can choose between GPU or CPU versions
+
+### GPU Version (Requires NVIDIA GPU with CUDA 12.1)
 
 ```bash
-# GPU Version (Requires NVIDIA GPU with CUDA 12.1)
 docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi:latest
+```
 
-# CPU Version (ONNX optimized inference)
+### CPU Version (ONNX optimized inference)
+
+```bash
 docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi:cpu-latest
 ```
 
 ## Setting up Open WebUI to use `Kokoro-FastAPI`
 
-- Open the Admin Panel and go to Settings -> Audio
+To use Kokoro-FastAPI with Open WebUI, follow these steps:
+
+- Open the Admin Panel and go to `Settings` -> `Audio`
 - Set your TTS Settings to match the following:
 - - Text-to-Speech Engine: OpenAI
   - API Base URL: `http://localhost:8880/v1`
   - API Key: `not-needed`
   - TTS Model: `kokoro`
   - TTS Voice: `af_bella`
-
-
 
 :::info
 The default API key is the string `not-needed`. You do not have to change that value if you do not need the added security.
@@ -85,6 +92,6 @@ cd Kokoro-FastAPI
 docker compose up --build
 ```
 
-**And that's it!**
+**That's it!**
 
-# Please see the repo [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) for instructions on how to build the docker container. (For chajnging ports etc)
+## For more information on building the Docker container, including changing ports, please refer to the [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) repository
