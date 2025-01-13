@@ -37,8 +37,8 @@ This tutorial is a community contribution and is not supported by the OpenWebUI 
 - am_michael
 - bf_emma
 - bf_isabella
-- bf_george
-- bf_lewis
+- bm_george
+- bm_lewis
 
 ## Languages
 
