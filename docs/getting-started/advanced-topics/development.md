@@ -13,13 +13,9 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
 
 - **Operating System**: Linux (or WSL on Windows) or macOS  
 - **Python Version**: Python 3.11+  
-- **Node.js Version**: 20.10+
+- **Node.js Version**: 22.10+
 
 ## Development Methods
-
-<Tabs groupId="dev-setup">
-
-<TabItem value="local" label="Local Setup">
 
 ### 🐧 Local Development Setup
 
@@ -79,101 +75,6 @@ Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice o
 
      📄 API docs available at: [http://localhost:8080/docs](http://localhost:8080/docs).
 
-</TabItem>
-
-<TabItem value="docker" label="Docker Setup">
-
-### 🐳 Docker-Based Development Setup
-
-1. **Create the Docker Compose File**:
-
-   ```yaml
-   name: open-webui-dev
-
-   services:
-     frontend:
-       build:
-         context: .
-         target: build
-       command: ["npm", "run", "dev"]
-       depends_on:
-         - backend
-       ports:
-         - "3000:5173"
-       extra_hosts:
-         - host.docker.internal:host-gateway
-       volumes:
-         - ./src:/app/src
-
-     backend:
-       build:
-         context: .
-         target: base
-       command: ["bash", "dev.sh"]
-       env_file: ".env"
-       environment:
-         - ENV=dev
-         - WEBUI_AUTH=False
-       ports:
-         - "8080:8080"
-       extra_hosts:
-         - host.docker.internal:host-gateway
-       volumes:
-         - ./backend:/app/backend
-         - data:/app/backend/data
-
-   volumes:
-     data: {}
-   ```
-
-2. **Start the Development Containers**:
-
-   ```bash
-   docker compose -f compose-dev.yaml up --watch
-   ```
-
-3. **Stop the Containers**:
-
-   ```bash
-   docker compose -f compose-dev.yaml down
-   ```
-
-</TabItem>
-<TabItem value="conda" label="Optional Conda Setup">
-
-### Conda Environment Setup
-
-If you prefer using **Conda** for isolation:
-
-1. **Create and Activate the Environment**:
-
-   ```bash
-   conda create --name open-webui-dev python=3.11
-   conda activate open-webui-dev
-   ```
-
-2. **Install Dependencies**:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the Servers**:
-   - Frontend:
-
-     ```bash
-     npm run dev
-     ```
-
-   - Backend:
-
-     ```bash
-     sh dev.sh
-     ```
-
-</TabItem>
-
-<TabItem value="troubleshooting" label="Troubleshooting">
 
 ## 🐛 Troubleshooting
 
