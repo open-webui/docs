@@ -3,10 +3,6 @@ sidebar_position: 5
 title: "🛠️ Development Guide"
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
 Welcome to the **Open WebUI Development Setup Guide!** Whether you're a novice or an experienced developer, this guide will help you set up a **local development environment** for both the frontend and backend components. Let’s dive in! 🚀
 
 ## System Requirements
@@ -99,10 +95,6 @@ If you encounter memory-related errors during the build, increase the **Node.js 
 
 - **Hot Reload Not Working**:  
    Verify that **watch mode** is enabled for both frontend and backend.
-
-</TabItem>
-
-</Tabs>
 
 ## Contributing to Open WebUI
 
