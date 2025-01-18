@@ -10,6 +10,7 @@ Open WebUI supports several forms of federated authentication:
 1. OAuth2
     1. Google
     1. Microsoft
+    1. Github
     1. OIDC
 1. Trusted Header
 
@@ -43,6 +44,16 @@ The following environment variables are required:
 1. `MICROSOFT_CLIENT_ID` - Microsoft OAuth client ID
 1. `MICROSOFT_CLIENT_SECRET` - Microsoft OAuth client secret
 1. `MICROSOFT_CLIENT_TENANT_ID` - Microsoft tenant ID - use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
+
+### Github
+
+To configure a Github OAuth Client, please refer to [Github's documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) on how to create a OAuth App or Github App for a **web application**.
+The allowed redirect URI should include `<open-webui>/oauth/github/callback`.
+
+The following environment variables are required:
+
+1. `GITHUB_CLIENT_ID` - Github OAuth App Client ID
+1. `GITHUB_CLIENT_SECRET` - Github OAuth App Client Secret
 
 ### OIDC
 
