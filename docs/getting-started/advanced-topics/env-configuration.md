@@ -1760,6 +1760,8 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 
 ### Github
 
+See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
 #### `GITHUB_CLIENT_ID`
 
 - Type: `str`
