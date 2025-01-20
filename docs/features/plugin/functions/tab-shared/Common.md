@@ -16,7 +16,7 @@ Valves are configurable by admins alone and UserValves are configurable by any u
             default=0, description="Priority level for the filter operations."
         )
         test_valve: int = Field(
-            default=4, description="A valve controlling a numberical value"
+            default=4, description="A valve controlling a numerical value"
         )
         pass
 
@@ -85,7 +85,7 @@ async def test_function(
             await __event_emitter__(
                 {
                     "type": "status",
-                    "data": {"description": f"An error occured: {e}", "done": True},
+                    "data": {"description": f"An error occurred: {e}", "done": True},
                 }
             )
 
@@ -131,7 +131,7 @@ async def test_function(
             await __event_emitter__(
                 {
                     "type": "status",
-                    "data": {"description": f"An error occured: {e}", "done": True},
+                    "data": {"description": f"An error occurred: {e}", "done": True},
                 }
             )
 

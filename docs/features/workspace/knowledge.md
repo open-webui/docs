@@ -50,6 +50,6 @@ Admins can add knowledge to the workspace, which users can access and use; howev
 
 - The Knowledge section is like Open WebUI's "memory bank," where you can store data that you want it to remember and use.
 - **Use Knowledge to keep the system aware** of important details, ensuring a personalized chat experience.
-- You can **directly reference Knowledge in chats** to bring in stored data whenever you need it using '#' + name of the knowlege.
+- You can **directly reference Knowledge in chats** to bring in stored data whenever you need it using '#' + name of the knowledge.
 
 🌟 Remember, there’s always more to discover, so dive in and make Open WebUI truly your own!

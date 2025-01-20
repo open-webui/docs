@@ -25,7 +25,7 @@ Here you'll be able to configure continue to use Open WebUI.
 
 Currently the 'ollama' provider does not support authentication so we cannot use this provider with Open WebUI.
 
-However Ollama and Open WebUI both have compatibily with OpenAI API spec. You can see a blog post from Ollama [here](https://ollama.com/blog/openai-compatibility) on this.
+However Ollama and Open WebUI both have compatibility with OpenAI API spec. You can see a blog post from Ollama [here](https://ollama.com/blog/openai-compatibility) on this.
 
 We can still setup Continue to use the openai provider which will allow us to use Open WebUI's authentication token.
 
@@ -94,12 +94,12 @@ Make sure you pull the model into your ollama instance/s beforehand.
 }
 ```
 
-Save your `config.json` and thats it!
+Save your `config.json` and that's it!
 
 You should now see your model in the Continue tab model selection.
 
 Select it and you should now be chatting via Open WebUI (and or any [pipelines](/pipelines) you have setup )
 
-You can do this for as many models you would like to use, altough any model should work, you should use a model that is designed for code.
+You can do this for as many models you would like to use, although any model should work, you should use a model that is designed for code.
 
 See the continue documentation for additional continue configuration, [Continue Documentation](https://docs.continue.dev/reference/Model%20Providers/openai)
