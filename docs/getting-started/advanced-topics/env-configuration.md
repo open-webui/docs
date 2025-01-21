@@ -1968,6 +1968,18 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the secret access key for S3 storage.
 
+### Google Cloud Storage
+#### `GCS_BUCKET_NAME`
+
+- Type: `str`
+- Description: Sets the bucket name for Google Cloud Storage
+
+#### `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+
+- Type: `JSON`
+- Description: Contents of Google Application Credentials JSON file.
+
+
 ### Database Pool
 
 #### `DATABASE_URL`
