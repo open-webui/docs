@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the OpenWebUI 
 
 ## What is `openai-edge-tts`? 
 
-[OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where the OpenAI Speech is used.
+[OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where you can define the endpoint URL, like with Open WebUI.
 
 It uses the [edge-tts](https://github.com/rany2/edge-tts) package, which leverages the Edge browser's free "Read Aloud" feature to emulate a request to Microsoft / Azure in order to receive very high quality text-to-speech for free.
 
