@@ -597,11 +597,51 @@ requests initiated by third-party websites, but only over HTTPS.
 - Default: `lax`
 - Description: Sets the `SameSite` attribute for session cookies.
 
+:::warning
+
+When `ENABLE_OAUTH_SIGNUP` is enabled, setting `WEBUI_SESSION_COOKIE_SAME_SITE` to `strict` can cause login failures. This is because Open WebUI uses a session cookie to validate the callback from the OAuth provider, which helps prevent CSRF attacks.
+
+However, a `strict` session cookie is not sent with the callback request, leading to potential login issues. If you experience this problem, use the default `lax` value instead.
+
+:::
+
 #### `WEBUI_SESSION_COOKIE_SECURE`
 
 - Type: `bool`
 - Default: `False`
 - Description: Sets the `Secure` attribute for session cookies if set to `True`.
+
+#### `WEBUI_AUTH_COOKIE_SAME_SITE`
+
+- Type: `str` (enum: `lax`, `strict`, `none`)
+- Options:
+  - `lax` - Sets the `SameSite` attribute to lax, allowing auth cookies to be sent with
+requests initiated by third-party websites.
+  - `strict` - Sets the `SameSite` attribute to strict, blocking auth cookies from being sent
+with requests initiated by third-party websites.
+  - `none` - Sets the `SameSite` attribute to none, allowing auth cookies to be sent with
+requests initiated by third-party websites, but only over HTTPS.
+- Default: `lax`
+- Description: Sets the `SameSite` attribute for auth cookies.
+
+:::info
+
+If the value is not set, `WEBUI_SESSION_COOKIE_SAME_SITE` will be used as a fallback.
+
+:::
+
+#### `WEBUI_AUTH_COOKIE_SECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sets the `Secure` attribute for auth cookies if set to `True`.
+
+:::info
+
+If the value is not set, `WEBUI_SESSION_COOKIE_SECURE` will be used as a fallback.
+
+:::
+
 
 #### `WEBUI_AUTH`
 
