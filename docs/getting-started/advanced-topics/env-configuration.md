@@ -1020,6 +1020,13 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Default: `${DATA_DIR}/vector_db/milvus.db`
 - Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
 
+#### `MILVUS_DB`
+
+- Type: `str`
+- Default: `default`
+- Description: Specifies the database to connect to within a milvus instance
+
+
 ### OpenSearch
 
 #### `OPENSEARCH_CERT_VERIFY`
