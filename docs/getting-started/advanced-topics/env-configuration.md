@@ -1983,6 +1983,16 @@ Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/c
 
 :::
 
+#### `DATABASE_SCHEMA`
+
+- Type: `str`
+- Default: None
+- Description: Specify a schema to use for the database
+
+:::info
+For Postgres, it might be useful to specify the [schema](https://www.postgresql.org/docs/current/ddl-schemas.html) for the tables to avoid conflicts between table names or reserved keywords
+:::
+
 #### `DATABASE_POOL_SIZE`
 
 - Type: `int`
