@@ -1942,13 +1942,19 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 
 These variables are not specific to Open WebUI but can still be valuable in certain contexts.
 
-### Amazon S3 Storage
+### Cloud Storage 
 
 #### `STORAGE_PROVIDER`
 
 - Type: `str`
+- Options:
+  - `s3` - uses S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
+  - `gcs` - uses GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
+
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
+
+#### Amazon S3 Storage
 
 #### `S3_ACCESS_KEY_ID`
 
@@ -1974,6 +1980,22 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Description: Sets the secret access key for S3 storage.
+
+#### Google Cloud Storage
+
+#### `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+
+- Type: `str`
+- Description: Contents of Google Application Credentials JSON file.
+  - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Google Metadata server if run on a Google Compute Engine.
+  - File can be generated for a service account following this [guide](https://developers.google.com/workspace/guides/create-credentials#service-account)
+
+
+#### `GCS_BUCKET_NAME`
+
+- Type: `str`
+- Description: Sets the bucket name for Google Cloud Storage. Bucket must already exist.
+
 
 ### Database Pool
 
