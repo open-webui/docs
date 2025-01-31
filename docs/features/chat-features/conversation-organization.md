@@ -12,7 +12,7 @@ Folders allow you to group related conversations together for quick access and b
 - **Creating a Folder**: You can create a new folder to store specific conversations. This is useful if you want to keep conversations of a similar topic or purpose together.
 - **Moving Conversations into Folders**: Conversations can be moved into folders by dragging and dropping them. This allows you to structure your workspace in a way that suits your workflow.
 
-![Folder Demo](/img/folder-demo.gif)
+![Folder Demo](/images/folder-demo.gif)
 
 ### Example Use Case
 
@@ -25,7 +25,7 @@ If you are managing multiple projects, you can create separate folders for each 
 Tags provide an additional layer of organization by allowing you to label conversations with keywords or phrases.
 
 - **Adding Tags to Conversations**: Tags can be applied to conversations based on their content or purpose. Tags are flexible and can be added or removed as needed.
-![Tag Demo](/img/tag-demo.gif)
+![Tag Demo](/images/tag-demo.gif)
 - **Using Tags for Searching**: Tags make it easy to locate specific conversations by using the search feature. You can filter conversations by tags to quickly find those related to specific topics.
 
 ### Example Use Case

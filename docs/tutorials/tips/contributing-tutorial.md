@@ -60,7 +60,7 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
      const config: Config = {
        title: "Open WebUI",
        tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
-       favicon: "img/favicon.png",
+       favicon: "images/favicon.png",
        url: process.env.SITE_URL || "https://openwebui.com",
        baseUrl: process.env.BASE_URL || "/",
        ...
