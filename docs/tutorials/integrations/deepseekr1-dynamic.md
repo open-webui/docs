@@ -100,7 +100,7 @@ Here’s the command to start the server:
 - **`--n-gpu-layers`:** Set the number of layers you want to offload to your GPU for faster inference. The exact number depends on your GPU’s memory capacity — reference Unsloth’s table for specific recommendations.
 :::
 
-For example, if your model was downloaded to `/Users/tim/Documents/workspace` and you have an RTX 4090 GPU with 24GB VRAM, your command would look like this:  
+For example, if your model was downloaded to `/Users/tim/Documents/workspace`, your command would look like this:  
 ```bash
 ./llama-server \
     --model /Users/tim/Documents/workspace/DeepSeek-R1-GGUF/DeepSeek-R1-UD-IQ1_S/DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf \
