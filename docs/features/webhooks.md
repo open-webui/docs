@@ -26,7 +26,7 @@ To configure webhooks in Open WebUI, you have two options:
 
 ### Option 2: Configure through Environment Variables
 
-Alternatively, you can configure the webhook URL by setting the `WEBHOOK_URL` environment variable. For more information on environment variables in Open WebUI, see [Environment Variable Configuration](https://docs.openwebui.com/getting-started/advanced-topics/env-configuration/#webhook_url).
+Alternatively, you can configure the webhook URL by setting the `WEBHOOK_URL` environment variable. For more information on environment variables in Open WebUI, see [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration/#webhook_url).
 
 ### Step 3: Verify the Webhook
 
