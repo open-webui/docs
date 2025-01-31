@@ -1070,6 +1070,12 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Default: `default`
 - Description: Specifies the database to connect to within a milvus instance
 
+#### `MILVUS_TOKEN`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the connection token for Milvus, optional.
+
 
 ### OpenSearch
 
