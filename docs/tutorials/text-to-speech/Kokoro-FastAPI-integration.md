@@ -13,9 +13,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) is a dockerized FastAPI wrapper for the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model that implements the OpenAI API endpoint specification. It offers high-performance text-to-speech with impressive generation speeds:
 
+- Small local model (~<300mb on disk, additional storage needed up to 5gb for CUDA drivers, etc)
 - 100x+ real-time speed via HF A100
 - 35-50x+ real-time speed via 4060Ti
 - 5x+ real-time speed via M3 Pro CPU
+- Low latecy (sub 1s with GPU), customizable by chunking parameters
+- 
 
 ## Key Features
 
@@ -23,18 +26,20 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 - NVIDIA GPU accelerated or CPU Onnx inference
 - Streaming support with variable chunking
 - Multiple audio format support (`.mp3`, `.wav`, `.opus`, `.flac`, `.aac`, `.pcm`)
-- Gradio Web UI interface for easy testing
+- Integrated web interface on localhost:8880/web (or additional container in repo for gradio)
 - Phoneme endpoints for conversion and generation
 
 ## Voices
 
 - af
 - af_bella
+- af_irulan
 - af_nicole
 - af_sarah
 - af_sky
 - am_adam
 - am_michael
+- am_gurney
 - bf_emma
 - bf_isabella
 - bm_george
@@ -49,23 +54,22 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 - Docker installed on your system
 - Open WebUI running
-- For GPU support: NVIDIA GPU with CUDA 12.1
+- For GPU support: NVIDIA GPU with CUDA 12.3
 - For CPU-only: No special requirements
 
 ## ⚡️ Quick start
 
 ### You can choose between GPU or CPU versions
-
 ### GPU Version (Requires NVIDIA GPU with CUDA 12.1)
 
 ```bash
-docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi:latest
+docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi-gpu:latest
 ```
 
 ### CPU Version (ONNX optimized inference)
 
 ```bash
-docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi:cpu-latest
+docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi-cpu:latest
 ```
 
 ## Setting up Open WebUI to use `Kokoro-FastAPI`
@@ -78,7 +82,7 @@ To use Kokoro-FastAPI with Open WebUI, follow these steps:
   - API Base URL: `http://localhost:8880/v1`
   - API Key: `not-needed`
   - TTS Model: `kokoro`
-  - TTS Voice: `af_bella`
+  - TTS Voice: `af_bella` # also accepts mapping of existing OAI voices for compatibility
 
 :::info
 The default API key is the string `not-needed`. You do not have to change that value if you do not need the added security.
@@ -89,6 +93,7 @@ The default API key is the string `not-needed`. You do not have to change that v
 ```bash
 git clone https://github.com/remsky/Kokoro-FastAPI.git
 cd Kokoro-FastAPI
+cd docker/cpu # or docker/gpu
 docker compose up --build
 ```
 
