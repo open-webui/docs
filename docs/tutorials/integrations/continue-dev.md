@@ -4,7 +4,7 @@ title: "⚛️ Continue.dev VSCode Extension with Open WebUI"
 ---
 
 :::warning
-This tutorial is a community contribution and is not supported by the OpenWebUI team. It serves only as a demonstration on how to customize OpenWebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
 # Integrating Continue.dev VSCode Extension with Open WebUI
