@@ -1,4 +1,5 @@
 ---
+sidebar_position: 200
 title: "🔒 HTTPS using Nginx"
 ---
 
@@ -24,10 +25,6 @@ import SelfSigned from './tab-nginx/SelfSigned.md';
 import LetsEncrypt from './tab-nginx/LetsEncrypt.md';
 
 <Tabs>
-  <TabItem value="self-signed" label="Self-Signed Certificate">
-    <SelfSigned />
-  </TabItem>
-
   <TabItem value="letsencrypt" label="Let's Encrypt">
     <LetsEncrypt />
   </TabItem>
