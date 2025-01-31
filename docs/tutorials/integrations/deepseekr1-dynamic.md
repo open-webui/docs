@@ -148,11 +148,7 @@ Once the connection is saved, you can start querying **DeepSeek-R1** directly fr
 
 You can now use Open WebUI’s chat interface to interact with the **DeepSeek-R1 Dynamic 1.58-bit model**.  
 
-:::info
-🖥️ **DeepSeek-R1 Response in Open WebUI**  
-
 ![Response Screenshot](/images/tutorials/deepseek/response.png)  
-:::
 
 ---
 
