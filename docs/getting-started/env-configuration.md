@@ -103,7 +103,7 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 
 :::danger
 
-This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/advanced-topics/env-configuration/#enable_oauth_signup)
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration/#enable_oauth_signup)
 is also being used and set to `True`. Failure to do so will result in the inability to login.
 
 :::
