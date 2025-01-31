@@ -8,7 +8,7 @@ Pipes are functions that can be used to perform actions prior to returning LLM m
 
 <p align="center">
   <a href="#">
-    <img src="/img/pipelines/pipes.png" alt="Pipe Workflow" />
+    <img src="/images/pipelines/pipes.png" alt="Pipe Workflow" />
   </a>
 </p>
 
@@ -16,6 +16,6 @@ Pipes that are defined in your WebUI show up as a new model with an "External" d
 
 <p align="center">
   <a href="#">
-    <img src="/img/pipelines/pipe-model-example.png" alt="Pipe Models in WebUI" />
+    <img src="/images/pipelines/pipe-model-example.png" alt="Pipe Models in WebUI" />
   </a>
 </p>

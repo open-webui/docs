@@ -160,7 +160,7 @@ Using Azure OpenAI Dall-E directly is unsupported, but you can [set up a LiteLLM
 
 ## Using Image Generation
 
-![Image Generation Tutorial](/img/tutorial_image_generation.png)
+![Image Generation Tutorial](/images/tutorial_image_generation.png)
 
 1. First, use a text generation model to write a prompt for image generation.
 2. After the response has finished, you can click the Picture icon to generate an image.

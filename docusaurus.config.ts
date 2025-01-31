@@ -6,7 +6,7 @@ import { themes as prismThemes } from "prism-react-renderer";
 const config: Config = {
 	title: "Open WebUI",
 	tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
-	favicon: "img/favicon.png",
+	favicon: "images/favicon.png",
 
 	// Set the production url of your site here
 	url: "https://openwebui.com",
@@ -65,12 +65,12 @@ const config: Config = {
 
 	themeConfig: {
 		// Replace with your project's social card
-		// image: "img/docusaurus-social-card.jpg",
+		// image: "images/docusaurus-social-card.jpg",
 		navbar: {
 			title: "Open WebUI",
 			logo: {
-				src: "img/logo.png",
-				srcDark: "img/logo-dark.png",
+				src: "images/logo.png",
+				srcDark: "images/logo-dark.png",
 			},
 			items: [
 				// {
@@ -108,7 +108,7 @@ const config: Config = {
 		},
 		footer: {
 			logo: {
-				src: "img/logo-dark.png",
+				src: "images/logo-dark.png",
 				height: 100,
 			},
 			style: "light",

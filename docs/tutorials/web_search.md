@@ -348,7 +348,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
 6. Save changes
 
-![SearXNG GUI Configuration](/img/tutorial_searxng_config.png)
+![SearXNG GUI Configuration](/images/tutorial_searxng_config.png)
 
 ## 5. Using Web Search in a Chat
 
@@ -356,7 +356,7 @@ To access Web Search, Click on the + next to the message input field.
 
 Here you can toggle Web Search On/Off.
 
-![Web Search UI Toggle](/img/web_search_toggle.png)
+![Web Search UI Toggle](/images/web_search_toggle.png)
 
 By following these steps, you will have successfully set up SearXNG with Open WebUI, enabling you to perform web searches using the SearXNG engine.
 
@@ -379,14 +379,14 @@ This is enabled on a per session basis eg. reloading the page, changing to anoth
 7. Fill `Google PSE API Key` with the `API key` and `Google PSE Engine Id` (# 4)
 8. Click `Save`
 
-![Open WebUI Admin panel](/img/tutorial_google_pse1.png)
+![Open WebUI Admin panel](/images/tutorial_google_pse1.png)
 
 #### Note
 
 You have to enable `Web search` in the prompt field, using plus (`+`) button.
 Search the web ;-)
 
-![enable Web search](/img/tutorial_google_pse2.png)
+![enable Web search](/images/tutorial_google_pse2.png)
 
 ## Brave API
 
@@ -444,13 +444,13 @@ services:
 6. [Optional] Enter the `SearchApi engine` name you want to query. Example, `google`, `bing`, `baidu`, `google_news`, `bing_news`, `google_videos`, `google_scholar` and `google_patents.` By default, it is set to `google`.
 7. Click `Save`.
 
-![Open WebUI Admin panel](/img/tutorial_searchapi_search.png)
+![Open WebUI Admin panel](/images/tutorial_searchapi_search.png)
 
 #### Note
 
 You have to enable `Web search` in the prompt field, using plus (`+`) button to search the web using [SearchApi](https://www.searchapi.io/) engines.
 
-![enable Web search](/img/enable_web_search.png)
+![enable Web search](/images/enable_web_search.png)
 
 ## Kagi API
 
