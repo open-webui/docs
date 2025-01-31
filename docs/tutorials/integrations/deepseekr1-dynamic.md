@@ -90,11 +90,15 @@ Here’s the command to start the server:
     --n-gpu-layers 40
 ```
 
-> 🔑 **Parameters to Customize Based on Your Machine:**  
-> - **`--model`:** Replace `/[your-directory]/` with the path where the GGUF files were downloaded in Step 2.  
-> - **`--port`:** The server default is `8080`, but feel free to change it based on your port availability.  
-> - **`--ctx-size`:** Determines context length (number of tokens). You can increase it if your hardware allows, but be cautious of rising RAM/VRAM usage.  
-> - **`--n-gpu-layers`:** Set the number of layers you want to offload to your GPU for faster inference. The exact number depends on your GPU’s memory capacity — reference Unsloth’s table for specific recommendations. For CPU-only setups, set it to `0`.  
+
+:::tip
+🔑 **Parameters to Customize Based on Your Machine:**  
+
+- **`--model`:** Replace `/[your-directory]/` with the path where the GGUF files were downloaded in Step 2.  
+- **`--port`:** The server default is `8080`, but feel free to change it based on your port availability.  
+- **`--ctx-size`:** Determines context length (number of tokens). You can increase it if your hardware allows, but be cautious of rising RAM/VRAM usage.  
+- **`--n-gpu-layers`:** Set the number of layers you want to offload to your GPU for faster inference. The exact number depends on your GPU’s memory capacity — reference Unsloth’s table for specific recommendations.
+:::
 
 For example, if your model was downloaded to `/Users/tim/Documents/workspace` and you have an RTX 4090 GPU with 24GB VRAM, your command would look like this:  
 ```bash
