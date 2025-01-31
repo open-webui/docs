@@ -78,9 +78,13 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 - Description: Sets the port to run Open WebUI from.
 
 :::info
+If you're running the application via Python and using the `open-webui serve` command, you cannot set the port using the `PORT` configuration. Instead, you must specify it directly as a command-line argument using the `--port` flag. For example:
 
-If installed via Python, you must instead pass `--port` as a command line argument.
+```bash
+open-webui serve --port 9999
+```
 
+This will run the Open WebUI on port `9999`. The `PORT` environment variable is disregarded in this mode.
 :::
 
 #### `ENABLE_SIGNUP`
