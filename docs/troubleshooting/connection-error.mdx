@@ -12,7 +12,7 @@ We're here to help you get everything set up and running smoothly. Below, you'll
 Struggling to connect to Ollama from Open WebUI? It could be because Ollama isn’t listening on a network interface that allows external connections. Let’s sort that out:
 
 1. **Configure Ollama to Listen Broadly** 🎧:
-   Set `OLLAMA_HOST` to `0.0.0.0` to make Ollama listen on all network interfaces.
+   Set `OLLAMA_HOST` to `0.0.0.0` to make Ollama listen on all network interfaces.  Use the [Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-configure-ollama-server) for details.
 
 2. **Update Environment Variables**:
    Ensure that the `OLLAMA_HOST` is accurately set within your deployment environment.
@@ -28,17 +28,36 @@ For more detailed instructions on configuring Ollama, please refer to the [Ollam
 
 If you're seeing a connection error when trying to access Ollama, it might be because the WebUI docker container can't talk to the Ollama server running on your host. Let’s fix that:
 
-1. **Adjust the Network Settings** 🛠️:
-   Use the `--network=host` flag in your Docker command. This links your container directly to your host’s network.
+1. **Make sure Ollama is running on all network interfaces**:
+   The docker container will be accessing Ollama through an external network interface, typically `172.17.0.1`.  Ensure you do not have a firewall blocking this.
+   
+   ```bash
+   sudo ufw allow from 172.17.0.0/16
+   ```
 
-2. **Change the Port**:
-   Remember that the internal port changes from 3000 to 8080.
+   and  
+
+   ```bash
+   sudo netstat -tuln | grep 11434
+   ```
+
+2. **Adjust the Network Settings** 🛠️:
+   Use the `--add-host=host.docker.internal:host-gateway` flag in your Docker command, and use `http://host.docker.internal:11434`.  To verify this, you can start up a container to verify that Ollama is accessible.
+
+   ```bash
+   docker run --rm -it --add-host=host.docker.internal:host-gateway alpine sh
+   / # apk add curl
+   / # curl http://host.docker.internal:11434
+   Ollama is running/ #
+   ```
 
 **Example Docker Command**:
+
 ```bash
-docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://host.docker.internal:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
-🔗 After running the above, your WebUI should be available at `http://localhost:8080`.
+
+🔗 After running the above, your WebUI should be available at `http://localhost:3000`.
 
 ## 🔒 SSL Connection Issue with Hugging Face
 
