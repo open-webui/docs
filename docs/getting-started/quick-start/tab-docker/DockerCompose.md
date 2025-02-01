@@ -39,7 +39,7 @@ A useful helper script called `run-compose.sh` is included with the codebase. Th
 
 ---
 
-**Note:** For Nvidia GPU support, add the following to your service definition in the `docker-compose.yml` file:
+**Note:** For Nvidia GPU support, you change the image from `ghcr.io/open-webui/open-webui:main` to `ghcr.io/open-webui/open-webui:cuda` and add the following to your service definition in the `docker-compose.yml` file:
 
 ```yaml
 deploy:
