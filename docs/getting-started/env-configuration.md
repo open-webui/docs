@@ -1170,6 +1170,20 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
   - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_WEB_LOADER`
+
+- Type: `str`
+- Default: `safe_web`
+- Description: Specifies the loader to use for retrieving and processing web content. Options include:
+  - `safe_web` - Uses the `requests` module with enhanced error handling.
+  - `playwright` - Uses Playwright (backed by Chromium) for more advanced web page rendering and interaction.
+
+:::info
+
+Choosing `playwright` is beneficial when dealing with JavaScript-heavy websites, while `safe_web` is suitable for static content. Dependencies will be automatically installed on launch of the Open WebUI instance.
+
+:::
+
 #### `SEARXNG_QUERY_URL`
 
 - Type: `str`
