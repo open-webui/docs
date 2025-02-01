@@ -129,7 +129,7 @@ Be sure to **keep this terminal session running**, as it serves the model for al
 1. Go to **Admin Settings** in Open WebUI.  
 2. Navigate to **Connections > OpenAI Connections.**  
 3. Add the following details for the new connection:  
-   - URL: `http://127.0.0.1:10000/v1`  
+   - URL: `http://127.0.0.1:10000/v1` (or `http://host.docker.internal:10000/v1` when running Open WebUI in docker)
    - API Key: `none`
 
 :::info
