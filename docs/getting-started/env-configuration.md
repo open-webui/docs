@@ -1170,17 +1170,38 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
   - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Web Loader Configuration
+
 #### `RAG_WEB_LOADER`
 
 - Type: `str`
 - Default: `safe_web`
 - Description: Specifies the loader to use for retrieving and processing web content. Options include:
   - `safe_web` - Uses the `requests` module with enhanced error handling.
-  - `playwright` - Uses Playwright (backed by Chromium) for more advanced web page rendering and interaction.
+  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
 
-Choosing `playwright` is beneficial when dealing with JavaScript-heavy websites, while `safe_web` is suitable for static content. Dependencies will be automatically installed on launch of the Open WebUI instance.
+When using `playwright`, you have two options:
+1. If `PLAYWRIGHT_WS_URI` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
+2. If `PLAYWRIGHT_WS_URI` is set, Open WebUI will connect to a remote browser instance instead of installing dependencies locally.
+
+:::
+
+#### `PLAYWRIGHT_WS_URI`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+Using a remote Playwright browser via `PLAYWRIGHT_WS_URI` can be beneficial for:
+- Reducing the size of the Open WebUI container
+- Using a different browser other than the default Chromium
+- Connecting to a non-headless (GUI) browser
 
 :::
 
