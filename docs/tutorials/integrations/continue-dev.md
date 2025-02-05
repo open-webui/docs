@@ -35,10 +35,10 @@ We can still setup Continue to use the openai provider which will allow us to us
 
 In `config.json` all you will need to do is add/change the following options.
 
-### Change provider to openai
+### Change provider to ollama
 
 ```json
-"provider": "openai"
+"provider": "ollama"
 ```
 
 ### Add or update apiBase
@@ -46,7 +46,7 @@ In `config.json` all you will need to do is add/change the following options.
 Set this to your Open Web UI domain on the end.
 
 ```json
-"apiBase": "http://localhost:3000/" #If you followed Getting Started Docker
+"apiBase": "http://localhost:3000/ollama" #If you followed Getting Started Docker
 ```
 
 ### Add apiKey
@@ -61,7 +61,7 @@ You'll want to copy the "API Key" (this starts with sk-)
 
 ## Example Config
 
-Here is a base example of config.json using Open WebUI via an openai provider. Using Granite Code as the model.
+Here is a base example of config.json using Open WebUI via an ollama provider. Using Granite Code as the model.
 Make sure you pull the model into your ollama instance/s beforehand.
 
 ```json
@@ -69,10 +69,10 @@ Make sure you pull the model into your ollama instance/s beforehand.
   "models": [
     {
       "title": "Granite Code",
-      "provider": "openai",
+      "provider": "ollama",
       "model": "granite-code:latest",
       "useLegacyCompletionsEndpoint": false,
-      "apiBase": "http://YOUROPENWEBUI/ollama/v1",
+      "apiBase": "http://YOUROPENWEBUI/ollama",
       "apiKey": "sk-YOUR-API-KEY"
     }
   ],
@@ -85,10 +85,10 @@ Make sure you pull the model into your ollama instance/s beforehand.
   ],
   "tabAutocompleteModel": {
     "title": "Granite Code",
-    "provider": "openai",
+    "provider": "ollama",
     "model": "granite-code:latest",
     "useLegacyCompletionsEndpoint": false,
-    "apiBase": "http://localhost:3000/ollama/v1",
+    "apiBase": "http://localhost:3000/ollama",
     "apiKey": "sk-YOUR-API-KEY"
   }
 }
