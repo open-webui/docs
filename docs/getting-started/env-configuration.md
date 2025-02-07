@@ -2021,6 +2021,11 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the endpoint URL for S3 storage.
 
+#### `S3_KEY_PREFIX`
+
+- Type: `str`
+- Description: Sets the key prefix for a S3 object.
+
 #### `S3_REGION_NAME`
 
 - Type: `str`
