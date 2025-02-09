@@ -98,5 +98,3 @@ Great! Looks like everything is worked as expected in Open-WebUI. Now let's veri
 Using Open-WebUI's swagger docs, we can get all the information related to this file using the `/api/v1/files/{id}` endpoint and passing in the unique ID (4405fabb-603e-4919-972b-2b39d6ad7f5b).
 
 ![Inspect the file by ID](/images/tutorials/amazon-s3/amazon-s3-get-file-by-id.png)
-
-Happy coding!
