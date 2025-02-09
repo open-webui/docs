@@ -81,4 +81,22 @@ docker run -d \
   ghcr.io/open-webui/open-webui:main
 ```
 
-## 3. Upload a file
+## 3. Test the set-up
+
+Now that we have Open-WebUI running, let's upload a simple `Hello, World` text file and test our set-up.
+
+![Upload a file in Open-WebUI](/images/tutorials/amazon-s3/amazon-s3-upload-file.png)
+
+And confirm that we're getting a response from the selected LLM.
+
+![Get a response in Open-WebUI](/images/tutorials/amazon-s3/amazon-s3-oui-response.png)
+
+Great! Looks like everything is worked as expected in Open-WebUI. Now let's verify that the text file was indeed uploaded and stored in the specified S3 bucket. Using the AWS Management Console, we can see that there is now a file in the S3 bucket. In addition to the name of the file we uploaded (`hello.txt`) you can see the object's name was appended with a unique ID. This is how Open-WebUI tracks all the files uploaded.
+
+![Get a response in Open-WebUI](/images/tutorials/amazon-s3/amazon-s3-object-in-bucket.png)
+
+Using Open-WebUI's swagger docs, we can get all the information related to this file using the `/api/v1/files/{id}` endpoint and passing in the unique ID (4405fabb-603e-4919-972b-2b39d6ad7f5b).
+
+![Inspect the file by ID](/images/tutorials/amazon-s3/amazon-s3-get-file-by-id.png)
+
+Happy coding!
