@@ -75,6 +75,24 @@ If changing the role of a logged in user, they will need to log out and log back
 
 :::
 
+### OAuth Group Management
+
+Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI.
+To use this feature set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
+You can configure the following environment variables to match the groups returned by the OAuth provider:
+
+1. `OAUTH_GROUP_CLAIM` - The claim that contains the groups. Defaults to `groups`. Can also be nested, for example `user.memberOf`.
+
+:::warning
+Admin users do not get their groups updated
+:::
+
+:::info
+
+If changing the group of a logged in user, they will need to log out and log back in to receive the new group.
+
+:::
+
 ## Trusted Header
 
 Open WebUI is able to delegate authentication to an authenticating reverse proxy that passes in the user's details in HTTP headers.
