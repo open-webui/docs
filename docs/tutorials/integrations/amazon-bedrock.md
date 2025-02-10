@@ -92,7 +92,7 @@ Now that you the BAG up-and-running, it's time to add it as a new connection in 
 
 You should now see all your Bedrock models available!
 
-![Use Bedrock Models](/images/tutorials/amazon-bedrock/amazon-bedrock-models-in-oiu.png)
+![Use Bedrock Models](/images/tutorials/amazon-bedrock/amazon-bedrock-models-in-oui.png)
 
 ## Other Helpful Tutorials
 
