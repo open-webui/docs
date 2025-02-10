@@ -869,7 +869,7 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_FILE_MAX_COUNT`
