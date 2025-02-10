@@ -7,18 +7,9 @@ title: "🗨️ Kokoro-FastAPI Using Docker"
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-# Integrating `Kokoro-FastAPI` 🗣️ with Open WebUI
-
 ## What is `Kokoro-FastAPI`?
 
-[Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) is a dockerized FastAPI wrapper for the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model that implements the OpenAI API endpoint specification. It offers high-performance text-to-speech with impressive generation speeds:
-
-- Small local model (~<300mb on disk, additional storage needed up to 5gb for CUDA drivers, etc)
-- 100x+ real-time speed via HF A100
-- 35-50x+ real-time speed via 4060Ti
-- 5x+ real-time speed via M3 Pro CPU
-- Low latecy (sub 1s with GPU), customizable by chunking parameters
-- 
+[Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) is a dockerized FastAPI wrapper for the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model that implements the OpenAI API endpoint specification. 
 
 ## Key Features
 
@@ -60,6 +51,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 ## ⚡️ Quick start
 
 ### You can choose between GPU or CPU versions
+
 ### GPU Version (Requires NVIDIA GPU with CUDA 12.1)
 
 ```bash
@@ -99,4 +91,4 @@ docker compose up --build
 
 **That's it!**
 
-## For more information on building the Docker container, including changing ports, please refer to the [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) repository
+For more information on building the Docker container, including changing ports, please refer to the [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) repository
