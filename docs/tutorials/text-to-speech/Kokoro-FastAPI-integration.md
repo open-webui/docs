@@ -54,14 +54,54 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ### GPU Version (Requires NVIDIA GPU with CUDA 12.1)
 
+Using docker run:
+
 ```bash
-docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi-gpu:latest
+docker run --gpus all -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-gpu
 ```
+
+Or docker compose, by creating a `docker-compose.yml` file and running `docker compose up`. For example:
+
+```yaml
+name: kokoro
+services:
+    kokoro-fastapi-gpu:
+        ports:
+            - 8880:8880
+        image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.1
+        restart: always
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities:
+                              - gpu
+```
+
+:::info
+You may need to install and configure [the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+:::
 
 ### CPU Version (ONNX optimized inference)
 
+With docker run:
+
 ```bash
-docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi-cpu:latest
+docker run -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu
+```
+
+With docker compose:
+
+```yaml
+name: kokoro
+services:
+    kokoro-fastapi-cpu:
+        ports:
+            - 8880:8880
+        image: ghcr.io/remsky/kokoro-fastapi-cpu
+        restart: always
 ```
 
 ## Setting up Open WebUI to use `Kokoro-FastAPI`
