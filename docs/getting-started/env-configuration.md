@@ -1815,6 +1815,36 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Description: Sets the redirect URI for Microsoft OAuth
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Github
+
+See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+#### `GITHUB_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_OAUTH_SCOPE`
+
+- Type: `str`
+- Default: `user:email`
+- Description: Sets the scope for Github OAuth authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_CLIENT_REDIRECT_URI`
+
+- Type: `str`
+- Default: `<backend>/oauth/github/callback`
+- Description: Sets the redirect URI for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### OpenID (OIDC)
 
 #### `OAUTH_CLIENT_ID`
