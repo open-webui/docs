@@ -262,7 +262,6 @@ await __event_emitter__(
     }
 )
 ```
-
 If you are sending multiple citations, you can iterate over citations and call the emitter multiple times. When implementing custom citations, ensure that you set `self.citation = False` in your `Tools` class `__init__` method. Otherwise, the built-in citations will override the ones you have pushed in. For example:
 
 ```python
@@ -270,4 +269,44 @@ def __init__(self):
     self.citation = False
 ```
 
-Leaving `self.citation = True` will replace any custom citations you send with automatically generated ones. By disabling it, you can fully manage your own citation references. 
+Leaving `self.citation = True` will replace any custom citations you send with automatically generated ones. By disabling it, you can fully manage your own citation references.
+
+<details>
+<summary>Example</summary>
+
+```
+class Tools:
+    class UserValves(BaseModel):
+        test: bool = Field(
+            default=True, description="test"
+        )
+
+    def __init__(self):
+        self.citation = False
+
+async def test_function(
+        self, prompt: str, __user__: dict, __event_emitter__=None
+    ) -> str:
+        """
+        This is a demo that just creates a citation
+
+        :param test: this is a test parameter
+        """
+
+        await __event_emitter__(
+            {
+                "type": "citation",
+                "data": {
+                    "document": ["This message will be appended to the chat as a citation when clicked into"],
+                    "metadata": [
+                        {
+                            "date_accessed": datetime.now().isoformat(),
+                            "source": title,
+                        }
+                    ],
+                    "source": {"name": "Title of the content"", "url": "http://link-to-citation"},
+                },
+            }
+        )
+```
+</details>
