@@ -9,7 +9,13 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## What is `Kokoro-FastAPI`?
 
-[Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) is a dockerized FastAPI wrapper for the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model that implements the OpenAI API endpoint specification. 
+[Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) is a dockerized FastAPI wrapper for the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model that implements the OpenAI API endpoint specification. It offers high-performance text-to-speech with impressive generation speeds:
+
+- Small local model (≅300mb on disk, additional storage needed up to 5gb for CUDA drivers, etc)
+- 100x+ real-time speed via HF A100
+- 35-50x+ real-time speed via 4060Ti
+- 5x+ real-time speed via M3 Pro CPU
+- Low latecy (sub 1s with GPU), customizable by chunking parameters
 
 ## Key Features
 
