@@ -10,6 +10,7 @@ Open WebUI supports several forms of federated authentication:
 1. OAuth2
     1. Google
     1. Microsoft
+    1. Github
     1. OIDC
 1. Trusted Header
 
@@ -44,6 +45,16 @@ The following environment variables are required:
 1. `MICROSOFT_CLIENT_SECRET` - Microsoft OAuth client secret
 1. `MICROSOFT_CLIENT_TENANT_ID` - Microsoft tenant ID - use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
 
+### Github
+
+To configure a Github OAuth Client, please refer to [Github's documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) on how to create a OAuth App or Github App for a **web application**.
+The allowed redirect URI should include `<open-webui>/oauth/github/callback`.
+
+The following environment variables are required:
+
+1. `GITHUB_CLIENT_ID` - Github OAuth App Client ID
+1. `GITHUB_CLIENT_SECRET` - Github OAuth App Client Secret
+
 ### OIDC
 
 Any authentication provider that supports OIDC can be configured.
@@ -72,6 +83,24 @@ You can configure the following environment variables to match the roles returne
 :::info
 
 If changing the role of a logged in user, they will need to log out and log back in to receive the new role.
+
+:::
+
+### OAuth Group Management
+
+Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI.
+To use this feature set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
+You can configure the following environment variables to match the groups returned by the OAuth provider:
+
+1. `OAUTH_GROUP_CLAIM` - The claim that contains the groups. Defaults to `groups`. Can also be nested, for example `user.memberOf`.
+
+:::warning
+Admin users do not get their groups updated
+:::
+
+:::info
+
+If changing the group of a logged in user, they will need to log out and log back in to receive the new group.
 
 :::
 
