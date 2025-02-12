@@ -35,7 +35,7 @@ Please note that `PersistentConfig` environment variables are clearly marked as 
 
 ## App/Backend
 
-The following environment variables are used by `backend/config.py` to provide Open WebUI startup
+The following environment variables are used by `backend/open_webui/config.py` to provide Open WebUI startup
 configuration. Please note that some variables may have different default values depending on
 whether you're running Open WebUI directly or via Docker. For more information on logging
 environment variables, see our [logging documentation](https://docs.openwebui.com/getting-started/advanced-topics/logging)).
@@ -869,7 +869,7 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_FILE_MAX_COUNT`
@@ -1815,6 +1815,36 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Description: Sets the redirect URI for Microsoft OAuth
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Github
+
+See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+#### `GITHUB_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_OAUTH_SCOPE`
+
+- Type: `str`
+- Default: `user:email`
+- Description: Sets the scope for Github OAuth authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_CLIENT_REDIRECT_URI`
+
+- Type: `str`
+- Default: `<backend>/oauth/github/callback`
+- Description: Sets the redirect URI for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### OpenID (OIDC)
 
 #### `OAUTH_CLIENT_ID`
@@ -1874,6 +1904,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 
 - Type: `str`
 - Description: Sets the attribute to use as username for LDAP authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_ATTRIBUTE_FOR_MAIL`
+
+- Type: `str`
+- Description: Sets the attribute to use as mail for LDAP authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_CA_CERT_FILE`
@@ -2020,6 +2056,11 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Description: Sets the endpoint URL for S3 storage.
+
+#### `S3_KEY_PREFIX`
+
+- Type: `str`
+- Description: Sets the key prefix for a S3 object.
 
 #### `S3_REGION_NAME`
 

@@ -7,8 +7,6 @@ title: "🗨️ Kokoro-FastAPI Using Docker"
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-# Integrating `Kokoro-FastAPI` 🗣️ with Open WebUI
-
 ## What is `Kokoro-FastAPI`?
 
 [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) is a dockerized FastAPI wrapper for the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model that implements the OpenAI API endpoint specification. It offers high-performance text-to-speech with impressive generation speeds:
@@ -62,14 +60,54 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ### GPU Version (Requires NVIDIA GPU with CUDA 12.1)
 
+Using docker run:
+
 ```bash
-docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi-gpu:latest
+docker run --gpus all -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-gpu
 ```
+
+Or docker compose, by creating a `docker-compose.yml` file and running `docker compose up`. For example:
+
+```yaml
+name: kokoro
+services:
+    kokoro-fastapi-gpu:
+        ports:
+            - 8880:8880
+        image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.1
+        restart: always
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities:
+                              - gpu
+```
+
+:::info
+You may need to install and configure [the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+:::
 
 ### CPU Version (ONNX optimized inference)
 
+With docker run:
+
 ```bash
-docker run -d -p 8880:8880 -p 7860:7860 remsky/kokoro-fastapi-cpu:latest
+docker run -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu
+```
+
+With docker compose:
+
+```yaml
+name: kokoro
+services:
+    kokoro-fastapi-cpu:
+        ports:
+            - 8880:8880
+        image: ghcr.io/remsky/kokoro-fastapi-cpu
+        restart: always
 ```
 
 ## Setting up Open WebUI to use `Kokoro-FastAPI`
@@ -99,4 +137,4 @@ docker compose up --build
 
 **That's it!**
 
-## For more information on building the Docker container, including changing ports, please refer to the [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) repository
+For more information on building the Docker container, including changing ports, please refer to the [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) repository
