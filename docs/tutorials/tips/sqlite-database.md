@@ -7,6 +7,9 @@ title: "💠 SQLite Database Overview"
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
+> [!WARNING]  
+> This documentation was created based on the current version (0.5.11) and is constantly being updated.
+
 # Open-WebUI Internal SQLite Database
 
 For Open-WebUI, the SQLite database serves as the backbone for user management, chat history, file storage, and various other core functionalities. Understanding this structure is essential for anyone looking to contribute to or maintain the project effectively.
