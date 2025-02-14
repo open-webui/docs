@@ -42,6 +42,40 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
       }'
   ```
 
+### 🔤 Embeddings
+- **Endpoint**: `POST /api/embeddings`
+- **Description**: OpenAI API compatible endpoint for generating embeddings from text input. This endpoint can be used to create vector representations of text that are useful for semantic search, text similarity comparisons, and other NLP tasks.
+
+- **Curl Example**:
+
+  ```bash
+  curl -X POST http://localhost:3000/api/embeddings \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "text-embedding-ada-002",
+        "input": "The quick brown fox jumps over the lazy dog"
+      }'
+  ```
+- **Python Example**:
+
+  ```python
+  import requests
+  
+  def generate_embeddings(token, text_input):
+      url = 'http://localhost:3000/api/embeddings'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Content-Type': 'application/json'
+      }
+      payload = {
+          'model': 'text-embedding-ada-002',
+          'input': text_input
+      }
+      response = requests.post(url, headers=headers, json=payload)
+      return response.json()
+  ```
+
 ### 🧩 Retrieval Augmented Generation (RAG)
 
 The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
