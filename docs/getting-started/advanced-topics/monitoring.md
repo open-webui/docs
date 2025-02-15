@@ -1,3 +1,8 @@
+---
+sidebar_position: 6
+title: "📊 Monitoring"
+---
+
 # Monitoring OpenWeb UI
 
 This guide covers different approaches to monitoring your OpenWeb UI instance.
