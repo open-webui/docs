@@ -90,3 +90,18 @@ $count(data[id in ['gpt-4o', 'gpt-4o-mini']]) = 2
 
 You can test JSONata queries at [jsonata.org](https://try.jsonata.org/) to verify they work with your API response.
 
+## Model Response Testing
+
+To verify that models can actually process requests, you can monitor the chat completions endpoint. This provides a deeper health check by ensuring models can generate responses.
+
+```bash
+# Test model response
+curl -X POST https://your-openweb-instance/api/chat/completions \
+  -H "Authorization: Bearer sk-adfadsflkhasdflkasdflkh" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [{"role": "user", "content": "Respond with the word HEALTHY"}],
+    "model": "llama3.1",
+    "temperature": 0
+  }'
+```
