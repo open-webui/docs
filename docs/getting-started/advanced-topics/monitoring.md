@@ -1,0 +1,92 @@
+# Monitoring OpenWeb UI
+
+This guide covers different approaches to monitoring your OpenWeb UI instance.
+
+## Basic Health Check Endpoint
+
+OpenWeb UI exposes a health check endpoint at `/health` that returns a 200 OK status when the service is running properly. 
+
+
+```bash
+   # No auth needed for this endpoint
+   curl https://your-openweb-instance/health
+```
+
+### Using Uptime Kuma
+[Uptime Kuma](https://github.com/louislam/uptime-kuma) is a great, easy to use, open source, self-hosted uptime monitoring tool. 
+
+1. In your Uptime Kuma dashboard, click "Add New Monitor"
+2. Set the following configuration:
+   - Monitor Type: HTTP(s)
+   - Name: OpenWeb UI
+   - URL: `http://your-openweb-instance:8080/health`
+   - Monitoring Interval: 60 seconds (or your preferred interval)
+   - Retry count: 3 (recommended)
+
+The health check will verify:
+- The web server is responding
+- The application is running
+- Basic database connectivity
+
+## OpenWeb UI Model Connectivity
+
+To verify that OpenWeb UI can successfully connect to and list your configured models, you can monitor the models endpoint. This endpoint requires authentication and checks OpenWeb UI's ability to communicate with your model providers.
+
+See [API documentation](https://docs.openwebui.com/getting-started/api-endpoints/#-retrieve-all-models) for more details about the models endpoint.
+
+
+```bash
+   # See steps below to get an API key
+   curl -H "Authorization: Bearer sk-adfadsflkhasdflkasdflkh" https://your-openweb-instance/api/models
+```
+
+### Authentication Setup
+
+1. Enable API Keys (Admin required):
+   - Go to Admin Settings > General
+   - Enable the "Enable API Key" setting
+   - Save changes
+
+2. Get your API key [docs](https://docs.openwebui.com/getting-started/api-endpoints):
+   - (Optional), consider making a non-admin user for the monitoring API key
+   - Go to Settings > Account in OpenWeb UI
+   - Generate a new API key specifically for monitoring
+   - Copy the API key for use in Uptime Kuma
+
+Note: If you don't see the option to generate API keys in your Settings > Account, check with your administrator to ensure API keys are enabled.
+
+### Using Uptime Kuma for Model Connectivity
+
+1. Create a new monitor in Uptime Kuma:
+   - Monitor Type: HTTP(s) - JSON Query
+   - Name: OpenWeb UI Model Connectivity
+   - URL: `http://your-openweb-instance:8080/api/models`
+   - Method: GET
+   - Expected Status Code: 200
+   - JSON Query: `$count(data[*])>0`
+   - Expected Value: `true`  
+   - Monitoring Interval: 300 seconds (5 minutes recommended)
+
+2. Configure Authentication:
+   - In the Headers section, add:
+     ```
+     {
+        "Authorization": "Bearer sk-abc123adfsdfsdfsdfsfdsdf"
+     }
+     ```
+   - Replace `YOUR_API_KEY` with the API key you generated
+
+Alternative JSON Queries:
+```
+# At least 1 models by ollama provider
+$count(data[owned_by='ollama'])>1
+
+# Check if specific model exists (returns true/false)
+$exists(data[id='gpt-4o'])
+
+# Check multiple models (returns true if ALL exist)
+$count(data[id in ['gpt-4o', 'gpt-4o-mini']]) = 2
+```
+
+You can test JSONata queries at [jsonata.org](https://try.jsonata.org/) to verify they work with your API response.
+
