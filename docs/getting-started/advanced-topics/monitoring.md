@@ -5,7 +5,10 @@ title: "📊 Monitoring"
 
 # Monitoring OpenWeb UI
 
-This guide covers different approaches to monitoring your OpenWeb UI instance.
+Monitoring your OpenWeb UI instance is crucial for ensuring reliable service and quickly identifying issues. This guide covers three levels of monitoring:
+- Basic health checks for service availability
+- Model connectivity verification
+- Deep health checks with model response testing
 
 ## Basic Health Check Endpoint
 
