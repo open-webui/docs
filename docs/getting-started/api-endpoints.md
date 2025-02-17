@@ -25,7 +25,8 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
-- **Example**:
+
+- **Curl Example**:
 
   ```bash
   curl -X POST http://localhost:3000/api/chat/completions \
@@ -40,6 +41,29 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
           }
         ]
       }'
+  ```
+  
+- **Python Example**:
+  ```python
+  import requests
+  
+  def chat_with_model(token):
+      url = 'http://localhost:3000/api/chat/completions'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Content-Type': 'application/json'
+      }
+      data = {
+        "model": "granite3.1-dense:8b",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Why is the sky blue?"
+          }
+        ]
+      }
+      response = requests.post(url, headers=headers, data=data)
+      return response.json()
   ```
 
 ### 🧩 Retrieval Augmented Generation (RAG)
