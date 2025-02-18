@@ -1172,7 +1172,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 
 ### Web Loader Configuration
 
-#### `RAG_WEB_LOADER`
+#### `RAG_WEB_LOADER_ENGINE`
 
 - Type: `str`
 - Default: `safe_web`
