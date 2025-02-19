@@ -35,7 +35,7 @@ Please note that `PersistentConfig` environment variables are clearly marked as 
 
 ## App/Backend
 
-The following environment variables are used by `backend/config.py` to provide Open WebUI startup
+The following environment variables are used by `backend/open_webui/config.py` to provide Open WebUI startup
 configuration. Please note that some variables may have different default values depending on
 whether you're running Open WebUI directly or via Docker. For more information on logging
 environment variables, see our [logging documentation](https://docs.openwebui.com/getting-started/advanced-topics/logging)).
@@ -373,18 +373,26 @@ when using OpenAI-compatible endpoints.
 Template:
 
 ```
-Create a concise, 3-5 word title with an emoji as a title for the chat history, in the given language. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
-
-Examples of titles:
-📉 Stock Market Trends
-🍪 Perfect Chocolate Chip Recipe
-Evolution of Music Streaming
-Remote Work Productivity Tips
-Artificial Intelligence in Healthcare
-🎮 Video Game Development Insights
-
+### Task:
+Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over excessive creativity; keep it clear and simple.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "📉 Stock Market Trends" },
+- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Evolution of Music Streaming" },
+- { "title": "Remote Work Productivity Tips" },
+- { "title": "Artificial Intelligence in Healthcare" },
+- { "title": "🎮 Video Game Development Insights" }
+### Chat History:
 <chat_history>
 {{MESSAGES:END:2}}
+</chat_history>
 ```
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -869,7 +877,7 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Description: Sets the maximum size of a file that can be uploaded for document ingestion.
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_FILE_MAX_COUNT`
@@ -1069,6 +1077,12 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Type: `str`
 - Default: `default`
 - Description: Specifies the database to connect to within a milvus instance
+
+#### `MILVUS_TOKEN`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the connection token for Milvus, optional.
 
 
 ### OpenSearch
@@ -1844,6 +1858,36 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Description: Sets the redirect URI for Microsoft OAuth
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Github
+
+See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+#### `GITHUB_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_OAUTH_SCOPE`
+
+- Type: `str`
+- Default: `user:email`
+- Description: Sets the scope for Github OAuth authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GITHUB_CLIENT_REDIRECT_URI`
+
+- Type: `str`
+- Default: `<backend>/oauth/github/callback`
+- Description: Sets the redirect URI for Github OAuth
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### OpenID (OIDC)
 
 #### `OAUTH_CLIENT_ID`
@@ -1903,6 +1947,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 
 - Type: `str`
 - Description: Sets the attribute to use as username for LDAP authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_ATTRIBUTE_FOR_MAIL`
+
+- Type: `str`
+- Description: Sets the attribute to use as mail for LDAP authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_CA_CERT_FILE`
@@ -2049,6 +2099,11 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Description: Sets the endpoint URL for S3 storage.
+
+#### `S3_KEY_PREFIX`
+
+- Type: `str`
+- Description: Sets the key prefix for a S3 object.
 
 #### `S3_REGION_NAME`
 

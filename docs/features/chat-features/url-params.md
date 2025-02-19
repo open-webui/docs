@@ -37,7 +37,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 3. **Web Search**
 
-- **Description**: Enabling `web-search` allows the chat session to access [web search](/tutorials/web_search) functionality.
+- **Description**: Enabling `web-search` allows the chat session to access [web search](/category/-web-search) functionality.
 - **How to Set**: Set this parameter to `true` to enable web search.
 - **Example**: `/?web-search=true`
 - **Behavior**: If enabled, the chat can retrieve web search results as part of its responses.

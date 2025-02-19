@@ -9,22 +9,29 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ## Key Features of Open WebUI ⭐
 
-- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (`kubectl`, `kustomize` or `helm`) for a hassle-free experience with support for both `:ollama` image with bundled Ollama and `:cuda` with CUDA support.
+- 🚀 **Effortless Setup**: Install seamlessly using Docker, Kubernetes, Podman, Helm Charts (`kubectl`, `kustomize`, `podman`, or `helm`) for a hassle-free experience with support for both `:ollama` image with bundled Ollama and `:cuda` with CUDA support.
 
-- 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. The OpenAI API URL can be customized to link with various third-party applications.
+- 🛠️ **Guided Initial Setup**: Complete the setup process with clarity, including an explicit indication of creating an admin account during the first-time setup.
 
-- 🛡️ **Granular Permissions and User Groups**: By allowing administrators to create detailed user roles and permissions, we ensure a secure user environment. This granularity not only enhances security but also allows for customized user experiences, fostering a sense of ownership and responsibility amongst users.
+- 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. The OpenAI API URL can be customized to integrate Open WebUI seamlessly with various third-party applications.
+
+- 🛡️ **Granular Permissions and User Groups**: By allowing administrators to create detailed user roles, user groups, and permissions across the workspace, we ensure a secure user environment for all users involved. This granularity not only enhances security, but also allows for customized user experiences, fostering a sense of ownership and responsibility amongst users.
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across desktop PCs, laptops, and mobile devices.
 
 - 📱 **Progressive Web App for Mobile**: Enjoy a native progressive web application experience on your mobile device with offline access on `localhost` or a personal domain, and a smooth user interface. In order for our PWA to be installable on your device, it must be delivered in a secure context. This usually means that it must be served over HTTPS.
+
+  :::info
+
   - To set up a PWA, you'll need some understanding of technologies like Linux, Docker, and reverse proxies such as `Nginx`, `Caddy`, or `Traefik`. Using these tools can help streamline the process of building and deploying a PWA tailored to your needs. While there's no "one-click install" option available, and your available option to securely deploy your Open WebUI instance over HTTPS requires user experience, using these resources can make it easier to create and deploy a PWA tailored to your needs.
 
-- ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
+  :::
 
-- 🧩 **Model Builder**: Easily create Ollama models directly from Open WebUI. Create and add custom characters and agents, customize chat elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
+- ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown, LaTex, and Rich Text capabilities for enriched interaction.
 
-- 📚 **Local and Remote RAG Integration**: Dive into the future of chat interactions and explore your documents with our cutting-edge Retrieval Augmented Generation (RAG) technology within your chats. Documents can be loaded into the workspace area, after which they can be accessed using the `#` symbol before a query, or by starting the prompt with `#`, followed by a URL for web content integration.
+- 🧩 **Model Builder**: Easily create custom models from base Ollama models directly from Open WebUI. Create and add custom characters and agents, customize model elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
+
+- 📚 **Local and Remote RAG Integration**: Dive into the future of chat interactions and explore your documents with our cutting-edge Retrieval Augmented Generation (RAG) technology within your chats. Documents can be loaded into the `Documents` tab of the Workspace, after which they can be accessed using the pound key [`#`] before a query, or by starting the prompt with the pound key [`#`], followed by a URL for webpage content integration.
 
 - 🔍 **Web Search for RAG**: You can perform web searches using a selection of various search providers and inject the results directly into your local Retrieval Augmented Generation (RAG) experience.
 
@@ -85,19 +92,47 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🎨 **Splash Screen**: A simple loading splash screen for a smoother user experience.
 
+- 🌐 **Personalized Interface**: Choose between a freshly designed search landing page and the classic chat UI from Settings > Interface, allowing for a tailored experience.
+
 - 📦 **Pip Install Method**: Installation of Open WebUI can be accomplished via the command `pip install open-webui`, which streamlines the process and makes it more accessible to new users. For further information, please visit: https://pypi.org/project/open-webui/.
 
 - 🌈 **Theme Customization**: Personalize your Open WebUI experience with a range of options, including a variety of solid, yet sleek themes, customizable chat background images, and three mode options: Light, Dark, or OLED Dark mode - or let *Her* choose for you! ;)
 
+- 🖼️ **Custom Background Support**: Set a custom background from Settings > Interface to personalize your experience.
+
+- 📝 **Rich Banners with Markdown**: Create visually engaging announcements with markdown support in banners, enabling richer and more dynamic content.
+
 - 💻 **Code Syntax Highlighting**: Our syntax highlighting feature enhances code readability, providing a clear and concise view of your code.
+
+- 🗨️ **Markdown Rendering in User Messages**: User messages are now rendered in Markdown, enhancing readability and interaction.
+
+- 🎨 **Flexible Text Input Options**: Switch between rich text input and legacy text area input for chat, catering to user preferences and providing a choice between advanced formatting and simpler text input.
+
+- 👆 Effortless Code Sharing : Streamline the sharing and collaboration process with convenient code copying options, including a floating copy button in code blocks and click-to-copy functionality from code spans, saving time and reducing frustration.
+
+- 🎨 **Interactive Artifacts**: Render web content and SVGs directly in the interface, supporting quick iterations and live changes for enhanced creativity and productivity.
+
+- 🖊️ **Live Code Editing**: Supercharged code blocks allow live editing directly in the LLM response, with live reloads supported by artifacts, streamlining coding and testing.
+
+- 🔍 **Enhanced SVG Interaction**: Pan and zoom capabilities for SVG images, including Mermaid diagrams, enable deeper exploration and understanding of complex concepts.
+
+- 🔍 **Text Select Quick Actions**: Floating buttons appear when text is highlighted in LLM responses, offering deeper interactions like "Ask a Question" or "Explain", and enhancing overall user experience.
 
 - ↕️ **Bi-Directional Chat Support**: You can easily switch between left-to-right and right-to-left chat directions to accommodate various language preferences.
 
 - 📱 **Mobile Accessibility**: The sidebar can be opened and closed on mobile devices with a simple swipe gesture.
 
-- 📂 **Unified Workspace**: A unified workspace section provides access to all your model files, prompts, documents, tools, and functions in one convenient location, streamlining your workflow.
+- 🤳 **Haptic Feedback on Supported Devices**: Android devices support haptic feedback for an immersive tactile experience during certain interactions.
 
-- 💾 **Persistent Settings**: Benefit from the convenience of saved and persistent settings within Open WebUI, stored in a config.json file for easy access and reuse.
+- 🔍 **User Settings Search**: Quickly search for settings fields, improving ease of use and navigation.
+
+- 📜 **Offline Swagger Documentation**: Access developer-friendly Swagger API documentation offline, ensuring full accessibility wherever you are.
+
+- 💾 **Performance Optimizations**: Lazy loading of large dependencies minimizes initial memory usage, boosting performance and reducing loading times.
+
+- 🚀 **Persistent and Scalable Configuration**: Open WebUI configurations are stored in a database (webui.db), allowing for seamless load balancing, high-availability setups, and persistent settings across multiple instances, making it easy to access and reuse your configurations.
+
+- 🔄 **Portable Import/Export**: Easily import and export Open WebUI configurations, simplifying the process of replicating settings across multiple systems.
 
 - ❓ **Quick Access to Documentation & Shortcuts**: The question mark button located at the bottom right-hand corner of the main UI screen (available on larger screens like desktop PCs and laptops) provides users with easy access to the Open WebUI documentation page and available keyboard shortcuts.
 
@@ -107,6 +142,24 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 💬 Conversations
 
+- 💬 **True Asynchronous Chat**: Enjoy uninterrupted multitasking with true asynchronous chat support, allowing you to create chats, navigate away, and return anytime with responses ready.
+
+- 🔔 **Chat Completion Notifications**: Stay updated with instant in-UI notifications when a chat finishes in a non-active tab, ensuring you never miss a completed response.
+
+- 🌐 **Notification Webhook Integration**: Receive timely updates for long-running chats or external integration needs with configurable webhook notifications, even when your tab is closed.
+
+- 📚 **Channels (Beta)**: Explore real-time collaboration between users and AIs with Discord/Slack-style chat rooms, build bots for channels, and unlock asynchronous communication for proactive multi-agent workflows.
+
+- 🖊️ **Typing Indicators in Channels**: Enhance collaboration with real-time typing indicators in channels, keeping everyone engaged and informed.
+
+- 👤 **User Status Indicators**: Quickly view a user's status by clicking their profile image in channels, providing better coordination and availability insights.
+
+- 💬 **Chat Controls**: Easily adjust parameters for each chat session, offering more precise control over your interactions.
+
+- 💖 **Favorite Response Management**: Easily mark and organize favorite responses directly from the chat overview, enhancing ease of retrieval and access to preferred responses.
+
+- 📌 **Pinned Chats**: Support for pinned chats, allowing you to keep important conversations easily accessible.
+
 - 🔍 **RAG Embedding Support**: Change the Retrieval Augmented Generation (RAG) embedding model directly in the `Admin Panel` > `Settings` > `Documents` menu, enhancing document processing. This feature supports Ollama and OpenAI models.
 
 - 📜 **Citations in RAG Feature**: The Retrieval Augmented Generation (RAG) feature allows users to easily track the context of documents fed to LLMs with added citations for reference points.
@@ -115,15 +168,45 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📹 **YouTube RAG Pipeline**: The dedicated Retrieval Augmented Generation (RAG) pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly.
 
+- 📁 **Comprehensive Document Retrieval**: Toggle between full document retrieval and traditional snippets, enabling comprehensive tasks like summarization and supporting enhanced document capabilities.
+
+- 🌟 **RAG Citation Relevance**: Easily assess citation accuracy with the addition of relevance percentages in RAG results.
+
+- 🗂️ **Advanced RAG**: Improve RAG accuracy with smart pre-processing of chat history to determine the best queries before retrieval.
+
+- 📚 **Inline Citations for RAG**: Benefit from seamless inline citations for Retrieval-Augmented Generation (RAG) responses, improving traceability and providing source clarity for newly uploaded files.
+
+- 📁 **Large Text Handling**: Optionally convert large pasted text into a file upload to be used directly with RAG, keeping the chat interface cleaner.
+
 - 🔄 **Multi-Modal Support**: Effortlessly engage with models that support multi-modal interactions, including images (`e.g., LLaVA`).
 
 - 🤖 **Multiple Model Support**: Quickly switch between different models for diverse chat interactions.
 
+- 🔀 **Merge Responses in Many Model Chat**: Enhances the dialogue by merging responses from multiple models into a single, coherent reply.
+
+- ✅ **Multiple Instances of Same Model in Chats**: Enhanced many model chat to support adding multiple instances of the same model.
+
+- 💬 **Temporary Chat Feature**: Introduced a temporary chat feature, deprecating the old chat history setting to enhance user interaction flexibility.
+
+- 🖋️ **User Message Editing**: Enhanced the user chat editing feature to allow saving changes without sending.
+
+- 💬 **Efficient Conversation Editing**: Create new message pairs quickly and intuitively using the Cmd/Ctrl+Shift+Enter shortcut, streamlining conversation length tests.
+
+- 🖼️ **Client-Side Image Compression**: Save bandwidth and improve performance with client-side image compression, allowing you to compress images before upload from Settings > Interface.
+
 - 👥 **'@' Model Integration**: By seamlessly switching to any accessible local or external model during conversations, users can harness the collective intelligence of multiple models in a single chat. This can done by using the `@` command to specify the model by name within a chat.
 
-- 🏷️ **Conversation Tagging**: Effortlessly categorize and locate tagged chats for quick reference and streamlined data collection.
+- 🏷️ Conversation Tagging : Effortlessly categorize and locate tagged chats for quick reference and streamlined data collection using our efficient 'tag:' query system, allowing you to manage, search, and organize your conversations without cluttering the interface.
+
+- 🧠 **Auto-Tagging**: Conversations can optionally be automatically tagged for improved organization, mirroring the efficiency of auto-generated titles.
 
 - 👶 **Chat Cloning**: Easily clone and save a snapshot of any chat for future reference or continuation. This feature makes it easy to pick up where you left off or share your session with others. To create a copy of your chat, simply click on the `Clone` button in the chat's dropdown options. Can you keep up with your clones?
+
+- ⭐ **Visualized Conversation Flows**: Interactive messages diagram for improved visualization of conversation flows, enhancing understanding and navigation of complex discussions.
+
+- 📁 **Chat Folders**: Organize your chats into folders, drag and drop them for easy management, and export them seamlessly for sharing or analysis.
+
+- 📤 **Easy Chat Import**: Import chats into your workspace by simply dragging and dropping chat exports (JSON) onto the sidebar.
 
 - 📜 **Prompt Preset Support**: Instantly access custom preset prompts using the `/` command in the chat input. Load predefined conversation starters effortlessly and expedite your interactions. Import prompts with ease through [Open WebUI Community](https://openwebui.com/) integration or create your own!
 
@@ -138,9 +221,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 ### 💻 Model Management
 
 
-- 🛠️ **Model Builder**: All models can be built and edited with a persistent model builder mode within the models workspace.
+- 🛠️ **Model Builder**: All models can be built and edited with a persistent model builder mode within the models edit page.
 
-- 📚 **Knowledge Support for Models**: The ability to attach functions and documents directly to models from the models workspace enhances the information available to each model.
+- 📚 **Knowledge Support for Models**: The ability to attach tools, functions, and knowledge collections directly to models from a model's edit page, enhancing the information available to each model.
 
 - 🗂️ **Model Presets**: Create and manage model presets for both the Ollama and OpenAI API.
 
@@ -148,7 +231,13 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📋 **Model Selector Dropdown Ordering**: Models can be effortlessly organized by dragging and dropping them into desired positions within the model workspace, which will then reflect the changes in the model dropdown menu.
 
-- 🔍 **Model Selector Dropdown**: Easily find and select your models with an included search filter and detailed model information with model tags and model descriptions.
+- 🔍 **Model Selector Dropdown**: Easily find and select your models with fuzzy search and detailed model information with model tags and model descriptions.
+
+- ⌨️ **Arrow Keys Model Selection**: Use arrow keys for quicker model selection, enhancing accessibility.
+
+- 🔧 **Quick Actions in Model Workspace**: Enhanced Shift key quick actions for hiding/displaying and deleting models in the model workspace.
+
+- 😄 **Transparent Model Usage**: Stay informed about the system's state during queries with knowledge-augmented models, thanks to visible status displays.
 
 - ⚙️ **Fine-Tuned Control with Advanced Parameters**: Gain a deeper level of control by adjusting model parameters such as `seed`, `temperature`, `frequency penalty`, `context length`, `seed`, and more.
 
@@ -161,6 +250,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - ⚙️ **Default Model Setting**: The default model preference for new chats can be set in the `Settings` > `Interface` menu on mobile devices, or can more easily be set in a new chat under the model selector dropdown on desktop PCs and laptops.
 
 - 💡 **LLM Response Insights**: Details of every generated response can be viewed, including external model API insights and comprehensive local model info.
+
+- 🕒 **Model Details at a Glance**: View critical model details, including model hash and last modified timestamp, directly in the Models workspace for enhanced tracking and management.
 
 - 📥🗑️ **Download/Delete Models**: Models can be downloaded or deleted directly from Open WebUI with ease.
 
@@ -176,10 +267,20 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🗨️ **Local Chat Sharing**: Generate and share chat links between users in an efficient and seamless manner, thereby enhancing collaboration and communication.
 
-- 👍👎 **RLHF Annotation**: Enhance the impact of your messages by rating them with either a thumbs up or thumbs down, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (`RLHF`). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
+- 👍👎 **RLHF Annotation**: Enhance the impact of your messages by rating them with either a thumbs up or thumbs down AMD provide a rating for the response on a scale of 1-10, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (`RLHF`). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
+
+- 🔧 **Comprehensive Feedback Export**: Export feedback history data to JSON for seamless integration with RLHF processing and further analysis, providing valuable insights for improvement.
 
 - 🤝 **Community Sharing**: Share your chat sessions with the [Open WebUI Community](https://openwebui.com/) by clicking the `Share to Open WebUI Community` button. This feature allows you to engage with other users and collaborate on the platform.
   - To utilize this feature, please sign-in to your Open WebUI Community account. Sharing your chats fosters a vibrant community, encourages knowledge sharing, and facilitates joint problem-solving. Please note that community sharing of chat sessions is an optional feature. Only Admins can toggle this feature on or off in the `Admin Settings` > `Settings` > `General` menu.
+
+- 🏆 **Community Leaderboard**: Compete and track your performance in real-time with our leaderboard system, which utilizes the ELO rating system and allows for optional sharing of feedback history.
+
+- ⚔️ **Model Evaluation Arena**: Conduct blind A/B testing of models directly from the Admin Settings for a true side-by-side comparison, making it easier to find the best model for your needs.
+
+- 🎯 **Topic-Based Rankings**: Discover more accurate rankings with our experimental topic-based re-ranking system, which adjusts leaderboard standings based on tag similarity in feedback.
+
+- 📂 Unified and Collaborative Workspace : Access and manage all your model files, prompts, documents, tools, and functions in one convenient location, while also enabling multiple users to collaborate and contribute to models, knowledge, prompts, or tools, streamlining your workflow and enhancing teamwork.
 
 ---
 
@@ -203,7 +304,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ---
 
-### 🎙️ Voice & Accessibility
+### 🎙️ Audio, Voice, & Accessibility
 
 - 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
   - Microphone access requires manually setting up a secure connection over HTTPS to work, or [manually whitelisting your URL at your own risk](https://docs.openwebui.com/troubleshooting/microphone-error).
@@ -219,7 +320,23 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 👆 **Tap to Interrupt**: Stop the AI’s speech during voice conversations with a simple tap on mobile devices, ensuring seamless control over the interaction.
 
+- 🎙️ **Voice Interrupt**: Stop the AI’s speech during voice conversations with your voice on mobile devices, ensuring seamless control over the interaction.
+
 - 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI-compatible endpoints for reading aloud LLM responses.
+
+- 🔗 **Direct Call Mode Access**: Activate call mode directly from a URL, providing a convenient shortcut for mobile device users.
+
+- ✨ **Customizable Text-to-Speech**: Control how message content is segmented for Text-to-Speech (TTS) generation requests, allowing for flexible speech output options.
+
+- 🔊 **Azure Speech Services Integration**: Supports Azure Speech services for Text-to-Speech (TTS), providing users with a wider range of speech synthesis options.
+
+- 🎚️ **Customizable Audio Playback**: Allows users to adjust audio playback speed to their preferences in Call mode settings, enhancing accessibility and usability.
+
+- 🎵 **Broad Audio Compatibility**: Enjoy support for a wide range of audio file format transcriptions with RAG, including 'audio/x-m4a', to broaden compatibility with audio content within the platform.
+
+- 🔊 **Audio Compression**: Experimental audio compression allows navigating around the 25MB limit for OpenAI's speech-to-text processing, expanding the possibilities for audio-based interactions.
+
+- 🗣️ **Experimental SpeechT5 TTS**: Enjoy local SpeechT5 support for improved text-to-speech capabilities.
 
 ---
 
@@ -233,6 +350,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🌊 **Mermaid Rendering**: Create visually appealing diagrams and flowcharts directly within Open WebUI using the [Mermaid Diagramming and charting tool](https://mermaid.js.org/intro/), which supports Mermaid syntax rendering.
 
+- 🔗 **Iframe Support**: Enables rendering HTML directly into your chat interface using functions and tools.
+
 ---
 
 ### 🔒 Integration & Security
@@ -245,13 +364,19 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🌐🔗 **External Ollama Server Connectivity**: Seamlessly link to an external Ollama server hosted on a different address by configuring the environment variable.
 
-- 🛢️ **External Database Support**: Seamlessly connect to custom SQLite or Postgres databases using the `DATABASE_URL` environment variable.
+- 🛢️ **Flexible Database Integration**: Seamlessly connect to custom databases, including SQLite, Postgres, and multiple vector databases like Milvus, using environment variables for flexible and scalable data management.
 
 - 🌐🗣️ **External Speech-to-Text Support**: The addition of external speech-to-text (`STT`) services provides enhanced flexibility, allowing users to choose their preferred provider for seamless interaction.
 
 - 🌐 **Remote ChromaDB Support**: Extend the capabilities of your database by connecting to remote ChromaDB servers.
 
 - 🔀 **Multiple Ollama Instance Load Balancing**: Effortlessly distribute chat requests across multiple Ollama instances for enhanced performance and reliability.
+
+- 🚀 **Advanced Load Balancing and Reliability**: Utilize enhanced load balancing capabilities, stateless instances with full Redis support, and automatic web socket re-connection to promote better performance, reliability, and scalability in WebUI, ensuring seamless and uninterrupted interactions across multiple instances.
+
+- ☁️ **Experimental S3 Support**: Enable stateless WebUI instances with S3 support for enhanced scalability and balancing heavy workloads.
+
+- 🛠️ **OAuth Management for User Groups**: Enhance control and scalability in collaborative environments with group-level management via OAuth integration.
 
 ---
 
@@ -288,5 +413,33 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/features/sso).
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`. This is an ideal solution for fresh installations without existing users or can be useful for demonstration purposes.
+
+- 🚫 **Advanced API Security**: Block API users based on customized model filters, enhancing security and control over API access.
+
+- ❗ **Administrator Updates**: Ensure administrators stay informed with immediate update notifications upon login, keeping them up-to-date on the latest changes and system statuses.
+
+- 👥 **User Group Management**: Create and manage user groups for seamless organization and control.
+
+- 🔐 **Group-Based Access Control**: Set granular access to models, knowledge, prompts, and tools based on user groups, allowing for more controlled and secure environments.
+
+- 🛠️ **Granular User Permissions**: Easily manage workspace permissions, including file uploads, deletions, edits, and temporary chats, as well as model, knowledge, prompt, and tool creation.
+
+- 🔑 **LDAP Authentication**: Enhance security and scalability with LDAP support for user management.
+
+- 🌐 **Customizable OpenAI Connections**: Enjoy smooth operation with custom OpenAI setups, including prefix ID support and explicit model ID support for APIs.
+
+- 🔐 **Ollama API Key Management**: Manage Ollama credentials, including prefix ID support, for secure and efficient operation.
+
+- 🔄 **Connection Management**: Easily enable or disable individual OpenAI and Ollama connections as needed.
+
+- 🎨 **Intuitive Model Workspace**: Manage models across users and groups with a redesigned and user-friendly interface.
+
+- 🔑 **API Key Authentication**: Tighten security by easily enabling or disabling API key authentication.
+
+- 🔄 **Unified Model Reset**: Reset and remove all models from the Admin Settings with a one-click option.
+
+- 🔓 **Flexible Model Access Control**: Easily bypass model access controls for user roles when not required, using the 'BYPASS_MODEL_ACCESS_CONTROL' environment variable, simplifying workflows in trusted environments.
+
+- 🔒 **Configurable API Key Authentication Restrictions**: Flexibly configure endpoint restrictions for API key authentication, now off by default for a smoother setup in trusted environments.
 
 ---
