@@ -1151,6 +1151,13 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Enables or disables search query generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_WEB_SEARCH_TRUST_ENV`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables proxy set by `http_proxy` and `https_proxy` during web search content fetching.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_WEB_SEARCH_RESULT_COUNT`
 
 - Type: `int`
