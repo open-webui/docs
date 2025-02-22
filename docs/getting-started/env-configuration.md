@@ -2173,6 +2173,30 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `redis://localhost:6379/0`
 - Description: Specifies the URL of the Redis instance for websocket communication.
 
+#### `WEBSOCKET_REDIS_CERTS`
+
+- Type: `str`
+- Default: empty string ('')
+- Description: Specifies the path to the Redis SSL certificate for websocket communication.
+
+#### `WEBSOCKET_REDIS_USERNAME`
+
+- Type: `str`
+- Default: empty string ('')
+- Description: Specifies the username for Redis authentication in websocket communication.
+
+#### `WEBSOCKET_REDIS_PASSWORD`
+
+- Type: `str`
+- Default: empty string ('')
+- Description: Specifies the password for Redis authentication in websocket communication.
+
+#### `WEBSOCKET_REDIS_AZURE_CREDENTIALS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the use of Azure credentials for Azure Redis Cache websocket communication. If `WEBSOCKET_REDIS_PASSWORD` is empty DefaultAzureCredentials will be used.
+
 ### Proxy Settings
 
 Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
