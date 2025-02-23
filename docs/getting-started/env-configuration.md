@@ -2080,6 +2080,20 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the secret access key for S3 storage.
 
+
+#### `S3_USE_ACCELERATE_ENDPOINT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Use the S3 accelerate endpoint. If the S3 Accelerate endpoint is being used then the addressing style will always be virtual.
+
+
+#### `S3_ADDRESSING_STYLE`
+
+- Type: `str`
+- Description: The style in which to address s3 endpoints. Values must be a string that equals one of `auto`, `virtual`, `path`.
+
+
 #### Google Cloud Storage
 
 #### `GOOGLE_APPLICATION_CREDENTIALS_JSON`

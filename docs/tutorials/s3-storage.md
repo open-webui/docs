@@ -34,19 +34,23 @@ To learn more about S3, visit: [Amazon S3's Official Page](https://aws.amazon.co
 
 In order to configure this option, you need to gather the following environment variables:
 
-| **Open-WebUI Environment Variable** | **Example Value**                           |
-|-------------------------------------|---------------------------------------------|
-| `S3_ACCESS_KEY_ID`                  | ABC123                                      |
-| `S3_SECRET_ACCESS_KEY`              | SuperSecret                                 |
-| `S3_ENDPOINT_URL`                   | https://s3.us-east-1.amazonaws.com          |
-| `S3_REGION_NAME`                    | us-east-1                                   |
-| `S3_BUCKET_NAME`                    | my-awesome-bucket-name                      |
+| **Open-WebUI Environment Variable** | **Example Value**                  |
+|-------------------------------------|------------------------------------|
+| `S3_ACCESS_KEY_ID`                  | ABC123                             |
+| `S3_SECRET_ACCESS_KEY`              | SuperSecret                        |
+| `S3_ENDPOINT_URL`                   | https://s3.us-east-1.amazonaws.com |
+| `S3_REGION_NAME`                    | us-east-1                          |
+| `S3_BUCKET_NAME`                    | my-awesome-bucket-name             |
+| `S3_USE_ACCELERATE_ENDPOINT`        | False                              |
+| `S3_ADDRESSING_STYLE`               | path                               |
 
 - S3_ACCESS_KEY_ID: This is an identifier for your AWS account's access key. You get this from the AWS Management Console or AWS CLI when creating an access key.
 - S3_SECRET_ACCESS_KEY: This is the secret part of your AWS access key pair. It's provided when you create an access key in AWS and should be stored securely.
 - S3_ENDPOINT_URL: This URL directs to your S3 service endpoint and can typically be found in AWS service documentation or account settings.
 - S3_REGION_NAME: This is the AWS region where your S3 bucket resides, like "us-east-1". You can identify this from the AWS Management Console under your S3 bucket details.
 - S3_BUCKET_NAME: This is the unique name of your S3 bucket, which you specified when creating the bucket in AWS.
+- S3_USE_ACCELERATE_ENDPOINT: Use the S3 accelerate endpoint. If the S3 Accelerate endpoint is being used then the addressing style will always be virtual.
+- S3_ADDRESSING_STYLE: The style in which to address s3 endpoints.
 
 For a complete list of the available S3 endpoint URLs, see: [Amazon S3 Regular Endpoints](https://docs.aws.amazon.com/general/latest/gr/s3.html)
 
@@ -62,7 +66,7 @@ Before we launch our instance of Open-WebUI, there is one final environment vari
 | `s3`                 | str      | Uses S3 client library and related environment variables mentioned in Amazon S3 Storage         | No          |
 | `gcs`                | str      | Uses GCS client library and related environment variables mentioned in Google Cloud Storage     | No          |
 
-To use Amazon S3, we need to set `STORAGE_PROVIDER` to "S3" along with all the environment variables we gathered in Step 1 (`S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_ENDPOINT_URL`, `S3_REGION_NAME`, `S3_BUCKET_NAME`).
+To use Amazon S3, we need to set `STORAGE_PROVIDER` to "S3" along with all the environment variables we gathered in Step 1 (`S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_ENDPOINT_URL`, `S3_REGION_NAME`, `S3_BUCKET_NAME`, `S3_USE_ACCELERATE_ENDPOINT`, `S3_ADDRESSING_STYLE`).
 
 Here, I'm also setting the `ENV` to "dev", which will allow us to see the Open-WebUI Swagger docs so we can further test and confirm the S3 storage set-up is working as expected.
 
@@ -76,6 +80,8 @@ docker run -d \
   -e S3_ENDPOINT_URL="https://s3.us-east-1.amazonaws.com" \
   -e S3_REGION_NAME="us-east-1" \
   -e S3_BUCKET_NAME="my-awesome-bucket-name" \
+  -e S3_USE_ACCELERATE_ENDPOINT="False" \
+  -e S3_ADDRESSING_STYLE="virtual" \
   -e ENV="dev" \
   --name open-webui \
   ghcr.io/open-webui/open-webui:main
