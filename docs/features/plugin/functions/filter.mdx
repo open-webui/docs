@@ -155,19 +155,19 @@ Note: The user feels the same, but the model processes a cleaner and easier-to-u
 
 ---
 
-## 🆕 3️⃣ **`stream` Hook (New in Open WebUI 0.5.17)**
+#### 🆕 3️⃣ **`stream` Hook (New in Open WebUI 0.5.17)**
 
-### 🔄 What is the `stream` Hook?
+##### 🔄 What is the `stream` Hook?
 The **`stream` function** is a new feature introduced in Open WebUI **0.5.17** that allows you to **intercept and modify streamed model responses** in real time.
 
 Unlike `outlet`, which processes an entire completed response, `stream` operates on **individual chunks** as they are received from the model.
 
-#### 🛠️ When to Use the Stream Hook?
+##### 🛠️ When to Use the Stream Hook?
 - Modify **streaming responses** before they are displayed to users.
 - Implement **real-time censorship or cleanup**.
 - **Monitor streamed data** for logging/debugging.
 
-### 📜 Example: Logging Streaming Chunks
+##### 📜 Example: Logging Streaming Chunks
 
 Here’s how you can inspect and modify streamed LLM responses:
 ```python
@@ -186,7 +186,7 @@ def stream(self, event: dict) -> dict:
 - Each line represents a **small fragment** of the model's streamed response.
 - The **`delta.content` field** contains the progressively generated text.
 
-### 🔄 Example: Filtering Out Emojis from Streamed Data
+##### 🔄 Example: Filtering Out Emojis from Streamed Data
 ```python
 def stream(self, event: dict) -> dict:
     for choice in event.get("choices", []):
