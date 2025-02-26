@@ -42,7 +42,7 @@ By default, Open WebUI applies the following permission settings:
 - Knowledge Access: Disabled (`USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS=False`)
 - Prompts Access: Disabled (`USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS=False`)
 - Tools Access: Disabled (`USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=False`)
-- Public Sharing: Enabled
+- Public Sharing: Enabled(`USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=True`)
 
 **Chat Permissions**:
 - Allow Chat Controls: Enabled
