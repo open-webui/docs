@@ -48,7 +48,7 @@ docker exec -it open-webui /bin/sh
 
 ## Table Overview
 
-Here is a complete list of tables in Open-WebUI's SQLite database. The tables are listed alphabetically and numbered for convinience.
+Here is a complete list of tables in Open-WebUI's SQLite database. The tables are listed alphabetically and numbered for convenience.
 
 | **No.** | **Table Name**   | **Description**                                              |
 | ------- | ---------------- | ------------------------------------------------------------ |
