@@ -13,7 +13,7 @@ Workspace permissions control access to core components of the Open WebUI platfo
 * **Knowledge Access**: Toggle to allow users to access and manage knowledge bases. (Environment variable: `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`)
 * **Prompts Access**: Toggle to allow users to access and manage saved prompts. (Environment variable: `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`)
 * **Tools Access**: Toggle to allow users to access and manage tools. (Environment variable: `USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS`) *Note: Enabling this gives users the ability to upload arbitrary code to the server.*
-* **Public Sharing**: Toggle to allow users to share content publicly from their workspace.
+* **Public Sharing**: Toggle to allow users to share content publicly from their workspace. (Environment variable: `USER_PERMISSIONS_WORKSPACE_PUBLIC_SHARING`)
 
 ## Chat Permissions
 
