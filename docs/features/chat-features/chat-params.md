@@ -10,8 +10,8 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 | **Level** | **Definition** | **Modification Permissions** | **Override Capabilities** |
 | --- | --- | --- | --- |
 | **Per-Chat** | System prompt and advanced parameters for a specific chat instance | Users can modify, but cannot override model-specific settings | Restricted from overriding model-specific settings |
-| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | Admin-specific settings take precedence, User settings can be overridden |
 | **Per-Account** | Default system prompt and advanced parameters for a specific user account | Users can set, but may be overridden by model-specific settings | User settings can be overridden by model-specific settings |
+| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | Admin-specific settings take precedence, User settings can be overridden |
 
 ### 1. **Per-chat basis:**
 
