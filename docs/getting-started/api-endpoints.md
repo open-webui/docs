@@ -13,22 +13,22 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
 
 ### 📜 Retrieve All Models
 
-- **Endpoint**: `GET /api/models`
+- **Endpoint**: `GET /api/v1/models`
 - **Description**: Fetches all models created or added via Open WebUI.
 - **Example**:
 
   ```bash
-  curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
+  curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/v1/models/
   ```
 
 ### 💬 Chat Completions
 
-- **Endpoint**: `POST /api/chat/completions`
+- **Endpoint**: `POST /api/v1/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 - **Example**:
 
   ```bash
-  curl -X POST http://localhost:3000/api/chat/completions \
+  curl -X POST http://localhost:3000/api/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -112,11 +112,11 @@ You can reference both individual files or entire collections in your RAG querie
 
 This method is beneficial when you want to focus the chat model's response on the content of a specific file.
 
-- **Endpoint**: `POST /api/chat/completions`
+- **Endpoint**: `POST /api/v1/chat/completions`
 - **Curl Example**:
 
   ```bash
-  curl -X POST http://localhost:3000/api/chat/completions \
+  curl -X POST http://localhost:3000/api/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -136,7 +136,7 @@ This method is beneficial when you want to focus the chat model's response on th
   import requests
 
   def chat_with_file(token, model, query, file_id):
-      url = 'http://localhost:3000/api/chat/completions'
+      url = 'http://localhost:3000/api/v1/chat/completions'
       headers = {
           'Authorization': f'Bearer {token}',
           'Content-Type': 'application/json'
@@ -154,11 +154,11 @@ This method is beneficial when you want to focus the chat model's response on th
 
 Leverage a knowledge collection to enhance the response when the inquiry may benefit from a broader context or multiple documents.
 
-- **Endpoint**: `POST /api/chat/completions`
+- **Endpoint**: `POST /api/v1/chat/completions`
 - **Curl Example**:
 
   ```bash
-  curl -X POST http://localhost:3000/api/chat/completions \
+  curl -X POST http://localhost:3000/api/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,7 +178,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
   import requests
   
   def chat_with_collection(token, model, query, collection_id):
-      url = 'http://localhost:3000/api/chat/completions'
+      url = 'http://localhost:3000/api/v1/chat/completions'
       headers = {
           'Authorization': f'Bearer {token}',
           'Content-Type': 'application/json'
