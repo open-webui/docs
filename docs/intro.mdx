@@ -112,7 +112,7 @@ There are two main ways to install and run Open WebUI: using the `uv` runtime ma
 
 The `uv` runtime manager ensures seamless Python environment management for applications like Open WebUI. Follow these steps to get started:
 
-#### 1. Install `uv`
+1. **Install `uv`**
 
 Pick the appropriate installation command for your operating system:
 
@@ -126,21 +126,39 @@ Pick the appropriate installation command for your operating system:
   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
 
-#### 2. Run Open WebUI
+2. **Install Open WebUI**:  
 
-Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
+   Open your terminal and run the following command:  
+   ```bash
+   uv tool install --python 3.11 open-webui
+   ```
+
+3. **Start Open WebUI**:  
+
+   Once installed, start the server using:  
+   ```bash
+   open-webui serve
+   ```
+
+To update to the latest version, simply run:  
+
+```bash
+uv tool upgrade open-webui
+```
+
+If you only need to run open-webui temporarily and do not need a permanent installation, you can also opt to use `uvx` or `uv tool run`.
+
+Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
 
 - **macOS/Linux**:  
   ```bash
-  DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
+  , uvx --python 3.11 open-webui@latest serve
   ```
 
 - **Windows**:  
   ```powershell
   $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
   ```
-
-
 
 ### Installation with `pip`
 
