@@ -21,7 +21,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 Firstly, before deploying your stack with Docker, ensure that your Docker Compose uses a persistent data store. If you're using the Docker Compose [from the Github repository](https://github.com/open-webui/open-webui/blob/main/docker-compose.yaml) that's already taken care of. But it's easy to cook up your own variations and forget to verify this.
 
-Docker contains are ephemeral and data must be persisted to ensure its survival on the host filesystem.
+Docker containers are ephemeral and data must be persisted to ensure its survival on the host filesystem.
 
 ## Using Docker volumes
 
