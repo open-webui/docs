@@ -218,6 +218,90 @@ echo "Backup completed successfully."
 exit 0
 ```
 
+## Model Backup Script Using SQLite & ChromaDB Backup Functions To B2 Remote
+
+```bash
+#!/bin/bash
+#
+# Backup script to back up ChromaDB and SQLite to Backblaze B2 bucket
+# openwebuiweeklies, maintaining 3 weekly snapshots.
+# Snapshots are independent and fully restorable.
+# Uses ChromaDB and SQLite native backup mechanisms.
+# Excludes audit.log, cache, and uploads directories.
+#
+# Ensure rclone is installed and configured correctly.
+# Install rclone: https://rclone.org/install/
+# Configure rclone: https://rclone.org/b2/
+
+# Source directory (containing ChromaDB and SQLite data)
+SOURCE="/var/lib/open-webui/data"
+
+# B2 bucket name and remote name
+B2_REMOTE="openwebuiweeklies"
+B2_BUCKET="b2:$B2_REMOTE"
+
+# Timestamp for the backup directory
+TIMESTAMP=$(date +%Y-%m-%d)
+
+# Backup directory name
+BACKUP_DIR="open-webui-backup-$TIMESTAMP"
+
+# Full path to the backup directory in the B2 bucket
+DESTINATION="$B2_BUCKET/$BACKUP_DIR"
+
+# Number of weekly snapshots to keep
+NUM_SNAPSHOTS=3
+
+# Exclude filters (applied *after* database backups)
+EXCLUDE_FILTERS="--exclude audit.log --exclude cache/** --exclude uploads/** --exclude vector_db"
+
+# ChromaDB Backup Settings (Adjust as needed)
+CHROMADB_DATA_DIR="$SOURCE/vector_db"  # Path to ChromaDB data directory
+CHROMADB_BACKUP_FILE="$SOURCE/chromadb_backup.tar.gz" # Archive file for ChromaDB backup
+
+# SQLite Backup Settings (Adjust as needed)
+SQLITE_DB_FILE="$SOURCE/webui.db" # Path to the SQLite database file
+SQLITE_BACKUP_FILE="$SOURCE/webui.db.backup" # Temporary file for SQLite backup
+
+# Function to backup ChromaDB
+backup_chromadb() {
+  echo "Backing up ChromaDB..."
+
+  # Create a tar archive of the vector_db directory
+  tar -czvf "$CHROMADB_BACKUP_FILE" -C "$SOURCE" vector_db
+
+  echo "ChromaDB backup complete."
+}
+
+# Function to backup SQLite
+backup_sqlite() {
+  echo "Backing up SQLite database..."
+  # Backup the SQLite database using the .backup command
+  sqlite3 "$SQLITE_DB_FILE" ".backup '$SQLITE_BACKUP_FILE'"
+
+  # Move the backup file to the source directory
+  mv "$SQLITE_BACKUP_FILE" "$SOURCE/"
+
+  echo "SQLite backup complete."
+}
+
+# Perform database backups
+backup_chromadb
+backup_sqlite
+
+# Perform the backup with exclusions
+rclone copy "$SOURCE" "$DESTINATION" $EXCLUDE_FILTERS --progress
+
+# Remove old backups, keeping the most recent NUM_SNAPSHOTS
+find "$B2_BUCKET" -type d -name "open-webui-backup-*" | sort -r | tail -n +$((NUM_SNAPSHOTS + 1)) | while read dir; do
+  rclone purge "$dir"
+done
+
+echo "Backup completed to $DESTINATION"
+```
+
+---
+
 ## Point In Time Snapshots
 
 In addition taking backups, users may also wish to create point-in-time snapshots which could be stored locally (on the server), remotely, or both.  
@@ -260,6 +344,8 @@ Set your new script(s) up to run using crontabs according to your desired run fr
 # Commercial Utilities
 
 In addition to scripting your own backup jobs, you can find commercial offerings which generally work by installing agents on your server that will abstract the complexities of running backups. These are beyond the purview of this article but provide convenient solutions.
+
+---
 
 # Host Level Backups
 
