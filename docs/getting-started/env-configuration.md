@@ -242,10 +242,15 @@ allowing the client to wait indefinitely.
 
 :::
 
+#### `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST`
+
+- Type: `int`
+- Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
 
 - Type: `int`
-- Description: Sets the timeout in seconds for fetching the OpenAI model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+- Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
 ### Directories
 
