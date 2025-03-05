@@ -74,6 +74,14 @@ Make sure you pull the model into your ollama instance/s beforehand.
       "useLegacyCompletionsEndpoint": false,
       "apiBase": "http://YOUROPENWEBUI/ollama/v1",
       "apiKey": "sk-YOUR-API-KEY"
+    },
+    {
+      "title": "Model ABC from pipeline",
+      "provider": "openai",
+      "model": "PIPELINE_MODEL_ID",
+      "useLegacyCompletionsEndpoint": false,
+      "apiBase": "http://YOUROPENWEBUI/api",
+      "apiKey": "sk-YOUR-API-KEY"
     }
   ],
   "customCommands": [
