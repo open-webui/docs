@@ -1,0 +1,172 @@
+---
+sidebar_position: 4
+title: "Parser Function"
+---
+
+# Parser Function: Handling custom Knowledge splitting/embedding/uploading
+
+## Introduction
+
+Knowledge allows AI Models to reference specific, known information. This is known as Retrieval Augmented Generated (RAG)
+ and is extremely useful for increasing answer accuracy.
+
+When a user uploads new Knowledge, that text must be split into chunks, turned into embeddings, and
+then uploaded to a vector database for later use. How the text is split apart and the embeddings used can
+drastically affect the performance of the model.
+
+By default OpenWebUI handles this process for you. However, it may not handle things well enough for your use case.
+In this situation, you can write your own Parser that will handle the process in whatever method best suits your needs.
+
+
+### 🦴 Basic Skeleton of a Parser
+
+The basics of a Parser are extremely simple. Only two attributes and a single method are required:
+
+```python
+from open_webui.utils.parser import PARSER_TYPE
+
+class Parser:
+    def __init__(self):
+        self.name = "Custom Parser"
+        self.parser_type = PARSER_TYPE.ALL
+
+    def save_docs_to_vector_db(self,
+                               request: Request,
+                               docs,
+                               collection_name,
+                               metadata: Optional[dict] = None,
+                               overwrite: bool = False,
+                               split: bool = True,
+                               add: bool = False,
+                               user=None,
+                               ) -> bool:
+        # This is where you handle splitting docs and putting their embeddings into the vdb collection
+
+        print("Handling splitting, embedding, and uploading")
+
+        return True # to mark that things completed successfully
+```
+
+
+### PARSER_TYPE
+
+Because different types of knowledge can be uploaded and different types of content need to be handled in different ways,
+open_webui.utils.parser.PARSER_TYPE defines what types of content the Parser will be used for. The currently available
+choices are:
+
+- TEXT
+- FILE
+- YOUTUBE
+- WEB_CONTENT
+- WEB_SEARCH
+- ALL
+
+Any combination of these values (or a single one) is viable, though ALL supersedes other choices.
+
+
+### Inheriting from DefaultParser
+
+Users may only care about changing one part of the custom Knowledge process (for example, you may want to
+split the document in a better way but don't want to handle embedding or uploading).
+
+In this case, users can inherit from openwebui.utils.parser.DefaultParser, which handles needed all needed steps. Specific steps
+can then be overridden.
+
+```python
+import logging
+
+import tiktoken
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter, TokenTextSplitter
+
+from open_webui.env import SRC_LOG_LEVELS
+from open_webui.constants import ERROR_MESSAGES
+from open_webui.utils.parser import PARSER_TYPE, DefaultParser
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["RAG"])
+
+
+class Parser(DefaultParser):
+    def __init__(self):
+        self.name = "Splitting Parser"
+        self.parser_type = PARSER_TYPE.ALL
+
+    def split(self, request, docs):
+        log.info("This is a custom override of the default splitting behavior")
+
+        if request.app.state.config.TEXT_SPLITTER in ["", "character"]:
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=request.app.state.config.CHUNK_SIZE,
+                chunk_overlap=request.app.state.config.CHUNK_OVERLAP,
+                add_start_index=True,
+            )
+        elif request.app.state.config.TEXT_SPLITTER == "token":
+            log.info(
+                f"Using token text splitter: {request.app.state.config.TIKTOKEN_ENCODING_NAME}"
+            )
+
+            tiktoken.get_encoding(str(request.app.state.config.TIKTOKEN_ENCODING_NAME))
+            text_splitter = TokenTextSplitter(
+                encoding_name=str(request.app.state.config.TIKTOKEN_ENCODING_NAME),
+                chunk_size=request.app.state.config.CHUNK_SIZE,
+                chunk_overlap=request.app.state.config.CHUNK_OVERLAP,
+                add_start_index=True,
+            )
+        else:
+            raise ValueError(ERROR_MESSAGES.DEFAULT("Invalid text splitter"))
+
+        docs = text_splitter.split_documents(docs)
+
+        if len(docs) == 0:
+            raise ValueError(ERROR_MESSAGES.EMPTY_CONTENT)
+
+        return docs
+
+```
+
+### Valves
+
+Just like other functions, Parsers can have Valves. More detailed information on Valves can be found in the
+[Pipe documentation](./pipe.mdx)
+
+```python
+from open_webui.utils.parser import PARSER_TYPE
+
+class Parser:
+    class Valves(BaseModel):
+        MODEL_ID: str = Field(default="")
+
+    def __init__(self):
+        super().__init__()
+        self.name = "Splitting Parser"
+        self.parser_type = PARSER_TYPE.ALL
+        self.valves = self.Valves()
+
+    def save_docs_to_vector_db(self,
+                               request: Request,
+                               docs,
+                               collection_name,
+                               metadata: Optional[dict] = None,
+                               overwrite: bool = False,
+                               split: bool = True,
+                               add: bool = False,
+                               user=None,
+                               ) -> bool:
+        # This is where you handle splitting docs and putting their embeddings into the vdb collection
+
+        print(f"valve value: {self.valves.MODEL_ID}")
+        print("Handling splitting, embedding, and uploading")
+
+        return True # to mark that things completed successfully
+```
+
+
+
+
+## FAQ 🛑
+
+### **Q: How Are Parsers Different From other Functions?**
+
+A: Parsers are the only Functions that occur when Knowledge is uploaded. Other functions can interact with Knowledge
+but none have control over how that Knowledge is handled by OpenWebUI.

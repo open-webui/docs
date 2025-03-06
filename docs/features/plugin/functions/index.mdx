@@ -15,7 +15,7 @@ Think of Functions as **modular building blocks** that let you enhance how the W
 
 ## 🏗️ Types of Functions  
 
-There are **three types of Functions** in Open WebUI, each with a specific purpose. Let’s break them down and explain exactly what they do:
+There are **four types of Functions** in Open WebUI, each with a specific purpose. Let’s break them down and explain exactly what they do:
 
 ---
 
@@ -77,6 +77,28 @@ Learn how to set them up in the [**Action Functions Guide**](./action.mdx).
 
 ---
 
+### 4. [**Parser Function** – Knowledge splitting/embedding/uploading](./parser.mdx)
+
+A **Parser Function** is used to handle how Knowledge is parsed and uploaded.
+
+**What does it do?**
+Parsers allow you to define new workflows when a user adds new Knowledge. The default behavior
+of Open WebUI uses LangChain's [RecursiveCharacterTextSplitter.](https://api.python.langchain.com/en/latest/character/langchain_text_splitters.character.RecursiveCharacterTextSplitter.html)
+
+If this default tool does not properly split your documents or additional information is needed when storing information,
+Parsers allow you to define a new workflow that will handle things according to your usecase. Multiple Parsers can be used
+if needed.
+
+**Use case example:**
+
+If you wanted to use [LayoutParser](https://layout-parser.github.io/) to handle more complex document structures, you can create a
+Parser that uses a pretrained Detectron2 model and OCR to better handle documents that RecursiveCharacterTextSplitter was poorly
+splitting.
+
+For a detailed guide, see [**Parser Functions**](./parser.mdx).
+
+---
+
 ## 🛠️ How to Use Functions  
 
 Here's how to put Functions to work in Open WebUI:
@@ -92,6 +114,7 @@ You can install Functions via the Open WebUI interface or by importing them manu
 Functions must be explicitly enabled after installation:  
 - When you enable a **Pipe Function**, it becomes available as its own **model** in the interface.  
 - For **Filter** and **Action Functions**, enabling them isn’t enough—you also need to assign them to specific models or enable them globally for all models.   
+- When enabling a **Parser Function**, it will automatically be applied when new Knowledge is uploaded of the same ParserType as defined in the Parser's constructor.
 
 ---
 
@@ -104,7 +127,8 @@ Functions must be explicitly enabled after installation:
 ### Quick Summary  
 - **Pipes** appear as standalone models you can interact with.  
 - **Filters** modify inputs/outputs for smoother AI interactions.  
-- **Actions** add clickable buttons to individual chat messages.  
+- **Actions** add clickable buttons to individual chat messages.
+- **Parsers** handle splitting/embedding/uploading of new Knowledge
 
 Once you’ve followed the setup process, Functions will seamlessly enhance your workflows.
 
@@ -124,10 +148,11 @@ Whether you’re customizing workflows for specific projects, integrating extern
 
 ### 📝 Final Notes:  
 1. Always install Functions from **trusted sources only**.  
-2. Make sure you understand the difference between Pipe, Filter, and Action Functions to use them effectively.  
+2. Make sure you understand the difference between Pipe, Filter, Action, and Parser Functions to use them effectively.
 3. Explore the official guides:  
    - [Pipe Functions Guide](./pipe.mdx)  
    - [Filter Functions Guide](./filter.mdx)  
-   - [Action Functions Guide](./action.mdx)  
+   - [Action Functions Guide](./action.mdx)
+   - [Parser Functions Guide](./parser.mdx)
 
 By leveraging Functions, you’ll bring entirely new capabilities to your Open WebUI setup. Start experimenting today! 🚀
