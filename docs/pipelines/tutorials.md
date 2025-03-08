@@ -24,6 +24,6 @@ with us, as we'd love to feature it here!
 
 - A hands-on demonstration and code review on utilizing text-to-sql tools powered by the Open WebUI.
 
-[Deploying custom Document RAG pipeline with Open-WebUI](https://github.com/Sebulba46/document-RAG-pipeline)
+[Deploying custom Document RAG pipeline with Open-WebUI](https://github.com/Sebulba46/document-RAG-pipeline) (GitHub guide by Sebulba46) 
 
 - Step by step guide to deploy Open-WebUI and pipelines containers and creating your own document RAG with local LLM API. 
