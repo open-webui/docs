@@ -177,6 +177,8 @@ Event Emitters are used to add additional information to the chat interface. Sim
 
 There are two different types of Event Emitters:
 
+If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field). You can also turn the `Function Calling` argument of the `Advanced Params` section of the Model page from `Default` to `Native`.
+
 #### Status
 This is used to add statuses to a message while it is performing steps. These can be done at any stage during the Tool. These statuses appear right above the message content. These are very useful for Tools that delay the LLM response or process large amounts of information. This allows you to inform users what is being processed in real-time.
 
