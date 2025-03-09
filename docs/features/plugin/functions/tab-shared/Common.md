@@ -13,10 +13,10 @@ Valves are configurable by admins alone via the Tools or Functions menus. On the
 from pydantic import BaseModel, Field
 
 # Define and Valves
-Class Filter:
+class Filter:
     # Notice the current indentation: Valves and UserValves must be declared as
     # attributes of a Tools, Filter or Pipe class. Here we take the
-    example of a Filter.
+    # example of a Filter.
     class Valves(BaseModel):
         # Valves and UserValves inherit from pydantic's BaseModel. This
         # enables complex use cases like model validators etc.
