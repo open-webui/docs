@@ -50,7 +50,7 @@ class Filter:
         pass
 
     # The inlet method is only used for Filter but the __user__ handling is the same
-    def inlet(body: dict, __user__: dict):
+    def inlet(self, body: dict, __user__: dict):
         # Because UserValves are defined per user they are only available
         # on use.
         # Note that although __user__ is a dict, __user__["valves"] is a
