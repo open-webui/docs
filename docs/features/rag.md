@@ -48,3 +48,18 @@ A variety of parsers extract content from local and remote documents. For more, 
 ## Google Drive Integration
 
 When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](https://github.com/open-webui/docs/blob/main/docs/getting-started/env-configuration.md) environment variables to use.
+
+### Detailed Instructions
+1. Create an OAuth 2.0 client and configure both the Authorized JavaScript origins & Authorized redirect URI to be the URL (include the port if any) you use to access your Open-WebUI instance.
+1. Make a note of the Client ID associated with that OAuth client.
+1. Make sure that you enable both Google Drive API and Google Picker API for your project.
+1. Also set your app (project) as Testing and add your Google Drive email to the User List
+1. Set the permission scope to include everything those APIs have to offer. And because the app would be in Testing mode, no verification is required by Google to allow the app from accessing the data of the limited test users.
+1. Go to the Google Picker API page, and click on the create credentials button.
+1. Create an API key and under Application restrictions and choose Websites. Then add your Open-WebUI instance's URL, same as the Authorized JavaScript origins and Authorized redirect URIs settings in the step 1.
+1. Set up API restrictions on the API Key to only have access to Google Drive API & Google Picker API
+1. Set up the environment variable, `GOOGLE_DRIVE_CLIENT_ID` to the Client ID of the OAuth client from step 2.
+1. Set up the environment variable `GOOGLE_DRIVE_API_KEY` to the API Key value setup up in step 7 (NOT the OAuth client secret from step 2).
+1. Set up the `GOOGLE_REDIRECT_URI` to my Open-WebUI instance's URL (include the port, if any).
+1. Then relaunch your Open-WebUI instance with those three environment variables.
+1. After that, make sure Google Drive was enabled under `Admin Panel` < `Settings` < `Documents` < `Google Drive`
