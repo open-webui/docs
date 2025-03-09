@@ -52,7 +52,7 @@ Alternatively, you can run Apache Tika using the following Docker command:
 ```bash
 docker run -d --name tika \
   -p 9998:9998 \
-  -restart unless-stopped \
+  --restart unless-stopped \
   apache/tika:latest-full
 ```
 
