@@ -95,25 +95,35 @@ Each tool must have type hints for arguments. As of version OpenWebUI version 0.
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
-Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given Tool.
+Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function.
 
-Valves are configurable by admins alone and UserValves are configurable by any users.
+Valves are configurable by admins alone via the Tools or Functions menus. On the other hand UserValves are configurable by any users directly from a chat session.
 
 <details>
-<summary>Example</summary>
+<summary>Commented example</summary>
 
 ```
+from pydantic import BaseModel, Field
+
 # Define and Valves
+Class Tool:
+    # Notice the current indentation: Valves and UserValves must be declared as
+    # attributes of a Tools, Filter or Pipe class. Here we take the
+    example of a Tool.
     class Valves(BaseModel):
-        priority: int = Field(
-            default=0, description="Priority level for the filter operations."
-        )
-        test_valve: int = Field(
-            default=4, description="A valve controlling a numberical value"
+        # Valves and UserValves inherit from pydantic's BaseModel. This
+        # enables complex use cases like model validators etc.
+        test_valve: int = Field(  # Notice the type hint: it is used to
+            # choose the kind of UI element to show the user (buttons,
+            # texts, etc).
+            default=4,
+            description="A valve controlling a numberical value"
+            # required=False,  # you can enforce fields using True
         )
         pass
+        # Note that this 'pass' helps for parsing and is recommended.
 
-    # Define any UserValves
+    # UserValves are defined the same way.
     class UserValves(BaseModel):
         test_user_valve: bool = Field(
             default=False, description="A user valve controlling a True/False (on/off) switch"
@@ -122,6 +132,31 @@ Valves are configurable by admins alone and UserValves are configurable by any u
 
     def __init__(self):
         self.valves = self.Valves()
+        # Because they are set by the admin, they are accessible directly
+        # upon code execution.
+        pass
+
+    # The  __user__ handling is the same for Filters, Tools and Functions.
+    def test_the_tool(message: str, __user__: dict):
+        """
+        This is a test tool. If the user asks you to test the tools, put any
+        string you want in the message argument.
+
+        :param message: Any string you want.
+        :return: The same string as input.
+        """
+        # Because UserValves are defined per user they are only available
+        # on use.
+        # Note that although __user__ is a dict, __user__["valves"] is a
+        # UserValves object. Hence you can access values like that:
+        test_user_valve = __user__["valves"].test_user_valve
+        # Or:
+        test_user_valve = dict(__user__["valves"])["test_user_valve"]
+        # But this will return the default value instead of the actual value:
+        # test_user_valve = __user__["valves"]["test_user_valve"]  # Do not do that!
+        
+        return message + f"\nThe user valve set value is: {test_user_valve}"
+        
 ```
 </details>
 
@@ -129,11 +164,13 @@ Valves are configurable by admins alone and UserValves are configurable by any u
 Below is a list of optional arguments your tools can depend on:
 - `__event_emitter__`: Emit events (see following section)
 - `__event_call__`: Same as event emitter but can be used for user interactions
-- `__user__`: A dictionary with user information
+- `__user__`: A dictionary with user information. It also contains the `UserValves` object in `__user__["valves"]`.
 - `__metadata__`: Dictionary with chat metadata
 - `__messages__`: List of previous messages
 - `__files__`: Attached files
 - `__model__`: Model name
+
+Just add them as argument to any method of your Tool class just like `__user__` in the example above.
 
 ### Event Emitters
 Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
