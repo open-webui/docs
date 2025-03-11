@@ -11,26 +11,6 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 # Integrating Open WebUI as a Local AI Chatbot Browser Assistant in Mozilla Firefox
 
-Table of Contents
-=================
-1. [Prerequisites](#prerequisites)
-2. [Enabling AI Chatbot in Firefox](#enabling-ai-chatbot-in-firefox)
-3. [Configuring about:config Settings](#configuring-aboutconfig-settings)
-    * [browser.ml.chat.enabled](#browsermlchatenabled)
-    * [browser.ml.chat.hideLocalhost](#browsermlchathidelocalhost)
-    * [browser.ml.chat.prompts.#](#browsermlchatsprompts)
-    * [browser.ml.chat.provider](#browsermlchatprovider)
-4. [URL Parameters for Open WebUI](#url-parameters-for-open-webui)
-    * [Models and Model Selection](#models-and-model-selection)
-    * [YouTube Transcription](#youtube-transcription)
-    * [Web Search](#web-search)
-    * [Tool Selection](#tool-selection)
-    * [Call Overlay](#call-overlay)
-    * [Initial Query Prompt](#initial-query-prompt)
-    * [Temporary Chat Sessions](#temporary-chat-sessions)
-5. [Additional about:config Settings](#additional-aboutconfig-settings)
-6. [Accessing the AI Chatbot Sidebar](#accessing-the-ai-chatbot-sidebar)
-
 ## Prerequisites
 
 Before integrating Open WebUI as a AI chatbot browser assistant in Mozilla Firefox, ensure you have:
