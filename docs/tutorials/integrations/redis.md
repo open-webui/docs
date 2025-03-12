@@ -104,6 +104,36 @@ docker run -d \
 
 Replace `127.0.0.1` with the actual IP address of your Redis container in the Docker network.
 
+When using SSL connections with Redis, you can set the `WEBSOCKET_REDIS_URL` and `WEBSOCKET_REDIS_CERTS` environment variables as follows:
+
+```bash
+ENABLE_WEBSOCKET_SUPPORT="true"
+WEBSOCKET_MANAGER="redis"
+WEBSOCKET_REDIS_URL="rediss://redis:6379/1"
+WEBSOCKET_REDIS_CERTS="/path/to/redis/certs"
+```
+
+When authenticating with Redis, you can set the `WEBSOCKET_REDIS_USERNAME` and `WEBSOCKET_REDIS_PASSWORD` environment variables as follows:
+
+```bash
+ENABLE_WEBSOCKET_SUPPORT="true"
+WEBSOCKET_MANAGER="redis"
+WEBSOCKET_REDIS_URL="rediss://redis:6379/1"
+WEBSOCKET_REDIS_CERTS="/path/to/redis/certs"
+WEBSOCKET_REDIS_USERNAME="username"
+WEBSOCKET_REDIS_PASSWORD="password"
+```
+
+When using Azure Redis Cache with Open WebUI, you can authenticate with an Azure Managed Identity using DefaultAzureCredentials() by setting the `WEBSOCKET_REDIS_AZURE_CREDENTIALS` environment variable as follows:
+
+```bash
+ENABLE_WEBSOCKET_SUPPORT="true"
+WEBSOCKET_MANAGER="redis"
+WEBSOCKET_REDIS_URL="rediss://redis:6379/1"
+WEBSOCKET_REDIS_CERTS="/path/to/redis/certs"
+WEBSOCKET_REDIS_AZURE_CREDENTIALS="true"
+```
+
 ## Verification
 
 If you have properly set up Redis and configured Open WebUI, you should see the following log message when starting your Open WebUI instance:
