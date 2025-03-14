@@ -2013,13 +2013,6 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Enables or disables user permission to access workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `USER_PERMISSIONS_WORKSPACE_PUBLIC_SHARING`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user ability to share created knowledge, tools, models and prompts publicly (if disabled, can only share to specific users and groups).
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 ## Chat Permissions
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
