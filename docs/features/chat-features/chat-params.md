@@ -10,8 +10,8 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 | **Level** | **Definition** | **Modification Permissions** | **Override Capabilities** |
 | --- | --- | --- | --- |
 | **Per-Chat** | System prompt and advanced parameters for a specific chat instance | Users can modify, but cannot override model-specific settings | Restricted from overriding model-specific settings |
-| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | Admin-specific settings take precedence, User settings can be overridden |
 | **Per-Account** | Default system prompt and advanced parameters for a specific user account | Users can set, but may be overridden by model-specific settings | User settings can be overridden by model-specific settings |
+| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | Admin-specific settings take precedence, User settings can be overridden |
 
 ### 1. **Per-chat basis:**
 
@@ -26,7 +26,20 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 :::
 </details>
 
-### 2. **Per-model basis:**
+### 2. **Per-account basis:**
+
+- **Description**: The per-account basis setting refers to the default system prompt and advanced parameters configured for a specific user account. Any user-specific changes can serve as a fallback in situations where lower-level settings aren't defined.
+- **How to set**: Users can set their own system prompt and advanced parameters for their account within the **General** section of the **Settings** menu in Open WebUI.
+- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that such parameters can still be overridden if an administrator has already set the **System Prompt** or specific **Advanced Parameters** on a per-model basis for the particular model being used.
+
+<details>
+<summary>Example Use Case</summary>
+:::tip **Per-account basis**:
+Suppose a user wants to set their own system prompt for their account. They can do so by accessing the **Settings** menu and modifying the **System Prompt** field.
+:::
+</details>
+
+### 3. **Per-model basis:**
 
 - **Description**: The per-model basis setting refers to the default system prompt and advanced parameters configured for a specific model. These settings are applicable to all chat instances using that model.
 - **How to set**: Administrators can set the default system prompt and advanced parameters for a specific model within the **Models** section of the **Workspace** in Open WebUI.
@@ -41,18 +54,6 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 :::
 </details>
 
-### 3. **Per-account basis:**
-
-- **Description**: The per-account basis setting refers to the default system prompt and advanced parameters configured for a specific user account. Any user-specific changes can serve as a fallback in situations where lower-level settings aren't defined.
-- **How to set**: Users can set their own system prompt and advanced parameters for their account within the **General** section of the **Settings** menu in Open WebUI.
-- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that such parameters can still be overridden if an administrator has already set the **System Prompt** or specific **Advanced Parameters** on a per-model basis for the particular model being used.
-
-<details>
-<summary>Example Use Case</summary>
-:::tip **Per-account basis**:
-Suppose a user wants to set their own system prompt for their account. They can do so by accessing the **Settings** menu and modifying the **System Prompt** field.
-:::
-</details>
 
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 

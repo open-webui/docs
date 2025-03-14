@@ -45,6 +45,12 @@ For example, to set `DEBUG` logging level as a Docker parameter use:
 --env GLOBAL_LOG_LEVEL="DEBUG"
 ```
 
+or for Docker Compose put this in the environment section of the docker-compose.yml file (notice the absence of quotation signs):
+```
+environment:
+  - GLOBAL_LOG_LEVEL=DEBUG
+```
+
 ### App/Backend ###
 
 Some level of granularity is possible using any of the following combination of variables. Note that `basicConfig` `force` isn't presently used so these statements may only affect Open-WebUI logging and not 3rd party modules.

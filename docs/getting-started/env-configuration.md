@@ -242,10 +242,15 @@ allowing the client to wait indefinitely.
 
 :::
 
+#### `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST`
+
+- Type: `int`
+- Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
 
 - Type: `int`
-- Description: Sets the timeout in seconds for fetching the OpenAI model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+- Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
 ### Directories
 
@@ -575,7 +580,7 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API.
+- Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API and Ollama API.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`

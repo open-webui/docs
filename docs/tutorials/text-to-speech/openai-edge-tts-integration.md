@@ -127,7 +127,7 @@ The server will start running at `http://localhost:5050`.
 
 #### 6. Test the API
 
-You can now interact with the API at `http://localhost:5050/v1/audio/speech` and other available endpoints. See the [Usage](#usage) section for request examples.
+You can now interact with the API at `http://localhost:5050/v1/audio/speech` and other available endpoints. See the Usage section for request examples.
 
 </details>
 
