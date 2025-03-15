@@ -2199,3 +2199,17 @@ Open WebUI uses the following environment variables:
 - Description: Lists domain extensions (or IP addresses) for which the proxy should not be used,
 separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
 bypassed when accessing documents from MIT.
+
+### Install required packages
+
+Open WebUI provides environment variables to customize the pip installation process. Below are the environment variables used by Open WebUI for adjusting package installation behavior:
+
+#### `PIP_OPTIONS`
+
+- Type: `str`
+- Description: Specifies additional command-line options that pip should use when installing packages. For example, you can include flags such as `--upgrade`, `--user`, or `--no-cache-dir` to control the installation process.
+
+#### `PIP_PACKAGE_INDEX_OPTIONS`
+
+- Type: `str`
+- Description: Defines custom package index behavior for pip. This can include specifying additional or alternate index URLs (e.g., `--extra-index-url`), authentication credentials, or other parameters to manage how packages are retrieved from different locations.
