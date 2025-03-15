@@ -68,7 +68,7 @@ licence: MIT
 
 ### Tools Class
 
-Tools have to be defined as methods withing a class called `Tools`, with optional subclasses called `Valves` and `UserValves`, for example:
+Tools have to be defined as methods within a class called `Tools`, with optional subclasses called `Valves` and `UserValves`, for example:
 
 ```python
 class Tools:
@@ -109,7 +109,7 @@ Valves are configurable by admins alone and UserValves are configurable by any u
             default=0, description="Priority level for the filter operations."
         )
         test_valve: int = Field(
-            default=4, description="A valve controlling a numberical value"
+            default=4, description="A valve controlling a numerical value"
         )
         pass
 
