@@ -4,10 +4,10 @@
 
 Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function.
 
-+Valves are configurable by admins alone via the Tools or Functions menus. On the other hand UserValves are configurable by any users directly from a chat session.
+Valves are configurable by admins alone via the Tools or Functions menus. On the other hand UserValves are configurable by any users directly from a chat session.
 
 <details>
-+<summary>Commented example</summary>
+<summary>Commented example</summary>
 
  ```
 from pydantic import BaseModel, Field
