@@ -16,7 +16,7 @@ Valves are configurable by admins alone and UserValves are configurable by any u
             default=0, description="Priority level for the filter operations."
         )
         test_valve: int = Field(
-            default=4, description="A valve controlling a numberical value"
+            default=4, description="A valve controlling a numerical value"
         )
         pass
 
