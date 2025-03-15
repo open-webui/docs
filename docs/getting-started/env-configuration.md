@@ -2055,6 +2055,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Options:
   - `s3` - uses S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
   - `gcs` - uses GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
+  - `azure` - uses Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
 
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
@@ -2106,6 +2107,23 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the bucket name for Google Cloud Storage. Bucket must already exist.
 
+#### Microsoft Azure Storage
+
+#### `AZURE_STORAGE_ENDPOINT`
+
+- Type: `str`
+- Description: Sets the endpoint URL for Azure Storage.
+
+#### `AZURE_STORAGE_CONTAINER_NAME`
+
+- Type: `str`
+- Description: Sets the container name for Azure Storage.
+
+#### `AZURE_STORAGE_KEY`
+
+- Type: `str`
+- Description: Set the access key for Azure Storage.
+  - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
 
 ### Database Pool
 
