@@ -11,22 +11,21 @@ This guide explains how to optimize your setup by configuring a dedicated, light
 
 ---
 
-## Why Does Open-WebUI Feel Slow?
-
-By default, Open-WebUI has several background tasks that can make it feel like magic but can also place a heavy load on local resources:
-
-- **Title Generation**
-- **Tag Generation**
-- **Autocomplete Generation** (this function triggers on every keystroke)
-- **Search Query Generation**
-
-Each of these features makes asynchronous requests to your model. For example, continuous calls from the autocomplete feature can significantly delay responses on devices with limited memory or processing power, such as a Mac with 32GB of RAM running a 32B quantized model.
-
-Optimizing the task model can help isolate these background tasks from your main chat application, improving overall responsiveness.
-
+> [!TIP]
+>## Why Does Open-WebUI Feel Slow?
+>By default, Open-WebUI has several background tasks that can make it feel like magic but can also place a heavy load on local resources:
+>- **Title Generation**
+>- **Tag Generation**
+>- **Autocomplete Generation** (this function triggers on every keystroke)
+>- **Search Query Generation**
+>
+>Each of these features makes asynchronous requests to your model. For example, continuous calls from the autocomplete feature can significantly delay responses on devices with limited memory >or processing power, such as a Mac with 32GB of RAM running a 32B quantized model.
+>
+>Optimizing the task model can help isolate these background tasks from your main chat application, improving overall responsiveness.
+>
 ---
 
-## How to Optimize Task Model Performance
+## ⚡ How to Optimize Task Model Performance
 
 Follow these steps to configure an efficient task model:
 
@@ -62,7 +61,7 @@ Follow these steps to configure an efficient task model:
 
 ---
 
-## Recommended Setup for Local Models
+## 🚀 Recommended Setup for Local Models
 
 | Optimization Strategy           | Benefit                                  | Recommended For                        |
 |---------------------------------|------------------------------------------|----------------------------------------|
@@ -74,7 +73,7 @@ Implementing these recommendations can greatly improve the responsiveness of Ope
 
 ---
 
-## Additional Tips
+## 💡 Additional Tips
 
 - **Monitor System Resources:** Use your operating system’s tools (such as Activity Monitor on macOS or Task Manager on Windows) to keep an eye on resource usage.
 - **Reduce Parallel Model Calls:** Limiting background automation prevents simultaneous requests from overwhelming your LLM.
