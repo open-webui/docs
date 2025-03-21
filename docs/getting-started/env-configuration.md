@@ -791,7 +791,14 @@ modeling files for reranking.
 
 - Type: `int`
 - Default: `3`
-- Description: Sets the default number of results to consider when using RAG.
+- Description: Sets the default number of results to consider for the embedding when using RAG.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_TOP_K_RERANKER`
+
+- Type: `int`
+- Default: `3`
+- Description: Sets the default number of results to consider for the reranker when using RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_RELEVANCE_THRESHOLD`
