@@ -69,7 +69,7 @@ We're now ready to build and launch the docker container using:
 ```bash
 docker build . -f Dockerfile -t bedrock-gateway
 
-docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" -e AWS_REGION=us-east-1 -d -p 8000:80 bedrock-gateway
+docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN -e AWS_REGION=us-east-1 -d -p 8000:80 bedrock-gateway
 ```
 
 You should now be able to access the BAG's swagger page at: http://localhost:8000/docs
