@@ -2258,6 +2258,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 #### `REDIS_URL`
 
 - Type: `str`
+- Example: `redis://localhost:6379/0`
 - Description: Specifies the URL of the Redis instance for app state.
 
 #### `SENTINEL_HOSTS`
