@@ -2241,7 +2241,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 #### `WEBSOCKET_REDIS_URL`
 
 - Type: `str`
-- Default: `redis://localhost:6379/0`
+- Default: `${REDIS_URL}`
 - Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice it is recommend to set both.
 
 #### `WEBSOCKET_SENTINEL_HOSTS`
