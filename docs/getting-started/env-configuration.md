@@ -152,6 +152,12 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `False`
 - Description: Bypasses model access control.
 
+#### `BYPASS_TASK_MODEL_ACCESS_CONTROL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Bypasses access control for the task model.
+
 #### `DEFAULT_MODELS`
 
 - Type: `str`
