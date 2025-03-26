@@ -16,7 +16,7 @@ export const TopBanners = () => {
 			url: "https://github.com/sponsors/tjbck",
 			name: "Open WebUI",
 			description:
-				"The top banner spot is reserved for only two Enterprise Diamond sponsors on a first-come, first-served basis",
+				"The top banner spot is reserved for only two Enterprise sponsors on a first-come, first-served basis",
 		},
 	];
 
