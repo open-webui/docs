@@ -3,9 +3,19 @@ sidebar_position: 11
 title: "🔎 Retrieval Augmented Generation (RAG)"
 ---
 
+:::warning
+
+If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This means that retrieved data may **not be used at all** because it doesn’t fit within the available context window. To improve **Retrieval-Augmented Generation (RAG) performance**, you should **increase the context length** to **8192+ tokens** in your Ollama model settings.  
+
+:::
+
+
 Retrieval Augmented Generation (RAG) is a cutting-edge technology that enhances the conversational capabilities of chatbots by incorporating context from diverse sources. It works by retrieving relevant information from a wide range of sources such as local and remote documents, web content, and even multimedia sources like YouTube videos. The retrieved text is then combined with a predefined RAG template and prefixed to the user's prompt, providing a more informed and contextually relevant response.
 
 One of the key advantages of RAG is its ability to access and integrate information from a variety of sources, making it an ideal solution for complex conversational scenarios. For instance, when a user asks a question related to a specific document or web page, RAG can retrieve and incorporate the relevant information from that source into the chat response. RAG can also retrieve and incorporate information from multimedia sources like YouTube videos. By analyzing the transcripts or captions of these videos, RAG can extract relevant information and incorporate it into the chat response.
+
+
+
 
 ## Local and Remote RAG Integration
 
