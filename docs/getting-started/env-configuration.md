@@ -2261,12 +2261,12 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Example: `redis://localhost:6379/0`
 - Description: Specifies the URL of the Redis instance for app state.
 
-#### `SENTINEL_HOSTS`
+#### `REDIS_SENTINEL_HOSTS`
 
 - Type: `str`
 - Description: Comma-separated list of Redis Sentinels for app state. If specified, the "hostname" in `REDIS_URL` will be interpreted as the Sentinel service name.
 
-#### `SENTINEL_PORT`
+#### `REDIS_SENTINEL_PORT`
 
 - Type: `int`
 - Default: `26379`
