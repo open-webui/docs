@@ -1,0 +1,37 @@
+---
+sidebar_position: 1
+title: "🦙 Starting With RamaLama"
+---
+
+## Overview
+
+Open WebUI makes it easy to connect and manage your **RamaLama** instance. This guide will walk you through setting up the connection, managing models, and getting started.
+
+---
+
+## Step 1: Starting a RamaLama server
+
+Run RamaLama with some model:
+
+  ```bash
+  ramalama serve granite3-moe
+  ```
+
+---
+
+## Step 2: Starting a Open WebUI server
+
+In another terminal start Open WebUI:
+
+  ```bash
+  podman run -it --rm --network slirp4netns:allow_host_loopback=true -e OPENAI_API_BASE_URL=http://host.containers.internal:8080 -p 3000:8080 -v open-webui:/app/backend/data:Z --name open-webui ghcr.io/open-webui/open-webui:main
+  ```
+
+---
+
+## Step 3: Connect via your web browser
+
+In a browser go to http://127.0.0.1:3000
+
+Have fun!
+
