@@ -2245,11 +2245,39 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `redis`
 - Description: Specifies the websocket manager to use (in this case, Redis).
 
-#### `WEBSOCKET_REDIS_URL` (`REDIS_URL` exists for potential future use cases. In practice, it is recommended to set both.)
+#### `WEBSOCKET_REDIS_URL`
 
 - Type: `str`
-- Default: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for websocket communication.
+- Default: `${REDIS_URL}`
+- Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice it is recommend to set both.
+
+#### `WEBSOCKET_SENTINEL_HOSTS`
+
+- Type: `str`
+- Description: Comma-separated list of Redis Sentinels for websocket. If specified, the "hostname" in `WEBSOCKET_REDIS_URL` will be interpreted as the Sentinel service name.
+
+#### `WEBSOCKET_SENTINEL_PORT`
+
+- Type: `int`
+- Default: `26379`
+- Description: Sentinel port for websocket Redis.
+
+#### `REDIS_URL`
+
+- Type: `str`
+- Example: `redis://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for app state.
+
+#### `REDIS_SENTINEL_HOSTS`
+
+- Type: `str`
+- Description: Comma-separated list of Redis Sentinels for app state. If specified, the "hostname" in `REDIS_URL` will be interpreted as the Sentinel service name.
+
+#### `REDIS_SENTINEL_PORT`
+
+- Type: `int`
+- Default: `26379`
+- Description: Sentinel port for app state Redis.
 
 ### Proxy Settings
 
