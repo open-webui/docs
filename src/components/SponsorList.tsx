@@ -12,10 +12,46 @@ export const SponsorList = () => {
 	];
 
 	return (
-		<div className="flex flex-wrap items-start justify-start gap-5">
-			{sponsors.map((sponsor) => (
-				<Sponsor sponsor={sponsor} />
-			))}
+
+		<div>
+
+			{/* <div className="mb-4">
+				<div className="font-semibold text-xl text-black dark:text-white ">Topaz</div>
+				<hr className="mt-1 mb-3 border-gray-200 dark:border-gray-700" />
+
+
+				<div className="flex flex-wrap items-start justify-start gap-5">
+					
+				</div>
+			</div>		 */}
+
+
+			<div className="mb-4">
+				<div className="font-medium text-xl text-black dark:text-white">Emerald</div>
+				<hr className="mt-1 mb-3 border-gray-200 dark:border-gray-700" />
+
+
+				<div className="flex flex-wrap items-start justify-start gap-5">
+				{sponsors.map((sponsor) => (
+						<Sponsor sponsor={sponsor} />
+					))}
+					
+				</div>
+			</div>		
+
+
+			<div className="mb-4">
+				<div className="font-medium text-xl text-black dark:text-white">Jade</div>
+				<hr className="mt-1 mb-3 border-gray-200 dark:border-gray-700" />
+
+
+				<div className="flex flex-wrap items-start justify-start gap-5">
+				{sponsors.map((sponsor) => (
+						<Sponsor sponsor={sponsor} />
+					))}
+				</div>
+			</div>			
 		</div>
+		
 	);
 };
