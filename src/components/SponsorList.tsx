@@ -12,7 +12,7 @@ export const SponsorList = () => {
 	];
 
 	return (
-		<div className="flex flex-wrap items-center justify-center gap-5">
+		<div className="flex flex-wrap items-start justify-start gap-5">
 			{sponsors.map((sponsor) => (
 				<Sponsor sponsor={sponsor} />
 			))}
