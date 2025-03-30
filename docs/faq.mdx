@@ -99,6 +99,20 @@ To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open
 
 To do this, configure your **Ollama model params** to allow a larger context window. You can check and modify this setting in your chat directly or from model editor page to enhance the RAG experience significantly.
 
+#### **Q: Is MCP (Model Context Protocol) supported in Open WebUI?**
+**A:** Yes, Open WebUI officially supports MCP Tool Servers—but exclusively through an **OpenAPI-compliant proxy** ([openapi-servers](https://github.com/open-webui/openapi-servers)) for optimal compatibility, security, and maintainability.
+
+To bridge MCP (and other backend protocols), we provide a purpose-built proxy implementation available at: 👉 [https://github.com/open-webui/openapi-servers](https://github.com/open-webui/openapi-servers?tab=readme-ov-file#-bridge-to-mcp-optional)
+
+This design choice is motivated by several core principles:
+
+- 📘 Standards-First: OpenAPI is the de facto standard for RESTful service definitions and contract-driven service interoperability. By aligning integrations through OpenAPI, we enable reproducible, schema-driven behavior across upgrades and deployments.
+- 🔒 Security Model Isolation: Integrating MCP through a proxy allows us to sandbox and isolate backend protocol behavior, reducing attack surface and enabling boundary-level auditing, authentication, and observability.
+- ⚙️ Protocol Abstraction: Supporting heterogeneous backends (e.g., MCP) through a unified OpenAPI schema enables Open WebUI to remain backend-agnostic while maintaining predictable runtime behavior.
+- ⛓️ Decoupled Deployment Topology: The proxy-based architecture allows tool servers (like MCP) to evolve independently from frontend presentation, facilitating highly modular production environments or distributed workloads.
+
+In summary: MCP is supported — as long as the MCP Tool Server is fronted by an OpenAPI-compatible proxy. This architectural decision is deliberate and ensures that Open WebUI remains scalable, secure, and maintainable.
+
 #### **Need Further Assistance?**
 
 If you have any further questions or concerns, please reach out to our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
