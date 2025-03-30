@@ -83,6 +83,7 @@ The key is to ensure your server exposes a valid OpenAPI schema, and that it com
 - Basic Auth
 
 Use HTTPS in production to encrypt data in transit, and restrict endpoints with proper auth/authz methods as appropriate. You can incorporate these directly in your OpenAPI schema using the securitySchemes field.
+
 ---
 
 #### ❓ Q: What kind of tools can I build using OpenAPI tool servers?
@@ -151,7 +152,7 @@ Just make sure they’re securely configured and publicly reachable (or VPN'd) i
 
 **A:** Great news! You can use the mcp-proxy provided in our repo to expose your existing MCP-based tool server as a standard OpenAPI-compatible server. This allows for seamless integration with Open WebUI or other OpenAPI-based agents without needing to rewrite existing logic.
 
-Refer to the optional MCP bridge section in the main docs for setup instructions.
+[Refer to the optional MCP bridge section in the main docs for setup instructions.](https://github.com/open-webui/openapi-servers?tab=readme-ov-file#-bridge-to-mcp-optional)
 
 ---
 
