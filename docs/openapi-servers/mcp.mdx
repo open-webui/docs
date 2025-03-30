@@ -11,70 +11,75 @@ The MCP-to-OpenAPI proxy server lets you use tool servers implemented with MCP (
 
 ### ✅ Quickstart: Running the Proxy Locally
 
-Here's how simple it is to launch the MCP-to-OpenAPI proxy server and expose tools already available from an MCP server:
+Here's how simple it is to launch the MCP-to-OpenAPI proxy server using the lightweight, easy-to-use tool **mcpo** ([GitHub Repository](https://github.com/open-webui/mcpo)):
 
 1. **Prerequisites**
+   - **Python 3.8+** with `pip` installed.
+   - MCP-compatible application (for example: `mcp-server-time`)
+   - (Optional but recommended) `uv` installed for faster startup and zero-config convenience.
 
-- **Python 3.8+** with `pip` installed.
-- (Optional) `nodejs` with `npm` and/or `uv` installed to run the MCP server.
+2. **Install mcpo**
 
-2. **Clone the Repository & Install Dependencies**
-
-```bash
-git clone https://github.com/open-webui/openapi-servers
-cd openapi-servers/servers/mcp-proxy
-pip install -r requirements.txt
-```
-
-3. **Run The Proxy Server**
-
-Simply type:
+Using **uv** (recommended):
 
 ```bash
-python main.py --host 0.0.0.0 --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
+uvx mcpo --port 8000 -- your_mcp_server_command
 ```
 
-- Replace `uvx mcp-server-time [options]` above with your custom MCP server command.
+Or using `pip`:
+
+```bash
+pip install mcpo
+mcpo --port 8000 -- your_mcp_server_command
+```
+
+3. **Run the Proxy Server**
+
+Example usage—exposing a time server:
+
+```bash
+uvx mcpo --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
+```
+
+Replace `uvx mcp-server-time [options]` with your custom MCP tool command.
 
 ### 🚀 Accessing the Generated APIs
 
-As soon as it starts, the MCP Proxy automatically:
+As soon as it starts, the MCP Proxy (`mcpo`) automatically:
 
-- Discovers available MCP tools dynamically and generates REST endpoints.
-- Creates human-readable documentation accessible from the built-in interactive API page at: http://localhost:8000/docs
+- Discovers MCP tools dynamically and generates REST endpoints.
+- Creates interactive, human-readable OpenAPI documentation accessible at:
+  - `http://localhost:8000/docs`
 
-- Now, simply call the generated API endpoints directly or use them with your AI agents or API clients!
+Simply call the auto-generated API endpoints directly via HTTP clients, AI agents, or other OpenAPI tools of your preference.
 
 ### 📖 Example Workflow for End-Users
 
-Assuming you ran the MCP command above (`uvx mcp-server-time`):
+Assuming you started the above server command (`uvx mcp-server-time`):
 
-- Visit your local URL (`http://localhost:8000/docs`)
-- Find the generated endpoint (e.g. `/get_current_time`) and use the easy interactive form provided by FastAPI.
-- Click "**Execute**", and immediately see the response output.
+- Visit your local API documentation at `http://localhost:8000/docs`.
+- Select a generated endpoint (e.g. `/get_current_time`) and use the provided interactive form.
+- Click "**Execute**" and instantly receive your response.
 
-You now have standard OpenAPI REST APIs made available instantly without complex setups.
+No setup complexity—just instant REST APIs.
 
 
 ## 🚀 Deploying in Production (Example)
 
-Deploying your MCP-to-OpenAPI proxy to a production environment is easy. Here's a concise step-by-step example using Docker and popular deployment environments like cloud hosting or VPS.
+Deploying your MCP-to-OpenAPI proxy (powered by mcpo) is straightforward. Here's how to easily Dockerize and deploy it to cloud or VPS solutions:
 
-### 🐳 Dockerize your Proxy Server
+### 🐳 Dockerize your Proxy Server using mcpo
 
-1. **Create a Dockerfile** (`Dockerfile`) inside your proxy server directory (`servers/mcp-proxy`):
+1. **Dockerfile Example**
+
+Create the following `Dockerfile` inside your deployment directory:
 
 ```dockerfile
 FROM python:3.11-slim
-
 WORKDIR /app
-
-COPY . /app
-
-RUN pip install -r requirements.txt
-
+RUN pip install mcpo uv
 # Replace with your MCP server command; example: uvx mcp-server-time
-CMD ["python", "main.py", "--host", "0.0.0.0", "--port", "8000", "--", "uvx", "mcp-server-time", "--local-timezone=America/New_York"]
+CMD ["uvx", "mcpo", "--host", "0.0.0.0", "--port", "8000", "--", "uvx", "mcp-server-time", "--local-timezone=America/New_York"]
 ```
 
 2. **Build & Run the Container Locally**
@@ -84,17 +89,18 @@ docker build -t mcp-proxy-server .
 docker run -d -p 8000:8000 mcp-proxy-server
 ```
 
-3. **Deploy to Production (AWS/Cloud/VPS Example)**
+3. **Deploying Your Container**
 
-- Push the Docker image to DockerHub or your favorite registry:
+Push to DockerHub or another registry:
+
 ```bash
 docker tag mcp-proxy-server yourdockerusername/mcp-proxy-server:latest
 docker push yourdockerusername/mcp-proxy-server:latest
 ```
 
-- Use Docker Compose, Kubernetes manifests, or deploy directly to AWS ECS, Azure Container Instances, Render.com Containers, Heroku, or your desired cloud hosting platform.
+Deploy using Docker Compose, Kubernetes YAML manifests, or your favorite cloud container services (AWS ECS, Azure Container Instances, Render.com, or Heroku).
 
-✔️ **Production-ready** — your MCP servers are now exposed and safely accessible using industry-standard REST APIs!
+✔️ Your production MCP servers are now effortlessly available via REST APIs!
 
 ## 🧑‍💻 Technical Details and Background 
 
