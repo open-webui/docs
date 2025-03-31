@@ -62,7 +62,7 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
           }
         ]
       }
-      response = requests.post(url, headers=headers, data=data)
+      response = requests.post(url, headers=headers, json=data)
       return response.json()
   ```
 
