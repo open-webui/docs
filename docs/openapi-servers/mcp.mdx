@@ -33,15 +33,42 @@ pip install mcpo
 mcpo --port 8000 -- your_mcp_server_command
 ```
 
-3. **Run the Proxy Server**
+3. 🚀 **Run the Proxy Server**
 
-Example usage—exposing a time server:
+To start your MCP-to-OpenAPI proxy server, you need an MCP-compatible tool server. If you don't have one yet, the MCP community provides various ready-to-use MCP server implementations.
+
+✨ **Where to find MCP Servers?**
+
+You can discover officially supported MCP servers at the following repository example:
+
+- [modelcontextprotocol/servers on GitHub](https://github.com/modelcontextprotocol/servers)
+
+For instance, the popular **Time MCP Server** is documented [here](https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md), and is typically referenced clearly in the README, inside the provided MCP configuration. Specifically, the README states:
+
+> Add to your Claude settings:
+>
+> ```json
+> "mcpServers": {   
+>   "time": {     
+>     "command": "uvx",     
+>     "args": ["mcp-server-time", "--local-timezone=America/New_York"]   
+>   } 
+> }
+> ```
+
+🔑 **Translating this MCP setup to a quick local proxy command**:
+
+You can easily run the recommended MCP server (`mcp-server-time`) directly through the **MCP-to-OpenAPI proxy** (`mcpo`) like this:
 
 ```bash
 uvx mcpo --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
 ```
 
-Replace `uvx mcp-server-time [options]` with your custom MCP tool command.
+That's it! You're now running the MCP-to-OpenAPI Proxy locally and exposing the powerful **MCP Time Server** through standard OpenAPI endpoints accessible at:
+
+- 📖 **Interactive OpenAPI Documentation:** [`http://localhost:8000/docs`](http://localhost:8000/docs)
+
+Feel free to replace `uvx mcp-server-time --local-timezone=America/New_York` with your preferred MCP Server command from other available MCP implementations found in the official repository.
 
 ### 🚀 Accessing the Generated APIs
 
