@@ -39,7 +39,10 @@ To bypass the login page for a single-user setup, set the `WEBUI_AUTH` environme
 ```bash
 docker run -d -p 3000:8080 -e WEBUI_AUTH=False -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 ```
-
+For Nvidia GPU on Single-User Mode, use:
+```bash
+docker run -d -p 3000:8080 -e WEBUI_AUTH=False --gpus all -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:cuda
+```
 :::warning
 You cannot switch between single-user mode and multi-account mode after this change.
 :::
