@@ -82,7 +82,7 @@ Suppose a user wants to initiate a quick chat session without saving the history
 These URL parameters can be combined to create highly customized chat sessions. For example:
 
 ```bash
-/chat?models=model1,model2&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
+/?models=model1,model2&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
 ```
 
 This URL will:
