@@ -9,6 +9,38 @@ This documentation explains how to easily set up and deploy the **MCP (Model Con
 
 The MCP-to-OpenAPI proxy server lets you use tool servers implemented with MCP (Model Context Protocol) directly via standard REST/OpenAPI APIs—no need to manage unfamiliar or complicated custom protocols. If you're an end-user or application developer, this means you can interact easily with powerful MCP-based tooling directly through familiar REST-like endpoints.
 
+### 💡 Why Use mcpo?
+
+While MCP tool servers are powerful and flexible, they commonly communicate via standard input/output (stdio)—often running on your local machine where they can easily access your filesystem, environment, and other native system capabilities.
+
+That’s a strength—but also a limitation.
+
+If you want to deploy your main interface (like Open WebUI) on the cloud, you quickly run into a problem: your cloud instance can’t speak directly to an MCP server running locally on your machine via stdio.
+
+That’s where mcpo comes in with a game-changing solution.
+
+MCP servers typically rely on raw stdio communication, which is:
+
+- 🔓 Inherently insecure across environments
+- ❌ Incompatible with most modern tools, UIs, or platforms
+- 🧩 Lacking critical features like authentication, documentation, and error handling
+
+The mcpo proxy eliminates those issues—automatically:
+
+- ✅ Instantly compatible with existing OpenAPI tools, SDKs, and clients
+- 🛡 Wraps your tools with secure, scalable, and standards-based HTTP endpoints
+- 🧠 Auto-generates interactive OpenAPI documentation for every tool, entirely config-free
+- 🔌 Uses plain HTTP—no socket setup, daemon juggling, or platform-specific glue code
+
+So even though adding mcpo might at first seem like "just one more layer"—in reality, it simplifies everything while giving you:
+
+- Better integration ✅
+- Better security ✅
+- Better scalability ✅
+- Happier developers & users ✅
+
+✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable—without changing a single line of tool server code.
+
 ### ✅ Quickstart: Running the Proxy Locally
 
 Here's how simple it is to launch the MCP-to-OpenAPI proxy server using the lightweight, easy-to-use tool **mcpo** ([GitHub Repository](https://github.com/open-webui/mcpo)):
