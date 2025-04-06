@@ -16,7 +16,7 @@ export const TopBanners = () => {
 			url: "mailto:sales@openwebui.com?subject=Sponsorship Inquiry: Open WebUI",
 			name: "Open WebUI",
 			description:
-				"The top banner spot is reserved for only two Enterprise sponsors on a first-come, first-served basis",
+				"The top banner spot is reserved for Emerald+ Enterprise sponsors on a first-come, first-served basis",
 		},
 	];
 
