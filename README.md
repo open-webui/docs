@@ -1,41 +1,19 @@
-# Website
+# 👋 Open WebUI Documentation
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Welcome to the official documentation for **Open WebUI** — a self-hosted, privacy-focused, and extensible AI interface for LLMs like Ollama and OpenAI-compatible APIs.
 
-## Installation
+This site is built with [Docusaurus](https://docusaurus.io/) and includes:
 
-```sh
-npm ci
-```
+- 🔧 Installation & setup guides (Docker, local, manual)
+- 🧩 Plugin & extension documentation
+- 📚 API reference & pipeline usage
+- 🗂 File uploads & RAG integration
+- 🤖 Developer contribution guide
 
-## Local Development
+## 📝 Contributing
 
-```sh
-npm start
-```
+Contributions are welcome! Please read the [contributing guide](docs/tutorials/tips/contributing-tutorial.md) for details.
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## 🌐 Live Docs
 
-## Build
-
-```sh
-npm run build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Deployment
-
-Using SSH:
-
-```sh
-USE_SSH=true npm run deploy
-```
-
-Not using SSH:
-
-```sh
-GIT_USER=<Your GitHub username> npm run deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+👉 Visit the docs: [docs.openwebui.com](https://docs.openwebui.com/)
