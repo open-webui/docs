@@ -2,6 +2,6 @@
 	"label": "📄 Documents",
 	"position": 2,
 	"link": {
-		"type": "generated-index"
+	  "type": "generated-index"
 	}
-}
+  }
