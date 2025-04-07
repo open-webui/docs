@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Overview
 
-This documentation page outlines the steps required to integrate Okta OIDC Single Sign-On (SSO) with Open WebUI, including support for managing user groups based on Okta group membership. By following these steps, you will enable users to log in to Open WebUI using their Okta credentials and automatically assign them to relevant groups within Open WebUI.
+This documentation page outlines the steps required to integrate Okta OIDC Single Sign-On (SSO) with Open WebUI. It also covers the **optional** feature of managing Open WebUI user groups based on Okta group membership. By following these steps, you will enable users to log in to Open WebUI using their Okta credentials. If you choose to enable group syncing, users can also be automatically assigned to relevant groups within Open WebUI based on their Okta groups.
 
 ### Prerequisites
 
@@ -34,7 +34,7 @@ First, you need to configure an OIDC application within your Okta organization a
 
 ### 2. Add a Groups Claim to the ID Token
 
-To enable group management in Open WebUI, you need to configure Okta to send the user's group memberships in the ID token.
+**(Optional)** To enable automatic group management in Open WebUI based on Okta groups, you need to configure Okta to send the user's group memberships in the ID token. If you only need SSO login and prefer to manage groups manually within Open WebUI, you can skip this section.
 
 1.  In the Admin Console, go to **Applications > Applications** and select your OIDC client app.
 2.  Go to the **Sign On** tab and click **Edit** in the **OpenID Connect ID Token** section.
@@ -51,7 +51,7 @@ To enable group management in Open WebUI, you need to configure Okta to send the
 
 ## Configuring Open WebUI
 
-To enable Okta OIDC SSO and group management in Open WebUI, you need to set the following environment variables for your Open WebUI instance:
+To enable Okta OIDC SSO in Open WebUI, you need to set the following core environment variables. Additional variables are required if you wish to enable the optional group management feature.
 
 ```bash
 # --- OIDC Core Settings ---
@@ -75,15 +75,17 @@ OAUTH_PROVIDER_NAME="Okta"
 # Scopes to request (default is usually sufficient)
 # OAUTH_SCOPES="openid email profile groups" # Ensure 'groups' is included if not default
 
-# --- OAuth Group Management ---
-# Enable group management feature
-ENABLE_OAUTH_GROUP_MANAGEMENT="true"
+# --- OAuth Group Management (Optional) ---
+# Set to "true" only if you configured the Groups Claim in Okta (Step 2)
+# and want Open WebUI groups to be managed based on Okta groups.
+# ENABLE_OAUTH_GROUP_MANAGEMENT="true"
 
+# Required only if ENABLE_OAUTH_GROUP_MANAGEMENT is true.
 # The claim name in the ID token containing group information (must match Okta config)
-OAUTH_GROUP_CLAIM="groups"
+# OAUTH_GROUP_CLAIM="groups"
 ```
 
-Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DISCOVERY_URL` with the actual values from your Okta application configuration. Ensure `OAUTH_GROUP_CLAIM` matches the claim name you configured in Okta (default is `groups`).
+Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DISCOVERY_URL` with the actual values from your Okta application configuration. If enabling group management, ensure `OAUTH_GROUP_CLAIM` matches the claim name you configured in Okta (default is `groups`).
 
 :::tip Disabling the Standard Login Form
 
