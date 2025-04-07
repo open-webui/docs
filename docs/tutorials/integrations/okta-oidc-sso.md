@@ -102,6 +102,8 @@ If this key is not consistent across all nodes, users may be forced to log in ag
 :::tip Disabling the Standard Login Form
 
 If you intend to *only* allow logins via Okta (and potentially other configured OAuth providers), you can disable the standard email/password login form by setting the following environment variable:
+:::
+
 
 ```bash
 ENABLE_LOGIN_FORM="false"
