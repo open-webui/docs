@@ -85,6 +85,18 @@ OAUTH_GROUP_CLAIM="groups"
 
 Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DISCOVERY_URL` with the actual values from your Okta application configuration. Ensure `OAUTH_GROUP_CLAIM` matches the claim name you configured in Okta (default is `groups`).
 
+:::tip Disabling the Standard Login Form
+
+If you intend to *only* allow logins via Okta (and potentially other configured OAuth providers), you can disable the standard email/password login form by setting the following environment variable:
+
+```bash
+ENABLE_LOGIN_FORM="false"
+```
+
+:::danger Important Prerequisite
+Setting `ENABLE_LOGIN_FORM="false"` **requires** `ENABLE_OAUTH_SIGNUP="true"` to be set as well. If you disable the login form without enabling OAuth signup, **users (including administrators) will be unable to log in.** Ensure at least one OAuth provider is configured and `ENABLE_OAUTH_SIGNUP` is enabled before disabling the standard login form.
+:::
+
 Restart your Open WebUI instance after setting these environment variables.
 
 ## Verification
@@ -98,7 +110,7 @@ Restart your Open WebUI instance after setting these environment variables.
 ## Troubleshooting
 
 *   **400 Bad Request/Redirect URI Mismatch:** Double-check that the **Sign-in redirect URI** in your Okta application exactly matches `<your-open-webui-url>/oauth/oidc/callback`.
-*   **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user logged out and back in after group changes. Remember admin groups are not synced.
+*   **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Remember admin groups are not synced.
 *   **Configuration Errors:** Review the Open WebUI server logs for detailed error messages related to OIDC configuration.
 *   Refer to the official [Open WebUI SSO Documentation](../features/sso.md).
 *   Consult the [Okta Developer Documentation](https://developer.okta.com/docs/).
