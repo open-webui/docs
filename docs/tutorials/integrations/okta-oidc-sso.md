@@ -90,6 +90,7 @@ Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DI
 :::info Session Persistence in Multi-Node Deployments
 
 When deploying Open WebUI across multiple nodes (e.g., in a Kubernetes cluster or behind a load balancer), it is crucial to ensure session persistence for a seamless user experience, especially with SSO. Set the `WEBUI_SECRET_KEY` environment variable to the **same secure, unique value** on **all** Open WebUI instances.
+:::
 
 ```bash
 # Example: Generate a strong secret key (e.g., using openssl rand -hex 32)
@@ -97,7 +98,6 @@ WEBUI_SECRET_KEY="YOUR_UNIQUE_AND_SECURE_SECRET_KEY"
 ```
 
 If this key is not consistent across all nodes, users may be forced to log in again if their session is routed to a different node, as the session token signed by one node will not be valid on another. By default, the Docker image generates a random key on first start, which is unsuitable for multi-node setups.
-:::
 
 :::tip Disabling the Standard Login Form
 
