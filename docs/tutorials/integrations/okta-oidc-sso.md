@@ -15,7 +15,7 @@ This documentation page outlines the steps required to integrate Okta OIDC Singl
 
 ### Prerequisites
 
-*   A valid Open WebUI instance.
+*   A new or existing Open WebUI instance.
 *   An Okta account with administrative privileges to create and configure applications.
 *   Basic understanding of OIDC, Okta application configuration, and Open WebUI environment variables.
 
@@ -28,7 +28,7 @@ First, you need to configure an OIDC application within your Okta organization a
 1.  Log in to your Okta Admin Console.
 2.  Navigate to **Applications > Applications**.
 3.  Either create a new **OIDC - OpenID Connect** application (choose **Web Application** as the type) or select an existing one you wish to use for Open WebUI.
-4.  During setup or in the application's **General** settings tab, configure the **Sign-in redirect URIs**. Add the URI for your Open WebUI instance, followed by `/oauth/oidc/callback`. For example: `https://your-open-webui.com/oauth/oidc/callback`.
+4.  During setup or in the application's **General** settings tab, configure the **Sign-in redirect URIs**. Add the URI for your Open WebUI instance, followed by `/oauth/oidc/callback`. Example: `https://your-open-webui.com/oauth/oidc/callback`.
 5.  Take note of the **Client ID** and **Client secret** provided on the application's **General** tab. You will need these for the Open WebUI configuration.
 6.  Ensure the correct users or groups are assigned to this application under the **Assignments** tab.
 
