@@ -60,4 +60,4 @@ Prompt management is controlled by the following permission settings:
 * Create intuitive slash commands that reflect the prompt's purpose
 * Document any specific requirements or expected inputs in the prompt description
 * Test prompts with different variable combinations to ensure they work as intended
-* Consider access levels carefully when sharing prompts with other users
+* Consider access levels carefully when sharing prompts with other users - public sharing means that it will appear automatically for all users when they hit `/` in a chat, so you want to avoid creating too many.
