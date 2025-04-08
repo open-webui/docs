@@ -2238,17 +2238,35 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `False`
 - Description: Enables websocket support in Open WebUI (used with Redis).
 
+:::INFO
+
+When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
+
+:::
+
 #### `WEBSOCKET_MANAGER`
 
 - Type: `str`
 - Default: `redis`
 - Description: Specifies the websocket manager to use (in this case, Redis).
 
+:::INFO
+
+When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+
+:::
+
 #### `WEBSOCKET_REDIS_URL`
 
 - Type: `str`
 - Default: `${REDIS_URL}`
 - Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice it is recommend to set both.
+
+:::INFO
+
+When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+
+:::
 
 #### `WEBSOCKET_SENTINEL_HOSTS`
 
@@ -2266,6 +2284,12 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Type: `str`
 - Example: `redis://localhost:6379/0`
 - Description: Specifies the URL of the Redis instance for app state.
+
+:::INFO
+
+When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
+
+:::
 
 #### `REDIS_SENTINEL_HOSTS`
 
