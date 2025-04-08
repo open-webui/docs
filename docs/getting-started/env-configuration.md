@@ -2232,6 +2232,29 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 ### Redis
 
+#### `REDIS_URL`
+
+- Type: `str`
+- Example: `redis://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for app state.
+
+:::INFO
+
+When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
+
+:::
+
+#### `REDIS_SENTINEL_HOSTS`
+
+- Type: `str`
+- Description: Comma-separated list of Redis Sentinels for app state. If specified, the "hostname" in `REDIS_URL` will be interpreted as the Sentinel service name.
+
+#### `REDIS_SENTINEL_PORT`
+
+- Type: `int`
+- Default: `26379`
+- Description: Sentinel port for app state Redis.
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
@@ -2279,28 +2302,6 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 - Default: `26379`
 - Description: Sentinel port for websocket Redis.
 
-#### `REDIS_URL`
-
-- Type: `str`
-- Example: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for app state.
-
-:::INFO
-
-When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
-
-:::
-
-#### `REDIS_SENTINEL_HOSTS`
-
-- Type: `str`
-- Description: Comma-separated list of Redis Sentinels for app state. If specified, the "hostname" in `REDIS_URL` will be interpreted as the Sentinel service name.
-
-#### `REDIS_SENTINEL_PORT`
-
-- Type: `int`
-- Default: `26379`
-- Description: Sentinel port for app state Redis.
 
 ### Uvicorn Settings
 
