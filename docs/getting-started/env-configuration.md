@@ -245,7 +245,12 @@ allowing the client to wait indefinitely.
 #### `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST`
 
 - Type: `int`
+- Default: `10`
 - Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+
+:::note
+The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped depending on your network conditions.
+:::
 
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
 
