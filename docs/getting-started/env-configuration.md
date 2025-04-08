@@ -2278,6 +2278,22 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
 
+### Uvicorn Settings
+
+#### `UVICORN_WORKERS`
+
+- Type: `int`
+- Default: `1`
+- Description: Controls the number of worker processes that Uvicorn spawns to handle requests. Each worker runs its own instance of the application in a separate process.
+
+:::INFO
+
+When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
+
+If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-instance setups are set accordingly.
+
+:::
+
 ### Proxy Settings
 
 Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
