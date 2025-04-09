@@ -53,7 +53,7 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
   - **Docker Default**: `prod`
 - Description: Environment setting.
 
-#### `PERSISTENT_CONFIGURATION_ENABLED`
+#### `ENABLE_PERSISTENT_CONFIG`
 
 - Type: `bool`
 - Default: `True`
