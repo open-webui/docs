@@ -2243,7 +2243,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Example: `redis://localhost:6379/0`
 - Description: Specifies the URL of the Redis instance for app state.
 
-:::INFO
+:::info
 
 When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
 
@@ -2266,7 +2266,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 - Default: `False`
 - Description: Enables websocket support in Open WebUI (used with Redis).
 
-:::INFO
+:::info
 
 When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
 
@@ -2278,7 +2278,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 - Default: `redis`
 - Description: Specifies the websocket manager to use (in this case, Redis).
 
-:::INFO
+:::info
 
 When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
@@ -2290,7 +2290,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 - Default: `${REDIS_URL}`
 - Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice it is recommend to set both.
 
-:::INFO
+:::info
 
 When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
@@ -2316,7 +2316,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 - Default: `1`
 - Description: Controls the number of worker processes that Uvicorn spawns to handle requests. Each worker runs its own instance of the application in a separate process.
 
-:::INFO
+:::info
 
 When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
 
