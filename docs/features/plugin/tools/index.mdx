@@ -29,18 +29,8 @@ Explore ready-to-use tools here:
 
 There are two easy ways to install Tools in Open WebUI:
 
-### Option 1: Manual Download & Import
-
-1. Visit the [Community Tool Library](https://openwebui.com/tools)
-2. Click on a Tool you like.
-3. Click the blue Get button > “Download as JSON export.”
-4. Go to Workspace ➡️ Tools in Open WebUI.
-5. Click “Import Tools” and upload the downloaded file.
-
-### Option 2: One-Click Import from the Web
-
 1. Go to [Community Tool Library](https://openwebui.com/tools)
-2. Choose a Tool, then click the blue Get button.
+2. Choose a Tool, then click the Get button.
 3. Enter your Open WebUI instance’s IP address or URL.
 4. Click “Import to WebUI” — done!
 
@@ -77,6 +67,62 @@ You can also let your LLM auto-select the right Tools using the AutoTool Filter:
 🎯 Note: Even when using AutoTool, you still need to enable your Tools using one of the two methods above.
 
 ✅ And that’s it — your LLM is now Tool-powered! You're ready to supercharge your chats with web search, image generation, voice output, and more.
+
+
+---
+
+# 🧠 Choosing How Tools Are Used: Default vs Native
+
+Once Tools are enabled for your model, Open WebUI gives you two different ways to let your LLM use them in conversations.
+
+You can decide how the model should call Tools by choosing between:
+
+- 🟡 Default Mode (Prompt-based)
+- 🟢 Native Mode (Built-in function calling)
+
+Let’s break it down:
+
+### 🟡 Default Mode (Prompt-based Tool Triggering)
+
+This is the default setting in Open WebUI.
+
+Here, your LLM doesn’t need to natively support function calling. Instead, we guide the model using smart prompts (ReACT-style — Reasoning + Acting) to select and use a Tool.
+
+✅ Works with almost any model  
+✅ Great way to unlock Tools with basic or local models  
+❗ Not as reliable or flexible as Native Mode when chaining tools
+
+### 🟢 Native Mode (Function Calling Built-In)
+
+If your model does support “native” function calling (like GPT-4o or GPT-3.5-turbo-1106), you can use this powerful mode to let the LLM decide — in real time — when and how to call multiple Tools during a single chat message.
+
+✅ Fast, accurate, and can chain multiple Tools in one response  
+✅ The most natural and advanced experience  
+❗ Requires a model that actually supports native function calling
+
+### ✳️ How to Switch Between Modes
+
+Want to enable native function calling in your chats? Here's how:
+
+1. Open the chat window with your model.
+2. Click ⚙️ Chat Controls > Advanced Params.
+3. Look for the Function Calling setting and switch it from Default → Native
+
+That’s it! Your chat is now using true native Tool support (as long as the model supports it).
+
+➡️ We recommend using GPT-4o or another OpenAI model for the best native function-calling experience.  
+🔎 Some local models may claim support, but often struggle with accurate or complex Tool usage.
+
+💡 Summary:
+
+| Mode     | Who it’s for                     | Pros                                    | Cons                                 |
+|----------|----------------------------------|-----------------------------------------|--------------------------------------|
+| Default  | Any model, even local ones       | Broad compatibility, safer, flexible    | May be less accurate or slower       |
+| Native   | GPT-4o, GPT-3.5 turbo, etc.       | Fast, smart, excellent tool chaining     | Needs proper function call support   |
+
+Choose the one that works best for your setup — and remember, you can always switch on the fly via Chat Controls.
+
+👏 And that's it — your LLM now knows how and when to use Tools, intelligently.
 
 ---
 
