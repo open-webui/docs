@@ -25,6 +25,10 @@ We'll set up both the frontend (user interface) and backend (API and server logi
 
 First, use `git clone` to download the Open WebUI repository to your local machine. This will create a local copy of the project on your computer.
 
+1. **Open your terminal** (or Git Bash if you're on Windows and using Git Bash).
+2. **Navigate to the directory** where you want to store the Open WebUI project.
+3. **Clone the repository:** Run the following command:
+
 ```bash
 git clone https://github.com/open-webui/open-webui.git
 cd open-webui
