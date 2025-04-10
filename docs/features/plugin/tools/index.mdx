@@ -24,24 +24,6 @@ Explore ready-to-use tools here:
 
 ---
 
-# 🔧 How to Use Tools in Open WebUI
-
-Once you've installed Tools (we’ll show you how below), here’s how to use them:
-
-1. Go to: Workspace ➡️ Models
-2. Pick the model (like GPT-4 or LLaMa2) and click the ✏️ pencil icon to edit it.
-3. Scroll down to the “Tools” section.
-4. ✅ Check the Tools you want to enable and click Save.
-
-Now, open a chat and click the ➕ plus icon to use Tools with your conversation!
-
-💡 Tip: Enabling a Tool doesn't mean it will always be used — your AI will choose when it’s helpful. You can also use something called the AutoTool Filter to let the LLM pick the right Tool automatically.
-
-🔗 [AutoTool Filter](https://openwebui.com/f/hub/autotool_filter/)
-
-🎯 Remember: Even when using AutoTool, you still have to enable Tools from the Model Settings!
-
----
 
 # 📦 How to Install Tools
 
@@ -63,6 +45,38 @@ There are two easy ways to install Tools in Open WebUI:
 4. Click “Import to WebUI” — done!
 
 🛑 Safety Tip: Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code.
+
+---
+
+
+# 🔧 How to Use Tools in Open WebUI
+
+Once you've installed Tools (we’ll show you how below), here’s how to enable and use them:
+
+You have two ways to enable a Tool for your model:
+
+### ✏️ Option 1: Enable by Default (Recommended for Frequent Use)
+1. Go to: Workspace ➡️ Models
+2. Choose the model you’re using (like GPT-4 or LLaMa2) and click the ✏️ edit icon.
+3. Scroll down to the “Tools” section.
+4. ✅ Check the Tools you want your model to have access to by default.
+5. Click Save.
+
+This ensures the model always has these Tools ready to use whenever you chat with it.
+
+### ➕ Option 2: Enable from the Chat Window
+
+While chatting, click the ➕ icon in the input area. You’ll see a list of available Tools — you can enable any of them on the fly for that session.
+
+💡 Tip: Enabling a Tool gives the model permission to use it — but it may not use it unless it's useful for the task.
+
+You can also let your LLM auto-select the right Tools using the AutoTool Filter:
+
+🔗 [AutoTool Filter](https://openwebui.com/f/hub/autotool_filter/)
+
+🎯 Note: Even when using AutoTool, you still need to enable your Tools using one of the two methods above.
+
+✅ And that’s it — your LLM is now Tool-powered! You're ready to supercharge your chats with web search, image generation, voice output, and more.
 
 ---
 
