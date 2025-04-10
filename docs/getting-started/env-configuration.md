@@ -231,6 +231,12 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration
 for local Whisper and embeddings.
 
+#### `EXTERNAL_PWA_MANIFEST_URL`
+
+- Type: `str`
+- Default: empty string (' '), since `None` is set as default
+- Description: When defined as a fully qualified URL (e.g. https://path/to/manifest.webmanifest), requests sent to /manifest.json will use the external manifest file. When not defined, the default manifest.json file will be used.
+
 ### AIOHTTP Client
 
 #### `AIOHTTP_CLIENT_TIMEOUT`
