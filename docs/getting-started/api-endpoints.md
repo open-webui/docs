@@ -66,6 +66,39 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
       return response.json()
   ```
 
+### 🦙 Ollama API Proxy Support
+
+If you want to interact directly with Ollama models—including for embedding generation or raw prompt streaming—Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
+
+- **Base URL**: `/ollama/<api>`
+- **Reference**: [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)
+
+#### 🔁 Generate Completion (Streaming)
+
+```bash
+curl http://localhost:3000/ollama/api/generate -d '{
+  "model": "llama3.2",
+  "prompt": "Why is the sky blue?"
+}'
+```
+
+#### 📦 List Available Models
+
+```bash
+curl http://localhost:3000/ollama/api/tags
+```
+
+#### 🧠 Generate Embeddings
+
+```bash
+curl -X POST http://localhost:3000/ollama/api/embed -d '{
+  "model": "llama3.2",
+  "input": ["Open WebUI is great!", "Let's generate embeddings."]
+}'
+```
+
+This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
+
 ### 🧩 Retrieval Augmented Generation (RAG)
 
 The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
