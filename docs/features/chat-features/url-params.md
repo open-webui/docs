@@ -5,6 +5,26 @@ title: "🔗 URL Parameters"
 
 In Open WebUI, chat sessions can be customized through various URL parameters. These parameters allow you to set specific configurations, enable features, and define model settings on a per-chat basis. This approach provides flexibility and control over individual chat sessions directly from the URL.
 
+## URL Structure and Navigation
+
+Open WebUI follows a consistent URL structure for its various features and interfaces:
+
+```
+https://[host]:[port]/[feature-path]?[parameters]
+```
+
+### Main Navigation Routes
+
+| **Route** | **Description** | **Example** |
+|-----------|-----------------|-------------|
+| `/` | Home page / Main chat interface | `https://openwebui.com/` |
+| `/chat/[chat-id]` | Specific chat session | `https://openwebui.com/chat/abc123` |
+| `/settings` | User settings page | `https://openwebui.com/settings` |
+| `/models` | Model management | `https://openwebui.com/models` |
+| `/collections` | Chat collections | `https://openwebui.com/collections` |
+| `/workspace` | Workspace management | `https://openwebui.com/workspace` |
+| `/admin` | Admin dashboard (requires admin privileges) | `https://openwebui.com/admin` |
+
 ## URL Parameter Overview
 
 The following table lists the available URL parameters, their function, and example usage.
@@ -19,6 +39,10 @@ The following table lists the available URL parameters, their function, and exam
 | `call`             | Enables a call overlay if set to `true`.                                        | `/?call=true`                    |
 | `q`                | Sets an initial query or prompt for the chat.                                   | `/?q=Hello%20there`              |
 | `temporary-chat`   | Marks the chat as temporary if set to `true`, for one-time sessions.            | `/?temporary-chat=true`          |
+| `embed`            | Enables embedded mode with simplified UI if set to `true`.                      | `/?embed=true`                   |
+| `hideHeader`       | Hides the header in embedded mode if set to `true`.                            | `/?embed=true&hideHeader=true`   |
+| `theme`            | Sets the theme (e.g., 'dark', 'light').                                        | `/?theme=dark`                   |
+| `message`          | Jumps to a specific message in a chat.                                         | `/chat/abc123?message=msg456`    |
 
 ### 1. **Models and Model Selection**
 
@@ -45,7 +69,7 @@ The following table lists the available URL parameters, their function, and exam
 ### 4. **Tool Selection**
 
 - **Description**: The `tools` or `tool-ids` parameters specify which [tools](/features/plugin/tools) to activate within the chat.
-- **How to Set**: Provide a comma-separated list of tool IDs as the parameter’s value.
+- **How to Set**: Provide a comma-separated list of tool IDs as the parameter's value.
 - **Example**: `/?tools=tool1,tool2` or `/?tool-ids=tool1,tool2`
 - **Behavior**: Each tool ID is matched and activated within the session for user interaction.
 
@@ -70,12 +94,31 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?temporary-chat=true`
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
 
+### 8. **Embedding Parameters**
+
+- **Description**: Parameters for embedding Open WebUI in other applications.
+- **How to Set**: Use `embed=true` along with optional customization parameters.
+- **Examples**:
+  - `/?embed=true` - Enable embedded mode with simplified UI
+  - `/?embed=true&hideHeader=true` - Embedded mode without header
+  - `/?embed=true&theme=dark` - Embedded mode with dark theme
+- **Behavior**: Adjusts the UI for embedding in other applications or websites.
+
 <details>
 <summary>Example Use Case</summary>
 :::tip **Temporary Chat Session**
 Suppose a user wants to initiate a quick chat session without saving the history. They can do so by setting `temporary-chat=true` in the URL. This provides a disposable chat environment ideal for one-time interactions.
 :::
 </details>
+
+## Deep Linking
+
+Open WebUI supports deep linking to specific content or features:
+
+- Link to a specific chat: `/chat/[chat-id]`
+- Link to a specific message in a chat: `/chat/[chat-id]?message=[message-id]`
+- Link to a specific collection: `/collections/[collection-id]`
+- Link to a specific model configuration: `/models/[model-id]`
 
 ## Using Multiple Parameters Together
 
@@ -92,3 +135,28 @@ This URL will:
 - Display a call overlay.
 - Set an initial prompt of "Hello there."
 - Mark the chat as temporary, avoiding any history saving.
+
+## Programmatic URL Generation
+
+When generating URLs programmatically, ensure all parameters are properly URL-encoded:
+
+```javascript
+const baseUrl = 'https://openwebui.com/';
+const params = new URLSearchParams({
+  models: 'gpt-4,claude-3',
+  'web-search': 'true',
+  tools: 'calculator,weather',
+  q: 'What is the weather forecast?'
+});
+
+const fullUrl = `${baseUrl}?${params.toString()}`;
+// Results in: https://openwebui.com/?models=gpt-4%2Cclaude-3&web-search=true&tools=calculator%2Cweather&q=What+is+the+weather+forecast%3F
+```
+
+## URL Shortening
+
+Open WebUI provides URL shortening for sharing chat sessions:
+
+| **Route** | **Description** | **Example** |
+|-----------|-----------------|-------------|
+| `/s/[short-id]` | Shortened URL for sharing | `https://openwebui.com/s/abc123` |
