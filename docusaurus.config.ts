@@ -168,16 +168,7 @@ const config: Config = {
 			darkTheme: prismThemes.dracula,
 		},
 	} satisfies Preset.ThemeConfig,
-	plugins: [
-		require.resolve("docusaurus-lunr-search"),
-		[
-			"@docusaurus/plugin-google-gtag",
-			{
-				trackingID: "G-522JSJVWTB",
-				anonymizeIP: false,
-			},
-		],
-	],
+	plugins: [require.resolve("docusaurus-lunr-search")],
 };
 
 export default config;
