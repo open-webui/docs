@@ -3,5 +3,6 @@
 		"no-inline-html": false,
 		"link-image-reference-definitions": false,
 		"fenced-code-language": false
-	}
+	},
+	"window.title": "${rootName}${separator}${profileName}${separator}${appName}${separator}${activeEditorShort}${dirty}${separator}[Branch: update-url-params]"
 }
