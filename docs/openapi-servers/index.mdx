@@ -42,40 +42,6 @@ uvicorn main:app --host 0.0.0.0 --reload
 
 Now, simply point your OpenAPI-compatible clients or AI agents to your local or publicly deployed URL—no configuration headaches, no complicated transports.
 
-## 📂 Server Examples
-
-Reference implementations provided in this repository demonstrate common use-cases clearly and simply:
-
-- **Filesystem Access** _(servers/filesystem)_ - Manage local file operations safely with configurable restrictions.
-- **Git Server** _(servers/git)_ - Expose Git repositories for searching, reading, and possibly writing via controlled API endpoints.
-- **WIP: Database Server** _(servers/database)_ - Query and inspect database schemas across common DB engines like PostgreSQL, MySQL, and SQLite.
-- **Memory & Knowledge Graph** _(servers/memory)_ - Persistent memory management and semantic knowledge querying using popular and reliable storage techniques.
-- **WIP: Web Search & Fetch** _(servers/web-search)_ - Retrieve and convert web-based content securely into structured API results usable by LLMs.
-
-(More examples and reference implementations will be actively developed and continually updated.)
-
-## 🔌 Bridge to MCP (Optional)
-
-For the easiest way to expose your MCP tools as OpenAPI-compatible APIs, we recommend using [mcpo](https://github.com/open-webui/mcpo). This enables tool providers who initially implemented MCP servers to expose them effortlessly as standard OpenAPI-compatible APIs, ensuring existing MCP servers and resources remain accessible without additional hassle.
-
-**Quick Usage:**
-```bash
-uvx mcpo --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
-```
-
-Alternatively, we also provide a simple Python-based proxy server:
-
-**Example:**
-```bash
-cd servers/mcp-proxy
-pip install -r requirements.txt
-python main.py --host 0.0.0.0 --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
-```
-
-Both methods help bridge existing MCP servers with OpenAPI clients, removing transport and security complexities during integration or migration.
-
-
-
 ## 🌱 Open WebUI Community  
 
 - For general discussions, technical exchange, and announcements, visit our [Community Discussions](https://github.com/open-webui/openapi-servers/discussions) page.
