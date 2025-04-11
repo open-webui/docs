@@ -124,6 +124,9 @@ For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing 
 
 Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
 
+You can also define `SIGNOUT_REDIRECT_URI` to set a URI to redirect to on
+logout, to point to the upstream authentication systems logout endpoint.
+
 ### Tailscale Serve
 
 [Tailscale Serve](https://tailscale.com/kb/1242/tailscale-serve) allows you to share a service within your tailnet, and Tailscale will set the header `Tailscale-User-Login` with the email address of the requester.
