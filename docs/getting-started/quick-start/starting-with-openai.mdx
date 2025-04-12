@@ -13,20 +13,20 @@ Open WebUI makes it easy to connect and use OpenAI and other OpenAI-compatible A
 
 ## Step 1: Get Your OpenAI API Key
 
-To use OpenAI models (such as GPT-4 or GPT-3.5), you need an API key from a supported provider.
+To use OpenAI models (such as GPT-4 or o3-mini), you need an API key from a supported provider.
 
 You can use:
 
 - OpenAI directly (https://platform.openai.com/account/api-keys)
 - Azure OpenAI
-- An OpenAI-compatible service (e.g., LocalAI, FastChat, Helicone, etc.)
+- Any OpenAI-compatible service (e.g., LocalAI, FastChat, Helicone, LiteLLM, OpenRouter etc.)
 
 👉 Once you have the key, copy it and keep it handy.
 
 For most OpenAI usage, the default API base URL is:  
 https://api.openai.com/v1
 
-Other providers may use different URLs — check your provider’s documentation.
+Other providers use different URLs — check your provider’s documentation.
 
 ---
 
@@ -38,7 +38,7 @@ Once Open WebUI is running:
 2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
 3. Click ➕ **Add New Connection**.
 4. Fill in the following:
-   - API URL: https://api.openai.com/v1
+   - API URL: https://api.openai.com/v1 (or the URL of your specific provider)
    - API Key: Paste your key here
 
 5. Click Save ✅.
@@ -61,7 +61,7 @@ Here’s what model selection looks like:
 
 ![OpenAI Model Selector](/images/getting-started/quick-start/selector-openai.png)
 
-Simply choose GPT-4, GPT-3.5, or any compatible model offered by your provider.
+Simply choose GPT-4, o3-mini, or any compatible model offered by your provider.
 
 ---
 

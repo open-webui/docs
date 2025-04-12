@@ -50,7 +50,7 @@ class Tools:
 ```
 
 ### Type Hints
-Each tool must have type hints for arguments. As of version OpenWebUI version 0.4.3, the types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
+Each tool must have type hints for arguments. As of version Open WebUI version 0.4.3, the types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
@@ -312,9 +312,9 @@ async def test_function(
 
 In the Tools definition metadata you can specify custom packages. When you click `Save` the line will be parsed and `pip install` will be run on all requirements at once.
 
-Keep in mind that as pip is used in the same process as Open-WebUI, the UI will be completely unresponsive during the installation.
+Keep in mind that as pip is used in the same process as Open WebUI, the UI will be completely unresponsive during the installation.
 
-No measures are taken to handle package conflicts with Open-WebUI's requirements. That means that specifying requirements can break OpenWebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
+No measures are taken to handle package conflicts with Open WebUI's requirements. That means that specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
 
 
 <details>

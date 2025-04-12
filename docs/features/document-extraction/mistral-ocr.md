@@ -31,7 +31,7 @@ Integration Steps
 * Go to `API Keys` or `https://console.mistral.ai/api-keys`
 * Create a new key and make sure to copy it
 
-### Step 3: Configure OpenWebUI to use Mistral OCR
+### Step 3: Configure Open WebUI to use Mistral OCR
 
 * Log in to your Open WebUI instance.
 * Navigate to the `Admin Panel` settings menu.
