@@ -11,11 +11,11 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
  Nobody likes losing data! 
 
- If you're self-hosting OpenWebUI, then you may wish to institute some kind of formal backup plan in order to ensure that you retain a second and third copy of parts of your configuration.
+ If you're self-hosting Open WebUI, then you may wish to institute some kind of formal backup plan in order to ensure that you retain a second and third copy of parts of your configuration.
 
  This guide is intended to recommend some basic recommendations for how users might go about doing that. 
 
- This guide assumes that the user has installed OpenWebUI via Docker (or intends to do so)
+ This guide assumes that the user has installed Open WebUI via Docker (or intends to do so)
 
  ## Ensuring data persistence
 
@@ -27,7 +27,7 @@ Docker containers are ephemeral and data must be persisted to ensure its surviva
 
 If you're using the Docker Compose from the project repository, you will be deploying Open Web UI using Docker volumes. 
 
-For Ollama and OpenWebUI the mounts are:
+For Ollama and Open WebUI the mounts are:
 
 ```yaml
 ollama:
@@ -349,7 +349,7 @@ In addition to scripting your own backup jobs, you can find commercial offerings
 
 # Host Level Backups
 
-Your OpenWebUI instance might be provisioned on a host (physical or virtualised) which you control. 
+Your Open WebUI instance might be provisioned on a host (physical or virtualised) which you control. 
 
 Host level backups involve creating snapshots or backups but of the entire VM rather than running applications. 
 
