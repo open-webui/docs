@@ -67,16 +67,6 @@ Admins can manage shared tool servers available to all or selected users across 
 - Add the tool server URL just as you would in user settings.
 - These tools are treated similarly to Open WebUI’s built-in tools.
 
-![Global Tool Server Message Input](/images/openapi-servers/open-webui/global-message-input.png)
-
-⚠️ Important:
-
-- By default, global tool servers are not activated — each one must be toggled ON explicitly before becoming available.
-- Once enabled, global tool servers are accessible by all users (or can be limited based on role-based access features).
-
-This is ideal for team setups or shared environments, where commonly-used tools (e.g. document search, memory, or web lookup) should be centrally accessible by multiple users.
-
-
 ### 👉 Optional: Using a Config File with mcpo
 
 If you're running multiple tools through mcpo using a config file, take note:
@@ -123,6 +113,28 @@ Clicking this icon opens a popup where you can:
 🔍 Here’s what the tool information modal looks like:
 
 ![Tool Info Modal Expanded](/images/openapi-servers/open-webui/info-modal.png)
+
+### 🛠️ Global Tool Servers Look Different — And Are Hidden by Default!
+
+If you've connected a Global Tool Server (i.e., one that’s admin-configured), it will not appear automatically in the input area like user tool servers do.
+
+Instead:
+
+- Global tools are hidden by default and must be explicitly activated per user.
+- To enable them, you'll need to click on the ➕ button in the message input area (bottom left of the chat box), and manually toggle on the specific global tool(s) you want to use.
+
+Here’s what that looks like:
+
+![Global Tool Server Message Input](/images/openapi-servers/open-webui/global-message-input.png)
+
+⚠️ Important Notes for Global Tool Servers:
+
+- They will not show up in the tool indicator popup until enabled from the ➕ menu.
+- Each global tool must be individually toggled on to become active inside your current chat.
+- Once toggled on, they function the same way as user tools.
+- Admins can control access to global tools via role-based permissions.
+
+This is ideal for team setups or shared environments, where commonly-used tools (e.g. document search, memory, or web lookup) should be centrally accessible by multiple users.
 
 ---
 
