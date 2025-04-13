@@ -604,6 +604,12 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
 
+#### `PASS_HEADERS_TO_TOOL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Passes the request headers from the user to the tool as the function variable "headers" (type: dict). This is useful when used in conjunction with `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` to identify which user is making the request to the tool.
+
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
 - Type: `bool`
