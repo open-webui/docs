@@ -49,6 +49,32 @@ Next, connect your running tool server to Open WebUI:
 
 ![Settings Page](/images/openapi-servers/open-webui/settings.png)
 
+### 🧑‍💻 User Tool Servers vs. 🛠️ Global Tool Servers
+
+There are two ways to register tool servers in Open WebUI:
+
+#### 1. User Tool Servers (added via regular Settings)
+
+- Only accessible to the user who registered the tool server.
+- The connection is made directly from the backend (server-side) on behalf of that user.
+- Perfect for personal workflows or when testing custom/local tools.
+
+#### 2. Global Tool Servers (added via Admin Settings)
+
+Admins can manage shared tool servers available to all or selected users across the entire deployment:
+
+- Go to 🛠️ **Admin Settings > Tools**.
+- Add the tool server URL just as you would in user settings.
+- These tools are treated similarly to Open WebUI’s built-in tools.
+
+![Global Tool Server Message Input](/images/openapi-servers/open-webui/global-message-input.png)
+
+⚠️ Important:
+
+- By default, global tool servers are not activated — each one must be toggled ON explicitly before becoming available.
+- Once enabled, global tool servers are accessible by all users (or can be limited based on role-based access features).
+
+This is ideal for team setups or shared environments, where commonly-used tools (e.g. document search, memory, or web lookup) should be centrally accessible by multiple users.
 
 
 ### 👉 Optional: Using a Config File with mcpo
