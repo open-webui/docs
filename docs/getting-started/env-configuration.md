@@ -1232,7 +1232,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Type: `str`
 - Default: `safe_web`
 - Description: Specifies the loader to use for retrieving and processing web content. Options include:
-  - `safe_web` - Uses the `requests` module with enhanced error handling.
+  - '' - Uses the `requests` module with enhanced error handling.
   - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
