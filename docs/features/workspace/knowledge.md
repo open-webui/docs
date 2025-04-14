@@ -29,7 +29,7 @@ Some examples of what you might store in Knowledge:
 
 ### How to Use Knowledge in Chats
 
-Accessing stored Knowledge in your chats is easy! By simply referencing what’s saved(using '#' before the name), Open WebUI can pull in data or follow specific guidelines that you’ve set up in the Knowledge section.
+Accessing stored Knowledge in your chats is easy! By simply referencing what’s saved (using '#' before the name), Open WebUI can pull in data or follow specific guidelines that you’ve set up in the Knowledge section.
 
 For example:
 
