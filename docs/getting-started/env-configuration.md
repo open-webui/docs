@@ -604,14 +604,14 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
 
-#### `ENABLE_RAG_LOCAL_WEB_FETCH`
+#### `ENABLE_LOCAL_WEB_FETCH`
 
 - Type: `bool`
 - Default: `False`
 - Description: Enables local web fetching for RAG. Enabling this allows Server Side Request
 Forgery attacks against local network resources.
 
-#### `ENABLE_RAG_WEB_LOADER_SSL_VERIFICATION`
+#### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
 - Type: `bool`
 - Default: `True`
@@ -1171,7 +1171,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 
 ## Web Search
 
-#### `ENABLE_RAG_WEB_SEARCH`
+#### `ENABLE_WEB_SEARCH`
 
 - Type: `bool`
 - Default: `False`
@@ -1185,28 +1185,28 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Enables or disables search query generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_WEB_SEARCH_TRUST_ENV`
+#### `WEB_SEARCH_TRUST_ENV`
 
 - Type: `bool`
 - Default: `False`
 - Description: Enables proxy set by `http_proxy` and `https_proxy` during web search content fetching.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_WEB_SEARCH_RESULT_COUNT`
+#### `WEB_SEARCH_RESULT_COUNT`
 
 - Type: `int`
 - Default: `3`
 - Description: Maximum number of search results to crawl.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_WEB_SEARCH_CONCURRENT_REQUESTS`
+#### `WEB_SEARCH_CONCURRENT_REQUESTS`
 
 - Type: `int`
 - Default: `10`
 - Description: Number of concurrent requests to crawl web pages returned from search results.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_WEB_SEARCH_ENGINE`
+#### `WEB_SEARCH_ENGINE`
 
 - Type: `str` (enum: `searxng`, `google_pse`, `brave`, `kagi`, `mojeek`, `serpstack`, `serper`, `serply`, `searchapi`, `duckduckgo`, `tavily`, `jina`, `bing`)
 - Options:
@@ -1227,7 +1227,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 
 ### Web Loader Configuration
 
-#### `RAG_WEB_LOADER_ENGINE`
+#### `WEB_LOADER_ENGINE`
 
 - Type: `str`
 - Default: `safe_web`
@@ -1244,7 +1244,7 @@ When using `playwright`, you have two options:
 
 :::
 
-#### `PLAYWRIGHT_WS_URI`
+#### `PLAYWRIGHT_WS_URL`
 
 - Type: `str`
 - Default: `None`
@@ -1253,7 +1253,7 @@ When using `playwright`, you have two options:
 
 :::tip
 
-Using a remote Playwright browser via `PLAYWRIGHT_WS_URI` can be beneficial for:
+Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Reducing the size of the Open WebUI container
 - Using a different browser other than the default Chromium
 - Connecting to a non-headless (GUI) browser
