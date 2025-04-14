@@ -1169,6 +1169,12 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Type: `str`
 - Description: Sets the URI for Qdrant.
 
+#### `QDRANT_ON_DISK`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enable the usage of memmap(also known as on-disk) storage
+
 ## Web Search
 
 #### `ENABLE_WEB_SEARCH`
