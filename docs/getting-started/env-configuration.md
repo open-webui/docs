@@ -13,11 +13,11 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up to date with Open WebUI release version [v0.6.5](https://github.com/open-webui/open-webui/releases/tag/v0.6.5), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.5](https://github.com/open-webui/open-webui/releases/tag/v0.6.5), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
-### Important Note on PersistentConfig Environment Variables
+### Important Note on `PersistentConfig` Environment Variables
 
 :::note
 
@@ -38,7 +38,7 @@ Please note that `PersistentConfig` environment variables are clearly marked as 
 The following environment variables are used by `backend/open_webui/config.py` to provide Open WebUI startup
 configuration. Please note that some variables may have different default values depending on
 whether you're running Open WebUI directly or via Docker. For more information on logging
-environment variables, see our [logging documentation](https://docs.openwebui.com/getting-started/advanced-topics/logging)).
+environment variables, see our [logging documentation](https://docs.openwebui.com/getting-started/advanced-topics/logging).
 
 ### General
 
@@ -62,7 +62,7 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 
 - Type: `bool`
 - Default: `True`
-- Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
+- Description: Toggles email, password, sign-in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::danger
@@ -82,7 +82,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 #### `DEFAULT_MODELS`
 
 - Type: `str`
-- Default: Empty string (' '), since `None` .
+- Default: Empty string (' '), since `None`.
 - Description: Sets a default Language Model.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -146,7 +146,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `str`
 - Options:
-  - `dev` - Enables the FastAPI API docs on `/docs`
+  - `dev` - Enables the FastAPI API documentation on `/docs`
   - `prod` - Automatically configures several environment variables
 - Default:
   - **Backend Default**: `dev`
@@ -208,7 +208,7 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 
 - Type: `list` of `dict`
 - Default: `[]`
-- Description: List of banners to show to users. Format of banners are:
+- Description: List of banners to show to users. The format for banners are:
 
 ```json
 [{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
@@ -237,7 +237,7 @@ for local Whisper and embeddings.
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
-- Description: When defined as a fully qualified URL (e.g. https://path/to/manifest.webmanifest), requests sent to /manifest.json will use the external manifest file. When not defined, the default manifest.json file will be used.
+- Description: When defined as a fully qualified URL (e.g., https://path/to/manifest.webmanifest), requests sent to /manifest.json will use the external manifest file. When not defined, the default manifest.json file will be used.
 
 #### `ENABLE_TITLE_GENERATION`
 
@@ -266,7 +266,7 @@ for local Whisper and embeddings.
 
 - Type: `int`
 - Default: `300`
-- Description: Specifies the timeout duration in seconds for the aiohttp client. This impacts things
+- Description: Specifies the timeout duration in seconds for the AIOHTTP client. This impacts things
 such as connections to Ollama and OpenAI endpoints.
 
 :::info
@@ -284,7 +284,7 @@ allowing the client to wait indefinitely.
 - Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
 :::note
-The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped depending on your network conditions.
+The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped, depending on your network conditions.
 :::
 
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
@@ -583,7 +583,7 @@ The format for the JSON response is strictly:
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the timeout for Jupyter code interpreter.
+- Description: Specifies the timeout for the Jupyter code interpreter.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Direct Connections (OpenAPI/MCPO Tool Servers)
@@ -620,7 +620,7 @@ When enabling `ENABLE_AUTOCOMPLETE_GENERATION`, ensure that you also configure `
 #### `AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: The value of the `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE` environment variable.
 
 `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`:
 
@@ -699,7 +699,7 @@ Output:
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables tags generation.
+- Description: Enables or disables tag generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `TAGS_GENERATION_PROMPT_TEMPLATE`
@@ -729,7 +729,7 @@ JSON format: { "tags": ["tag1", "tag2", "tag3"] }
 </chat_history>
 ```
 
-- Description: Sets the prompt template for tags generation.
+- Description: Sets the prompt template for tag generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### API Key Endpoint Restrictions
@@ -773,7 +773,7 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, id, email, and role) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user information (name, ID, email, and role) as X-headers to OpenAI API and Ollama API.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
@@ -856,7 +856,7 @@ If the value is not set, `WEBUI_SESSION_COOKIE_SECURE` will be used as a fallbac
 If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
 important to note that turning off authentication is only possible for fresh installations without
 any existing users. If there are already users registered, you cannot disable authentication
-directly. Ensure that no users are present in the database, if you intend to turn off `WEBUI_AUTH`.
+directly. Ensure that no users are present in the database if you intend to turn off `WEBUI_AUTH`.
 
 :::
 
@@ -869,7 +869,7 @@ directly. Ensure that no users are present in the database, if you intend to tur
 
 :::info
 
-When deploying Open-WebUI in a multiple node cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes. 
+When deploying Open-WebUI in a multiple-node cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
 
 :::
 
@@ -901,13 +901,13 @@ When deploying Open-WebUI in a multiple node cluster with a load balancer, you m
 
 - Type: `bool`
 - Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own modeling files.
+- Description: Determines whether to allow custom models defined on the Hub in their own modeling files.
 
 #### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
 - Default: `False`
-- Description: Determines whether or not to allow custom models defined on the Hub in their own
+- Description: Determines whether to allow custom models defined on the Hub in their own.
 modeling files for reranking.
 
 #### `RAG_EMBEDDING_MODEL_AUTO_UPDATE`
@@ -960,7 +960,7 @@ modeling files for reranking.
 #### `CHROMA_HTTP_HEADERS`
 
 - Type: `str`
-- Description: Comma-separated list of HTTP headers to include with every ChromaDB request.
+- Description: A comma-separated list of HTTP headers to include with every ChromaDB request.
 - Example: `Authorization=Bearer heuhagfuahefj,User-Agent=OpenWebUI`.
 
 #### `CHROMA_HTTP_SSL`
@@ -972,7 +972,7 @@ modeling files for reranking.
 #### `CHROMA_CLIENT_AUTH_PROVIDER`
 
 - Type: `str`
-- Description: Specifies auth provider for remote ChromaDB Server.
+- Description: Specifies an authentication provider for remote ChromaDB Server.
 - Example: `chromadb.auth.basic_authn.BasicAuthClientProvider`
 
 #### `CHROMA_CLIENT_AUTH_CREDENTIALS`
@@ -999,7 +999,7 @@ modeling files for reranking.
 
 #### `ELASTICSEARCH_CLOUD_ID`
 
-- Type: `str
+- Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the Elasticsearch cloud ID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -1044,13 +1044,13 @@ modeling files for reranking.
 
 - Type: `str`
 - Default: `default`
-- Description: Specifies the database to connect to within a milvus instance
+- Description: Specifies the database to connect to within a Milvus instance.
 
 #### `MILVUS_TOKEN`
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the connection token for Milvus, optional.
+- Description: Specifies an optional connection token for Milvus.
 
 ### OpenSearch
 
@@ -1087,7 +1087,7 @@ modeling files for reranking.
 #### `PGVECTOR_DB_URL`
 
 - Type: `str`
-- Default: The value of `DATABASE_URL` environment variable
+- Default: The value of the `DATABASE_URL` environment variable
 - Description: Sets the database URL for model storage.
 
 #### `PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH`
@@ -1246,13 +1246,13 @@ Provide a clear and direct response to the user's query, including inline citati
 
 - Type: `str`
 - Default: `{CACHE_DIR}/tiktoken`
-- Description: Sets the directory for TikiToken cache.
+- Description: Sets the directory for TikToken cache.
 
 #### `TIKTOKEN_ENCODING_NAME`
 
 - Type: `str`
 - Default: `cl100k_base`
-- Description: Sets the encoding name for TikiToken.
+- Description: Sets the encoding name for TikToken.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `CHUNK_SIZE`
@@ -1407,27 +1407,27 @@ Strictly return in JSON format:
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables local web fetch for RAG.
-- Persistence: This environment variable is a `PersistentConfig` variable, but appears to be a string.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
 
 - Type: 
 - Default: `None`
-- Description: Specifies the prefix for RAG embedding content.
+- Description: Specifies the prefix for the RAG embedding content.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
 
 - Type: 
 - Default: `None`
-- Description: Specifies the field name for RAG embedding prefix.
+- Description: Specifies the field name for the RAG embedding prefix.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_QUERY_PREFIX`
 
 - Type: 
 - Default: `None`
-- Description: Specifies the prefix for RAG embedding query.
+- Description: Specifies the prefix for the RAG embedding query.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_FULL_CONTEXT`
@@ -1813,7 +1813,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `str`
 - Options:
-  - Leave empty to use built-in local Whisper engine for Speech-to-Text.
+  - Leave empty to use the built-in local Whisper engine for Speech-to-Text.
   - `openai` - Uses OpenAI engine for Speech-to-Text.
   - `deepgram`- Uses Deepgram engine for Speech-to-Text.
   - `azure` Uses Azure engine for Speech-to-Text.
@@ -1885,7 +1885,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `str`
 - Options:
-  - Leave empty to use built-in WebAPI engine for Text-to-Speech.
+  - Leave empty to use the built-in WebAPI engine for Text-to-Speech.
   - `azure` - Uses Azure engine for Text-to-Speech.
   - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech
   - `openai` - Uses OpenAI engine for Text-to-Speech.
@@ -1952,7 +1952,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Options:
   - `openai` - Uses OpenAI DALL-E for image generation.
   - `comfyui` - Uses ComfyUI engine for image generation.
-  - `automatic1111` - Uses Automatic1111 engine for image generation.
+  - `automatic1111` - Uses AUTOMATIC1111 engine for image generation.
   - `gemini` - Uses Gemini for image generation.
 - Default: `openai`
 - Description: Specifies the engine to use for image generation.
@@ -2028,31 +2028,31 @@ Strictly return in JSON format:
 #### `AUTOMATIC1111_BASE_URL`
 
 - Type: `str`
-- Description: Specifies the URL to Automatic1111's Stable Diffusion API.
+- Description: Specifies the URL to AUTOMATIC1111's Stable Diffusion API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATIC1111_API_AUTH`
 
 - Type: `str`
-- Description: Sets the Automatic1111 API authentication.
+- Description: Sets the AUTOMATIC1111 API authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATIC1111_CFG_SCALE`
 
 - Type: `float`
-- Description: Sets the scale for Automatic1111 inference.
+- Description: Sets the scale for AUTOMATIC1111 inference.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATIC1111_SAMPLER`
 
 - Type: `str`
-- Description: Sets the sampler for Automatic1111 inference.
+- Description: Sets the sampler for AUTOMATIC1111 inference.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATIC1111_SCHEDULER`
 
 - Type: `str`
-- Description: Sets the scheduler for Automatic1111 inference.
+- Description: Sets the scheduler for AUTOMATIC1111 inference.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### ComfyUI
@@ -2239,7 +2239,7 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables account creation when sighting up via OAuth. Distinct from `ENABLE_SIGNUP`.
+- Description: Enables account creation when signing up via OAuth. Distinct from `ENABLE_SIGNUP`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::danger
@@ -2334,20 +2334,20 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Description: Sets the redirect URI for Microsoft OAuth
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### Github
+### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 
 #### `GITHUB_CLIENT_ID`
 
 - Type: `str`
-- Description: Sets the client ID for Github OAuth
+- Description: Sets the client ID for GitHub OAuth
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GITHUB_CLIENT_SECRET`
 
 - Type: `str`
-- Description: Sets the client secret for Github OAuth
+- Description: Sets the client secret for GitHub OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GITHUB_CLIENT_SCOPE`
@@ -2361,7 +2361,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 - Type: `str`
 - Default: `<backend>/oauth/github/callback`
-- Description: Sets the redirect URI for Github OAuth
+- Description: Sets the redirect URI for GitHub OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### OpenID (OIDC)
@@ -2402,7 +2402,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the code challenge method for OAUTH authentication.
+- Description: Specifies the code challenge method for OAuth authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_PROVIDER_NAME`
@@ -2437,21 +2437,21 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 - Type: `str`
 - Default: `groups`
-- Description: Specifies the group claim for OAUTH authentication.
+- Description: Specifies the group claim for OAuth authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_OAUTH_ROLE_MANAGEMENT`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables role management to oauth delegation.
+- Description: Enables role management for OAuth delegation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_OAUTH_GROUP_MANAGEMENT`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables OAUTH group management.
+- Description: Enables or disables OAuth group management.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_ROLES_CLAIM`
@@ -2479,7 +2479,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 - Type: `str`
 - Default: `*`
-- Description: Specifies the allowed domains for OAUTH authentication. (e.g. "example1.com,example2.com").
+- Description: Specifies the allowed domains for OAuth authentication. (e.g. "example1.com,example2.com").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## LDAP
@@ -2494,21 +2494,22 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `LDAP_SERVER_LABEL`
 
 - Type: `str`
-- Description: Sets the label of LDAP server.
+- Description: Sets the label of the LDAP server.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
 
 #### `LDAP_SERVER_HOST`
 
 - Type: `str`
 - Default: `localhost`
-- Description: Sets the hostname of LDAP server.
+- Description: Sets the hostname of the LDAP server.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_SERVER_PORT`
 
 - Type: `int`
 - Default: `389`
-- Description: Sets the port number of LDAP server.
+- Description: Sets the port number of the LDAP server.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_MAIL`
@@ -2520,19 +2521,19 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `LDAP_ATTRIBUTE_FOR_USERNAME`
 
 - Type: `str`
-- Description: Sets the attribute to use as username for LDAP authentication.
+- Description: Sets the attribute to use as a username for LDAP authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_APP_DN`
 
 - Type: `str`
-- Description: Sets the distinguished name for LDAP application.
+- Description: Sets the distinguished name for the LDAP application.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_APP_PASSWORD`
 
 - Type: `str`
-- Description: Sets the password for LDAP application.
+- Description: Sets the password for the LDAP application.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_SEARCH_BASE`
@@ -2564,7 +2565,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `LDAP_CA_CERT_FILE`
 
 - Type: `str`
-- Description: Sets the path to LDAP CA certificate file.
+- Description: Sets the path to the LDAP CA certificate file.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_CIPHERS`
@@ -2661,14 +2662,14 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 - Type: `str`
 - Default: 'True'
-- Description: Enables or disables user permission to use web search feature.
+- Description: Enables or disables user permission to use the web search feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_IMAGE_GENERATION`
 
 - Type: `str`
 - Default: 'True'
-- Description: Enables or disables user permission to use image generation feature.
+- Description: Enables or disables user permission to use the image generation feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`
@@ -2746,9 +2747,9 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Options:
-  - `s3` - uses S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
-  - `gcs` - uses GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
-  - `azure` - uses Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
+  - `s3` - uses the S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
+  - `gcs` - uses the GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
+  - `azure` - uses the Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
 
@@ -2803,7 +2804,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Contents of Google Application Credentials JSON file.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Google Metadata server if run on a Google Compute Engine.
-  - File can be generated for a service account following this [guide](https://developers.google.com/workspace/guides/create-credentials#service-account)
+  - A file can be generated for a service account following this [guide.](https://developers.google.com/workspace/guides/create-credentials#service-account)
 
 #### `GCS_BUCKET_NAME`
 
@@ -2839,7 +2840,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 :::info
 
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on URL scheme available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
 :::
 
@@ -2891,7 +2892,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `str`
 - Example: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for app state.
+- Description: Specifies the URL of the Redis instance for the app-state.
 
 :::info
 
@@ -2938,7 +2939,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 
 - Type: `str`
 - Default: `${REDIS_URL}`
-- Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice it is recommend to set both.
+- Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
 
 :::info
 
