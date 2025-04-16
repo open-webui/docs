@@ -1007,7 +1007,7 @@ modeling files for reranking.
 #### `ELASTICSEARCH_INDEX_PREFIX`
 
 - Type: `str`
-- Default: `'open_webui_collections'`
+- Default: `open_webui_collections`
 - Description: Specifies the prefix for the Elasticsearch index.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1021,7 +1021,7 @@ modeling files for reranking.
 #### `ELASTICSEARCH_URL`
 
 - Type: `str`
-- Default: `'https://localhost:9200'`
+- Default: `https://localhost:9200`
 - Description: Specifies the URL for the Elasticsearch instance.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1384,7 +1384,7 @@ Strictly return in JSON format:
 #### `BYPASS_EMBEDDING_AND_RETRIEVAL`
 
 - Type: `bool`
-- Default: `'os.environ.get('BYPASS_EMBEDDING_AND_RETRIEVAL', 'False').lower() == 'true'`
+- Default: `False`
 - Description: Bypasses the embedding and retrieval process.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1433,7 +1433,7 @@ Strictly return in JSON format:
 #### `RAG_FULL_CONTEXT`
 
 - Type: `bool`
-- Default: `'os.getenv('RAG_FULL_CONTEXT', 'False').lower() == 'true'`
+- Default: `False`
 - Description: Specifies whether to use the full context for RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1544,7 +1544,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
 - Type: `bool`
-- Default: `'os.getenv('BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL', 'False').lower() == 'true'`
+- Default: `False`
 - Description: Bypasses the web search embedding and retrieval process.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2793,7 +2793,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 #### `S3_USE_ACCELERATE_ENDPOINT`
 
 - Type: `str`
-- Default: `'False'`
+- Default: `False`
 - Description: Specifies whether to use the accelerated endpoint for S3 storage.
 
 #### Google Cloud Storage
