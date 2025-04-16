@@ -42,8 +42,6 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 
 ### General
 
-### Open WebUI
-
 #### `WEBUI_URL`
 
 - Type: `str`
