@@ -1093,7 +1093,7 @@ modeling files for reranking.
 #### `PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH`
 
 - Type: `str`
-- Default: '1536'
+- Default: `1536`
 - Description: Specifies the maximum vector length for PGVector initialization.
 
 ### Qdrant
@@ -1692,7 +1692,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `TAVILY_EXTRACT_DEPTH`
 
 - Type: `str`
-- Default: 'basic'
+- Default: `basic`
 - Description: Specifies the extract depth for Tavily search results.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1737,7 +1737,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `FIRECRAWL_API_BASE_URL`
 
 - Type: `str`
-- Default: 'https://api.firecrawl.dev'
+- Default: `https://api.firecrawl.dev`
 - Description: Sets the base URL for Firecrawl API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2582,7 +2582,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `USER_PERMISSIONS_CHAT_CONTROLS`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to access chat controls.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2610,28 +2610,28 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `USER_PERMISSIONS_CHAT_STT`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to use Speech-to-Text in chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_CHAT_TTS`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to use Text-to-Speech in chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_CHAT_CALL`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to make calls in chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to use multiple models in chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2645,7 +2645,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
 
 - Type: `str`
-- Default: 'False'
+- Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2654,28 +2654,28 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
 
 - Type: `str`
-- Default: 'False'
+- Default: `False`
 - Description: Enables or disables user permission to access direct tool servers.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_WEB_SEARCH`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to use the web search feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_IMAGE_GENERATION`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to use the image generation feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`
 
 - Type: `str`
-- Default: 'True'
+- Default: `True`
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2712,28 +2712,28 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
-- Default: 'False'
+- Default: `False`
 - Description: Enables or disables public sharing of workspace models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
-- Default: 'False'
+- Default: `False`
 - Description: Enables or disables public sharing of workspace knowledge.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
-- Default: 'False'
+- Default: `False`
 - Description: Enables or disables public sharing of workspace prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
-- Default: 'False'
+- Default: `False`
 - Description: Enables or disables public sharing of workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
