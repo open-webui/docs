@@ -1469,7 +1469,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 #### `ENABLE_ONEDRIVE_INTEGRATION`
 
 - Type: `bool`
-- Default: `os.getenv('ENABLE_ONEDRIVE_INTEGRATION', 'False').lower() == 'true'`
+- Default: `False`
 - Description: Enables or disables OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1797,7 +1797,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `WHISPER_VAD_FILTER`
 
 - Type: `bool`
-- Default: `os.getenv('WHISPER_VAD_FILTER', 'False').lower() == 'true'`
+- Default: `False`
 - Description: Specifies whether to apply a Voice Activity Detection (VAD) filter to Whisper Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
