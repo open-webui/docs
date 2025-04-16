@@ -125,7 +125,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 #### `ENABLE_USER_WEBHOOKS`
 
 - Type: `bool`
-- Default: `os.environ.get('ENABLE_USER_WEBHOOKS', 'True').lower() == 'true'`
+- Default: `True`
 - Description: Enables or disables user webhooks.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -242,7 +242,7 @@ for local Whisper and embeddings.
 #### `ENABLE_TITLE_GENERATION`
 
 - Type: `bool`
-- Default: `os.environ.get('ENABLE_TITLE_GENERATION', 'True').lower() == 'true'`
+- Default: `True`
 - Description: Enables or disables chat title generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -482,7 +482,7 @@ The format for the JSON response is strictly:
 #### `ENABLE_CODE_EXECUTION`
 
 - Type: `bool`
-- Default: `os.environ.get('ENABLE_CODE_EXECUTION', 'True').lower() == 'true'`
+- Default: `True`
 - Description: Enables or disables code execution.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -533,7 +533,7 @@ The format for the JSON response is strictly:
 #### `ENABLE_CODE_INTERPRETER`
 
 - Type: `bool`
-- Default: `os.environ.get('ENABLE_CODE_INTERPRETER', 'True').lower() == 'true'`
+- Default: `True`
 - Description: Enables or disables code interpreter.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -591,7 +591,7 @@ The format for the JSON response is strictly:
 #### `ENABLE_DIRECT_CONNECTIONS`
 
 - Type: `bool`
-- Default: `os.environ.get('ENABLE_DIRECT_CONNECTIONS', 'True').lower() == 'true'`
+- Default: `True`
 - Description: Enables or disables direct connections.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1968,7 +1968,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `ENABLE_IMAGE_PROMPT_GENERATION`
 
 - Type: `bool`
-- Default: `os.environ.get('ENABLE_IMAGE_PROMPT_GENERATION', 'true').lower() == 'true'`
+- Default: `True`
 - Description: Enables or disables image prompt generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
