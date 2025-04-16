@@ -249,7 +249,7 @@ for local Whisper and embeddings.
 #### `LICENSE_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the license key to use (for Enterprise users only).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -496,28 +496,28 @@ The format for the JSON response is strictly:
 #### `CODE_EXECUTION_JUPYTER_URL`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Jupyter URL to use for code execution.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `CODE_EXECUTION_JUPYTER_AUTH`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Jupyter authentication method to use for code execution.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `CODE_EXECUTION_JUPYTER_AUTH_TOKEN`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Jupyter authentication token to use for code execution.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `CODE_EXECUTION_JUPYTER_AUTH_PASSWORD`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Jupyter authentication password to use for code execution.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -547,7 +547,7 @@ The format for the JSON response is strictly:
 #### `CODE_INTERPRETER_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the prompt template to use for code interpreter.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1125,7 +1125,7 @@ modeling files for reranking.
 #### `MISTRAL_OCR_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Mistral OCR API key to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1391,14 +1391,14 @@ Strictly return in JSON format:
 #### `DOCUMENT_INTELLIGENCE_ENDPOINT`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the endpoint for document intelligence.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DOCUMENT_INTELLIGENCE_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the key for document intelligence.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1476,7 +1476,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 #### `ONEDRIVE_CLIENT_ID`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the client ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1650,42 +1650,42 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `BOCHA_SEARCH_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the API key for Bocha Search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `EXA_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the API key for Exa search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `SERPAPI_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the API key for SerpAPI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `SERPAPI_ENGINE`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the search engine to use for SerpAPI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `SOUGOU_API_SID`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the Sogou API SID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `SOUGOU_API_SK`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the Sogou API SK.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1744,14 +1744,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `FIRECRAWL_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the API key for Firecrawl API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PERPLEXITY_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the API key for Perplexity API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1846,21 +1846,21 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `AUDIO_STT_AZURE_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Azure API key to use for Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUDIO_STT_AZURE_REGION`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Azure region to use for Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUDIO_STT_AZURE_LOCALES`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the locales to use for Azure Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1869,7 +1869,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `DEEPGRAM_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the Deepgram API key to use for Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1975,7 +1975,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the template to use for generating image prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2192,14 +2192,14 @@ Strictly return in JSON format:
 #### `GEMINI_API_BASE_URL`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Specifies the URL to Gemini's API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GEMINI_API_KEY`
 
 - Type: `str`
-- Default: ''
+- Default: `None`
 - Description: Sets the Gemini API key.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
