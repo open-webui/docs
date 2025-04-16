@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up to date with Open WebUI release version [v0.5.1](https://github.com/open-webui/open-webui/releases/tag/v0.5.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up to date with Open WebUI release version [v0.6.5](https://github.com/open-webui/open-webui/releases/tag/v0.6.5), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -42,9 +42,109 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 
 ### General
 
+### Open WebUI
+
+#### `WEBUI_URL`
+
+- Type: `str`
+- Default: `http://localhost:3000`
+- Description: Specifies the URL where the Open WebUI is reachable. Currently used for search engine support.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_SIGNUP`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles user account creation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_LOGIN_FORM`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::danger
+
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration/#enable_oauth_signup)
+is also being used and set to `True`. Failure to do so will result in the inability to login.
+
+:::
+
+#### `DEFAULT_LOCALE`
+
+- Type: `str`
+- Default: `en`
+- Description: Sets the default locale for the application.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `DEFAULT_MODELS`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` .
+- Description: Sets a default Language Model.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `DEFAULT_USER_ROLE`
+
+- Type: `str`
+- Options:
+  - `pending` - New users are pending until their accounts are manually activated by an admin.
+  - `user` - New users are automatically activated with regular user permissions.
+  - `admin` - New users are automatically activated with administrator permissions.
+- Default: `pending`
+- Description: Sets the default role assigned to new users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_CHANNELS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables channel support.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `WEBHOOK_URL`
+
+- Type: `str`
+- Description: Sets a webhook for integration with Discord/Slack/Microsoft Teams.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_ADMIN_EXPORT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether admin users can export data.
+
+#### `ENABLE_ADMIN_CHAT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables admin users to access all chats.
+
+#### `ENABLE_USER_WEBHOOKS`
+
+- Type: `bool`
+- Default: `os.environ.get('ENABLE_USER_WEBHOOKS', 'True').lower() == 'true'`
+- Description: Enables or disables user webhooks.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SHOW_ADMIN_DETAILS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles whether to show admin user details in the interface.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ADMIN_EMAIL`
+
+- Type: `str`
+- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `ENV`
 
-- Type: `str` (enum: `dev`, `prod`)
+- Type: `str`
 - Options:
   - `dev` - Enables the FastAPI API docs on `/docs`
   - `prod` - Automatically configures several environment variables
@@ -70,13 +170,6 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 - Default: `Open WebUI`
 - Description: Sets the main WebUI name. Appends `(Open WebUI)` if overridden.
 
-#### `WEBUI_URL`
-
-- Type: `str`
-- Default: `http://localhost:3000`
-- Description: Specifies the URL where the Open WebUI is reachable. Currently used for search engine support.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 #### `PORT`
 
 - Type: `int`
@@ -93,101 +186,17 @@ open-webui serve --port 9999
 This will run the Open WebUI on port `9999`. The `PORT` environment variable is disregarded in this mode.
 :::
 
-#### `ENABLE_SIGNUP`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles user account creation.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `ENABLE_LOGIN_FORM`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles email, password, sign in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-:::danger
-
-This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration/#enable_oauth_signup)
-is also being used and set to `True`. Failure to do so will result in the inability to login.
-
-:::
-
 #### `ENABLE_REALTIME_CHAT_SAVE`
 
 - Type: `bool`
 - Default: `False`
 - Description: When enabled, the system saves each chunk of streamed chat data to the database in real time to ensure maximum data persistency. This feature provides robust data recovery and allows accurate session tracking. However, the tradeoff is increased latency, as saving to the database introduces a delay. Disabling this feature can improve performance and reduce delays, but it risks potential data loss in the event of a system failure or crash. Use based on your application's requirements and acceptable tradeoffs.
 
-#### `ENABLE_ADMIN_EXPORT`
-
-- Type: `bool`
-- Default: `True`
-- Description: Controls whether admin users can export data.
-
-#### `ENABLE_ADMIN_CHAT_ACCESS`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables admin users to access all chats.
-
-#### `ENABLE_CHANNELS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables channel support.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `ADMIN_EMAIL`
-
-- Type: `str`
-- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `SHOW_ADMIN_DETAILS`
-
-- Type: `bool`
-- Default: `True`
-- Description: Toggles whether to show admin user details in the interface.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 #### `BYPASS_MODEL_ACCESS_CONTROL`
 
 - Type: `bool`
 - Default: `False`
 - Description: Bypasses model access control.
-
-#### `DEFAULT_MODELS`
-
-- Type: `str`
-- Default: empty string (' '), since `None` is set as default
-- Description: Sets a default Language Model.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `DEFAULT_USER_ROLE`
-
-- Type: `str` (enum: `pending`, `user`, `admin`)
-- Options:
-  - `pending` - New users are pending until their accounts are manually activated by an admin.
-  - `user` - New users are automatically activated with regular user permissions.
-  - `admin` - New users are automatically activated with administrator permissions.
-- Default: `pending`
-- Description: Sets the default role assigned to new users.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `DEFAULT_LOCALE`
-
-- Type: `str`
-- Default: `en`
-- Description: Sets the default locale for the application.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `WEBHOOK_URL`
-
-- Type: `str`
-- Description: Sets a webhook for integration with Discord/Slack/Microsoft Teams.
-- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -217,13 +226,6 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 :::
 
-#### `JWT_EXPIRES_IN`
-
-- Type: `int`
-- Default: `-1`
-- Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 #### `USE_CUDA_DOCKER`
 
 - Type: `bool`
@@ -234,8 +236,29 @@ for local Whisper and embeddings.
 #### `EXTERNAL_PWA_MANIFEST_URL`
 
 - Type: `str`
-- Default: empty string (' '), since `None` is set as default
+- Default: Empty string (' '), since `None` is set as default.
 - Description: When defined as a fully qualified URL (e.g. https://path/to/manifest.webmanifest), requests sent to /manifest.json will use the external manifest file. When not defined, the default manifest.json file will be used.
+
+#### `ENABLE_TITLE_GENERATION`
+
+- Type: `bool`
+- Default: `os.environ.get('ENABLE_TITLE_GENERATION', 'True').lower() == 'true'`
+- Description: Enables or disables chat title generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LICENSE_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the license key to use (for Enterprise users only).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SSL_ASSERT_FINGERPRINT`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the SSL assert fingerprint to use.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### AIOHTTP Client
 
@@ -392,7 +415,7 @@ when using OpenAI-compatible endpoints.
 - Description: Prompt to use when generating chat titles.
 - Default: The value of `DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE` environment variable.
 
-Template:
+`DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE`:
 
 ```
 ### Task:
@@ -425,12 +448,151 @@ JSON format: { "title": "your concise title here" }
 - Description: Prompt to use when calling tools.
 - Default: The value of `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` environment variable.
 
-Template:
+`DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`:
 
 ```
-Available Tools: {{TOOLS}}\nReturn an empty string if no tools match the query. If a function tool matches, construct and return a JSON object in the format {\"name\": \"functionName\", \"parameters\": {\"requiredFunctionParamKey\": \"requiredFunctionParamValue\"}} using the appropriate tool and its parameters. Only return the object and limit the response to the JSON object without additional text.
+Available Tools: {{TOOLS}}
+
+Your task is to choose and return the correct tool(s) from the list of available tools based on the query. Follow these guidelines:
+
+- Return only the JSON object, without any additional text or explanation.
+
+- If no tools match the query, return an empty array: 
+   {
+     "tool_calls": []
+   }
+
+- If one or more tools match the query, construct a JSON response containing a "tool_calls" array with objects that include:
+   - "name": The tool's name.
+   - "parameters": A dictionary of required parameters and their corresponding values.
+
+The format for the JSON response is strictly:
+{
+  "tool_calls": [
+    {"name": "toolName1", "parameters": {"key1": "value1"}},
+    {"name": "toolName2", "parameters": {"key2": "value2"}}
+  ]
+}
 ```
 
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Code Execution
+
+#### `ENABLE_CODE_EXECUTION`
+
+- Type: `bool`
+- Default: `os.environ.get('ENABLE_CODE_EXECUTION', 'True').lower() == 'true'`
+- Description: Enables or disables code execution.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_EXECUTION_ENGINE`
+
+- Type: `str`
+- Default: `pyodide`
+- Description: Specifies the code execution engine to use.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_EXECUTION_JUPYTER_URL`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Jupyter URL to use for code execution.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_EXECUTION_JUPYTER_AUTH`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Jupyter authentication method to use for code execution.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_EXECUTION_JUPYTER_AUTH_TOKEN`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Jupyter authentication token to use for code execution.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_EXECUTION_JUPYTER_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Jupyter authentication password to use for code execution.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_EXECUTION_JUPYTER_TIMEOUT`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the timeout for Jupyter code execution.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Code Interpreter
+
+#### `ENABLE_CODE_INTERPRETER`
+
+- Type: `bool`
+- Default: `os.environ.get('ENABLE_CODE_INTERPRETER', 'True').lower() == 'true'`
+- Description: Enables or disables code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_ENGINE`
+
+- Type: `str`
+- Default: `pyodide`
+- Description: Specifies the code interpreter engine to use.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the prompt template to use for code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_JUPYTER_URL`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the Jupyter URL to use for code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_JUPYTER_AUTH`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the Jupyter authentication method to use for code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_JUPYTER_AUTH_TOKEN`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the Jupyter authentication token to use for code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the Jupyter authentication password to use for code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_JUPYTER_TIMEOUT`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the timeout for Jupyter code interpreter.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Direct Connections (OpenAPI/MCPO Tool Servers)
+
+#### `ENABLE_DIRECT_CONNECTIONS`
+
+- Type: `bool`
+- Default: `os.environ.get('ENABLE_DIRECT_CONNECTIONS', 'True').lower() == 'true'`
+- Description: Enables or disables direct connections.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Autocomplete
@@ -460,7 +622,7 @@ When enabling `ENABLE_AUTOCOMPLETE_GENERATION`, ensure that you also configure `
 - Type: `str`
 - Default: The value of `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE` environment variable.
 
-Template:
+`DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`:
 
 ```
 ### Task:
@@ -545,7 +707,7 @@ Output:
 - Type: `str`
 - Default: The value of `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE` environment variable.
 
-Template:
+`DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE`:
 
 ```
 ### Task:
@@ -572,6 +734,13 @@ JSON format: { "tags": ["tag1", "tag2", "tag3"] }
 
 ### API Key Endpoint Restrictions
 
+#### `ENABLE_API_KEY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables API key authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `ENABLE_API_KEY_ENDPOINT_RESTRICTIONS`
 
 - Type: `bool`
@@ -591,6 +760,13 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 :::
 
+#### `JWT_EXPIRES_IN`
+
+- Type: `int`
+- Default: `-1`
+- Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## Security Variables
 
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
@@ -604,13 +780,6 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
 
-#### `ENABLE_LOCAL_WEB_FETCH`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables local web fetching for RAG. Enabling this allows Server Side Request
-Forgery attacks against local network resources.
-
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
 - Type: `bool`
@@ -620,7 +789,7 @@ Forgery attacks against local network resources.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
 
-- Type: `str` (enum: `lax`, `strict`, `none`)
+- Type: `str`
 - Options:
   - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with
 requests initiated by third-party websites.
@@ -647,7 +816,7 @@ However, a `strict` session cookie is not sent with the callback request, leadin
 
 #### `WEBUI_AUTH_COOKIE_SAME_SITE`
 
-- Type: `str` (enum: `lax`, `strict`, `none`)
+- Type: `str`
 - Options:
   - `lax` - Sets the `SameSite` attribute to lax, allowing auth cookies to be sent with
 requests initiated by third-party websites.
@@ -675,7 +844,6 @@ If the value is not set, `WEBUI_SESSION_COOKIE_SAME_SITE` will be used as a fall
 If the value is not set, `WEBUI_SESSION_COOKIE_SECURE` will be used as a fallback.
 
 :::
-
 
 #### `WEBUI_AUTH`
 
@@ -754,25 +922,232 @@ modeling files for reranking.
 - Default: `True`
 - Description: Toggles automatic update of the reranking model.
 
-#### `WHISPER_MODEL_AUTO_UPDATE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Toggles automatic update of the Whisper model.
-
-## Retrieval Augmented Generation (RAG)
+## Vector Database
 
 #### `VECTOR_DB`
 
 - Type: `str`
 - Options:
-- `chroma`, `milvus`, `qdrant`, `opensearch`, `pgvector`
+- `chroma`, `elasticsearch`, `milvus`, `qdrant`, `opensearch`, `pgvector`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
+### ChromaDB
+
+#### `CHROMA_TENANT`
+
+- Type: `str`
+- Default: The value of `chromadb.DEFAULT_TENANT` (a constant in the `chromadb` module)
+- Description: Sets the tenant for ChromaDB to use for RAG embeddings.
+
+#### `CHROMA_DATABASE`
+
+- Type: `str`
+- Default: The value of `chromadb.DEFAULT_DATABASE` (a constant in the `chromadb` module)
+- Description: Sets the database in the ChromaDB tenant to use for RAG embeddings.
+
+#### `CHROMA_HTTP_HOST`
+
+- Type: `str`
+- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set.
+
+#### `CHROMA_HTTP_PORT`
+
+- Type: `int`
+- Default: `8000`
+- Description: Specifies the port of a remote ChromaDB Server.
+
+#### `CHROMA_HTTP_HEADERS`
+
+- Type: `str`
+- Description: Comma-separated list of HTTP headers to include with every ChromaDB request.
+- Example: `Authorization=Bearer heuhagfuahefj,User-Agent=OpenWebUI`.
+
+#### `CHROMA_HTTP_SSL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether or not SSL is used for ChromaDB Server connections.
+
+#### `CHROMA_CLIENT_AUTH_PROVIDER`
+
+- Type: `str`
+- Description: Specifies auth provider for remote ChromaDB Server.
+- Example: `chromadb.auth.basic_authn.BasicAuthClientProvider`
+
+#### `CHROMA_CLIENT_AUTH_CREDENTIALS`
+
+- Type: `str`
+- Description: Specifies auth credentials for remote ChromaDB Server.
+- Example: `username:password`
+
+### Elasticsearch
+
+#### `ELASTICSEARCH_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the Elasticsearch API key.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ELASTICSEARCH_CA_CERTS`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the path to the CA certificates for Elasticsearch.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ELASTICSEARCH_CLOUD_ID`
+
+- Type: `str
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the Elasticsearch cloud ID.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ELASTICSEARCH_INDEX_PREFIX`
+
+- Type: `str`
+- Default: `'open_webui_collections'`
+- Description: Specifies the prefix for the Elasticsearch index.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ELASTICSEARCH_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the password for Elasticsearch.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ELASTICSEARCH_URL`
+
+- Type: `str`
+- Default: `'https://localhost:9200'`
+- Description: Specifies the URL for the Elasticsearch instance.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ELASTICSEARCH_USERNAME`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the username for Elasticsearch.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Milvus
+
+#### `MILVUS_URI`
+
+- Type: `str`
+- Default: `${DATA_DIR}/vector_db/milvus.db`
+- Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
+
+#### `MILVUS_DB`
+
+- Type: `str`
+- Default: `default`
+- Description: Specifies the database to connect to within a milvus instance
+
+#### `MILVUS_TOKEN`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the connection token for Milvus, optional.
+
+### OpenSearch
+
+#### `OPENSEARCH_CERT_VERIFY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenSearch certificate verification.
+
+#### `OPENSEARCH_PASSWORD`
+
+- Type: `str`
+- Description: Sets the password for OpenSearch.
+
+#### `OPENSEARCH_SSL`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables SSL for OpenSearch.
+
+#### `OPENSEARCH_URI`
+
+- Type: `str`
+- Default: `https://localhost:9200`
+- Description: Sets the URI for OpenSearch.
+
+#### `OPENSEARCH_USERNAME`
+
+- Type: `str`
+- Description: Sets the username for OpenSearch.
+
+### PGVector
+
+#### `PGVECTOR_DB_URL`
+
+- Type: `str`
+- Default: The value of `DATABASE_URL` environment variable
+- Description: Sets the database URL for model storage.
+
+#### `PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH`
+
+- Type: `str`
+- Default: '1536'
+- Description: Specifies the maximum vector length for PGVector initialization.
+
+### Qdrant
+
+#### `QDRANT_API_KEY`
+
+- Type: `str`
+- Description: Sets the API key for Qdrant.
+
+#### `QDRANT_URI`
+
+- Type: `str`
+- Description: Sets the URI for Qdrant.
+
+## RAG Content Extraction Engine
+
+#### `CONTENT_EXTRACTION_ENGINE`
+
+- Type: `str`
+- Options:
+  - Leave empty to use default
+  - `tika` - Use a local Apache Tika server
+  - `docling` - Use Docling engine
+  - `document_intelligence` - Use Document Intelligence engine
+  - `mistral_ocr` - Use Mistral OCR engine
+- Description: Sets the content extraction engine to use for document ingestion.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MISTRAL_OCR_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Mistral OCR API key to use.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `TIKA_SERVER_URL`
+
+- Type: `str`
+- Default: `http://localhost:9998`
+- Description: Sets the URL for the Apache Tika server.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `DOCLING_SERVER_URL`
+
+- Type: `str`
+- Default: `http://docling:5001`
+- Description: Specifies the URL for the Docling server.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+## Retrieval Augmented Generation (RAG)
+
 #### `RAG_EMBEDDING_ENGINE`
 
-- Type: `str` (enum: `ollama`, `openai`)
+- Type: `str`
 - Options:
   - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
   - `ollama` - Uses the Ollama API for embeddings.
@@ -793,15 +1168,6 @@ modeling files for reranking.
 - Default: `False`
 - Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using
 `sentence_transformers` models.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `CONTENT_EXTRACTION_ENGINE`
-
-- Type: `str` (`tika`)
-- Options:
-  - Leave empty to use default
-  - `tika` - Use a local Apache Tika server
-- Description: Sets the content extraction engine to use for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_TOP_K`
@@ -830,7 +1196,7 @@ modeling files for reranking.
 - Type: `str`
 - Default: The value of `DEFAULT_RAG_TEMPLATE` environment variable.
 
-Template:
+`DEFAULT_RAG_TEMPLATE`:
 
 ```
 ### Task:
@@ -869,7 +1235,9 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `RAG_TEXT_SPLITTER`
 
 - Type: `str`
-- Options: `character`, `token`
+- Options:
+  - `character`
+  - `token`
 - Default: `character`
 - Description: Sets the text splitter for RAG models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -983,7 +1351,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 - Type: `str`
 - Default: The value of `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` environment variable.
 
-Template:
+`DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE`:
 
 ```
 ### Task:
@@ -1013,63 +1381,61 @@ Strictly return in JSON format:
 - Description: Sets the prompt template for query generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### Apache Tika
+#### `BYPASS_EMBEDDING_AND_RETRIEVAL`
 
-#### `TIKA_SERVER_URL`
-
-- Type: `str`
-- Default: `http://localhost:9998`
-- Description: Sets the URL for the Apache Tika server.
+- Type: `bool`
+- Default: `'os.environ.get('BYPASS_EMBEDDING_AND_RETRIEVAL', 'False').lower() == 'true'`
+- Description: Bypasses the embedding and retrieval process.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### ChromaDB
-
-#### `CHROMA_TENANT`
+#### `DOCUMENT_INTELLIGENCE_ENDPOINT`
 
 - Type: `str`
-- Default: the value of `chromadb.DEFAULT_TENANT` (a constant in the `chromadb` module)
-- Description: Sets the tenant for ChromaDB to use for RAG embeddings.
+- Default: ''
+- Description: Specifies the endpoint for document intelligence.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `CHROMA_DATABASE`
-
-- Type: `str`
-- Default: the value of `chromadb.DEFAULT_DATABASE` (a constant in the `chromadb` module)
-- Description: Sets the database in the ChromaDB tenant to use for RAG embeddings.
-
-#### `CHROMA_HTTP_HOST`
+#### `DOCUMENT_INTELLIGENCE_KEY`
 
 - Type: `str`
-- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set.
+- Default: ''
+- Description: Specifies the key for document intelligence.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `CHROMA_HTTP_PORT`
-
-- Type: `int`
-- Default: `8000`
-- Description: Specifies the port of a remote ChromaDB Server.
-
-#### `CHROMA_HTTP_HEADERS`
-
-- Type: `str`
-- Description: Comma-separated list of HTTP headers to include with every ChromaDB request.
-- Example: `Authorization=Bearer heuhagfuahefj,User-Agent=OpenWebUI`.
-
-#### `CHROMA_HTTP_SSL`
+#### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether or not SSL is used for ChromaDB Server connections.
+- Description: Enables or disables local web fetch for RAG.
+- Persistence: This environment variable is a `PersistentConfig` variable, but appears to be a string.
 
-#### `CHROMA_CLIENT_AUTH_PROVIDER`
+#### `RAG_EMBEDDING_CONTENT_PREFIX`
 
-- Type: `str`
-- Description: Specifies auth provider for remote ChromaDB Server.
-- Example: `chromadb.auth.basic_authn.BasicAuthClientProvider`
+- Type: 
+- Default: `None`
+- Description: Specifies the prefix for RAG embedding content.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `CHROMA_CLIENT_AUTH_CREDENTIALS`
+#### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
 
-- Type: `str`
-- Description: Specifies auth credentials for remote ChromaDB Server.
-- Example: `username:password`
+- Type: 
+- Default: `None`
+- Description: Specifies the field name for RAG embedding prefix.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_EMBEDDING_QUERY_PREFIX`
+
+- Type: 
+- Default: `None`
+- Description: Specifies the prefix for RAG embedding query.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_FULL_CONTEXT`
+
+- Type: `bool`
+- Default: `'os.getenv('RAG_FULL_CONTEXT', 'False').lower() == 'true'`
+- Description: Specifies whether to use the full context for RAG.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Google Drive
 
@@ -1098,76 +1464,21 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Sets the API key for Google Drive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### Milvus
+### OneDrive
 
-#### `MILVUS_URI`
-
-- Type: `str`
-- Default: `${DATA_DIR}/vector_db/milvus.db`
-- Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
-
-#### `MILVUS_DB`
-
-- Type: `str`
-- Default: `default`
-- Description: Specifies the database to connect to within a milvus instance
-
-#### `MILVUS_TOKEN`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the connection token for Milvus, optional.
-
-
-### OpenSearch
-
-#### `OPENSEARCH_CERT_VERIFY`
+#### `ENABLE_ONEDRIVE_INTEGRATION`
 
 - Type: `bool`
-- Default: `False`
-- Description: Enables or disables OpenSearch certificate verification.
+- Default: `os.getenv('ENABLE_ONEDRIVE_INTEGRATION', 'False').lower() == 'true'`
+- Description: Enables or disables OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `OPENSEARCH_PASSWORD`
-
-- Type: `str`
-- Description: Sets the password for OpenSearch.
-
-#### `OPENSEARCH_SSL`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables SSL for OpenSearch.
-
-#### `OPENSEARCH_URI`
+#### `ONEDRIVE_CLIENT_ID`
 
 - Type: `str`
-- Default: `https://localhost:9200`
-- Description: Sets the URI for OpenSearch.
-
-#### `OPENSEARCH_USERNAME`
-
-- Type: `str`
-- Description: Sets the username for OpenSearch.
-
-### PGVector
-
-#### `PGVECTOR_DB_URL`
-
-- Type: `str`
-- Default: The value of `DATABASE_URL` environment variable
-- Description: Sets the database URL for model storage.
-
-### Qdrant
-
-#### `QDRANT_API_KEY`
-
-- Type: `str`
-- Description: Sets the API key for Qdrant.
-
-#### `QDRANT_URI`
-
-- Type: `str`
-- Description: Sets the URI for Qdrant.
+- Default: ''
+- Description: Specifies the client ID for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Web Search
 
@@ -1208,57 +1519,34 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 
 #### `WEB_SEARCH_ENGINE`
 
-- Type: `str` (enum: `searxng`, `google_pse`, `brave`, `kagi`, `mojeek`, `serpstack`, `serper`, `serply`, `searchapi`, `duckduckgo`, `tavily`, `jina`, `bing`)
+- Type: `str`
 - Options:
   - `searxng` - Uses the [SearXNG](https://github.com/searxng/searxng) search engine.
   - `google_pse` - Uses the [Google Programmable Search Engine](https://programmablesearchengine.google.com/about/).
   - `brave` - Uses the [Brave search engine](https://brave.com/search/api/).
   - `kagi` - Uses the [Kagi](https://www.kagi.com/) search engine.
   - `mojeek` - Uses the [Mojeek](https://www.mojeek.com/) search engine.
+  - `bocha` - Uses the Bocha search engine.
   - `serpstack` - Uses the [Serpstack](https://serpstack.com/) search engine.
   - `serper` - Uses the [Serper](https://serper.dev/) search engine.
   - `serply` - Uses the [Serply](https://serply.io/) search engine.
   - `searchapi` - Uses the [SearchAPI](https://www.searchapi.io/) search engine.
+  - `serpapi` - Uses the [SerpApi](https://serpapi.com/) search engine.
   - `duckduckgo` - Uses the [DuckDuckGo](https://duckduckgo.com/) search engine.
   - `tavily` - Uses the [Tavily](https://tavily.com/) search engine.
   - `jina` - Uses the [Jina](https://jina.ai/) search engine.
   - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
+  - `exa` - Uses the [Exa](https://exa.ai/) search engine.
+  - `perplexity` - Uses the [Perplexity AI](https://www.perplexity.ai/) search engine.
+  - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### Web Loader Configuration
+#### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
-#### `WEB_LOADER_ENGINE`
-
-- Type: `str`
-- Default: `safe_web`
-- Description: Specifies the loader to use for retrieving and processing web content. Options include:
-  - '' - Uses the `requests` module with enhanced error handling.
-  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+- Type: `bool`
+- Default: `'os.getenv('BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL', 'False').lower() == 'true'`
+- Description: Bypasses the web search embedding and retrieval process.
 - Persistence: This environment variable is a `PersistentConfig` variable.
-
-:::info
-
-When using `playwright`, you have two options:
-1. If `PLAYWRIGHT_WS_URI` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
-2. If `PLAYWRIGHT_WS_URI` is set, Open WebUI will connect to a remote browser instance instead of installing dependencies locally.
-
-:::
-
-#### `PLAYWRIGHT_WS_URL`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-:::tip
-
-Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
-- Reducing the size of the Open WebUI container
-- Using a different browser other than the default Chromium
-- Connecting to a non-headless (GUI) browser
-
-:::
 
 #### `SEARXNG_QUERY_URL`
 
@@ -1359,6 +1647,121 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the subscription key for Bing Search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `BOCHA_SEARCH_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the API key for Bocha Search API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXA_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the API key for Exa search API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SERPAPI_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the API key for SerpAPI.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SERPAPI_ENGINE`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the search engine to use for SerpAPI.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SOUGOU_API_SID`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the Sogou API SID.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SOUGOU_API_SK`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the Sogou API SK.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `TAVILY_EXTRACT_DEPTH`
+
+- Type: `str`
+- Default: 'basic'
+- Description: Specifies the extract depth for Tavily search results.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Web Loader Configuration
+
+#### `WEB_LOADER_ENGINE`
+
+- Type: `str`
+- Default: `safe_web`
+- Description: Specifies the loader to use for retrieving and processing web content.
+- Options:
+  - '' - Uses the `requests` module with enhanced error handling.
+  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+When using `playwright`, you have two options:
+
+1. If `PLAYWRIGHT_WS_URI` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
+2. If `PLAYWRIGHT_WS_URI` is set, Open WebUI will connect to a remote browser instance instead of installing dependencies locally.
+
+:::
+
+#### `PLAYWRIGHT_WS_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
+
+- Reducing the size of the Open WebUI container
+- Using a different browser other than the default Chromium
+- Connecting to a non-headless (GUI) browser
+
+:::
+
+#### `FIRECRAWL_API_BASE_URL`
+
+- Type: `str`
+- Default: 'https://api.firecrawl.dev'
+- Description: Sets the base URL for Firecrawl API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FIRECRAWL_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the API key for Firecrawl API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PERPLEXITY_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the API key for Perplexity API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PLAYWRIGHT_TIMEOUT`
+
+- Type: `int`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the timeout for Playwright requests.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### YouTube Loader
 
 #### `YOUTUBE_LOADER_PROXY_URL`
@@ -1391,14 +1794,29 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `${DATA_DIR}/cache/whisper/models`
 - Description: Specifies the directory to store Whisper model files.
 
+#### `WHISPER_VAD_FILTER`
+
+- Type: `bool`
+- Default: `os.getenv('WHISPER_VAD_FILTER', 'False').lower() == 'true'`
+- Description: Specifies whether to apply a Voice Activity Detection (VAD) filter to Whisper Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `WHISPER_MODEL_AUTO_UPDATE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Toggles automatic update of the Whisper model.
+
 ### Speech-to-Text (OpenAI)
 
 #### `AUDIO_STT_ENGINE`
 
-- Type: `str` (enum: `openai`)
+- Type: `str`
 - Options:
-  - Leave empty to use local Whisper engine for Speech-to-Text.
+  - Leave empty to use built-in local Whisper engine for Speech-to-Text.
   - `openai` - Uses OpenAI engine for Speech-to-Text.
+  - `deepgram`- Uses Deepgram engine for Speech-to-Text.
+  - `azure` Uses Azure engine for Speech-to-Text.
 - Description: Specifies the Speech-to-Text engine to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1423,6 +1841,38 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the OpenAI API key to use for Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Speech-to-Text (Azure)
+
+#### `AUDIO_STT_AZURE_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Azure API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_AZURE_REGION`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Azure region to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_AZURE_LOCALES`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the locales to use for Azure Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Speech-to-Text (Deepgram)
+
+#### `DEEPGRAM_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the Deepgram API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Text-to-Speech
 
 #### `AUDIO_TTS_API_KEY`
@@ -1433,7 +1883,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 #### `AUDIO_TTS_ENGINE`
 
-- Type: `str` (enum: `azure`, `elevenlabs`, `openai`, `transformers`)
+- Type: `str`
 - Options:
   - Leave empty to use built-in WebAPI engine for Text-to-Speech.
   - `azure` - Uses Azure engine for Text-to-Speech.
@@ -1450,18 +1900,32 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Specifies the OpenAI text-to-speech model to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### Azure Text-to-Speech
-
-#### `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT`
+#### `AUDIO_TTS_VOICE`
 
 - Type: `str`
-- Description: Sets the output format for Azure Text to Speech.
+- Default: `alloy`
+- Description: Sets the OpenAI text-to-speech voice to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_SPLIT_ON`
+
+- Type: `str`
+- Default: `punctuation`
+- Description: Sets the OpenAI text-to-speech split on to use.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Azure Text-to-Speech
 
 #### `AUDIO_TTS_AZURE_SPEECH_REGION`
 
 - Type: `str`
 - Description: Sets the region for Azure Text to Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT`
+
+- Type: `str`
+- Description: Sets the output format for Azure Text to Speech.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### OpenAI Text-to-Speech
@@ -1480,21 +1944,19 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the API key to use for text-to-speech.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `AUDIO_TTS_SPLIT_ON`
-
-- Type: `str`
-- Default: `punctuation`
-- Description: Sets the OpenAI text-to-speech split on to use.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `AUDIO_TTS_VOICE`
-
-- Type: `str`
-- Default: `alloy`
-- Description: Sets the OpenAI text-to-speech voice to use.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 ## Image Generation
+
+#### `IMAGE_GENERATION_ENGINE`
+
+- Type: `str`
+- Options:
+  - `openai` - Uses OpenAI DALL-E for image generation.
+  - `comfyui` - Uses ComfyUI engine for image generation.
+  - `automatic1111` - Uses Automatic1111 engine for image generation.
+  - `gemini` - Uses Gemini for image generation.
+- Default: `openai`
+- Description: Specifies the engine to use for image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_IMAGE_GENERATION`
 
@@ -1503,22 +1965,43 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Enables or disables image generation features.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGE_GENERATION_ENGINE`
+#### `ENABLE_IMAGE_PROMPT_GENERATION`
 
-- Type: `str` (enum: `openai`, `comfyui`, `automatic1111`)
-- Options:
-  - `openai` - Uses OpenAI DALL-E for image generation.
-  - `comfyui` - Uses ComfyUI engine for image generation.
-  - `automatic1111` - Uses Automatic1111 engine for image generation (default).
-- Default: `openai`
-- Description: Specifies the engine to use for image generation.
+- Type: `bool`
+- Default: `os.environ.get('ENABLE_IMAGE_PROMPT_GENERATION', 'true').lower() == 'true'`
+- Description: Enables or disables image prompt generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGE_GENERATION_MODEL`
+#### `IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Description: Default model to use for image generation
+- Default: ''
+- Description: Specifies the template to use for generating image prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+`DEFAULT_IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`:
+
+```
+### Task:
+Generate a detailed prompt for am image generation task based on the given language and context. Describe the image as if you were explaining it to someone who cannot see it. Include relevant details, colors, shapes, and any other important elements.
+
+### Guidelines:
+- Be descriptive and detailed, focusing on the most important aspects of the image.
+- Avoid making assumptions or adding information not present in the image.
+- Use the chat's primary language; default to English if multilingual.
+- If the image is too complex, focus on the most prominent elements.
+
+### Output:
+Strictly return in JSON format:
+{
+    "prompt": "Your detailed description here."
+}
+
+### Chat History:
+<chat_history>
+{{MESSAGES:END:6}}
+</chat_history>
+```
 
 #### `IMAGE_SIZE`
 
@@ -1534,18 +2017,24 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### AUTOMATIC1111
-
-#### `AUTOMATIC1111_API_AUTH`
+#### `IMAGE_GENERATION_MODEL`
 
 - Type: `str`
-- Description: Sets the Automatic1111 API authentication.
+- Description: Default model to use for image generation
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+### AUTOMATIC1111
 
 #### `AUTOMATIC1111_BASE_URL`
 
 - Type: `str`
 - Description: Specifies the URL to Automatic1111's Stable Diffusion API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUTOMATIC1111_API_AUTH`
+
+- Type: `str`
+- Description: Sets the Automatic1111 API authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATIC1111_CFG_SCALE`
@@ -1698,6 +2187,36 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the ComfyUI workflow.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Gemini
+
+#### `GEMINI_API_BASE_URL`
+
+- Type: `str`
+- Default: ''
+- Description: Specifies the URL to Gemini's API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `GEMINI_API_KEY`
+
+- Type: `str`
+- Default: ''
+- Description: Sets the Gemini API key.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `IMAGES_GEMINI_API_BASE_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the URL to Gemini's image generation API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `IMAGES_GEMINI_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the Gemini API key for image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### OpenAI DALL-E
 
 #### `IMAGES_OPENAI_API_BASE_URL`
@@ -1729,27 +2248,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 :::
 
-#### `ENABLE_API_KEY`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables API key authentication.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `ENABLE_OAUTH_ROLE_MANAGEMENT`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables role management to oauth delegation.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `ENABLE_OAUTH_GROUP_MANAGEMENT`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables OAUTH group management.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`
@@ -1757,69 +2255,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: If enabled, merges OAuth accounts with existing accounts using the same email
 address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to
 potential account takeovers.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_USERNAME_CLAIM`
-
-- Type: `str`
-- Default: `name`
-- Description: Set username claim for OpenID.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_EMAIL_CLAIM`
-
-- Type: `str`
-- Default: `email`
-- Description: Set email claim for OpenID.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_PICTURE_CLAIM`
-
-- Type: `str`
-- Default: `picture`
-- Description: Set picture (avatar) claim for OpenID.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_GROUP_CLAIM`
-
-- Type: `str`
-- Default: `groups`
-- Description: Specifies the group claim for OAUTH authentication.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_ROLES_CLAIM`
-
-- Type: `str`
-- Default: `roles`
-- Description: Sets the roles claim to look for in the OIDC token.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_SCOPES`
-
-- Type: `str`
-- Default: `openid email profile`
-- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_ALLOWED_DOMAINS`
-
-- Type: `str`
-- Default: `*`
-- Description: Specifies the allowed domains for OAUTH authentication. (e.g. "example1.com,example2.com").
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_ALLOWED_ROLES`
-
-- Type: `str`
-- Default: `user,admin`
-- Description: Sets the roles that are allowed access to the platform.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_ADMIN_ROLES`
-
-- Type: `str`
-- Default: `admin`
-- Description: Sets the roles that are considered administrators.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
@@ -1915,11 +2350,11 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Sets the client secret for Github OAuth
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `GITHUB_OAUTH_SCOPE`
+#### `GITHUB_CLIENT_SCOPE`
 
 - Type: `str`
 - Default: `user:email`
-- Description: Sets the scope for Github OAuth authentication.
+- Description: Specifies the scope for GitHub OAuth authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GITHUB_CLIENT_REDIRECT_URI`
@@ -1949,6 +2384,27 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Path to the `.well-known/openid-configuration` endpoint
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `OPENID_REDIRECT_URI`
+
+- Type: `str`
+- Default: `<backend>/oauth/oidc/callback`
+- Description: Sets the redirect URI for OIDC
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_SCOPES`
+
+- Type: `str`
+- Default: `openid email profile`
+- Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_CODE_CHALLENGE_METHOD`
+
+- Type: `str`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the code challenge method for OAUTH authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `OAUTH_PROVIDER_NAME`
 
 - Type: `str`
@@ -1956,11 +2412,74 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Sets the name for the OIDC provider.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `OPENID_REDIRECT_URI`
+#### `OAUTH_USERNAME_CLAIM`
 
 - Type: `str`
-- Default: `<backend>/oauth/oidc/callback`
-- Description: Sets the redirect URI for OIDC
+- Default: `name`
+- Description: Set username claim for OpenID.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_EMAIL_CLAIM`
+
+- Type: `str`
+- Default: `email`
+- Description: Set email claim for OpenID.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_PICTURE_CLAIM`
+
+- Type: `str`
+- Default: `picture`
+- Description: Set picture (avatar) claim for OpenID.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_GROUP_CLAIM`
+
+- Type: `str`
+- Default: `groups`
+- Description: Specifies the group claim for OAUTH authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_OAUTH_ROLE_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables role management to oauth delegation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_OAUTH_GROUP_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OAUTH group management.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_ROLES_CLAIM`
+
+- Type: `str`
+- Default: `roles`
+- Description: Sets the roles claim to look for in the OIDC token.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_ALLOWED_ROLES`
+
+- Type: `str`
+- Default: `user,admin`
+- Description: Sets the roles that are allowed access to the platform.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_ADMIN_ROLES`
+
+- Type: `str`
+- Default: `admin`
+- Description: Sets the roles that are considered administrators.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_ALLOWED_DOMAINS`
+
+- Type: `str`
+- Default: `*`
+- Description: Specifies the allowed domains for OAUTH authentication. (e.g. "example1.com,example2.com").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## LDAP
@@ -1970,6 +2489,38 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables LDAP authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_SERVER_LABEL`
+
+- Type: `str`
+- Description: Sets the label of LDAP server.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_SERVER_HOST`
+
+- Type: `str`
+- Default: `localhost`
+- Description: Sets the hostname of LDAP server.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_SERVER_PORT`
+
+- Type: `int`
+- Default: `389`
+- Description: Sets the port number of LDAP server.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_ATTRIBUTE_FOR_MAIL`
+
+- Type: `str`
+- Description: Sets the attribute to use as mail for LDAP authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_ATTRIBUTE_FOR_USERNAME`
+
+- Type: `str`
+- Description: Sets the attribute to use as username for LDAP authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_APP_DN`
@@ -1984,16 +2535,30 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Sets the password for LDAP application.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `LDAP_ATTRIBUTE_FOR_USERNAME`
+#### `LDAP_SEARCH_BASE`
 
 - Type: `str`
-- Description: Sets the attribute to use as username for LDAP authentication.
+- Description: Sets the base to search for LDAP authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `LDAP_ATTRIBUTE_FOR_MAIL`
+#### `LDAP_SEARCH_FILTER`
 
 - Type: `str`
-- Description: Sets the attribute to use as mail for LDAP authentication.
+- Default: `None`
+- Description: Sets a single filter to use for LDAP search. Alternative to `LDAP_SEARCH_FILTERS`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_SEARCH_FILTERS`
+
+- Type: `str`
+- Description: Sets the filter to use for LDAP search.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_USE_TLS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables TLS for LDAP connection.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_CA_CERT_FILE`
@@ -2009,46 +2574,111 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Sets the ciphers to use for LDAP connection.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `LDAP_SEARCH_BASE`
+## User Permissions
+
+### Chat Permissions
+
+#### `USER_PERMISSIONS_CHAT_CONTROLS`
 
 - Type: `str`
-- Description: Sets the base to search for LDAP authentication.
+- Default: 'True'
+- Description: Enables or disables user permission to access chat controls.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `LDAP_SEARCH_FILTERS`
-
-- Type: `str`
-- Description: Sets the filter to use for LDAP search.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `LDAP_SERVER_HOST`
-
-- Type: `str`
-- Default: `localhost`
-- Description: Sets the hostname of LDAP server.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `LDAP_SERVER_LABEL`
-
-- Type: `str`
-- Description: Sets the label of LDAP server.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `LDAP_SERVER_PORT`
-
-- Type: `int`
-- Default: `389`
-- Description: Sets the port number of LDAP server.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `LDAP_USE_TLS`
+#### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables TLS for LDAP connection.
+- Description: Enables or disables user permission to upload files to chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-## Workspace Permissions
+#### `USER_PERMISSIONS_CHAT_DELETE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to delete chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_EDIT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to edit chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_STT`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to use Speech-to-Text in chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_TTS`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to use Text-to-Speech in chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_CALL`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to make calls in chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to use multiple models in chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_TEMPORARY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to create temporary chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
+
+- Type: `str`
+- Default: 'False'
+- Description: Enables or disables enforced temporary chats for users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Feature Permissions
+
+#### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
+
+- Type: `str`
+- Default: 'False'
+- Description: Enables or disables user permission to access direct tool servers.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_WEB_SEARCH`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to use web search feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_IMAGE_GENERATION`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to use image generation feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`
+
+- Type: `str`
+- Default: 'True'
+- Description: Enables or disables user permission to use code interpreter feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Workspace Permissions
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`
 
@@ -2078,41 +2708,39 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Enables or disables user permission to access workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-## Chat Permissions
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
-#### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to upload files to chats.
+- Type: `str`
+- Default: 'False'
+- Description: Enables or disables public sharing of workspace models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `USER_PERMISSIONS_CHAT_DELETE`
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_PUBLIC_SHARING`
 
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to delete chats.
+- Type: `str`
+- Default: 'False'
+- Description: Enables or disables public sharing of workspace knowledge.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `USER_PERMISSIONS_CHAT_EDIT`
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_PUBLIC_SHARING`
 
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to edit chats.
+- Type: `str`
+- Default: 'False'
+- Description: Enables or disables public sharing of workspace prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `USER_PERMISSIONS_CHAT_TEMPORARY`
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_PUBLIC_SHARING`
 
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables user permission to create temporary chats.
+- Type: `str`
+- Default: 'False'
+- Description: Enables or disables public sharing of workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Misc Environment Variables
 
 These variables are not specific to Open WebUI but can still be valuable in certain contexts.
 
-### Cloud Storage 
+### Cloud Storage
 
 #### `STORAGE_PROVIDER`
 
@@ -2121,7 +2749,6 @@ These variables are not specific to Open WebUI but can still be valuable in cert
   - `s3` - uses S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
   - `gcs` - uses GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
   - `azure` - uses Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
-
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
 
@@ -2131,6 +2758,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Description: Sets the access key ID for S3 storage.
+
+#### `S3_ADDRESSING_STYLE`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the addressing style to use for S3 storage (e.g., 'path', 'virtual').
 
 #### `S3_BUCKET_NAME`
 
@@ -2157,6 +2790,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the secret access key for S3 storage.
 
+#### `S3_USE_ACCELERATE_ENDPOINT`
+
+- Type: `str`
+- Default: `'False'`
+- Description: Specifies whether to use the accelerated endpoint for S3 storage.
+
 #### Google Cloud Storage
 
 #### `GOOGLE_APPLICATION_CREDENTIALS_JSON`
@@ -2165,7 +2804,6 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Description: Contents of Google Application Credentials JSON file.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Google Metadata server if run on a Google Compute Engine.
   - File can be generated for a service account following this [guide](https://developers.google.com/workspace/guides/create-credentials#service-account)
-
 
 #### `GCS_BUCKET_NAME`
 
@@ -2318,7 +2956,6 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for websocket Redis.
-
 
 ### Uvicorn Settings
 
