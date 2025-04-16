@@ -2994,7 +2994,7 @@ Open WebUI uses the following environment variables:
 separated by commas. For example, setting no_proxy to '.mit.edu' ensures that the proxy is
 bypassed when accessing documents from MIT.
 
-### Install required packages
+### Install Required Python Packages
 
 Open WebUI provides environment variables to customize the pip installation process. Below are the environment variables used by Open WebUI for adjusting package installation behavior:
 
