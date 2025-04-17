@@ -30,7 +30,7 @@ class Parser(ParserInterface):
         self.name = "Custom Parser"
         self.parser_type = PARSER_TYPE.ALL
 
-   def delete_docs(self, collection_name, file_id):
+   def delete_doc(self, collection_name, file_id):
         # This is where you do things when the user deletes a Knowledge File
         print("Handling deleting of a single file")
 
@@ -56,10 +56,12 @@ class Parser(ParserInterface):
         return {"texts": [], "embeddings": [], "metadatas": []}
 
    def store(self, request, collection_name, texts, embeddings, metadatas, overwrite=False, add=True):
+        # This is where you handle storing the information in the Vector Data Base
         print("uploading information to vector database")
 
    # THIS IS THE OPTIONAL METHOD
    def is_applicable_to_item(self, item_id):
+        # This allows you to be choose to parse based on the specific item. Can be file name, search query, web url
         print(f"Based on item {item_id}, should this parser be applied? ")
         return True
 ```
