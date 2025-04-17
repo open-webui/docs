@@ -2462,7 +2462,11 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 - Type: `list` of `str`
 - Default: `[]`
-- Description: List of groups excluded from group management.
+- Description: List of groups excluded from group management. The format is :
+
+```json
+["GRP1", "GRP2"]
+```
 
 #### `OAUTH_ROLES_CLAIM`
 
