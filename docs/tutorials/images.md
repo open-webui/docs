@@ -128,6 +128,17 @@ Some workflows, such as ones that use any of the Flux models, may utilize multip
 
 After completing these steps, your ComfyUI setup should be integrated with Open WebUI, and you can use the Flux.1 models for image generation.
 
+### Configuring with ViewComfy
+
+If you need to run your ComfyUI workflow on a cloud GPU, ViewComfy offers a simple solution to host workflows on serverless infrastructure.
+
+1. Deploy your ComfyUI workflow: create an account on the ViewComfy [website](https://viewcomfy.com/) and drop your workflow in the "Deploy your own" tab. 
+2. Configure ViewComfy Settings
+* **Add your workflow_api.json file**: Add the same file you deployed on ViewComfy. You can change parameter values inside the workflow_api file if you need to. 
+* **Map the ComfyUI Workflow Nodes**: Just like when using the standard ComfyUI implementation, you must map the ComfyUI Workflow Nodes according to the imported workflow node IDs.
+* **Save**: Click Save to apply the settings
+
+
 ### Configuring with SwarmUI
 
 SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `ComfyUI Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as [Step one: Configure Open WebUI Settings](https://github.com/open-webui/docs/edit/main/docs/features/images.md#step-1-configure-open-webui-settings) as outlined above.
