@@ -93,6 +93,7 @@ To use this feature set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the groups returned by the OAuth provider:
 
 1. `OAUTH_GROUP_CLAIM` - The claim that contains the groups. Defaults to `groups`. Can also be nested, for example `user.memberOf`.
+2. `OAUTH_GROUP_BLACKLIST` - List of groups excluded from group management.
 
 :::warning
 Admin users do not get their groups updated
