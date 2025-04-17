@@ -2458,6 +2458,12 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Enables or disables OAuth group management.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `OAUTH_GROUP_BLACKLIST`
+
+- Type: `list` of `str`
+- Default: `[]`
+- Description: List of groups excluded from group management.
+
 #### `OAUTH_ROLES_CLAIM`
 
 - Type: `str`
