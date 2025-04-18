@@ -52,7 +52,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ### You can choose between GPU or CPU versions
 
-### GPU Version (Requires NVIDIA GPU with CUDA 12.1)
+### GPU Version (Requires NVIDIA GPU with CUDA 12.8)
 
 Using docker run:
 
