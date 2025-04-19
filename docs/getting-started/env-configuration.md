@@ -326,7 +326,7 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Description: Enables the use of Ollama APIs.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `OLLAMA_BASE_URL` (`OLLAMA_API_BASE_URL` is depreciated) {#ollama_base_url}
+#### `OLLAMA_BASE_URL` (`OLLAMA_API_BASE_URL` is deprecated) {#ollama_base_url}
 
 - Type: `str`
 - Default: `http://localhost:11434`
