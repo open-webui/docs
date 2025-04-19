@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Overview
 
-This documentation page outlines the steps required to integrate Okta OIDC Single Sign-On (SSO) with Open WebUI. It also covers the **optional** feature of managing Open WebUI user groups based on Okta group membership. By following these steps, you will enable users to log in to Open WebUI using their Okta credentials. If you choose to enable group syncing, users can also be automatically assigned to relevant groups within Open WebUI based on their Okta groups.
+This documentation page outlines the steps required to integrate Okta OIDC Single Sign-On (SSO) with Open WebUI. It also covers the **optional** features of managing Open WebUI user groups based on Okta group membership, including **Just-in-Time (JIT) group creation**. By following these steps, you will enable users to log in to Open WebUI using their Okta credentials. If you choose to enable group syncing (`ENABLE_OAUTH_GROUP_MANAGEMENT`), users will be automatically assigned to relevant groups within Open WebUI based on their Okta groups upon login. If you *also* enable JIT group creation (`ENABLE_OAUTH_GROUP_CREATION`), groups present in Okta claims but missing in Open WebUI will be created automatically during login.
 
 ### Prerequisites
 
@@ -77,15 +77,34 @@ OAUTH_PROVIDER_NAME="Okta"
 
 # --- OAuth Group Management (Optional) ---
 # Set to "true" only if you configured the Groups Claim in Okta (Step 2)
-# and want Open WebUI groups to be managed based on Okta groups.
+# and want Open WebUI groups to be managed based on Okta groups upon login.
+# This syncs existing groups. Users will be added/removed from Open WebUI groups
+# to match their Okta group claims.
 # ENABLE_OAUTH_GROUP_MANAGEMENT="true"
 
 # Required only if ENABLE_OAUTH_GROUP_MANAGEMENT is true.
 # The claim name in the ID token containing group information (must match Okta config)
 # OAUTH_GROUP_CLAIM="groups"
+
+# Optional: Enable Just-in-Time (JIT) creation of groups if they exist in Okta claims but not in Open WebUI.
+# Requires ENABLE_OAUTH_GROUP_MANAGEMENT="true".
+# If set to false (default), only existing groups will be synced.
+# ENABLE_OAUTH_GROUP_CREATION="false"
 ```
 
-Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DISCOVERY_URL` with the actual values from your Okta application configuration. If enabling group management, ensure `OAUTH_GROUP_CLAIM` matches the claim name you configured in Okta (default is `groups`).
+Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DISCOVERY_URL` with the actual values from your Okta application configuration.
+
+To enable group synchronization based on Okta claims, set `ENABLE_OAUTH_GROUP_MANAGEMENT="true"` and ensure `OAUTH_GROUP_CLAIM` matches the claim name configured in Okta (default is `groups`).
+
+To *also* enable automatic Just-in-Time (JIT) creation of groups that exist in Okta but not yet in Open WebUI, set `ENABLE_OAUTH_GROUP_CREATION="true"`. You can leave this as `false` if you only want to manage memberships for groups that already exist in Open WebUI.
+
+:::warning Group Membership Management
+When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI will be **strictly synchronized** with the groups received in their Okta claims upon each login. This means:
+*   Users will be **added** to Open WebUI groups that match their Okta claims.
+*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their Okta claims for that login session.
+
+Ensure that all necessary groups are correctly configured and assigned within Okta and included in the group claim.
+:::
 
 :::info Session Persistence in Multi-Node Deployments
 
@@ -120,7 +139,7 @@ Restart your Open WebUI instance after setting these environment variables.
 1.  Navigate to your Open WebUI login page. You should see a button labeled "Login with Okta" (or whatever you set for `OAUTH_PROVIDER_NAME`).
 2.  Click the button and authenticate through the Okta login flow.
 3.  Upon successful authentication, you should be redirected back to Open WebUI and logged in.
-4.  If `ENABLE_OAUTH_GROUP_MANAGEMENT` is true, log in as a non-admin user. Their groups within Open WebUI should reflect their group memberships in Okta (after their first login). Note that admin users' groups are not automatically updated via SSO.
+4.  If `ENABLE_OAUTH_GROUP_MANAGEMENT` is true, log in as a non-admin user. Their groups within Open WebUI should now strictly reflect their current group memberships in Okta (any memberships in groups *not* in the Okta claim will be removed). If `ENABLE_OAUTH_GROUP_CREATION` is also true, any groups present in the user's Okta claims that did not previously exist in Open WebUI should now have been created automatically. Note that admin users' groups are not automatically updated via SSO.
 5.  Check the Open WebUI server logs for any OIDC or group-related errors if you encounter issues.
 
 ## Troubleshooting
