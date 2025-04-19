@@ -1733,6 +1733,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Enables or disables OAUTH group management.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_OAUTH_GROUP_CREATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`

@@ -93,6 +93,7 @@ To use this feature set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the groups returned by the OAuth provider:
 
 1. `OAUTH_GROUP_CLAIM` - The claim that contains the groups. Defaults to `groups`. Can also be nested, for example `user.memberOf`.
+1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`.
 
 :::warning
 Admin users do not get their groups updated
