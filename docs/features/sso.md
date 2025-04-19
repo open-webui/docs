@@ -88,20 +88,30 @@ If changing the role of a logged in user, they will need to log out and log back
 
 ### OAuth Group Management
 
-Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI.
-To use this feature set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
-You can configure the following environment variables to match the groups returned by the OAuth provider:
+Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI upon user login.
+To enable this synchronization, set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 
-1. `OAUTH_GROUP_CLAIM` - The claim that contains the groups. Defaults to `groups`. Can also be nested, for example `user.memberOf`.
-1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`.
+You can configure the following environment variables:
 
-:::warning
-Admin users do not get their groups updated
+1. `OAUTH_GROUP_CLAIM` - The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
+1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
+
+:::warning Strict Group Synchronization
+When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
+
+*   Users will be **added** to Open WebUI groups that match their OAuth claims.
+*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session.
+
+Ensure all necessary groups are correctly configured in your OAuth provider and included in the group claim (`OAUTH_GROUP_CLAIM`).
 :::
 
-:::info
+:::warning Admin Users
+Admin users' group memberships are **not** automatically updated via OAuth group management.
+:::
 
-If changing the group of a logged in user, they will need to log out and log back in to receive the new group.
+:::info Login Required for Updates
+
+If a user's groups change in the OAuth provider, they will need to log out of Open WebUI and log back in for the changes to be reflected.
 
 :::
 

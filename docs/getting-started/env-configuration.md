@@ -1723,21 +1723,21 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables role management to oauth delegation.
+- Description: Enables role management delegation via OAuth claims.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_OAUTH_GROUP_MANAGEMENT`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables OAUTH group management.
+- Description: Enables synchronization of user group memberships based on OAuth claims upon login. If `true`, user memberships in Open WebUI groups will be strictly managed based on the groups provided in the `OAUTH_GROUP_CLAIM`. Users will be added to matching groups and removed from any groups *not* present in the claim (including manually added ones). See also `ENABLE_OAUTH_GROUP_CREATION`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_OAUTH_GROUP_CREATION`
 
 - Type: `bool`
 - Default: `False`
-- Description: If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system.
+- Description: Enables **Just-in-Time (JIT) group creation** during OAuth login. If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will automatically create groups if they are present in the user's OAuth claims (`OAUTH_GROUP_CLAIM`) but do not yet exist in the system. If `false`, only memberships in existing groups will be managed.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
