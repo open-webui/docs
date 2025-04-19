@@ -27,7 +27,12 @@ Integration Steps
 docker run -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docling-project/docling-serve
 ```
 
-### Step 2: Configure OpenWebUI to use Docling
+*With GPU support:
+```bash
+docker run --gpus all -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docling-project/docling-serve
+```
+
+### Step 2: Configure Open WebUI to use Docling
 
 * Log in to your Open WebUI instance.
 * Navigate to the `Admin Panel` settings menu.

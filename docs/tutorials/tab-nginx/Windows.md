@@ -1,8 +1,8 @@
 ### Using a Self-Signed Certificate and Nginx on Windows without Docker
 
-For basic internal/development installations, you can use nginx and a self-signed certificate to proxy openwebui to https, allowing use of features such as microphone input over LAN. (By default, most browsers will not allow microphone input on insecure non-localhost urls)
+For basic internal/development installations, you can use nginx and a self-signed certificate to proxy Open WebUI to https, allowing use of features such as microphone input over LAN. (By default, most browsers will not allow microphone input on insecure non-localhost urls)
 
-This guide assumes you installed openwebui using pip and are running `open-webui serve`
+This guide assumes you installed Open WebUI using pip and are running `open-webui serve`
 
 #### Step 1: Installing openssl for certificate generation
 
@@ -46,7 +46,7 @@ Move the generated nginx.key and nginx.crt files to a folder of your choice, or 
 
 Open C:\nginx\conf\nginx.conf in a text editor
 
-If you want openwebui to be accessible over your local LAN, be sure to note your LAN ip address using `ipconfig` e.g. 192.168.1.15
+If you want Open WebUI to be accessible over your local LAN, be sure to note your LAN ip address using `ipconfig` e.g. 192.168.1.15
 
 Set it up as follows:
 
@@ -145,4 +145,4 @@ Run nginx by running `nginx`. If an nginx service is already started, you can re
 
 ---
 
-You should now be able to access openwebui on https://192.168.1.15 (or your own LAN ip as appropriate). Be sure to allow windows firewall access as needed. 
+You should now be able to access Open WebUI on https://192.168.1.15 (or your own LAN ip as appropriate). Be sure to allow windows firewall access as needed. 

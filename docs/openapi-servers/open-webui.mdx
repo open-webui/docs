@@ -49,6 +49,53 @@ Next, connect your running tool server to Open WebUI:
 
 ![Settings Page](/images/openapi-servers/open-webui/settings.png)
 
+### 🧑‍💻 User Tool Servers vs. 🛠️ Global Tool Servers
+
+There are two ways to register tool servers in Open WebUI:
+
+#### 1. User Tool Servers (added via regular Settings)
+
+- Only accessible to the user who registered the tool server.
+- The connection is made directly from the browser (client-side) by the user.
+- Perfect for personal workflows or when testing custom/local tools.
+
+#### 2. Global Tool Servers (added via Admin Settings)
+
+Admins can manage shared tool servers available to all or selected users across the entire deployment:
+
+- Go to 🛠️ **Admin Settings > Tools**.
+- Add the tool server URL just as you would in user settings.
+- These tools are treated similarly to Open WebUI’s built-in tools.
+
+### 👉 Optional: Using a Config File with mcpo
+
+If you're running multiple tools through mcpo using a config file, take note:
+
+🧩 Each tool is mounted under its own unique path!
+
+For example, if you’re using memory and time tools simultaneously through mcpo, they’ll each be available at a distinct route:
+
+- http://localhost:8000/time
+- http://localhost:8000/memory
+
+This means:
+
+- When connecting a tool in Open WebUI, you must enter the full route to that specific tool — do NOT enter just the root URL (http://localhost:8000).
+- Add each tool individually in Open WebUI Settings using their respective subpath URLs.
+
+![MCPO Config Tools Setting](/images/openapi-servers/open-webui/mcpo-config-tools.png)
+
+✅ Good:
+
+http://localhost:8000/time  
+http://localhost:8000/memory
+
+🚫 Not valid:
+
+http://localhost:8000
+
+This ensures Open WebUI recognizes and communicates with each tool server correctly.
+
 ---
 
 ## Step 3: Confirm Your Tool Server Is Connected ✅
@@ -68,6 +115,28 @@ Clicking this icon opens a popup where you can:
 🔍 Here’s what the tool information modal looks like:
 
 ![Tool Info Modal Expanded](/images/openapi-servers/open-webui/info-modal.png)
+
+### 🛠️ Global Tool Servers Look Different — And Are Hidden by Default!
+
+If you've connected a Global Tool Server (i.e., one that’s admin-configured), it will not appear automatically in the input area like user tool servers do.
+
+Instead:
+
+- Global tools are hidden by default and must be explicitly activated per user.
+- To enable them, you'll need to click on the ➕ button in the message input area (bottom left of the chat box), and manually toggle on the specific global tool(s) you want to use.
+
+Here’s what that looks like:
+
+![Global Tool Server Message Input](/images/openapi-servers/open-webui/global-message-input.png)
+
+⚠️ Important Notes for Global Tool Servers:
+
+- They will not show up in the tool indicator popup until enabled from the ➕ menu.
+- Each global tool must be individually toggled on to become active inside your current chat.
+- Once toggled on, they function the same way as user tools.
+- Admins can control access to global tools via role-based permissions.
+
+This is ideal for team setups or shared environments, where commonly-used tools (e.g. document search, memory, or web lookup) should be centrally accessible by multiple users.
 
 ---
 

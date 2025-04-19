@@ -1,115 +1,171 @@
 ---
 sidebar_position: 6
-title: "📊 Monitoring"
+title: "📊 Monitoring Your Open WebUI"
 ---
 
-# Monitoring Open WebUI
+# Keep Your Open WebUI Healthy with Monitoring 🩺
 
-Monitoring your Open WebUI instance is crucial for ensuring reliable service and quickly identifying issues. This guide covers three levels of monitoring:
-- Basic health checks for service availability
-- Model connectivity verification
-- Deep health checks with model response testing
+Monitoring your Open WebUI instance is crucial for ensuring it runs reliably, performs well, and allows you to quickly identify and resolve any issues. This guide outlines three levels of monitoring, from basic availability checks to in-depth model response testing.
 
-## Basic Health Check Endpoint
+**Why Monitor?**
 
-Open WebUI exposes a health check endpoint at `/health` that returns a 200 OK status when the service is running properly. 
+* **Ensure Uptime:**  Proactively detect outages and service disruptions.
+* **Performance Insights:**  Track response times and identify potential bottlenecks.
+* **Early Issue Detection:**  Catch problems before they impact users significantly.
+* **Peace of Mind:**  Gain confidence that your Open WebUI instance is running smoothly.
 
+## 🚦 Levels of Monitoring
 
-```bash
-   # No auth needed for this endpoint
-   curl https://your-open-webuiinstance/health
-```
+We'll cover three levels of monitoring, progressing from basic to more comprehensive:
 
-### Using Uptime Kuma
-[Uptime Kuma](https://github.com/louislam/uptime-kuma) is a great, easy to use, open source, self-hosted uptime monitoring tool. 
+1. **Basic Health Check:**  Verifies if the Open WebUI service is running and responding.
+2. **Model Connectivity Check:** Confirms that Open WebUI can connect to and list your configured models.
+3. **Model Response Testing (Deep Health Check):**  Ensures that models can actually process requests and generate responses.
 
-1. In your Uptime Kuma dashboard, click "Add New Monitor"
-2. Set the following configuration:
-   - Monitor Type: HTTP(s)
-   - Name: Open WebUI
-   - URL: `http://your-open-webuiinstance:8080/health`
-   - Monitoring Interval: 60 seconds (or your preferred interval)
-   - Retry count: 3 (recommended)
+## Level 1: Basic Health Check Endpoint ✅
 
-The health check will verify:
-- The web server is responding
-- The application is running
-- Basic database connectivity
+The simplest level of monitoring is checking the `/health` endpoint. This endpoint is publicly accessible (no authentication required) and returns a `200 OK` status code when the Open WebUI service is running correctly.
 
-## Open WebUI Model Connectivity
+**How to Test:**
 
-To verify that Open WebUI can successfully connect to and list your configured models, you can monitor the models endpoint. This endpoint requires authentication and checks Open WebUI's ability to communicate with your model providers.
-
-See [API documentation](https://docs.openwebui.com/getting-started/api-endpoints/#-retrieve-all-models) for more details about the models endpoint.
-
+You can use `curl` or any HTTP client to check this endpoint:
 
 ```bash
-   # See steps below to get an API key
-   curl -H "Authorization: Bearer sk-adfadsflkhasdflkasdflkh" https://your-open-webuiinstance/api/models
+   # Basic health check - no authentication needed
+   curl https://your-open-webui-instance/health
 ```
 
-### Authentication Setup
+**Expected Output:**  A successful health check will return a `200 OK` HTTP status code. The content of the response body is usually not important for a basic health check.
 
-1. Enable API Keys (Admin required):
-   - Go to Admin Settings > General
-   - Enable the "Enable API Key" setting
-   - Save changes
+### Using Uptime Kuma for Basic Health Checks 🐻
 
-2. Get your API key [docs](https://docs.openwebui.com/getting-started/api-endpoints):
-   - (Optional), consider making a non-admin user for the monitoring API key
-   - Go to Settings > Account in Open WebUI
-   - Generate a new API key specifically for monitoring
-   - Copy the API key for use in Uptime Kuma
+[Uptime Kuma](https://github.com/louislam/uptime-kuma) is a fantastic, open-source, and easy-to-use self-hosted uptime monitoring tool. It's highly recommended for monitoring Open WebUI.
 
-Note: If you don't see the option to generate API keys in your Settings > Account, check with your administrator to ensure API keys are enabled.
+**Steps to Set Up in Uptime Kuma:**
 
-### Using Uptime Kuma for Model Connectivity
+1. **Add a New Monitor:** In your Uptime Kuma dashboard, click "Add New Monitor".
+2. **Configure Monitor Settings:**
+   * **Monitor Type:**  Select "HTTP(s)".
+   * **Name:**  Give your monitor a descriptive name, e.g., "Open WebUI Health Check".
+   * **URL:** Enter the health check endpoint URL: `http://your-open-webui-instance:8080/health` (Replace `your-open-webui-instance:8080` with your actual Open WebUI address and port).
+   * **Monitoring Interval:** Set the frequency of checks (e.g., `60 seconds` for every minute).
+   * **Retry Count:**  Set the number of retries before considering the service down (e.g., `3` retries).
 
-1. Create a new monitor in Uptime Kuma:
-   - Monitor Type: HTTP(s) - JSON Query
-   - Name: Open WebUI Model Connectivity
-   - URL: `http://your-open-webuiinstance:8080/api/models`
-   - Method: GET
-   - Expected Status Code: 200
-   - JSON Query: `$count(data[*])>0`
-   - Expected Value: `true`  
-   - Monitoring Interval: 300 seconds (5 minutes recommended)
+**What This Check Verifies:**
 
-2. Configure Authentication:
-   - In the Headers section, add:
-     ```
-     {
-        "Authorization": "Bearer sk-abc123adfsdfsdfsdfsfdsdf"
-     }
-     ```
-   - Replace `YOUR_API_KEY` with the API key you generated
+* **Web Server Availability:**  Ensures the web server (e.g., Nginx, Uvicorn) is responding to requests.
+* **Application Running:**  Confirms that the Open WebUI application itself is running and initialized.
+* **Basic Database Connectivity:**  Typically includes a basic check to ensure the application can connect to the database.
 
-Alternative JSON Queries:
-```
-# At least 1 models by ollama provider
-$count(data[owned_by='ollama'])>1
+## Level 2: Open WebUI Model Connectivity 🔗
 
-# Check if specific model exists (returns true/false)
-$exists(data[id='gpt-4o'])
+To go beyond basic availability, you can monitor the `/api/models` endpoint. This endpoint **requires authentication** and verifies that Open WebUI can successfully communicate with your configured model providers (e.g., Ollama, OpenAI) and retrieve a list of available models.
 
-# Check multiple models (returns true if ALL exist)
-$count(data[id in ['gpt-4o', 'gpt-4o-mini']]) = 2
-```
+**Why Monitor Model Connectivity?**
 
-You can test JSONata queries at [jsonata.org](https://try.jsonata.org/) to verify they work with your API response.
+* **Model Provider Issues:** Detect problems with your model provider services (e.g., API outages, authentication failures).
+* **Configuration Errors:**  Identify misconfigurations in your model provider settings within Open WebUI.
+* **Ensure Model Availability:**  Confirm that the models you expect to be available are actually accessible to Open WebUI.
 
-## Model Response Testing
+**API Endpoint Details:**
 
-To verify that models can actually process requests, you can monitor the chat completions endpoint. This provides a deeper health check by ensuring models can generate responses.
+See the [Open WebUI API documentation](https://docs.openwebui.com/getting-started/api-endpoints/#-retrieve-all-models) for full details about the `/api/models` endpoint and its response structure.
+
+**How to Test with `curl` (Authenticated):**
+
+You'll need an API key to access this endpoint.  See the "Authentication Setup" section below for instructions on generating an API key.
 
 ```bash
-# Test model response
-curl -X POST https://your-open-webuiinstance/api/chat/completions \
-  -H "Authorization: Bearer sk-adfadsflkhasdflkasdflkh" \
+   # Authenticated model connectivity check
+   curl -H "Authorization: Bearer YOUR_API_KEY" https://your-open-webui-instance/api/models
+```
+
+*(Replace `YOUR_API_KEY` with your actual API key and `your-open-webui-instance` with your Open WebUI address.)*
+
+**Expected Output:** A successful request will return a `200 OK` status code and a JSON response containing a list of models.
+
+### Authentication Setup for API Key 🔑
+
+Before you can monitor the `/api/models` endpoint, you need to enable API keys in Open WebUI and generate one:
+
+1. **Enable API Keys (Admin Required):**
+   * Log in to Open WebUI as an administrator.
+   * Go to **Admin Settings** (usually in the top right menu) > **General**.
+   * Find the "Enable API Key" setting and **turn it ON**.
+   * Click **Save Changes**.
+
+2. **Generate an API Key (User Settings):**
+   * Go to your **User Settings** (usually by clicking on your profile icon in the top right).
+   * Navigate to the **Account** section.
+   * Click **Generate New API Key**.
+   * Give the API key a descriptive name (e.g., "Monitoring API Key").
+   * **Copy the generated API key** and store it securely. You'll need this for your monitoring setup.
+
+   *(Optional but Recommended):* For security best practices, consider creating a **non-administrator user account** specifically for monitoring and generate an API key for that user. This limits the potential impact if the monitoring API key is compromised.
+
+   *If you don't see the API key generation option in your settings, contact your Open WebUI administrator to ensure API keys are enabled.*
+
+### Using Uptime Kuma for Model Connectivity Monitoring 🐻
+
+1. **Create a New Monitor in Uptime Kuma:**
+   * Monitor Type: "HTTP(s) - JSON Query".
+   * Name: "Open WebUI Model Connectivity Check".
+   * URL: `http://your-open-webui-instance:8080/api/models` (Replace with your URL).
+   * Method: "GET".
+   * Expected Status Code: `200`.
+
+2. **Configure JSON Query (Verify Model List):**
+   * **JSON Query:**  `$count(data[*])>0`
+     * **Explanation:** This JSONata query checks if the `data` array in the API response (which contains the list of models) has a count greater than 0. In other words, it verifies that at least one model is returned.
+   * **Expected Value:** `true` (The query should return `true` if models are listed).
+
+3. **Add Authentication Headers:**
+   * In the "Headers" section of the Uptime Kuma monitor configuration, click "Add Header".
+   * **Header Name:** `Authorization`
+   * **Header Value:** `Bearer YOUR_API_KEY` (Replace `YOUR_API_KEY` with the API key you generated).
+
+4. **Set Monitoring Interval:**  Recommended interval: `300 seconds` (5 minutes) or longer, as model lists don't typically change very frequently.
+
+**Alternative JSON Queries (Advanced):**
+
+You can use more specific JSONata queries to check for particular models or providers. Here are some examples:
+
+* **Check for at least one Ollama model:**  `$count(data[owned_by='ollama'])>0`
+* **Check if a specific model exists (e.g., 'gpt-4o'):** `$exists(data[id='gpt-4o'])`
+* **Check if multiple specific models exist (e.g., 'gpt-4o' and 'gpt-4o-mini'):** `$count(data[id in ['gpt-4o', 'gpt-4o-mini']]) = 2`
+
+You can test and refine your JSONata queries at [jsonata.org](https://try.jsonata.org/) using a sample API response to ensure they work as expected.
+
+## Level 3: Model Response Testing (Deep Health Check) 🤖
+
+For the most comprehensive monitoring, you can test if models are actually capable of processing requests and generating responses. This involves sending a simple chat completion request to the `/api/chat/completions` endpoint.
+
+**Why Test Model Responses?**
+
+* **End-to-End Verification:**  Confirms that the entire model pipeline is working, from API request to model response.
+* **Model Loading Issues:**  Detects problems with specific models failing to load or respond.
+* **Backend Processing Errors:**  Catches errors in the backend logic that might prevent models from generating completions.
+
+**How to Test with `curl` (Authenticated POST Request):**
+
+This test requires an API key and sends a POST request with a simple message to the chat completions endpoint.
+
+```bash
+# Test model response - authenticated POST request
+curl -X POST https://your-open-webui-instance/api/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Respond with the word HEALTHY"}],
-    "model": "llama3.1",
-    "temperature": 0
+    "model": "llama3.1",  # Replace with a model you expect to be available
+    "temperature": 0      # Set temperature to 0 for consistent responses
   }'
 ```
+
+*(Replace `YOUR_API_KEY`, `your-open-webui-instance`, and `llama3.1` with your actual values.)*
+
+**Expected Output:** A successful request will return a `200 OK` status code and a JSON response containing a chat completion. You can verify that the response includes the word "HEALTHY" (or a similar expected response based on your prompt).
+
+**Setting up Level 3 Monitoring in Uptime Kuma would involve configuring an HTTP(s) monitor with a POST request, JSON body, authentication headers, and potentially JSON query to validate the response content. This is a more advanced setup and can be customized based on your specific needs.**
+
+By implementing these monitoring levels, you can proactively ensure the health, reliability, and performance of your Open WebUI instance, providing a consistently positive experience for users.
