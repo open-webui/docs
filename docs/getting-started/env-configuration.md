@@ -932,7 +932,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1126,9 +1126,51 @@ modeling files for reranking.
 
 #### `QDRANT_GRPC_PORT`
 
-- Type: `str`
-- Default: `"6334"`
+- Type: `int`
+- Default: `6334`
 - Description: Sets the gRPC port number for Qdrant.
+
+### Pinecone
+
+When using Pinecone as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
+
+#### `PINECONE_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key used to authenticate with the Pinecone service.
+
+#### `PINECONE_ENVIRONMENT`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the Pinecone environment to connect to (e.g., `us-west1-gcp`, `gcp-starter`, etc.).
+
+#### `PINECONE_INDEX_NAME`
+
+- Type: `str`
+- Default: `open-webui-index`
+- Description: Defines the name of the Pinecone index that will be used to store and query vector embeddings.
+
+#### `PINECONE_DIMENSION`
+
+- Type: `int`
+- Default: `1536`
+- Description: The dimensionality of the vector embeddings. Must match the dimension expected by the index (commonly 768, 1024, 1536, or 3072 based on model used).
+
+#### `PINECONE_METRIC`
+
+- Type: `str`
+- Default: `cosine`
+- Options: `cosine`, `dotproduct`, `euclidean`
+- Description: Specifies the similarity metric to use for vector comparisons within the Pinecone index.
+
+#### `PINECONE_CLOUD`
+
+- Type: `str`
+- Default: `aws`
+- Options: `aws`, `gcp`, `azure`
+- Description: Specifies the cloud provider where the Pinecone index is hosted.
 
 ## RAG Content Extraction Engine
 
