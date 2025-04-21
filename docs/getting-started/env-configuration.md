@@ -129,8 +129,8 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 #### `THREAD_POOL_SIZE`
 
-- Type: `str`
-- Default: `"0"`
+- Type: `int`
+- Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default FastAPI/AnyIO use `40` threads.
 
 #### `SHOW_ADMIN_DETAILS`
