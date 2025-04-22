@@ -2908,6 +2908,12 @@ Documentation on the URL scheme is available available [here](https://docs.sqlal
 
 :::
 
+#### `DATABASE_SCHEMA`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the database schema to connect to.
+
 #### `DATABASE_POOL_SIZE`
 
 - Type: `int`
