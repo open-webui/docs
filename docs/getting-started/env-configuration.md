@@ -127,6 +127,12 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Enables or disables user webhooks.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `THREAD_POOL_SIZE`
+
+- Type: `int`
+- Default: `0`
+- Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default FastAPI/AnyIO use `40` threads.
+
 #### `SHOW_ADMIN_DETAILS`
 
 - Type: `bool`
@@ -1106,6 +1112,24 @@ modeling files for reranking.
 - Type: `str`
 - Description: Sets the URI for Qdrant.
 
+#### `QDRANT_ON_DISK`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enable the usage of memmap(also known as on-disk) storage
+
+#### `QDRANT_PREFER_GRPC`
+
+- Type: `bool`
+- Default: `False`
+- Description: Use gPRC interface whenever possible
+
+#### `QDRANT_GRPC_PORT`
+
+- Type: `int`
+- Default: `6334`
+- Description: Sets the gRPC port number for Qdrant.
+
 ### Pinecone
 
 When using Pinecone as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
@@ -1519,12 +1543,6 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Default: `None`
 - Description: Specifies the client ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `QDRANT_ON_DISK`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enable the usage of memmap(also known as on-disk) storage
 
 ## Web Search
 
