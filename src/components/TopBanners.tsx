@@ -16,7 +16,7 @@ export const TopBanners = () => {
 			url: "https://forms.gle/92mvG3ESYj47zzRL9",
 			name: "Open WebUI",
 			description:
-				"The top banner spot is reserved for Emerald+ Enterprise sponsors on a first-come, first-served basis",
+				"The top banner spot is reserved for Emerald+ Enterprise sponsors",
 		},
 	];
 
