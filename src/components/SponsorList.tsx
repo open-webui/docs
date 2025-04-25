@@ -1,6 +1,16 @@
 import { Sponsor } from "@site/src/components/Sponsors/Sponsor";
 
 export const SponsorList = () => {
+
+	const emeraldSponsors = [
+		{
+			imgSrc: "/sponsors/logos/n8n.png",
+			url: "https://n8n.io/",
+			name: "n8n",
+			description:
+				"Does your interface have a backend yet? Try n8n",
+		},
+	];
 	const sponsors = [
 		{
 			imgSrc: "/sponsors/sponsor.png",
@@ -52,7 +62,7 @@ export const SponsorList = () => {
 
 
 				<div className="flex flex-wrap items-start justify-start gap-5">
-				{sponsors.map((sponsor) => (
+				{emeraldSponsors.map((sponsor) => (
 						<Sponsor sponsor={sponsor} />
 					))}
 					

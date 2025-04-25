@@ -10,14 +10,14 @@ export const TopBanner = ({ items }) => {
 
 						<a href={item.url} target="_blank">
 							<img
-								className="hidden w-full rounded-xl md:block h-16 object-cover" 
+								className="hidden w-full rounded-xl md:block h-18 object-cover" 
 								loading="lazy"
 								alt={item.name}
 								src={item.imgSrc}
 							/>
 
 							<img
-								className="block w-full rounded-xl md:hidden h-16 object-cover"
+								className="block w-full rounded-xl md:hidden h-18 object-cover"
 								loading="lazy"
 								alt={item.name}
 								src={item?.mobileImgSrc || item.imgSrc}

@@ -3,12 +3,12 @@ import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
 export const TopBanners = () => {
 	const items = [
 		{
-			imgSrc: "/sponsors/banners/openwebui-banner.png",
-			mobileImgSrc: "/sponsors/banners/openwebui-banner-mobile.png",
-			url: "https://openwebui.com",
-			name: "Open WebUI Community",
+			imgSrc: "/sponsors/banners/n8n-banner.png",
+			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
+			url: "https://n8n.io/",
+			name: "n8n",
 			description:
-				"Join our growing community! Sign up to gain access to exclusive models, tools, and functions.",
+				"Does your interface have a backend yet? Try n8n",
 		},
 		{
 			imgSrc: "/sponsors/banners/placeholder.png",
