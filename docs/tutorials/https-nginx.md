@@ -23,11 +23,15 @@ Choose the method that best fits your deployment needs.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+import NginxProxyManager from './tab-nginx/NginxProxyManager.md';
 import SelfSigned from './tab-nginx/SelfSigned.md';
 import LetsEncrypt from './tab-nginx/LetsEncrypt.md';
 import Windows from './tab-nginx/Windows.md';
 
 <Tabs>
+  <TabItem value="NginxProxyManager" label="Nginx Proxy Manager">
+    <NginxProxyManager />
+  </TabItem>
   <TabItem value="letsencrypt" label="Let's Encrypt">
     <LetsEncrypt />
   </TabItem>
