@@ -1871,6 +1871,12 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Default: `False`
 - Description: Toggles automatic update of the Whisper model.
 
+#### `WHISPER_LANGUAGE`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the language Whisper uses for TTS. Whisper predicts the language by default. To revert to default behaviour, unset this variable.
+
 ### Speech-to-Text (OpenAI)
 
 #### `AUDIO_STT_ENGINE`
