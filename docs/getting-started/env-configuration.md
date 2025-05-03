@@ -2743,6 +2743,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_FEATURES_PLAYGROUND_ACCESS`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables user permission to use the playground.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Workspace Permissions
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`
