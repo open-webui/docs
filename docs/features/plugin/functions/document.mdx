@@ -1,0 +1,70 @@
+---
+sidebar_position: 4
+title: "📄 Document Function"
+---
+
+# 📄 Document Function: Process document prior inserting to vector database
+
+Welcome to the comprehensive guide on Document Functions in Open WebUI! 
+Document processors are a flexible and powerful **plugin system** for modifying data *before it's sent to the Vector Database.
+Whether you’re transforming document for better context or cleaning up for improved readability, **Document Functions** let you do it all.  
+
+<details>
+<summary>Example</summary>
+
+```
+import re
+import logging
+from pydantic import BaseModel, Field
+
+from open_webui.env import SRC_LOG_LEVELS
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MAIN"])
+
+class Document:
+    """
+    Document cleaner that removes common artifacts from imported documents.
+
+    This processor cleans up document text by removing:
+    - Document banners (CONFIDENTIAL, INTERNAL, DRAFT)
+    - Page numbers and footers
+    - Excessive whitespace and line breaks
+    """
+
+    class Valves(BaseModel):
+        priority: int = Field(default=0, description="Processing priority (lower numbers run first)")
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    def process(self, text: str) -> str:
+        """
+        Clean document text by removing common artifacts.
+
+        Args:
+            text: Original document text
+
+        Returns:
+            Cleaned document text
+        """
+        if not text or not isinstance(text, str):
+            return text
+
+        # Remove banners like "## INTERNAL ##", "**CONFIDENTIAL**", etc.
+        text = re.sub(
+            r"^\s*[#*\-]*\s*(internal|confidential|draft)\s*[#*\-]*\s*$",
+            "",
+            text,
+            flags=re.IGNORECASE | re.MULTILINE,
+        )
+
+        # Remove footers like "page 3 of 10"
+        text = re.sub(r"page\s*\d+\s*of\s*\d+", "", text, flags=re.IGNORECASE)
+
+        # Collapse excessive empty lines
+        text = re.sub(r"\n\s*\n+", "\n\n", text)
+
+        return text.strip()
+```
+</details>
