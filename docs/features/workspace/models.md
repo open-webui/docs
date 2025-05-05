@@ -26,7 +26,9 @@ When editing a modelfile, you can customize the following settings:
 * **Prompt Suggestions**: Add prompts that will be displayed on a fresh new chat page.
 * **Documents**: Add documents to the modelfile (always RAG [Retrieval Augmented Generation]).
 * **Tools, Filters, and Actions**: Select the tools, filters, and actions that will be available to the modelfile.
-* **Vision**: Toggle to enable `Vision` for multi-modals.
+* **Capabilites**: Enable or disable `Capabilities` for the model.
+  * **Vision**: Toggle to enable `Vision` for multi-modals.
+  * **File Upload Supported**: Toggle to show / hide file upload button in chat input.
 * **Tags**: Add tags to the modelfile that will be displayed beside the model name in the model selector dropdown.
 
 ### Model Discovery and Import/Export
