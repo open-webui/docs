@@ -1839,7 +1839,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `en`
 - Description: Comma-separated list of language codes to try when fetching YouTube video transcriptions, in priority order.
-- Example: If set to es,de,en, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English. Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English. Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Audio
