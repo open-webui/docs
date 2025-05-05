@@ -1875,7 +1875,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the language Whisper uses for STT. Whisper predicts the language by default. To revert to default behaviour, unset this variable.
+- Description: Specifies the ISO 639-2 language Whisper uses for STT. Whisper predicts the language by default.
 
 ### Speech-to-Text (OpenAI)
 
