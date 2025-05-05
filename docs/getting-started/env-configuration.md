@@ -1207,6 +1207,22 @@ When using Pinecone as the vector store, the following environment variables are
 - Description: Specifies the URL for the Docling server.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DOCLING_OCR_ENGINE`
+
+- Type: `str`  
+- Default: `tesseract`  
+- Description: Specifies the OCR engine used by Docling.  
+  Supported values include: `tesseract` (default), `easyocr`, `ocrmac`, `rapidocr`, and `tesserocr`.  
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `DOCLING_OCR_LANG`
+
+- Type: `str`  
+- Default: `eng,fra,deu,spa` (when using the default `tesseract` engine)  
+- Description: Specifies the OCR language(s) to be used with the configured `DOCLING_OCR_ENGINE`.  
+  The format and available language codes depend on the selected OCR engine.  
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## Retrieval Augmented Generation (RAG)
 
 #### `RAG_EMBEDDING_ENGINE`
