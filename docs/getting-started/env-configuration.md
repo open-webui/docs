@@ -264,6 +264,16 @@ for local Whisper and embeddings.
 - Description: Specifies the SSL assert fingerprint to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_PROMPT_SUGGESTIONS`
+
+- Type: `list` of `dict`
+- Default: `[]` (which means to use the built-in default prompt suggestions)
+- Description: List of prompt suggestions. The format for prompt suggestions are:
+
+```json
+[{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
+```
+
 ### AIOHTTP Client
 
 #### `AIOHTTP_CLIENT_TIMEOUT`
