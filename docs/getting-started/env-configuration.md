@@ -1871,6 +1871,12 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Default: `False`
 - Description: Toggles automatic update of the Whisper model.
 
+#### `WHISPER_LANGUAGE`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the ISO 639-1 language Whisper uses for STT (ISO 639-2 for Hawaiian and Cantonese). Whisper predicts the language by default.
+
 ### Speech-to-Text (OpenAI)
 
 #### `AUDIO_STT_ENGINE`
