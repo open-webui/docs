@@ -1917,7 +1917,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `AUDIO_STT_AZURE_REGION`
 
 - Type: `str`
-- Default: `None`
+- Default: `eastus`
 - Description: Specifies the Azure region to use for Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1926,6 +1926,20 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `None`
 - Description: Specifies the locales to use for Azure Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_AZURE_BASE_URL`
+
+- Type: `str`
+- Default: `https://{region}.tts.speech.microsoft.com`
+- Description: Specifies the Azure endpoint to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_AZURE_MAX_SPEAKERS`
+
+- Type: `str`
+- Default: `3`
+- Description: Specifies the maximum speakers to attempt to recognize during transcription.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Speech-to-Text (Deepgram)
@@ -1983,6 +1997,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `AUDIO_TTS_AZURE_SPEECH_REGION`
 
 - Type: `str`
+- Default: `eastus`
 - Description: Sets the region for Azure Text to Speech.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1990,6 +2005,13 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `str`
 - Description: Sets the output format for Azure Text to Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_AZURE_SPEECH_BASE_URL`
+
+- Type: `str`
+- Default: `https://{region}.api.cognitive.microsoft.com`
+- Description: Specifies the Azure endpoint to use for Azure Text to Speech.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### OpenAI Text-to-Speech
