@@ -17,7 +17,7 @@ export const SponsorList = () => {
 			url: "https://openwebui.com",
 			name: "Open WebUI",
 			description:
-				"On a mission to build the best open-source AI user interface.",
+				"On a mission to build the best AI user interface.",
 		},
 	];
 
