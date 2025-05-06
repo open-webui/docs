@@ -37,7 +37,6 @@ services:
       - ./data:/data
       - ./letsencrypt:/etc/letsencrypt
 ```
-###### Note: If you get error that port ``80`` is busy for some reason, you can change ``80:80`` to ``8085:80`` (just an example, select any available port).
 
 Run the container:
 ```bash
@@ -48,11 +47,11 @@ docker-compose up -d
     * Log in to your domain provider (e.g., DuckDNS) and create a domain. 
     * Point the domain to your proxy’s local IP (e.g., 192.168.0.6).
     * If using DuckDNS, get an API token from their dashboard.
-    ###### Here is a simple example how it's done in https://www.duckdns.org/domains :
-![%pn_28_09_37](https://github.com/user-attachments/assets/41b2be92-cdce-4e7b-a51d-e97f1ae2409f)
+
+###### Here is a simple example how it's done in https://www.duckdns.org/domains :
     
 4. **Set Up SSL Certificates:**
-* Access Nginx Proxy Manager at http://<server_ip>:81. For example: ``192.168.0.6:81``
+* Access Nginx Proxy Manager at http://server_ip:81. For example: ``192.168.0.6:81``
 * Log in with the default credentials (admin@example.com / changeme). Change them as asked.
 * Go to SSL Certificates → Add SSL Certificate → Let's Encrypt.
 * Write your email and domain name you got from DuckDNS. One domain name contains an asterisk and another does not. Example: ``*.hello.duckdns.org`` and ``hello.duckdns.org``.
@@ -65,9 +64,6 @@ docker-compose up -d
 * Fill in the domain name (e.g., openwebui.hello.duckdns.org).
 * Set the scheme to HTTP (default), enable ``Websockets support`` and point to your Docker IP (if docker with open-webui is running on the same computer as NGINX manager, this will be the same IP as earlier (example: ``192.168.0.6``) 
 * Select the SSL certificate generated earlier, force SSL, and enable HTTP/2.
-###### Additional information: ``hello.duckdns.org`` is a **second-level domain**. ``openwebui.hello.duckdns.org`` is a subdomain of a subdomain/nested subdomain. Example of setup: 
-![%pn_28_10_09](https://github.com/user-attachments/assets/bc182a51-ebcf-4592-92fb-bfed0c13b1d9)
-
 6. **Add your url to open-webui (otherwise getting HTTPS error):**
 
 * Go to your open-webui → Admin Panel → Settings → General
@@ -76,4 +72,5 @@ docker-compose up -d
 #### Access the WebUI:
 
 Access Open WebUI via HTTPS at either ``hello.duckdns.org`` or ``openwebui.hello.duckdns.org`` (in whatever way you set it up).
+
 ###### Firewall Note: Be aware that local firewall software (like Portmaster) might block internal Docker network traffic or required ports. If you experience issues, check your firewall rules to ensure necessary communication for this setup is allowed.
