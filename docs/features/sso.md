@@ -22,6 +22,8 @@ There are several global configuration options for OAuth:
 1. `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` - allows logging into an account that matches the email address provided by the OAuth provider.
     - This is considered insecure as not all OAuth providers verify email addresses, and may allow accounts to be hijacked.
 1. `OAUTH_UPDATE_PICTURE_ON_LOGIN` - if `true`, users will have OAuth-provided profile pictures updated on login.
+    - If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to the empty string, this configuration will be ignored.
+1. `OAUTH_PICTURE_CLAIM` - can be used to customize or disable profile picture storage. The default, `picture`, will work for most providers; if set to the empty string, all users will receive the default person profile picture.
 
 ### Google
 
