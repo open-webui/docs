@@ -1,312 +1,139 @@
 ---
-sidebar_position: 2
-title: "⚙️ Tools"
+sidebar_position: 2  
+title: "⚙️ Tools"  
 ---
 
-## What are Tools?
-Tools are python scripts that are provided to an LLM at the time of the request. Tools allow LLMs to perform actions and receive additional context as a result. Generally speaking, your LLM of choice will need to support function calling for tools to be reliably utilized.
+# ⚙️ What are Tools?
 
-Tools enable many use cases for chats, including web search, web scraping, and API interactions within the chat.
+Tools are small Python scripts that add superpowers to your LLM. When enabled, they allow your chatbot to do amazing things — like search the web, scrape data, generate images, talk back using AI voices, and more.
 
-Many Tools are available to use on the [Community Website](https://openwebui.com/tools) and can easily be imported into your Open WebUI instance.
+Think of Tools as useful plugins that your AI can use when chatting with you.
 
-## How can I use Tools?
-[Once installed](#how-to-install-tools), Tools can be used by assigning them to any LLM that supports function calling and then enabling that Tool. To assign a Tool to a model, you need to navigate to Workspace => Models. Here you can select the model for which you’d like to enable any Tools.
+---
 
-Once you click the pencil icon to edit the model settings, scroll down to the Tools section and check any Tools you wish to enable. Once done you must click save.
+## 🚀 What Can Tools Help Me Do?
 
-Now that Tools are enabled for the model, you can click the “+” icon when chatting with an LLM to use various Tools. Please keep in mind that enabling a Tool does not force it to be used. It means the LLM will be provided the option to call this Tool.
+Here are just a few examples of what Tools let your AI assistant do:
 
-Lastly, we do provide a filter function on the community site that allows LLMs to autoselect Tools without you needing to enable them in the “+” icon menu: https://openwebui.com/f/hub/autotool_filter/
+- 🌍 Web Search: Get real-time answers by searching the internet.
+- 🖼️ Image Generation: Create images from your prompts.
+- 🔊 Voice Output: Generate AI voices using ElevenLabs.
 
-Please note: when using the AutoTool Filter, you will still need to take the steps above to enable the Tools per model.
+Explore ready-to-use tools here:  
+🧰 [Tools Showcase](https://openwebui.com/tools)
 
-## How to install Tools
-The Tools import process is quite simple. You will have two options:
+---
 
-### Download and import manually
-Navigate to the community site: https://openwebui.com/tools/
-1) Click on the Tool you wish to import
-2) Click the blue “Get” button in the top right-hand corner of the page
-3) Click “Download as JSON export”
-4) You can now upload the Tool into Open WebUI by navigating to Workspace => Tools and clicking “Import Tools”
 
-### Import via your Open WebUI URL
-1) Navigate to the community site: https://openwebui.com/tools/
-2) Click on the Tool you wish to import
-3) Click the blue “Get” button in the top right-hand corner of the page
-4) Enter the IP address of your Open WebUI instance and click “Import to WebUI” which will automatically open your instance and allow you to import the Tool.
+## 📦 How to Install Tools
 
-Note: You can install your own Tools and other Tools not tracked on the community site using the manual import method. Please do not import Tools you do not understand or are not from a trustworthy source. Running unknown code is ALWAYS a risk.
+There are two easy ways to install Tools in Open WebUI:
 
-## What sorts of things can Tools do?
-Tools enable diverse use cases for interactive conversations by providing a wide range of functionality such as:
+1. Go to [Community Tool Library](https://openwebui.com/tools)
+2. Choose a Tool, then click the Get button.
+3. Enter your Open WebUI instance’s IP address or URL.
+4. Click “Import to WebUI” — done!
 
-- [**Web Search**](https://openwebui.com/t/constliakos/web_search/): Perform live web searches to fetch real-time information.
-- [**Image Generation**](https://openwebui.com/t/justinrahb/image_gen/): Generate images based on the user prompt
-- [**External Voice Synthesis**](https://openwebui.com/t/justinrahb/elevenlabs_tts/): Make API requests within the chat to integrate external voice synthesis service ElevenLabs and generate audio based on the LLM output.
+🛑 Safety Tip: Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code.
 
-## Writing A Custom Toolkit
+---
 
-Toolkits are defined in a single Python file, with a top level docstring with metadata and a `Tools` class.
 
-### Example Top-Level Docstring
+## 🔧 How to Use Tools in Open WebUI
 
-```python
-"""
-title: String Inverse
-author: Your Name
-author_url: https://website.com
-git_url: https://github.com/username/string-reverse.git
-description: This tool calculates the inverse of a string
-required_open_webui_version: 0.4.0
-requirements: langchain-openai, langgraph, ollama, langchain_ollama
-version: 0.4.0
-licence: MIT
-"""
-```
+Once you've installed Tools (we’ll show you how below), here’s how to enable and use them:
 
-### Tools Class
+You have two ways to enable a Tool for your model:
 
-Tools have to be defined as methods withing a class called `Tools`, with optional subclasses called `Valves` and `UserValves`, for example:
+### ➕ Option 1: Enable from the Chat Window
 
-```python
-class Tools:
-    def __init__(self):
-        """Initialize the Tool."""
-        self.valves = self.Valves()
+While chatting, click the ➕ icon in the input area. You’ll see a list of available Tools — you can enable any of them on the fly for that session.
 
-    class Valves(BaseModel):
-        api_key: str = Field("", description="Your API key here")
+💡 Tip: Enabling a Tool gives the model permission to use it — but it may not use it unless it's useful for the task.
 
-    def reverse_string(self, string: str) -> str:
-        """
-        Reverses the input string.
-        :param string: The string to reverse
-        """
-        # example usage of valves
-        if self.valves.api_key != "42":
-            return "Wrong API key"
-        return string[::-1] 
-```
+### ✏️ Option 2: Enable by Default (Recommended for Frequent Use)
+1. Go to: Workspace ➡️ Models
+2. Choose the model you’re using (like GPT-4 or LLaMa2) and click the ✏️ edit icon.
+3. Scroll down to the “Tools” section.
+4. ✅ Check the Tools you want your model to have access to by default.
+5. Click Save.
 
-### Type Hints
-Each tool must have type hints for arguments. As of version OpenWebUI version 0.4.3, the types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
+This ensures the model always has these Tools ready to use whenever you chat with it.
 
-### Valves and UserValves - (optional, but HIGHLY encouraged)
+You can also let your LLM auto-select the right Tools using the AutoTool Filter:
 
-Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given Tool.
+🔗 [AutoTool Filter](https://openwebui.com/f/hub/autotool_filter/)
 
-Valves are configurable by admins alone and UserValves are configurable by any users.
+🎯 Note: Even when using AutoTool, you still need to enable your Tools using Option 2.
 
-<details>
-<summary>Example</summary>
+✅ And that’s it — your LLM is now Tool-powered! You're ready to supercharge your chats with web search, image generation, voice output, and more.
 
-```
-# Define and Valves
-    class Valves(BaseModel):
-        priority: int = Field(
-            default=0, description="Priority level for the filter operations."
-        )
-        test_valve: int = Field(
-            default=4, description="A valve controlling a numberical value"
-        )
-        pass
+---
 
-    # Define any UserValves
-    class UserValves(BaseModel):
-        test_user_valve: bool = Field(
-            default=False, description="A user valve controlling a True/False (on/off) switch"
-        )
-        pass
+## 🧠 Choosing How Tools Are Used: Default vs Native
 
-    def __init__(self):
-        self.valves = self.Valves()
-```
-</details>
+Once Tools are enabled for your model, Open WebUI gives you two different ways to let your LLM use them in conversations.
 
-### Optional Arguments
-Below is a list of optional arguments your tools can depend on:
-- `__event_emitter__`: Emit events (see following section)
-- `__event_call__`: Same as event emitter but can be used for user interactions
-- `__user__`: A dictionary with user information
-- `__metadata__`: Dictionary with chat metadata
-- `__messages__`: List of previous messages
-- `__files__`: Attached files
-- `__model__`: Model name
+You can decide how the model should call Tools by choosing between:
 
-### Event Emitters
-Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
+- 🟡 Default Mode (Prompt-based)
+- 🟢 Native Mode (Built-in function calling)
 
-There are two different types of Event Emitters:
+Let’s break it down:
 
-#### Status
-This is used to add statuses to a message while it is performing steps. These can be done at any stage during the Tool. These statuses appear right above the message content. These are very useful for Tools that delay the LLM response or process large amounts of information. This allows you to inform users what is being processed in real-time.
+### 🟡 Default Mode (Prompt-based Tool Triggering)
 
-```
-await __event_emitter__(
-            {
-                "type": "status", # We set the type here
-                "data": {"description": "Message that shows up in the chat", "done": False, "hidden": False}, 
-                # Note done is False here indicating we are still emitting statuses
-            }
-        )
-```
+This is the default setting in Open WebUI.
 
-<details>
-<summary>Example</summary>
+Here, your LLM doesn’t need to natively support function calling. Instead, we guide the model using smart tool selection prompt template to select and use a Tool.
 
-```
-async def test_function(
-        self, prompt: str, __user__: dict, __event_emitter__=None
-    ) -> str:
-        """
-        This is a demo
+✅ Works with almost any model  
+✅ Great way to unlock Tools with basic or local models  
+❗ Not as reliable or flexible as Native Mode when chaining tools
 
-        :param test: this is a test parameter
-        """
+### 🟢 Native Mode (Function Calling Built-In)
 
-        await __event_emitter__(
-            {
-                "type": "status", # We set the type here
-                "data": {"description": "Message that shows up in the chat", "done": False}, 
-                # Note done is False here indicating we are still emitting statuses
-            }
-        )
+If your model does support “native” function calling (like GPT-4o or GPT-3.5-turbo-1106), you can use this powerful mode to let the LLM decide — in real time — when and how to call multiple Tools during a single chat message.
 
-        # Do some other logic here
-        await __event_emitter__(
-            {
-                "type": "status",
-                "data": {"description": "Completed a task message", "done": True, "hidden": False},
-                # Note done is True here indicating we are done emitting statuses
-                # You can also set "hidden": True if you want to remove the status once the message is returned
-            }
-        )
+✅ Fast, accurate, and can chain multiple Tools in one response  
+✅ The most natural and advanced experience  
+❗ Requires a model that actually supports native function calling
 
-        except Exception as e:
-            await __event_emitter__(
-                {
-                    "type": "status",
-                    "data": {"description": f"An error occured: {e}", "done": True},
-                }
-            )
+### ✳️ How to Switch Between Modes
 
-            return f"Tell the user: {e}"
-```
-</details>
+Want to enable native function calling in your chats? Here's how:
 
-#### Message
-This type is used to append a message to the LLM at any stage in the Tool. This means that you can append messages, embed images, and even render web pages before, or after, or during the LLM response.
+![Chat Controls](/images/features/plugin/tools/chat-controls.png)
 
-```
-await __event_emitter__(
-                    {
-                        "type": "message", # We set the type here
-                        "data": {"content": "This message will be appended to the chat."},
-                        # Note that with message types we do NOT have to set a done condition
-                    }
-                )
-```
+1. Open the chat window with your model.
+2. Click ⚙️ Chat Controls > Advanced Params.
+3. Look for the Function Calling setting and switch it from Default → Native
 
-<details>
-<summary>Example</summary>
+That’s it! Your chat is now using true native Tool support (as long as the model supports it).
 
-```
-async def test_function(
-        self, prompt: str, __user__: dict, __event_emitter__=None
-    ) -> str:
-        """
-        This is a demo
+➡️ We recommend using GPT-4o or another OpenAI model for the best native function-calling experience.  
+🔎 Some local models may claim support, but often struggle with accurate or complex Tool usage.
 
-        :param test: this is a test parameter
-        """
+💡 Summary:
 
-        await __event_emitter__(
-                    {
-                        "type": "message", # We set the type here
-                        "data": {"content": "This message will be appended to the chat."},
-                        # Note that with message types we do NOT have to set a done condition
-                    }
-                )
+| Mode     | Who it’s for                     | Pros                                    | Cons                                 |
+|----------|----------------------------------|-----------------------------------------|--------------------------------------|
+| Default  | Any model                         | Broad compatibility, safer, flexible    | May be less accurate or slower       |
+| Native   | GPT-4o, etc.                      | Fast, smart, excellent tool chaining     | Needs proper function call support   |
 
-        except Exception as e:
-            await __event_emitter__(
-                {
-                    "type": "status",
-                    "data": {"description": f"An error occured: {e}", "done": True},
-                }
-            )
+Choose the one that works best for your setup — and remember, you can always switch on the fly via Chat Controls.
 
-            return f"Tell the user: {e}"
-```
-</details>
+👏 And that's it — your LLM now knows how and when to use Tools, intelligently.
 
-#### Citations
-This type is used to provide citations or references in the chat. You can utilize it to specify the content, the source, and any relevant metadata. Below is an example of how to emit a citation event:
+---
 
-```
-await __event_emitter__(
-    {
-        "type": "citation",
-        "data": {
-            "document": [content],
-            "metadata": [
-                {
-                    "date_accessed": datetime.now().isoformat(),
-                    "source": title,
-                }
-            ],
-            "source": {"name": title, "url": url},
-        },
-    }
-)
-```
-If you are sending multiple citations, you can iterate over citations and call the emitter multiple times. When implementing custom citations, ensure that you set `self.citation = False` in your `Tools` class `__init__` method. Otherwise, the built-in citations will override the ones you have pushed in. For example:
+## 🧠 Summary
 
-```python
-def __init__(self):
-    self.citation = False
-```
+Tools are add-ons that help your AI model do much more than just chat. From answering real-time questions to generating images or speaking out loud — Tools bring your AI to life.
 
-Warning: if you set `self.citation = True`, this will replace any custom citations you send with the automatically generated return citation. By disabling it, you can fully manage your own citation references.
+- Visit: [https://openwebui.com/tools](https://openwebui.com/tools) to discover new Tools.
+- Install them manually or with one-click.
+- Enable them per model from Workspace ➡️ Models.
+- Use them in chat by clicking ➕
 
-<details>
-<summary>Example</summary>
-
-```
-class Tools:
-    class UserValves(BaseModel):
-        test: bool = Field(
-            default=True, description="test"
-        )
-
-    def __init__(self):
-        self.citation = False
-
-async def test_function(
-        self, prompt: str, __user__: dict, __event_emitter__=None
-    ) -> str:
-        """
-        This is a demo that just creates a citation
-
-        :param test: this is a test parameter
-        """
-
-        await __event_emitter__(
-            {
-                "type": "citation",
-                "data": {
-                    "document": ["This message will be appended to the chat as a citation when clicked into"],
-                    "metadata": [
-                        {
-                            "date_accessed": datetime.now().isoformat(),
-                            "source": title,
-                        }
-                    ],
-                    "source": {"name": "Title of the content"", "url": "http://link-to-citation"},
-                },
-            }
-        )
-```
-</details>
+Now go make your AI waaaaay smarter 🤖✨

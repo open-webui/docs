@@ -3,19 +3,41 @@ import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
 export const TopBanners = () => {
 	const items = [
 		{
-			imgSrc: "/ads/pipelines-banner.png",
-			mobileImgSrc: "/ads/pipelines-banner-mobile.png",
-			url: "https://github.com/open-webui/pipelines",
-			name: "Open WebUI Pipelines",
+			imgSrc: "/sponsors/banners/n8n-banner.png",
+			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
+			url: "https://n8n.io/",
+			name: "n8n",
 			description:
-				"Pipelines: Versatile, UI-Agnostic OpenAI-Compatible Plugin Framework",
+				"Does your interface have a backend yet? Try n8n",
 		},
+
 		{
-			imgSrc: "/ads/sponsor-banner-1.png",
-			mobileImgSrc: "/ads/sponsor-banner-small-1.png",
-			url: "https://davewaring.com/tag/digital-brain-building/",
-			name: "Dave Waring",
-			description: "Follow along as I build my own AI powered digital brain.",
+			imgSrc: "/sponsors/banners/n8n-banner.png",
+			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
+			url: "https://n8n.io/",
+			name: "n8n",
+			description:
+				"Does your interface have a backend yet? Try n8n",
+		},
+
+
+		{
+			imgSrc: "/sponsors/banners/n8n-banner.png",
+			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
+			url: "https://n8n.io/",
+			name: "n8n",
+			description:
+				"Does your interface have a backend yet? Try n8n",
+		},
+
+		
+		{
+			imgSrc: "/sponsors/banners/placeholder.png",
+			mobileImgSrc: "/sponsors/banners/placeholder-mobile.png",
+			url: "https://forms.gle/92mvG3ESYj47zzRL9",
+			name: "Open WebUI",
+			description:
+				"The top banner spot is reserved for Emerald+ Enterprise sponsors",
 		},
 	];
 

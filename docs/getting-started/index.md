@@ -3,7 +3,12 @@ sidebar_position: 200
 title: "🚀 Getting Started"
 ---
 
-# Getting Started with Open WebUI
+
+import { TopBanners } from "@site/src/components/TopBanners";
+
+
+<TopBanners />
+
 
 Welcome to the **Open WebUI Documentation Hub!** Below is a list of essential guides and resources to help you get started, manage, and develop with Open WebUI.
 

@@ -48,6 +48,32 @@ docker volume rm open-webui
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 ```
 
+## Keeps being logged out after every update?
+If you find yourself getting logged out after every update, ensure that `WEBUI_SECRET_KEY` is set in your environment variables. Without this key being consistently defined, your authentication sessions may be invalidated after updates.
+
+To set `WEBUI_SECRET_KEY` persistently, include it when running your Docker container:
+
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui -e WEBUI_SECRET_KEY=your_secret_key ghcr.io/open-webui/open-webui:main
+```
+
+Or, if using **docker-compose**, add it under the `environment` section:
+
+```yml
+version: '3'
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - WEBUI_SECRET_KEY=your_secret_key
+```
+
+For more details on environment variable settings, check the [Open WebUI documentation on security variables](https://docs.openwebui.com/getting-started/env-configuration#security-variables).
+
 ## Automatically Updating Open WebUI with Watchtower
 
 You can use [Watchtower](https://containrrr.dev/watchtower/) to automate the update process for Open WebUI. Here are three options:

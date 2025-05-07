@@ -5,7 +5,7 @@ import { themes as prismThemes } from "prism-react-renderer";
 
 const config: Config = {
 	title: "Open WebUI",
-	tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
+	tagline: "On a mission to build the best AI interface",
 	favicon: "images/favicon.png",
 
 	// Set the production url of your site here
@@ -40,6 +40,10 @@ const config: Config = {
 		[
 			"classic",
 			{
+				gtag: {
+					trackingID: "G-522JSJVWTB",
+					anonymizeIP: false,
+				},
 				docs: {
 					sidebarPath: "./sidebars.ts",
 					routeBasePath: "/",

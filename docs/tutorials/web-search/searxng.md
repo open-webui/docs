@@ -343,6 +343,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 * `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
 
 **Do note the `/search?q=<query>` part is mandatory.**
+
 5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
 6. Save changes
 

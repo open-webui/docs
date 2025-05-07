@@ -1,0 +1,121 @@
+---
+sidebar_position: 3
+title: "🧠 Troubleshooting RAG (Retrieval-Augmented Generation)"
+---
+
+Retrieval-Augmented Generation (RAG) enables language models to reason over external content—documents, knowledge bases, and more—by retrieving relevant info and feeding it into the model. But when things don’t work as expected (e.g., the model "hallucinates" or misses relevant info), it's often not the model's fault—it's a context issue.
+
+Let’s break down the common causes and solutions so you can supercharge your RAG accuracy! 🚀
+
+## Common RAG Issues and How to Fix Them 🛠️
+
+### 1. The Model "Can’t See" Your Content 👁️❌
+
+This is the most common problem—and it's typically caused by issues during your content ingestion process. The model doesn’t hallucinate because it’s wrong, it hallucinates because it was never given the right content in the first place.
+
+✅ Solution: Check your content extraction settings
+
+- Navigate to: **Admin Settings > Documents**.
+- Make sure you're using a robust content extraction engine such as:
+  - Apache Tika
+  - Docling
+  - Custom extractors (depending on your document types)
+
+📌 Tip: Try uploading a document and preview the extracted content. If it’s blank or missing key sections, you need to adjust your extractor settings or use a different engine.
+
+---
+
+### 2. Only a Small Part of the Document is Being Used 📄➡️✂️
+
+Open WebUI is designed to work with models that have limited context windows by default. For instance, many local models (e.g. Ollama's default models) are limited to 2048 tokens. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
+
+✅ Solutions:
+
+- Go to **Admin Settings > Documents**
+- Either:
+  - 💡 Enable “Bypass Embedding and Retrieval” — This sends full content directly without applying strict retrieval filters.
+  - 🔍 Toggle on “Full Context Mode” — This injects more comprehensive content into the model prompt.
+
+📌 Warning: Be mindful of context limits—if your model can’t handle more tokens, it will still get cut off.
+
+---
+
+### 3. Token Limit is Too Short ⏳
+
+Even if retrieval works, your model might still not process all the content it receives—because it simply can’t.
+
+By default, many models (especially Ollama-hosted LLMs) are limited to a 2048-token context window. That means only a fraction of your retrieved data will actually be used.
+
+✅ Solutions:
+
+- 🛠️ Extend the model’s context length:
+  - Navigate to the **Model Editor or Chat Controls**
+  - Modify the context length (e.g., increase to 8192+ tokens if supported)
+
+ℹ️ Note: The 2048-token default is a big limiter. For better RAG results, we recommend using models that support longer contexts.
+
+✅ Alternative: Use an external LLM with larger context capacity
+
+- Try GPT-4, GPT-4o, Claude 3, Gemini 1.5, or Mixtral with 8k+ context
+- Compare performance to Ollama—notice the accuracy difference when more content can be injected!
+
+📌 Tip: Stick with external models for better RAG performance in production use cases.
+
+---
+
+### 4. Embedding Model is Low-Quality or Mismatched 📉🧠
+
+Bad embeddings = bad retrieval. If the vector representation of your content is poor, the retriever won't pull the right content—no matter how powerful your LLM is.
+
+✅ Solution:
+
+- Change to a high-quality embedding model (e.g., all-MiniLM-L6-v2, Instructor X, or OpenAI embeddings)
+- Go to: **Admin Settings > Documents**
+- After changing the model, be sure to:
+  - ⏳ Reindex all existing documents so the new embeddings take effect.
+
+📌 Remember: Embedding quality directly affects what content is retrieved.
+
+---
+
+### 5. ❌ 400: 'NoneType' object has no attribute 'encode'
+
+This error indicates a misconfigured or missing embedding model. When Open WebUI tries to create embeddings but doesn’t have a valid model loaded, it can’t process the text—and the result is this cryptic error.
+
+💥 Cause:
+- Your embedding model isn’t set up properly.
+- It might not have downloaded completely.
+- Or if you're using an external embedding model, it may not be accessible.
+
+✅ Solution:
+
+- Go to: **Admin Settings > Documents > Embedding Model**
+- Save the embedding model again—even if it's already selected. This forces a recheck/download.
+- If you're using a remote/external embedding tool, make sure it's running and accessible to Open WebUI.
+
+📌 Tip: After fixing the configuration, try re-embedding a document and verify no error is shown in the logs.
+
+---
+
+## 🧪 Pro Tip: Test with GPT-4o or GPT-4
+
+If you’re not sure whether the issue is with retrieval, token limits, or embedding—try using GPT-4o temporarily (e.g., via OpenAI API). If the results suddenly become more accurate, it's a strong signal that your local model’s context limit (2048 by default in Ollama) is the bottleneck.
+
+- GPT-4o handles larger inputs (128k tokens!)
+- Provides a great benchmark to evaluate your system's RAG reliability
+
+---
+
+## Summary Checklist ✅
+
+| Problem | Fix |
+|--------|------|
+| 🤔 Model can’t “see” content | Check document extractor settings |
+| 🧹 Only part of content used | Enable Full Context Mode or Bypass Embedding |
+| ⏱ Limited by 2048 token cap | Increase model context length or use large-context LLM |
+| 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
+| Still confused? | Test with GPT-4o and compare outputs |
+
+---
+
+By optimizing these areas—extraction, embedding, retrieval, and model context—you can dramatically improve how accurately your LLM works with your documents. Don’t let a 2048-token window or weak retrieval pipeline hold back your AI’s power 🎯.

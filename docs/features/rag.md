@@ -3,9 +3,19 @@ sidebar_position: 11
 title: "🔎 Retrieval Augmented Generation (RAG)"
 ---
 
+:::warning
+
+If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This means that retrieved data may **not be used at all** because it doesn’t fit within the available context window. To improve **Retrieval-Augmented Generation (RAG) performance**, you should **increase the context length** to **8192+ tokens** in your Ollama model settings.  
+
+:::
+
+
 Retrieval Augmented Generation (RAG) is a cutting-edge technology that enhances the conversational capabilities of chatbots by incorporating context from diverse sources. It works by retrieving relevant information from a wide range of sources such as local and remote documents, web content, and even multimedia sources like YouTube videos. The retrieved text is then combined with a predefined RAG template and prefixed to the user's prompt, providing a more informed and contextually relevant response.
 
 One of the key advantages of RAG is its ability to access and integrate information from a variety of sources, making it an ideal solution for complex conversational scenarios. For instance, when a user asks a question related to a specific document or web page, RAG can retrieve and incorporate the relevant information from that source into the chat response. RAG can also retrieve and incorporate information from multimedia sources like YouTube videos. By analyzing the transcripts or captions of these videos, RAG can extract relevant information and incorporate it into the chat response.
+
+
+
 
 ## Local and Remote RAG Integration
 
@@ -48,3 +58,18 @@ A variety of parsers extract content from local and remote documents. For more, 
 ## Google Drive Integration
 
 When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](https://github.com/open-webui/docs/blob/main/docs/getting-started/env-configuration.md) environment variables to use.
+
+### Detailed Instructions
+1. Create an OAuth 2.0 client and configure both the Authorized JavaScript origins & Authorized redirect URI to be the URL (include the port if any) you use to access your Open-WebUI instance.
+1. Make a note of the Client ID associated with that OAuth client.
+1. Make sure that you enable both Google Drive API and Google Picker API for your project.
+1. Also set your app (project) as Testing and add your Google Drive email to the User List
+1. Set the permission scope to include everything those APIs have to offer. And because the app would be in Testing mode, no verification is required by Google to allow the app from accessing the data of the limited test users.
+1. Go to the Google Picker API page, and click on the create credentials button.
+1. Create an API key and under Application restrictions and choose Websites. Then add your Open-WebUI instance's URL, same as the Authorized JavaScript origins and Authorized redirect URIs settings in the step 1.
+1. Set up API restrictions on the API Key to only have access to Google Drive API & Google Picker API
+1. Set up the environment variable, `GOOGLE_DRIVE_CLIENT_ID` to the Client ID of the OAuth client from step 2.
+1. Set up the environment variable `GOOGLE_DRIVE_API_KEY` to the API Key value setup up in step 7 (NOT the OAuth client secret from step 2).
+1. Set up the `GOOGLE_REDIRECT_URI` to my Open-WebUI instance's URL (include the port, if any).
+1. Then relaunch your Open-WebUI instance with those three environment variables.
+1. After that, make sure Google Drive was enabled under `Admin Panel` < `Settings` < `Documents` < `Google Drive`

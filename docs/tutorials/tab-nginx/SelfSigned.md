@@ -33,6 +33,10 @@ Using self-signed certificates is suitable for development or internal use where
 
             # (Optional) Disable proxy buffering for better streaming response from models
             proxy_buffering off;
+
+            # (Optional) Increase max request size for large attachments and long audio messages
+            client_max_body_size 20M;
+            proxy_read_timeout 10m;
         }
     }
     ```
