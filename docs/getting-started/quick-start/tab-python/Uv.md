@@ -25,7 +25,7 @@ Once `uv` is installed, running Open WebUI is a breeze. Use the command below, e
   DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
   ```
 
-- **Windows**:  
+- **Windows** (PowerShell):  
   ```powershell
   $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
   ```
