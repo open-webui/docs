@@ -1,0 +1,76 @@
+---
+
+sidebar_position: 4  
+title: "🌐 Starting with OpenAI-Compatible Servers"
+
+---
+
+## Overview
+
+Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server that implements the OpenAI-compatible API**, running locally or remotely. This is perfect if you want to run different language models, or if you already have a favorite backend or ecosystem. This guide will show you how to:
+
+- Set up an OpenAI-compatible server (with a few popular options)
+- Connect it to Open WebUI
+- Start chatting right away
+
+## Step 1: Choose an OpenAI-Compatible Server
+
+There are many servers and tools that expose an OpenAI-compatible API. Here are some of the most popular:
+
+- [Llama.cpp](https://github.com/ggml-org/llama.cpp): Extremely efficient, runs on CPU and GPU
+- [Ollama](https://ollama.com/): Super user-friendly and cross-platform
+- [LM Studio](https://lmstudio.ai/): Rich desktop app for Windows/Mac/Linux
+- [Lemonade (ONNX TurnkeyML)](https://github.com/onnx/turnkeyml): Fast ONNX-based backend, easily runs GGUF and other models locally
+
+Pick whichever suits your workflow!
+
+---
+
+#### 🍋 Get Started with Lemonade (ONNX TurnkeyML)
+
+Lemonade is a plug-and-play ONNX-based OpenAI-compatible server. Here’s how to try it on Windows:
+
+1. [Download the latest `.exe`](https://github.com/onnx/turnkeyml/releases)
+2. Run `Lemonade_Server_Installer.exe`
+3. Install and download a model using Lemonade’s installer
+4. Once running, your API endpoint will be:
+
+   ```
+   http://localhost:8000/api/v0
+   ```
+
+![Lemonade Server](/images/getting-started/lemonade-server.png)
+
+
+Lemonade works on Linux and Mac too—see [their docs](https://github.com/onnx/turnkeyml) for details.
+
+---
+
+## Step 2: Connect Your Server to Open WebUI
+
+1. Open Open WebUI in your browser.
+2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI Connections**.
+3. Click ➕ **Add Connection**.
+
+   - **URL**: Use your server’s API endpoint (for example, `http://localhost:11434/v1` for Ollama, or your own Llama.cpp server’s address).
+   - **API Key**: Leave blank unless required.
+
+4. Click Save.
+
+*Tip: If running Open WebUI in Docker and your model server on your host machine, use `http://host.docker.internal:<your-port>/v1`.*
+
+##### **For Lemonade:**  When adding Lemonade, use `http://localhost:8000/api/v0` as the URL.
+
+![Lemonade Connection](/images/getting-started/lemonade-connection.png)
+
+---
+
+## Step 3: Start Chatting!
+
+Select your connected server’s model in the chat menu and get started!
+
+That’s it! Whether you choose Llama.cpp, Ollama, LM Studio, or Lemonade, you can easily experiment and manage multiple model servers—all in Open WebUI.
+
+--- 
+
+🚀 Enjoy building your perfect local AI setup!
