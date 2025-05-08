@@ -1066,6 +1066,43 @@ modeling files for reranking.
 - Default: `None`
 - Description: Specifies an optional connection token for Milvus.
 
+#### `MILVUS_INDEX_TYPE`
+
+- Type: `str`
+- Default: `AUTOINDEX`
+- Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`
+- Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but typically requires a clustered Milvus setup.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MILVUS_METRIC_TYPE`
+
+- Type: `str`
+- Default: `COSINE`
+- Options: `COSINE`, `IP`, `L2`
+- Description: Specifies the metric type for vector similarity search in Milvus.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MILVUS_HNSW_M`
+
+- Type: `int`
+- Default: `16`
+- Description: Specifies the `M` parameter for the HNSW index type in Milvus. This influences the number of bi-directional links created for each new element during construction. Only applicable if `MILVUS_INDEX_TYPE` is `HNSW`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MILVUS_HNSW_EFCONSTRUCTION`
+
+- Type: `int`
+- Default: `100`
+- Description: Specifies the `efConstruction` parameter for the HNSW index type in Milvus. This influences the size of the dynamic list for the nearest neighbors during index construction. Only applicable if `MILVUS_INDEX_TYPE` is `HNSW`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MILVUS_IVF_FLAT_NLIST`
+
+- Type: `int`
+- Default: `128`
+- Description: Specifies the `nlist` parameter for the IVF_FLAT index type in Milvus. This is the number of cluster units. Only applicable if `MILVUS_INDEX_TYPE` is `IVF_FLAT`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### OpenSearch
 
 #### `OPENSEARCH_CERT_VERIFY`
