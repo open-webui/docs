@@ -1069,7 +1069,7 @@ modeling files for reranking.
 #### `MILVUS_INDEX_TYPE`
 
 - Type: `str`
-- Default: `AUTOINDEX`
+- Default: `HNSW`
 - Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`
 - Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but typically requires a clustered Milvus setup.
 - Persistence: This environment variable is a `PersistentConfig` variable.
