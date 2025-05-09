@@ -27,7 +27,7 @@ class Filter:
             default=4,
             description="A valve controlling a numberical value"
             # required=False,  # you can enforce fields using True
-         )
+        )
         # To give the user the choice between multiple strings, you can use Literal from typing:
         choice_option: Literal["choiceA", "choiceB"] = Field(
             default="choiceA",
@@ -36,10 +36,10 @@ class Filter:
         priority: int = Field(
             default=0,
             description="Priority level for the filter operations. Lower values are passed through first"
-         )
+        )
         # The priority field is optional but if present will be used to
         # order the Filters.
-         pass
+        pass
         # Note that this 'pass' helps for parsing and is recommended.
  
     # UserValves are defined the same way.
