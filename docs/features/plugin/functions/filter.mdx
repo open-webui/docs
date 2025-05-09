@@ -177,10 +177,10 @@ def stream(self, event: dict) -> dict:
 ```
 
 > **Example Streamed Events:**
-```json
-{'id': 'chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb','choices': [{'delta': {'content': 'Hi'}}]}
-{'id': 'chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb','choices': [{'delta': {'content': '!'}}]}
-{'id': 'chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb','choices': [{'delta': {'content': ' 😊'}}]}
+```jsonl
+{"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": "Hi"}}]}
+{"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": "!"}}]}
+{"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": " 😊"}}]}
 ```
 📖 **What Happens?**
 - Each line represents a **small fragment** of the model's streamed response.
