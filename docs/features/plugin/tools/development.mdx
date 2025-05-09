@@ -50,7 +50,7 @@ class Tools:
 ```
 
 ### Type Hints
-Each tool must have type hints for arguments. As of version Open WebUI version 0.4.3, the types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
+Each tool must have type hints for arguments. The types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
