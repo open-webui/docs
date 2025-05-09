@@ -11,6 +11,7 @@ Valves are configurable by admins alone via the Tools or Functions menus. On the
 
  ```
 from pydantic import BaseModel, Field
+from typing import Literal
 
 # Define and Valves
 class Filter:
@@ -27,6 +28,11 @@ class Filter:
             description="A valve controlling a numberical value"
             # required=False,  # you can enforce fields using True
          )
+        # To give the user the choice between multiple strings, you can use Literal from typing:
+        choice_option: Literal["choiceA", "choiceB"] = Field(
+            default="choiceA",
+            description="An example of a multi choice valve",
+        )
         priority: int = Field(
             default=0,
             description="Priority level for the filter operations. Lower values are passed through first"
