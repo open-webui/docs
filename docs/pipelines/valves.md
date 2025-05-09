@@ -5,7 +5,9 @@ title: "⚙️ Valves"
 
 # Valves
 
-Valves are input variables that are set per pipeline. Valves are set as a subclass of the `Pipeline` class, and initialized as part of the `__init__` method of the `Pipeline` class.
+`Valves` (see the dedicated [Valves & UserValves](../features/plugin/valves/index.mdx) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
+
+`Valves` are set as a subclass of the `Pipeline` class, and initialized as part of the `__init__` method of the `Pipeline` class.
 
 When adding valves to your pipeline, include a way to ensure that valves can be reconfigured by admins in the web UI. There are a few options for this:
 
