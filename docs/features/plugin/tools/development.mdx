@@ -78,7 +78,7 @@ If the model seems to be unable to call the tool, make sure it is enabled (eithe
 #### Status
 This is used to add statuses to a message while it is performing steps. These can be done at any stage during the Tool. These statuses appear right above the message content. These are very useful for Tools that delay the LLM response or process large amounts of information. This allows you to inform users what is being processed in real-time.
 
-```
+```python
 await __event_emitter__(
             {
                 "type": "status", # We set the type here
@@ -91,7 +91,7 @@ await __event_emitter__(
 <details>
 <summary>Example</summary>
 
-```
+```python
 async def test_function(
         self, prompt: str, __user__: dict, __event_emitter__=None
     ) -> str:
@@ -134,7 +134,7 @@ async def test_function(
 #### Message
 This type is used to append a message to the LLM at any stage in the Tool. This means that you can append messages, embed images, and even render web pages before, or after, or during the LLM response.
 
-```
+```python
 await __event_emitter__(
                     {
                         "type": "message", # We set the type here
@@ -147,7 +147,7 @@ await __event_emitter__(
 <details>
 <summary>Example</summary>
 
-```
+```python
 async def test_function(
         self, prompt: str, __user__: dict, __event_emitter__=None
     ) -> str:
@@ -180,7 +180,7 @@ async def test_function(
 #### Citations
 This type is used to provide citations or references in the chat. You can utilize it to specify the content, the source, and any relevant metadata. Below is an example of how to emit a citation event:
 
-```
+```python
 await __event_emitter__(
     {
         "type": "citation",
@@ -209,7 +209,7 @@ Warning: if you set `self.citation = True`, this will replace any custom citatio
 <details>
 <summary>Example</summary>
 
-```
+```python
 class Tools:
     class UserValves(BaseModel):
         test: bool = Field(
@@ -258,7 +258,7 @@ No measures are taken to handle package conflicts with Open WebUI's requirements
 <details>
 <summary>Example</summary>
 
-```
+```python
 """
 title: myToolName
 author: myName
