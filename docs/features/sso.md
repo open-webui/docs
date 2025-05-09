@@ -91,7 +91,12 @@ If changing the role of a logged in user, they will need to log out and log back
 Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI upon user login.
 To enable this synchronization, set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 
+<<<<<<< HEAD
 You can configure the following environment variables:
+=======
+1. `OAUTH_GROUP_CLAIM` - The claim that contains the groups. Defaults to `groups`. Can also be nested, for example `user.memberOf`.
+2. `OAUTH_GROUP_BLACKLIST` - List of groups excluded from group management.
+>>>>>>> f81421c (feat: Add group blacklist feature for oauth)
 
 1. `OAUTH_GROUP_CLAIM` - The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
 1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
