@@ -13,7 +13,7 @@ When adding valves to your pipeline, include a way to ensure that valves can be 
 
 - Use `os.getenv()` to set an environment variable to use for the pipeline, and a default value to use if the environment variable isn't set. An example can be seen below:
 
-```
+```python
 self.valves = self.Valves(
     **{
         "LLAMAINDEX_OLLAMA_BASE_URL": os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
@@ -25,7 +25,7 @@ self.valves = self.Valves(
 
 - Set the valve to the `Optional` type, which will allow the pipeline to load even if no value is set for the valve.
 
-```
+```python
 class Pipeline:
     class Valves(BaseModel):
         target_user_roles: List[str] = ["user"]
