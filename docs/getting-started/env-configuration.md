@@ -2894,6 +2894,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Default: `False`
 - Description: Specifies whether to use the accelerated endpoint for S3 storage.
 
+#### `S3_ENABLE_TAGGING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables S3 object tagging after uploads for better organization, searching, and integration with file management policies. Always set to `False` when using Cloudflare R2, as R2 does not support object tagging.
+- 
 #### Google Cloud Storage
 
 #### `GOOGLE_APPLICATION_CREDENTIALS_JSON`
