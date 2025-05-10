@@ -75,6 +75,17 @@ Buttons provide a **clean and user-friendly way** to interact with extended func
 
 Learn how to set them up in the [**Action Functions Guide**](./action.mdx).
 
+### 4. [**Document Function** - Process Document](./document.mdx)
+
+An **Document Function** is used to process a document before inserting it into vector databases. These functions enable transformations or enhancements of the document content, ensuring the text is formatted, cleaned, or enriched according to the business needs before being stored or indexed.
+
+#### **How It Works**
+1. **Definition**: A Document Function typically accepts a `text` input (the content of a document) and returns a processed version of the content (as a `str`).
+2. **Pipeline Integration**: Document functions are part of a processing pipeline that can be applied to documents during their loading process. These functions can be chained, allowing multiple transformations to be applied to the document content.
+3. **Dynamic Loading**: These functions are dynamically loaded and executed based on their configuration in the system.
+
+Learn how to set them up in the [**Document Process Functions Guide**](./document.mdx).
+
 ---
 
 ## 🛠️ How to Use Functions  
