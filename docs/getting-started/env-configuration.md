@@ -3060,8 +3060,8 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
-- Default: `False`
-- Description: Enables websocket support in Open WebUI (used with Redis).
+- Default: `True`
+- Description: Enables websocket support in Open WebUI.
 
 :::info
 
