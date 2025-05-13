@@ -55,6 +55,18 @@ The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables
 
 A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
 
+## RAG File Type Allowlist
+
+You can configure the environment variable `RAG_FILE_UPLOAD_TYPE_ALLOWLIST` to specify which file types can be uploaded via the "Upload Files" dialog.
+
+### Environment Variable Description
+---------------------------------
+
+* `RAG_FILE_UPLOAD_TYPE_ALLOWLIST`:
+  * Type: string separated by `;`
+  * Default: `''`
+  * Description: List of file extensions allowed for uploading like `'json;txt;md'`
+
 ## Google Drive Integration
 
 When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](https://github.com/open-webui/docs/blob/main/docs/getting-started/env-configuration.md) environment variables to use.
