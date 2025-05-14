@@ -2391,6 +2391,13 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 potential account takeovers.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `OAUTH_UPDATE_PICTURE_ON_LOGIN`
+
+- Type: `bool`
+- Default: `False`
+- Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
