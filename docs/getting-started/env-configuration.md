@@ -95,6 +95,22 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Sets the default role assigned to new users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ACCOUNT_PENDING_TITLE`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Default: `pending`
+- Description: Sets a custom title for the account activation screen for pending users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ACCOUNT_PENDING_TEXT`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Default: `pending`
+- Description: Sets a custom text for the account activation screen for pending users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `ENABLE_CHANNELS`
 
 - Type: `bool`
