@@ -1,16 +1,7 @@
 ---
 sidebar_position: 3
-title: "👩‍💻 Roles, Groups and Permissions"
+title: "🔑 Roles"
 ---
-
-Open WebUI provides a comprehensive and flexible user management system with role-based access control and fine-grained
-permissions. Administrators have granular control over user access, while integration with external authentication
-providers enables seamless incorporation into existing identity infrastructure.
-
-The role-based model with fine-grained permissions ensures that users only have access to the features and resources
-appropriate for their role, maintaining security while providing flexibility for different deployment scenarios.
-
-## User Roles
 
 Open WebUI implements a structured role-based access control system with three primary user roles:
 
@@ -71,47 +62,3 @@ When OAuth group management is enabled, user group memberships are synchronized 
 * Users are removed from groups not present in their OAuth claims
 * With `ENABLE_OAUTH_GROUP_CREATION` enabled, groups from OAuth claims that don't exist in Open WebUI are automatically
   created
-
-## Permission Framework
-
-Open WebUI implements a comprehensive [permission system](./permissions.md) divided into three main categories:
-
-1. Workspace Permissions
-2. Chat Permissions
-3. Features Permissions
-
-Administrators can configure permissions for each category individually and configure the default permissions for each
-category.
-
-## Resource Access Control
-
-Open WebUI implements granular access control for resources like models, knowledge bases, prompts, and tools. Access can
-be controlled at both the user and group level.
-
-### Access Control Structure
-
-Resources like knowledge bases use an access control structure that specifies read and write permissions for both users
-and groups:
-
-```json
-{
-  "read": {
-    "group_ids": ["group_id1", "group_id2"],
-    "user_ids": ["user_id1", "user_id2"]
-  },
-  "write": {
-    "group_ids": ["group_id1", "group_id2"],
-    "user_ids": ["user_id1", "user_id2"]
-  }
-}
-```
-
-This structure allows for precise control over who can view and modify specific resources.
-
-## Managing Permissions
-
-Administrators can manage permissions in the following ways:
-
-1. **User Interface:** The Workspace's Permissions section provides a graphical interface for configuring permissions.
-2. **Environment Variables:** Permissions can be set using environment variables, which are stored as `PersistentConfig` variables.
-3. **Group Management:** Assigning users to groups with predefined permissions.
