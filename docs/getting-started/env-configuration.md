@@ -2702,6 +2702,12 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Sets the path to the LDAP CA certificate file.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `LDAP_VALIDATE_CERT`
+
+- Type: `bool`
+- Description: Sets whether to validate the LDAP CA certificate.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `LDAP_CIPHERS`
 
 - Type: `str`
