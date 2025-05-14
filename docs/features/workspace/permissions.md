@@ -5,6 +5,12 @@ title: "🔒 Permissions"
 
 The `Permissions` section of the `Workspace` within Open WebUI allows administrators to configure access controls and feature availability for users. This powerful system enables fine-grained control over what users can access and modify within the application.
 
+Administrators can manage permissions in the following ways:
+
+1. **User Interface:** The Workspace's Permissions section provides a graphical interface for configuring permissions.
+2. **Environment Variables:** Permissions can be set using environment variables, which are stored as `PersistentConfig` variables.
+3. **Group Management:** Assigning users to groups with predefined permissions.
+
 ## Workspace Permissions
 
 Workspace permissions control access to core components of the Open WebUI platform:
@@ -55,6 +61,8 @@ By default, Open WebUI applies the following permission settings:
 - Image Generation: Enabled (`ENABLE_IMAGE_GENERATION=True`)
 - Code Interpreter: Enabled (`USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
 - Direct Tool Servers: Disabled (`USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS=False`)
+
+Administrators can change the default permissions in the user interface under "users" in the admin panel.
 
 ## Managing Permissions
 
