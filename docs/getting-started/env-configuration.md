@@ -1135,6 +1135,7 @@ modeling files for reranking.
 #### `OPENSEARCH_PASSWORD`
 
 - Type: `str`
+- Default: `None`
 - Description: Sets the password for OpenSearch.
 
 #### `OPENSEARCH_SSL`
@@ -1152,6 +1153,7 @@ modeling files for reranking.
 #### `OPENSEARCH_USERNAME`
 
 - Type: `str`
+- Default: `None`
 - Description: Sets the username for OpenSearch.
 
 ### PGVector
