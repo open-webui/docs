@@ -99,16 +99,14 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `str`
 - Default: Empty string (' ')
-- Default: `pending`
-- Description: Sets a custom title for the account activation screen for pending users.
+- Description: Sets a custom title for the pending user overlay.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PENDING_USER_OVERLAY_CONTENT`
 
 - Type: `str`
 - Default: Empty string (' ')
-- Default: `pending`
-- Description: Sets a custom text for the account activation screen for pending users.
+- Description: Sets a custom text content for the pending user overlay.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_CHANNELS`
