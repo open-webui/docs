@@ -141,6 +141,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Enables or disables user webhooks.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RESPONSE_WATERMARK`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets a custom text that will be included when you copy a message in the chat. E.g. `"This text is AI generated"` -> will add "This text is AI generated" to every message, when copied.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `THREAD_POOL_SIZE`
 
 - Type: `int`
