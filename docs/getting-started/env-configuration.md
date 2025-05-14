@@ -95,7 +95,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Sets the default role assigned to new users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `ACCOUNT_PENDING_TITLE`
+#### `PENDING_USER_OVERLAY_TITLE`
 
 - Type: `str`
 - Default: Empty string (' ')
@@ -103,7 +103,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Sets a custom title for the account activation screen for pending users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `ACCOUNT_PENDING_TEXT`
+#### `PENDING_USER_OVERLAY_CONTENT`
 
 - Type: `str`
 - Default: Empty string (' ')
