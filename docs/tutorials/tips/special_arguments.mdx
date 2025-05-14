@@ -13,16 +13,12 @@ When developping your own `Tools`, `Functions` (`Filters`, `Pipes` or `Actions`)
 
 This page aims to detail the type and structure of each special argument as well as provide an example.
 
-<!--
-Reference files for ease of maintenance:
-https://github.com/open-webui/open-webui/blob/main/backend/open_webui/functions.py
--->
-
 ### `body`
 
 A `dict` usually destined to go almost directly to the model. Although it is not strictly a special argument, it is included here for easier reference and because it contains itself some special arguments.
 
-<details> <summary>Example</summary>
+<details>
+<summary>Example</summary>
 
 ```json
 
@@ -75,7 +71,8 @@ A `dict` with user information.
 
 Note that if the `UserValves` class is defined, its instance has to be accessed via `__user__["valves"]`. Otherwise, the `valves` keyvalue is missing entirely from `__user__`.
 
-<details> <summary>Example</summary>
+<details>
+<summary>Example</summary>
 
 ```json
 {
@@ -94,7 +91,8 @@ Note that if the `UserValves` class is defined, its instance has to be accessed 
 
 A `dict` with wide ranging information about the chat, model, files, etc.
 
-<details> <summary>Example</summary>
+<details>
+<summary>Example</summary>
 
 ```json
 {
@@ -137,7 +135,8 @@ A `dict` with wide ranging information about the chat, model, files, etc.
 
 A `dict` with information about the model.
 
-<details> <summary>Example</summary>
+<details>
+<summary>Example</summary>
 
 ```json
 {
@@ -236,13 +235,9 @@ See the `__metadata__["message_id"]` value above.
 
 A `Callable` used to display event information to the user.
 
-See the [related Tools page](./development.mdx) for examples.
-
 ### `__event_call__`
 
 A `Callable` used for `Actions`.
-
-See the [related Actions page](../functions/action.mdx) for examples.
 
 ### `__files__`
 
@@ -259,7 +254,8 @@ assert the_file.exists()
 
 Note that the same files dict can also be accessed via `__metadata__["files"]` (and its value is `[]` if no files are sent) or via `body["files"]` (but the `files` key is missing entirely from `body` if no files are sent).
 
-<details> <summary>Example</summary>
+<details>
+<summary>Example</summary>
 
 ```json
 
@@ -331,22 +327,11 @@ A `str` for the type of task. Its value is just a shorthand for `__metadata__["t
 
 </details>
 
-<!--
-Reference files for ease of maintenance:
-https://github.com/open-webui/open-webui/blob/main/backend/open_webui/constants.py
--->
-
-
 ### `__task_body__`
 
 A `dict` containing the `body` needed to accomplish a given `__task__`. Its value is just a shorthand for `__metadata__["task_body"]` if present, otherwise `None`.
 
 Its structure is the same as `body` above, with modifications like using the appropriate model and system message etc.
-
-<!--
-Reference files for ease of maintenance:
-https://github.com/open-webui/open-webui/blob/main/backend/open_webui/routers/tasks.py
--->
 
 
 ### `__tools__`
@@ -355,7 +340,3 @@ A `list` of `ToolUserModel` instances.
 
 For details the attributes of `ToolUserModel` instances, the code can be found in [tools.py](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/models/tools.py).
 
-<!--
-Reference files for ease of maintenance:
-https://github.com/open-webui/open-webui/blob/main/backend/open_webui/models/tools.py
--->
