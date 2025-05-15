@@ -1200,6 +1200,20 @@ modeling files for reranking.
 - Default: `6334`
 - Description: Sets the gRPC port number for Qdrant.
 
+#### `ENABLE_QDRANT_MULTITENANCY_MODE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables multitenancy pattern for Qdrant collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Recommend turn on
+
+:::info
+
+This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to  `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledges.
+
+The Qdrant collections created in the previous pattern will still take resources. Therefore, when you decided to use multitenancy pattern as your default, go to `Admin Settings` > `Documents` to reset Qdrant, which will delete all collections with `open_webui` prefix and then do the Reindex Knowledge Base.
+
+:::
+
 ### Pinecone
 
 When using Pinecone as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
