@@ -1200,7 +1200,7 @@ modeling files for reranking.
 - Default: `6334`
 - Description: Sets the gRPC port number for Qdrant.
 
-#### `QDRANT_MULTITENANCY`
+#### `ENABLE_QDRANT_MULTITENANCY_MODE`
 
 - Type: `bool`
 - Default: `False`
