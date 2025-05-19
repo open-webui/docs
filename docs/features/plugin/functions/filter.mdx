@@ -96,7 +96,7 @@ class Filter:
             {
                 "type": "status",
                 "data": {
-                    "description": "Toggled!!",
+                    "description": "Toggled!",
                     "done": True,
                     "hidden": False,
                 },
@@ -108,7 +108,9 @@ class Filter:
 #### 🖼️ What’s happening?
 - **toggle = True** creates a switch UI in Open WebUI—users can manually enable or disable the filter in real time.
 - **icon** (with a Data URI) will show up as a little image next to the filter’s name. You can use any SVG as long as it’s Data URI encoded!
-- **The `inlet` function** uses the `__event_emitter__` special argument to broadcast feedback/status to the UI, such as a little toast/notification that reads "Toggled!!"
+- **The `inlet` function** uses the `__event_emitter__` special argument to broadcast feedback/status to the UI, such as a little toast/notification that reads "Toggled!"
+
+![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
 
 You can use these mechanisms to make your filters dynamic, interactive, and visually unique within Open WebUI’s plugin ecosystem.
 
