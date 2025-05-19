@@ -102,131 +102,250 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 - You can define your own types and handle them at the UI layer (or use upcoming event-extension mechanisms).
 
 ### ❗ Details on Specific Event Types
+### `status`
 
-#### `status`
-
-Show an updating status/history block for a message (e.g., progress).  
-**Data Example:**
-```python
-{
-    "description": "Step 1/3: Fetching data...",
-    "done": False,
-    "hidden": False
-}
-```
-
-#### `chat:message:delta` or `message`
-
-Append text to the message in progress (streaming output).
+Show a status/progress update in the UI:
 
 ```python
-{
-    "content": "Partial text"
-}
+await __event_emitter__(
+    {
+        "type": "status",
+        "data": {
+            "description": "Step 1/3: Fetching data...",
+            "done": False,
+            "hidden": False,
+        },
+    }
+)
 ```
 
-#### `chat:message` or `replace`
+---
 
-Set or replace the entire message content.
+### `chat:message:delta` or `message`
+
+**Streaming output** (append text):
 
 ```python
-{
-    "content": "Final complete response."
-}
+await __event_emitter__(
+    {
+        "type": "chat:message:delta",  # or simply "message"
+        "data": {
+            "content": "Partial text, "
+        },
+    }
+)
+
+# Later, as you generate more:
+await __event_emitter__(
+    {
+        "type": "chat:message:delta",
+        "data": {
+            "content": "next chunk of response."
+        },
+    }
+)
 ```
 
-#### `files` or `chat:message:files`
+---
 
-Set or update the array of files for a message (useful for file uploads or response with files):
+### `chat:message` or `replace`
+
+**Set (or replace) the entire message content:**
 
 ```python
-{
-    "files": [
-        { "name": "file.txt", "url": "https://..." }
-    ]
-}
+await __event_emitter__(
+    {
+        "type": "chat:message",  # or "replace"
+        "data": {
+            "content": "Final, complete response."
+        },
+    }
+)
 ```
 
-#### `chat:title`
+---
 
-Update the conversation title or trigger UI to refresh titles.
+### `files` or `chat:message:files`
+
+**Attach or update files:**
 
 ```python
-{
-    "title": "New conversation subject"
-}
+await __event_emitter__(
+    {
+        "type": "files",  # or "chat:message:files"
+        "data": {
+            "files": [
+               # Open WebUI File Objects
+            ]
+        },
+    }
+)
 ```
 
-#### `chat:tags`
+---
 
-Update tags on the current chat session.
+### `chat:title`
+
+**Update the chat's title:**
 
 ```python
-{
-    "tags": ["work", "openai", "todo"]
-}
+await __event_emitter__(
+    {
+        "type": "chat:title",
+        "data": {
+            "title": "Market Analysis Bot Session"
+        },
+    }
+)
 ```
 
-#### `source` or `citation` (and code execution)
+---
 
-Append a source reference, or—if `type: code_execution` inside `data`—track code execution state for the message.
+### `chat:tags`
+
+**Update the chat's tags:**
 
 ```python
-{
-    "type": "code_execution",
-    "id": "unique-id-abc",
-    "status": "running" | "done" | "error",
-    "output": "...",
-    ...
-}
+await __event_emitter__(
+    {
+        "type": "chat:tags",
+        "data": {
+            "tags": ["finance", "AI", "daily-report"]
+        },
+    }
+)
 ```
-If not code, ordinary reference/citation data is added to message `.sources`.
 
-#### `notification`
+---
 
-Show a UI "toast" for the user.
+### `source` or `citation` (and code execution)
+
+**Add a reference/citation:**
 
 ```python
-{
-    "type": "success",   # or "error", "info", "warning"
-    "content": "Successfully completed action!"
-}
+await __event_emitter__(
+    {
+        "type": "source",  # or "citation"
+        "data": {
+            # Open WebUI Source (Citation) Object
+        }
+    }
+)
 ```
 
-#### `confirmation` (**requires** `await __event_call__`)
-
-Presents an OK/Cancel/Yes/No confirmation dialog to the user, returns user response.
+**For code execution (track execution state):**
 
 ```python
-{
-    "title": "Are you sure?",
-    "message": "Do you want to continue?",
-}
+await __event_emitter__(
+    {
+        "type": "source",
+        "data": {
+            # Open WebUI Code Source (Citation) Object
+        }
+    }
+)
 ```
 
-#### `input` (**requires** `await __event_call__`)
+---
 
-Prompts user for simple text input (modal input box).
+### `notification`
+
+**Show a toast notification:**
 
 ```python
-{
-    "title": "Enter your email",
-    "message": "We'll send you a receipt.",
-    "placeholder": "user@example.com"
-}
+await __event_emitter__(
+    {
+        "type": "notification",
+        "data": {
+            "type": "info",  # "success", "warning", "error"
+            "content": "The operation completed successfully!"
+        }
+    }
+)
 ```
-Returns `{value: ...}`.
 
-#### `execute` (**requires** `await __event_call__`)
+---
 
-Evaluates code client-side (dangerous!). Used for specialized scenarios.
+### `confirmation` (**requires** `__event_call__`)
+
+**Show a confirm dialog and get user response:**
 
 ```python
-{
-    "code": "return 2 + 2;"
-}
+result = await __event_call__(
+    {
+        "type": "confirmation",
+        "data": {
+            "title": "Are you sure?",
+            "message": "Do you really want to proceed?"
+        }
+    }
+)
+
+if result:  # or check result contents
+    await __event_emitter__({
+        "type": "notification",
+        "data": {"type": "success", "content": "User confirmed operation."}
+    })
+else:
+    await __event_emitter__({
+        "type": "notification",
+        "data": {"type": "warning", "content": "User cancelled."}
+    })
 ```
-Returns the result of evaluation.
+
+---
+
+### `input` (**requires** `__event_call__`)
+
+**Prompt user for text input:**
+
+```python
+result = await __event_call__(
+    {
+        "type": "input",
+        "data": {
+            "title": "Enter your name",
+            "message": "We need your name to proceed.",
+            "placeholder": "Your full name"
+        }
+    }
+)
+
+user_input = result
+await __event_emitter__(
+    {
+        "type": "notification",
+        "data": {"type": "info", "content": f"You entered: {user_input}"}
+    }
+)
+```
+
+---
+
+### `execute` (**requires** `__event_call__`)
+
+**Run code dynamically on the user's side:**
+
+```python
+result = await __event_call__(
+    {
+        "type": "execute",
+        "data": {
+            "code": "print(40 + 2);",
+        }
+    }
+)
+
+await __event_emitter__(
+    {
+        "type": "notification",
+        "data": {
+            "type": "info",
+            "content": f"Code executed, result: {result}"
+        }
+    }
+)
+```
 
 ---
 
