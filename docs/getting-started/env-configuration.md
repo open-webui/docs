@@ -1262,6 +1262,7 @@ When using Pinecone as the vector store, the following environment variables are
 - Type: `str`
 - Options:
   - Leave empty to use default
+  - `external` - Use external loader
   - `tika` - Use a local Apache Tika server
   - `docling` - Use Docling engine
   - `document_intelligence` - Use Document Intelligence engine
@@ -1274,6 +1275,20 @@ When using Pinecone as the vector store, the following environment variables are
 - Type: `str`
 - Default: `None`
 - Description: Specifies the Mistral OCR API key to use.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the URL for the external document loader service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key for authenticating with the external document loader service.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `TIKA_SERVER_URL`
