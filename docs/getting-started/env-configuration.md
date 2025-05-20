@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.5](https://github.com/open-webui/open-webui/releases/tag/v0.6.5), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.9](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -236,7 +236,7 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 - Description: List of banners to show to users. The format for banners are:
 
 ```json
-[{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
+[{"id": "string", "type": "string [info, success, warning, error]", "title": "string", "content": "string", "dismissible": false, "timestamp": 1000}]
 ```
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -255,8 +255,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `bool`
 - Default: `False`
-- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration
-for local Whisper and embeddings.
+- Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration for local Whisper and embeddings.
 
 #### `EXTERNAL_PWA_MANIFEST_URL`
 
@@ -1575,21 +1574,21 @@ Strictly return in JSON format:
 
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
 
-- Type: 
+- Type: `str`
 - Default: `None`
 - Description: Specifies the prefix for the RAG embedding content.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
 
-- Type: 
+- Type: `str`
 - Default: `None`
 - Description: Specifies the field name for the RAG embedding prefix.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_QUERY_PREFIX`
 
-- Type: 
+- Type: `str`
 - Default: `None`
 - Description: Specifies the prefix for the RAG embedding query.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -1650,7 +1649,7 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 
 - Type: `bool`
 - Default: `False`
-- Description: Enable web search toggle
+- Description: Enable web search toggle.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_SEARCH_QUERY_GENERATION`
@@ -1868,7 +1867,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `safe_web`
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
-  - '' - Uses the `requests` module with enhanced error handling.
+  - `requests` - Uses the Requests module with enhanced error handling.
   - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2424,8 +2423,7 @@ Strictly return in JSON format:
 - Type: `bool`
 - Default: `False`
 - Description: If enabled, merges OAuth accounts with existing accounts using the same email
-address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to
-potential account takeovers.
+address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to potential account takeovers.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_UPDATE_PICTURE_ON_LOGIN`
@@ -2453,13 +2451,13 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 #### `GOOGLE_CLIENT_ID`
 
 - Type: `str`
-- Description: Sets the client ID for Google OAuth
+- Description: Sets the client ID for Google OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GOOGLE_CLIENT_SECRET`
 
 - Type: `str`
-- Description: Sets the client secret for Google OAuth
+- Description: Sets the client secret for Google OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GOOGLE_OAUTH_SCOPE`
@@ -2473,7 +2471,7 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 
 - Type: `str`
 - Default: `<backend>/oauth/google/callback`
-- Description: Sets the redirect URI for Google OAuth
+- Description: Sets the redirect URI for Google OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Microsoft
@@ -2483,19 +2481,19 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 #### `MICROSOFT_CLIENT_ID`
 
 - Type: `str`
-- Description: Sets the client ID for Microsoft OAuth
+- Description: Sets the client ID for Microsoft OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `MICROSOFT_CLIENT_SECRET`
 
 - Type: `str`
-- Description: Sets the client secret for Microsoft OAuth
+- Description: Sets the client secret for Microsoft OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `MICROSOFT_CLIENT_TENANT_ID`
 
 - Type: `str`
-- Description: Sets the tenant ID for Microsoft OAuth
+- Description: Sets the tenant ID for Microsoft OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `MICROSOFT_OAUTH_SCOPE`
@@ -2509,7 +2507,7 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 
 - Type: `str`
 - Default: `<backend>/oauth/microsoft/callback`
-- Description: Sets the redirect URI for Microsoft OAuth
+- Description: Sets the redirect URI for Microsoft OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### GitHub
@@ -2519,7 +2517,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `GITHUB_CLIENT_ID`
 
 - Type: `str`
-- Description: Sets the client ID for GitHub OAuth
+- Description: Sets the client ID for GitHub OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GITHUB_CLIENT_SECRET`
@@ -2547,13 +2545,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 #### `OAUTH_CLIENT_ID`
 
 - Type: `str`
-- Description: Sets the client ID for OIDC
+- Description: Sets the client ID for OIDC.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_CLIENT_SECRET`
 
 - Type: `str`
-- Description: Sets the client secret for OIDC
+- Description: Sets the client secret for OIDC.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OPENID_PROVIDER_URL`
@@ -2765,7 +2763,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 #### `USER_PERMISSIONS_CHAT_CONTROLS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to access chat controls.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -2793,14 +2791,14 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 
 #### `USER_PERMISSIONS_CHAT_STT`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use Speech-to-Text in chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_CHAT_TTS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use Text-to-Speech in chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -2986,7 +2984,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Default: `False`
 - Description: Enables S3 object tagging after uploads for better organization, searching, and integration with file management policies. Always set to `False` when using Cloudflare R2, as R2 does not support object tagging.
-- 
+
 #### Google Cloud Storage
 
 #### `GOOGLE_APPLICATION_CREDENTIALS_JSON`
