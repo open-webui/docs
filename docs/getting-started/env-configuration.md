@@ -1457,6 +1457,18 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 :::
 
+#### `RAG_ALLOWED_FILE_EXTENSIONS`
+
+- Type: `list` of `str`
+- Default: `[]` (which means all supported file types are allowed)
+- Description: Specifies which file extensions are permitted for upload. 
+
+```json
+["pdf,docx,txt"]
+```
+
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
