@@ -2770,6 +2770,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Enables or disables user permission to access chat controls.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CHAT_ADVANCED_CONTROLS`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to access chat advanced controls.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
 - Type: `bool`
