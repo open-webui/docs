@@ -1209,19 +1209,19 @@ modeling files for reranking.
 
 This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to  `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledges.
 
-The Qdrant collections created in the previous pattern will still take resources.
+The Qdrant collections created in the previous pattern will still consume resources.
 
-Currently, there is no button on the UI for only reset vector DB, if you want to migrate knowledges to multitenancy:
-- Remove all collections with `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) with native Qdrant Client
-- Go to  `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledges
+Currently, there is no button in the UI to only reset the vector DB. If you want to migrate knowledge to multitenancy:
+- Remove all collections with the `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) using the native Qdrant client
+- Go to `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledge base
 
-`Reindex Knowledge Base` will ONLY migrate knowledges
+`Reindex Knowledge Base` will ONLY migrate the knowledge base
 
 :::
 
 :::danger
 
-When you decided to use multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Admin Settings` > `Documents` to reset vector and knowledge, which will delete all collections with `open_webui` prefix and knowledges.
+If you decide to use the multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Admin Settings` > `Documents` to reset vector and knowledge, which will delete all collections with the `open_webui` prefix and all stored knowledge.
 
 :::
 
