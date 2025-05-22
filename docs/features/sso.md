@@ -38,15 +38,16 @@ The following environment variables are required:
 ### Microsoft
 
 To configure a Microsoft OAuth client, please refer to [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) on how to create a Microsoft OAuth client for a **web application**.
-The allowed redirect URI should include `<open-webui>/oauth/microsoft/callback`.
+The allowed redirect URI should include `<open-webui>/oauth/microsoft/callback`. This value should be used for the `MICROSOFT_REDIRECT_URI` environment variable.
 
 Support for Microsoft OAuth is currently limited to a single tenant, that is a single Entra organization or personal Microsoft accounts.
 
 The following environment variables are required:
 
 1. `MICROSOFT_CLIENT_ID` - Microsoft OAuth client ID
-1. `MICROSOFT_CLIENT_SECRET` - Microsoft OAuth client secret
-1. `MICROSOFT_CLIENT_TENANT_ID` - Microsoft tenant ID - use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
+2. `MICROSOFT_CLIENT_SECRET` - Microsoft OAuth client secret
+3. `MICROSOFT_CLIENT_TENANT_ID` - Microsoft tenant ID - use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
+4. `MICROSOFT_REDIRECT_URI` - The redirect URI configured in your Microsoft OAuth application. This must be set to `<open-webui>/oauth/microsoft/callback`.
 
 ### Github
 
