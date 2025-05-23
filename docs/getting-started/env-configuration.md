@@ -1355,7 +1355,7 @@ When using Pinecone as the vector store, the following environment variables are
 - Description: Sets the relevance threshold to consider for documents when used with reranking.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_BM25_WEIGHT`
+#### `RAG_HYBRID_BM25_WEIGHT`
 
 - Type: `float`
 - Default: `0.5`
