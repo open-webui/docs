@@ -134,6 +134,12 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `True`
 - Description: Enables admin users to access all chats.
 
+#### `ENABLE_ADMIN_WORKSPACE_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables admin users to access all workspace items of all users (even if set to private). If set to `false`, admins will only see workspace items that are explicitly shared with them (via group or public permission).
+
 #### `ENABLE_USER_WEBHOOKS`
 
 - Type: `bool`
