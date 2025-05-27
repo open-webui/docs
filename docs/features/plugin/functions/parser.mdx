@@ -1,0 +1,239 @@
+---
+sidebar_position: 4
+title: "Parser Function"
+---
+
+# Parser Function: Handling custom Knowledge splitting/embedding/uploading
+
+## Introduction
+
+Knowledge allows AI Models to reference specific, known information. This is known as Retrieval Augmented Generated (RAG)
+ and is extremely useful for increasing answer accuracy.
+
+When a user uploads new Knowledge, that text must be split into chunks, turned into embeddings, and
+then uploaded to a vector database for later use. How the text is split apart and the embeddings used can
+drastically affect the performance of the model.
+
+By default OpenWebUI handles this process for you. However, it may not handle things well enough for your use case.
+In this situation, you can write your own Parser that will handle the process in whatever method best suits your needs.
+
+
+### 🦴 Basic Skeleton of a Parser
+
+A parser requires 2 attributes and 5 methods. There is an optional 6th method:
+
+```python
+from open_webui.utils.parser import PARSER_TYPE, ParserInterface
+
+class Parser(ParserInterface):
+    def __init__(self):
+        self.name = "Custom Parser"
+        self.parser_type = PARSER_TYPE.ALL
+
+   def delete_doc(self, collection_name, file_id):
+        # This is where you do things when the user deletes a Knowledge File
+        print("Handling deleting of a single file")
+
+   def delete_collection(self, file_collection):
+        # This is where you do things when the user deletes a Knowledge Collection
+        print("Handling deleting of an entire collection")
+
+   def reset(self):
+        # This is handling the deletion of all Knowledges and Files
+        print("reseting everything")
+
+   def parse(self,
+              request: Request,
+              docs,
+              metadata: Optional[dict] = None,
+              user=None,
+              **kwargs
+              ) -> dict:
+        # This is where you handle splitting docs and returning them for use
+        print("Handling splitting and embedding")
+
+        # a dictionary of items for use
+        return {"texts": [], "embeddings": [], "metadatas": []}
+
+   def store(self, request, collection_name, texts, embeddings, metadatas, overwrite=False, add=True):
+        # This is where you handle storing the information in the Vector Data Base
+        print("uploading information to vector database")
+
+   # THIS IS THE OPTIONAL METHOD
+   def is_applicable_to_item(self, item_id):
+        # This allows you to be choose to parse based on the specific item. Can be file name, search query, web url
+        print(f"Based on item {item_id}, should this parser be applied? ")
+        return True
+```
+
+
+The Base `ParserInterface` can be inherited from to make sure that all methods are properly addressed
+
+```python
+class ParserInterface(ABC):
+    def is_applicable_to_item(self, item_id):
+        print(f"item id: {item_id}")
+        return True
+
+    @abstractmethod
+    def delete_doc(self, collection_name, file_id):
+        assert NotImplementedError
+
+    @abstractmethod
+    def delete_collection(self, file_collection):
+        assert NotImplementedError
+
+    @abstractmethod
+    def reset(self):
+        assert NotImplementedError
+
+    @abstractmethod
+    def parse(self,
+              request: Request,
+              docs,
+              metadata: Optional[dict] = None,
+              user=None,
+              **kwargs
+              ) -> dict:
+        assert NotImplementedError
+
+    @abstractmethod
+    def store(self, request, collection_name, texts, embeddings, metadatas, overwrite=False, add=True):
+        assert NotImplementedError
+
+```
+
+
+### PARSER_TYPE
+
+Because different types of knowledge can be uploaded and different types of content need to be handled in different ways,
+open_webui.utils.parser.PARSER_TYPE defines what types of content the Parser will be used for. The currently available
+choices are:
+
+- TEXT
+- FILE
+- YOUTUBE
+- WEB_CONTENT
+- WEB_SEARCH
+- ALL
+
+Any combination of these values (or a single one) is viable, though ALL supersedes other choices.
+
+### is_applicable_to_item
+
+For more fine grained control, the `is_applicable_to_item(self, item_id)` method can decide if a specific parser
+is applied to a specific file_type, url, search query, etc.
+
+NOTE: For a Parser to be called, it must be of the correct PARSER_TYPE and is_applicable_to_item() must return True.
+By default, is_applicable_to_item() will return True unless overridden
+
+
+### Inheriting from DefaultParser
+
+Users may only care about changing one part of the custom Knowledge process (for example, you may want to
+split the document in a better way but don't want to handle embedding, uploading, or deleting).
+
+In this case, users can inherit from openwebui.utils.parser.DefaultParser, which handles needed all needed steps. Specific steps
+can then be overridden.
+
+```python
+import logging
+
+import tiktoken
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter, TokenTextSplitter
+
+from open_webui.env import SRC_LOG_LEVELS
+from open_webui.constants import ERROR_MESSAGES
+from open_webui.utils.parser import PARSER_TYPE, DefaultParser
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["RAG"])
+
+
+class Parser(DefaultParser):
+    def __init__(self):
+        self.name = "Splitting Parser"
+        self.parser_type = PARSER_TYPE.ALL
+
+    def split(self, request, docs):
+        log.info("This is a custom override of the default splitting behavior")
+
+        if request.app.state.config.TEXT_SPLITTER in ["", "character"]:
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=request.app.state.config.CHUNK_SIZE,
+                chunk_overlap=request.app.state.config.CHUNK_OVERLAP,
+                add_start_index=True,
+            )
+        elif request.app.state.config.TEXT_SPLITTER == "token":
+            log.info(
+                f"Using token text splitter: {request.app.state.config.TIKTOKEN_ENCODING_NAME}"
+            )
+
+            tiktoken.get_encoding(str(request.app.state.config.TIKTOKEN_ENCODING_NAME))
+            text_splitter = TokenTextSplitter(
+                encoding_name=str(request.app.state.config.TIKTOKEN_ENCODING_NAME),
+                chunk_size=request.app.state.config.CHUNK_SIZE,
+                chunk_overlap=request.app.state.config.CHUNK_OVERLAP,
+                add_start_index=True,
+            )
+        else:
+            raise ValueError(ERROR_MESSAGES.DEFAULT("Invalid text splitter"))
+
+        docs = text_splitter.split_documents(docs)
+
+        if len(docs) == 0:
+            raise ValueError(ERROR_MESSAGES.EMPTY_CONTENT)
+
+        return docs
+
+```
+
+### Valves
+
+Just like other functions, Parsers can have Valves. More detailed information on Valves can be found in the
+[Pipe documentation](./pipe.mdx)
+
+```python
+from open_webui.utils.parser import PARSER_TYPE
+
+class Parser(DefaultParser):
+    class Valves(BaseModel):
+        MODEL_ID: str = Field(default="")
+
+    def __init__(self):
+        super().__init__()
+        self.name = "Splitting Parser"
+        self.parser_type = PARSER_TYPE.ALL
+        self.valves = self.Valves()
+
+    def parse(self,
+              request: Request,
+              docs,
+              metadata: Optional[dict] = None,
+              user=None,
+              **kwargs
+              ) -> dict:
+        # This is where you handle splitting docs and putting their embeddings into the vdb collection
+
+        print(f"valve value: {self.valves.MODEL_ID}")
+        print("Handling splitting, embedding, and uploading")
+
+        return {"texts": [], "embeddings": [], "metadatas": []}
+```
+
+
+
+
+## FAQ 🛑
+
+### **Q: How Are Parsers Different From other Functions?**
+
+A: Parsers are the only Functions that occur when Knowledge is uploaded. Other functions can interact with Knowledge
+but none have control over how that Knowledge is handled by OpenWebUI.
+
+### **Q: Do I have to do anything else with the Knowledge after my Parsers have handled it?**
+
+A: No, unless you want to. By default, OpenWebUI will handling the RAG part of querying and will pull your parsed information
+from the relevant Knowledge container. However, if you instead want to do custom RAG or something non-default, [pipelines](../../../pipelines/pipes)
+may be a good way to handle that.
