@@ -10,7 +10,16 @@ export const SponsorList = () => {
 			description:
 				"Does your interface have a backend yet? Try n8n",
 		},
+
+		{
+			imgSrc: "/sponsors/logos/warp.png",
+			url: "https://warp.dev/open-webui",
+			name: "Warp",
+			description:
+				"The intelligent terminal for developers",
+		},
 	];
+
 	const sponsors = [
 		{
 			imgSrc: "/sponsors/sponsor.png",
@@ -62,8 +71,8 @@ export const SponsorList = () => {
 
 
 				<div className="flex flex-wrap items-start justify-start gap-5">
-				{emeraldSponsors.map((sponsor) => (
-						<Sponsor sponsor={sponsor} />
+				{emeraldSponsors.map((sponsor, sponsorIdx) => (
+						<Sponsor sponsor={sponsor} key={`emerald-${sponsorIdx}`} />
 					))}
 					
 				</div>
@@ -76,8 +85,8 @@ export const SponsorList = () => {
 
 
 				<div className="flex flex-wrap items-start justify-start gap-5">
-				{sponsors.map((sponsor) => (
-						<Sponsor sponsor={sponsor} />
+				{sponsors.map((sponsor, sponsorIdx) => (
+						<Sponsor sponsor={sponsor} key={`emerald-${sponsorIdx}`} />
 					))}
 				</div>
 			</div>			

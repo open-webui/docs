@@ -1,4 +1,5 @@
 import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
+import { useEffect, useState } from "react";
 
 export const TopBanners = () => {
 	const items = [
@@ -20,17 +21,24 @@ export const TopBanners = () => {
 				"Does your interface have a backend yet? Try n8n",
 		},
 
-
 		{
-			imgSrc: "/sponsors/banners/n8n-banner.png",
-			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
-			url: "https://n8n.io/",
-			name: "n8n",
+			imgSrc: "/sponsors/banners/warp-banner.png",
+			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
+			url: "https://warp.dev/open-webui",
+			name: "Warp",
 			description:
-				"Does your interface have a backend yet? Try n8n",
+				"The intelligent terminal for developers",
 		},
 
-		
+		{
+			imgSrc: "/sponsors/banners/warp-banner.png",
+			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
+			url: "https://warp.dev/open-webui",
+			name: "Warp",
+			description:
+				"The intelligent terminal for developers",
+		},
+
 		{
 			imgSrc: "/sponsors/banners/placeholder.png",
 			mobileImgSrc: "/sponsors/banners/placeholder-mobile.png",
@@ -42,7 +50,15 @@ export const TopBanners = () => {
 	];
 
 	// Randomly select an item to display
-	let selectedItemIdx = Math.floor(Math.random() * items.length);
+	const [selectedItemIdx, setSelectedItemIdx] = useState(Math.floor(Math.random() * items.length));
 
-	return <TopBanner items={[items[selectedItemIdx]]} />;
+	useEffect(() => {
+		// After mounting update every 5 seconds
+		setInterval(() => {
+			setSelectedItemIdx(Math.floor(Math.random() * items.length));
+		}, 10000); // 10000 ms = 10 seconds
+	}, []);
+
+
+	return <TopBanner item={items[selectedItemIdx]} />;
 };
