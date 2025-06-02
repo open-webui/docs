@@ -2,7 +2,7 @@ export const SidebarBanner = ({ item }) => {
 	return (
 		<div className="pb-4">
 			<div className="mb-2">
-				<div className="mb-1 text-xs font-semibold text-gray-600 underline dark:text-gray-300">
+				<div className="mb-1 text-xs font-medium text-gray-600 underline dark:text-gray-300">
 					Sponsored by {item.name}
 				</div>
 
@@ -16,7 +16,7 @@ export const SidebarBanner = ({ item }) => {
 					/>
 				</a>
 
-				<div className="mt-1 line-clamp-1 text-right text-xs font-semibold text-gray-600 dark:text-gray-300">
+				<div className="mt-1 line-clamp-2 text-right font-medium text-xs text-gray-600 dark:text-gray-300">
 					{item.description}
 				</div>
 			</div>
