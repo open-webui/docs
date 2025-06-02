@@ -9,7 +9,7 @@ export const SidebarBanner = ({ item }) => {
 				<a href={item.url} target="_blank">
 				
 					<img
-						className="block w-full rounded-xl h-16 object-cover"
+						className="block w-full rounded-xl h-12 object-cover"
 						loading="lazy"
 						alt={item.name}
 						src={item?.mobileImgSrc || item.imgSrc}
