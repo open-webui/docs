@@ -40,6 +40,26 @@ export const TopBanners = () => {
 		},
 
 		{
+			imgSrc: "/sponsors/banners/tailscale-banner.png",
+			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
+			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
+			name: "Tailscale",
+			description:
+				"Connect self-hosted AI to any device with Tailscale",
+		},
+
+
+		{
+			imgSrc: "/sponsors/banners/tailscale-banner.png",
+			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
+			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
+			name: "Tailscale",
+			description:
+				"Connect self-hosted AI to any device with Tailscale",
+		},
+
+
+		{
 			imgSrc: "/sponsors/banners/placeholder.png",
 			mobileImgSrc: "/sponsors/banners/placeholder-mobile.png",
 			url: "https://forms.gle/92mvG3ESYj47zzRL9",
