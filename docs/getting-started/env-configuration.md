@@ -2524,6 +2524,17 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
 
+#### `MICROSOFT_CLOUD`
+
+- Type: `str`
+- Default: `Global`
+- Options:  environment variables mentioned in [Microsoft Entra authentication endpoints](https://learn.microsoft.com/en-us/entra/identity-platform/authentication-national-cloud)
+  - `Global` - uses microsoftonline.com for the domain
+  - `AzureUSGovernmentCloud` - uses microsoftonline.us for the domain
+  - `AzureChinaCloud` - uses chinacloudapi.cn for the domain
+- Description: Sets the cloud environment for Microsoft OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `MICROSOFT_CLIENT_ID`
 
 - Type: `str`
