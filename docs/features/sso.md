@@ -51,7 +51,7 @@ The following environment variables are required:
 
 The following environment variables are optional:
 
-1. `MICROSOFT_CLOUD` - The microsoft cloud you are using for authentication. Defaults to global. Can also specify AzureUSGovernmentCloud and AzureChinaCloud
+1. `MICROSOFT_CLOUD` - The microsoft cloud you are using for authentication. Defaults to global. Can also specify AzureUSGovernmentCloud
 
 ### Github
 

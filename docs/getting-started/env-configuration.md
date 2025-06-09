@@ -2531,7 +2531,6 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 - Options:  environment variables mentioned in [Microsoft Entra authentication endpoints](https://learn.microsoft.com/en-us/entra/identity-platform/authentication-national-cloud)
   - `Global` - uses microsoftonline.com for the domain
   - `AzureUSGovernmentCloud` - uses microsoftonline.us for the domain
-  - `AzureChinaCloud` - uses chinacloudapi.cn for the domain
 - Description: Sets the cloud environment for Microsoft OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
