@@ -1,7 +1,7 @@
 import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
 import { useEffect, useState } from "react";
 
-export const TopBanners = () => {
+export const TopBanners = ({bannerClassName = 'h-18', label= true, description= true, mobile = true }) => {
 	const items = [
 		{
 			imgSrc: "/sponsors/banners/n8n-banner.png",
@@ -80,5 +80,5 @@ export const TopBanners = () => {
 	}, []);
 
 
-	return <TopBanner item={items[selectedItemIdx]} />;
+	return <TopBanner bannerClassName={bannerClassName} item={items[selectedItemIdx]} label={label} description={description} mobile={mobile} />;
 };
