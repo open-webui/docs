@@ -8,18 +8,32 @@ import { TopBanners } from "@site/src/components/TopBanners";
 <TopBanners />
 
 ### 💡 Why Docker?
+
 We understand Docker might not be everyone's preference; however, this approach is central to our project's design and operational efficiency. We view the project's commitment to Docker as a fundamental aspect and encourage those looking for different deployment methods to explore community-driven alternatives.
 
+#### **Q: How do I customize the logo and branding?**
 
-#### **Q: How do I customize the logo and branding?**  
+**A:** You can customize the theme, logo, and branding with our **[Enterprise License](https://docs.openwebui.com/enterprise)**, which unlocks exclusive enterprise features.
 
-**A:** You can customize the theme, logo, and branding with our **[Enterprise License](https://docs.openwebui.com/enterprise)**, which unlocks exclusive enterprise features.  
-
-For more details on enterprise solutions and branding customizations, please contact our sales team at: 📧 **sales@openwebui.com**  
+For more details on enterprise solutions and branding customizations, please contact our sales team at: 📧 **sales@openwebui.com**
 
 #### **Q: Why am I asked to sign up? Where are my data being sent to?**
 
 **A:** We require you to sign up to become the admin user for enhanced security. This ensures that if the Open WebUI is ever exposed to external access, your data remains secure. It's important to note that everything is kept local. We do not collect your data. When you sign up, all information stays within your server and never leaves your device. Your privacy and security are our top priorities, ensuring that your data remains under your control at all times.
+
+#### **Q: Why can't my Docker container connect to services on the host using `localhost`?**
+
+**A:** Inside a Docker container, `localhost` refers to the container itself, not the host machine. This distinction is crucial for networking. To establish a connection from your container to services running on the host, you should use the DNS name `host.docker.internal` instead of `localhost`. This DNS name is specially recognized by Docker to facilitate such connections, effectively treating the host as a reachable entity from within the container, thus bypassing the usual `localhost` scope limitation.
+
+#### **Q: What is the difference between Direct and External connections in Open WebUI?** _(Direct vs External Connections)_
+
+**A:** Open WebUI offers two ways to connect to LLM APIs:
+
+- **External Connections**: The central backend server handles API requests on behalf of users. For example, when the Open WebUI backend is deployed, it will send requests directly to LLM APIs. This method cannot access services running locally on your machine.
+
+- **Direct Connections**: The browser sends API requests directly, bypassing the backend server. This allows interaction with local or external services from your own computer.
+
+> **Note:** Direct connections are not fully supported yet and may have limited functionality.
 
 #### **Q: Why can't my Docker container connect to services on the host using `localhost`?**
 
@@ -91,15 +105,17 @@ Everything you need to run Open WebUI, including your data, remains within your 
 ```bash
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
+
 #### **Q: RAG with Open WebUI is very bad or not working at all. Why?**
 
-**A:** If you're using **Ollama**, be aware that Ollama sets the context length to **2048 tokens by default**. This means that none of the retrieved data might be used because it doesn't fit within the available context window.  
+**A:** If you're using **Ollama**, be aware that Ollama sets the context length to **2048 tokens by default**. This means that none of the retrieved data might be used because it doesn't fit within the available context window.
 
-To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open WebUI, you should **increase the context length** to a much larger value (**8192+ tokens**) to ensure that retrieved documents can effectively contribute to the model’s responses.  
+To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open WebUI, you should **increase the context length** to a much larger value (**8192+ tokens**) to ensure that retrieved documents can effectively contribute to the model’s responses.
 
 To do this, configure your **Ollama model params** to allow a larger context window. You can check and modify this setting in your chat directly or from model editor page to enhance the RAG experience significantly.
 
 #### **Q: Is MCP (Model Context Protocol) supported in Open WebUI?**
+
 **A:** [Yes, Open WebUI officially supports MCP Tool Servers—but exclusively through an **OpenAPI-compliant proxy**](/openapi-servers/mcp) ([openapi-servers](https://github.com/open-webui/openapi-servers)) for optimal compatibility, security, and maintainability.
 
 To bridge MCP (and other backend protocols), we provide a purpose-built proxy implementation available at: 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo)
