@@ -1,7 +1,7 @@
-import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
+import { SidebarBanner } from "@site/src/components/Sponsors/SidebarBanner";
 import { useEffect, useState } from "react";
 
-export const TopBanners = () => {
+export const SidebarBanners = () => {
 	const items = [
 		{
 			imgSrc: "/sponsors/banners/n8n-banner.png",
@@ -48,7 +48,6 @@ export const TopBanners = () => {
 				"Connect self-hosted AI to any device with Tailscale",
 		},
 
-
 		{
 			imgSrc: "/sponsors/banners/tailscale-banner.png",
 			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
@@ -80,5 +79,5 @@ export const TopBanners = () => {
 	}, []);
 
 
-	return <TopBanner item={items[selectedItemIdx]} />;
+	return <SidebarBanner item={items[selectedItemIdx]} />;
 };

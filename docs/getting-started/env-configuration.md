@@ -31,6 +31,8 @@ You can update the values of `PersistentConfig` environment variables directly f
 
 Please note that `PersistentConfig` environment variables are clearly marked as such in the documentation below, so you can be aware of how they will behave.
 
+To disable `PersistentConfig` and have Open WebUI treat all variables equally, you can set `ENABLE_PERSISTENT_CONFIG` to `False`.
+
 :::
 
 ## App/Backend
@@ -46,8 +48,20 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 
 - Type: `str`
 - Default: `http://localhost:3000`
-- Description: Specifies the URL where the Open WebUI is reachable. Currently used for search engine support.
+- Description: Specifies the URL where your Open WebUI installation is reachable. Needed for search engine support and OAuth/SSO.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+This variable has to be set before you start using OAuth/SSO for authentication.
+Since this is a persistent config environment variable, you can only change it through one of the following options:
+
+ - Temporarily disabling persistent config using `ENABLE_PERSISTENT_CONFIG`
+ - Changing `WEBUI_URL` in the admin panel > settings and changing "WebUI URL".
+
+Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in.
+
+:::
 
 #### `ENABLE_SIGNUP`
 
@@ -158,7 +172,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `int`
 - Default: `0`
-- Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to 0) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
+- Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -909,7 +923,7 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 :::info
 
-When deploying Open-WebUI in a multiple-node cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
+When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
 
 :::
 
@@ -917,7 +931,22 @@ When deploying Open-WebUI in a multiple-node cluster with a load balancer, you m
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables offline mode.
+- Description: Disables Open WebUI's network connections for update checks and automatic model downloads.
+
+:::info
+
+**Disabled when enabled:**
+- Automatic version update checks
+- Downloads of embedding models from Hugging Face Hub
+  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
+- Update notifications in the UI
+
+**Still functional:**
+- External LLM API connections (OpenAI, etc.)
+- OAuth authentication providers
+- Web search and RAG with external APIs
+
+:::
 
 #### `RESET_CONFIG_ON_START`
 
@@ -2485,6 +2514,12 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+::info
+
+If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
+
+:::
+
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
@@ -2660,6 +2695,12 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Default: `picture`
 - Description: Set picture (avatar) claim for OpenID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+::info
+
+If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
+
+:::
 
 #### `OAUTH_GROUP_CLAIM`
 
@@ -3142,7 +3183,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
+When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
 
 :::
 
@@ -3165,7 +3206,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
+When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3177,7 +3218,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3189,7 +3230,7 @@ When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that t
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 

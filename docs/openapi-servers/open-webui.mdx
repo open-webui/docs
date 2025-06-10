@@ -13,7 +13,7 @@ In this guide, you'll learn how to launch an OpenAPI-compatible tool server and 
 
 ## Step 1: Launch an OpenAPI Tool Server
 
-To begin, you'll need to start one of the reference tool servers available in the openapi-servers repo. For quick testing, we’ll use the time tool server as an example.
+To begin, you'll need to start one of the reference tool servers available in the [openapi-servers repo](https://github.com/open-webui/openapi-servers). For quick testing, we’ll use the time tool server as an example.
 
 🛠️ Example: Starting the `time` server locally
 
@@ -66,6 +66,33 @@ Admins can manage shared tool servers available to all or selected users across 
 - Go to 🛠️ **Admin Settings > Tools**.
 - Add the tool server URL just as you would in user settings.
 - These tools are treated similarly to Open WebUI’s built-in tools.
+
+
+#### Main Difference: Where Are Requests Made From?
+
+The primary distinction between **User Tool Servers** and **Global Tool Servers** is where the API connection and requests are actually made:
+
+- **User Tool Servers**  
+  - Requests to the tool server are performed **directly from your browser** (the client).
+  - This means you can safely connect to localhost URLs (like `http://localhost:8000`)—even exposing private or development-only endpoints such as your local filesystem or dev tools—without risking exposure to the wider internet or other users.
+  - Your connection is isolated; only your browser can access that tool server.
+
+- **Global Tool Servers**  
+  - Requests are sent **from the Open WebUI backend/server** (not your browser).
+  - The backend must be able to reach the tool server URL you specify—so `localhost` means the backend server's localhost, _not_ your computer's.
+  - Use this for sharing tools with other users across the deployment, but be mindful: since the backend makes the requests, you cannot access your personal local resources (like your own filesystem) through this method.
+  - Think security! Only expose remote/global endpoints that are safe and meant to be accessed by multiple users.
+
+**Summary Table:**
+
+| Tool Server Type   | Request Origin        | Use Localhost?     | Use Case Example                        |
+| ------------------ | -------------------- | ------------------ | ---------------------------------------- |
+| User Tool Server   | User's Browser (Client-side) | Yes (private to you) | Personal tools, local dev/testing        |
+| Global Tool Server | Open WebUI Backend (Server-side) | No (unless running on the backend itself) | Team/shared tools, enterprise integrations |
+
+:::tip 
+User Tool Servers are best for personal or experimental tools, especially those running on your own machine, while Global Tool Servers are ideal for production or shared environments where everyone needs access to the same tools.
+:::
 
 ### 👉 Optional: Using a Config File with mcpo
 
@@ -160,7 +187,7 @@ Want to enable ReACT-style (Reasoning + Acting) native function calls directly i
 
 ## Need More Tools? Explore & Expand! 🧱
 
-The openapi-servers repo includes a variety of useful reference servers:
+The [openapi-servers repo](https://github.com/open-webui/openapi-servers) includes a variety of useful reference servers:
 
 - 📂 Filesystem access
 - 🧠 Memory & knowledge graphs
