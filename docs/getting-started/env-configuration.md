@@ -925,7 +925,22 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables offline mode.
+- Description: Disables Open WebUI's network connections for update checks and automatic model downloads.
+
+:::info
+
+**Disabled when enabled:**
+- Automatic version update checks
+- Downloads of embedding models from Hugging Face Hub
+  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
+- Update notifications in the UI
+
+**Still functional:**
+- External LLM API connections (OpenAI, etc.)
+- OAuth authentication providers
+- Web search and RAG with external APIs
+
+:::
 
 #### `RESET_CONFIG_ON_START`
 
