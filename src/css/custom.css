@@ -49,6 +49,21 @@
 	border-width: 0 !important;
 }
 
+.navbar-sidebar__brand {
+	align-items: center;
+	box-shadow: var(--ifm-navbar-shadow);
+	display: flex;
+	flex: 1;
+	height: fit-content !important;
+	padding: var(--ifm-navbar-padding-vertical)
+		var(--ifm-navbar-padding-horizontal);
+}
+.navbar-sidebar__items {
+	display: flex;
+	height: fit-content !important;
+	transition: transform var(--ifm-transition-fast) ease-in-out;
+}
+
 /* .hiring-link {
    color: #fff;
    background-color: #3c8957;
