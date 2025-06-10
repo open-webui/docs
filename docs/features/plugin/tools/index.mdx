@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2  
-title: "⚙️ Tools"  
+sidebar_position: 2
+title: "⚙️ Tools"
 ---
 
 # ⚙️ What are Tools?
@@ -24,7 +24,6 @@ Explore ready-to-use tools here:
 
 ---
 
-
 ## 📦 How to Install Tools
 
 There are two easy ways to install Tools in Open WebUI:
@@ -37,7 +36,6 @@ There are two easy ways to install Tools in Open WebUI:
 🛑 Safety Tip: Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code.
 
 ---
-
 
 ## 🔧 How to Use Tools in Open WebUI
 
@@ -52,6 +50,7 @@ While chatting, click the ➕ icon in the input area. You’ll see a list of ava
 💡 Tip: Enabling a Tool gives the model permission to use it — but it may not use it unless it's useful for the task.
 
 ### ✏️ Option 2: Enable by Default (Recommended for Frequent Use)
+
 1. Go to: Workspace ➡️ Models
 2. Choose the model you’re using (like GPT-4 or LLaMa2) and click the ✏️ edit icon.
 3. Scroll down to the “Tools” section.
@@ -85,7 +84,7 @@ Let’s break it down:
 
 This is the default setting in Open WebUI.
 
-Here, your LLM doesn’t need to natively support function calling. Instead, we guide the model using smart tool selection prompt template to select and use a Tool.
+Here, your LLM doesn’t need to natively support function calling. Instead, we guide the model using smart tool selection prompt template to select and use a Tool. Open WebUI then interprets the model's response and executes the tool on the model's behalf.
 
 ✅ Works with almost any model  
 ✅ Great way to unlock Tools with basic or local models  
@@ -93,7 +92,7 @@ Here, your LLM doesn’t need to natively support function calling. Instead, we 
 
 ### 🟢 Native Mode (Function Calling Built-In)
 
-If your model does support “native” function calling (like GPT-4o or GPT-3.5-turbo-1106), you can use this powerful mode to let the LLM decide — in real time — when and how to call multiple Tools during a single chat message.
+If your model does support “native” function calling (like GPT-4o or GPT-3.5-turbo-1106), you can use this powerful mode to let the LLM decide — in real time — when and how to call multiple Tools during a single chat message. Open WebUI will send the model full specifications of available tools, which the model can then decide in real time when to use.
 
 ✅ Fast, accurate, and can chain multiple Tools in one response  
 ✅ The most natural and advanced experience  
@@ -116,10 +115,10 @@ That’s it! Your chat is now using true native Tool support (as long as the mod
 
 💡 Summary:
 
-| Mode     | Who it’s for                     | Pros                                    | Cons                                 |
-|----------|----------------------------------|-----------------------------------------|--------------------------------------|
-| Default  | Any model                         | Broad compatibility, safer, flexible    | May be less accurate or slower       |
-| Native   | GPT-4o, etc.                      | Fast, smart, excellent tool chaining     | Needs proper function call support   |
+| Mode    | Who it’s for | Pros                                 | Cons                               |
+| ------- | ------------ | ------------------------------------ | ---------------------------------- |
+| Default | Any model    | Broad compatibility, safer, flexible | May be less accurate or slower     |
+| Native  | GPT-4o, etc. | Fast, smart, excellent tool chaining | Needs proper function call support |
 
 Choose the one that works best for your setup — and remember, you can always switch on the fly via Chat Controls.
 
