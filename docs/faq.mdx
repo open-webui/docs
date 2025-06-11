@@ -25,13 +25,13 @@ For more details on enterprise solutions and branding customizations, please con
 
 **A:** Inside a Docker container, `localhost` refers to the container itself, not the host machine. This distinction is crucial for networking. To establish a connection from your container to services running on the host, you should use the DNS name `host.docker.internal` instead of `localhost`. This DNS name is specially recognized by Docker to facilitate such connections, effectively treating the host as a reachable entity from within the container, thus bypassing the usual `localhost` scope limitation.
 
-#### **Q: What is the difference between Direct and External connections in Open WebUI?** _(Direct vs External Connections)_
+#### **Q: What is the difference between Direct and External connections in Open WebUI?**
 
 **A:** Open WebUI offers two ways to connect to LLM APIs:
 
-- **External Connections**: The central backend server handles API requests on behalf of users. For example, when the Open WebUI backend is deployed, it will send requests directly to LLM APIs. This method cannot access services running locally on your machine. These connections can be added from the **`Admin Panel > Settings > Connections`**.
+- **External Connections**: The central backend server sends API requests to LLM providers on behalf of users. External connections generally cannot access services running locally on your machine unless specifically configured to allow it (e.g., if both the backend and local LLM are on the same machine and properly routed). These connections can be added from the **`Admin Panel > Settings > Connections`**.
 
-- **Direct Connections**: The browser sends API requests directly, bypassing the backend server. This allows interaction with local or external services from your own computer. These connections can be added from the **`Settings > Connections`**.
+- **Direct Connections**: The browser sends API requests directly to the LLM provider, bypassing the backend server. This allows interaction with local or external services from the users' computer. These connections can be added from the **`Settings > Connections`**.
 
 > **Note:** Direct connections are not fully supported yet and may have limited functionality.
 
