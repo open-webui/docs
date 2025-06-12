@@ -494,7 +494,7 @@ JSON format: { "title": "your concise title here" }
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables tag generation.
+- Description: Enables or disables follow up generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`
