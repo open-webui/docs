@@ -490,6 +490,41 @@ JSON format: { "title": "your concise title here" }
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_FOLLOW_UP_GENERATION`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables follow up generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Description: Prompt to use for generating several relevant follow-up questions.
+- Default: The value of `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` environment variable.
+
+`DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`:
+
+```
+### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+{{MESSAGES:END:6}}
+</chat_history>"
+```
+
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
 - Type: `str`
