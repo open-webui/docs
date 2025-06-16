@@ -2974,6 +2974,13 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Enables or disables enforced temporary chats for users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
+
+- Type: `str`
+- Default: `True`
+- Description: Allows or disallows users to set a custom system prompt for all of their chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Feature Permissions
 
 #### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
