@@ -13,13 +13,16 @@ A scaffold of Action code can be found [in the community section](https://openwe
 An example of a graph visualization Action can be seen in the video below.
 
 <p align="center">
-  <a href="#">
-    <img src="/images/pipelines/graph-viz-action.gif" alt="Graph Visualization Action" />
-  </a>
+	<a href="#">
+		<img
+			src="/images/pipelines/graph-viz-action.gif"
+			alt="Graph Visualization Action"
+		/>
+	</a>
 </p>
 
-
 ### Action
+
 Actions are used to create a button in the Message UI (the small buttons found directly underneath individual chat messages).
 
 Actions have a single main component called an action function. This component takes an object defining the type of action and the data being processed.
@@ -49,4 +52,30 @@ async def action(
         )
         print(response)
 ```
+
 </details>
+
+### Example - Specifying Action Frontmatter
+
+Each Action function can include a docstring at the top to define metadata for the button. This helps customize the display and behavior of your Action in Open WebUI.
+
+Example of supported frontmatter fields:
+
+- `title`: Display name of the Action.
+- `author`: Name of the creator.
+- `version`: Version number of the Action.
+- `required_open_webui_version`: Minimum compatible version of Open WebUI.
+- `icon_url (optional)`: URL or Base64 string for a custom icon.
+
+**Base64-Encoded Example:**
+
+```python
+"""
+title: Summarize Text
+author: @you
+version: 1.0.0
+required_open_webui_version: 0.5.0
+icon_url: data:image/svg+xml;base64,<IMAGE STRING>...
+"""
+
+```
