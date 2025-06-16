@@ -2879,6 +2879,27 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Sets the ciphers to use for LDAP connection.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_LDAP_GROUP_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the group management feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_LDAP_GROUP_CREATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_ATTRIBUTE_FOR_GROUPS`
+
+- Type: `str`
+- Default: `memberOf`
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## User Permissions
 
 ### Chat Permissions
