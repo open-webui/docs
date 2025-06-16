@@ -14,7 +14,7 @@ The following table lists the available URL parameters, their function, and exam
 | `models`              | Specifies the models to be used, as a comma-separated list.                       | `/?models=model1,model2`         |
 | `model`               | Specifies a single model to be used for the chat session.                         | `/?model=model1`                 |
 | `youtube`             | Specifies a YouTube video ID to be transcribed within the chat.                   | `/?youtube=VIDEO_ID`             |
-| `load_url`            | Specifies a Website URL to be fetched and uploaded as a document within the chat. | `/?load_url=https://google.com`  |
+| `load-url`            | Specifies a Website URL to be fetched and uploaded as a document within the chat. | `/?load-url=https://google.com`  |
 | `web-search`          | Enables web search functionality if set to `true`.                                | `/?web-search=true`              |
 | `tools` or `tool-ids` | Specifies a comma-separated list of tool IDs to activate in the chat.             | `/?tools=tool1,tool2`            |
 | `call`                | Enables a call overlay if set to `true`.                                          | `/?call=true`                    |
@@ -38,9 +38,9 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 3. **Website Insertion**
 
-- **Description**: The `load_url` parameter downloads the specified website and extracts the content to upload it as a document into the chat.
+- **Description**: The `load-url` parameter downloads the specified website and extracts the content to upload it as a document into the chat.
 - **How to Set**: Use the full website URL as the value for this parameter.
-- **Example**: `/?load_url=https://google.com`
+- **Example**: `/?load-url=https://google.com`
 - **Behavior**: This triggers insertion of the specified website url.
 
 ### 4. **Web Search**
