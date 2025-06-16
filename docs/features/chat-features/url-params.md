@@ -20,6 +20,8 @@ The following table lists the available URL parameters, their function, and exam
 | `call`                | Enables a call overlay if set to `true`.                                          | `/?call=true`                    |
 | `q`                   | Sets an initial query or prompt for the chat.                                     | `/?q=Hello%20there`              |
 | `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions.              | `/?temporary-chat=true`          |
+| `code-interpreter`    | Enables the code interpreter feature if set to `true`.                            | `/?code-interpreter=true`        |
+| `image-generation`    | Enables the image generation feature if set to `true`.                            | `/?image-generation=true`        |
 
 ### 1. **Models and Model Selection**
 
@@ -77,6 +79,20 @@ The following table lists the available URL parameters, their function, and exam
 - **How to Set**: Set this parameter to `true` for a temporary chat session.
 - **Example**: `/?temporary-chat=true`
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
+
+### 9. **Code Interpreter**
+
+- **Description**: The `code-interpreter` parameter enables the code interpreter feature.
+- **How to Set**: Set this parameter to `true` to enable the code interpreter feature for this new chat session.
+- **Example**: `/?code-interpreter=true`
+- **Behavior**: Activates the code interpreter button to execute the code interpreter with the next prompt sent to the LLM.
+
+### 10. **Image Generation**
+
+- **Description**: The `image-generation` parameter enables the image generation for the provided prompt.
+- **How to Set**: Set this parameter to `true` to enable image generation for the chat.
+- **Example**: `/?image-generation=true`
+- **Behavior**: Activates the image generation button to generate an image.
 
 <details>
 <summary>Example Use Case</summary>
