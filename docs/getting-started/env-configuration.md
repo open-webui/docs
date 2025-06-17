@@ -446,15 +446,20 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 #### `TASK_MODEL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation
-when using Ollama models.
+- Description: The default model to use when using Ollama models, for tasks like generating conversation titles, creating web search queries, crafting follow-up prompts and other auxiliary operations. Task models enhance the conversation experience by handling these supporting functions automatically.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `TASK_MODEL_EXTERNAL`
 
 - Type: `str`
-- Description: The default model to use for tasks such as title and web search query generation
-when using OpenAI-compatible endpoints.
+- Description: The default model to use when using OpenAI-compatible endpoints, for tasks like generating conversation titles, creating web search queries, crafting follow-up prompts and other auxiliary operations. Task models enhance the conversation experience by handling these supporting functions automatically.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `TASK_MESSAGE_TRUNCATION_LENGTH`
+
+- Type: `int`
+- Description: Sets the maximum character limit per message when providing context to the task model, preventing excessive token usage.
+- Default: Is set to `-1` by default (no limit).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
