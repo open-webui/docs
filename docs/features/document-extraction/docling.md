@@ -42,6 +42,21 @@ docker run --gpus all -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docli
 * Update the context extraction engine URL to `http://host.docker.internal:5001`.
 * Save the changes.
 
+### (optional) Step 3: Configure Docling's picture description features
+
+* on the `Documents` tab:
+* Activate `Describe Pictures in Documents` button.
+* Below, choose a description mode: `local` or `API`
+  * `local`: vision model will run in the same context as Docling itself
+  * `API`: Docling will make a call to an external service/container (i.e. Ollama)
+* fill in an **object value** as described at https://github.com/docling-project/docling-serve/blob/main/docs/usage.md#picture-description-options
+* Save the changes.
+
+  #### Make sure the object value is a valid JSON! Working examples below:
+ 
+  ![image](https://github.com/user-attachments/assets/f6524949-fb47-4686-9c81-6ab8fdda6db1)
+  ![image](https://github.com/user-attachments/assets/982e0081-8c11-457c-b886-af91569e7fef)
+
 Verifying Docling in Docker
 =====================================
 
