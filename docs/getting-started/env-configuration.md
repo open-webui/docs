@@ -952,7 +952,7 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
 
 :::
 
@@ -3236,11 +3236,12 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `str`
 - Example: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for the app-state.
+- Example with TLS: `rediss://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for the app state.
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app state will occur as the workers would be unable to communicate.
 
 :::
 
@@ -3263,7 +3264,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3275,7 +3276,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3287,7 +3288,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
