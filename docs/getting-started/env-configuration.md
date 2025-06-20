@@ -3191,7 +3191,7 @@ Documentation on the URL scheme is available available [here](https://docs.sqlal
 #### `DATABASE_POOL_SIZE`
 
 - Type: `int`
-- Default: `0`
+- Default: `1`
 - Description: Specifies the size of the database pool. A value of `0` disables pooling.
 
 #### `DATABASE_POOL_MAX_OVERFLOW`
