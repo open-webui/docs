@@ -3191,8 +3191,8 @@ Documentation on the URL scheme is available available [here](https://docs.sqlal
 #### `DATABASE_POOL_SIZE`
 
 - Type: `int`
-- Default: `0`
-- Description: Specifies the size of the database pool. A value of `0` disables pooling.
+- Default: `None`
+- Description: Specifies the pooling strategy and size of the database pool. By default SQLAlchemy will automatically chose the proper pooling strategy for the selected database connection. A value of `0` disables pooling. A value larger `0` will set the pooling strategy to `QueuePool` and the pool size accordingly.
 
 #### `DATABASE_POOL_MAX_OVERFLOW`
 
