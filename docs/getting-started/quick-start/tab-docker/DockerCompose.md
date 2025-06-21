@@ -13,7 +13,6 @@ Docker Compose requires an additional package, `docker-compose-v2`.
 Here is an example configuration file for setting up Open WebUI with Docker Compose:
 
 ```yaml
-version: '3'
 services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
