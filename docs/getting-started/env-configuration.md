@@ -965,15 +965,19 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 :::info
 
 **Disabled when enabled:**
+
 - Automatic version update checks
 - Downloads of embedding models from Hugging Face Hub
   - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
 - Update notifications in the UI
 
 **Still functional:**
+
 - External LLM API connections (OpenAI, etc.)
 - OAuth authentication providers
 - Web search and RAG with external APIs
+
+Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 
 :::
 
