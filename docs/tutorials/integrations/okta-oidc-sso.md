@@ -28,8 +28,14 @@ First, you need to configure an OIDC application within your Okta organization a
 1.  Log in to your Okta Admin Console.
 2.  Navigate to **Applications > Applications**.
 3.  Either create a new **OIDC - OpenID Connect** application (choose **Web Application** as the type) or select an existing one you wish to use for Open WebUI.
+
+    ![Okta Create App](/images/tutorials/okta/okta-auth-create-app.png)
+
 4.  During setup or in the application's **General** settings tab, configure the **Sign-in redirect URIs**. Add the URI for your Open WebUI instance, followed by `/oauth/oidc/callback`. Example: `https://your-open-webui.com/oauth/oidc/callback`.
 5.  Take note of the **Client ID** and **Client secret** provided on the application's **General** tab. You will need these for the Open WebUI configuration.
+
+    ![Okta Client Key](/images/tutorials/okta/okta-auth-clientkey.png)
+
 6.  Ensure the correct users or groups are assigned to this application under the **Assignments** tab.
 
 ### 2. Add a Groups Claim to the ID Token
@@ -48,6 +54,32 @@ First, you need to configure an OIDC application within your Okta organization a
 7.  From the **More** button dropdown menu for your application, click **Refresh Application Data**.
 
 *For more advanced group claim configurations, refer to the Okta documentation on [customizing tokens](https://developer.okta.com/docs/guides/customize-tokens-returned-from-okta/main/) and [group functions](https://developer.okta.com/docs/reference/okta-expression-language/#group-functions).*
+
+### 3. Applying MFA (e.g., Google Authenticator)
+
+To enhance security, you can enforce Multi-Factor Authentication (MFA) for users logging into Open WebUI via Okta. This example demonstrates how to set up Google Authenticator as an additional factor.
+
+1.  **Configure an Authenticator**:
+    *   In the Okta Admin Console, navigate to **Security > Authenticators**.
+    *   Click **Add Authenticator** and add **Google Authenticator**.
+    *   During setup, you can set **"User verification"** to **"Required"** to enhance security.
+
+2.  **Create and Apply a Sign-On Policy**:
+    *   Go to **Security > Authenticators**, then click the **Sign On** tab.
+    *   Click **Add a policy** to create a new policy (e.g., "WebUI MFA Policy").
+    *   In the policy you just created, click **Add rule**.
+    *   Configure the rule:
+        *   Set **"IF User's IP is"** to **"Anywhere"**.
+        *   Set **"THEN Access is"** to **"Allowed after successful authentication"**.
+        *   Under **"AND User must authenticate with"**, select **"Password + Another factor"**.
+        *   Ensure your desired factor (e.g., Google Authenticator) is included under **"AND Possession factor constraints are"**.
+    *   Finally, assign this policy to your Open WebUI application. Go to **Applications > Applications**, select your OIDC app, and under the **Sign On** tab, select the policy you created.
+
+Now, when users log in to Open WebUI, they will be required to provide their Okta password and an additional verification code from Google Authenticator.
+
+:::note Re-authentication Frequency
+By default, Okta's Sign-On Policy may not prompt for MFA on every login from the same device or browser to improve user experience. If you require MFA for every session, you can adjust this setting within the policy rule you created. Look for the **"Prompt for re-authentication"** setting and set it to **"Every sign-in attempt"**.
+:::
 
 ## Configuring Open WebUI
 
@@ -147,5 +179,6 @@ Restart your Open WebUI instance after setting these environment variables.
 *   **400 Bad Request/Redirect URI Mismatch:** Double-check that the **Sign-in redirect URI** in your Okta application exactly matches `<your-open-webui-url>/oauth/oidc/callback`.
 *   **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Remember admin groups are not synced.
 *   **Configuration Errors:** Review the Open WebUI server logs for detailed error messages related to OIDC configuration.
+
 *   Refer to the official [Open WebUI SSO Documentation](/features/sso).
 *   Consult the [Okta Developer Documentation](https://developer.okta.com/docs/).
