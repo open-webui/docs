@@ -3184,6 +3184,8 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
 Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
+If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
+
 :::
 
 #### `DATABASE_SCHEMA`
