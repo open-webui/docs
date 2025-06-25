@@ -952,7 +952,7 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
 
 :::
 
@@ -965,15 +965,19 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 :::info
 
 **Disabled when enabled:**
+
 - Automatic version update checks
 - Downloads of embedding models from Hugging Face Hub
   - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
 - Update notifications in the UI
 
 **Still functional:**
+
 - External LLM API connections (OpenAI, etc.)
 - OAuth authentication providers
 - Web search and RAG with external APIs
+
+Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 
 :::
 
@@ -2974,6 +2978,13 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Enables or disables enforced temporary chats for users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
+
+- Type: `str`
+- Default: `True`
+- Description: Allows or disallows users to set a custom system prompt for all of their chats.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Feature Permissions
 
 #### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
@@ -3173,6 +3184,8 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
 Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
+If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
+
 :::
 
 #### `DATABASE_SCHEMA`
@@ -3184,8 +3197,8 @@ Documentation on the URL scheme is available available [here](https://docs.sqlal
 #### `DATABASE_POOL_SIZE`
 
 - Type: `int`
-- Default: `0`
-- Description: Specifies the size of the database pool. A value of `0` disables pooling.
+- Default: `None`
+- Description: Specifies the pooling strategy and size of the database pool. By default SQLAlchemy will automatically chose the proper pooling strategy for the selected database connection. A value of `0` disables pooling. A value larger `0` will set the pooling strategy to `QueuePool` and the pool size accordingly.
 
 #### `DATABASE_POOL_MAX_OVERFLOW`
 
@@ -3229,11 +3242,12 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `str`
 - Example: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for the app-state.
+- Example with TLS: `rediss://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for the app state.
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app state will occur as the workers would be unable to communicate.
 
 :::
 
@@ -3256,7 +3270,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3268,7 +3282,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3280,7 +3294,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 

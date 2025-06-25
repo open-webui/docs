@@ -17,7 +17,7 @@ Getting started with Tools and Functions is easy because everything’s already 
 
 ## What are "Tools" and "Functions"?
 
-Let's start by thinking of **Open WebUI** as a "base" software that can do many tasks related to using Large Language Models (LLMs). But sometimes, you need extra features or abilities that don't come *out of the box*—this is where **tools** and **functions** come into play.
+Let's start by thinking of **Open WebUI** as a "base" software that can do many tasks related to using Large Language Models (LLMs). But sometimes, you need extra features or abilities that don't come _out of the box_—this is where **tools** and **functions** come into play.
 
 ### Tools
 
@@ -32,6 +32,7 @@ Imagine you're chatting with an LLM and you want it to give you the latest weath
 Tools are essentially **abilities** you’re giving your AI to help it interact with the outside world. By adding these, the LLM can "grab" useful information or perform specialized tasks based on the context of the conversation.
 
 #### Examples of Tools (extending LLM’s abilities):
+
 1. **Real-time weather predictions** 🛰️.
 2. **Stock price retrievers** 📈.
 3. **Flight tracking information** ✈️.
@@ -40,19 +41,29 @@ Tools are essentially **abilities** you’re giving your AI to help it interact 
 
 While **tools** are used by the AI during a conversation, **functions** help extend or customize the capabilities of Open WebUI itself. Imagine tools are like adding new ingredients to a dish, and functions are the process you use to control the kitchen! 🚪
 
-#### Let's break that down: 
+#### Let's break that down:
 
 - **Functions** give you the ability to tweak or add **features** inside **Open WebUI** itself.
 - You’re not giving new abilities to the LLM, but instead, you’re extending the **interface, behavior, or logic** of the platform itself!
 
 For instance, maybe you want to:
+
 1. Add a new AI model like **Anthropic** to the WebUI.
 2. Create a custom button in your toolbar that performs a frequently used command.
 3. Implement a better **filter** function that catches inappropriate or **spammy messages** from the incoming text.
 
 Without functions, these would all be out of reach. But with this framework in Open WebUI, you can easily extend these features!
 
+### Where to Find and Manage Functions
+
+Functions are not located in the same place as Tools.
+
+- **Tools** are about model access and live in your **Workspace tabs** (where you add models, prompts, and knowledge collections). They can be added by users if granted permissions.
+- **Functions** are about **platform customization** and are found in the **Admin Panel**.  
+  They are configured and managed only by admins who want to extend the platform interface or behavior for all users.
+
 ### Summary of Differences:
+
 - **Tools** are things that allow LLMs to **do more things** outside their default abilities (such as retrieving live info or performing custom tasks based on external data).
 - **Functions** help the WebUI itself **do more things**, like adding new AI models or creating smarter ways to filter data.
 
@@ -64,13 +75,13 @@ And then, we have **Pipelines**… Here’s where things start to sound pretty t
 
 **Pipelines** are part of an Open WebUI initiative focused on making every piece of the WebUI **inter-operable with OpenAI’s API system**. Essentially, they extend what both **Tools** and **Functions** can already do, but now with even more flexibility. They allow you to turn features into OpenAI API-compatible formats. 🧠
 
-### But here’s the thing… 
+### But here’s the thing…
 
 You likely **won't need** pipelines unless you're dealing with super-advanced setups.
 
 - **Who are pipelines for?** Typically, **experts** or people running more complicated use cases.
 - **When do you need them?** If you're trying to offload processing from your primary Open WebUI instance to a different machine (so you don’t overload your primary system).
-  
+
 In most cases, as a beginner or even an intermediate user, you won’t have to worry about pipelines. Just focus on enjoying the benefits that **tools** and **functions** bring to your Open WebUI experience!
 
 ## Want to Try? 🚀
