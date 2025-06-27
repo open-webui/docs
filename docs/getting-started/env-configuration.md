@@ -1293,6 +1293,12 @@ If you decide to use the multitenancy pattern as your default and you don't need
 
 :::
 
+#### `QDRANT_COLLECTION_PREFIX`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Sets the prefix for Qdrant collection names. Useful for namespacing or isolating collections, especially in multitenancy mode. Changing this value will cause the application to use a different set of collections in Qdrant. Existing collections with a different prefix will not be affected.
+
 ### Pinecone
 
 When using Pinecone as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
