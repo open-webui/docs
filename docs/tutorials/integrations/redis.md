@@ -85,9 +85,10 @@ To enable websocket support in Open WebUI, you will need to set the following en
 ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
 WEBSOCKET_REDIS_URL="redis://redis:6379/1"
+REDIS_KEY_PREFIX="open-webui"
 ```
 
-These environment variables enable websocket support, specify Redis as the websocket manager, and define the Redis URL. Make sure to replace the `WEBSOCKET_REDIS_URL` value with the actual IP address of your Redis instance.
+These environment variables enable websocket support, specify Redis as the websocket manager, define the Redis URL, and set a custom Redis key prefix. The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Redis instance without key conflicts. In Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot. Make sure to replace the `WEBSOCKET_REDIS_URL` value with the actual IP address of your Redis instance.
 
 When running Open WebUI using Docker, you need to connect it to the same Docker network:
 
@@ -99,6 +100,7 @@ docker run -d \
   -e ENABLE_WEBSOCKET_SUPPORT="true" \
   -e WEBSOCKET_MANAGER="redis" \
   -e WEBSOCKET_REDIS_URL="redis://127.0.0.1:6379/1" \
+  -e REDIS_KEY_PREFIX="open-webui" \
   ghcr.io/open-webui/open-webui:main
 ```
 

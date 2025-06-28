@@ -1,15 +1,19 @@
 import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
 import { useEffect, useState } from "react";
 
-export const TopBanners = ({bannerClassName = 'h-18', label= true, description= true, mobile = true }) => {
+export const TopBanners = ({
+	bannerClassName = "h-18",
+	label = true,
+	description = true,
+	mobile = true,
+}) => {
 	const items = [
 		{
 			imgSrc: "/sponsors/banners/n8n-banner.png",
 			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
 			url: "https://n8n.io/",
 			name: "n8n",
-			description:
-				"Does your interface have a backend yet? Try n8n",
+			description: "Does your interface have a backend yet? Try n8n",
 		},
 
 		{
@@ -17,8 +21,7 @@ export const TopBanners = ({bannerClassName = 'h-18', label= true, description= 
 			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
 			url: "https://n8n.io/",
 			name: "n8n",
-			description:
-				"Does your interface have a backend yet? Try n8n",
+			description: "Does your interface have a backend yet? Try n8n",
 		},
 
 		{
@@ -26,8 +29,7 @@ export const TopBanners = ({bannerClassName = 'h-18', label= true, description= 
 			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
 			url: "https://warp.dev/open-webui",
 			name: "Warp",
-			description:
-				"The intelligent terminal for developers",
+			description: "The intelligent terminal for developers",
 		},
 
 		{
@@ -35,8 +37,7 @@ export const TopBanners = ({bannerClassName = 'h-18', label= true, description= 
 			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
 			url: "https://warp.dev/open-webui",
 			name: "Warp",
-			description:
-				"The intelligent terminal for developers",
+			description: "The intelligent terminal for developers",
 		},
 
 		{
@@ -44,20 +45,16 @@ export const TopBanners = ({bannerClassName = 'h-18', label= true, description= 
 			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
 			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
 			name: "Tailscale",
-			description:
-				"Connect self-hosted AI to any device with Tailscale",
+			description: "Connect self-hosted AI to any device with Tailscale",
 		},
-
 
 		{
 			imgSrc: "/sponsors/banners/tailscale-banner.png",
 			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
 			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
 			name: "Tailscale",
-			description:
-				"Connect self-hosted AI to any device with Tailscale",
+			description: "Connect self-hosted AI to any device with Tailscale",
 		},
-
 
 		{
 			imgSrc: "/sponsors/banners/placeholder.png",
@@ -70,7 +67,9 @@ export const TopBanners = ({bannerClassName = 'h-18', label= true, description= 
 	];
 
 	// Randomly select an item to display
-	const [selectedItemIdx, setSelectedItemIdx] = useState(Math.floor(Math.random() * items.length));
+	const [selectedItemIdx, setSelectedItemIdx] = useState(
+		Math.floor(Math.random() * items.length)
+	);
 
 	useEffect(() => {
 		// After mounting update every 5 seconds
@@ -79,6 +78,13 @@ export const TopBanners = ({bannerClassName = 'h-18', label= true, description= 
 		}, 10000); // 10000 ms = 10 seconds
 	}, []);
 
-
-	return <TopBanner bannerClassName={bannerClassName} item={items[selectedItemIdx]} label={label} description={description} mobile={mobile} />;
+	return (
+		<TopBanner
+			bannerClassName={bannerClassName}
+			item={items[selectedItemIdx]}
+			label={label}
+			description={description}
+			mobile={mobile}
+		/>
+	);
 };
