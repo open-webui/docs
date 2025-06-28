@@ -2,7 +2,7 @@ export const Sponsor = ({ sponsor }) => {
 	return (
 		<>
 			<div className="mb-2 flex flex-col">
-				<div className="mb-1.5 text-[0.6rem] font-semibold text-gray-500  dark:text-gray-400">
+				<div className="mb-1.5 text-[0.6rem] font-semibold text-gray-500 dark:text-gray-400">
 					<a href={sponsor.url} target="_blank" className="no-underline">
 						{sponsor.name}
 					</a>
