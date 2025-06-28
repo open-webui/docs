@@ -3268,6 +3268,12 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
 
+#### `REDIS_KEY_PREFIX`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
