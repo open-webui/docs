@@ -1,7 +1,12 @@
 import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
 import { useEffect, useState } from "react";
 
-export const Testimonals = ({bannerClassName = 'h-18', label= true, description= true, mobile = true }) => {
+export const Testimonals = ({
+	bannerClassName = "h-18",
+	label = true,
+	description = true,
+	mobile = true,
+}) => {
 	const items = [
 		{
 			imgSrc: "https://avatars.githubusercontent.com/u/5860369?v=4",
@@ -13,25 +18,31 @@ export const Testimonals = ({bannerClassName = 'h-18', label= true, description=
 		},
 	];
 
-
-	return  (
+	return (
 		<>
 			{items.map((item, index) => (
-				<div key={index} className="flex gap-6 items-center text-center py-6">
-					<div className="flex flex-col items-center shrink-0 basis-1/4">
-
+				<div key={index} className="flex items-center gap-6 py-6 text-center">
+					<div className="flex shrink-0 basis-1/4 flex-col items-center">
 						<a href={item.url} target="_blank" rel="noopener noreferrer">
 							<div>
-								<img src={item.imgSrc} alt={item.name} className="rounded-full size-20 mb-2" />
+								<img
+									src={item.imgSrc}
+									alt={item.name}
+									className="mb-2 size-20 rounded-full"
+								/>
 							</div>
 
-							<div className="text-sm font-medium hover:underline no-underline ">{item.name}</div>
-							<div className="text-sm font-medium hover:underline no-underline ">@ {item.company}</div>
+							<div className="text-sm font-medium no-underline hover:underline">
+								{item.name}
+							</div>
+							<div className="text-sm font-medium no-underline hover:underline">
+								@ {item.company}
+							</div>
 						</a>
 					</div>
 					<p className="text-sm italic">{item.content}</p>
 				</div>
 			))}
 		</>
-	)
-}
+	);
+};
