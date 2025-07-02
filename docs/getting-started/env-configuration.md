@@ -956,6 +956,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::
 
+#### `ENABLE_VERSION_UPDATE_CHECK`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates.
+
+:::info
+
+If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always set to `false` automatically.
+
+:::
+
 #### `OFFLINE_MODE`
 
 - Type: `bool`
@@ -966,10 +978,10 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 **Disabled when enabled:**
 
-- Automatic version update checks
+- Automatic version update checks (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 - Downloads of embedding models from Hugging Face Hub
   - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
-- Update notifications in the UI
+- Update notifications in the UI (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 
 **Still functional:**
 
