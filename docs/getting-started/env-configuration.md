@@ -843,6 +843,13 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 :::
 
+#### `API_KEY_EXPIRES_IN`
+
+- Type: `int`
+- Default: `-1`
+- Description: Sets the API key expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `JWT_EXPIRES_IN`
 
 - Type: `int`
