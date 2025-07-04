@@ -130,6 +130,91 @@ class Valves(BaseModel):
 For example:  
 If you're creating a filter that converts responses into uppercase, you might allow users to configure whether every output gets totally capitalized via a valve like `TRANSFORM_UPPERCASE: bool = True/False`.
 
+
+##### Configuring Valves with Dropdown Menus (Enums)
+
+You can enhance the user experience for your filter's settings by providing dropdown menus instead of free-form text inputs for certain `Valves`. This is achieved using `json_schema_extra` with the `enum` keyword in your Pydantic `Field` definitions.
+
+The `enum` keyword allows you to specify a list of predefined values that the UI should present as options in a dropdown.
+
+**Example:** Creating a dropdown for color themes in a filter.
+
+```python
+from pydantic import BaseModel, Field
+from typing import Optional
+
+# Define your available options (e.g., color themes)
+COLOR_THEMES = {
+    "Plain (No Color)": [],
+    "Monochromatic Blue": ["blue", "RoyalBlue", "SteelBlue", "LightSteelBlue"],
+    "Warm & Energetic": ["orange", "red", "magenta", "DarkOrange"],
+    "Cool & Calm": ["cyan", "blue", "green", "Teal", "CadetBlue"],
+    "Forest & Earth": ["green", "DarkGreen", "LimeGreen", "OliveGreen"],
+    "Mystical Purple": ["purple", "DarkOrchid", "MediumPurple", "Lavender"],
+    "Grayscale": ["gray", "DarkGray", "LightGray"],
+    "Rainbow Fun": [
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "indigo",
+        "violet",
+    ],
+    "Ocean Breeze": ["blue", "cyan", "LightCyan", "DarkTurquoise"],
+    "Sunset Glow": ["DarkRed", "DarkOrange", "Orange", "gold"],
+    "Custom Sequence (See Code)": [],
+}
+
+class Filter:
+    class Valves(BaseModel):
+        selected_theme: str = Field(
+            "Monochromatic Blue",
+            description="Choose a predefined color theme for LLM responses. 'Plain (No Color)' disables coloring.",
+            json_schema_extra={"enum": list(COLOR_THEMES.keys())}, # KEY: This creates the dropdown
+        )
+        custom_colors_csv: str = Field(
+            "",
+            description="CSV of colors for 'Custom Sequence' theme (e.g., 'red,blue,green'). Uses xcolor names.",
+        )
+        strip_existing_latex: bool = Field(
+            True,
+            description="If true, attempts to remove existing LaTeX color commands. Recommended to avoid nested rendering issues.",
+        )
+        colorize_type: str = Field(
+            "sequential_word",
+            description="How to apply colors: 'sequential_word' (word by word), 'sequential_line' (line by line), 'per_letter' (letter by letter), 'full_message' (entire message).",
+            json_schema_extra={
+                "enum": [
+                    "sequential_word",
+                    "sequential_line",
+                    "per_letter",
+                    "full_message",
+                ]
+            }, # Another example of an enum dropdown
+        )
+        color_cycle_reset_per_message: bool = Field(
+            True,
+            description="If true, the color sequence restarts for each new LLM response message. If false, it continues across messages.",
+        )
+        debug_logging: bool = Field(
+            False,
+            description="Enable verbose logging to the console for debugging filter operations.",
+        )
+
+    def __init__(self):
+        self.valves = self.Valves()
+        # ... rest of your __init__ logic ...
+```
+
+**What's happening?**
+
+*   **`json_schema_extra`**: This argument in `Field` allows you to inject arbitrary JSON Schema properties that Pydantic doesn't explicitly support but can be used by downstream tools (like Open WebUI's UI renderer).
+*   **`"enum": list(COLOR_THEMES.keys())`**: This tells Open WebUI that the `selected_theme` field should present a selection of values, specifically the keys from our `COLOR_THEMES` dictionary. The UI will then render a dropdown menu with "Plain (No Color)", "Monochromatic Blue", "Warm & Energetic", etc., as selectable options.
+*   The `colorize_type` field also demonstrates another `enum` dropdown for different coloring methods.
+
+Using `enum` for your `Valves` options makes your filters more user-friendly and prevents invalid inputs, leading to a smoother configuration experience.
+
 ---
 
 #### 2️⃣ **`inlet` Function (Input Pre-Processing)**
