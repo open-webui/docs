@@ -1,0 +1,124 @@
+---
+sidebar_position: 4
+title: "🎨 Advanced: Figma MCP Integration"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+This document provides a detailed guide on how to connect the MCP (Model Context Protocol) server provided directly by the **Figma Desktop App** to Open WebUI using the **`mcpo`** proxy. This guide covers advanced topics, including networking and firewall configurations.
+
+## 📌 Understanding the Architecture
+
+The Figma integration has a unique architecture compared to other MCP servers.
+
+1.  **Figma App as the Server:** The `figma-mcp-server` is not a separate program you install. It's a **built-in MCP server that runs directly from the Figma Desktop App's 'Dev Mode'**.
+2.  **HTTP/SSE Communication:** This server communicates via the **HTTP/SSE (Server-Sent Events)** protocol, not standard I/O (stdio).
+3.  **`mcpo` as a Proxy:** `mcpo` acts as a **proxy that connects as a client** to the Figma app's MCP server. It then translates the server's functionality into standard OpenAPI endpoints that can be accessed externally.
+
+**The complete workflow:**
+
+`Open WebUI` ↔ `mcpo (Proxy)` ↔ `Figma App's Built-in MCP Server (HTTP/SSE)` ↔ `Figma Desktop App`
+
+---
+
+## ✅ Prerequisites
+
+1.  **Figma Desktop App:** Must be installed and running.
+2.  **Python 3.8+:** Must be installed with `pip`.
+3.  **`mcpo` Installation:**
+
+    ```bash
+    uv pip install mcpo
+    ```
+
+---
+
+## 🚀 Step 1: Activate the MCP Server in the Figma App
+
+First, you need to enable the built-in MCP server within the Figma Desktop App.
+
+1.  Open the Figma app and turn on the **'Dev Mode' toggle** in the upper-right corner.
+2.  In Dev Mode, find and enable the **"MCP Server"** option. This will start the server directly.
+3.  Figma will provide a connection URL, typically in the format `http://127.0.0.1:[PORT]/sse`. **Copy this address.**
+
+:::warning
+For security, the Figma MCP server only accepts requests from `127.0.0.1` (localhost) by default.
+:::
+
+---
+
+## 🚀 Step 2: Run the `mcpo` Proxy Server
+
+Now, run `mcpo` using the Figma MCP server URL you copied in Step 1.
+
+Open a terminal and execute the command below. Replace `[FIGMA_MCP_URL]` with the address you copied.
+
+```bash
+# Example: mcpo --port 8000 --server-type "sse" -- http://127.0.0.1:3845/sse
+mcpo --port 8000 --server-type "sse" -- [FIGMA_MCP_URL]
+```
+
+**Command Breakdown:**
+
+-   `mcpo --port 8000`: Runs the `mcpo` proxy on port 8000.
+-   `--server-type "sse"`: Specifies that the target MCP server communicates via **Server-Sent Events (SSE)**. This is mandatory for the Figma integration.
+-   `-- [FIGMA_MCP_URL]`: The full URL of the Figma MCP server that `mcpo` will connect to as a client.
+
+`mcpo` will now serve OpenAPI endpoints at `http://localhost:8000`, forwarding all requests internally to the Figma app's MCP server.
+
+---
+
+## 🐳 Step 3: Networking & Firewall (for Docker Users)
+
+Running Open WebUI or `mcpo` inside a Docker container introduces networking complexities.
+
+-   **The Problem:** A Docker container's `127.0.0.1` refers to the container itself, not the host machine (e.g., Windows) where the Figma app is running.
+
+-   **The Solution:**
+    1.  **Use Host IP:** In the `mcpo` command, replace `127.0.0.1` with the host machine's internal IP address (e.g., `192.168.1.10`) or the special DNS name provided by Docker (`host.docker.internal`).
+
+        ```bash
+        # Example for running inside a Docker container
+        mcpo --port 8000 --server-type "sse" -- http://host.docker.internal:3845/sse
+        ```
+
+    2.  **Configure Firewall:** The host machine's firewall (Windows/macOS) may block incoming connections from the Docker container. You must **configure your firewall** to allow **inbound connections** to the Figma app or its specific port (e.g., `3845`).
+
+---
+
+## 🔗 Step 4: Connect to Open WebUI and Use the Tool
+
+1.  Open Open WebUI and navigate to ⚙️ **Settings** > **Tools**.
+2.  Click **➕ Tools** and enter the URL for the `mcpo` proxy server.
+    -   If `mcpo` is running locally: `http://localhost:8000`
+    -   If `mcpo` is running in Docker: `http://[mcpo_container_IP]:8000`
+3.  **Select a node (object) in the Figma app** that you want to work with, then ask for a related task in Open WebUI.
+
+**Example Prompts:**
+
+> "Generate the CSS code for the currently selected node."
+> "Change the background color of the selected button to `#FF0000`."
+
+---
+
+## 🛠️ Troubleshooting
+
+### Issue 1: `mcpo` fails to connect to the Figma server
+
+-   **Cause:** The URL might be incorrect, or a firewall is blocking the connection.
+-   **Solution:**
+    1.  Double-check that the MCP server URL from the Figma app is correct.
+    2.  If running `mcpo` in Docker, ensure you are using `host.docker.internal` and that the host's firewall allows inbound connections on the specified port.
+
+### Issue 2: `422 Unprocessable Entity` Error
+
+-   **Cause:** The LLM sent a request containing `{"nodeId": null}`, which violates the tool's requirements.
+-   **Solution:** Modify your prompt to be more explicit about operating on the "currently selected node." The tool's description specifies that the `nodeId` parameter should be omitted.
+
+### Issue 3: `500` or `400` Error with a `"Nothing is selected"` message
+
+-   **Cause:** **No node was selected in the Figma app.** This is not a server error but a failure to meet a precondition on the user's part.
+-   **Solution:** Switch to the Figma app and ensure the object (node) you want to work on is properly selected.
+
+Happy integrations! 🌟🚀
