@@ -23,23 +23,6 @@ export const TopBanners = ({
 			name: "n8n",
 			description: "Does your interface have a backend yet? Try n8n",
 		},
-
-		{
-			imgSrc: "/sponsors/banners/warp-banner.png",
-			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
-			url: "https://warp.dev/open-webui",
-			name: "Warp",
-			description: "The intelligent terminal for developers",
-		},
-
-		{
-			imgSrc: "/sponsors/banners/warp-banner.png",
-			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
-			url: "https://warp.dev/open-webui",
-			name: "Warp",
-			description: "The intelligent terminal for developers",
-		},
-
 		{
 			imgSrc: "/sponsors/banners/tailscale-banner.png",
 			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
