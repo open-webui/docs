@@ -17,7 +17,7 @@ The offline mode of Open WebUI lets you run the application without the need for
 
 :::info
 
-**Disabled when enabled:**
+**Disabled functionality when offline mode is enabled:**
 
 - Automatic version update checks
 - Downloads of embedding models from Hugging Face Hub
