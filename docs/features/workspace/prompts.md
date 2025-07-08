@@ -127,11 +127,10 @@ This prompt acts as a structured form to ensure all necessary details for a bug 
     **Priority:** {{priority | select:options=["High", "Medium", "Low"]:default="Medium"}}
     **Steps to Reproduce:**
     {{steps | textarea:placeholder="1. Go to...\n2. Click on...\n3. See error..."}}
-    {{optional_screenshot_details | textarea:placeholder="Optional: If you're attaching a screenshot, describe it here."}}
     
     Please format this into a clear and complete bug report document.
     ```
-    When used, this prompt generates a form with a text input, a dropdown menu, and two text areas. The `optional_screenshot_details` section is optional; if you leave its field blank, that entire variable will be omitted from the final prompt.
+    When used, this prompt generates a form with a text input, a dropdown menu, and two text areas.
 
 **3. Social Media Post Generator**
 
