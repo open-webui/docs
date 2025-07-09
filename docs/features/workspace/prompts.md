@@ -72,7 +72,7 @@ There are two ways to define a custom variable:
 1.  **Simple Input**: `{{variable_name}}`
     *   This creates a standard, single-line `text` type input field in the popup window.
 
-2.  **Typed Input**: `{{variable_name | type:property="value"}}`
+2.  **Typed Input**: `{{variable_name | [type][:property="value"]}}`
     *   This allows you to specify the type of input field (e.g., a dropdown, a date picker) and configure its properties.
 
 **Input Types Overview**
