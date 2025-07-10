@@ -1042,7 +1042,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `oracle23ai`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1352,6 +1352,72 @@ When using Pinecone as the vector store, the following environment variables are
 - Default: `aws`
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
+
+### Oracle 23ai Vector Search (oracle23ai)
+
+#### `ORACLE_DB_USE_WALLET`
+
+-   **Type**: `bool`
+-   **Default**: `false`
+-   **Description**: Determines the connection method to the Oracle Database.
+    -   Set to `false` for direct connections (e.g., to Oracle Database 23ai Free or DBCS instances) using host, port, and service name in `ORACLE_DB_DSN`.
+    -   Set to `true` for wallet-based connections (e.g., to Oracle Autonomous Database (ADW/ATP)). When `true`, `ORACLE_WALLET_DIR` and `ORACLE_WALLET_PASSWORD` must also be configured.
+
+#### `ORACLE_DB_USER`
+
+-   **Type**: `str`
+-   **Default**: `DEMOUSER`
+-   **Description**: Specifies the username used to connect to the Oracle Database.
+
+#### `ORACLE_DB_PASSWORD`
+
+-   **Type**: `str`
+-   **Default**: `Welcome123456`
+-   **Description**: Specifies the password for the `ORACLE_DB_USER`.
+
+#### `ORACLE_DB_DSN`
+
+-   **Type**: `str`
+-   **Default**: `localhost:1521/FREEPDB1`
+-   **Description**: Defines the Data Source Name for the Oracle Database connection.
+    -   If `ORACLE_DB_USE_WALLET` is `false`, this should be in the format `hostname:port/service_name` (e.g., `localhost:1521/FREEPDB1`).
+    -   If `ORACLE_DB_USE_WALLET` is `true`, this can be a TNS alias (e.g., `medium` for ADW/ATP), or a full connection string.
+
+#### `ORACLE_WALLET_DIR`
+
+-   **Type**: `str`
+-   **Default**: `/home/opc/adb_wallet`
+-   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the absolute path to the directory containing the Oracle Cloud Wallet files (e.g., `cwallet.sso`, `sqlnet.ora`, `tnsnames.ora`).
+
+#### `ORACLE_WALLET_PASSWORD`
+
+-   **Type**: `str`
+-   **Default**: `Welcome1`
+-   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the password for the Oracle Cloud Wallet.
+
+#### `ORACLE_VECTOR_LENGTH`
+
+-   **Type**: `int`
+-   **Default**: `768`
+-   **Description**: Sets the expected dimension or length of the vector embeddings stored in the Oracle Database. This must match the embedding model used.
+
+#### `ORACLE_DB_POOL_MIN`
+
+-   **Type**: `int`
+-   **Default**: `2`
+-   **Description**: The minimum number of connections to maintain in the Oracle Database connection pool.
+
+#### `ORACLE_DB_POOL_MAX`
+
+-   **Type**: `int`
+-   **Default**: `10`
+-   **Description**: The maximum number of connections allowed in the Oracle Database connection pool.
+
+#### `ORACLE_DB_POOL_INCREMENT`
+
+-   **Type**: `int`
+-   **Default**: `1`
+-   **Description**: The number of connections to create when the pool needs to grow.
 
 ## RAG Content Extraction Engine
 
