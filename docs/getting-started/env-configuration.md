@@ -2567,7 +2567,7 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
@@ -2749,7 +2749,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Set picture (avatar) claim for OpenID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
 
