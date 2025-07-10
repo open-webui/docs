@@ -1386,13 +1386,13 @@ When using Pinecone as the vector store, the following environment variables are
 #### `ORACLE_WALLET_DIR`
 
 -   **Type**: `str`
--   **Default**: `/home/opc/adb_wallet`
+-   **Default**: Empty string (' ')
 -   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the absolute path to the directory containing the Oracle Cloud Wallet files (e.g., `cwallet.sso`, `sqlnet.ora`, `tnsnames.ora`).
 
 #### `ORACLE_WALLET_PASSWORD`
 
 -   **Type**: `str`
--   **Default**: `Welcome1`
+-   **Default**: Empty string (' ')
 -   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the password for the Oracle Cloud Wallet.
 
 #### `ORACLE_VECTOR_LENGTH`
