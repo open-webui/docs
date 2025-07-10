@@ -1763,6 +1763,20 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Specifies the client ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ONEDRIVE_SHAREPOINT_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint site URL for OneDrive integration e.g. https://companyname.sharepoint.com.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_TENANT_ID`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint tenant ID for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## Web Search
 
 #### `ENABLE_WEB_SEARCH`
