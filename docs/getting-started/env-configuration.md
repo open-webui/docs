@@ -845,7 +845,7 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 #### `JWT_EXPIRES_IN`
 
-- Type: `int`
+- Type: `str`
 - Default: `-1`
 - Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
