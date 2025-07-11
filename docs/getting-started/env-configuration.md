@@ -1775,6 +1775,20 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Specifies the client ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ONEDRIVE_SHAREPOINT_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint site URL for OneDrive integration e.g. https://companyname.sharepoint.com.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_TENANT_ID`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint tenant ID for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## Web Search
 
 #### `ENABLE_WEB_SEARCH`
@@ -2565,7 +2579,7 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
@@ -2747,7 +2761,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Set picture (avatar) claim for OpenID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
 
