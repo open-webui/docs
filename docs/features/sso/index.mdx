@@ -138,7 +138,20 @@ When the `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` environment variable is set, Open Web
 
 For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing a HTTP header of `X-User-Email: example@example.com` would authenticate the request with the email `example@example.com`.
 
-Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
+Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists. 
+If `WEBUI_AUTH_TRUSTED_NAME_HEADER` is not set, the email address is used as user name.
+
+
+#### Group Management
+
+You can use the `WEBUI_AUTH_TRUSTED_GROUPS_HEADER` environment variable to synchronize user groups in Open WebUI. Set this variable to the name of the HTTP header that will contain a comma-separated list of group names for the authenticated user.
+
+When a request is authenticated via `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`, and the trusted groups header is set and present, Open WebUI will update the user's group memberships to match the groups listed in the header.
+
+- The header value must be a comma-separated list of group names (e.g., `X-User-Groups: admins,editors,users`).
+- If the header is not present or empty, the user's group memberships will not be updated.
+- User will be unassigned from groups not present in the header.
+- Group creation via trusted header is not automatic; only existing groups in Open WebUI will be assigned.
 
 ### Tailscale Serve
 

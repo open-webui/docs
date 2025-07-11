@@ -2570,6 +2570,11 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Description: Defines the trusted request header for the username of anyone registering with the
 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/sso).
 
+#### `WEBUI_AUTH_TRUSTED_GROUPS_HEADER`
+
+- Type: `str`
+- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/sso).
+
 ### Google
 
 See https://support.google.com/cloud/answer/6158849?hl=en
