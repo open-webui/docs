@@ -60,15 +60,6 @@ When configuring your identity provider, use the following settings:
 3. Set authentication to "HTTP Header"
 4. Add Authorization header with value: `Bearer your-scim-token`
 
-#### Azure AD / Entra ID
-1. In Azure AD, configure provisioning for your enterprise application
-2. Set the Tenant URL to: `https://your-domain.com/api/v1/scim/v2/`
-3. Set the Secret Token to: `your-scim-token`
-
-#### Google Workspace
-1. In Google Admin, configure SCIM provisioning
-2. Set the SCIM endpoint URL to: `https://your-domain.com/api/v1/scim/v2/`
-3. Set the access token to: `your-scim-token`
 
 ## Supported SCIM Operations
 
@@ -183,7 +174,6 @@ curl -X POST \
 
 ## Limitations
 
-- Password management is not supported via SCIM (users authenticate via SSO)
 - Custom schema extensions are not currently supported
 - Bulk operations are not implemented
 - ETags for resource versioning are not supported
@@ -192,7 +182,7 @@ curl -X POST \
 
 SCIM works best when combined with SSO (Single Sign-On). A typical setup includes:
 1. SCIM for automated user provisioning
-2. OAuth/SAML for user authentication
+2. OIDC for user authentication
 
 This ensures users are automatically created and can immediately authenticate using their corporate credentials.
 
