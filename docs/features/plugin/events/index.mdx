@@ -82,20 +82,20 @@ Most of the time, you only set `"type"` and `"data"`. Open WebUI fills in the ro
 
 Below is a comprehensive table of **all supported `type` values** for events, along with their intended effect and data structure. (This is based on up-to-date analysis of Open WebUI event handling logic.)
 
-| type                        | When to use                                   | Data payload structure (examples)                                  |
-|-----------------------------|-----------------------------------------------|--------------------------------------------------------------------|
-| `status`                    | Show a status update/history for a message    | `{description: ..., done: bool, hidden: bool}`                     |
-| `chat:completion`           | Provide a chat completion result              | (Custom, see Open WebUI internals)                                 |
-| `chat:message:delta`,<br/>`message` | Append content to the current message              | `{content: "text to append"}`                                      |
-| `chat:message`,<br/>`replace`        | Replace current message content completely          | `{content: "replacement text"}`                                    |
-| `chat:message:files`,<br/>`files`   | Set or overwrite message files (for uploads, output) | `{files: [...]}`                                                   |
-| `chat:title`                | Set (or update) the chat conversation title   | Topic string OR `{title: ...}`                                     |
-| `chat:tags`                 | Update the set of tags for a chat             | Tag array or object                                                |
-| `source`,<br/>`citation`              | Add a source/citation, or code execution result     | For code: See [below.](#code-execution-event)                      |
-| `notification`              | Show a notification ("toast") in the UI       | `{type: "info" or "success" or "error" or "warning", content: "..."}`      |
-| `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)         | `{title: "...", message: "..."}`                                   |
-| `input` <br/>(needs `__event_call__`)    | Request simple user input ("input box" dialog)      | `{title: "...", message: "...", placeholder: "...", value: ...}`   |
-| `execute` <br/>(needs `__event_call__`)  | Request user-side code execution and return result  | `{code: "...javascript code..."}`                                  |
+| type                                         | When to use                                          | Data payload structure (examples)                                                                    |
+| -------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `status`                                     | Show a status update/history for a message           | `{description: ..., done: bool, hidden: bool}`                                                       |
+| `chat:completion`                            | Provide a chat completion result                     | (Custom, see Open WebUI internals)                                                                   |
+| `chat:message:delta`,<br/>`message`          | Append content to the current message                | `{content: "text to append"}`                                                                        |
+| `chat:message`,<br/>`replace`                | Replace current message content completely           | `{content: "replacement text"}`                                                                      |
+| `chat:message:files`,<br/>`files`            | Set or overwrite message files (for uploads, output) | `{files: [...]}`                                                                                     |
+| `chat:title`                                 | Set (or update) the chat conversation title          | Topic string OR `{title: ...}`                                                                       |
+| `chat:tags`                                  | Update the set of tags for a chat                    | Tag array or object                                                                                  |
+| `source`,<br/>`citation`                     | Add a source/citation, or code execution result      | For code: See [below.](/docs/features/plugin/events/index.mdx#source-or-citation-and-code-execution) |
+| `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
+| `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
+| `input` <br/>(needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ...}`                                     |
+| `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |
 
 **Other/Advanced types:**
 
