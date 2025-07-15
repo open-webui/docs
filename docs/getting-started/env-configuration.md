@@ -148,6 +148,12 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `True`
 - Description: Enables admin users to access all chats.
 
+#### `RESPECT_USER_WORKSPACE_PRIVACY`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `False`, admins have access to all created items in the workspace area regardless of access permissions.
+
 #### `ENABLE_USER_WEBHOOKS`
 
 - Type: `bool`
