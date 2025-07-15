@@ -8,8 +8,7 @@ export const SidebarBanners = () => {
 			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
 			url: "https://n8n.io/",
 			name: "n8n",
-			description:
-				"Does your interface have a backend yet? Try n8n",
+			description: "Does your interface have a backend yet? Try n8n",
 		},
 
 		{
@@ -17,26 +16,14 @@ export const SidebarBanners = () => {
 			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
 			url: "https://n8n.io/",
 			name: "n8n",
-			description:
-				"Does your interface have a backend yet? Try n8n",
+			description: "Does your interface have a backend yet? Try n8n",
 		},
-
 		{
-			imgSrc: "/sponsors/banners/warp-banner.png",
-			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
-			url: "https://warp.dev/open-webui",
-			name: "Warp",
-			description:
-				"The intelligent terminal for developers",
-		},
-
-		{
-			imgSrc: "/sponsors/banners/warp-banner.png",
-			mobileImgSrc: "/sponsors/banners/warp-banner-mobile.png",
-			url: "https://warp.dev/open-webui",
-			name: "Warp",
-			description:
-				"The intelligent terminal for developers",
+			imgSrc: "/sponsors/banners/tailscale-banner.png",
+			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
+			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
+			name: "Tailscale",
+			description: "Connect self-hosted AI to any device with Tailscale",
 		},
 
 		{
@@ -44,19 +31,8 @@ export const SidebarBanners = () => {
 			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
 			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
 			name: "Tailscale",
-			description:
-				"Connect self-hosted AI to any device with Tailscale",
+			description: "Connect self-hosted AI to any device with Tailscale",
 		},
-
-		{
-			imgSrc: "/sponsors/banners/tailscale-banner.png",
-			mobileImgSrc: "/sponsors/banners/tailscale-banner-mobile.png",
-			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
-			name: "Tailscale",
-			description:
-				"Connect self-hosted AI to any device with Tailscale",
-		},
-
 
 		{
 			imgSrc: "/sponsors/banners/placeholder.png",
@@ -69,7 +45,9 @@ export const SidebarBanners = () => {
 	];
 
 	// Randomly select an item to display
-	const [selectedItemIdx, setSelectedItemIdx] = useState(Math.floor(Math.random() * items.length));
+	const [selectedItemIdx, setSelectedItemIdx] = useState(
+		Math.floor(Math.random() * items.length)
+	);
 
 	useEffect(() => {
 		// After mounting update every 5 seconds
@@ -77,7 +55,6 @@ export const SidebarBanners = () => {
 			setSelectedItemIdx(Math.floor(Math.random() * items.length));
 		}, 10000); // 10000 ms = 10 seconds
 	}, []);
-
 
 	return <SidebarBanner item={items[selectedItemIdx]} />;
 };

@@ -496,6 +496,41 @@ JSON format: { "title": "your concise title here" }
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_FOLLOW_UP_GENERATION`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables follow up generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Description: Prompt to use for generating several relevant follow-up questions.
+- Default: The value of `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` environment variable.
+
+`DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`:
+
+```
+### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+{{MESSAGES:END:6}}
+</chat_history>"
+```
+
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
 - Type: `str`
@@ -816,7 +851,7 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 #### `JWT_EXPIRES_IN`
 
-- Type: `int`
+- Type: `str`
 - Default: `-1`
 - Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -923,7 +958,19 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
+
+:::
+
+#### `ENABLE_VERSION_UPDATE_CHECK`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates.
+
+:::info
+
+If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always set to `false` automatically.
 
 :::
 
@@ -936,15 +983,19 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 :::info
 
 **Disabled when enabled:**
-- Automatic version update checks
+
+- Automatic version update checks (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 - Downloads of embedding models from Hugging Face Hub
   - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
-- Update notifications in the UI
+- Update notifications in the UI (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 
 **Still functional:**
+
 - External LLM API connections (OpenAI, etc.)
 - OAuth authentication providers
 - Web search and RAG with external APIs
+
+Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 
 :::
 
@@ -1259,6 +1310,12 @@ Currently, there is no button in the UI to only reset the vector DB. If you want
 If you decide to use the multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Admin Settings` > `Documents` to reset vector and knowledge, which will delete all collections with the `open_webui` prefix and all stored knowledge.
 
 :::
+
+#### `QDRANT_COLLECTION_PREFIX`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Sets the prefix for Qdrant collection names. Useful for namespacing or isolating collections, especially in multitenancy mode. Changing this value will cause the application to use a different set of collections in Qdrant. Existing collections with a different prefix will not be affected.
 
 ### Pinecone
 
@@ -1722,6 +1779,20 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Type: `str`
 - Default: `None`
 - Description: Specifies the client ID for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint site URL for OneDrive integration e.g. https://companyname.sharepoint.com.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_TENANT_ID`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint tenant ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Web Search
@@ -2514,7 +2585,7 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
@@ -2696,7 +2767,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Set picture (avatar) claim for OpenID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
 
@@ -2850,6 +2921,27 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Sets the ciphers to use for LDAP connection.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_LDAP_GROUP_MANAGEMENT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the group management feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_LDAP_GROUP_CREATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `LDAP_ATTRIBUTE_FOR_GROUPS`
+
+- Type: `str`
+- Default: `memberOf`
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## User Permissions
 
 ### Chat Permissions
@@ -2922,6 +3014,13 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
+
+- Type: `str`
+- Default: `True`
+- Description: Allows or disallows users to set a custom system prompt for all of their chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Feature Permissions
@@ -3123,6 +3222,8 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
 Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
+If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
+
 :::
 
 #### `DATABASE_SCHEMA`
@@ -3134,8 +3235,8 @@ Documentation on the URL scheme is available available [here](https://docs.sqlal
 #### `DATABASE_POOL_SIZE`
 
 - Type: `int`
-- Default: `0`
-- Description: Specifies the size of the database pool. A value of `0` disables pooling.
+- Default: `None`
+- Description: Specifies the pooling strategy and size of the database pool. By default SQLAlchemy will automatically chose the proper pooling strategy for the selected database connection. A value of `0` disables pooling. A value larger `0` will set the pooling strategy to `QueuePool` and the pool size accordingly.
 
 #### `DATABASE_POOL_MAX_OVERFLOW`
 
@@ -3179,11 +3280,12 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `str`
 - Example: `redis://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for the app-state.
+- Example with TLS: `rediss://localhost:6379/0`
+- Description: Specifies the URL of the Redis instance for the app state.
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app-state will occur as the workers would be unable to communicate.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app state will occur as the workers would be unable to communicate.
 
 :::
 
@@ -3198,6 +3300,12 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
 
+#### `REDIS_KEY_PREFIX`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
@@ -3206,7 +3314,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3218,7 +3326,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 
@@ -3230,7 +3338,7 @@ When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::info
 
-When deploying Open-WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
 

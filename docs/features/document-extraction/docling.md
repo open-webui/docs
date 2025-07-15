@@ -42,6 +42,44 @@ docker run --gpus all -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docli
 * Update the context extraction engine URL to `http://host.docker.internal:5001`.
 * Save the changes.
 
+### (optional) Step 3: Configure Docling's picture description features
+
+* on the `Documents` tab:
+* Activate `Describe Pictures in Documents` button.
+* Below, choose a description mode: `local` or `API`
+  * `local`: vision model will run in the same context as Docling itself
+  * `API`: Docling will make a call to an external service/container (i.e. Ollama)
+* fill in an **object value** as described at https://github.com/docling-project/docling-serve/blob/main/docs/usage.md#picture-description-options
+* Save the changes.
+
+  #### Make sure the object value is a valid JSON! Working examples below:
+
+  ![image](https://github.com/user-attachments/assets/f6524949-fb47-4686-9c81-6ab8fdda6db1)
+
+```json
+{
+  "repo_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "generation_config": {
+    "max_new_tokens": 200,
+    "do_sample": false
+  },
+  "prompt": "Describe this image in a few sentences."
+}
+```
+
+  ![image](https://github.com/user-attachments/assets/982e0081-8c11-457c-b886-af91569e7fef)
+
+```json
+{
+  "url": "http://localhost:11434/v1/chat/completions",
+  "params": {
+    "model": "qwen2.5vl:7b-q4_K_M"
+  },
+  "timeout": 60,
+  "prompt": "Describe this image in great details. "
+}
+```
+
 Verifying Docling in Docker
 =====================================
 
@@ -59,10 +97,10 @@ This command starts the Docling container and maps port 5001 from the container 
 
 ### 2. Verify the Server is Running
 
-* Go to `http://127.0.0.1:5001/ui/` 
+* Go to `http://127.0.0.1:5001/ui/`
 * The URL should lead to a UI to use Docling
 
-### 3. Verify the Integration 
+### 3. Verify the Integration
 
 * You can try uploading some files via the UI and it should return output in MD format or your desired format
 
