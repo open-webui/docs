@@ -46,7 +46,7 @@ schema: v1
 models:
   - name: LLama3
     provider: openai
-    model: /models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+    model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
     env:
       useLegacyCompletionsEndpoint: false
     apiBase: http://localhost:3000/api
@@ -131,7 +131,7 @@ This is the actual name of your model in Open WebUI. Navigate to `Admin Panel` >
 Below the user-given name, you'll find the actual model name.
 
 ```yaml
-model: /models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
 ```
 
 ---
