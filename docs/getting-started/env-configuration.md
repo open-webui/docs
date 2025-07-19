@@ -856,12 +856,13 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, ID, email, and role) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user information (name, ID, email, role and chat-id) as X-headers to OpenAI API and Ollama API.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
+  - `X-OpenWebUI-Chat-Id`
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
