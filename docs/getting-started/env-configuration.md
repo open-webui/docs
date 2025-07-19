@@ -146,13 +146,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats.
+- Description: Enables admin users to access all chats. When disabled, admins can no longer accesss user's chats in the admin panel.
 
-#### `RESPECT_USER_WORKSPACE_PRIVACY`
+#### `ENABLE_ADMIN_USER_WORKSPACE_ACCESS`
 
 - Type: `bool`
-- Default: `False`
-- Description: When enabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `False`, admins have access to all created items in the workspace area regardless of access permissions.
+- Default: `True`
+- Description: When disabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `True`, admins have access to all created items in the workspace area regardless of access permissions.
 
 #### `ENABLE_USER_WEBHOOKS`
 
