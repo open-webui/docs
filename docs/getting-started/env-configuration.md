@@ -850,6 +850,14 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 - Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+:::warning
+
+Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.  
+**Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.**  
+Never use `-1` in a production environment.
+
+:::
+
 ## Security Variables
 
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
