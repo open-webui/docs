@@ -127,7 +127,6 @@ docker run -d --name open-webui \
 - Review Open WebUI logs for OTLP export errors
 
 **High overhead:**
-- Reduce sampling rate using `OTEL_TRACES_SAMPLER_ARG`
 - Disable metrics with `ENABLE_OTEL_METRICS=false` if not needed
 
 **Authentication issues:**
@@ -141,5 +140,3 @@ docker run -d --name open-webui \
 3. **Adjust Sampling:** Reduce sampling in high-traffic production environments
 4. **Custom Dashboards:** Create application-specific dashboards for your use cases
 5. **Alert Setup:** Configure alerts for error rates and response time thresholds
-
----
