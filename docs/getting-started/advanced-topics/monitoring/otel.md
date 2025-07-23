@@ -92,10 +92,3 @@ docker run -d --name open-webui \
 **Authentication issues:**
 - Set `OTEL_BASIC_AUTH_USERNAME` and `OTEL_BASIC_AUTH_PASSWORD` for authenticated collectors
 - Verify TLS settings with `OTEL_EXPORTER_OTLP_INSECURE`
-
-## 🌟 Best Practices
-
-1. **Start Simple:** Use the provided `docker-compose.otel.yaml` for initial setup
-2. **Monitor Resource Usage:** Track CPU and memory impact of telemetry
-3. **Custom Dashboards:** Create application-specific dashboards for your use cases
-4. **Alert Setup:** Configure alerts for error rates and response time thresholds
