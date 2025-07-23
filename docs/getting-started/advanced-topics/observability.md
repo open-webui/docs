@@ -64,40 +64,6 @@ The `utils/telemetry/metrics.py` module exports the following metrics:
 
 Metrics are pushed to the Collector (OTLP) every 10 seconds and can be visualized in Prometheus → Grafana.
 
-## 📈 Grafana Dashboard Setup
-
-The example LGTM image has pre-configured data source UIDs: `tempo`, `prometheus`, and `loki`.
-
-### Importing Dashboard Configuration
-
-1. **Dashboards → Import → Upload JSON**
-2. Paste the provided JSON configuration (`docs/dashboards/ollama.json`) → Import
-3. An "Ollama" dashboard will be created in the `Open WebUI` folder
-
-![Dashboard Import Configuration](/images/tutorials/otel/dashboards-config-import.png)
-
-For persistent dashboard provisioning, mount the provisioning directories:
-
-```yaml
-grafana:
-  volumes:
-    - ./grafana/dashboards:/etc/grafana/dashboards:ro
-    - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-```
-
-### Exploring Metrics with Prometheus
-
-You can explore and query metrics directly using Grafana's Explore feature:
-
-![Explore Prometheus Queries](/images/tutorials/otel/explore-prometheus.png)
-
-This allows you to:
-- Run custom PromQL queries to analyze API call patterns
-- Monitor request rates, error rates, and response times
-- Create custom visualizations for specific metrics
-
-
-
 ## 🔧 Custom Collector Setup
 
 If you're running your own OpenTelemetry Collector instead of the provided `docker-compose.otel.yaml`:
