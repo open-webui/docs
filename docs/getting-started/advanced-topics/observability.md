@@ -52,7 +52,6 @@ The `utils/telemetry/instrumentors.py` module automatically instruments the foll
   * `http.url`, `http.method`, `http.status_code`
   * Error details: `error.message`, `error.kind` when exceptions occur
 
-Open WebUI creates worker threads only when needed, minimizing overhead while providing efficient trace export.
 
 ### Metrics Collection
 
