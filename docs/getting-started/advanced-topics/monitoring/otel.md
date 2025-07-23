@@ -30,11 +30,11 @@ Configure OpenTelemetry using these environment variables:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `ENABLE_OTEL` | **false** | Set to `true` to enable trace export |
+| `ENABLE_OTEL_METRICS` | **false** | Enable FastAPI HTTP metrics export |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | OTLP gRPC/HTTP Collector URL |
 | `OTEL_EXPORTER_OTLP_INSECURE` | `true` | Disable TLS (for local testing) |
 | `OTEL_SERVICE_NAME` | `open-webui` | Service name tag in resource attributes |
 | `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | _(empty)_ | Basic Auth credentials for Collector if required |
-| `ENABLE_OTEL_METRICS` | **true** | Enable FastAPI HTTP metrics export |
 
 > You can override these in your `.env` file or `docker-compose.*.yaml` configuration.
 
