@@ -126,9 +126,6 @@ docker run -d --name open-webui \
 - Check collector connectivity: `curl http://localhost:4317`
 - Review Open WebUI logs for OTLP export errors
 
-**High overhead:**
-- Disable metrics with `ENABLE_OTEL_METRICS=false` if not needed
-
 **Authentication issues:**
 - Set `OTEL_BASIC_AUTH_USERNAME` and `OTEL_BASIC_AUTH_PASSWORD` for authenticated collectors
 - Verify TLS settings with `OTEL_EXPORTER_OTLP_INSECURE`
@@ -137,6 +134,5 @@ docker run -d --name open-webui \
 
 1. **Start Simple:** Use the provided `docker-compose.otel.yaml` for initial setup
 2. **Monitor Resource Usage:** Track CPU and memory impact of telemetry
-3. **Adjust Sampling:** Reduce sampling in high-traffic production environments
-4. **Custom Dashboards:** Create application-specific dashboards for your use cases
-5. **Alert Setup:** Configure alerts for error rates and response time thresholds
+3. **Custom Dashboards:** Create application-specific dashboards for your use cases
+4. **Alert Setup:** Configure alerts for error rates and response time thresholds
