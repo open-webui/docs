@@ -64,13 +64,9 @@ Metrics are pushed to the Collector (OTLP) every 10 seconds and can be visualize
 
 ## 🔧 Custom Collector Setup
 
-If you're running your own OpenTelemetry Collector instead of the provided `docker-compose.otel.yaml`:
+If you're running your own OpenTelemetry Collector:
 
 ```bash
-# Set your collector endpoint
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
-export ENABLE_OTEL=true
-
 # Start Open WebUI
 docker run -d --name open-webui \
   -p 8080:8080 \
