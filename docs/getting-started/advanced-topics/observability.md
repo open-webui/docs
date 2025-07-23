@@ -5,7 +5,7 @@ title: "📊 Observability & OpenTelemetry"
 
 # 📊 Observability with OpenTelemetry
 
-Open WebUI (v0.4.0+) supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with monitoring systems like Grafana LGTM Stack, Jaeger, Tempo, and Prometheus to monitor request flows, database/Redis queries, response times, and more in real-time.
+Open WebUI supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with monitoring systems like Grafana LGTM Stack, Jaeger, Tempo, and Prometheus to monitor request flows, database/Redis queries, response times, and more in real-time.
 
 ## 🚀 Quick Start with Docker Compose
 
