@@ -3,88 +3,110 @@ sidebar_position: 7
 title: "🔭 OpenTelemetry"
 ---
 
-Open WebUI supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with monitoring systems like Grafana LGTM Stack, Jaeger, Tempo, and Prometheus to monitor request flows, database/Redis queries, response times, and more in real-time.
+Open WebUI supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with modern observability stacks such as **Grafana LGTM (Loki, Grafana, Tempo, Mimir)**, as well as **Jaeger**, **Tempo**, and **Prometheus** to monitor requests, database/Redis queries, response times, and more in real-time.
 
 ## 🚀 Quick Start with Docker Compose
 
-The fastest way to get started with observability is using the pre-configured Docker Compose setup:
+The fastest way to get started with observability is with the pre-configured Docker Compose:
 
 ```bash
-# Minimal setup: WebUI + Grafana LGTM all-in-one
+# Spin up Open WebUI and the latest Grafana LGTM stack, all-in-one
 docker compose -f docker-compose.otel.yaml up -d
 ```
 
-The `docker-compose.otel.yaml` file starts the following services:
+The `docker-compose.otel.yaml` file sets up these components:
 
-| Service | Port | Description |
-|---------|------|-------------|
-| **grafana/otel-lgtm** | 3000 (UI), 4317 (OTLP gRPC), 4318 (OTLP HTTP) | Loki + Grafana + Tempo + Mimir all-in-one |
-| **open-webui** | 8080 → 8080 | WebUI with OTEL environment variables configured |
+| Service     | Port(s)                                   | Description                                          |
+|-------------|------------------------------------------|------------------------------------------------------|
+| **grafana** | 3000 (UI), 4317 (OTLP/gRPC), 4318 (HTTP) | Grafana LGTM (Loki+Grafana+Tempo+Mimir) all-in-one   |
+| **open-webui** | 8088 (default) → 8080                     | WebUI, OTEL enabled, exposes on host port 8088          |
 
-After startup, visit `http://localhost:3000` and log in with `admin` / `admin` to access the Grafana dashboard.
+After startup, access the Grafana dashboard at [http://localhost:3000](http://localhost:3000)  
+Login: `admin` / `admin`
 
 ## ⚙️ Environment Variables
 
-Configure OpenTelemetry using these environment variables:
+You can configure OpenTelemetry in Open WebUI with these environment variables (as used in the Compose file):
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ENABLE_OTEL` | **false** | Set to `true` to enable trace export |
-| `ENABLE_OTEL_METRICS` | **false** | Enable FastAPI HTTP metrics export |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | OTLP gRPC/HTTP Collector URL |
-| `OTEL_EXPORTER_OTLP_INSECURE` | `true` | Disable TLS (for local testing) |
-| `OTEL_SERVICE_NAME` | `open-webui` | Service name tag in resource attributes |
-| `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | _(empty)_ | Basic Auth credentials for Collector if required |
+| Variable                            | Default                         | Description                                         |
+|--------------------------------------|---------------------------------|-----------------------------------------------------|
+| `ENABLE_OTEL`                       | **true** in Compose             | Enable OpenTelemetry tracing                        |
+| `ENABLE_OTEL_METRICS`                | **true** in Compose             | Enable FastAPI HTTP metrics export                  |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`        | `http://grafana:4317` in Compose| OTLP gRPC/HTTP Collector endpoint URL               |
+| `OTEL_EXPORTER_OTLP_INSECURE`        | **true** in Compose             | Insecure (no TLS) connection for OTLP               |
+| `OTEL_SERVICE_NAME`                  | `open-webui`                    | Service name (tagged in traces and metrics)         |
+| `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | *(empty)*      | Basic Auth credentials if Collector requires them   |
 
-> You can override these in your `.env` file or `docker-compose.*.yaml` configuration.
+> Tip: Override defaults in your `.env` file or Compose file as needed.
+
+Check the [docker-compose.otel.yaml](docker-compose.otel.yaml) for reference:
+
+```yaml
+  open-webui:
+    environment:
+      - ENABLE_OTEL=true
+      - ENABLE_OTEL_METRICS=true
+      - OTEL_EXPORTER_OTLP_INSECURE=true # Use insecure connection for OTLP, you may want to remove this in production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana:4317
+      - OTEL_SERVICE_NAME=open-webui
+      # You may set OTEL_BASIC_AUTH_USERNAME/PASSWORD here if needed
+```
 
 ## 📊 Data Collection
 
 ### Distributed Tracing
 
-The `utils/telemetry/instrumentors.py` module automatically instruments the following libraries:
+The Open WebUI backend automatically instruments:
 
-* **FastAPI** (request routes) · **SQLAlchemy** · **Redis** · External calls via `requests` / `httpx` / `aiohttp`
-* Span attributes include:
-  * `db.instance`, `db.statement`, `redis.args`
-  * `http.url`, `http.method`, `http.status_code`
-  * Error details: `error.message`, `error.kind` when exceptions occur
+- **FastAPI** (routes)
+- **SQLAlchemy** (database queries)
+- **Redis**
+- **requests**, **httpx**, **aiohttp** (external calls)
 
+Each trace span includes rich data such as:
+
+- `db.instance`, `db.statement`, `redis.args`
+- `http.url`, `http.method`, `http.status_code`
+- Error details (`error.message`, `error.kind`) on exceptions
 
 ### Metrics Collection
 
-The `utils/telemetry/metrics.py` module exports the following metrics:
+WebUI exports the following metrics via OpenTelemetry:
 
-| Instrument | Type | Unit | Labels |
-|------------|------|------|--------|
-| `http.server.requests` | Counter | 1 | `http.method`, `http.route`, `http.status_code` |
-| `http.server.duration` | Histogram | ms | Same as above |
+| Instrument             | Type      | Unit | Labels                               |
+|------------------------|-----------|------|--------------------------------------|
+| `http.server.requests` | Counter   | 1    | `http.method`, `http.route`, `http.status_code` |
+| `http.server.duration` | Histogram | ms   | (same as above)                      |
 
-Metrics are pushed to the Collector (OTLP) every 10 seconds and can be visualized in Prometheus → Grafana.
+Metrics are sent via OTLP (default every 10 seconds) and can be visualized in **Grafana** (via Prometheus/Mimir).
 
 ## 🔧 Custom Collector Setup
 
-If you're running your own OpenTelemetry Collector:
+To use a different (external) OpenTelemetry Collector/Stack:
 
 ```bash
-# Start Open WebUI
 docker run -d --name open-webui \
-  -p 8080:8080 \
+  -p 8088:8080 \
   -e ENABLE_OTEL=true \
+  -e ENABLE_OTEL_METRICS=true \
   -e OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317 \
+  -e OTEL_EXPORTER_OTLP_INSECURE=true \
+  -e OTEL_SERVICE_NAME=open-webui \
   -v open-webui:/app/backend/data \
   ghcr.io/open-webui/open-webui:main
 ```
 
 ## 🚨 Troubleshooting
 
-### Common Issues
+**Traces/metrics not appearing in Grafana?**
 
-**Traces not appearing in Grafana:**
-- Verify `ENABLE_OTEL=true` is set
-- Check collector connectivity: `curl http://localhost:4317`
-- Review Open WebUI logs for OTLP export errors
+- Double-check `ENABLE_OTEL` and `ENABLE_OTEL_METRICS` are both set to `true`
+- Is the endpoint correct? (`OTEL_EXPORTER_OTLP_ENDPOINT`)
+- Inspect logs from Open WebUI (`docker logs open-webui`) for OTLP errors
+- Collector's OTLP port (`4317`) should be open and reachable. Try:  
+  `curl http://localhost:4317` (replace host as needed)
 
-**Authentication issues:**
-- Set `OTEL_BASIC_AUTH_USERNAME` and `OTEL_BASIC_AUTH_PASSWORD` for authenticated collectors
-- Verify TLS settings with `OTEL_EXPORTER_OTLP_INSECURE`
+**Authentication required?**
+
+- Set `OTEL_BASIC_AUTH_USERNAME` and `OTEL_BASIC_AUTH_PASSWORD` for auth-protected collectors
+- If using SSL/TLS, adjust or remove `OTEL_EXPORTER_OTLP_INSECURE` as appropriate
