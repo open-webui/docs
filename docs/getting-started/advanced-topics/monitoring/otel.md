@@ -39,8 +39,6 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 
 > Tip: Override defaults in your `.env` file or Compose file as needed.
 
-Check the [docker-compose.otel.yaml](docker-compose.otel.yaml) for reference:
-
 ```yaml
   open-webui:
     environment:
