@@ -2562,6 +2562,12 @@ Strictly return in JSON format:
 
 ## OAuth
 
+:::info
+
+You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
+
+:::
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
