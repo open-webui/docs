@@ -174,6 +174,18 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
 
+### `MODELS_CACHE_TTL`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
+
+:::info
+
+This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
+
+:::
+
 #### `SHOW_ADMIN_DETAILS`
 
 - Type: `bool`
@@ -856,18 +868,29 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 - Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+:::warning
+
+Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.  
+
+**Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.** Never use `-1` in a production environment.
+
+If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change your `WEBUI_SECRET_KEY` to immediately invalidate all existing tokens.
+
+:::
+
 ## Security Variables
 
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, ID, email, and role) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user information (name, ID, email, role and chat-id) as X-headers to OpenAI API and Ollama API.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
+  - `X-OpenWebUI-Chat-Id`
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
@@ -2557,6 +2580,12 @@ Strictly return in JSON format:
 
 ## OAuth
 
+:::info
+
+You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
+
+:::
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
@@ -2602,9 +2631,20 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Description: Defines the trusted request header for the username of anyone registering with the
 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/sso).
 
+#### `WEBUI_AUTH_TRUSTED_GROUPS_HEADER`
+
+- Type: `str`
+- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/sso).
+
 ### Google
 
 See https://support.google.com/cloud/answer/6158849?hl=en
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GOOGLE_CLIENT_ID`
 
@@ -2635,6 +2675,12 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 ### Microsoft
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `MICROSOFT_CLIENT_ID`
 
@@ -2671,6 +2717,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 ### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GITHUB_CLIENT_ID`
 
@@ -2717,6 +2769,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::danger
+
+The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
+Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
+
+:::
 
 #### `OPENID_REDIRECT_URI`
 
