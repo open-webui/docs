@@ -1382,6 +1382,26 @@ When using Pinecone as the vector store, the following environment variables are
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
 
+### S3 Vector Bucket
+
+When using S3 Vector Bucket as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
+
+:::info
+
+Note: this configuration assumes that AWS credentials will be available to your Open WebUI environment. This could be through environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through IAM role permissions.
+
+:::
+
+#### `S3_VECTOR_BUCKET_NAME`
+
+- Type: `str`
+- Description: Specifies the name of the S3 Vector Bucket to store vectors in.
+
+#### `S3_VECTOR_REGION`
+
+- Type: `str`
+- Description: Specifies the AWS region where the S3 Vector Bucket is hosted.
+
 ## RAG Content Extraction Engine
 
 #### `CONTENT_EXTRACTION_ENGINE`
