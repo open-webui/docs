@@ -3335,8 +3335,8 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Specifies the URL of the Redis instance or cluster host for storing application state.
 - Examples:
   - `redis://localhost:6379/0`
-  - `rediss://localhost:6379/0` _(with TLS)_
-  - `rediss://:password@redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with password and mTLS)_
+  - `rediss://:password@localhost:6379/0` _(with password and TLS)_
+  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with mTLS)_
 
 :::info
 
