@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 1
 title: "🛠️ Local Development Guide"
 ---
 
@@ -86,6 +86,22 @@ Let's get the user interface (what you see in your browser) up and running first
      This command launches the frontend development server. If the steps were followed successfully, it will usually indicate the server is running and provide a local URL.
 
      🎉 **Access the Frontend:** Open your web browser and go to [http://localhost:5173](http://localhost:5173). You should see a message indicating that Open WebUI's frontend is running and is waiting for the backend to be available. Don't worry about that message yet! Let's set up the backend next. **Keep this terminal running** – it's serving your frontend!
+
+
+### **🧩 Step 2.5: Build the Frontend (Recommended)**
+
+Once you’ve verified that the frontend development server (`npm run dev`) is running correctly and you can see Open WebUI at [http://localhost:5173](http://localhost:5173), it's a **good practice to also build the frontend assets**. This step simulates the production environment and can help catch build-time errors that don't show up during development.
+
+**In the same frontend terminal:**
+
+```bash
+npm run build
+```
+
+- This command generates an optimized, production-ready build of the frontend and places the static files in the `build` directory.
+- If the build completes successfully (without errors), you're ready! If there are errors, address them before proceeding.
+- You don't need to do anything more with `build` for local development, but building ensures your code will not break in production or during deployment.
+
 
 ### 3. Backend Setup (API and Server)
 
