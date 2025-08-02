@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.9](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.19](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -69,6 +69,12 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Default: `True`
 - Description: Toggles user account creation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_SIGNUP_PASSWORD_CONFIRMATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
 
 #### `ENABLE_LOGIN_FORM`
 
@@ -167,6 +173,18 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Type: `int`
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
+
+### `MODELS_CACHE_TTL`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
+
+:::info
+
+This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
+
+:::
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -845,10 +863,20 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 #### `JWT_EXPIRES_IN`
 
-- Type: `int`
+- Type: `str`
 - Default: `-1`
 - Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.  
+
+**Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.** Never use `-1` in a production environment.
+
+If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change your `WEBUI_SECRET_KEY` to immediately invalidate all existing tokens.
+
+:::
 
 ## Security Variables
 
@@ -856,12 +884,13 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, ID, email, and role) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user information (name, ID, email, role and chat-id) as X-headers to OpenAI API and Ollama API.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
+  - `X-OpenWebUI-Chat-Id`
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
@@ -956,6 +985,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 :::
 
+#### `ENABLE_VERSION_UPDATE_CHECK`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates.
+
+:::info
+
+If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always set to `false` automatically.
+
+:::
+
 #### `OFFLINE_MODE`
 
 - Type: `bool`
@@ -966,10 +1007,10 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 **Disabled when enabled:**
 
-- Automatic version update checks
+- Automatic version update checks (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 - Downloads of embedding models from Hugging Face Hub
   - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
-- Update notifications in the UI
+- Update notifications in the UI (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 
 **Still functional:**
 
@@ -1030,7 +1071,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1341,6 +1382,26 @@ When using Pinecone as the vector store, the following environment variables are
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
 
+### S3 Vector Bucket
+
+When using S3 Vector Bucket as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
+
+:::info
+
+Note: this configuration assumes that AWS credentials will be available to your Open WebUI environment. This could be through environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through IAM role permissions.
+
+:::
+
+#### `S3_VECTOR_BUCKET_NAME`
+
+- Type: `str`
+- Description: Specifies the name of the S3 Vector Bucket to store vectors in.
+
+#### `S3_VECTOR_REGION`
+
+- Type: `str`
+- Description: Specifies the AWS region where the S3 Vector Bucket is hosted.
+
 ## RAG Content Extraction Engine
 
 #### `CONTENT_EXTRACTION_ENGINE`
@@ -1388,7 +1449,7 @@ When using Pinecone as the vector store, the following environment variables are
 
 - Type: `str`
 - Default: `http://docling:5001`
-- Description: Specifies the URL for the Docling server.
+- Description: Specifies the URL for the Docling server. Requires Docling version 1.0.0 or later.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DOCLING_OCR_ENGINE`
@@ -1761,6 +1822,20 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Type: `str`
 - Default: `None`
 - Description: Specifies the client ID for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint site URL for OneDrive integration e.g. https://companyname.sharepoint.com.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_TENANT_ID`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint tenant ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Web Search
@@ -2525,6 +2600,12 @@ Strictly return in JSON format:
 
 ## OAuth
 
+:::info
+
+You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
+
+:::
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
@@ -2553,7 +2634,7 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
@@ -2578,6 +2659,12 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 ### Google
 
 See https://support.google.com/cloud/answer/6158849?hl=en
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GOOGLE_CLIENT_ID`
 
@@ -2608,6 +2695,12 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 ### Microsoft
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `MICROSOFT_CLIENT_ID`
 
@@ -2644,6 +2737,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 ### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GITHUB_CLIENT_ID`
 
@@ -2690,6 +2789,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::danger
+
+The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
+Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
+
+:::
 
 #### `OPENID_REDIRECT_URI`
 
@@ -2740,7 +2846,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Set picture (avatar) claim for OpenID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
 
@@ -2923,8 +3029,26 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to access chat controls.
+- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_VALVES`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+
+#### USER_PERMISSIONS_CHAT_SYSTEM_PROMPT
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
+
+#### USER_PERMISSIONS_CHAT_PARAMS
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Parameters" section within the chat controls panel.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
@@ -2987,13 +3111,6 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
-
-- Type: `str`
-- Default: `True`
-- Description: Allows or disallows users to set a custom system prompt for all of their chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Feature Permissions

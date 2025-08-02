@@ -4,116 +4,181 @@ title: "⚛️ Continue.dev VSCode Extension with Open WebUI"
 ---
 
 :::warning
-This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
 :::
 
 # Integrating Continue.dev VSCode Extension with Open WebUI
 
-### Download Extension
+## Download Extension
 
-You can download the VSCode extension here on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Continue.continue)
+You can download the VSCode extension on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Continue.continue) or directly via the `EXTENSION:MARKETPLACE` within VSCode by searching for `continue`.
+Once installed, you can access the application via the `continue` tab in the side bar of VSCode.
 
-Once installed you should now have a 'continue' tab in the side bar. Open this.
+**VSCode side bar icon:**
 
-Click on the Assistant selector above the main chat input. Then hover over "Local Assistant" and you should see a settings icon (looks like a cog).
-
-Once you click on the settings icon, a `config.yaml` should open up in the editor.
-
-Here you'll be able to configure continue to use Open WebUI.
+![continue.dev vscode icon](/images/tutorials/continue-dev/continue_dev_vscode_icon.png)
 
 ---
 
-Currently the 'ollama' provider does not support authentication so we cannot use this provider with Open WebUI.
+## Setup
 
-However Ollama and Open WebUI both have compatibily with OpenAI API spec. You can see a blog post from Ollama [here](https://ollama.com/blog/openai-compatibility) on this.
+Click on the assistant selector to the right of the main chat input. Then hover over `Local Assistant` and click on the settings icon (⚙️).
+This will open the `config.yaml` file in your editor. Here you can change the settings of your `Local Assistant`.
 
-We can still setup Continue to use the openai provider which will allow us to use Open WebUI's authentication token.
+![continue.dev chat input](/images/tutorials/continue-dev/continue_dev_extension_input_field.png)
 
----
+:::info
 
-## Config
+Currently the `ollama` provider does not support authentication so we cannot use this provider with Open WebUI.
+However Ollama and Open WebUI both have compatibility with OpenAI API spec. Read more about the specification in the [Ollama blog post](https://ollama.com/blog/openai-compatibility).
+We can still setup continue.dev to use the openai provider which will allow us to use Open WebUI's authentication token.
 
-In `config.yaml` all you will need to do is add/change the following options.
+:::
 
-### Change provider to openai
+### Example config
 
-```yaml
-provider: openai
-```
-
-### Add or update apiBase
-
-Set this to your Open Web UI domain on the end.
-
-```yaml
-apiBase: http://localhost:3000/ #If you followed Getting Started Docker
-```
-
-### Add apiKey
-
-```yaml
-apiKey: sk-79970662256d425eb274fc4563d4525b # Replace with your API key
-```
-
-You can find and generate your api key from Open WebUI -> Settings -> Account -> API Keys
-
-You'll want to copy the "API Key" (this starts with sk-)
-
-## Example Config
-
-Here is a base example of config.yaml using Open WebUI via an openai provider. Using Granite Code as the model.
-Make sure you pull the model into your ollama instance/s beforehand.
+Below you find an example config for Llama3 as the model with a local Open WebUI setup.
 
 ```yaml
 name: Local Assistant
 version: 1.0.0
 schema: v1
 models:
-  - name: Granite Code
+  - name: LLama3
     provider: openai
-    model: granite-code:latest
+    model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
     env:
       useLegacyCompletionsEndpoint: false
-    apiBase: http://YOUROPENWEBUI/ollama/v1
-    apiKey: sk-YOUR-API-KEY
+    apiBase: http://localhost:3000/api
+    apiKey: YOUR_OPEN_WEBUI_API_KEY
     roles:
       - chat
       - edit
+context:
+  - provider: code
+  - provider: docs
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
 
-  - name: Model ABC from pipeline
-    provider: openai
-    model: PIPELINE_MODEL_ID
-    env:
-      useLegacyCompletionsEndpoint: false
-    apiBase: http://YOUROPENWEBUI/api
-    apiKey: sk-YOUR-API-KEY
-    roles:
-      - chat
-      - edit
-
-  - name: Granite Code Autocomplete
-    provider: openai
-    model: granite-code:latest
-    env:
-      useLegacyCompletionsEndpoint: false
-    apiBase: http://localhost:3000/ollama/v1
-    apiKey: sk-YOUR-API-KEY
-    roles:
-      - autocomplete
-
-prompts:
-  - name: test
-    description: Write unit tests for highlighted code
-    prompt: |
-      Write a comprehensive set of unit tests for the selected code. It should setup, run tests that check for correctness including important edge cases, and teardown. Ensure that the tests are complete and sophisticated. Give the tests just as chat output, don't edit any file.
 ```
 
-Save your `config.yaml` and thats it!
+---
 
-You should now see your model in the Continue tab model selection.
+### Miscellaneous Configuration Settings
 
-Select it and you should now be chatting via Open WebUI (and or any [pipelines](/pipelines) you have setup )
+These values are needed by the extension to work properly. Find more information in the [official config guide](https://docs.continue.dev/reference).
 
-You can do this for as many models you would like to use, altough any model should work, you should use a model that is designed for code.
+```yaml
+name: Local Assistant
+version: 1.0.0
+schema: v1
+```
 
-See the continue documentation for additional continue configuration, [Continue Documentation](https://docs.continue.dev/reference/Model%20Providers/openai)
+The context section provides additional information to the models. Find more information in the [official config guide](https://docs.continue.dev/reference#context) and in the [context provider guide](https://docs.continue.dev/customize/custom-providers).
+
+```yaml
+context:
+  - provider: code
+  - provider: docs
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
+```
+
+---
+
+### Models
+
+The models section is where you specify all models you want to add. Find more information in the [official models guide](https://docs.continue.dev/reference#models).
+
+```yaml
+models:
+  - ...
+```
+
+---
+
+### Name
+
+Sets the name for the model you want to use. This will be displayed within the chat input of the extension.
+
+```yaml
+name: LLama3
+```
+
+![continue.dev chat input](/images/tutorials/continue-dev/continue_dev_extension_input_field.png)
+
+---
+
+### Provider
+
+Specifies the method used to communicate with the API, which in our case is the OpenAI API endpoint provided by Open WebUI.
+
+```yaml
+provider: openai
+```
+
+---
+
+### Model
+
+This is the actual name of your model in Open WebUI. Navigate to `Admin Panel` > `Settings` > `Models`, and then click on your preferred LLM.
+Below the user-given name, you'll find the actual model name.
+
+```yaml
+model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+```
+
+---
+
+### Legacy completions endpoint
+
+This setting is not needed for Open WebUI, though more information is available in the [original guide](https://platform.openai.com/docs/guides/completions/completions-api-legacy).
+
+```yaml
+env:
+  useLegacyCompletionsEndpoint: false
+```
+
+---
+
+### APIBase
+
+This is a crucial step: you need to direct the continue.dev extension requests to your Open WebUI instance.
+Either use an actual domain name if the instance is hosted somewhere (e.g. `https://example.com/api`) or your localhost setup (e.g. `http://localhost:3000/api`).
+You can find more information about the URLs in the [API Endpoints guide](/docs/getting-started/api-endpoints.md).
+
+```yaml
+apiBase: http://localhost:3000/api
+```
+
+---
+
+### API Key
+
+To authenticate with your Open WebUI instance, you'll need to generate an API key.
+Follow the instructions in [this guide](https://docs.openwebui.com/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) to create it.
+
+```yaml
+apiKey: YOUR_OPEN_WEBUI_API_KEY
+```
+
+---
+
+### Roles
+
+The roles will allow your model to be used by the extension for certain tasks. For the beginning you can choose `chat` and `edit`.
+You can find more information about roles in the [official roles guide](https://docs.continue.dev/customize/model-roles/intro).
+
+```yaml
+roles:
+  - chat
+  - edit
+```
+
+The setup is now completed and you can interact with your model(s) via the chat input. Find more information about the features and usage of the continue.dev plugin in the [official documentation](https://docs.continue.dev/getting-started/overview).

@@ -1,0 +1,80 @@
+---
+sidebar_position: 4
+title: "🔐 Troubleshooting OAUTH / SSO Issues"
+---
+
+OAUTH or Single Sign-On (SSO) lets you secure Open WebUI with modern authentication, but when users encounter login problems, the solution is often simple—if you know where to look. Most of the time, one of these key issues below is the culprit. Here’s how to hunt them down and fix SSO headaches fast! 🚦
+
+## Common OAUTH/SSO Issues and How to Fix Them 🛠️
+
+### 1. WebUI URL Not Configured in Admin Panel 🚪🔒
+Most OAUTH flows require the application’s external URL (“redirect URI”) so the provider knows where to send users after login. If this is missing, OAUTH won’t be able to complete!
+
+✅ Solution:
+- Navigate to: **Admin Settings > General**
+- Ensure your **WebUI URL** field is filled in and points to your deployed instance (e.g., `https://yourwebui.yourdomain.com`)
+📌 Tip: Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
+
+---
+
+### 2. Incorrect Environment Variable Configuration 📝🚫
+This is by far the **most common cause** of OAUTH breakage. If you misspell, omit, or set the wrong environment variable (especially for OIDC/OAUTH config), authentication can’t work.
+
+✅ Solutions:
+- Double-check your deployment environment:
+  - Ensure all required environment variables are set (see docs for names like `OIDC_CONFIG`, `OAUTH_CLIENT_ID`, etc.)
+  - If self-hosting, confirm these variables are present in your Docker Compose, Kubernetes manifest, or `.env` file.
+- Restart your backend/app after changing variables so the new values are loaded.
+
+📌 Tip: Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly set or missing entirely!
+
+---
+
+### 3. OAUTH Misconfiguration on the Provider Side 🏢🔗
+Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Azure AD) not aligning with your WebUI’s setup.
+
+✅ Solutions:
+- Verify your application is correctly registered with the OAUTH provider. Confirm:
+  - Redirect URIs exactly match your deployed WebUI address
+  - Client ID and secret match the values given in your environment settings
+  - Scopes and allowed grant types (e.g., `authorization_code`) are set as required by Open WebUI
+- Check the provider’s logs—misconfigured apps will often show clear error messages there.
+
+📌 Tip: When in doubt, recheck your provider registration and regenerate client secrets if needed.
+
+---
+
+### 4. Server-Side Caching (A Hidden Trouble Spot!) 🧊🚦
+A **new and tricky problem**: If you use NGINX (or another reverse proxy) with server-side caching, OAUTH endpoints can misbehave. The result isn’t always a total failure—often, users experience random or “weird” login bugs that are almost impossible to debug.
+
+✅ Solutions:
+- In your NGINX (or proxy) configuration:
+  - Make sure to **exclude** the following endpoints from server-side caching:
+    - `/api`, `/oauth`, `/callback`, `/login`, `/ws`, `/websocket`
+  - Any critical login/auth endpoint must remain uncached!
+- Reload the proxy config after making changes.
+
+📌 Warning: Never cache OAUTH or login endpoints! Caching can “poison” the session or deliver stale tokens, causing bizarre auth errors.
+
+---
+
+## 🧪 Pro Tip: Always Check the Logs
+
+- Look at backend logs and browser network errors. The first error usually points to the misconfiguration (redirect URI mismatch, missing/invalid variable, provider-side error, or caching).
+- If unsure which side is the problem, try logging in from an incognito browser window and watch for any blocked or failed requests.
+
+---
+
+## Summary Checklist ✅
+
+| Problem | Fix |
+|-------------------------------|------------------------------------------------------------|
+| 🔗 WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
+| 📝 Env var typo or missing    | Double-check and set all OAUTH/SSO env variables            |
+| 🏢 Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
+| 🧊 Proxy caching interfering  | Exclude OAUTH endpoints from all server-side caches         |
+| Still stuck?                  | Review logs and test without caches                         |
+
+---
+
+By carefully configuring BOTH your OAUTH provider and your WebUI environment—and keeping critical login endpoints immune to caching—you’ll eliminate nearly all SSO/OAUTH login problems. Don’t let a typo or a hidden cache block your users from seamless, secure AI access! 🦾
