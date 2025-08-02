@@ -88,7 +88,7 @@ Let's get the user interface (what you see in your browser) up and running first
      🎉 **Access the Frontend:** Open your web browser and go to [http://localhost:5173](http://localhost:5173). You should see a message indicating that Open WebUI's frontend is running and is waiting for the backend to be available. Don't worry about that message yet! Let's set up the backend next. **Keep this terminal running** – it's serving your frontend!
 
 
-### 🧩 Step 2.5: Build the Frontend (Recommended)
+### 2.5: Build the Frontend (Recommended)
 
 Once you’ve verified that the frontend development server (`npm run dev`) is running correctly and you can see Open WebUI at [http://localhost:5173](http://localhost:5173), it's a **good practice to also build the frontend assets**. This step simulates the production environment and can help catch build-time errors that don't show up during development.
 
