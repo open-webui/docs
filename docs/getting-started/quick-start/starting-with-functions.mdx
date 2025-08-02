@@ -1,0 +1,94 @@
+---
+sidebar_position: 5
+title: "🔌 Getting Started with Functions"  
+---
+
+## Overview
+
+Did you know Open WebUI can connect to almost **anything**—not just OpenAI-compatible APIs?  
+
+Thanks to **Pipe Functions**, you can bring in services that don’t support the OpenAI API (like **Anthropic**, Home Assistant, Google Search, or *any* Python codebase). No restrictions on LLMs or AI models: if you can automate it in Python, you can turn it into a plugin for Open WebUI!
+
+This guide walks you through setting up your first Pipe Function, using the [Anthropic Pipe](https://openwebui.com/f/justinrahb/anthropic) plugin as an example.
+
+## What are Pipe Functions?
+
+Pipe Functions are “bring-your-own-model (or tool)” plugins:
+
+- **Act like models**: They show up as selectable models in your Open WebUI sidebar.
+- **Flexible**: Integrate with *any* backend, API, or workflow—no OpenAI compatibility required.
+- **No LLM required**: You can build plugins for search, home automation, weather, databases, or whatever you like.
+- **Pure Python**: All logic is Python code that runs *directly inside* your WebUI (so be cautious with what you enable!).
+
+## Step 1: Find a Pipe Function to Try
+
+Let’s integrate **Anthropic** with Open WebUI—even though Anthropic only supports its own native API (not OpenAI-compatible endpoints)!
+
+1. Go to the [Anthropic Chat function page](https://openwebui.com/f/justinrahb/anthropic).
+
+2. Click **Get**.
+
+![Anthropic Pipe Function Page](/images/getting-started/pipe-anthropic-function.png)
+
+## Step 2: Import the Function to Open WebUI
+
+A modal will appear:
+
+1. Enter your Open WebUI URL (e.g., `http://localhost:3000`) in the prompt.
+2. Click **Import to Open WebUI**.
+
+![Import Modal Screenshot](/images/getting-started/pipe-import-modal.png)
+
+You’ll be redirected **directly to the Functions Editor** within your running instance of Open WebUI.
+
+## Step 3: Review & Save
+
+- You’ll see all of the Pipe Function’s Python code and configuration.
+- **Important:** Functions run arbitrary Python! Review the code for safety, and only install from sources you trust.
+- If you’re happy with the code, click **Save** to add it to your instance.
+
+![Function Editor Screenshot](/images/getting-started/pipe-function-editor.png)
+
+
+## Step 4: Enable the Function
+
+Your new Pipe Function is now available, but **must be enabled**:
+
+1. Switch the toggler to enable the function.
+
+![Enable Function Screenshot](/images/getting-started/pipe-enable.png)
+
+## Step 5: Enter any Required API Keys via Valves
+
+Some functions need credentials (like Anthropic’s API key):
+
+1. Click on the Gear icon next to the switch to open the **Valves** configuration.
+2. Input your required API key(s) for the Pipe Function.
+
+   ![Valves/API Key Screenshot](/images/getting-started/pipe-valves.png)
+
+## Step 6: Start Using Your New Plugin!
+
+- The new function now appears as a selectable “model” in the chat interface.
+- Select `Anthropic` (or whatever you installed), and start chatting!
+
+![Select Pipe Function as Model Screenshot](/images/getting-started/pipe-select-model.png)
+
+## 🎉 That’s It—You’re Plugged Into Anything!
+
+- Pipe Functions open Open WebUI to *any* API, model, or automation—not just OpenAI-compatible endpoints.
+- Think beyond LLMs: Integrate tools, APIs, local scripts, or your entire smart home.
+
+## ⚠️ Security Notes
+
+- **Always** review function code before enabling.
+- Only use plugins from trusted sources.
+- You have the power to enhance (or break!) your WebUI—use responsibly.
+
+### Next Steps & Learn More
+
+- [Pipe Functions Guide](https://docs.openwebui.com/features/plugin/functions/pipe)
+- [Browse community functions](https://openwebui.com/functions)
+
+
+🚀 With Pipe Functions, your Open WebUI is limited *only by your imagination*!
