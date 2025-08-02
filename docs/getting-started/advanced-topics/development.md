@@ -67,7 +67,15 @@ Let's get the user interface (what you see in your browser) up and running first
      npm install
      ```
 
-     This command uses `npm` (Node Package Manager) to read the `package.json` file in the project root directory and download all the necessary JavaScript libraries and tools required for the frontend to run. This might take a few minutes depending on your internet connection.
+     This will install all frontend dependencies listed in `package.json`.  
+
+     *Note: Depending on your Open WebUI version, you might see compatibility warnings or errors. If so, just run:*
+
+     ```bash
+     npm install --force
+     ```
+     
+     *Some setups need this to get around version issues.*
 
 2. **Start the Frontend Development Server:**
 
@@ -81,16 +89,9 @@ Let's get the user interface (what you see in your browser) up and running first
 
 ### 3. Backend Setup (API and Server)
 
-For a smoother development experience, we **strongly recommend** using separate terminal instances for your frontend and backend processes. This keeps your workflows organized and makes it easier to manage each part of the application independently.
+We **require** you to use separate terminal instances for your frontend and backend processes. This keeps your workflows organized and makes it easier to manage each part of the application independently.
 
-**Why Separate Terminals?**
-
-- **Process Isolation:** The frontend and backend development servers are distinct programs. Running them in separate terminals ensures they don't interfere with each other and allows for independent restarts or stops.
-- **Clearer Logs and Output:** Each terminal will display the logs and output specific to either the frontend or backend. This makes debugging and monitoring much easier, as you're not sifting through interleaved logs.
-- **Reduced Terminal Clutter:** Mixing frontend and backend commands in a single terminal can become confusing. Separate terminals keep your command history and active processes organized.
-- **Improved Workflow Efficiency:** You can work on frontend tasks (like running `npm run dev`) in one terminal and simultaneously manage backend tasks (like starting the server or checking logs) in another, without having to switch contexts constantly within a single terminal.
-
-**Using VSCode Integrated Terminals (Recommended):**
+**Using VSCode Integrated Terminals:**
 
 VSCode's integrated terminal feature makes managing multiple terminals incredibly easy. Here's how to leverage it for frontend and backend separation:
 
