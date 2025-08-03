@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.9](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.19](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -69,6 +69,12 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Default: `True`
 - Description: Toggles user account creation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_SIGNUP_PASSWORD_CONFIRMATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
 
 #### `ENABLE_LOGIN_FORM`
 
@@ -1065,7 +1071,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1376,6 +1382,26 @@ When using Pinecone as the vector store, the following environment variables are
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
 
+### S3 Vector Bucket
+
+When using S3 Vector Bucket as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
+
+:::info
+
+Note: this configuration assumes that AWS credentials will be available to your Open WebUI environment. This could be through environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through IAM role permissions.
+
+:::
+
+#### `S3_VECTOR_BUCKET_NAME`
+
+- Type: `str`
+- Description: Specifies the name of the S3 Vector Bucket to store vectors in.
+
+#### `S3_VECTOR_REGION`
+
+- Type: `str`
+- Description: Specifies the AWS region where the S3 Vector Bucket is hosted.
+
 ## RAG Content Extraction Engine
 
 #### `CONTENT_EXTRACTION_ENGINE`
@@ -1423,7 +1449,7 @@ When using Pinecone as the vector store, the following environment variables are
 
 - Type: `str`
 - Default: `http://docling:5001`
-- Description: Specifies the URL for the Docling server.
+- Description: Specifies the URL for the Docling server. Requires Docling version 1.0.0 or later.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DOCLING_OCR_ENGINE`
@@ -3003,8 +3029,26 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to access chat controls.
+- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_VALVES`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+
+#### USER_PERMISSIONS_CHAT_SYSTEM_PROMPT
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
+
+#### USER_PERMISSIONS_CHAT_PARAMS
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Parameters" section within the chat controls panel.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
@@ -3067,13 +3111,6 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
-
-- Type: `str`
-- Default: `True`
-- Description: Allows or disallows users to set a custom system prompt for all of their chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Feature Permissions
