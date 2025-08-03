@@ -9,6 +9,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 import DockerCompose from './tab-docker/DockerCompose.md';
 import Podman from './tab-docker/Podman.md';
+import PodmanKubePlay from './tab-docker/PodmanKubePlay.md';
 import ManualDocker from './tab-docker/ManualDocker.md';
 import DockerSwarm from './tab-docker/DockerSwarm.md';
 import DockerUpdating from './tab-docker/DockerUpdating.md';
@@ -58,6 +59,12 @@ Choose your preferred installation method below:
           <Podman />
         </div>
       </TabItem>
+
+    <TabItem value="podman-kube-play" label="Podman Kube Play">
+      <div className='mt-5'>
+        <PodmanKubePlay />
+      </div>
+    </TabItem>
 
       <TabItem value="swarm" label="Docker Swarm">
         <div className='mt-5'>
