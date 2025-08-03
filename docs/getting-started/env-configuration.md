@@ -3298,6 +3298,107 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Set the access key for Azure Storage.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
+ 
+### OpenTelemetry Configuration
+
+#### `ENABLE_OTEL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry for observability. When enabled, tracing, metrics, and logging data can be collected and exported to an OTLP endpoint.
+
+#### `ENABLE_OTEL_METRICS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry metrics collection and export. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `ENABLE_OTEL_LOGS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry logging export. When enabled, application logs are sent to the configured OTLP endpoint. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: `http://localhost:4317`
+- Description: Specifies the default OTLP (OpenTelemetry Protocol) endpoint for exporting traces, metrics, and logs. This can be overridden for metrics if `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT` is set.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry metrics. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for traces and metrics are used.
+
+#### `OTEL_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection (e.g., HTTP for gRPC) for traces. For metrics, its behavior is governed by `OTEL_METRICS_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for metrics. Defaults to `False`.
+
+#### `OTEL_SERVICE_NAME`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Sets the service name that will be reported to your OpenTelemetry collector or observability platform. This helps identify your Open WebUI instance.
+
+#### `OTEL_RESOURCE_ATTRIBUTES`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Allows you to define additional resource attributes to be attached to all telemetry data, in a comma-separated `key1=val1,key2=val2` format.
+
+#### `OTEL_TRACES_SAMPLER`
+
+- Type: `str`
+- Options: `parentbased_always_on`, `always_on`, `always_off`, `parentbased_always_off`, etc.
+- Default: `parentbased_always_on`
+- Description: Configures the sampling strategy for OpenTelemetry traces. This determines which traces are collected and exported to reduce data volume.
+
+#### `OTEL_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the username for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden.
+
+#### `OTEL_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the password for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden.
+
+#### `OTEL_METRICS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_METRICS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: `grpc`
+- Description: Specifies the protocol for exporting OpenTelemetry traces (gRPC or HTTP).
+
+#### `OTEL_METRICS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry metrics (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
 
 ### Database Pool
 
