@@ -1043,8 +1043,20 @@ Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 #### `CORS_ALLOW_CUSTOM_SCHEME`
 
 - Type `str`
-- Default ``
-- Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS).
+- Default: `""` (empty string)
+- Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS). Allows you to specify additional custom URL schemes, beyond the standard `http` and `https`, that are permitted as valid origins for Cross-Origin Resource Sharing (CORS).
+
+:::info
+
+This is particularly useful for scenarios such as:
+ - Integrating with desktop applications that use custom protocols (e.g., `app://`, `custom-app-scheme://`).
+ - Local development environments or testing setups that might employ non-standard schemes (e.g., `file://` if applicable, or `electron://`).
+
+Provide a semicolon-separated list of scheme names without the `://`. For example: `app;file;electron;my-custom-scheme`.
+
+When configured, these custom schemes will be validated alongside `http` and `https` for any origins specified in `CORS_ALLOW_ORIGIN`.
+
+:::
 
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
