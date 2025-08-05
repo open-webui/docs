@@ -1040,6 +1040,12 @@ Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 - Default: `*`
 - Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
+#### `CORS_ALLOW_CUSTOM_SCHEME`
+
+- Type `str`
+- Default ``
+- Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS).
+
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
