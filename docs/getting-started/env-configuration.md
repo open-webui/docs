@@ -2660,12 +2660,6 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 See https://support.google.com/cloud/answer/6158849?hl=en
 
-:::info
-
-You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
-
-:::
-
 #### `GOOGLE_CLIENT_ID`
 
 - Type: `str`
@@ -2695,12 +2689,6 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 ### Microsoft
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
-
-:::info
-
-You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
-
-:::
 
 #### `MICROSOFT_CLIENT_ID`
 
@@ -2737,12 +2725,6 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 ### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-
-:::info
-
-You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
-
-:::
 
 #### `GITHUB_CLIENT_ID`
 
@@ -2789,13 +2771,6 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 - Persistence: This environment variable is a `PersistentConfig` variable.
-
-:::danger
-
-The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
-Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
-
-:::
 
 #### `OPENID_REDIRECT_URI`
 
