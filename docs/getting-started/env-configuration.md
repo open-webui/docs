@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.9](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.19](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -69,6 +69,12 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Default: `True`
 - Description: Toggles user account creation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_SIGNUP_PASSWORD_CONFIRMATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
 
 #### `ENABLE_LOGIN_FORM`
 
@@ -146,7 +152,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats.
+- Description: Enables admin users to access all chats. When disabled, admins can no longer accesss user's chats in the admin panel.
+
+#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: When disabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `True`, admins have access to all created items in the workspace area regardless of access permissions.
 
 #### `ENABLE_USER_WEBHOOKS`
 
@@ -167,6 +179,18 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Type: `int`
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
+
+### `MODELS_CACHE_TTL`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
+
+:::info
+
+This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
+
+:::
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -845,10 +869,20 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 #### `JWT_EXPIRES_IN`
 
-- Type: `int`
+- Type: `str`
 - Default: `-1`
 - Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.  
+
+**Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.** Never use `-1` in a production environment.
+
+If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change your `WEBUI_SECRET_KEY` to immediately invalidate all existing tokens.
+
+:::
 
 ## Security Variables
 
@@ -856,12 +890,13 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, ID, email, and role) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user information (name, ID, email, role and chat-id) as X-headers to OpenAI API and Ollama API.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
+  - `X-OpenWebUI-Chat-Id`
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
@@ -1011,6 +1046,24 @@ Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 - Default: `*`
 - Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
+#### `CORS_ALLOW_CUSTOM_SCHEME`
+
+- Type `str`
+- Default: `""` (empty string)
+- Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS). Allows you to specify additional custom URL schemes, beyond the standard `http` and `https`, that are permitted as valid origins for Cross-Origin Resource Sharing (CORS).
+
+:::info
+
+This is particularly useful for scenarios such as:
+ - Integrating with desktop applications that use custom protocols (e.g., `app://`, `custom-app-scheme://`).
+ - Local development environments or testing setups that might employ non-standard schemes (e.g., `file://` if applicable, or `electron://`).
+
+Provide a semicolon-separated list of scheme names without the `://`. For example: `app;file;electron;my-custom-scheme`.
+
+When configured, these custom schemes will be validated alongside `http` and `https` for any origins specified in `CORS_ALLOW_ORIGIN`.
+
+:::
+
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
@@ -1042,7 +1095,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `oracle23ai`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1419,6 +1472,26 @@ When using Pinecone as the vector store, the following environment variables are
 -   **Default**: `1`
 -   **Description**: The number of connections to create when the pool needs to grow.
 
+### S3 Vector Bucket
+
+When using S3 Vector Bucket as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
+
+:::info
+
+Note: this configuration assumes that AWS credentials will be available to your Open WebUI environment. This could be through environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through IAM role permissions.
+
+:::
+
+#### `S3_VECTOR_BUCKET_NAME`
+
+- Type: `str`
+- Description: Specifies the name of the S3 Vector Bucket to store vectors in.
+
+#### `S3_VECTOR_REGION`
+
+- Type: `str`
+- Description: Specifies the AWS region where the S3 Vector Bucket is hosted.
+
 ## RAG Content Extraction Engine
 
 #### `CONTENT_EXTRACTION_ENGINE`
@@ -1466,7 +1539,7 @@ When using Pinecone as the vector store, the following environment variables are
 
 - Type: `str`
 - Default: `http://docling:5001`
-- Description: Specifies the URL for the Docling server.
+- Description: Specifies the URL for the Docling server. Requires Docling version 1.0.0 or later.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DOCLING_OCR_ENGINE`
@@ -1839,6 +1912,20 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Type: `str`
 - Default: `None`
 - Description: Specifies the client ID for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint site URL for OneDrive integration e.g. https://companyname.sharepoint.com.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_SHAREPOINT_TENANT_ID`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the SharePoint tenant ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Web Search
@@ -2603,6 +2690,12 @@ Strictly return in JSON format:
 
 ## OAuth
 
+:::info
+
+You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
+
+:::
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
@@ -2631,7 +2724,7 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
@@ -2648,9 +2741,20 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Description: Defines the trusted request header for the username of anyone registering with the
 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/sso).
 
+#### `WEBUI_AUTH_TRUSTED_GROUPS_HEADER`
+
+- Type: `str`
+- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/sso).
+
 ### Google
 
 See https://support.google.com/cloud/answer/6158849?hl=en
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GOOGLE_CLIENT_ID`
 
@@ -2681,6 +2785,12 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 ### Microsoft
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `MICROSOFT_CLIENT_ID`
 
@@ -2717,6 +2827,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 ### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GITHUB_CLIENT_ID`
 
@@ -2763,6 +2879,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::danger
+
+The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
+Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
+
+:::
 
 #### `OPENID_REDIRECT_URI`
 
@@ -2813,7 +2936,7 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Description: Set picture (avatar) claim for OpenID.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-::info
+:::info
 
 If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
 
@@ -2996,8 +3119,26 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to access chat controls.
+- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_VALVES`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+
+#### USER_PERMISSIONS_CHAT_SYSTEM_PROMPT
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
+
+#### USER_PERMISSIONS_CHAT_PARAMS
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Parameters" section within the chat controls panel.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
@@ -3060,13 +3201,6 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
-
-- Type: `str`
-- Default: `True`
-- Description: Allows or disallows users to set a custom system prompt for all of their chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Feature Permissions
@@ -3254,6 +3388,138 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Set the access key for Azure Storage.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
+ 
+### OpenTelemetry Configuration
+
+#### `ENABLE_OTEL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry for observability. When enabled, tracing, metrics, and logging data can be collected and exported to an OTLP endpoint.
+
+#### `ENABLE_OTEL_METRICS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry metrics collection and export. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `ENABLE_OTEL_LOGS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry logging export. When enabled, application logs are sent to the configured OTLP endpoint. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: `http://localhost:4317`
+- Description: Specifies the default OTLP (OpenTelemetry Protocol) endpoint for exporting traces, metrics, and logs. This can be overridden for metrics if `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT` is set, and for logs if `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT` is set.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry metrics. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for traces and metrics are used.
+
+#### `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry logs. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for logs, traces, and metrics are used.
+
+#### `OTEL_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection (e.g., HTTP for gRPC) for traces. For metrics, its behavior is governed by `OTEL_METRICS_EXPORTER_OTLP_INSECURE`, and for logs by `OTEL_LOGS_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for metrics. Defaults to `False`.
+
+#### `OTEL_LOGS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for logs. Defaults to `False`.
+
+#### `OTEL_SERVICE_NAME`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Sets the service name that will be reported to your OpenTelemetry collector or observability platform. This helps identify your Open WebUI instance.
+
+#### `OTEL_RESOURCE_ATTRIBUTES`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Allows you to define additional resource attributes to be attached to all telemetry data, in a comma-separated `key1=val1,key2=val2` format.
+
+#### `OTEL_TRACES_SAMPLER`
+
+- Type: `str`
+- Options: `parentbased_always_on`, `always_on`, `always_off`, `parentbased_always_off`, etc.
+- Default: `parentbased_always_on`
+- Description: Configures the sampling strategy for OpenTelemetry traces. This determines which traces are collected and exported to reduce data volume.
+
+#### `OTEL_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the username for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the password for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_METRICS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_METRICS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_LOGS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP logs endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_LOGS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP logs endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: `grpc`
+- Description: Specifies the default protocol for exporting OpenTelemetry traces (gRPC or HTTP). This can be overridden for metrics if `OTEL_METRICS_OTLP_SPAN_EXPORTER` is set, and for logs if `OTEL_LOGS_OTLP_SPAN_EXPORTER` is set.
+
+#### `OTEL_METRICS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry metrics (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
+
+#### `OTEL_LOGS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry logs (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
 
 ### Database Pool
 

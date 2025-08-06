@@ -35,7 +35,7 @@
 }
 
 /** In mobile view, reduce the padding */
-@media screen and (max-width: 996px) {
+@media screen and (width <= 996px) {
 	:root {
 		--ifm-navbar-height: 100%;
 	}
@@ -58,6 +58,7 @@
 	padding: var(--ifm-navbar-padding-vertical)
 		var(--ifm-navbar-padding-horizontal);
 }
+
 .navbar-sidebar__items {
 	display: flex;
 	height: fit-content !important;
@@ -548,6 +549,12 @@ div.special_table + table thead tr {
 	border-bottom: 0;
 }
 
+th,
+td,
+div.special_table + table {
+	border-width: 0 !important;
+}
+
 div.special_table + table tr th {
 	background: rgb(255 255 255 / 0%);
 	color: #000;
@@ -562,12 +569,6 @@ div.special_table + table tr td {
 
 div.special_table + table tr:nth-child(even) {
 	background: rgb(255 255 255 / 0%);
-}
-
-div.special_table + table,
-th,
-td {
-	border-width: 0 !important;
 }
 
 .custom-tag {

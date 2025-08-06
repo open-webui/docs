@@ -33,12 +33,35 @@ Get started quickly with our reference FastAPI-based implementations provided in
 ```bash
 git clone https://github.com/open-webui/openapi-servers
 cd openapi-servers
+```
 
+### With Bash
+
+```bash
 # Example: Installing dependencies for a specific server 'filesystem'
 cd servers/filesystem
 pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --reload
 ```
+
+The filesystem server should be reachable from: [http://localhost:8000](http://localhost:8000)
+
+The documentation path will be: [http://localhost:8000](http://localhost:8000)
+
+### With Docker
+
+If you have docker compose installed, bring the servers up with:
+
+```bash
+docker compose up
+```
+
+The services will be reachable from:
+
+ * [Filesystem localhost:8081](http://localhost:8081)
+ * [memory server localhost:8082](http://localhost:8082)
+ * [time-server localhost:8083](http://localhost:8083)
+
 
 Now, simply point your OpenAPI-compatible clients or AI agents to your local or publicly deployed URL—no configuration headaches, no complicated transports.
 
