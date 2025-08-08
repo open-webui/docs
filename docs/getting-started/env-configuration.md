@@ -168,6 +168,24 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Sets a custom text that will be included when you copy a message in the chat. E.g. `"This text is AI generated"` -> will add "This text is AI generated" to every message, when copied.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_AUTOPLAY_SSML`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sets the default value for the "Auto-play Speech Blocks" setting for new users.
+
+#### `DEFAULT_SSML_OVERRIDE_CALL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sets the default value for the "Override Conversation Response with Speech Blocks" setting for new users.
+
+#### `DEFAULT_SHOW_SSML`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sets the default value for the "Default Show Speech Blocks" setting for new users.
+
 #### `THREAD_POOL_SIZE`
 
 - Type: `int`
