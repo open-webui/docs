@@ -255,6 +255,18 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 - Default: `False`
 - Description: When enabled, the system saves each chunk of streamed chat data to the database in real time to ensure maximum data persistency. This feature provides robust data recovery and allows accurate session tracking. However, the tradeoff is increased latency, as saving to the database introduces a delay. Disabling this feature can improve performance and reduce delays, but it risks potential data loss in the event of a system failure or crash. Use based on your application's requirements and acceptable tradeoffs.
 
+#### `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets a system-wide minimum value for the number of tokens to batch together before sending them to the client during a streaming response. This allows an administrator to enforce a baseline level of performance and stability across the entire system by preventing excessively small chunk sizes that can cause high CPU load. The final chunk size used for a response will be the highest value set among this global variable, the model's advanced parameters, or the per-chat settings. The default is 1, which applies no minimum batching at the global level.
+
+:::info
+
+It is recommended to set this to a high single-digit or low double-digit value if you run Open WebUI with high concurrency, many users, and very fast streaming models.
+
+:::
+
 #### `BYPASS_MODEL_ACCESS_CONTROL`
 
 - Type: `bool`
