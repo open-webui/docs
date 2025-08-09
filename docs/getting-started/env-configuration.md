@@ -1336,7 +1336,13 @@ modeling files for reranking.
 
 - Type: `bool`
 - Default: `False`
-- Description: Use gPRC interface whenever possible
+- Description: Use gPRC interface whenever possible.
+
+:::info
+
+If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabled and certificate signed by a private CA, set the environment variable `GRPC_DEFAULT_SSL_ROOTS_FILE_PATH` to the path of your PEM-encoded CA certificates file. See the [gRPC Core Docs](https://grpc.github.io/grpc/core/md_doc_environment_variables.html) for more information.
+
+:::
 
 #### `QDRANT_GRPC_PORT`
 
@@ -3372,6 +3378,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Description: Sets the endpoint URL for S3 storage.
+
+:::info
+
+If the endpoint is an S3-compatible provider like MinIO that uses a TLS certificate signed by a private CA, set the environment variable `AWS_CA_BUNDLE` to the path of your PEM-encoded CA certificates file. See the [Amazon SDK Docs](https://docs.aws.amazon.com/sdkref/latest/guide/feature-gen-config.html) for more information.
+
+:::
 
 #### `S3_KEY_PREFIX`
 
