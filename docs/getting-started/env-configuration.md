@@ -2709,6 +2709,25 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 :::
 
+#### `ENABLE_OAUTH_PERSISTENT_CONFIG`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether OAuth-related settings are persisted in the database after the first launch.
+
+:::info
+
+By default, OAuth configurations are stored in the database and managed via the Admin Panel after the initial setup. Set this variable to `False` to force Open WebUI to **always** read OAuth settings from the environment variables on every restart. This is ideal for environments using GitOps or immutable infrastructure where configuration is managed exclusively through external files (e.g., Docker Compose, Kubernetes ConfigMaps).
+
+:::
+
+#### `OAUTH_SUB_CLAIM`
+
+- Type: `str`
+- Default: `None`
+- Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`
