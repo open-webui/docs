@@ -1,3 +1,7 @@
+---
+sidebar_position: 500
+title: "🔗 API Reference"
+---
 # OpenWebUI API - Complete Reference Documentation
 
 This document provides a comprehensive, source-verified reference for the OpenWebUI server API. It details all major endpoints, recommended client flows, payloads, and data schemas for developers building integrations and applications.
