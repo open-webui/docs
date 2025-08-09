@@ -3,21 +3,21 @@ import { useEffect, useState } from "react";
 
 export const SidebarBanners = () => {
 	const items = [
-		{
-			imgSrc: "/sponsors/banners/n8n-banner.png",
-			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
-			url: "https://n8n.io/",
-			name: "n8n",
-			description: "Does your interface have a backend yet? Try n8n",
-		},
+		// {
+		// 	imgSrc: "/sponsors/banners/n8n-banner.png",
+		// 	mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
+		// 	url: "https://n8n.io/",
+		// 	name: "n8n",
+		// 	description: "Does your interface have a backend yet? Try n8n",
+		// },
 
-		{
-			imgSrc: "/sponsors/banners/n8n-banner.png",
-			mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
-			url: "https://n8n.io/",
-			name: "n8n",
-			description: "Does your interface have a backend yet? Try n8n",
-		},
+		// {
+		// 	imgSrc: "/sponsors/banners/n8n-banner.png",
+		// 	mobileImgSrc: "/sponsors/banners/n8n-banner-mobile.png",
+		// 	url: "https://n8n.io/",
+		// 	name: "n8n",
+		// 	description: "Does your interface have a backend yet? Try n8n",
+		// },
 
 		{
 			imgSrc: "/sponsors/banners/warp-banner.png",
