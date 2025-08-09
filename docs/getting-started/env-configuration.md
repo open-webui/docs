@@ -3038,13 +3038,13 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `True`
 - Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
 
-#### USER_PERMISSIONS_CHAT_SYSTEM_PROMPT
+#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
 
 - Type: `bool`
 - Default: `True`
 - Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
 
-#### USER_PERMISSIONS_CHAT_PARAMS
+#### `USER_PERMISSIONS_CHAT_PARAMS`
 
 - Type: `bool`
 - Default: `True`
