@@ -1344,6 +1344,18 @@ modeling files for reranking.
 - Default: `6334`
 - Description: Sets the gRPC port number for Qdrant.
 
+#### `QDRANT_TIMEOUT`
+
+- Type: `int`
+- Default: `5`
+- Description: Sets the timeout in seconds for all requests made to the Qdrant server, helping to prevent long-running queries from stalling the application.
+
+#### `QDRANT_HNSW_M`
+
+- Type: `int`
+- Default: `16`
+- Description: Controls the HNSW (Hierarchical Navigable Small World) index construction. In standard mode, this sets the `m` parameter. In multi-tenancy mode, this value is used for the `payload_m` parameter to build indexes on the payload, as the global `m` is disabled for performance, following Qdrant best practices.
+
 #### `ENABLE_QDRANT_MULTITENANCY_MODE`
 
 - Type: `bool`
@@ -3562,10 +3574,32 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 :::info
 
-Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+Supports SQLite, Postgres, and encrypted SQLite via SQLCipher. Changing the URL does not migrate data between databases.
+Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
+
+For encrypted SQLite, see the "SQLite with SQLCipher Encryption" section below for configuration details.
+
+:::
+
+### Encrypted SQLite with SQLCipher
+
+For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
+
+To enable encryption, you must configure two environment variables:
+
+1.  Set `DATABASE_TYPE="sqlite+sqlcipher"`.
+1.  Set `DATABASE_PASSWORD="your-secure-password"`.
+
+When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
+
+:::danger
+
+- The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
+- The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
+
+Ensure the database password is kept secure, as it is needed to decrypt and access all application data.
 
 :::
 
