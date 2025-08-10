@@ -152,7 +152,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats.
+- Description: Enables admin users to access all chats. When disabled, admins can no longer accesss user's chats in the admin panel.
+
+#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: When disabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `True`, admins have access to all created items in the workspace area regardless of access permissions.
 
 #### `ENABLE_USER_WEBHOOKS`
 
@@ -248,6 +254,18 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 - Type: `bool`
 - Default: `False`
 - Description: When enabled, the system saves each chunk of streamed chat data to the database in real time to ensure maximum data persistency. This feature provides robust data recovery and allows accurate session tracking. However, the tradeoff is increased latency, as saving to the database introduces a delay. Disabling this feature can improve performance and reduce delays, but it risks potential data loss in the event of a system failure or crash. Use based on your application's requirements and acceptable tradeoffs.
+
+#### `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets a system-wide minimum value for the number of tokens to batch together before sending them to the client during a streaming response. This allows an administrator to enforce a baseline level of performance and stability across the entire system by preventing excessively small chunk sizes that can cause high CPU load. The final chunk size used for a response will be the highest value set among this global variable, the model's advanced parameters, or the per-chat settings. The default is 1, which applies no minimum batching at the global level.
+
+:::info
+
+It is recommended to set this to a high single-digit or low double-digit value if you run Open WebUI with high concurrency, many users, and very fast streaming models.
+
+:::
 
 #### `BYPASS_MODEL_ACCESS_CONTROL`
 
@@ -1040,6 +1058,24 @@ Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 - Default: `*`
 - Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
+#### `CORS_ALLOW_CUSTOM_SCHEME`
+
+- Type `str`
+- Default: `""` (empty string)
+- Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS). Allows you to specify additional custom URL schemes, beyond the standard `http` and `https`, that are permitted as valid origins for Cross-Origin Resource Sharing (CORS).
+
+:::info
+
+This is particularly useful for scenarios such as:
+ - Integrating with desktop applications that use custom protocols (e.g., `app://`, `custom-app-scheme://`).
+ - Local development environments or testing setups that might employ non-standard schemes (e.g., `file://` if applicable, or `electron://`).
+
+Provide a semicolon-separated list of scheme names without the `://`. For example: `app;file;electron;my-custom-scheme`.
+
+When configured, these custom schemes will be validated alongside `http` and `https` for any origins specified in `CORS_ALLOW_ORIGIN`.
+
+:::
+
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
@@ -1071,7 +1107,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1300,13 +1336,31 @@ modeling files for reranking.
 
 - Type: `bool`
 - Default: `False`
-- Description: Use gPRC interface whenever possible
+- Description: Use gPRC interface whenever possible.
+
+:::info
+
+If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabled and certificate signed by a private CA, set the environment variable `GRPC_DEFAULT_SSL_ROOTS_FILE_PATH` to the path of your PEM-encoded CA certificates file. See the [gRPC Core Docs](https://grpc.github.io/grpc/core/md_doc_environment_variables.html) for more information.
+
+:::
 
 #### `QDRANT_GRPC_PORT`
 
 - Type: `int`
 - Default: `6334`
 - Description: Sets the gRPC port number for Qdrant.
+
+#### `QDRANT_TIMEOUT`
+
+- Type: `int`
+- Default: `5`
+- Description: Sets the timeout in seconds for all requests made to the Qdrant server, helping to prevent long-running queries from stalling the application.
+
+#### `QDRANT_HNSW_M`
+
+- Type: `int`
+- Default: `16`
+- Description: Controls the HNSW (Hierarchical Navigable Small World) index construction. In standard mode, this sets the `m` parameter. In multi-tenancy mode, this value is used for the `payload_m` parameter to build indexes on the payload, as the global `m` is disabled for performance, following Qdrant best practices.
 
 #### `ENABLE_QDRANT_MULTITENANCY_MODE`
 
@@ -1381,6 +1435,72 @@ When using Pinecone as the vector store, the following environment variables are
 - Default: `aws`
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
+
+### Oracle 23ai Vector Search (oracle23ai)
+
+#### `ORACLE_DB_USE_WALLET`
+
+-   **Type**: `bool`
+-   **Default**: `false`
+-   **Description**: Determines the connection method to the Oracle Database.
+    -   Set to `false` for direct connections (e.g., to Oracle Database 23ai Free or DBCS instances) using host, port, and service name in `ORACLE_DB_DSN`.
+    -   Set to `true` for wallet-based connections (e.g., to Oracle Autonomous Database (ADW/ATP)). When `true`, `ORACLE_WALLET_DIR` and `ORACLE_WALLET_PASSWORD` must also be configured.
+
+#### `ORACLE_DB_USER`
+
+-   **Type**: `str`
+-   **Default**: `DEMOUSER`
+-   **Description**: Specifies the username used to connect to the Oracle Database.
+
+#### `ORACLE_DB_PASSWORD`
+
+-   **Type**: `str`
+-   **Default**: `Welcome123456`
+-   **Description**: Specifies the password for the `ORACLE_DB_USER`.
+
+#### `ORACLE_DB_DSN`
+
+-   **Type**: `str`
+-   **Default**: `localhost:1521/FREEPDB1`
+-   **Description**: Defines the Data Source Name for the Oracle Database connection.
+    -   If `ORACLE_DB_USE_WALLET` is `false`, this should be in the format `hostname:port/service_name` (e.g., `localhost:1521/FREEPDB1`).
+    -   If `ORACLE_DB_USE_WALLET` is `true`, this can be a TNS alias (e.g., `medium` for ADW/ATP), or a full connection string.
+
+#### `ORACLE_WALLET_DIR`
+
+-   **Type**: `str`
+-   **Default**: Empty string (' ')
+-   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the absolute path to the directory containing the Oracle Cloud Wallet files (e.g., `cwallet.sso`, `sqlnet.ora`, `tnsnames.ora`).
+
+#### `ORACLE_WALLET_PASSWORD`
+
+-   **Type**: `str`
+-   **Default**: Empty string (' ')
+-   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the password for the Oracle Cloud Wallet.
+
+#### `ORACLE_VECTOR_LENGTH`
+
+-   **Type**: `int`
+-   **Default**: `768`
+-   **Description**: Sets the expected dimension or length of the vector embeddings stored in the Oracle Database. This must match the embedding model used.
+
+#### `ORACLE_DB_POOL_MIN`
+
+-   **Type**: `int`
+-   **Default**: `2`
+-   **Description**: The minimum number of connections to maintain in the Oracle Database connection pool.
+
+#### `ORACLE_DB_POOL_MAX`
+
+-   **Type**: `int`
+-   **Default**: `10`
+-   **Description**: The maximum number of connections allowed in the Oracle Database connection pool.
+
+#### `ORACLE_DB_POOL_INCREMENT`
+
+-   **Type**: `int`
+-   **Default**: `1`
+-   **Description**: The number of connections to create when the pool needs to grow.
 
 ### S3 Vector Bucket
 
@@ -2619,6 +2739,25 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 :::
 
+#### `ENABLE_OAUTH_PERSISTENT_CONFIG`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether OAuth-related settings are persisted in the database after the first launch.
+
+:::info
+
+By default, OAuth configurations are stored in the database and managed via the Admin Panel after the initial setup. Set this variable to `False` to force Open WebUI to **always** read OAuth settings from the environment variables on every restart. This is ideal for environments using GitOps or immutable infrastructure where configuration is managed exclusively through external files (e.g., Docker Compose, Kubernetes ConfigMaps).
+
+:::
+
+#### `OAUTH_SUB_CLAIM`
+
+- Type: `str`
+- Default: `None`
+- Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`
@@ -3240,6 +3379,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the endpoint URL for S3 storage.
 
+:::info
+
+If the endpoint is an S3-compatible provider like MinIO that uses a TLS certificate signed by a private CA, set the environment variable `AWS_CA_BUNDLE` to the path of your PEM-encoded CA certificates file. See the [Amazon SDK Docs](https://docs.aws.amazon.com/sdkref/latest/guide/feature-gen-config.html) for more information.
+
+:::
+
 #### `S3_KEY_PREFIX`
 
 - Type: `str`
@@ -3298,6 +3443,138 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Set the access key for Azure Storage.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
+ 
+### OpenTelemetry Configuration
+
+#### `ENABLE_OTEL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry for observability. When enabled, tracing, metrics, and logging data can be collected and exported to an OTLP endpoint.
+
+#### `ENABLE_OTEL_METRICS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry metrics collection and export. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `ENABLE_OTEL_LOGS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry logging export. When enabled, application logs are sent to the configured OTLP endpoint. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: `http://localhost:4317`
+- Description: Specifies the default OTLP (OpenTelemetry Protocol) endpoint for exporting traces, metrics, and logs. This can be overridden for metrics if `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT` is set, and for logs if `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT` is set.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry metrics. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for traces and metrics are used.
+
+#### `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry logs. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for logs, traces, and metrics are used.
+
+#### `OTEL_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection (e.g., HTTP for gRPC) for traces. For metrics, its behavior is governed by `OTEL_METRICS_EXPORTER_OTLP_INSECURE`, and for logs by `OTEL_LOGS_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: Value of `OTEL_EXPORTER_OTLP_INSECURE`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for metrics. If not specified, it uses the value of `OTEL_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_LOGS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: Value of `OTEL_EXPORTER_OTLP_INSECURE`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for logs. If not specified, it uses the value of `OTEL_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_SERVICE_NAME`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Sets the service name that will be reported to your OpenTelemetry collector or observability platform. This helps identify your Open WebUI instance.
+
+#### `OTEL_RESOURCE_ATTRIBUTES`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Allows you to define additional resource attributes to be attached to all telemetry data, in a comma-separated `key1=val1,key2=val2` format.
+
+#### `OTEL_TRACES_SAMPLER`
+
+- Type: `str`
+- Options: `parentbased_always_on`, `always_on`, `always_off`, `parentbased_always_off`, etc.
+- Default: `parentbased_always_on`
+- Description: Configures the sampling strategy for OpenTelemetry traces. This determines which traces are collected and exported to reduce data volume.
+
+#### `OTEL_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the username for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the password for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_METRICS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_METRICS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_LOGS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP logs endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_LOGS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP logs endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: `grpc`
+- Description: Specifies the default protocol for exporting OpenTelemetry traces (gRPC or HTTP). This can be overridden for metrics if `OTEL_METRICS_OTLP_SPAN_EXPORTER` is set, and for logs if `OTEL_LOGS_OTLP_SPAN_EXPORTER` is set.
+
+#### `OTEL_METRICS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry metrics (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
+
+#### `OTEL_LOGS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry logs (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
 
 ### Database Pool
 
@@ -3309,10 +3586,32 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 :::info
 
-Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+Supports SQLite, Postgres, and encrypted SQLite via SQLCipher. Changing the URL does not migrate data between databases.
+Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
+
+For encrypted SQLite, see the "SQLite with SQLCipher Encryption" section below for configuration details.
+
+:::
+
+### Encrypted SQLite with SQLCipher
+
+For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
+
+To enable encryption, you must configure two environment variables:
+
+1.  Set `DATABASE_TYPE="sqlite+sqlcipher"`.
+1.  Set `DATABASE_PASSWORD="your-secure-password"`.
+
+When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
+
+:::danger
+
+- The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
+- The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
+
+Ensure the database password is kept secure, as it is needed to decrypt and access all application data.
 
 :::
 
