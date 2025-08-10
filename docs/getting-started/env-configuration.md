@@ -3491,14 +3491,14 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 #### `OTEL_METRICS_EXPORTER_OTLP_INSECURE`
 
 - Type: `bool`
-- Default: `False`
-- Description: If set to `True`, the OTLP exporter will use an insecure connection for metrics. Defaults to `False`.
+- Default: Value of `OTEL_EXPORTER_OTLP_INSECURE`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for metrics. If not specified, it uses the value of `OTEL_EXPORTER_OTLP_INSECURE`.
 
 #### `OTEL_LOGS_EXPORTER_OTLP_INSECURE`
 
 - Type: `bool`
-- Default: `False`
-- Description: If set to `True`, the OTLP exporter will use an insecure connection for logs. Defaults to `False`.
+- Default: Value of `OTEL_EXPORTER_OTLP_INSECURE`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for logs. If not specified, it uses the value of `OTEL_EXPORTER_OTLP_INSECURE`.
 
 #### `OTEL_SERVICE_NAME`
 
