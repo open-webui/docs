@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+          SITE_URL: ${{ vars.SITE_URL }}
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
