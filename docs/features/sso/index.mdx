@@ -49,7 +49,7 @@ The following environment variables are required:
 
 1. `GOOGLE_CLIENT_ID` - Google OAuth client ID
 1. `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
-1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly.
+1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly. (Usually to `https://accounts.google.com/.well-known/openid-configuration`)
 
 ### Microsoft
 
@@ -75,7 +75,6 @@ The following environment variables are required:
 
 1. `GITHUB_CLIENT_ID` - Github OAuth App Client ID
 1. `GITHUB_CLIENT_SECRET` - Github OAuth App Client Secret
-1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly.
 
 ### OIDC
 
@@ -310,7 +309,7 @@ services:
 
 ### Authentik
 
-To configure a [Authentik](https://goauthentik.io/) OAuth client, please refer to [documentation](https://docs.goauthentik.io/docs/applications) on how to create an application and `OAuth2/OpenID Provider`.
+To configure a [Authentik](https://goauthentik.io/) OAuth client, please refer to [documentation](https://integrations.goauthentik.io/miscellaneous/open-webui/) on how to create an application and `OAuth2/OpenID Provider`.
 The allowed redirect URI should include `<open-webui>/oauth/oidc/callback`.
 
 While creating provider, please note `App-name`, `Client-ID` and `Client-Secret` and use it for open-webui environment variables:
