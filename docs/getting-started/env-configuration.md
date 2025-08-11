@@ -3668,9 +3668,11 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 #### `REDIS_URL`
 
 - Type: `str`
-- Example: `redis://localhost:6379/0`
-- Example with TLS: `rediss://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for the app state.
+- Description: Specifies the URL of the Redis instance or cluster host for storing application state.
+- Examples:
+  - `redis://localhost:6379/0`
+  - `rediss://:password@localhost:6379/0` _(with password and TLS)_
+  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with mTLS)_
 
 :::info
 
@@ -3688,6 +3690,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
+
+#### `REDIS_CLUSTER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+
+:::info
+
+This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
+
+:::
 
 #### `REDIS_KEY_PREFIX`
 
@@ -3723,7 +3737,7 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 - Type: `str`
 - Default: `${REDIS_URL}`
-- Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
+- Description: Specifies the URL of the Redis instance or cluster host for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
 
 :::info
 
@@ -3741,6 +3755,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for websocket Redis.
+
+#### `WEBSOCKET_REDIS_CLUSTER`
+
+- Type: `bool`
+- Default: `${REDIS_CLUSTER}`
+- Description: Specifies that websocket should communicate with a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `WEBSOCKET_REDIS_URL` and/or `REDIS_URL` must also be defined.
+
+:::info
+
+This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
+
+:::
 
 ### Uvicorn Settings
 
