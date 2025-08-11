@@ -3392,11 +3392,11 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
 
-#### `REDIS_CLUSTER_MODE`
+#### `REDIS_CLUSTER`
 
 - Type: `bool`
 - Default: `False`
-- Description: Connect to Redis in Cluster Mode instead of to a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
 
 :::info
 
@@ -3457,11 +3457,11 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Default: `26379`
 - Description: Sentinel port for websocket Redis.
 
-#### `WEBSOCKET_REDIS_CLUSTER_MODE`
+#### `WEBSOCKET_REDIS_CLUSTER`
 
 - Type: `bool`
-- Default: `${REDIS_CLUSTER_MODE}`
-- Description: Specifies that websocket should communicate with Redis in Cluster Mode instead of to a single instance or using Redis Sentinels. If `True`, `WEBSOCKET_REDIS_URL` and/or `REDIS_URL` must also be defined.
+- Default: `${REDIS_CLUSTER}`
+- Description: Specifies that websocket should communicate with a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `WEBSOCKET_REDIS_URL` and/or `REDIS_URL` must also be defined.
 
 :::info
 
