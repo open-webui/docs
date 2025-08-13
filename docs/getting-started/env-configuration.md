@@ -271,7 +271,7 @@ It is recommended to set this to a high single-digit or low double-digit value i
 
 - Type: `bool`
 - Default: `False`
-- Description: Bypasses model access control.
+- Description: Bypasses model access control. When set to `true`, all users (and admins alike) will have access to all models, regardless of the model's privacy setting (Private, Public, Shared with certain groups). This is useful for smaller or individual Open WebUI installations where model access restrictions may not be needed.
 
 #### `WEBUI_BUILD_HASH`
 
