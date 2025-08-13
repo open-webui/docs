@@ -1,0 +1,7 @@
+{
+	"markdownlint.config": {
+		"no-inline-html": false,
+		"link-image-reference-definitions": false,
+		"fenced-code-language": false
+	}
+}
