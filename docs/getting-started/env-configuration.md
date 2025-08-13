@@ -158,7 +158,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: When disabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `True`, admins have access to all created items in the workspace area regardless of access permissions.
+- Description: When disabled, admin users are treated like regular users for workspace access (models, knowledge, prompts and tools) and only see items they have **explicit permission to access** through the existing access control system. This also applies to the visibility of models in the model selector - admins will be treated as regular users: base models and custom models they do not have **explicit permission to access**, will be hidden. If set to `True` (Default), admins have access to **all created items** in the workspace area and all models in the model selector, **regardless of access permissions**.
 
 #### `ENABLE_USER_WEBHOOKS`
 
