@@ -3160,6 +3160,22 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+## SCIM
+
+#### `SCIM_ENABLED`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables SCIM 2.0 (System for Cross-domain Identity Management) support for automated user and group provisioning from identity providers like Okta, Azure AD, and Google Workspace.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SCIM_TOKEN`
+
+- Type: `str`
+- Default: `""`
+- Description: Sets the bearer token for SCIM authentication. This token must be provided by identity providers when making SCIM API requests. Generate a secure random token (e.g., using `openssl rand -base64 32`) and configure it in both Open WebUI and your identity provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## User Permissions
 
 ### Chat Permissions
