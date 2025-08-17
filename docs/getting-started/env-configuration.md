@@ -668,7 +668,6 @@ The format for the JSON response is strictly:
 - Type: `str` (comma-separated list of module names)
 - Default: None
 - Description: Specifies a comma-separated list of Python modules that are blacklisted and cannot be imported or used within the code interpreter. This enhances security by preventing access to potentially sensitive or system-level functionalities.
-- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `CODE_INTERPRETER_PROMPT_TEMPLATE`
 
