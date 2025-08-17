@@ -146,13 +146,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admin users can export data.
+- Description: Controls whether admins can export data, chats and the database in the admin panel.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats. When disabled, admins can no longer accesss user's chats in the admin panel.
+- Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel.
 
 #### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
 
