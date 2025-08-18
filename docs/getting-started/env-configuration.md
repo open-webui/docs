@@ -1994,12 +1994,18 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Maximum number of search results to crawl.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `WEB_SEARCH_CONCURRENT_REQUESTS`
+#### `WEB_LOADER_CONCURRENT_REQUESTS`
 
 - Type: `int`
 - Default: `10`
-- Description: Number of concurrent requests to crawl web pages returned from search results.
+- Description: Specifies the number of concurrent requests used by the web loader to fetch content from web pages returned by search results. This directly impacts how many pages can be crawled simultaneously.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". If you were using the old name, please update your configurations to use "WEB_LOADER_CONCURRENT_REQUESTS" as the old variable name is now deprecated and will not be recognized. This renaming clarifies its function, as it specifically controls the concurrency of the web *loader* component that fetches content from search results, not the initial search engine query itself.
+
+:::
 
 #### `WEB_SEARCH_ENGINE`
 
