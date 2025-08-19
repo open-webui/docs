@@ -186,4 +186,26 @@ If this setting is disabled, the option to share to the community will not be vi
 
 **Note:** You can change the permission level of your shared chats on the community platform at any time from your `openwebui.com` account.
 
+## Frequently Asked Questions (FAQ)
+
+**❓ How long does it take for the “Expires in” timer to take effect?**
+
+The expiration takes effect immediately on the backend. The moment a link is accessed, the system checks if it has expired. While the "Shared Chats" dashboard on the frontend checks for expired links every second to update their status, the authoritative check happens on the backend, ensuring that an expired link cannot be accessed even if the frontend hasn't updated yet.
+
+**❓ Can I change the password of an already-shared link?**
+
+Yes. You can change or even remove the password of an already-shared link. From the "Shared Chats" dashboard, find the link you want to modify, click on "Modify", and you will be able to set a new password or clear the existing one. To change or remove an existing password, you will be required to enter the current password for security.
+
+**❓ What happens to the QR code when I edit the link settings?**
+
+The QR code is generated based on the share link's URL (e.g., `/s/your-share-id`). If you change the custom link ID, the URL changes, and a new QR code will be generated. If you only change other settings like the password, expiration time, or public status, the share ID and the URL remain the same, so the QR code will not change.
+
+**❓ I’m an admin – how do I see *all* shared chats on the instance?**
+
+Currently, there is no built-in feature for an administrator to view a list of all shared chats from all users on the instance. The "Shared Chats" page only shows the chats shared by the currently logged-in user.
+
+**❓ Is there an API to list my shared chats?**
+
+Yes. You can get a list of your shared chats by making a `GET` request to the `/api/v1/chats/shared` endpoint. This will return a paginated list of your shared chats with their details.
+
 We hope this guide helps you make the most of the Shared Chats feature in Open WebUI! If you have any further questions, please refer to the main project documentation or join our community.
