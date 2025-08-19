@@ -1,6 +1,6 @@
 ---
 sidebar_position: 20
-title: "💥 Monitoring and Debugging with Langfuse"
+title: "🪢 Monitoring and Debugging with Langfuse"
 ---
 
 # Langfuse Integration with Open WebUI
@@ -20,7 +20,7 @@ _Langfuse integration steps_
 
 [Pipelines](https://github.com/open-webui/pipelines/) in Open WebUI is an UI-agnostic framework for OpenAI API plugins. It enables the injection of plugins that intercept, process, and forward user prompts to the final LLM, allowing for enhanced control and customization of prompt handling.
 
-To trace your application data with Langfuse, you can use the [Langfuse pipeline](https://github.com/open-webui/pipelines/blob/d4fca4c37c4b8603be7797245e749e9086f35130/examples/filters/langfuse_filter_pipeline.py), which enables real-time monitoring and analysis of message interactions.
+To trace your application data with Langfuse, you can use the [Langfuse pipeline](https://github.com/open-webui/pipelines/blob/039f9c54f8e9f9bcbabde02c2c853e80d25c79e4/examples/filters/langfuse_v3_filter_pipeline.py), which enables real-time monitoring and analysis of message interactions.
 
 ## Quick Start Guide
 
@@ -47,10 +47,10 @@ In the _Admin Settings_, create and save a new connection of type OpenAI API wit
 
 ### Step 4: Adding the Langfuse Filter Pipeline
 
-Next, navigate to _Admin Settings_ -> _Pipelines_ and add the Langfuse Filter Pipeline. Specify that Pipelines is listening on http://host.docker.internal:9099 (as configured earlier) and install the [Langfuse Filter Pipeline](https://github.com/open-webui/pipelines/blob/main/examples/filters/langfuse_filter_pipeline.py) by using the _Install from Github URL_ option with the following URL:
+Next, navigate to _Admin Settings_ -> _Pipelines_ and add the Langfuse Filter Pipeline. Specify that Pipelines is listening on http://host.docker.internal:9099 (as configured earlier) and install the [Langfuse Filter Pipeline](https://github.com/open-webui/pipelines/blob/039f9c54f8e9f9bcbabde02c2c853e80d25c79e4/examples/filters/langfuse_v3_filter_pipeline.py) by using the _Install from Github URL_ option with the following URL:
 
 ```
-https://github.com/open-webui/pipelines/blob/main/examples/filters/langfuse_filter_pipeline.py
+https://github.com/open-webui/pipelines/blob/main/examples/filters/langfuse_v3_filter_pipeline.py
 ```
 
 Now, add your Langfuse API keys below. If you haven't signed up to Langfuse yet, you can get your API keys by creating an account [here](https://cloud.langfuse.com).
