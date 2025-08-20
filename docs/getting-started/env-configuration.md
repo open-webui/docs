@@ -152,7 +152,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats. When disabled, admins can no longer accesss user's chats in the admin panel.
+- Description: Enables admin users to access all chats. When disabled, admins can no longer access user's chats in the admin panel. If you disable this, you will likely want to also disable `ENABLE_ADMIN_EXPORT`, as the exports also contains user chats.
 
 #### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
 
