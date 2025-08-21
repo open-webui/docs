@@ -146,13 +146,13 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admins can export data, chats and the database in the admin panel.
+- Description: Controls whether admins can export data, chats and the database in the admin panel. Database exports only work for SQLite databases for now.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel.
+- Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
