@@ -2,12 +2,12 @@ import { Sponsor } from "@site/src/components/Sponsors/Sponsor";
 
 export const SponsorList = () => {
 	const emeraldSponsors = [
-		{
-			imgSrc: "/sponsors/logos/n8n.png",
-			url: "https://n8n.io/",
-			name: "n8n",
-			description: "Does your interface have a backend yet? Try n8n",
-		},
+		// {
+		// 	imgSrc: "/sponsors/logos/n8n.png",
+		// 	url: "https://n8n.io/",
+		// 	name: "n8n",
+		// 	description: "Does your interface have a backend yet? Try n8n",
+		// },
 
 		{
 			imgSrc: "/sponsors/logos/warp.png",
