@@ -146,19 +146,19 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admin users can export data.
+- Description: Controls whether admins can export data, chats and the database in the admin panel. Database exports only work for SQLite databases for now.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats. When disabled, admins can no longer access user's chats in the admin panel. If you disable this, you will likely want to also disable `ENABLE_ADMIN_EXPORT`, as the exports also contains user chats.
+- Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
 
-#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
+#### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`
 - Default: `True`
-- Description: When disabled, admin users are treated like regular users for workspace access and only see knowledge bases, models, prompts, and tools they have **explicit permission to access** through the existing access control system. If set to `True`, admins have access to all created items in the workspace area regardless of access permissions.
+- Description: When disabled, admin users are treated like regular users for workspace access (models, knowledge, prompts and tools) and only see items they have **explicit permission to access** through the existing access control system. This also applies to the visibility of models in the model selector - admins will be treated as regular users: base models and custom models they do not have **explicit permission to access**, will be hidden. If set to `True` (Default), admins have access to **all created items** in the workspace area and all models in the model selector, **regardless of access permissions**.
 
 #### `ENABLE_USER_WEBHOOKS`
 
@@ -271,7 +271,7 @@ It is recommended to set this to a high single-digit or low double-digit value i
 
 - Type: `bool`
 - Default: `False`
-- Description: Bypasses model access control.
+- Description: Bypasses model access control. When set to `true`, all users (and admins alike) will have access to all models, regardless of the model's privacy setting (Private, Public, Shared with certain groups). This is useful for smaller or individual Open WebUI installations where model access restrictions may not be needed.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -662,6 +662,12 @@ The format for the JSON response is strictly:
 - Default: `pyodide`
 - Description: Specifies the code interpreter engine to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_BLACKLISTED_MODULES`
+
+- Type: `str` (comma-separated list of module names)
+- Default: None
+- Description: Specifies a comma-separated list of Python modules that are blacklisted and cannot be imported or used within the code interpreter. This enhances security by preventing access to potentially sensitive or system-level functionalities.
 
 #### `CODE_INTERPRETER_PROMPT_TEMPLATE`
 
@@ -1988,12 +1994,18 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Maximum number of search results to crawl.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `WEB_SEARCH_CONCURRENT_REQUESTS`
+#### `WEB_LOADER_CONCURRENT_REQUESTS`
 
 - Type: `int`
 - Default: `10`
-- Description: Number of concurrent requests to crawl web pages returned from search results.
+- Description: Specifies the number of concurrent requests used by the web loader to fetch content from web pages returned by search results. This directly impacts how many pages can be crawled simultaneously.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". If you were using the old name, please update your configurations to use "WEB_LOADER_CONCURRENT_REQUESTS" as the old variable name is now deprecated and will not be recognized. This renaming clarifies its function, as it specifically controls the concurrency of the web *loader* component that fetches content from search results, not the initial search engine query itself.
+
+:::
 
 #### `WEB_SEARCH_ENGINE`
 
@@ -3160,6 +3172,22 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+## SCIM
+
+#### `SCIM_ENABLED`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables SCIM 2.0 (System for Cross-domain Identity Management) support for automated user and group provisioning from identity providers like Okta, Azure AD, and Google Workspace.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SCIM_TOKEN`
+
+- Type: `str`
+- Default: `""`
+- Description: Sets the bearer token for SCIM authentication. This token must be provided by identity providers when making SCIM API requests. Generate a secure random token (e.g., using `openssl rand -base64 32`) and configure it in both Open WebUI and your identity provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## User Permissions
 
 ### Chat Permissions
@@ -3663,14 +3691,28 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 :::
 
+#### `DATABASE_ENABLE_SQLITE_WAL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables SQLite WAL (Write-Ahead Logging) mode. When enabled, SQLite transactions can be managed more efficiently, allowing multiple readers and one writer concurrently, which can improve database performance, especially under high concurrency. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_DEDUPLICATE_INTERVAL`
+
+- Type: `float`
+- Default: `0.0`
+- Description: Sets a time interval in seconds during which certain database write operations (e.g., updating a user's `last_active_at` timestamp) will be deduplicated. If a write operation is attempted within this interval for the same entity, it will be skipped. A value of `0.0` disables deduplication. Enabling this can reduce write conflicts and improve performance, but may result in less real-time accuracy for the affected fields.
+
 ### Redis
 
 #### `REDIS_URL`
 
 - Type: `str`
-- Example: `redis://localhost:6379/0`
-- Example with TLS: `rediss://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for the app state.
+- Description: Specifies the URL of the Redis instance or cluster host for storing application state.
+- Examples:
+  - `redis://localhost:6379/0`
+  - `rediss://:password@localhost:6379/0` _(with password and TLS)_
+  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with mTLS)_
 
 :::info
 
@@ -3688,6 +3730,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
+
+#### `REDIS_CLUSTER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+
+:::info
+
+This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
+
+:::
 
 #### `REDIS_KEY_PREFIX`
 
@@ -3723,7 +3777,7 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 - Type: `str`
 - Default: `${REDIS_URL}`
-- Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
+- Description: Specifies the URL of the Redis instance or cluster host for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
 
 :::info
 
@@ -3741,6 +3795,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for websocket Redis.
+
+#### `WEBSOCKET_REDIS_CLUSTER`
+
+- Type: `bool`
+- Default: `${REDIS_CLUSTER}`
+- Description: Specifies that websocket should communicate with a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `WEBSOCKET_REDIS_URL` and/or `REDIS_URL` must also be defined.
+
+:::info
+
+This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
+
+:::
 
 ### Uvicorn Settings
 
