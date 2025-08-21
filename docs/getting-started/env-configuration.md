@@ -154,7 +154,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `True`
 - Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel.
 
-#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
+#### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`
 - Default: `True`
