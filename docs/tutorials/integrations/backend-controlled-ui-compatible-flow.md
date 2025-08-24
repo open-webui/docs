@@ -73,9 +73,9 @@ Without this enrichment, the assistant's response will not appear in the fronten
 ### Step 1: Create Chat with User Message
 
 This starts the chat and returns a `chatId` that will be used in subsequent requests.
-
+<host>
 ```bash
-curl -X POST https://rag-ui.ai.nu.education/api/v1/chats/new \
+curl -X POST https://<host>/api/v1/chats/new \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -129,7 +129,7 @@ public void enrichChatWithAssistantMessage(OWUIChatResponse chatResponse, String
 After creating the chat and enriching it with the assistant message, fetch the first chat response to get the initial state:
 
 ```bash
-curl -X POST https://rag-ui.ai.nu.education/api/v1/chats/<chatId> \
+curl -X POST https://<host>/api/v1/chats/<chatId> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -185,7 +185,7 @@ curl -X POST https://rag-ui.ai.nu.education/api/v1/chats/<chatId> \
 Generate the actual AI response using the completion endpoint:
 
 ```bash
-curl -X POST https://rag-ui.ai.nu.education/api/chat/completions \
+curl -X POST https://<host>/api/chat/completions \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -225,7 +225,7 @@ curl -X POST https://rag-ui.ai.nu.education/api/chat/completions \
 For advanced use cases involving knowledge bases or document collections, include knowledge files in the completion request:
 
 ```bash
-curl -X POST https://rag-ui.ai.nu.education/api/chat/completions \
+curl -X POST https://<host>/api/chat/completions \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -296,7 +296,7 @@ For manual polling, you can use:
 ```bash
 # Poll every few seconds until assistant content is populated
 while true; do
-  response=$(curl -s -X GET https://rag-ui.ai.nu.education/api/v1/chats/<chatId> \
+  response=$(curl -s -X GET https://<host>/api/v1/chats/<chatId> \
     -H "Authorization: Bearer <token>")
   
   # Check if assistant message has content (response is ready)
@@ -315,7 +315,7 @@ done
 Once the assistant response is ready, mark it as completed:
 
 ```bash
-curl -X POST https://rag-ui.ai.nu.education/api/chat/completed \
+curl -X POST https://<host>/api/chat/completed \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -331,7 +331,7 @@ curl -X POST https://rag-ui.ai.nu.education/api/chat/completed \
 Retrieve the completed conversation:
 
 ```bash
-curl -X GET https://rag-ui.ai.nu.education/api/v1/chats/<chatId> \
+curl -X GET https://<host>/api/v1/chats/<chatId> \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -342,7 +342,7 @@ curl -X GET https://rag-ui.ai.nu.education/api/v1/chats/<chatId> \
 Retrieve knowledge base information for RAG integration:
 
 ```bash
-curl -X GET https://rag-ui.ai.nu.education/api/v1/knowledge/<knowledge-id> \
+curl -X GET https://<host>/api/v1/knowledge/<knowledge-id> \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -351,7 +351,7 @@ curl -X GET https://rag-ui.ai.nu.education/api/v1/knowledge/<knowledge-id> \
 Get details about a specific model:
 
 ```bash
-curl -X GET https://rag-ui.ai.nu.education/api/v1/models/model?id=<model-name> \
+curl -X GET https://<host>/api/v1/models/model?id=<model-name> \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -360,7 +360,7 @@ curl -X GET https://rag-ui.ai.nu.education/api/v1/models/model?id=<model-name> \
 For multi-turn conversations, you can send additional messages to an existing chat:
 
 ```bash
-curl -X POST https://rag-ui.ai.nu.education/api/v1/chats/<chatId> \
+curl -X POST https://<host>/api/v1/chats/<chatId> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
