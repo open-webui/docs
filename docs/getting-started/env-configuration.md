@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.9](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.19](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -69,6 +69,12 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Default: `True`
 - Description: Toggles user account creation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_SIGNUP_PASSWORD_CONFIRMATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
 
 #### `ENABLE_LOGIN_FORM`
 
@@ -140,13 +146,19 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admin users can export data.
+- Description: Controls whether admins can export data, chats and the database in the admin panel. Database exports only work for SQLite databases for now.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to access all chats.
+- Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
+
+#### `BYPASS_ADMIN_ACCESS_CONTROL`
+
+- Type: `bool`
+- Default: `True`
+- Description: When disabled, admin users are treated like regular users for workspace access (models, knowledge, prompts and tools) and only see items they have **explicit permission to access** through the existing access control system. This also applies to the visibility of models in the model selector - admins will be treated as regular users: base models and custom models they do not have **explicit permission to access**, will be hidden. If set to `True` (Default), admins have access to **all created items** in the workspace area and all models in the model selector, **regardless of access permissions**.
 
 #### `ENABLE_USER_WEBHOOKS`
 
@@ -167,6 +179,18 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Type: `int`
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
+
+### `MODELS_CACHE_TTL`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
+
+:::info
+
+This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
+
+:::
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -231,11 +255,23 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 - Default: `False`
 - Description: When enabled, the system saves each chunk of streamed chat data to the database in real time to ensure maximum data persistency. This feature provides robust data recovery and allows accurate session tracking. However, the tradeoff is increased latency, as saving to the database introduces a delay. Disabling this feature can improve performance and reduce delays, but it risks potential data loss in the event of a system failure or crash. Use based on your application's requirements and acceptable tradeoffs.
 
+#### `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets a system-wide minimum value for the number of tokens to batch together before sending them to the client during a streaming response. This allows an administrator to enforce a baseline level of performance and stability across the entire system by preventing excessively small chunk sizes that can cause high CPU load. The final chunk size used for a response will be the highest value set among this global variable, the model's advanced parameters, or the per-chat settings. The default is 1, which applies no minimum batching at the global level.
+
+:::info
+
+It is recommended to set this to a high single-digit or low double-digit value if you run Open WebUI with high concurrency, many users, and very fast streaming models.
+
+:::
+
 #### `BYPASS_MODEL_ACCESS_CONTROL`
 
 - Type: `bool`
 - Default: `False`
-- Description: Bypasses model access control.
+- Description: Bypasses model access control. When set to `true`, all users (and admins alike) will have access to all models, regardless of the model's privacy setting (Private, Public, Shared with certain groups). This is useful for smaller or individual Open WebUI installations where model access restrictions may not be needed.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -626,6 +662,12 @@ The format for the JSON response is strictly:
 - Default: `pyodide`
 - Description: Specifies the code interpreter engine to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CODE_INTERPRETER_BLACKLISTED_MODULES`
+
+- Type: `str` (comma-separated list of module names)
+- Default: None
+- Description: Specifies a comma-separated list of Python modules that are blacklisted and cannot be imported or used within the code interpreter. This enhances security by preventing access to potentially sensitive or system-level functionalities.
 
 #### `CODE_INTERPRETER_PROMPT_TEMPLATE`
 
@@ -1022,6 +1064,24 @@ Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 - Default: `*`
 - Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
 
+#### `CORS_ALLOW_CUSTOM_SCHEME`
+
+- Type `str`
+- Default: `""` (empty string)
+- Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS). Allows you to specify additional custom URL schemes, beyond the standard `http` and `https`, that are permitted as valid origins for Cross-Origin Resource Sharing (CORS).
+
+:::info
+
+This is particularly useful for scenarios such as:
+ - Integrating with desktop applications that use custom protocols (e.g., `app://`, `custom-app-scheme://`).
+ - Local development environments or testing setups that might employ non-standard schemes (e.g., `file://` if applicable, or `electron://`).
+
+Provide a semicolon-separated list of scheme names without the `://`. For example: `app;file;electron;my-custom-scheme`.
+
+When configured, these custom schemes will be validated alongside `http` and `https` for any origins specified in `CORS_ALLOW_ORIGIN`.
+
+:::
+
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
@@ -1053,7 +1113,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1282,13 +1342,31 @@ modeling files for reranking.
 
 - Type: `bool`
 - Default: `False`
-- Description: Use gPRC interface whenever possible
+- Description: Use gPRC interface whenever possible.
+
+:::info
+
+If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabled and certificate signed by a private CA, set the environment variable `GRPC_DEFAULT_SSL_ROOTS_FILE_PATH` to the path of your PEM-encoded CA certificates file. See the [gRPC Core Docs](https://grpc.github.io/grpc/core/md_doc_environment_variables.html) for more information.
+
+:::
 
 #### `QDRANT_GRPC_PORT`
 
 - Type: `int`
 - Default: `6334`
 - Description: Sets the gRPC port number for Qdrant.
+
+#### `QDRANT_TIMEOUT`
+
+- Type: `int`
+- Default: `5`
+- Description: Sets the timeout in seconds for all requests made to the Qdrant server, helping to prevent long-running queries from stalling the application.
+
+#### `QDRANT_HNSW_M`
+
+- Type: `int`
+- Default: `16`
+- Description: Controls the HNSW (Hierarchical Navigable Small World) index construction. In standard mode, this sets the `m` parameter. In multi-tenancy mode, this value is used for the `payload_m` parameter to build indexes on the payload, as the global `m` is disabled for performance, following Qdrant best practices.
 
 #### `ENABLE_QDRANT_MULTITENANCY_MODE`
 
@@ -1364,6 +1442,92 @@ When using Pinecone as the vector store, the following environment variables are
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
 
+### Oracle 23ai Vector Search (oracle23ai)
+
+#### `ORACLE_DB_USE_WALLET`
+
+-   **Type**: `bool`
+-   **Default**: `false`
+-   **Description**: Determines the connection method to the Oracle Database.
+    -   Set to `false` for direct connections (e.g., to Oracle Database 23ai Free or DBCS instances) using host, port, and service name in `ORACLE_DB_DSN`.
+    -   Set to `true` for wallet-based connections (e.g., to Oracle Autonomous Database (ADW/ATP)). When `true`, `ORACLE_WALLET_DIR` and `ORACLE_WALLET_PASSWORD` must also be configured.
+
+#### `ORACLE_DB_USER`
+
+-   **Type**: `str`
+-   **Default**: `DEMOUSER`
+-   **Description**: Specifies the username used to connect to the Oracle Database.
+
+#### `ORACLE_DB_PASSWORD`
+
+-   **Type**: `str`
+-   **Default**: `Welcome123456`
+-   **Description**: Specifies the password for the `ORACLE_DB_USER`.
+
+#### `ORACLE_DB_DSN`
+
+-   **Type**: `str`
+-   **Default**: `localhost:1521/FREEPDB1`
+-   **Description**: Defines the Data Source Name for the Oracle Database connection.
+    -   If `ORACLE_DB_USE_WALLET` is `false`, this should be in the format `hostname:port/service_name` (e.g., `localhost:1521/FREEPDB1`).
+    -   If `ORACLE_DB_USE_WALLET` is `true`, this can be a TNS alias (e.g., `medium` for ADW/ATP), or a full connection string.
+
+#### `ORACLE_WALLET_DIR`
+
+-   **Type**: `str`
+-   **Default**: Empty string (' ')
+-   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the absolute path to the directory containing the Oracle Cloud Wallet files (e.g., `cwallet.sso`, `sqlnet.ora`, `tnsnames.ora`).
+
+#### `ORACLE_WALLET_PASSWORD`
+
+-   **Type**: `str`
+-   **Default**: Empty string (' ')
+-   **Description**: **Required when `ORACLE_DB_USE_WALLET` is `true`**. Specifies the password for the Oracle Cloud Wallet.
+
+#### `ORACLE_VECTOR_LENGTH`
+
+-   **Type**: `int`
+-   **Default**: `768`
+-   **Description**: Sets the expected dimension or length of the vector embeddings stored in the Oracle Database. This must match the embedding model used.
+
+#### `ORACLE_DB_POOL_MIN`
+
+-   **Type**: `int`
+-   **Default**: `2`
+-   **Description**: The minimum number of connections to maintain in the Oracle Database connection pool.
+
+#### `ORACLE_DB_POOL_MAX`
+
+-   **Type**: `int`
+-   **Default**: `10`
+-   **Description**: The maximum number of connections allowed in the Oracle Database connection pool.
+
+#### `ORACLE_DB_POOL_INCREMENT`
+
+-   **Type**: `int`
+-   **Default**: `1`
+-   **Description**: The number of connections to create when the pool needs to grow.
+
+### S3 Vector Bucket
+
+When using S3 Vector Bucket as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
+
+:::info
+
+Note: this configuration assumes that AWS credentials will be available to your Open WebUI environment. This could be through environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through IAM role permissions.
+
+:::
+
+#### `S3_VECTOR_BUCKET_NAME`
+
+- Type: `str`
+- Description: Specifies the name of the S3 Vector Bucket to store vectors in.
+
+#### `S3_VECTOR_REGION`
+
+- Type: `str`
+- Description: Specifies the AWS region where the S3 Vector Bucket is hosted.
+
 ## RAG Content Extraction Engine
 
 #### `CONTENT_EXTRACTION_ENGINE`
@@ -1411,7 +1575,7 @@ When using Pinecone as the vector store, the following environment variables are
 
 - Type: `str`
 - Default: `http://docling:5001`
-- Description: Specifies the URL for the Docling server.
+- Description: Specifies the URL for the Docling server. Requires Docling version 1.0.0 or later.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DOCLING_OCR_ENGINE`
@@ -1830,12 +1994,18 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Maximum number of search results to crawl.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `WEB_SEARCH_CONCURRENT_REQUESTS`
+#### `WEB_LOADER_CONCURRENT_REQUESTS`
 
 - Type: `int`
 - Default: `10`
-- Description: Number of concurrent requests to crawl web pages returned from search results.
+- Description: Specifies the number of concurrent requests used by the web loader to fetch content from web pages returned by search results. This directly impacts how many pages can be crawled simultaneously.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". If you were using the old name, please update your configurations to use "WEB_LOADER_CONCURRENT_REQUESTS" as the old variable name is now deprecated and will not be recognized. This renaming clarifies its function, as it specifically controls the concurrency of the web *loader* component that fetches content from search results, not the initial search engine query itself.
+
+:::
 
 #### `WEB_SEARCH_ENGINE`
 
@@ -2562,6 +2732,12 @@ Strictly return in JSON format:
 
 ## OAuth
 
+:::info
+
+You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
+
+:::
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
@@ -2574,6 +2750,25 @@ Strictly return in JSON format:
 `ENABLE_LOGIN_FORM` must be set to `False` when `ENABLE_OAUTH_SIGNUP` is set to `True`. Failure to do so will result in the inability to login.
 
 :::
+
+#### `ENABLE_OAUTH_PERSISTENT_CONFIG`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether OAuth-related settings are persisted in the database after the first launch.
+
+:::info
+
+By default, OAuth configurations are stored in the database and managed via the Admin Panel after the initial setup. Set this variable to `False` to force Open WebUI to **always** read OAuth settings from the environment variables on every restart. This is ideal for environments using GitOps or immutable infrastructure where configuration is managed exclusively through external files (e.g., Docker Compose, Kubernetes ConfigMaps).
+
+:::
+
+#### `OAUTH_SUB_CLAIM`
+
+- Type: `str`
+- Default: `None`
+- Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
@@ -2616,6 +2811,12 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 See https://support.google.com/cloud/answer/6158849?hl=en
 
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
+
 #### `GOOGLE_CLIENT_ID`
 
 - Type: `str`
@@ -2645,6 +2846,12 @@ See https://support.google.com/cloud/answer/6158849?hl=en
 ### Microsoft
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `MICROSOFT_CLIENT_ID`
 
@@ -2681,6 +2888,12 @@ See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-registe
 ### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+:::info
+
+You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
+
+:::
 
 #### `GITHUB_CLIENT_ID`
 
@@ -2727,6 +2940,13 @@ See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-o
 - Type: `str`
 - Description: Path to the `.well-known/openid-configuration` endpoint
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::danger
+
+The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
+Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
+
+:::
 
 #### `OPENID_REDIRECT_URI`
 
@@ -2952,6 +3172,22 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+## SCIM
+
+#### `SCIM_ENABLED`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables SCIM 2.0 (System for Cross-domain Identity Management) support for automated user and group provisioning from identity providers like Okta, Azure AD, and Google Workspace.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SCIM_TOKEN`
+
+- Type: `str`
+- Default: `""`
+- Description: Sets the bearer token for SCIM authentication. This token must be provided by identity providers when making SCIM API requests. Generate a secure random token (e.g., using `openssl rand -base64 32`) and configure it in both Open WebUI and your identity provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## User Permissions
 
 ### Chat Permissions
@@ -2960,8 +3196,26 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to access chat controls.
+- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_VALVES`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+
+#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
+
+#### `USER_PERMISSIONS_CHAT_PARAMS`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Parameters" section within the chat controls panel.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
@@ -3024,13 +3278,6 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
-
-- Type: `str`
-- Default: `True`
-- Description: Allows or disallows users to set a custom system prompt for all of their chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Feature Permissions
@@ -3160,6 +3407,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Sets the endpoint URL for S3 storage.
 
+:::info
+
+If the endpoint is an S3-compatible provider like MinIO that uses a TLS certificate signed by a private CA, set the environment variable `AWS_CA_BUNDLE` to the path of your PEM-encoded CA certificates file. See the [Amazon SDK Docs](https://docs.aws.amazon.com/sdkref/latest/guide/feature-gen-config.html) for more information.
+
+:::
+
 #### `S3_KEY_PREFIX`
 
 - Type: `str`
@@ -3218,6 +3471,138 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Type: `str`
 - Description: Set the access key for Azure Storage.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
+ 
+### OpenTelemetry Configuration
+
+#### `ENABLE_OTEL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry for observability. When enabled, tracing, metrics, and logging data can be collected and exported to an OTLP endpoint.
+
+#### `ENABLE_OTEL_METRICS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry metrics collection and export. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `ENABLE_OTEL_LOGS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry logging export. When enabled, application logs are sent to the configured OTLP endpoint. This variable works in conjunction with `ENABLE_OTEL`.
+
+#### `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: `http://localhost:4317`
+- Description: Specifies the default OTLP (OpenTelemetry Protocol) endpoint for exporting traces, metrics, and logs. This can be overridden for metrics if `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT` is set, and for logs if `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT` is set.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry metrics. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for traces and metrics are used.
+
+#### `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT`
+
+- Type: `str`
+- Default: Value of `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Description: Specifies the dedicated OTLP endpoint for exporting OpenTelemetry logs. If not set, it defaults to the value of `OTEL_EXPORTER_OTLP_ENDPOINT`. This is useful when separate endpoints for logs, traces, and metrics are used.
+
+#### `OTEL_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection (e.g., HTTP for gRPC) for traces. For metrics, its behavior is governed by `OTEL_METRICS_EXPORTER_OTLP_INSECURE`, and for logs by `OTEL_LOGS_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_METRICS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: Value of `OTEL_EXPORTER_OTLP_INSECURE`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for metrics. If not specified, it uses the value of `OTEL_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_LOGS_EXPORTER_OTLP_INSECURE`
+
+- Type: `bool`
+- Default: Value of `OTEL_EXPORTER_OTLP_INSECURE`
+- Description: If set to `True`, the OTLP exporter will use an insecure connection for logs. If not specified, it uses the value of `OTEL_EXPORTER_OTLP_INSECURE`.
+
+#### `OTEL_SERVICE_NAME`
+
+- Type: `str`
+- Default: `open-webui`
+- Description: Sets the service name that will be reported to your OpenTelemetry collector or observability platform. This helps identify your Open WebUI instance.
+
+#### `OTEL_RESOURCE_ATTRIBUTES`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Allows you to define additional resource attributes to be attached to all telemetry data, in a comma-separated `key1=val1,key2=val2` format.
+
+#### `OTEL_TRACES_SAMPLER`
+
+- Type: `str`
+- Options: `parentbased_always_on`, `always_on`, `always_off`, `parentbased_always_off`, etc.
+- Default: `parentbased_always_on`
+- Description: Configures the sampling strategy for OpenTelemetry traces. This determines which traces are collected and exported to reduce data volume.
+
+#### `OTEL_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the username for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the password for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_METRICS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_METRICS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP metrics endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_LOGS_BASIC_AUTH_USERNAME`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_USERNAME`
+- Description: Sets the username for basic authentication specifically for the OTLP logs endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_USERNAME`.
+
+#### `OTEL_LOGS_BASIC_AUTH_PASSWORD`
+
+- Type: `str`
+- Default: Value of `OTEL_BASIC_AUTH_PASSWORD`
+- Description: Sets the password for basic authentication specifically for the OTLP logs endpoint. If not specified, it uses the value of `OTEL_BASIC_AUTH_PASSWORD`.
+
+#### `OTEL_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: `grpc`
+- Description: Specifies the default protocol for exporting OpenTelemetry traces (gRPC or HTTP). This can be overridden for metrics if `OTEL_METRICS_OTLP_SPAN_EXPORTER` is set, and for logs if `OTEL_LOGS_OTLP_SPAN_EXPORTER` is set.
+
+#### `OTEL_METRICS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry metrics (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
+
+#### `OTEL_LOGS_OTLP_SPAN_EXPORTER`
+
+- Type: `str`
+- Options: `grpc`, `http`
+- Default: Value of `OTEL_OTLP_SPAN_EXPORTER`
+- Description: Specifies the protocol for exporting OpenTelemetry logs (gRPC or HTTP). If not specified, it uses the value of `OTEL_OTLP_SPAN_EXPORTER`.
 
 ### Database Pool
 
@@ -3229,10 +3614,32 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 :::info
 
-Supports SQLite and Postgres. Changing the URL does not migrate data between databases.
-Documentation on the URL scheme is available available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
+Supports SQLite, Postgres, and encrypted SQLite via SQLCipher. Changing the URL does not migrate data between databases.
+Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
+
+For encrypted SQLite, see the "SQLite with SQLCipher Encryption" section below for configuration details.
+
+:::
+
+### Encrypted SQLite with SQLCipher
+
+For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
+
+To enable encryption, you must configure two environment variables:
+
+1.  Set `DATABASE_TYPE="sqlite+sqlcipher"`.
+1.  Set `DATABASE_PASSWORD="your-secure-password"`.
+
+When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
+
+:::danger
+
+- The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
+- The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
+
+Ensure the database password is kept secure, as it is needed to decrypt and access all application data.
 
 :::
 
@@ -3284,14 +3691,28 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 :::
 
+#### `DATABASE_ENABLE_SQLITE_WAL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables SQLite WAL (Write-Ahead Logging) mode. When enabled, SQLite transactions can be managed more efficiently, allowing multiple readers and one writer concurrently, which can improve database performance, especially under high concurrency. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_DEDUPLICATE_INTERVAL`
+
+- Type: `float`
+- Default: `0.0`
+- Description: Sets a time interval in seconds during which certain database write operations (e.g., updating a user's `last_active_at` timestamp) will be deduplicated. If a write operation is attempted within this interval for the same entity, it will be skipped. A value of `0.0` disables deduplication. Enabling this can reduce write conflicts and improve performance, but may result in less real-time accuracy for the affected fields.
+
 ### Redis
 
 #### `REDIS_URL`
 
 - Type: `str`
-- Example: `redis://localhost:6379/0`
-- Example with TLS: `rediss://localhost:6379/0`
-- Description: Specifies the URL of the Redis instance for the app state.
+- Description: Specifies the URL of the Redis instance or cluster host for storing application state.
+- Examples:
+  - `redis://localhost:6379/0`
+  - `rediss://:password@localhost:6379/0` _(with password and TLS)_
+  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with mTLS)_
 
 :::info
 
@@ -3309,6 +3730,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for app state Redis.
+
+#### `REDIS_CLUSTER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+
+:::info
+
+This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
+
+:::
 
 #### `REDIS_KEY_PREFIX`
 
@@ -3344,7 +3777,7 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 
 - Type: `str`
 - Default: `${REDIS_URL}`
-- Description: Specifies the URL of the Redis instance for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
+- Description: Specifies the URL of the Redis instance or cluster host for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
 
 :::info
 
@@ -3362,6 +3795,18 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Type: `int`
 - Default: `26379`
 - Description: Sentinel port for websocket Redis.
+
+#### `WEBSOCKET_REDIS_CLUSTER`
+
+- Type: `bool`
+- Default: `${REDIS_CLUSTER}`
+- Description: Specifies that websocket should communicate with a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `WEBSOCKET_REDIS_URL` and/or `REDIS_URL` must also be defined.
+
+:::info
+
+This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
+
+:::
 
 ### Uvicorn Settings
 

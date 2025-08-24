@@ -14,9 +14,23 @@ Open WebUI supports several forms of federated authentication:
     1. OIDC
 1. Trusted Header
 
+:::info
+
+For more information about all environment variables, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
+It is highly recommended to check the environment variable page, to get more details about how to set the variable and what values are expected.
+
+:::
+
+:::danger
+
+Right now, you can only configure one OAUTH provider at a time.
+You cannot have Microsoft **and** Google as providers simultaneously.
+
+:::
+
 ## OAuth
 
-There are several global configuration options for OAuth:
+There are several global configuration options for OAuth in general:
 
 1. `ENABLE_OAUTH_SIGNUP` - if `true`, allows accounts to be created when logging in with OAuth. Distinct from `ENABLE_SIGNUP`.
 1. `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` - allows logging into an account that matches the email address provided by the OAuth provider.
@@ -24,6 +38,7 @@ There are several global configuration options for OAuth:
 1. `OAUTH_UPDATE_PICTURE_ON_LOGIN` - if `true`, users will have OAuth-provided profile pictures updated on login.
     - If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to the empty string, this configuration will be ignored.
 1. `OAUTH_PICTURE_CLAIM` - can be used to customize or disable profile picture storage. The default, `picture`, will work for most providers; if set to the empty string, all users will receive the default person profile picture.
+1. `WEBUI_AUTH_SIGNOUT_REDIRECT_URI` - can be set to optionally forward the user to a specific URI after logging out.
 
 ### Google
 
@@ -34,6 +49,7 @@ The following environment variables are required:
 
 1. `GOOGLE_CLIENT_ID` - Google OAuth client ID
 1. `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly. (Usually to `https://accounts.google.com/.well-known/openid-configuration`)
 
 ### Microsoft
 
@@ -45,9 +61,10 @@ Support for Microsoft OAuth is currently limited to a single tenant, that is a s
 The following environment variables are required:
 
 1. `MICROSOFT_CLIENT_ID` - Microsoft OAuth client ID
-2. `MICROSOFT_CLIENT_SECRET` - Microsoft OAuth client secret
-3. `MICROSOFT_CLIENT_TENANT_ID` - Microsoft tenant ID - use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
-4. `MICROSOFT_REDIRECT_URI` - The redirect URI configured in your Microsoft OAuth application. This must be set to `<open-webui>/oauth/microsoft/callback`.
+1. `MICROSOFT_CLIENT_SECRET` - Microsoft OAuth client secret
+1. `MICROSOFT_CLIENT_TENANT_ID` - Microsoft tenant ID - use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
+1. `MICROSOFT_REDIRECT_URI` - The redirect URI configured in your Microsoft OAuth application. This must be set to `<open-webui>/oauth/microsoft/callback`.
+1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly.
 
 ### Github
 
@@ -292,7 +309,7 @@ services:
 
 ### Authentik
 
-To configure a [Authentik](https://goauthentik.io/) OAuth client, please refer to [documentation](https://docs.goauthentik.io/docs/applications) on how to create an application and `OAuth2/OpenID Provider`.
+To configure a [Authentik](https://goauthentik.io/) OAuth client, please refer to [documentation](https://integrations.goauthentik.io/miscellaneous/open-webui/) on how to create an application and `OAuth2/OpenID Provider`.
 The allowed redirect URI should include `<open-webui>/oauth/oidc/callback`.
 
 While creating provider, please note `App-name`, `Client-ID` and `Client-Secret` and use it for open-webui environment variables:
