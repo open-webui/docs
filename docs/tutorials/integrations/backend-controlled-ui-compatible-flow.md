@@ -62,7 +62,7 @@ The assistant message must appear in both locations:
   "parentId": "<user-msg-id>",
   "modelName": "gpt-4o",
   "modelIdx": 0,
-  "timestamp": <currentTimestamp>
+  "timestamp": "<currentTimestamp>"
 }
 ```
 
@@ -73,7 +73,7 @@ Without this enrichment, the assistant's response will not appear in the fronten
 ### Step 1: Create Chat with User Message
 
 This starts the chat and returns a `chatId` that will be used in subsequent requests.
-<host>
+
 ```bash
 curl -X POST https://<host>/api/v1/chats/new \
   -H "Authorization: Bearer <token>" \
