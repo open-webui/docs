@@ -3829,7 +3829,12 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 #### `CACHE_CONTROL`
 
 - Type: `str`
-- Description: Set the Cache-Control header on all HTTP responses. The default is no caching, so it is recommended to set this when deploying, e.g. to `private,max-age=86400`, to reduce loading time of the static files.
+- Default: Not set (no Cache-Control header added)
+- Description: Sets the Cache-Control header for all HTTP responses. Supports standard directives like `public`, `private`, `no-cache`, `no-store`, `must-revalidate`, `max-age=seconds`, etc. If an invalid value is provided, defaults to `"no-store, max-age=0"` (no caching).
+- Examples:
+  - `"private, max-age=86400"` - Cache privately for 24 hours  
+  - `"public, max-age=3600, must-revalidate"` - Cache publicly for 1 hour, then revalidate
+  - `"no-cache, no-store, must-revalidate"` - Never cache
 
 ### Proxy Settings
 
