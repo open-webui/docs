@@ -26,26 +26,27 @@ Before following this tutorial, ensure you have:
 
 ## Overview
 
-This tutorial describes a comprehensive 6-step process that enables server-side orchestration of Open WebUI conversations while ensuring that assistant replies appear properly in the frontend UI.
+This tutorial describes a comprehensive 7-step process that enables server-side orchestration of Open WebUI conversations while ensuring that assistant replies appear properly in the frontend UI.
 
 ### Process Flow
 
 The essential steps are:
 
 1. **Create a new chat with a user message** - Initialize the conversation with the user's input
-2. **Manually inject an empty assistant message** - Create a placeholder for the assistant's response
-3. **Trigger the assistant completion** - Generate the actual AI response (with optional knowledge integration)
-4. **Mark the completion** - Signal that the response generation is complete
+2. **Enrich the chat response with an assistant message** - Add assistant message to the response object in memory
+3. **Fetch the first chat response** - Get the initial chat state from the server
+4. **Trigger the assistant completion** - Generate the actual AI response (with optional knowledge integration)
 5. **Poll for response readiness** - Wait for the assistant response to be fully generated
-6. **Fetch and process the final chat** - Retrieve and parse the completed conversation
+6. **Complete the assistant message** - Mark the response as completed
+7. **Fetch and process the final chat** - Retrieve and parse the completed conversation
 
 This enables server-side orchestration while still making replies show up in the frontend UI exactly as if they were generated through normal user interaction.
 
 ## Implementation Guide
 
-### Critical Step: Manually Inject the Assistant Message
+### Critical Step: Enrich Chat Response with Assistant Message
 
-The assistant message needs to be injected manually as a critical prerequisite before triggering the completion. This step is essential because the Open WebUI frontend expects assistant messages to exist in a specific structure.
+The assistant message needs to be added to the chat response object in memory as a critical prerequisite before triggering the completion. This step is essential because the Open WebUI frontend expects assistant messages to exist in a specific structure.
 
 The assistant message must appear in both locations:
 - `chat.messages[]` - The main message array
@@ -61,11 +62,11 @@ The assistant message must appear in both locations:
   "parentId": "<user-msg-id>",
   "modelName": "gpt-4o",
   "modelIdx": 0,
-  "timestamp": <currentTimestamp>
+  "timestamp": "<currentTimestamp>"
 }
 ```
 
-Without this manual injection, the assistant's response will not appear in the frontend interface, even if the completion is successful.
+Without this enrichment, the assistant's response will not appear in the frontend interface, even if the completion is successful.
 
 ## Step-by-Step Implementation
 
@@ -106,26 +107,80 @@ curl -X POST https://<host>/api/v1/chats/new \
   }'
 ```
 
-### Step 2: Manually Inject Empty Assistant Message
+### Step 2: Enrich Chat Response with Assistant Message
 
-Add the assistant message placeholder to the chat structure:
+Add the assistant message to the chat response object in memory (this is done programmatically, not via API call):
+
+```java
+// Example implementation in Java
+public void enrichChatWithAssistantMessage(OWUIChatResponse chatResponse, String model) {
+    OWUIMessage assistantOWUIMessage = buildAssistantMessage(chatResponse, model, "assistant", "");
+    assistantOWUIMessage.setParentId(chatResponse.getChat().getMessages().get(0).getId());
+
+    chatResponse.getChat().getMessages().add(assistantOWUIMessage);
+    chatResponse.getChat().getHistory().getMessages().put(assistantOWUIMessage.getId(), assistantOWUIMessage);
+}
+```
+
+**Note:** This step is performed in memory on the response object, not via a separate API call to `/chats/<chatId>/messages`.
+
+### Step 3: Fetch First Chat Response
+
+After creating the chat and enriching it with the assistant message, fetch the first chat response to get the initial state:
 
 ```bash
-curl -X POST https://<host>/api/v1/chats/<chatId>/messages \
+curl -X POST https://<host>/api/v1/chats/<chatId> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "id": "assistant-msg-id",
-    "role": "assistant",
-    "content": "",
-    "parentId": "user-msg-id",
-    "modelName": "gpt-4o",
-    "modelIdx": 0,
-    "timestamp": 1720000001000
+    "chat": {
+      "id": "<chatId>",
+      "title": "New Chat",
+      "models": ["gpt-4o"],
+      "messages": [
+        {
+          "id": "user-msg-id",
+          "role": "user",
+          "content": "Hi, what is the capital of France?",
+          "timestamp": 1720000000000,
+          "models": ["gpt-4o"]
+        },
+        {
+          "id": "assistant-msg-id",
+          "role": "assistant",
+          "content": "",
+          "parentId": "user-msg-id",
+          "modelName": "gpt-4o",
+          "modelIdx": 0,
+          "timestamp": 1720000001000
+        }
+      ],
+      "history": {
+        "current_id": "assistant-msg-id",
+        "messages": {
+          "user-msg-id": {
+            "id": "user-msg-id",
+            "role": "user",
+            "content": "Hi, what is the capital of France?",
+            "timestamp": 1720000000000,
+            "models": ["gpt-4o"]
+          },
+          "assistant-msg-id": {
+            "id": "assistant-msg-id",
+            "role": "assistant",
+            "content": "",
+            "parentId": "user-msg-id",
+            "modelName": "gpt-4o",
+            "modelIdx": 0,
+            "timestamp": 1720000001000
+          }
+        }
+      }
+    }
   }'
 ```
 
-### Step 3: Trigger Assistant Completion
+### Step 4: Trigger Assistant Completion
 
 Generate the actual AI response using the completion endpoint:
 
@@ -212,25 +267,31 @@ curl -X POST https://<host>/api/chat/completions \
   }'
 ```
 
-### Step 4: Mark Completion
-
-Signal that the assistant response is complete:
-
-```bash
-curl -X POST https://<host>/api/chat/completed \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "chat_id": "<chatId>",
-    "id": "assistant-msg-id",
-    "session_id": "session-id",
-    "model": "gpt-4o"
-  }'
-```
-
 ### Step 5: Poll for Assistant Response Completion
 
-Since assistant responses are generated asynchronously, poll the chat endpoint until the response is ready:
+Since assistant responses are generated asynchronously, poll the chat endpoint until the response is ready. The actual implementation uses a retry mechanism with exponential backoff:
+
+```java
+// Example implementation in Java
+@Retryable(
+    retryFor = AssistantResponseNotReadyException.class,
+    maxAttemptsExpression = "#{${webopenui.retries:50}}",
+    backoff = @Backoff(delayExpression = "#{${webopenui.backoffmilliseconds:2000}}")
+)
+public String getAssistantResponseWhenReady(String chatId, ChatCompletedRequest chatCompletedRequest) {
+    OWUIChatResponse response = owuiService.fetchFinalChatResponse(chatId);
+    Optional<OWUIMessage> assistantMsg = extractAssistantResponse(response);
+
+    if (assistantMsg.isPresent() && !assistantMsg.get().getContent().isBlank()) {
+        owuiService.completeAssistantMessage(chatCompletedRequest);
+        return assistantMsg.get().getContent();
+    }
+
+    throw new AssistantResponseNotReadyException("Assistant response not ready yet for chatId: " + chatId);
+}
+```
+
+For manual polling, you can use:
 
 ```bash
 # Poll every few seconds until assistant content is populated
@@ -249,7 +310,23 @@ while true; do
 done
 ```
 
-### Step 6: Fetch Final Chat
+### Step 6: Complete Assistant Message
+
+Once the assistant response is ready, mark it as completed:
+
+```bash
+curl -X POST https://<host>/api/chat/completed \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "chat_id": "<chatId>",
+    "id": "assistant-msg-id",
+    "session_id": "session-id",
+    "model": "gpt-4o"
+  }'
+```
+
+### Step 7: Fetch Final Chat
 
 Retrieve the completed conversation:
 
@@ -276,6 +353,42 @@ Get details about a specific model:
 ```bash
 curl -X GET https://<host>/api/v1/models/model?id=<model-name> \
   -H "Authorization: Bearer <token>"
+```
+
+### Send Additional Messages to Chat
+
+For multi-turn conversations, you can send additional messages to an existing chat:
+
+```bash
+curl -X POST https://<host>/api/v1/chats/<chatId> \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "chat": {
+      "id": "<chatId>",
+      "messages": [
+        {
+          "id": "new-user-msg-id",
+          "role": "user",
+          "content": "Can you tell me more about this?",
+          "timestamp": 1720000002000,
+          "models": ["gpt-4o"]
+        }
+      ],
+      "history": {
+        "current_id": "new-user-msg-id",
+        "messages": {
+          "new-user-msg-id": {
+            "id": "new-user-msg-id",
+            "role": "user",
+            "content": "Can you tell me more about this?",
+            "timestamp": 1720000002000,
+            "models": ["gpt-4o"]
+          }
+        }
+      }
+    }
+  }'
 ```
 
 ## Response Processing
@@ -735,7 +848,7 @@ This cleaning process handles:
 ## Important Notes
 
 - This workflow is compatible with Open WebUI + backend orchestration scenarios
-- **Critical:** Avoid skipping the assistant injection step — otherwise the frontend won't display the message
+- **Critical:** The assistant message enrichment must be done in memory on the response object, not via API call
 - No frontend code changes are required for this approach
 - The `stream: true` parameter allows for real-time response streaming if needed
 - Background tasks like title generation can be controlled via the `background_tasks` object
@@ -750,11 +863,12 @@ This cleaning process handles:
 Use the Open WebUI backend APIs to:
 
 1. **Start a chat** - Create the initial conversation with user input
-2. **Inject an assistant placeholder message** - Prepare the response container
-3. **Trigger a reply** - Generate the AI response (with optional knowledge integration)
-4. **Poll for completion** - Wait for the assistant response to be ready
-5. **Finalize the conversation** - Mark completion and retrieve the final chat
-6. **Process the response** - Parse and clean the assistant's output
+2. **Enrich with assistant message** - Add assistant placeholder to the response object in memory
+3. **Fetch first response** - Get the initial chat state from the server
+4. **Trigger a reply** - Generate the AI response (with optional knowledge integration)
+5. **Poll for completion** - Wait for the assistant response to be ready
+6. **Complete the message** - Mark the response as completed
+7. **Fetch the final chat** - Retrieve and parse the completed conversation
 
 **Enhanced Capabilities:**
 - **RAG Integration** - Include knowledge collections for context-aware responses
@@ -777,4 +891,4 @@ You can test your implementation by following the step-by-step CURL examples pro
 
 :::tip
 Start with a simple user message and gradually add complexity like knowledge integration and advanced features once the basic flow is working.
-::: 
+:::
