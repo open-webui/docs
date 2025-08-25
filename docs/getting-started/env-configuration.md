@@ -3824,6 +3824,13 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 
 :::
 
+### Cache Settings
+
+#### `CACHE_CONTROL`
+
+- Type: `str`
+- Description: Set the Cache-Control header on all HTTP responses. The default is no caching, so it is recommended to set this when deploying, e.g. to `private,max-age=86400`, to reduce loading time of the static files.
+
 ### Proxy Settings
 
 Open WebUI supports using proxies for HTTP and HTTPS retrievals. To specify proxy settings,
