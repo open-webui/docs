@@ -3238,6 +3238,30 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Enables or disables user permission to edit chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to delete individual messages within chats. This provides granular control over message deletion capabilities separate from full chat deletion.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_CONTINUE_RESPONSE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to continue AI responses. When disabled, users cannot use the "Continue Response" button, which helps prevent potential system prompt leakage through response continuation manipulation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_REGENERATE_RESPONSE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to regenerate AI responses. Controls access to both the standard regenerate button and the guided regeneration menu.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_RATE_RESPONSE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to rate AI responses using the thumbs up/down feedback system. This controls access to the response rating functionality for evaluation and feedback collection.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_CHAT_STT`
 
 - Type: `bool`
