@@ -22,7 +22,7 @@ An example of a graph visualization Action can be seen in the video below.
 
 ## Action Function Architecture
 
-Actions are Python-based functions that integrate directly into the chat message interface. They execute server-side and can interact with users through real-time events, modify message content, and access the full Open WebUI context.
+Actions are Python-based functions that integrate directly into the chat message toolbar. They execute server-side and can interact with users through real-time events, modify message content, and access the full Open WebUI context.
 
 ### Function Structure
 
@@ -59,6 +59,9 @@ The `action` method receives several parameters that provide access to the execu
 Actions can utilize Open WebUI's real-time event system for interactive experiences:
 
 ### Event Emitter (`__event_emitter__`)
+
+**For more information about Events and Event emitters, [see here](https://docs.openwebui.com/features/plugin/events/).**
+
 Send real-time updates to the frontend during action execution:
 
 ```python
