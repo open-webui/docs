@@ -1320,6 +1320,18 @@ modeling files for reranking.
 - Default: `1536`
 - Description: Specifies the maximum vector length for PGVector initialization.
 
+#### `PGVECTOR_SKIP_EXTENSION_CREATION`
+
+- Type: `str`
+- Default `False`
+- Description: Skips creation of the `vector` extension.
+
+:::info
+
+If set to `True`, open-webui will assume the postgreSQL database where embeddings will be stored is pre-configured with the `vector` extension. It will do a check and fail if that is not the case. Useful if you cannot manage the database user.
+
+:::
+
 ### Qdrant
 
 #### `QDRANT_API_KEY`
