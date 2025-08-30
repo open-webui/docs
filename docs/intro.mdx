@@ -148,6 +148,12 @@ Once `uv` is installed, running Open WebUI is a breeze. Use the command below, e
   $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
   ```
 
+> **Note**  
+> Starting with **v0.6.26**, if you are using **PostgreSQL** as your database backend, you must install the postgres extra dependency when updating your instance:  
+> 
+> ```bash
+> open-webui[postgres]@latest serve
+> ```
 
 
 ### Installation with `pip`
