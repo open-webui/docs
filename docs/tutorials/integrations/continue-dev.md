@@ -1,20 +1,20 @@
 ---
 sidebar_position: 13
-title: "⚛️ Continue.dev VSCode Extension with Open WebUI"
+title: "⚛️ Continue.dev VS Code Extension with Open WebUI"
 ---
 
 :::warning
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
 :::
 
-# Integrating Continue.dev VSCode Extension with Open WebUI
+# Integrating Continue.dev VS Code Extension with Open WebUI
 
 ## Download Extension
 
-You can download the VSCode extension on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Continue.continue) or directly via the `EXTENSION:MARKETPLACE` within VSCode by searching for `continue`.
-Once installed, you can access the application via the `continue` tab in the side bar of VSCode.
+You can download the VS Code extension on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Continue.continue) or directly via the `EXTENSION:MARKETPLACE` within VS Code by searching for `continue`.
+Once installed, you can access the application via the `continue` tab in the side bar of VS Code.
 
-**VSCode side bar icon:**
+**VS Code side bar icon:**
 
 ![continue.dev vscode icon](/images/tutorials/continue-dev/continue_dev_vscode_icon.png)
 
