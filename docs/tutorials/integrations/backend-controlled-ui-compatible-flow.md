@@ -34,9 +34,9 @@ The essential steps are:
 
 1. **Create a new chat with a user message** - Initialize the conversation with the user's input
 2. **Enrich the chat response with an assistant message** - Add assistant message to the response object in memory
-3. **Fetch the first chat response** - Get the initial chat state from the server
+3. **Update chat with assistant message** - Send the enriched chat state to the server
 4. **Trigger the assistant completion** - Generate the actual AI response (with optional knowledge integration)
-5. **Poll for response readiness** - Wait for the assistant response to be fully generated
+5. **Wait for response completion** - Monitor the assistant response until fully generated
 6. **Complete the assistant message** - Mark the response as completed
 7. **Fetch and process the final chat** - Retrieve and parse the completed conversation
 
@@ -109,7 +109,7 @@ curl -X POST https://<host>/api/v1/chats/new \
 
 ### Step 2: Enrich Chat Response with Assistant Message
 
-Add the assistant message to the chat response object in memory (this is done programmatically, not via API call):
+Add the assistant message to the chat response object in memory. Note that this can be combined with Step 1 by including the assistant message in the initial chat creation:
 
 ```java
 // Example implementation in Java
@@ -122,11 +122,11 @@ public void enrichChatWithAssistantMessage(OWUIChatResponse chatResponse, String
 }
 ```
 
-**Note:** This step is performed in memory on the response object, not via a separate API call to `/chats/<chatId>/messages`.
+**Note:** This step can be performed in memory on the response object, or combined with Step 1 by including both user and empty assistant messages in the initial chat creation.
 
-### Step 3: Fetch First Chat Response
+### Step 3: Update Chat with Assistant Message
 
-After creating the chat and enriching it with the assistant message, fetch the first chat response to get the initial state:
+Send the enriched chat state containing both user and assistant messages to the server:
 
 ```bash
 curl -X POST https://<host>/api/v1/chats/<chatId> \
@@ -220,7 +220,7 @@ curl -X POST https://<host>/api/chat/completions \
   }'
 ```
 
-#### Step 3.1: Trigger Assistant Completion with Knowledge Integration (RAG)
+#### Step 4.1: Trigger Assistant Completion with Knowledge Integration (RAG)
 
 For advanced use cases involving knowledge bases or document collections, include knowledge files in the completion request:
 
@@ -267,9 +267,15 @@ curl -X POST https://<host>/api/chat/completions \
   }'
 ```
 
-### Step 5: Poll for Assistant Response Completion
+### Step 5: Wait for Assistant Response Completion
 
-Since assistant responses are generated asynchronously, poll the chat endpoint until the response is ready. The actual implementation uses a retry mechanism with exponential backoff:
+Assistant responses can be handled in two ways depending on your implementation needs:
+
+#### Option A: Stream Processing (Recommended)
+If using `stream: true` in the completion request, you can process the streamed response in real-time and wait for the stream to complete. This is the approach used by the OpenWebUI web interface and provides immediate feedback.
+
+#### Option B: Polling Approach
+For implementations that cannot handle streaming, poll the chat endpoint until the response is ready. Use a retry mechanism with exponential backoff:
 
 ```java
 // Example implementation in Java
@@ -849,12 +855,13 @@ This cleaning process handles:
 
 - This workflow is compatible with Open WebUI + backend orchestration scenarios
 - **Critical:** The assistant message enrichment must be done in memory on the response object, not via API call
+- **Alternative Approach:** You can include both user and assistant messages in the initial chat creation (Step 1) instead of doing Step 2 separately
 - No frontend code changes are required for this approach
 - The `stream: true` parameter allows for real-time response streaming if needed
+- **Response Monitoring:** Use streaming for real-time processing or polling for simpler implementations that cannot handle streams
 - Background tasks like title generation can be controlled via the `background_tasks` object
 - Session IDs help maintain conversation context across requests
 - **Knowledge Integration:** Use the `files` array to include knowledge collections for RAG capabilities
-- **Polling Strategy:** Always poll for completion rather than assuming immediate response availability
 - **Response Parsing:** Handle JSON responses that may be wrapped in markdown code blocks
 - **Error Handling:** Implement proper retry mechanisms for network timeouts and server errors
 
@@ -863,16 +870,16 @@ This cleaning process handles:
 Use the Open WebUI backend APIs to:
 
 1. **Start a chat** - Create the initial conversation with user input
-2. **Enrich with assistant message** - Add assistant placeholder to the response object in memory
-3. **Fetch first response** - Get the initial chat state from the server
+2. **Enrich with assistant message** - Add assistant placeholder to the response object in memory (can be combined with Step 1)
+3. **Update chat state** - Send the enriched chat to the server
 4. **Trigger a reply** - Generate the AI response (with optional knowledge integration)
-5. **Poll for completion** - Wait for the assistant response to be ready
+5. **Monitor completion** - Wait for the assistant response using streaming or polling
 6. **Complete the message** - Mark the response as completed
 7. **Fetch the final chat** - Retrieve and parse the completed conversation
 
 **Enhanced Capabilities:**
 - **RAG Integration** - Include knowledge collections for context-aware responses
-- **Asynchronous Processing** - Handle long-running AI operations with polling
+- **Asynchronous Processing** - Handle long-running AI operations with streaming or polling
 - **Response Parsing** - Clean and validate JSON responses from the assistant
 - **Session Management** - Maintain conversation context across requests
 
