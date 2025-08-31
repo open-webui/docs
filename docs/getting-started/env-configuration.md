@@ -1117,6 +1117,17 @@ modeling files for reranking.
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
+:::note
+
+PostgreSQL Dependencies
+To use `pgvector`, ensure you have PostgreSQL dependencies installed:
+
+```bash
+pip install open-webui[all]
+```
+
+:::
+
 ### ChromaDB
 
 #### `CHROMA_TENANT`
@@ -1307,6 +1318,17 @@ modeling files for reranking.
 - Description: Sets the username for OpenSearch.
 
 ### PGVector
+
+:::note
+
+PostgreSQL Dependencies
+To use `pgvector`, ensure you have PostgreSQL dependencies installed:
+
+```bash
+pip install open-webui[all]
+```
+
+:::
 
 #### `PGVECTOR_DB_URL`
 
@@ -3638,7 +3660,10 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 :::info
 
-Supports SQLite, Postgres, and encrypted SQLite via SQLCipher. Changing the URL does not migrate data between databases.
+**For PostgreSQL support, ensure you installed with `pip install open-webui[all]` instead of the basic installation.**
+Supports SQLite, Postgres, and encrypted SQLite via SQLCipher.
+**Changing the URL does not migrate data between databases.**
+
 Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
