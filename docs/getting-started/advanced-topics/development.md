@@ -14,7 +14,7 @@ Before you begin, ensure your system meets these minimum requirements:
 - **Operating System:** Linux (or WSL on Windows), Windows 11, or macOS. *(Recommended for best compatibility)*
 - **Python:** Version **3.11 or higher**. *(Required for backend services)*
 - **Node.js:** Version **22.10 or higher**. *(Required for frontend development)*
-- **IDE (Recommended):** We recommend using an IDE like [VSCode](https://code.visualstudio.com/) for code editing, debugging, and integrated terminal access. Feel free to use your favorite IDE if you have one!
+- **IDE (Recommended):** We recommend using an IDE like [VS Code](https://code.visualstudio.com/) for code editing, debugging, and integrated terminal access. Feel free to use your favorite IDE if you have one!
 - **[Optional] GitHub Desktop:** For easier management of the Git repository, especially if you are less familiar with command-line Git, consider installing [GitHub Desktop](https://desktop.github.com/).
 
 ## Setting Up Your Local Environment
@@ -49,7 +49,7 @@ Let's get the user interface (what you see in your browser) up and running first
 
      This command copies the `.env.example` file to a new file named `.env`. The `.env` file is where you'll configure environment variables for the frontend.
 
-   - **Customize `.env`**: Open the `.env` file in your code editor (like VSCode). This file contains configuration variables for the frontend, such as API endpoints and other settings. For local development, the default settings in `.env.example` are usually sufficient to start with. However, you can customize them if needed.
+   - **Customize `.env`**: Open the `.env` file in your code editor (like VS Code). This file contains configuration variables for the frontend, such as API endpoints and other settings. For local development, the default settings in `.env.example` are usually sufficient to start with. However, you can customize them if needed.
 
   **Important:** Do not commit sensitive information to `.env` if you are contributing back to the repository.
 
@@ -107,17 +107,17 @@ npm run build
 
 We **require** you to use separate terminal instances for your frontend and backend processes. This keeps your workflows organized and makes it easier to manage each part of the application independently.
 
-**Using VSCode Integrated Terminals:**
+**Using VS Code Integrated Terminals:**
 
-VSCode's integrated terminal feature makes managing multiple terminals incredibly easy. Here's how to leverage it for frontend and backend separation:
+VS Code's integrated terminal feature makes managing multiple terminals incredibly easy. Here's how to leverage it for frontend and backend separation:
 
-1. **Frontend Terminal (You likely already have this):** If you followed the Frontend Setup steps, you probably already have a terminal open in VSCode at the project root (`open-webui` directory). This is where you'll run your frontend commands (`npm run dev`, etc.). Ensure you are in the `open-webui` directory for the next steps if you are not already.
+1. **Frontend Terminal (You likely already have this):** If you followed the Frontend Setup steps, you probably already have a terminal open in VS Code at the project root (`open-webui` directory). This is where you'll run your frontend commands (`npm run dev`, etc.). Ensure you are in the `open-webui` directory for the next steps if you are not already.
 
 2. **Backend Terminal (Open a New One):**
-   - In VSCode, go to **Terminal > New Terminal** (or use the shortcut `Ctrl+Shift+` on Windows/Linux or `Cmd+Shift+` on macOS). This will open a new integrated terminal panel.
+   - In VS Code, go to **Terminal > New Terminal** (or use the shortcut `Ctrl+Shift+` on Windows/Linux or `Cmd+Shift+` on macOS). This will open a new integrated terminal panel.
    - **Navigate to the `backend` directory:** In this *new* terminal, use the `cd backend` command to change the directory to the `backend` folder within your project. This ensures all backend-related commands are executed in the correct context.
 
-   Now you have **two separate terminal instances within VSCode**: one for the frontend (likely in the `open-webui` directory) and one specifically for the backend (inside the `backend` directory). You can easily switch between these terminals within VSCode to manage your frontend and backend processes independently. This setup is highly recommended for a cleaner and more efficient development workflow.
+   Now you have **two separate terminal instances within VS Code**: one for the frontend (likely in the `open-webui` directory) and one specifically for the backend (inside the `backend` directory). You can easily switch between these terminals within VS Code to manage your frontend and backend processes independently. This setup is highly recommended for a cleaner and more efficient development workflow.
 
 **Backend Setup Steps (in your *backend* terminal):**
 

@@ -7,7 +7,7 @@ Open WebUI offers powerful code execution capabilities directly within your chat
 
 ## Key Features
 
-- **Python Code Execution**: Run Python scripts directly in your browser using Pyodide, with support for popular libraries like pandas and matplotlib no setup required.
+- **Python Code Execution**: Run Python scripts directly in your browser using Pyodide, with support for popular libraries like pandas and matplotlib with no setup required.
 
 - **MermaidJS Rendering**: Create and visualize flowcharts, diagrams, and other visual representations with MermaidJS syntax that automatically renders in your chat.
 

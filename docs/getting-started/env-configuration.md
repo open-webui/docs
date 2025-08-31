@@ -1117,6 +1117,17 @@ modeling files for reranking.
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
+:::note
+
+PostgreSQL Dependencies
+To use `pgvector`, ensure you have PostgreSQL dependencies installed:
+
+```bash
+pip install open-webui[all]
+```
+
+:::
+
 ### ChromaDB
 
 #### `CHROMA_TENANT`
@@ -1307,6 +1318,17 @@ modeling files for reranking.
 - Description: Sets the username for OpenSearch.
 
 ### PGVector
+
+:::note
+
+PostgreSQL Dependencies
+To use `pgvector`, ensure you have PostgreSQL dependencies installed:
+
+```bash
+pip install open-webui[all]
+```
+
+:::
 
 #### `PGVECTOR_DB_URL`
 
@@ -3238,6 +3260,30 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Enables or disables user permission to edit chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to delete individual messages within chats. This provides granular control over message deletion capabilities separate from full chat deletion.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_CONTINUE_RESPONSE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to continue AI responses. When disabled, users cannot use the "Continue Response" button, which helps prevent potential system prompt leakage through response continuation manipulation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_REGENERATE_RESPONSE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to regenerate AI responses. Controls access to both the standard regenerate button and the guided regeneration menu.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_RATE_RESPONSE`
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to rate AI responses using the thumbs up/down feedback system. This controls access to the response rating functionality for evaluation and feedback collection.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_CHAT_STT`
 
 - Type: `bool`
@@ -3614,7 +3660,10 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 :::info
 
-Supports SQLite, Postgres, and encrypted SQLite via SQLCipher. Changing the URL does not migrate data between databases.
+**For PostgreSQL support, ensure you installed with `pip install open-webui[all]` instead of the basic installation.**
+Supports SQLite, Postgres, and encrypted SQLite via SQLCipher.
+**Changing the URL does not migrate data between databases.**
+
 Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
@@ -3823,6 +3872,18 @@ When deploying in orchestrated environments like Kubernetes or using Helm charts
 If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-instance setups are set accordingly.
 
 :::
+
+### Cache Settings
+
+#### `CACHE_CONTROL`
+
+- Type: `str`
+- Default: Not set (no Cache-Control header added)
+- Description: Sets the Cache-Control header for all HTTP responses. Supports standard directives like `public`, `private`, `no-cache`, `no-store`, `must-revalidate`, `max-age=seconds`, etc. If an invalid value is provided, defaults to `"no-store, max-age=0"` (no caching).
+- Examples:
+  - `"private, max-age=86400"` - Cache privately for 24 hours  
+  - `"public, max-age=3600, must-revalidate"` - Cache publicly for 1 hour, then revalidate
+  - `"no-cache, no-store, must-revalidate"` - Never cache
 
 ### Proxy Settings
 
