@@ -109,27 +109,27 @@ The Shared Chats dashboard provides powerful tools to help you find and manage y
 
 You can filter your shared chats using the following criteria:
 
--   **Search:** Use the search bar to find chats by their title.
--   **Date Range:** Select a start and end date to filter chats shared within a specific period.
--   **Visibility:** Filter by public or private status.
--   **Password:** Filter by whether a chat is password-protected or not.
--   **Status:** Filter by "Active", "Expired", or "Revoked" status.
--   **Type:** Filter by "Snapshot" or "Live" share type.
+- **Search:** Use the search bar to find chats by their title.
+- **Date Range:** Select a start and end date to filter chats shared within a specific period.
+- **Visibility:** Filter by public or private status.
+- **Password:** Filter by whether a chat is password-protected or not.
+- **Status:** Filter by "Active", "Expired", or "Revoked" status.
+- **Type:** Filter by "Snapshot" or "Live" share type.
 
 #### Sorting
 
 The list of shared chats is fully sortable. Click on any of the column headers to sort the list by that column. The available columns for sorting are:
 
--   Title
--   Created On
--   Last Updated
--   Link
--   Visibility
--   Password
--   Views
--   Clones
--   Status
--   Type
+- Title
+- Created On
+- Last Updated
+- Link
+- Visibility
+- Password
+- Views
+- Clones
+- Status
+- Type
 
 #### Pagination
 
@@ -228,9 +228,9 @@ Administrators of an Open WebUI instance can configure certain features and perm
 
 The following environment variables can be used to control the chat sharing functionality:
 
--   `USER_PERMISSIONS_SHARING_PUBLIC_CHAT`: Set this to `true` to allow users to create public share links. If set to `false`, users will only be able to create private links that require authentication. This is equivalent to the "Enable Public Chat Sharing" permission in the admin panel.
--   `USER_PERMISSIONS_CHAT_SHARE`: Set this to `false` to disable the chat sharing feature entirely. If disabled, users will not see the "Share" button in the chat interface.
--   `ENABLE_COMMUNITY_SHARING`: Set this to `false` to disable the "Share to Open WebUI Community" feature. If disabled, the button will not be visible in the "Share Chat" modal.
+- `USER_PERMISSIONS_SHARING_PUBLIC_CHAT`: Set this to `true` to allow users to create public share links. If set to `false`, users will only be able to create private links that require authentication. This is equivalent to the "Enable Public Chat Sharing" permission in the admin panel.
+- `USER_PERMISSIONS_CHAT_SHARE`: Set this to `false` to disable the chat sharing feature entirely. If disabled, users will not see the "Share" button in the chat interface.
+- `ENABLE_COMMUNITY_SHARING`: Set this to `false` to disable the "Share to Open WebUI Community" feature. If disabled, the button will not be visible in the "Share Chat" modal.
 
 ## Automatic Revocation and Expiration
 
@@ -339,24 +339,24 @@ For developers looking to integrate with Open WebUI's chat sharing features, her
 
 ### Sharing and Accessing Chats
 
--   `POST /api/v1/chats/{id}/share`: Creates or updates a share link for a specific chat.
--   `GET /api/v1/chats/share/{share_id}`: Retrieves the details of a shared chat.
--   `POST /api/v1/chats/share/{share_id}/verify`: Verifies the password for a password-protected shared chat.
--   `POST /api/v1/chats/{id}/clone/shared`: Clones a shared chat into the authenticated user's account.
+- `POST /api/v1/chats/{id}/share`: Creates or updates a share link for a specific chat.
+- `GET /api/v1/chats/share/{share_id}`: Retrieves the details of a shared chat.
+- `POST /api/v1/chats/share/{share_id}/verify`: Verifies the password for a password-protected shared chat.
+- `POST /api/v1/chats/{id}/clone/shared`: Clones a shared chat into the authenticated user's account.
 
 ### Managing Shared Chats
 
--   `GET /api/v1/chats/shared`: Returns a paginated list of all shared chats for the authenticated user.
--   `GET /api/v1/chats/shared/meta`: Returns metadata for all shared chats for the authenticated user.
--   `DELETE /api/v1/chats/{id}/share`: Revokes a share link for a specific chat.
--   `POST /api/v1/chats/{id}/share/restore`: Restores a revoked share link for a specific chat.
--   `DELETE /api/v1/chats/shared/all`: Revokes all shared links for the authenticated user.
--   `DELETE /api/v1/chats/shared/revoked`: Clears all revoked shared links from the dashboard view for the authenticated user.
+- `GET /api/v1/chats/shared`: Returns a paginated list of all shared chats for the authenticated user.
+- `GET /api/v1/chats/shared/meta`: Returns metadata for all shared chats for the authenticated user.
+- `DELETE /api/v1/chats/{id}/share`: Revokes a share link for a specific chat.
+- `POST /api/v1/chats/{id}/share/restore`: Restores a revoked share link for a specific chat.
+- `DELETE /api/v1/chats/shared/all`: Revokes all shared links for the authenticated user.
+- `DELETE /api/v1/chats/shared/revoked`: Clears all revoked shared links from the dashboard view for the authenticated user.
 
 ### Statistics
 
--   `POST /api/v1/chats/{id}/reset_stats`: Resets the "Views" and "Clones" counters for a specific shared chat back to zero.
--   `POST /api/v1/chats/shared/all/reset_stats`: Resets the statistics for all of the authenticated user's shared chats.
+- `POST /api/v1/chats/{id}/reset_stats`: Resets the "Views" and "Clones" counters for a specific shared chat back to zero.
+- `POST /api/v1/chats/shared/all/reset_stats`: Resets the statistics for all of the authenticated user's shared chats.
 
 For more detailed information on the request and response formats for these endpoints, please refer to the OpenAPI specification or the project's source code.
 
