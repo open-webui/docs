@@ -7,6 +7,48 @@ title: "🗨️ Chat Sharing"
 
 This guide provides comprehensive information and guidance on using the Shared Chats system in Open WebUI.
 
+## Table of Contents
+
+- [Help Center: Shared Chats in Open WebUI](#help-center-shared-chats-in-open-webui)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction to Shared Chats](#introduction-to-shared-chats)
+  - [How to Share a Chat](#how-to-share-a-chat)
+    - [From the Chat Interface](#from-the-chat-interface)
+    - [Using Drag and Drop](#using-drag-and-drop)
+    - [Dynamic Expiration Summary](#dynamic-expiration-summary)
+  - [Feature Matrix for Shared Chats](#feature-matrix-for-shared-chats)
+  - [Managing Your Shared Chats](#managing-your-shared-chats)
+    - [The Shared Chats Dashboard](#the-shared-chats-dashboard)
+    - [Advanced Filtering and Sorting](#advanced-filtering-and-sorting)
+      - [Filtering](#filtering)
+      - [Sorting](#sorting)
+      - [Pagination](#pagination)
+    - [Actions on Shared Chats](#actions-on-shared-chats)
+      - [Individual Actions](#individual-actions)
+      - [Bulk Actions](#bulk-actions)
+  - [Troubleshooting Shared Links](#troubleshooting-shared-links)
+  - [The Viewer Experience](#the-viewer-experience)
+    - [What the Viewer Sees](#what-the-viewer-sees)
+    - [Authenticated vs. Unauthenticated Viewers](#authenticated-vs-unauthenticated-viewers)
+      - [Unauthenticated (Anonymous) Viewers](#unauthenticated-anonymous-viewers)
+      - [Authenticated (Logged-In) Viewers](#authenticated-logged-in-viewers)
+  - [Permissions and Public Chats](#permissions-and-public-chats)
+    - [What Happens if Your Public Sharing Permission is Revoked?](#what-happens-if-your-public-sharing-permission-is-revoked)
+  - [Administrator Configuration](#administrator-configuration)
+    - [Environment Variables](#environment-variables)
+  - [Automatic Revocation and Expiration](#automatic-revocation-and-expiration)
+  - [What Happens When You Share a Chat](#what-happens-when-you-share-a-chat)
+  - [What Happens When You Revoke a Link](#what-happens-when-you-revoke-a-link)
+  - [QR Code Generation](#qr-code-generation)
+  - [Sharing to the Open WebUI Community](#sharing-to-the-open-webui-community)
+    - [Enabling Community Sharing](#enabling-community-sharing)
+    - [How to Share to the Community](#how-to-share-to-the-community)
+  - [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
+  - [For Developers: API Endpoints](#for-developers-api-endpoints)
+    - [Sharing and Accessing Chats](#sharing-and-accessing-chats)
+    - [Managing Shared Chats](#managing-shared-chats)
+    - [Statistics](#statistics)
+
 ## Introduction to Shared Chats
 
 The Shared Chats feature allows you to share your conversations with others by creating a public link. This is useful for collaborating, sharing information, or getting feedback on your interactions with the AI.
