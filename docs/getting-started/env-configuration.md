@@ -2745,6 +2745,13 @@ Strictly return in JSON format:
 - Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `IMAGES_OPENAI_API_VERSION`
+
+- Type: `str`
+- Default: `${OPENAI_API_VERSION}`
+- Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation. If the Azure OpenAI service is used, this needs to be configured.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `IMAGES_OPENAI_API_KEY`
 
 - Type: `str`
