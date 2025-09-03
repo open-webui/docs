@@ -337,12 +337,26 @@ Yes. You can get a list of your shared chats by making a `GET` request to the `/
 
 For developers looking to integrate with Open WebUI's chat sharing features, here are the primary API endpoints available:
 
-- `POST /api/v1/chats/{id}/share`: Creates or updates a share link for a specific chat.
-- `GET /api/v1/chats/share/{share_id}`: Retrieves the details of a shared chat.
-- `DELETE /api/v1/chats/{id}/share`: Revokes a share link for a specific chat.
-- `POST /api/v1/chats/{id}/clone/shared`: Clones a shared chat into the authenticated user's account.
-- `GET /api/v1/chats/shared`: Returns a paginated list of all shared chats for the authenticated user.
-- `POST /api/v1/chats/share/{share_id}/verify`: Verifies the password for a password-protected shared chat.
+### Sharing and Accessing Chats
+
+-   `POST /api/v1/chats/{id}/share`: Creates or updates a share link for a specific chat.
+-   `GET /api/v1/chats/share/{share_id}`: Retrieves the details of a shared chat.
+-   `POST /api/v1/chats/share/{share_id}/verify`: Verifies the password for a password-protected shared chat.
+-   `POST /api/v1/chats/{id}/clone/shared`: Clones a shared chat into the authenticated user's account.
+
+### Managing Shared Chats
+
+-   `GET /api/v1/chats/shared`: Returns a paginated list of all shared chats for the authenticated user.
+-   `GET /api/v1/chats/shared/meta`: Returns metadata for all shared chats for the authenticated user.
+-   `DELETE /api/v1/chats/{id}/share`: Revokes a share link for a specific chat.
+-   `POST /api/v1/chats/{id}/share/restore`: Restores a revoked share link for a specific chat.
+-   `DELETE /api/v1/chats/shared/all`: Revokes all shared links for the authenticated user.
+-   `DELETE /api/v1/chats/shared/revoked`: Clears all revoked shared links from the dashboard view for the authenticated user.
+
+### Statistics
+
+-   `POST /api/v1/chats/{id}/reset_stats`: Resets the "Views" and "Clones" counters for a specific shared chat back to zero.
+-   `POST /api/v1/chats/shared/all/reset_stats`: Resets the statistics for all of the authenticated user's shared chats.
 
 For more detailed information on the request and response formats for these endpoints, please refer to the OpenAPI specification or the project's source code.
 
