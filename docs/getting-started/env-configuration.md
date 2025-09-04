@@ -3663,7 +3663,7 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 - Type: `str`
 - Default: `sqlite:///${DATA_DIR}/webui.db`
-- Description: Specifies the database URL to connect to.
+- Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. This variable takes precedence over individual database connection parameters if explicitly set.
 
 :::info
 
@@ -3675,8 +3675,54 @@ Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
 
-For encrypted SQLite, see the "SQLite with SQLCipher Encryption" section below for configuration details.
+For configuration using individual parameters or encrypted SQLite, see the relevant sections below.
 
+:::
+
+#### `DATABASE_TYPE`
+
+- Type: `str`
+- Default: `None` (automatically set to `sqlite` if `DATABASE_URL` uses default SQLite path)
+- Description: Specifies the database type (e.g., `sqlite`, `postgresql`, `mysql`, `sqlite+sqlcipher`). This is used in conjunction with other individual parameters to construct the `DATABASE_URL` if a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_USER`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the username for database authentication. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_PASSWORD`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the password for database authentication. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined. If your password contains special characters, please ensure they are properly URL-encoded.
+- Persistence: No
+
+#### `DATABASE_HOST`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the hostname or IP address of the database server. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_PORT`
+
+- Type: `int`
+- Default: `None`
+- Description: Specifies the port number of the database server. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_NAME`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the name of the database to connect to. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+:::info
+When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct it using a combination of `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, and `DATABASE_NAME`. For this automatic construction to occur, **all** of these individual parameters must be provided. If any are missing, the default `DATABASE_URL` (SQLite file) or any explicitly set `DATABASE_URL` will be used instead.
 :::
 
 ### Encrypted SQLite with SQLCipher
