@@ -1,0 +1,478 @@
+---
+sidebar_position: 99
+title: "🎨 Theming"
+---
+
+# ✨ Theming
+
+Open WebUI features a robust theming system that allows you to customize the application's appearance to your liking. Whether you're a user who wants to personalize your experience or a developer looking to create and share your own themes, this guide has you covered.
+
+## For Users: Managing Themes
+
+### Built-in Themes
+
+Open WebUI comes with several pre-installed themes:
+
+-   **System**: Automatically syncs with your operating system's light or dark mode.
+-   **Light**: A clean and bright interface.
+-   **Dark**: A classic dark mode.
+-   **OLED Dark**: An even darker mode designed for OLED screens, with true black backgrounds.
+-   **Her**: A special theme inspired by the movie "Her".
+
+You can switch between these themes at any time in the `Settings > Themes` menu.
+
+### Community Themes
+
+The real power of the theming system lies in "Community Themes." These are themes created and shared by other users, allowing for a vast range of visual styles.
+
+#### Installing Community Themes
+
+You can install community themes in two main ways:
+
+1.  **From a URL:** If a developer provides a URL to a `theme.json` file, you can add it directly:
+    *   Go to `Settings > Themes`.
+    *   Under "Import Community Theme," paste the URL into the input field and click **Add**.
+
+2.  **From a File:** If you've downloaded a `theme.json` file:
+    *   Go to `Settings > Themes`.
+    *   Click on **Import File** and select the `theme.json` file from your computer.
+
+#### Managing Installed Themes
+
+Once installed, community themes appear in the theme list alongside the built-in ones. You can:
+
+-   **Select Theme:** Click on a theme in the list to apply it immediately.
+-   **Live Preview in Editor:** When creating a new theme or editing an existing one, the Theme Editor provides a real-time preview of your changes.
+-   **Update:** If a theme developer has provided an update source, Open WebUI will notify you when a new version is available.
+-   **Edit:** Click the pencil icon to open the Theme Editor and make your own tweaks.
+-   **Export/Copy:** Share your modified theme by exporting it as a file or copying the JSON to your clipboard.
+-   **Remove:** Click the trash can icon to delete a community theme.
+
+---
+
+## For Developers: Creating Themes
+
+Creating your own theme is a straightforward process of defining a `Theme` object in a JSON format. You can start from scratch or by editing an existing theme.
+
+### The Theme Object
+
+A theme is a single JSON object with the following properties. Only `id`, `name`, and `base` are strictly required.
+
+| Property             | Type                                           | Description                                                                                             |
+| -------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `id`                 | `string`                                       | A unique, machine-readable identifier (e.g., `"my-cool-theme"`). **Required**.                            |
+| `name`               | `string`                                       | A user-friendly name (e.g., `"My Cool Theme"`). **Required**.                                           |
+| `base`               | `'light' \| 'dark' \| 'oled-dark' \| 'her'`      | The built-in theme to use as a foundation. **Required**.                                                |
+| `version`            | `string`                                       | The version of your theme (e.g., `"1.0.0"`). Used for updates.                                          |
+| `author`             | `string`                                       | Your name or username.                                                                                  |
+| `repository`         | `string`                                       | A URL to the theme's repository, like a GitHub page.                                                    |
+| `targetWebUIVersion` | `string`                                       | The version of Open WebUI your theme is designed for.                                                   |
+| `emoji`              | `string`                                       | An emoji to represent your theme in the UI.                                                             |
+| `metaThemeColor`     | `string`                                       | A hex color (`#RRGGBB`) for the browser's UI elements.                                                  |
+| `variables`          | `object`                                       | An object where keys are CSS variable names and values are the new colors.                              |
+| `gradient`           | `object`                                       | Defines a background gradient. See the "Backgrounds" section for details.                                                      |
+| `tsparticlesConfig`  | `object`                                       | A configuration object for [tsParticles](https://particles.js.org/).                                    |
+| `animationScript`    | `string`                                       | A string of JavaScript code to be run in a web worker for custom canvas animations.                     |
+| `css`                | `string`                                       | A string of custom CSS rules to be injected.                                                            |
+| `sourceUrl`          | `string`                                       | A URL pointing to the raw `theme.json` file, allowing for automatic update checks.                      |
+| `systemBackgroundImageUrl` | `string` | URL for an image to be used as the main background for the entire UI. |
+| `systemBackgroundImageDarken`| `number` | A value from 0 to 100 to control the darkness of the system background image. |
+| `chatBackgroundImageUrl` | `string` | URL for an image to be used as the background for the chat message area. |
+| `chatBackgroundImageDarken` | `number` | A value from 0 to 100 to control the darkness of the chat background image. |
+| `toggles` | `object` | An object to selectively enable or disable theme features. See the "Advanced Theming" section for details. |
+| `codeMirrorTheme`    | `string`                                       | The name of a [CodeMirror theme](https://codemirror.net/5/demo/theme.html) for the text editor. See the "CodeMirror Themes" section for a full list of options. |
+
+### Creating a Theme
+
+The easiest way to start is using the built-in Theme Editor:
+
+1.  Navigate to `Settings > Themes`.
+2.  Click the **Add Manually** button. This opens the Theme Editor with a basic template.
+3.  Modify the properties. The editor provides a live preview as you make changes.
+4.  Once you're happy, click **Save**.
+
+### Advanced Theming
+
+#### Using Custom Fonts
+You can embed custom fonts in your theme using the `css` property. By using the `@font-face` rule, you can load fonts from external services like Google Fonts. For best performance, you should link directly to the font file (e.g., a `.woff2` file).
+
+```css
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2') format('woff2');
+}
+body, button, input, textarea {
+  font-family: 'Roboto', sans-serif;
+}
+```
+
+#### Controlling Features with Toggles
+The Theme Editor modal includes toggles for all major features (like gradients, custom CSS, animations, etc.). These toggles are always visible, allowing users to see the full range of customization options.
+
+When you create a theme, you can define which of these features are active by default. For example, if you include a `gradient` object in your `theme.json`, the "Gradient" toggle will be enabled and switched on. If you omit the `gradient` property, the toggle will be switched off.
+
+The `toggles` property in your `theme.json` gives you explicit control. By setting a feature's corresponding key to `true` or `false` in the `toggles` object, you can define its default on/off state in the editor. This is useful for creating themes with optional features that you want to be explicitly enabled or disabled by default.
+
+Here are the available toggles:
+
+- `cssVariables`
+- `customCss`
+- `animationScript`
+- `tsParticles`
+- `gradient`
+- `systemBackgroundImage`
+- `chatBackgroundImage`
+
+### CodeMirror Themes
+
+You can customize the appearance of the code editor in Open WebUI by specifying a `codeMirrorTheme` property of your `theme.json`. A wide variety of themes are available to choose from.
+
+Here is a list of the available CodeMirror themes:
+
+- `one-dark` (Default)
+- `abcdef`
+- `abyss`
+- `androidstudio`
+- `andromeda`
+- `atomone`
+- `aura`
+- `bbedit`
+- `basicLight`
+- `basicDark`
+- `bespin`
+- `copilot`
+- `consoleLight`
+- `consoleDark`
+- `dracula`
+- `darcula`
+- `duotoneLight`
+- `duotoneDark`
+- `eclipse`
+- `githubLight`
+- `githubDark`
+- `gruvboxDark`
+- `gruvboxLight`
+- `materialLight`
+- `materialDark`
+- `monokai`
+- `monokaiDimmed`
+- `kimbie`
+- `noctisLilac`
+- `nord`
+- `okaidia`
+- `quietlight`
+- `red`
+- `solarizedLight`
+- `solarizedDark`
+- `sublime`
+- `tokyoNight`
+- `tokyoNightStorm`
+- `tokyoNightDay`
+- `tomorrowNightBlue`
+- `whiteLight`
+- `whiteDark`
+- `vscodeDark`
+- `vscodeLight`
+- `xcodeLight`
+- `xcodeDark`
+
+### The Documentation Tab
+The Theme Editor includes a "Documentation" tab, which is a valuable resource when creating themes. It contains a table of all available CSS variables with their default values and descriptions, as well as the full theme schema.
+
+### Example 1: Simple Color Theme
+
+This theme creates a "Forest" look by overriding the default CSS color variables.
+
+```json
+{
+  "id": "forest",
+  "name": "Forest",
+  "base": "dark",
+  "author": "Jules",
+  "emoji": "🌲",
+  "metaThemeColor": "#1A3622",
+  "variables": {
+    "--color-gray-950": "#0D1A13",
+    "--color-gray-900": "#1A3622",
+    "--color-gray-850": "#22482D",
+    "--color-primary": "#6B8E23"
+  }
+}
+```
+
+### Backgrounds
+
+You can customize the background of the application in two ways: with a gradient or with an image.
+
+#### Gradient Background
+
+The `gradient` property allows you to create a smooth, and optionally animated, color gradient for the main UI background.
+
+| Property    | Type      | Description                               |
+| ----------- | --------- | ----------------------------------------- |
+| `enabled`   | `boolean` | Whether the gradient is enabled.          |
+| `animated`  | `boolean` | Whether the gradient should be animated.  |
+| `colors`    | `string[]`| An array of hex color strings.            |
+| `direction` | `number`  | The direction of the gradient in degrees. |
+| `intensity` | `number`  | The opacity of the gradient (0-100).      |
+
+#### Background Images
+
+You can set separate background images for the main UI and the chat area.
+
+| Property                      | Type     | Description                                                          |
+| ----------------------------- | -------- | -------------------------------------------------------------------- |
+| `systemBackgroundImageUrl`    | `string` | URL for an image to be used as the main background for the entire UI.  |
+| `systemBackgroundImageDarken` | `number` | A value from 0 to 100 to control the darkness of the system background image. |
+| `chatBackgroundImageUrl`      | `string` | URL for an image to be used as the background for the chat message area. |
+| `chatBackgroundImageDarken`   | `number` | A value from 0 to 100 to control the darkness of the chat background image. |
+
+### Example 2: Animated Gradient Background
+
+This theme adds a subtle, animated gradient to the background.
+
+```json
+{
+  "id": "ocean-breeze",
+  "name": "Ocean Breeze",
+  "base": "light",
+  "emoji": "🌊",
+  "gradient": {
+    "enabled": true,
+    "animated": true,
+    "colors": ["#a8c0ff", "#3f2b96"],
+    "direction": 120,
+    "intensity": 80
+  }
+}
+```
+
+### Animations
+
+Open WebUI supports two powerful methods for creating dynamic, animated backgrounds for your themes: **tsParticles** for easy-to-configure particle effects, and **Custom Animation Scripts** for full control over a canvas element.
+
+#### Using tsParticles
+
+[tsParticles](https://particles.js.org/) is a lightweight library for creating particle animations. You can create a wide variety of effects, from falling snow to interactive starfields.
+
+To use tsParticles, you need to provide a valid configuration object in the `tsparticlesConfig` property of your `theme.json`. The easiest way to get started is to use the [official tsParticles editor](https://particles.js.org/samples/#twinkle) to create your desired effect and then export the JSON configuration.
+
+Let's break down the `starfield` example:
+
+```json
+{
+  "id": "starfield",
+  "name": "Starfield",
+  "base": "oled-dark",
+  "emoji": "✨",
+  "tsparticlesConfig": {
+    "particles": {
+      "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
+      "color": { "value": "#ffffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 1, "random": true },
+      "size": { "value": 3, "random": true },
+      "line_linked": { "enable": false },
+      "move": { "enable": true, "speed": 1, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
+    }
+  }
+}
+```
+
+-   **`particles.number`**: Controls the number of particles. `density` makes the number of particles responsive to the screen size.
+-   **`particles.color`**: Sets the color of the particles.
+-   **`particles.shape`**: Defines the shape of the particles (e.g., `circle`, `square`, `triangle`).
+-   **`particles.opacity`**: Controls the transparency of the particles.
+-   **`particles.size`**: Controls the size of the particles.
+-   **`particles.move`**: Defines the movement of the particles, including their `speed` and `direction`.
+
+#### Using a Custom Animation Script
+
+This section provides a step-by-step guide on how to convert a standard JavaScript canvas animation into a format that is compatible with the Open WebUI theme system.
+
+##### Understanding the Open WebUI Theme Engine
+
+The Open WebUI theme engine runs custom animation scripts in a **Web Worker**. This is a crucial point to understand, as it imposes several restrictions on the code you can write.
+
+**Key characteristics of the Web Worker environment:**
+
+*   **No DOM Access:** You do not have access to the `document` or `window` objects. This means you cannot create or manipulate DOM elements (like `<canvas>`) directly from the animation script.
+*   **Communication via Messaging:** The only way to communicate between the main application and the animation script (the worker) is through the `self.onmessage` and `postMessage` APIs.
+*   **Canvas is an `OffscreenCanvas`:** The main application will create a `<canvas>` element and transfer it to the worker as an `OffscreenCanvas`. You will receive this canvas object in the `init` message.
+
+##### The Conversion Process
+
+Here is a step-by-step guide to converting a typical JavaScript canvas animation.
+
+###### 1. Identify and Isolate the Core Animation Logic
+
+Most canvas animations have the following components:
+
+*   **Setup/Initialization Code:** This code runs once at the beginning to set up the canvas, create initial objects, etc. In a typical script, this might be at the top level of the script.
+*   **Animation Loop:** This is a function that is called repeatedly to draw each frame of the animation. It usually uses `requestAnimationFrame` or `setTimeout`.
+*   **Helper Functions:** These are utility functions for things like math, color manipulation, etc.
+*   **Object Definitions:** These are classes or constructor functions for the objects in the animation (e.g., `Particle`).
+*   **Event Listeners:** These are functions that respond to user input, like `mousemove` or `resize`.
+
+Your goal is to separate these components and adapt them to the worker environment.
+
+###### 2. Adapt the Code for the Worker Environment
+
+Here is a template for a converted animation script. You will need to move the code from the original script into the appropriate sections of this template.
+
+```javascript
+// 1. Paste all helper functions and object definitions here.
+//    (e.g., randomIntFromRange, Particle, etc.)
+
+// 2. Define global variables for the worker script.
+let canvas;
+let ctx;
+let w, h;
+// ... any other global variables your animation needs
+
+// 3. The main message handler for the worker.
+self.onmessage = function(e) {
+  if (e.data.type === 'init') {
+    // This is where the setup/initialization code goes.
+    canvas = e.data.canvas;
+    ctx = canvas.getContext('2d');
+    w = canvas.width = e.data.width;
+    h = canvas.height = e.data.height;
+
+    // Call your initialization function here.
+    init();
+    // Start the animation loop.
+    animate();
+
+  } else if (e.data.type === 'resize') {
+    // This is where the resize handling code goes.
+    w = canvas.width = e.data.width;
+    h = canvas.height = e.data.height;
+    // You might need to re-initialize your animation on resize.
+    init();
+
+  } else if (e.data.type === 'mousemove') {
+    // This is where the mouse move handling code goes.
+    // Update your mouse coordinates object here.
+    mouse.x = e.data.x;
+    mouse.y = e.data.y;
+  }
+};
+
+// 4. Your initialization function.
+function init() {
+  // ... your init code here ...
+}
+
+// 5. Your animation loop.
+function animate() {
+  // ... your drawing code here ...
+  requestAnimationFrame(animate);
+}
+```
+
+###### 3. Conversion Checklist
+
+Here is a checklist of common things to look for and change in the original script:
+
+*   **`document.querySelector('canvas')` or `document.getElementById('canvas')`:** Remove these lines. The canvas is provided to you.
+*   **`canvas.getContext('2d')`:** Move this line inside the `init` message handler.
+*   **`canvas.width = window.innerWidth` and `canvas.height = window.innerHeight`:** Remove these lines from the top level of the script. The canvas dimensions are provided in the `init` and `resize` messages.
+*   **`addEventListener('mousemove', ...)` and `addEventListener('resize', ...)`:** Remove these event listeners. This functionality is now handled by the `self.onmessage` handler.
+*   **`requestAnimationFrame(animate)` or `setTimeout(animate, ...)`:** Make sure the animation loop is started by calling `animate()` once from within the `init` message handler. The loop itself should use `requestAnimationFrame(animate)`.
+*   **Global variables:** Make sure any global variables from the original script are defined at the top level of your worker script (outside the `self.onmessage` handler).
+
+###### Example: Before and After
+
+Here is an example of a simple animation before and after conversion.
+
+**Before:**
+```javascript
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let x = 0;
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(x, 100, 50, 50);
+  x += 1;
+  requestAnimationFrame(animate);
+}
+
+animate();
+```
+
+**After:**
+```javascript
+let canvas;
+let ctx;
+let w, h;
+let x = 0;
+
+self.onmessage = function(e) {
+  if (e.data.type === 'init') {
+    canvas = e.data.canvas;
+    ctx = canvas.getContext('2d');
+    w = canvas.width = e.data.width;
+    h = canvas.height = e.data.height;
+    animate();
+  }
+};
+
+function animate() {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillRect(x, 100, 50, 50);
+  x += 1;
+  if (x > w) {
+    x = 0;
+  }
+  requestAnimationFrame(animate);
+}
+```
+
+By following these instructions, you should be able to convert most JavaScript canvas animations to work with the Open WebUI theme system.
+
+### Example 4: The `Matrix Rain` theme
+
+The following is an example of a `Matrix Rain` theme.
+
+```json
+{
+  "id": "matrix-rain",
+  "name": "Matrix Rain",
+  "base": "oled-dark",
+  "emoji": "🔢",
+  "css": "#main-container.matrix-rain-bg { background-color: transparent !important; isolation: isolate; position: relative; } #matrix-rain-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }",
+  "animationScript": "let animationFrameId;let canvas;let ctx;let columns;let rainDrops=[];const alphabet='アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';const fontSize=16;const setup=(width,height)=>{if(!canvas)return;canvas.width=width;canvas.height=height;columns=canvas.width/fontSize;rainDrops=[];for(let x=0;x<columns;x++){rainDrops[x]=1}};const draw=()=>{if(!ctx)return;ctx.fillStyle='rgba(0, 0, 0, 0.05)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#06F0BF';ctx.font=`${fontSize}px monospace`;for(let i=0;i<rainDrops.length;i++){const text=alphabet.charAt(Math.floor(Math.random()*alphabet.length));ctx.fillText(text,i*fontSize,rainDrops[i]*fontSize);if(rainDrops[i]*fontSize>canvas.height&&Math.random()>0.975){rainDrops[i]=0}rainDrops[i]++}};let lastTime=0;const fps=15;const interval=1000/fps;const animate=(timestamp)=>{if(timestamp-lastTime>interval){draw();lastTime=timestamp}animationFrameId=requestAnimationFrame(animate)};self.onmessage=(event)=>{if(event.data.type==='init'){canvas=event.data.canvas;ctx=canvas.getContext('2d');setup(event.data.width,event.data.height);animate(0)}else if(event.data.type==='resize'){setup(event.data.width,event.data.height)}};"
+}
+```
+
+- In the `init` handler, the script gets the `canvas` object, calls a `setup()` function, and then kicks off a performant animation loop using `requestAnimationFrame`.
+- The `animate` function is throttled to run at a specific FPS (15 frames per second) for efficiency.
+- The `draw()` function is where the actual drawing happens, filling the canvas with random characters from a large alphabet to create the Matrix effect.
+- The `resize` handler updates the canvas dimensions and re-runs the `setup()` function to adapt the animation to the new size.
+- The theme also includes a `css` property to make the main container transparent and correctly position the animation canvas behind all other content.
+
+### Example 5: Background Image Theme
+
+This theme adds a background image to the chat and the overall system.
+
+```json
+{
+  "id": "galaxy-explorer",
+  "name": "Galaxy Explorer",
+  "base": "oled-dark",
+  "emoji": "🚀",
+  "systemBackgroundImageUrl": "https://example.com/path/to/galaxy.jpg",
+  "systemBackgroundImageDarken": 50,
+  "chatBackgroundImageUrl": "https://example.com/path/to/space.jpg",
+  "chatBackgroundImageDarken": 30
+}
+```
+
+### Sharing Your Theme
+
+To make your theme easily shareable and updatable, host the `theme.json` file somewhere with a raw file link (like GitHub Gist or a public repository) and set the `sourceUrl` property to that link. This allows others to install your theme with one click and receive updates automatically.
