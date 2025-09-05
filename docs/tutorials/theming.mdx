@@ -1,0 +1,82 @@
+---
+sidebar_position: 99
+title: "✨ Customizing Themes"
+---
+
+:::warning
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+:::
+
+# Customizing and Adding New Themes
+
+Open WebUI supports a variety of themes to customize your experience. This guide explains how you can contribute your own themes, particularly animated themes powered by [Particle.js](https://vincentgarreau.com/particles.js/).
+
+## For Users: Proposing New Themes
+
+If you are not a developer but have a great idea for a new animated theme, we'd love to hear it! The best way to contribute is to:
+
+1.  Find a cool Particle.js configuration you like. You can explore examples on sites like [CodePen](https://codepen.io/tag/particles.js).
+2.  Open a "Feature Request" issue on our [GitHub repository](https://github.com/open-webui/open-webui/issues).
+3.  In your request, include a link to the Particle.js configuration you'd like to see added as a theme.
+
+## For Developers: Adding a New Particle.js Theme
+
+If you are a developer, you can add new themes directly to the project. Here is a step-by-step guide.
+
+### Step 1: Create Your Theme Files
+
+Every animated theme requires two files: a TypeScript configuration file and a CSS file. We have provided templates to make this easier.
+
+1.  **Create the Configuration File:**
+    *   Navigate to `src/lib/themes/`.
+    *   Copy the `_template.ts` file and rename it to match your theme (e.g., `my-cool-theme.ts`).
+    *   Uncomment the code inside your new file.
+    *   Customize the `TEMPLATE_THEME` object with your desired Particle.js settings. You can find all available options commented within the template.
+    *   Rename the exported constant from `TEMPLATE_THEME` to something unique (e.g., `MY_COOL_THEME`).
+
+2.  **Create the CSS File:**
+    *   Navigate to `static/themes/`.
+    *   Copy the `_template.css` file and rename it to `my-cool-theme.css`.
+    *   Uncomment the code inside the file.
+    *   Change the CSS class from `.template-bg` to a name that matches your theme, for example: `#main-container.my-cool-theme-bg`. You can also change the `background-color`.
+
+### Step 2: Register Your Theme in the Application
+
+Next, you need to make the application aware of your new theme.
+
+1.  **Edit `src/lib/theme.ts`:**
+    *   **Import your theme config:** At the top of the file, add an import for your new theme configuration object.
+        ```typescript
+        import { MY_COOL_THEME } from '$lib/themes/my-cool-theme';
+        ```
+    *   **Add your theme to the list:** Find the `themes` array and add the name of your theme (this should match the CSS class suffix).
+        ```typescript
+        export const themes = [
+            // ... other themes
+            'my-cool-theme',
+            'matrix',
+            'her'
+        ];
+        ```
+    *   **Add the theme logic:** In the `applyTheme` function, add a new `else if` block to handle your theme. This block tells the app how to apply your theme's styles and animation.
+        ```typescript
+        // Inside applyTheme(), after the other themes:
+        } else if (_theme === 'my-cool-theme' && mainContainer) {
+            manageStylesheet('my-cool-theme-stylesheet', '/themes/my-cool-theme.css', 'add');
+            mainContainer.classList.add('my-cool-theme-bg');
+            startParticlesJS(mainContainer, MY_COOL_THEME);
+        }
+        ```
+
+### Step 3: Add Your Theme to the UI
+
+Finally, add your theme to the dropdown menu in the settings.
+
+1.  **Edit `src/lib/components/chat/Settings/General.svelte`:**
+    *   Find the `<select>` element for themes.
+    *   Add a new `<option>` element for your theme. Pick an emoji that fits!
+        ```html
+        <option value="my-cool-theme">My Cool Theme</option>
+        ```
+
+That's it! You have now successfully added a new animated theme to Open WebUI.
