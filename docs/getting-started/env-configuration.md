@@ -1342,6 +1342,18 @@ pip install open-webui[all]
 - Default: `1536`
 - Description: Specifies the maximum vector length for PGVector initialization.
 
+#### `PGVECTOR_CREATE_EXTENSION`
+
+- Type: `str`
+- Default `true`
+- Description: Creates the vector extension in the database
+
+:::info
+
+If set to `false`, open-webui will assume the postgreSQL database where embeddings will be stored is pre-configured with the `vector` extension. This also allows open-webui to run as a non superuser database user.
+
+:::
+
 ### Qdrant
 
 #### `QDRANT_API_KEY`
