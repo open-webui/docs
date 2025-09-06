@@ -43,7 +43,7 @@ cd searxng-docker
 # * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
 # * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
 
-SEARXNG_HOSTNAME=localhost:8080/
+SEARXNG_HOSTNAME=localhost:8080
 # LETSENCRYPT_EMAIL=<email>
 
 # Optional:
