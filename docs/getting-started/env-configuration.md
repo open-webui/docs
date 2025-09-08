@@ -2832,6 +2832,13 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 :::
 
+#### `ENABLE_OAUTH_ID_TOKEN_COOKIE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.**
+- Usage: For new and secure deployments, **it is recommended to set this to `False`** to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
+
 #### `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`
 
 - Type: `str`
@@ -2844,13 +2851,6 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 In any production environment running more than one instance of Open WebUI (e.g., Docker Swarm, Kubernetes), this variable **MUST** be explicitly set to a persistent, shared secret. If left unset, each replica will generate or use a different key, causing session decryption to fail intermittently as user requests are load-balanced across instances.
 
 :::
-
-#### `ENABLE_OAUTH_ID_TOKEN_COOKIE`
-
-- Type: `bool`
-- Default: `True`
-- Description: Controls whether the legacy `oauth_id_token` cookie is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. The new, recommended approach is to use the server-side session management.
-- Usage: For new and secure deployments, it is recommended to set this to `False` to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
