@@ -71,6 +71,46 @@ For more information about `__oauth_token__` and how to configure this token to 
 
 Just add them as argument to any method of your Tool class just like `__user__` in the example above.
 
+#### Using the OAuth Token in a Tool
+
+When building tools that need to interact with external APIs on the user's behalf, you can now directly access their OAuth token. This removes the need for fragile cookie scraping and ensures the token is always valid.
+
+**Example:** A tool that calls an external API using the user's access token.
+
+```python
+import httpx
+from typing import Optional
+
+class Tools:
+    # ... other class setup ...
+
+    async def get_user_profile_from_external_api(self, __oauth_token__: Optional[dict] = None) -> str:
+        """
+        Fetches user profile data from a secure external API using their OAuth access token.
+
+        :param __oauth_token__: Injected by Open WebUI, contains the user's token data.
+        """
+        if not __oauth_token__ or "access_token" not in __oauth_token__:
+            return "Error: User is not authenticated via OAuth or token is unavailable."
+            
+        access_token = __oauth_token__["access_token"]
+        
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get("https://api.my-service.com/v1/profile", headers=headers)
+                response.raise_for_status() # Raise an exception for bad status codes
+                return f"API Response: {response.json()}"
+        except httpx.HTTPStatusError as e:
+            return f"Error: Failed to fetch data from API. Status: {e.response.status_code}"
+        except Exception as e:
+            return f"An unexpected error occurred: {e}"
+```
+
 ### Event Emitters
 Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
 
