@@ -157,7 +157,13 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 
 ### Azure OpenAI
 
-Using Azure OpenAI Dall-E directly is unsupported, but you can [set up a LiteLLM proxy](https://litellm.vercel.app/docs/image_generation) which is compatible with the `Open AI (Dall-E)` Image Generation Engine.
+Image generation with a Azure OpenAI Dall-E or GPT-Image is supported with OpenWeb UI. Configure the Image Generation as follows:
+
+1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+2. Set the `Image Generation Engine` field to `Open AI` (Azure OpenAI uses the same syntax as OpenAI).
+3. Change the API endpoint URL to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Set the instance and model id as you find it in the settings of the Azure AI Foundry.
+4. Configure the API version to the value you find in the settings of the Azure AI Fountry.
+5. Enter your Azure OpenAI API key.
 
 
 ## Image Router

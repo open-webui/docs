@@ -1342,6 +1342,18 @@ pip install open-webui[all]
 - Default: `1536`
 - Description: Specifies the maximum vector length for PGVector initialization.
 
+#### `PGVECTOR_CREATE_EXTENSION`
+
+- Type: `str`
+- Default `true`
+- Description: Creates the vector extension in the database
+
+:::info
+
+If set to `false`, open-webui will assume the postgreSQL database where embeddings will be stored is pre-configured with the `vector` extension. This also allows open-webui to run as a non superuser database user.
+
+:::
+
 ### Qdrant
 
 #### `QDRANT_API_KEY`
@@ -2745,6 +2757,13 @@ Strictly return in JSON format:
 - Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `IMAGES_OPENAI_API_VERSION`
+
+- Type: `str`
+- Default: `${OPENAI_API_VERSION}`
+- Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation. If the Azure OpenAI service is used, this needs to be configured.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `IMAGES_OPENAI_API_KEY`
 
 - Type: `str`
@@ -2810,6 +2829,26 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 :::info
 
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
+
+:::
+
+#### `ENABLE_OAUTH_ID_TOKEN_COOKIE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.**
+- Usage: For new and secure deployments, **it is recommended to set this to `False`** to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
+
+#### `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`
+
+- Type: `str`
+- Default: Falls back to the value of `WEBUI_SECRET_KEY`.
+- Description: Specifies the secret key used to encrypt and decrypt OAuth tokens stored server-side in the database. This is a critical security component for protecting user credentials at rest. If not set, it defaults to using the main `WEBUI_SECRET_KEY`, but it is highly recommended to set it to a unique, securely generated value for production environments.
+
+:::warning
+
+**Required for Multi-Replica Deployments**
+In any production environment running more than one instance of Open WebUI (e.g., Docker Swarm, Kubernetes), this variable **MUST** be explicitly set to a persistent, shared secret. If left unset, each replica will generate or use a different key, causing session decryption to fail intermittently as user requests are load-balanced across instances.
 
 :::
 
@@ -3656,7 +3695,7 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 - Type: `str`
 - Default: `sqlite:///${DATA_DIR}/webui.db`
-- Description: Specifies the database URL to connect to.
+- Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. This variable takes precedence over individual database connection parameters if explicitly set.
 
 :::info
 
@@ -3668,8 +3707,54 @@ Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/
 
 If your database password contains special characters, please ensure they are properly URL-encoded. For example, a password like `p@ssword` should be encoded as `p%40ssword`.
 
-For encrypted SQLite, see the "SQLite with SQLCipher Encryption" section below for configuration details.
+For configuration using individual parameters or encrypted SQLite, see the relevant sections below.
 
+:::
+
+#### `DATABASE_TYPE`
+
+- Type: `str`
+- Default: `None` (automatically set to `sqlite` if `DATABASE_URL` uses default SQLite path)
+- Description: Specifies the database type (e.g., `sqlite`, `postgresql`, `mysql`, `sqlite+sqlcipher`). This is used in conjunction with other individual parameters to construct the `DATABASE_URL` if a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_USER`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the username for database authentication. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_PASSWORD`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the password for database authentication. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined. If your password contains special characters, please ensure they are properly URL-encoded.
+- Persistence: No
+
+#### `DATABASE_HOST`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the hostname or IP address of the database server. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_PORT`
+
+- Type: `int`
+- Default: `None`
+- Description: Specifies the port number of the database server. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_NAME`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the name of the database to connect to. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+:::info
+When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct it using a combination of `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, and `DATABASE_NAME`. For this automatic construction to occur, **all** of these individual parameters must be provided. If any are missing, the default `DATABASE_URL` (SQLite file) or any explicitly set `DATABASE_URL` will be used instead.
 :::
 
 ### Encrypted SQLite with SQLCipher
