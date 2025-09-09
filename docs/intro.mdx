@@ -33,7 +33,7 @@ Passionate about open-source AI? [Join our team →](https://careers.openwebui.c
 ![Open WebUI Demo](/images/demo.gif)
 
 :::tip
-**Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** – **[Speak with Our Sales Team Today!](mailto:sales@openwebui.com)**
+**Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** — **[Speak with Our Sales Team Today!](mailto:sales@openwebui.com)**
 
 Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
 :::
@@ -58,6 +58,14 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 
 ```bash
 docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+```
+
+### Slim Image Variants
+
+For environments with limited storage or bandwidth, Open WebUI offers slim image variants that exclude pre-bundled models. These images are significantly smaller but download required models on first use:
+
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main-slim
 ```
 
 ### Open WebUI Bundled with Ollama
@@ -92,6 +100,12 @@ If you want to try out the latest bleeding-edge features and are okay with occas
 
 ```bash
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
+```
+
+For the slim variant of the dev branch:
+
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev-slim
 ```
 
 ### Updating Open WebUI
