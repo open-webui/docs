@@ -24,6 +24,24 @@ volumes:
   open-webui:
 ```
 
+### Using Slim Images
+
+For environments with limited storage or bandwidth, you can use the slim image variant that excludes pre-bundled models:
+
+```yaml
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main-slim
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+volumes:
+  open-webui:
+```
+
+**Note:** Slim images download required models (whisper, embedding models) on first use, which may result in longer initial startup times but significantly smaller image sizes.
+
 ## Starting the Services
 
 To start your services, run the following command:
