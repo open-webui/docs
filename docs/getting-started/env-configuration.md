@@ -1730,6 +1730,7 @@ Provide a clear and direct response to the user's query, including inline citati
 - Options:
   - `character`
   - `token`
+  - `markdown_header`
 - Default: `character`
 - Description: Sets the text splitter for RAG models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
