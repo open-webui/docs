@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: ðŸ³ Installing Docker
+title: 🐳 Installing Docker
 ---
 
 :::info **Looking to install Open WebUI?**
@@ -27,7 +27,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 1. **Open your terminal.**
 
-2. **Set up Dockerâ€™s apt repository:**
+2. **Set up Docker's apt repository:**
 
    ```bash
    sudo apt-get update
