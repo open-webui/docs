@@ -157,7 +157,7 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 
 ### Azure OpenAI
 
-Image generation with a Azure OpenAI Dall-E or GPT-Image is supported with OpenWeb UI. Configure the Image Generation as follows:
+Image generation with a Azure OpenAI Dall-E or GPT-Image is supported with Open WebUI. Configure the Image Generation as follows:
 
 1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Open AI` (Azure OpenAI uses the same syntax as OpenAI).
