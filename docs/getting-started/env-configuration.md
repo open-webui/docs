@@ -1998,6 +1998,13 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Specifies the SharePoint tenant ID for OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_ONEDRIVE_TYPE`
+
+- Type: `str`
+- Default: `None`
+- Description: Specify the Type for OneDrive integration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## Web Search
 
 #### `ENABLE_WEB_SEARCH`
