@@ -165,6 +165,8 @@ Image generation with a Azure OpenAI Dall-E or GPT-Image is supported with OpenW
 4. Configure the API version to the value you find in the settings of the Azure AI Fountry.
 5. Enter your Azure OpenAI API key.
 
+:::tip Another API endpoint URL tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` , you can find your endpoint name in https://ai.azure.com/resource/overview, and model name in https://ai.azure.com/resource/deployments . You can also copy Target URI from your deployment detailed page, but remember to delete strings after model name. For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the API endpoint URL in OpenWebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
+
 
 ## Image Router
 
