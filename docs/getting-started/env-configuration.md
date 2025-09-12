@@ -2983,6 +2983,35 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 - Description: Sets the redirect URI for GitHub OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Feishu
+
+See https://open.feishu.cn/document/sso/web-application-sso/login-overview
+
+#### `FEISHU_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Feishu OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FEISHU_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for Feishu OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FEISHU_CLIENT_SCOPE`
+
+- Type: `str`
+- Default: `contact:user.base:readonly`
+- Description: Specifies the scope for Feishu OAuth authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FEISHU_CLIENT_REDIRECT_URI`
+
+- Type: `str`
+- Description: Sets the redirect URI for Feishu OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### OpenID (OIDC)
 
 #### `OAUTH_CLIENT_ID`
