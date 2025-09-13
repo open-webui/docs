@@ -1,0 +1,169 @@
+---
+sidebar_position: 99
+title: "🎨 Theming"
+---
+
+# ✨ Theming
+
+Open WebUI features a robust theming system that allows you to customize the application's appearance to your liking. Whether you're a user who wants to personalize your experience or a developer looking to create and share your own themes, this guide has you covered.
+
+## For Users: Managing Themes
+
+### Built-in Themes
+
+Open WebUI comes with several pre-installed themes:
+
+-   **System**: Automatically syncs with your operating system's light or dark mode.
+-   **Light**: A clean and bright interface.
+-   **Dark**: A classic dark mode.
+-   **OLED Dark**: An even darker mode designed for OLED screens, with true black backgrounds.
+-   **Her**: A special theme inspired by the movie "Her".
+
+You can switch between these themes at any time in the `Settings > Themes` menu.
+
+### Community Themes
+
+The real power of the theming system lies in "Community Themes." These are themes created and shared by other users, allowing for a vast range of visual styles.
+
+#### Installing Community Themes
+
+You can install community themes in two main ways:
+
+1.  **From a URL:** If a developer provides a URL to a `theme.json` file, you can add it directly:
+    *   Go to `Settings > Themes`.
+    *   Under "Import Community Theme," paste the URL into the input field and click **Add**.
+
+2.  **From a File:** If you've downloaded a `theme.json` file:
+    *   Go to `Settings > Themes`.
+    *   Click on **Import File** and select the `theme.json` file from your computer.
+
+#### Managing Installed Themes
+
+Once installed, community themes appear in the theme list alongside the built-in ones. You can:
+
+-   **Select Theme:** Click on a theme in the list to apply it immediately.
+-   **Live Preview in Editor:** When creating a new theme or editing an existing one, the Theme Editor provides a real-time preview of your changes.
+-   **Update:** If a theme developer has provided an update source, Open WebUI will notify you when a new version is available.
+-   **Edit:** Click the pencil icon to open the Theme Editor and make your own tweaks.
+-   **Export/Copy:** Share your modified theme by exporting it as a file or copying the JSON to your clipboard.
+-   **Remove:** Click the trash can icon to delete a community theme.
+
+---
+
+## For Developers: Creating Themes
+
+Creating your own theme is a straightforward process of defining a `Theme` object in a JSON format. You can start from scratch or by editing an existing theme.
+
+### The Theme Object
+
+A theme is a single JSON object with the following properties. Only `id`, `name`, and `base` are strictly required.
+
+| Property             | Type                                           | Description                                                                                             |
+| -------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `id`                 | `string`                                       | A unique, machine-readable identifier (e.g., `"my-cool-theme"`). **Required**.                            |
+| `name`               | `string`                                       | A user-friendly name (e.g., `"My Cool Theme"`). **Required**.                                           |
+| `base`               | `'light' \| 'dark' \| 'oled-dark' \| 'her'`      | The built-in theme to use as a foundation. **Required**.                                                |
+| `version`            | `string`                                       | The version of your theme (e.g., `"1.0.0"`). Used for updates.                                          |
+| `author`             | `string`                                       | Your name or username.                                                                                  |
+| `repository`         | `string`                                       | A URL to the theme's repository, like a GitHub page.                                                    |
+| `targetWebUIVersion` | `string`                                       | The version of Open WebUI your theme is designed for.                                                   |
+| `emoji`              | `string`                                       | An emoji to represent your theme in the UI.                                                             |
+| `metaThemeColor`     | `string`                                       | A hex color (`#RRGGBB`) for the browser's UI elements.                                                  |
+| `variables`          | `object`                                       | An object where keys are CSS variable names and values are the new colors.                              |
+| `gradient`           | `object`                                       | Defines a background gradient. See details below.                                                       |
+| `tsparticlesConfig`  | `object`                                       | A configuration object for [tsParticles](https://particles.js.org/).                                    |
+| `animationScript`    | `string`                                       | A string of JavaScript code to be run in a web worker for custom canvas animations.                     |
+| `css`                | `string`                                       | A string of custom CSS rules to be injected.                                                            |
+| `sourceUrl`          | `string`                                       | A URL pointing to the raw `theme.json` file, allowing for automatic update checks.                      |
+| `codeMirrorTheme`    | `string`                                       | The name of a [CodeMirror theme](https://codemirror.net/5/demo/theme.html) for the text editor.         |
+
+### Creating a Theme
+
+The easiest way to start is using the built-in Theme Editor:
+
+1.  Navigate to `Settings > Themes`.
+2.  Click the **Add Manually** button. This opens the Theme Editor with a basic template.
+3.  Modify the properties. The editor provides a live preview as you make changes.
+4.  Once you're happy, click **Save**.
+
+### Example 1: Simple Color Theme
+
+This theme creates a "Forest" look by overriding the default CSS color variables.
+
+```json
+{
+  "id": "forest",
+  "name": "Forest",
+  "base": "dark",
+  "author": "Jules",
+  "emoji": "🌲",
+  "metaThemeColor": "#1A3622",
+  "variables": {
+    "--color-gray-950": "#0D1A13",
+    "--color-gray-900": "#1A3622",
+    "--color-gray-850": "#22482D",
+    "--color-primary": "#6B8E23"
+  }
+}
+```
+
+### Example 2: Gradient Background Theme
+
+This theme adds a subtle, animated gradient to the background.
+
+```json
+{
+  "id": "ocean-breeze",
+  "name": "Ocean Breeze",
+  "base": "light",
+  "emoji": "🌊",
+  "gradient": {
+    "enabled": true,
+    "colors": ["#a8c0ff", "#3f2b96"],
+    "direction": 120,
+    "intensity": 80
+  }
+}
+```
+
+### Example 3: tsParticles Theme
+
+This theme uses `tsParticles` to create an interactive particle background. Paste a valid `tsParticles` JSON config into the `tsparticlesConfig` property.
+
+```json
+{
+  "id": "starfield",
+  "name": "Starfield",
+  "base": "oled-dark",
+  "emoji": "✨",
+  "tsparticlesConfig": {
+    "particles": {
+      "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
+      "color": { "value": "#ffffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 1, "random": true },
+      "size": { "value": 3, "random": true },
+      "line_linked": { "enable": false },
+      "move": { "enable": true, "speed": 1, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
+    }
+  }
+}
+```
+
+### Example 4: Custom Animation Theme
+
+For complete control, you can provide JavaScript for a custom canvas animation. This script runs in a separate worker thread for performance.
+
+```json
+{
+  "id": "matrix-rain",
+  "name": "Matrix Rain",
+  "base": "oled-dark",
+  "emoji": "🔢",
+  "animationScript": "const canvas = self.canvas; const ctx = canvas.getContext('2d'); let columns; let drops; function setup() { const width = self.width; const height = self.height; canvas.width = width; canvas.height = height; columns = Math.floor(width / 20); drops = []; for (let i = 0; i < columns; i++) { drops[i] = 1; } } function draw() { ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#0F0'; ctx.font = '15px monospace'; for (let i = 0; i < drops.length; i++) { const text = String.fromCharCode(0x30A0 + Math.random() * 96); ctx.fillText(text, i * 20, drops[i] * 20); if (drops[i] * 20 > canvas.height && Math.random() > 0.975) { drops[i] = 0; } drops[i]++; } } self.onmessage = (e) => { if (e.data.type === 'init') { self.canvas = e.data.canvas; setup(); setInterval(draw, 33); } else if (e.data.type === 'resize') { self.width = e.data.width; self.height = e.data.height; setup(); } };"
+}
+```
+
+### Sharing Your Theme
+
+To make your theme easily shareable and updatable, host the `theme.json` file somewhere with a raw file link (like GitHub Gist or a public repository) and set the `sourceUrl` property to that link. This allows others to install your theme with one click and receive updates automatically.
