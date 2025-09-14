@@ -5,17 +5,18 @@ title: "🔎 Retrieval Augmented Generation (RAG)"
 
 :::warning
 
-If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This means that retrieved data may **not be used at all** because it doesn’t fit within the available context window. To improve **Retrieval-Augmented Generation (RAG) performance**, you should **increase the context length** to **8192+ tokens** in your Ollama model settings.  
+If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
+
+**Why This Is Critical for Web Search:**
+Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 2048 tokens available, you're getting less than half the page content, often missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
+
+**To Fix This:** Navigate to **Admin Panel > Models > Settings** (of your Ollama model) > **Advanced Parameters** and **increase the context length to 8192+ tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-4 Turbo with 128k tokens).
 
 :::
-
 
 Retrieval Augmented Generation (RAG) is a cutting-edge technology that enhances the conversational capabilities of chatbots by incorporating context from diverse sources. It works by retrieving relevant information from a wide range of sources such as local and remote documents, web content, and even multimedia sources like YouTube videos. The retrieved text is then combined with a predefined RAG template and prefixed to the user's prompt, providing a more informed and contextually relevant response.
 
 One of the key advantages of RAG is its ability to access and integrate information from a variety of sources, making it an ideal solution for complex conversational scenarios. For instance, when a user asks a question related to a specific document or web page, RAG can retrieve and incorporate the relevant information from that source into the chat response. RAG can also retrieve and incorporate information from multimedia sources like YouTube videos. By analyzing the transcripts or captions of these videos, RAG can extract relevant information and incorporate it into the chat response.
-
-
-
 
 ## Local and Remote RAG Integration
 
