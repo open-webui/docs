@@ -720,6 +720,14 @@ The format for the JSON response is strictly:
 - Description: Enables or disables direct connections.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `TOOL_SERVER_CONNECTIONS`
+
+- Type: `str` (JSON array)
+- Default: `[]`
+- Description: Specifies a JSON array of tool server connection configurations. Each connection should define the necessary parameters to connect to external tool servers that implement the OpenAPI/MCPO protocol. The JSON must be properly formatted or it will fallback to an empty array.
+- Example: `'[{"name": "example-server", "url": "https://api.example.com", "api_key": "your-key"}]'`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Autocomplete
 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
