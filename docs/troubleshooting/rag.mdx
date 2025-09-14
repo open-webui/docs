@@ -61,13 +61,9 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 - 🛠️ **For Ollama Models**: Extend the model's context length:
   - Navigate to: **Admin Panel > Models > Settings** (of the model you want to edit)
   - Go to **Advanced Parameters**
-  - Modify the context length (e.g., increase to 8192+ tokens if supported by your model)
+  - Modify the context length (e.g., increase to 8192+ or ideally beyond 16000 tokens if supported by your model)
 
-- 🌐 **For OpenAI and Other Integrated Models**: These models typically have their own context limits that cannot be modified through Open WebUI settings. Ensure you're using a model with sufficient context length:
-  - GPT-4: 8,192 tokens
-  - GPT-4-32k: 32,768 tokens
-  - GPT-4 Turbo: 128,000 tokens
-  - Claude 3: Up to 200,000 tokens
+- 🌐 **For OpenAI and Other Integrated Models**: These models typically have their own context limits that cannot be modified through Open WebUI settings. Ensure you're using a model with sufficient context length.
 
 ℹ️ Note: The 2048-token default is a big limiter for web search. For better RAG results with web content, we strongly recommend using at least 8192 tokens, with 16384+ being ideal for complex web pages.
 
