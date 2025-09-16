@@ -118,6 +118,23 @@ Here's how the layers are applied, from bottom to top:
 
 The real power of the theming system comes from combining these layers. You are not limited to using just one property at a time. A single theme can change the color variables, add a background image, and use custom CSS to change fonts, all at once.
 
+#### Controlling Features with Toggles
+The Theme Editor modal includes toggles for all major features (like gradients, custom CSS, animations, etc.). These toggles are always visible, allowing users to see the full range of customization options.
+
+When you create a theme, you can define which of these features are active by default. For example, if you include a `gradient` object in your `theme.json`, the "Gradient" toggle will be enabled and switched on. If you omit the `gradient` property, the toggle will be switched off.
+
+The `toggles` property in your `theme.json` gives you explicit control. By setting a feature's corresponding key to `true` or `false` in the `toggles` object, you can define its default on/off state in the editor. This is useful for creating themes with optional features that you want to be explicitly enabled or disabled by default.
+
+Here are the available toggles:
+
+- `cssVariables`
+- `customCss`
+- `animationScript`
+- `tsParticles`
+- `gradient`
+- `systemBackgroundImage`
+- `chatBackgroundImage`
+
 ### Advanced Theming
 
 #### Using Custom Fonts
@@ -159,26 +176,9 @@ body {
 
 Either block can be used independently; both override the default font for every visible part of Open WebUI.
 
-#### Controlling Features with Toggles
-The Theme Editor modal includes toggles for all major features (like gradients, custom CSS, animations, etc.). These toggles are always visible, allowing users to see the full range of customization options.
-
-When you create a theme, you can define which of these features are active by default. For example, if you include a `gradient` object in your `theme.json`, the "Gradient" toggle will be enabled and switched on. If you omit the `gradient` property, the toggle will be switched off.
-
-The `toggles` property in your `theme.json` gives you explicit control. By setting a feature's corresponding key to `true` or `false` in the `toggles` object, you can define its default on/off state in the editor. This is useful for creating themes with optional features that you want to be explicitly enabled or disabled by default.
-
-Here are the available toggles:
-
-- `cssVariables`
-- `customCss`
-- `animationScript`
-- `tsParticles`
-- `gradient`
-- `systemBackgroundImage`
-- `chatBackgroundImage`
-
 ### CodeMirror Themes
 
-You can customize the appearance of the code editor in Open WebUI by specifying a `codeMirrorTheme` property of your `theme.json`. A wide variety of themes are available to choose from.
+You can customize the appearance of the code editor in Open WebUI by specifying a `codeMirrorTheme` property of your `theme.json`. A wide variety of themes are available to choose from. These themes are sourced from the [`@uiw/codemirror-themes-all`](https://www.npmjs.com/package/@uiw/codemirror-themes-all) package.
 
 Here is a list of the available CodeMirror themes:
 
