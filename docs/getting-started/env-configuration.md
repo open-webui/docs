@@ -1986,6 +1986,18 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Description: Enables or disables OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_ONEDRIVE_PERSONAL`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the personal OneDrive option appears in the attachment menu. When enabled, users can upload files from their personal Microsoft OneDrive accounts.
+
+#### `ENABLE_ONEDRIVE_BUSINESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the work/school OneDrive option appears in the attachment menu. When enabled, users can upload files from their organizational OneDrive/SharePoint accounts.
+
 #### `ONEDRIVE_CLIENT_ID`
 
 - Type: `str`
