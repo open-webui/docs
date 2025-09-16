@@ -91,6 +91,33 @@ The easiest way to start is using the built-in Theme Editor:
 3.  Modify the properties. The editor provides a live preview as you make changes.
 4.  Once you're happy, click **Save**.
 
+### Sharing Your Theme
+
+To make your theme easily shareable and updatable, host the `theme.json` file somewhere with a raw file link (like GitHub Gist or a public repository) and set the `sourceUrl` property to that link. This allows others to install your theme with one click and receive updates automatically.
+
+### The Documentation Tab
+The Theme Editor includes a "Documentation" tab, which is a valuable resource when creating themes. It contains a table of all available CSS variables with their default values and descriptions, as well as the full theme schema.
+
+### Understanding the Layering System
+
+A powerful feature of the Open WebUI theming engine is its layering system. While not always visible, this system is what allows for flexible and powerful theme customization. Think of it like layers in an image editor: each new property you define in your `theme.json` adds a layer on top of the previous one, modifying the final appearance.
+
+Here's how the layers are applied, from bottom to top:
+
+1.  **Base Theme**: This is the foundation. When you choose a `base` theme (e.g., `'dark'`), you are selecting the foundational set of styles for the entire application.
+
+2.  **Color Variables**: The `variables` object is the next layer. It allows you to override the specific colors defined in the base theme. For example, you can change `--color-primary` to a new hex code without altering any other part of the theme.
+
+3.  **Backgrounds**: After the base colors are set, you can add a background layer using either the `gradient` property or a `systemBackgroundImageUrl`. This layer sits behind all the UI elements.
+
+4.  **Animations**: On top of the background, you can add a dynamic animation layer with `tsparticlesConfig` or a custom `animationScript`. You can use CSS to control the exact positioning of this layer, such as placing it behind the main content.
+
+5.  **Custom CSS**: The `css` property is the final and most powerful layer. The styles you define here are injected last, giving them the ability to override any of the styles from the layers below. This is where you can make fine-tuned adjustments, add custom fonts, or change the layout.
+
+#### Combining Layers
+
+The real power of the theming system comes from combining these layers. You are not limited to using just one property at a time. A single theme can change the color variables, add a background image, and use custom CSS to change fonts, all at once.
+
 ### Advanced Theming
 
 #### Using Custom Fonts
@@ -122,59 +149,6 @@ Here are the available toggles:
 - `gradient`
 - `systemBackgroundImage`
 - `chatBackgroundImage`
-
-### Understanding the Layering System
-
-A powerful feature of the Open WebUI theming engine is its layering system. While not always visible, this system is what allows for flexible and powerful theme customization. Think of it like layers in an image editor: each new property you define in your `theme.json` adds a layer on top of the previous one, modifying the final appearance.
-
-Here's how the layers are applied, from bottom to top:
-
-1.  **Base Theme**: This is the foundation. When you choose a `base` theme (e.g., `'dark'`), you are selecting the foundational set of styles for the entire application.
-
-2.  **Color Variables**: The `variables` object is the next layer. It allows you to override the specific colors defined in the base theme. For example, you can change `--color-primary` to a new hex code without altering any other part of the theme.
-
-3.  **Backgrounds**: After the base colors are set, you can add a background layer using either the `gradient` property or a `systemBackgroundImageUrl`. This layer sits behind all the UI elements.
-
-4.  **Animations**: On top of the background, you can add a dynamic animation layer with `tsparticlesConfig` or a custom `animationScript`. You can use CSS to control the exact positioning of this layer, such as placing it behind the main content.
-
-5.  **Custom CSS**: The `css` property is the final and most powerful layer. The styles you define here are injected last, giving them the ability to override any of the styles from the layers below. This is where you can make fine-tuned adjustments, add custom fonts, or change the layout.
-
-#### Combining Layers
-
-The real power of the theming system comes from combining these layers. You are not limited to using just one property at a time. A single theme can change the color variables, add a background image, and use custom CSS to change fonts, all at once.
-
-##### Example: "Cyberpunk Sunset" Theme
-
-Let's create a theme that combines multiple layers to achieve a unique "Cyberpunk Sunset" look.
-
-```json
-{
-  "id": "cyberpunk-sunset",
-  "name": "Cyberpunk Sunset",
-  "base": "dark",
-  "emoji": "🌇",
-  "variables": {
-    "--color-primary": "#FF00FF",
-    "--color-secondary": "#00FFFF"
-  },
-  "gradient": {
-    "enabled": true,
-    "animated": true,
-    "colors": ["#7B2ABF", "#FF00FF", "#00FFFF"],
-    "direction": 160,
-    "intensity": 75
-  },
-  "css": "@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap'); body { font-family: 'Orbitron', sans-serif; }"
-}
-```
-
-In this example:
--   We start with the `dark` **base theme**.
--   We then override the primary and secondary colors with bright, cyberpunk-style hex codes in the **`variables`** layer.
--   Next, we add an animated **`gradient`** layer with a matching color scheme to create a sunset effect.
--   Finally, we use the **`css`** layer to import and apply the "Orbitron" font from Google Fonts, giving the UI a futuristic feel.
-
-This example demonstrates how you can stack different properties to create a cohesive and complex theme that goes far beyond simple color changes.
 
 ### CodeMirror Themes
 
@@ -229,30 +203,6 @@ Here is a list of the available CodeMirror themes:
 - `xcodeLight`
 - `xcodeDark`
 
-### The Documentation Tab
-The Theme Editor includes a "Documentation" tab, which is a valuable resource when creating themes. It contains a table of all available CSS variables with their default values and descriptions, as well as the full theme schema.
-
-### Example 1: Simple Color Theme
-
-This theme creates a "Forest" look by overriding the default CSS color variables.
-
-```json
-{
-  "id": "forest",
-  "name": "Forest",
-  "base": "dark",
-  "author": "Jules",
-  "emoji": "🌲",
-  "metaThemeColor": "#1A3622",
-  "variables": {
-    "--color-gray-950": "#0D1A13",
-    "--color-gray-900": "#1A3622",
-    "--color-gray-850": "#22482D",
-    "--color-primary": "#6B8E23"
-  }
-}
-```
-
 ### Backgrounds
 
 You can customize the background of the application in two ways: with a gradient or with an image.
@@ -279,26 +229,6 @@ You can set separate background images for the main UI and the chat area.
 | `systemBackgroundImageDarken` | `number` | A value from 0 to 100 to control the darkness of the system background image. |
 | `chatBackgroundImageUrl`      | `string` | URL for an image to be used as the background for the chat message area. |
 | `chatBackgroundImageDarken`   | `number` | A value from 0 to 100 to control the darkness of the chat background image. |
-
-### Example 2: Animated Gradient Background
-
-This theme adds a subtle, animated gradient to the background.
-
-```json
-{
-  "id": "ocean-breeze",
-  "name": "Ocean Breeze",
-  "base": "light",
-  "emoji": "🌊",
-  "gradient": {
-    "enabled": true,
-    "animated": true,
-    "colors": ["#a8c0ff", "#3f2b96"],
-    "direction": 120,
-    "intensity": 80
-  }
-}
-```
 
 ### Animations
 
@@ -435,7 +365,11 @@ Here is a checklist of common things to look for and change in the original scri
 *   **`requestAnimationFrame(animate)` or `setTimeout(animate, ...)`:** Make sure the animation loop is started by calling `animate()` once from within the `init` message handler. The loop itself should use `requestAnimationFrame(animate)`.
 *   **Global variables:** Make sure any global variables from the original script are defined at the top level of your worker script (outside the `self.onmessage` handler).
 
-###### Example: Before and After
+---
+
+## Examples
+
+### Example: Before and After Custom Animation Script Conversion
 
 Here is an example of a simple animation before and after conversion.
 
@@ -485,8 +419,81 @@ function animate() {
   requestAnimationFrame(animate);
 }
 ```
-
 By following these instructions, you should be able to convert most JavaScript canvas animations to work with the Open WebUI theme system.
+
+### Example 1: "Cyberpunk Sunset" Theme
+
+Let's create a theme that combines multiple layers to achieve a unique "Cyberpunk Sunset" look.
+
+```json
+{
+  "id": "cyberpunk-sunset",
+  "name": "Cyberpunk Sunset",
+  "base": "dark",
+  "emoji": "🌇",
+  "variables": {
+    "--color-primary": "#FF00FF",
+    "--color-secondary": "#00FFFF"
+  },
+  "gradient": {
+    "enabled": true,
+    "animated": true,
+    "colors": ["#7B2ABF", "#FF00FF", "#00FFFF"],
+    "direction": 160,
+    "intensity": 75
+  },
+  "css": "@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap'); body { font-family: 'Orbitron', sans-serif; }"
+}
+```
+
+In this example:
+-   We start with the `dark` **base theme**.
+-   We then override the primary and secondary colors with bright, cyberpunk-style hex codes in the **`variables`** layer.
+-   Next, we add an animated **`gradient`** layer with a matching color scheme to create a sunset effect.
+-   Finally, we use the **`css`** layer to import and apply the "Orbitron" font from Google Fonts, giving the UI a futuristic feel.
+
+This example demonstrates how you can stack different properties to create a cohesive and complex theme that goes far beyond simple color changes.
+
+### Example 2: Simple Color Theme
+
+This theme creates a "Forest" look by overriding the default CSS color variables.
+
+```json
+{
+  "id": "forest",
+  "name": "Forest",
+  "base": "dark",
+  "author": "Jules",
+  "emoji": "🌲",
+  "metaThemeColor": "#1A3622",
+  "variables": {
+    "--color-gray-950": "#0D1A13",
+    "--color-gray-900": "#1A3622",
+    "--color-gray-850": "#22482D",
+    "--color-primary": "#6B8E23"
+  }
+}
+```
+
+### Example 3: Animated Gradient Background
+
+This theme adds a subtle, animated gradient to the background.
+
+```json
+{
+  "id": "ocean-breeze",
+  "name": "Ocean Breeze",
+  "base": "light",
+  "emoji": "🌊",
+  "gradient": {
+    "enabled": true,
+    "animated": true,
+    "colors": ["#a8c0ff", "#3f2b96"],
+    "direction": 120,
+    "intensity": 80
+  }
+}
+```
 
 ### Example 4: The `Matrix Rain` theme
 
@@ -525,7 +532,3 @@ This theme adds a background image to the chat and the overall system.
   "chatBackgroundImageDarken": 30
 }
 ```
-
-### Sharing Your Theme
-
-To make your theme easily shareable and updatable, host the `theme.json` file somewhere with a raw file link (like GitHub Gist or a public repository) and set the `sourceUrl` property to that link. This allows others to install your theme with one click and receive updates automatically.
