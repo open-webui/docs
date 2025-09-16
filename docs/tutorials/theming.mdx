@@ -121,17 +121,43 @@ The real power of the theming system comes from combining these layers. You are 
 ### Advanced Theming
 
 #### Using Custom Fonts
-You can embed custom fonts in your theme using the `css` property. By using the `@font-face` rule, you can load fonts from external services like Google Fonts. For best performance, you should link directly to the font file (e.g., a `.woff2` file).
+
+Open WebUI lets you embed custom fonts in your theme using the `css` property to override the default font family in two ways:  
+1. A fast, self-hosted `@font-face` declaration  
+2. A convenient Google Fonts `@import` statement
+
+Both snippets go into the **Custom CSS** field of your theme.
+
+---
+
+**Option 1 – self-hosted**  
+If you want the smallest possible file and full control over privacy, reference the raw font file directly (`.woff2` recommended):
 
 ```css
 @font-face {
   font-family: 'Roboto';
   src: url('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2') format('woff2');
 }
+
 body, button, input, textarea {
   font-family: 'Roboto', sans-serif;
 }
 ```
+
+---
+
+**Option 2 – Google Fonts import**  
+The quickest way to add a Google font is the standard `@import` statement:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+body {
+  font-family: 'Orbitron', sans-serif;
+}
+```
+
+Either block can be used independently; both override the default font for every visible part of Open WebUI.
 
 #### Controlling Features with Toggles
 The Theme Editor modal includes toggles for all major features (like gradients, custom CSS, animations, etc.). These toggles are always visible, allowing users to see the full range of customization options.
