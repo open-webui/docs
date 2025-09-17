@@ -10,12 +10,26 @@ Start by pulling the latest Open WebUI Docker image from the GitHub Container Re
 docker pull ghcr.io/open-webui/open-webui:main
 ```
 
+### Slim Image Variant
+
+For environments with limited storage or bandwidth, Open WebUI offers slim image variants that exclude pre-bundled models. These images are significantly smaller but download required models (whisper, embedding models) on first use.
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:main-slim
+```
+
 ## Step 2: Run the Container
 
 Run the container with default settings. This command includes a volume mapping to ensure persistent data storage.
 
 ```bash
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+```
+
+To use the slim variant instead:
+
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main-slim
 ```
 
 ### Important Flags

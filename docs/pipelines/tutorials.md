@@ -26,4 +26,8 @@ with us, as we'd love to feature it here!
 
 [Deploying custom Document RAG pipeline with Open-WebUI](https://github.com/Sebulba46/document-RAG-pipeline) (GitHub guide by Sebulba46) 
 
-- Step by step guide to deploy Open-WebUI and pipelines containers and creating your own document RAG with local LLM API. 
+- Step by step guide to deploy Open-WebUI and pipelines containers and creating your own document RAG with local LLM API.
+
+[Deploy Your Own Open WebUI Interface with HTTPS Security](https://henrynavarro.org/deploy-your-own-open-webui-interface-with-https-security-53a6ea2609d7?sk=a5876acd56b44ea60f10f9b13aa24aee) (Medium article by @hdnh2006)
+
+- Learn how to deploy Open WebUI 100% secure through https.

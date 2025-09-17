@@ -720,6 +720,14 @@ The format for the JSON response is strictly:
 - Description: Enables or disables direct connections.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `TOOL_SERVER_CONNECTIONS`
+
+- Type: `str` (JSON array)
+- Default: `[]`
+- Description: Specifies a JSON array of tool server connection configurations. Each connection should define the necessary parameters to connect to external tool servers that implement the OpenAPI/MCPO protocol. The JSON must be properly formatted or it will fallback to an empty array.
+- Example: `'[{"name": "example-server", "url": "https://api.example.com", "api_key": "your-key"}]'`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Autocomplete
 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
@@ -1730,6 +1738,7 @@ Provide a clear and direct response to the user's query, including inline citati
 - Options:
   - `character`
   - `token`
+  - `markdown_header`
 - Default: `character`
 - Description: Sets the text splitter for RAG models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -1976,6 +1985,18 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 - Default: `False`
 - Description: Enables or disables OneDrive integration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_ONEDRIVE_PERSONAL`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the personal OneDrive option appears in the attachment menu. When enabled, users can upload files from their personal Microsoft OneDrive accounts.
+
+#### `ENABLE_ONEDRIVE_BUSINESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the work/school OneDrive option appears in the attachment menu. When enabled, users can upload files from their organizational OneDrive/SharePoint accounts.
 
 #### `ONEDRIVE_CLIENT_ID`
 
@@ -2980,6 +3001,35 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 - Type: `str`
 - Default: `<backend>/oauth/github/callback`
 - Description: Sets the redirect URI for GitHub OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Feishu
+
+See https://open.feishu.cn/document/sso/web-application-sso/login-overview
+
+#### `FEISHU_CLIENT_ID`
+
+- Type: `str`
+- Description: Sets the client ID for Feishu OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FEISHU_CLIENT_SECRET`
+
+- Type: `str`
+- Description: Sets the client secret for Feishu OAuth.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FEISHU_CLIENT_SCOPE`
+
+- Type: `str`
+- Default: `contact:user.base:readonly`
+- Description: Specifies the scope for Feishu OAuth authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FEISHU_CLIENT_REDIRECT_URI`
+
+- Type: `str`
+- Description: Sets the redirect URI for Feishu OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### OpenID (OIDC)

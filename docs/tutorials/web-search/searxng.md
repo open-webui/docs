@@ -316,6 +316,50 @@ docker compose up -d
 On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi`.ini. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
 :::
 
+**Configure SearXNG for Open WebUI Integration**
+
+After starting the container, you need to configure SearXNG to support JSON format queries from Open WebUI:
+
+1. Stop the container after about 30 seconds to allow initial configuration files to be generated:
+
+```bash
+docker compose down
+```
+
+2. Navigate to the `./searxng` folder and edit the `settings.yml` file:
+
+```bash
+cd searxng
+```
+
+3. Open the `settings.yml` file in your preferred text editor and locate the `search` section. Add `json` to the formats list:
+
+```yaml
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: ""
+  formats:
+    - html
+    - json  # Add this line to enable JSON format support for Open WebUI
+```
+
+Alternatively, you can use the following command to automatically add JSON support:
+
+```bash
+sed -i '/formats:/,/]/s/html/html\n    - json/' searxng/settings.yml
+```
+
+4. Save the file and restart the container:
+
+```bash
+docker compose up -d
+```
+
+:::warning
+Without adding JSON format support, SearXNG will block queries from Open WebUI and you'll encounter `403 Client Error: Forbidden` errors in your Open WebUI logs.
+:::
+
 Alternatively, you can run SearXNG directly using `docker run`:
 
 ```bash

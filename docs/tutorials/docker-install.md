@@ -3,6 +3,12 @@ sidebar_position: 4
 title: 🐳 Installing Docker
 ---
 
+:::info **Looking to install Open WebUI?**
+
+This page covers Docker installation only. For **Open WebUI installation instructions via Docker**, please visit our [Quick Start Guide](https://docs.openwebui.com/getting-started/quick-start/) which provides comprehensive setup instructions.
+
+:::
+
 :::warning
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
@@ -21,7 +27,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 1. **Open your terminal.**
 
-2. **Set up Docker’s apt repository:**
+2. **Set up Docker's apt repository:**
 
    ```bash
    sudo apt-get update

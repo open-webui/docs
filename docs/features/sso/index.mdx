@@ -1,6 +1,6 @@
 ---
 sidebar_position: 19
-title: "🔒 SSO: Federated Authentication Support"
+title: "🔐 SSO: Federated Authentication Support"
 ---
 
 # Federated Authentication Support
@@ -18,6 +18,13 @@ Open WebUI supports several forms of federated authentication:
 
 For more information about all environment variables, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
 It is highly recommended to check the environment variable page, to get more details about how to set the variable and what values are expected.
+
+:::
+
+:::tip
+
+Need help with troubleshooting your SSO setup?
+Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting/sso)
 
 :::
 
@@ -41,6 +48,20 @@ You cannot have Microsoft **and** Google as providers simultaneously.
 | `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`     | *empty*   | Redirect users to this URL after signout. E.g., `https://your-company.com/logout-success`                                               |
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | **Required.** A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`    | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.                       |
+
+:::warning
+
+**Critical Configuration Notes:**
+
+1. **WEBUI_URL Must Be Set First**: Configure `WEBUI_URL` in the Admin Panel before enabling OAuth, as it's used for redirect URIs.
+
+2. **Persistent Config Behavior**: When `ENABLE_OAUTH_PERSISTENT_CONFIG=true` (default), OAuth settings are stored in the database after first launch. To change environment variables after initial setup, either:
+   - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
+   - Update settings through the Admin Panel instead of environment variables
+
+3. **Required Variables**: Always verify you're using the exact variable names from the [environment configuration documentation](https://docs.openwebui.com/getting-started/env-configuration/). Common mistakes include using non-existent variables like `OIDC_CONFIG`.
+
+:::
 
 ### Server-Side OAuth Session Management
 
@@ -104,10 +125,19 @@ The following environment variables are used:
 
 1. `OAUTH_CLIENT_ID` - OIDC client ID
 1. `OAUTH_CLIENT_SECRET` - OIDC client secret
-1. `OPENID_PROVIDER_URL` - OIDC well known URL, for example `https://accounts.google.com/.well-known/openid-configuration`
+1. `OPENID_PROVIDER_URL` - **Required.** OIDC well known URL, for example `https://accounts.google.com/.well-known/openid-configuration`
 1. `OAUTH_PROVIDER_NAME` - Name of the provider to show on the UI, defaults to SSO
 1. `OAUTH_SCOPES` - Scopes to request. Defaults to `openid email profile`
 1. `OPENID_REDIRECT_URI` - The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
+
+:::warning
+
+**Common OIDC Mistakes:**
+- Using non-existent environment variables like `OIDC_CONFIG` or `WEBUI_OIDC_CLIENT_ID`
+- Forgetting to set `OPENID_PROVIDER_URL` (this is mandatory for OIDC)
+- Using incorrect redirect URI format - must be exactly `<your-domain>/oauth/oidc/callback`
+
+:::
 
 ### OAuth Role Management
 
