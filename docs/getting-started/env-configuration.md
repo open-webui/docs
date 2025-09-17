@@ -1638,6 +1638,8 @@ Note: this configuration assumes that AWS credentials will be available to your 
 
 ## Retrieval Augmented Generation (RAG)
 
+### Core Configuration
+
 #### `RAG_EMBEDDING_ENGINE`
 
 - Type: `str`
@@ -1645,6 +1647,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
   - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
   - `ollama` - Uses the Ollama API for embeddings.
   - `openai` - Uses the OpenAI API for embeddings.
+  - `azure` - Uses Azure OpenAI Services for embeddings.
 - Description: Selects an embedding engine to use for RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -1653,14 +1656,6 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Type: `str`
 - Default: `sentence-transformers/all-MiniLM-L6-v2`
 - Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `ENABLE_RAG_HYBRID_SEARCH`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using
-`sentence_transformers` models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_TOP_K`
@@ -1684,11 +1679,18 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Description: Sets the relevance threshold to consider for documents when used with reranking.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_RAG_HYBRID_SEARCH`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_HYBRID_BM25_WEIGHT`
 
 - Type: `float`
 - Default: `0.5`
-- Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword serach, 0 means only vector search.
+- Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword search, 0 means only vector search.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_TEMPLATE`
@@ -1729,7 +1731,23 @@ Provide a clear and direct response to the user's query, including inline citati
 </user_query>
 ```
 
-- Description: Template to use when injecting RAG documents into chat completion
+- Description: Template to use when injecting RAG documents into chat completion.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Document Processing
+
+#### `CHUNK_SIZE`
+
+- Type: `int`
+- Default: `1000`
+- Description: Sets the document chunk size for embeddings.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `CHUNK_OVERLAP`
+
+- Type: `int`
+- Default: `100`
+- Description: Specifies how much overlap there should be between chunks.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_TEXT_SPLITTER`
@@ -1756,20 +1774,6 @@ Provide a clear and direct response to the user's query, including inline citati
 - Description: Sets the encoding name for TikToken.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `CHUNK_SIZE`
-
-- Type: `int`
-- Default: `1000`
-- Description: Sets the document chunk size for embeddings.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `CHUNK_OVERLAP`
-
-- Type: `int`
-- Default: `100`
-- Description: Specifies how much overlap there should be between chunks.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 #### `PDF_EXTRACT_IMAGES`
 
 - Type: `bool`
@@ -1789,17 +1793,11 @@ Provide a clear and direct response to the user's query, including inline citati
 - Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-:::info
-
-When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the values are reasonable to prevent excessive file uploads and potential performance issues.
-
-:::
-
 #### `RAG_ALLOWED_FILE_EXTENSIONS`
 
 - Type: `list` of `str`
 - Default: `[]` (which means all supported file types are allowed)
-- Description: Specifies which file extensions are permitted for upload. 
+- Description: Specifies which file extensions are permitted for upload.
 
 ```json
 ["pdf,docx,txt"]
@@ -1807,11 +1805,45 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_RERANKING_MODEL`
+:::info
+
+When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the values are reasonable to prevent excessive file uploads and potential performance issues.
+
+:::
+
+### Embedding Engine Configuration
+
+#### General Embedding Settings
+
+#### `RAG_EMBEDDING_BATCH_SIZE`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the batch size for embedding in RAG (Retrieval-Augmented Generator) models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_EMBEDDING_CONTENT_PREFIX`
 
 - Type: `str`
-- Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
+- Default: `None`
+- Description: Specifies the prefix for the RAG embedding content.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the field name for the RAG embedding prefix.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_EMBEDDING_QUERY_PREFIX`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the prefix for the RAG embedding query.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### OpenAI Embeddings
 
 #### `RAG_OPENAI_API_BASE_URL`
 
@@ -1833,11 +1865,35 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 - Default: `1`
 - Description: Sets the batch size for OpenAI embeddings.
 
-#### `RAG_EMBEDDING_BATCH_SIZE`
+#### Azure OpenAI Embeddings
 
-- Type: `int`
-- Default: `1`
-- Description: Sets the batch size for embedding in RAG (Retrieval-Augmented Generator) models.
+#### `RAG_AZURE_OPENAI_BASE_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the base URL for Azure OpenAI Services when using Azure OpenAI for RAG embeddings. Should be in the format `https://{your-resource-name}.openai.azure.com`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_AZURE_OPENAI_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key for Azure OpenAI Services when using Azure OpenAI for RAG embeddings.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_AZURE_OPENAI_API_VERSION`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API version for Azure OpenAI Services when using Azure OpenAI for RAG embeddings. Common values include `2023-05-15`, `2023-12-01-preview`, or `2024-02-01`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### Ollama Embeddings
+
+#### `RAG_OLLAMA_BASE_URL`
+
+- Type: `str`
+- Description: Sets the base URL for Ollama API used in RAG models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_OLLAMA_API_KEY`
@@ -1846,11 +1902,15 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 - Description: Sets the API key for Ollama API used in RAG models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `RAG_OLLAMA_BASE_URL`
+### Reranking
+
+#### `RAG_RERANKING_MODEL`
 
 - Type: `str`
-- Description: Sets the base URL for Ollama API used in RAG models.
+- Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Query Generation
 
 #### `ENABLE_RETRIEVAL_QUERY_GENERATION`
 
@@ -1894,12 +1954,7 @@ Strictly return in JSON format:
 - Description: Sets the prompt template for query generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `BYPASS_EMBEDDING_AND_RETRIEVAL`
-
-- Type: `bool`
-- Default: `False`
-- Description: Bypasses the embedding and retrieval process.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+### Document Intelligence (Azure)
 
 #### `DOCUMENT_INTELLIGENCE_ENDPOINT`
 
@@ -1915,32 +1970,13 @@ Strictly return in JSON format:
 - Description: Specifies the key for document intelligence.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `ENABLE_RAG_LOCAL_WEB_FETCH`
+### Advanced Settings
+
+#### `BYPASS_EMBEDDING_AND_RETRIEVAL`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables local web fetch for RAG.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `RAG_EMBEDDING_CONTENT_PREFIX`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the prefix for the RAG embedding content.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the field name for the RAG embedding prefix.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `RAG_EMBEDDING_QUERY_PREFIX`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the prefix for the RAG embedding query.
+- Description: Bypasses the embedding and retrieval process.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_FULL_CONTEXT`
@@ -1948,6 +1984,13 @@ Strictly return in JSON format:
 - Type: `bool`
 - Default: `False`
 - Description: Specifies whether to use the full context for RAG.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_RAG_LOCAL_WEB_FETCH`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables local web fetch for RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Google Drive
