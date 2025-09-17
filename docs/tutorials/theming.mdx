@@ -274,6 +274,9 @@ You can set separate background images for the main UI and the chat area.
 | `chatBackgroundImageUrl`      | `string` | URL for an image to be used as the background for the chat message area. |
 | `chatBackgroundImageDarken`   | `number` | A value from 0 to 100 to control the darkness of the chat background image. |
 
+> **Note on Legacy Settings:**
+> Previously, a global "Chat Background Image" could be set in the user's `Interface` settings. This has been replaced by the more flexible per-theme background image settings described above, which include a "darken" slider. For backward compatibility, a `Legacy Chat Background Image` option is still available in `Settings > Interface`, but it only exists to reset the legacy chat background image.
+
 ### Animations
 
 Open WebUI supports two powerful methods for creating dynamic, animated backgrounds for your themes: **tsParticles** for easy-to-configure particle effects, and **Custom Animation Scripts** for full control over a canvas element.
