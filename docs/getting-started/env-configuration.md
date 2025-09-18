@@ -3076,8 +3076,10 @@ Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_P
 #### `OAUTH_CODE_CHALLENGE_METHOD`
 
 - Type: `str`
+- Options:
+  - `S256` - Hash `code_verifier` with SHA-256.
 - Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the code challenge method for OAuth authentication.
+- Description: Specifies the code challenge method for OAuth authentication. Set to `S256` when PKCE is required by the provider.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_PROVIDER_NAME`
