@@ -316,112 +316,136 @@ Let's break down the `starfield` example:
 -   **`particles.size`**: Controls the size of the particles.
 -   **`particles.move`**: Defines the movement of the particles, including their `speed` and `direction`.
 
-#### Using a Custom Animation Script
+#### Using a Custom Animation Script with Open WebUI Themes
 
-This section provides a step-by-step guide on how to convert a standard JavaScript canvas animation into a format that is compatible with the Open WebUI theme system.
-
-##### Understanding the Open WebUI Theme Engine
-
-The Open WebUI theme engine runs custom animation scripts in a **Web Worker**. This is a crucial point to understand, as it imposes several restrictions on the code you can write.
-
-**Key characteristics of the Web Worker environment:**
-
-*   **No DOM Access:** You do not have access to the `document` or `window` objects. This means you cannot create or manipulate DOM elements (like `<canvas>`) directly from the animation script.
-*   **Communication via Messaging:** The only way to communicate between the main application and the animation script (the worker) is through the `self.onmessage` and `postMessage` APIs.
-*   **Canvas is an `OffscreenCanvas`:** The main application will create a `<canvas>` element and transfer it to the worker as an `OffscreenCanvas`. You will receive this canvas object in the `init` message.
-
-##### The Conversion Process
-
-Here is a step-by-step guide to converting a typical JavaScript canvas animation.
-
-###### 1. Identify and Isolate the Core Animation Logic
-
-Most canvas animations have the following components:
-
-*   **Setup/Initialization Code:** This code runs once at the beginning to set up the canvas, create initial objects, etc. In a typical script, this might be at the top level of the script.
-*   **Animation Loop:** This is a function that is called repeatedly to draw each frame of the animation. It usually uses `requestAnimationFrame` or `setTimeout`.
-*   **Helper Functions:** These are utility functions for things like math, color manipulation, etc.
-*   **Object Definitions:** These are classes or constructor functions for the objects in the animation (e.g., `Particle`).
-*   **Event Listeners:** These are functions that respond to user input, like `mousemove` or `resize`.
-
-Your goal is to separate these components and adapt them to the worker environment.
-
-###### 2. Adapt the Code for the Worker Environment
-
-Here is a template for a converted animation script. You will need to move the code from the original script into the appropriate sections of this template.
-
-```javascript
-// 1. Paste all helper functions and object definitions here.
-//    (e.g., randomIntFromRange, Particle, etc.)
-
-// 2. Define global variables for the worker script.
-let canvas;
-let ctx;
-let w, h;
-// ... any other global variables your animation needs
-
-// 3. The main message handler for the worker.
-self.onmessage = function(e) {
-  if (e.data.type === 'init') {
-    // This is where the setup/initialization code goes.
-    canvas = e.data.canvas;
-    ctx = canvas.getContext('2d');
-    w = canvas.width = e.data.width;
-    h = canvas.height = e.data.height;
-
-    // Call your initialization function here.
-    init();
-    // Start the animation loop.
-    animate();
-
-  } else if (e.data.type === 'resize') {
-    // This is where the resize handling code goes.
-    w = canvas.width = e.data.width;
-    h = canvas.height = e.data.height;
-    // You might need to re-initialize your animation on resize.
-    init();
-
-  } else if (e.data.type === 'mousemove') {
-    // This is where the mouse move handling code goes.
-    // Update your mouse coordinates object here.
-    mouse.x = e.data.x;
-    mouse.y = e.data.y;
-  }
-};
-
-// 4. Your initialization function.
-function init() {
-  // ... your init code here ...
-}
-
-// 5. Your animation loop.
-function animate() {
-  // ... your drawing code here ...
-  requestAnimationFrame(animate);
-}
-```
-
-###### 3. Conversion Checklist
-
-Here is a checklist of common things to look for and change in the original script:
-
-*   **`document.querySelector('canvas')` or `document.getElementById('canvas')`:** Remove these lines. The canvas is provided to you.
-*   **`canvas.getContext('2d')`:** Move this line inside the `init` message handler.
-*   **`canvas.width = window.innerWidth` and `canvas.height = window.innerHeight`:** Remove these lines from the top level of the script. The canvas dimensions are provided in the `init` and `resize` messages.
-*   **`addEventListener('mousemove', ...)` and `addEventListener('resize', ...)`:** Remove these event listeners. This functionality is now handled by the `self.onmessage` handler.
-*   **`requestAnimationFrame(animate)` or `setTimeout(animate, ...)`:** Make sure the animation loop is started by calling `animate()` once from within the `init` message handler. The loop itself should use `requestAnimationFrame(animate)`.
-*   **Global variables:** Make sure any global variables from the original script are defined at the top level of your worker script (outside the `self.onmessage` handler).
+This guide walks you through converting a standard JavaScript canvas animation to work seamlessly with the Open WebUI theme system. It covers the unique environment constraints, how to structure your code, layering techniques, and best practices.
 
 ---
 
-## Examples
+## Understanding the Open WebUI Theme Engine Environment
 
-### Example: Before and After Custom Animation Script Conversion
+Open WebUI runs your custom animation scripts **inside a Web Worker**. This design improves performance and responsiveness but imposes strict limitations you must understand:
 
-Here is an example of a simple animation before and after conversion.
+- **No DOM Access:**  
+  You cannot access or manipulate any DOM elements (`document`, `window`, `<canvas>`, etc.). All rendering happens via an `OffscreenCanvas` transferred to the worker.
 
-**Before:**
-```javascript
+- **Message-based Communication:**  
+  Interaction with the main thread is only possible through the `self.onmessage` and `postMessage` APIs. This includes receiving the canvas, handling input events, and resize notifications.
+
+- **Canvas Provided as `OffscreenCanvas`:**  
+  The main application creates a `<canvas>` and transfers it to your worker as an `OffscreenCanvas` object. You receive this canvas in the `init` message, along with its dimensions.
+
+---
+
+## Core Concepts & Workflow
+
+Your animation script should be split into these components:
+
+| Component              | Description                                                                                  |
+|------------------------|----------------------------------------------------------------------------------------------|
+| **Setup/Initialization** | Runs once per initialization or resize; sets up canvas context, initializes objects, etc.    |
+| **Animation Loop**       | Called repeatedly via `requestAnimationFrame` to update and draw each frame                   |
+| **Helper Functions**     | Utility code for math, colors, physics, or other calculations                                |
+| **Object Definitions**   | Classes or constructor functions for animated entities                                      |
+| **Message Handlers**     | React to messages from main thread (`init`, `resize`, `mousemove`, etc.)                    |
+
+---
+
+## Template for Open WebUI Animation Script
+
+```js
+// 1. Helper functions & object definitions here
+
+// 2. Global variables for the worker context
+let canvas, ctx, w, h;
+let mouse = { x: 0, y: 0 };
+// ... other global state ...
+
+// 3. Main message handler
+self.onmessage = function (e) {
+  switch (e.data.type) {
+    case 'init':
+      canvas = e.data.canvas;
+      ctx = canvas.getContext('2d');
+      w = canvas.width = e.data.width;
+      h = canvas.height = e.data.height;
+      init();
+      animate();
+      break;
+    case 'resize':
+      w = canvas.width = e.data.width;
+      h = canvas.height = e.data.height;
+      init();
+      break;
+    case 'mousemove':
+      mouse.x = e.data.x;
+      mouse.y = e.data.y;
+      break;
+    // Add more message types as needed
+  }
+};
+
+// 4. Initialization function
+function init() {
+  // Setup canvas state, create objects, reset variables
+}
+
+// 5. Animation loop
+function animate() {
+  // Clear or partially clear canvas
+  // Update and draw your animation layers here
+  requestAnimationFrame(animate);
+}
+````
+
+---
+
+## Key Conversion Checklist
+
+When porting existing canvas animations:
+
+* **Remove all DOM queries and event listeners.**
+  No `document.querySelector`, `window.addEventListener`, etc.
+
+* **Move canvas context creation inside the `init` handler.**
+
+* **Use `self.onmessage` to receive canvas and input data.**
+
+* **Handle resizing inside the `resize` message by resetting canvas size and state.**
+
+* **Start your animation loop inside `init` (call `animate()` once).**
+
+* **Use `requestAnimationFrame` inside the worker for smooth looping.**
+
+* **Declare all global variables outside of handlers for state persistence.**
+
+---
+
+## Layering Techniques in Open WebUI
+
+Because you only have **one OffscreenCanvas context**, layering must be simulated by drawing multiple visual layers sequentially within each animation frame.
+
+* Use **drawing order**: earlier draws are background layers, later draws paint on top.
+
+* Use **`globalCompositeOperation`** to control blending modes:
+
+  * `'source-over'` (default): paint normally, covering previous pixels.
+
+  * `'lighter'` or `'screen'`: additive blending — great for glows, neon effects.
+
+  * `'multiply'`, `'overlay'`, `'xor'`: for complex color blending or masking.
+
+* Optionally, use **semi-transparent clears** or alpha fills to create fading trails or motion blur.
+
+* Maintain **separate arrays or state** for each visual layer’s objects to update and render them independently.
+
+---
+
+## Example: Simple Before & After Conversion
+
+**Original:**
+
+```js
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -439,11 +463,10 @@ function animate() {
 animate();
 ```
 
-**After:**
-```javascript
-let canvas;
-let ctx;
-let w, h;
+**Converted for Open WebUI:**
+
+```js
+let canvas, ctx, w, h;
 let x = 0;
 
 self.onmessage = function(e) {
@@ -460,13 +483,42 @@ function animate() {
   ctx.clearRect(0, 0, w, h);
   ctx.fillRect(x, 100, 50, 50);
   x += 1;
-  if (x > w) {
-    x = 0;
-  }
+  if (x > w) x = 0;
   requestAnimationFrame(animate);
 }
 ```
-By following these instructions, you should be able to convert most JavaScript canvas animations to work with the Open WebUI theme system.
+
+---
+
+## Performance & Best Practices
+
+* **Minimize overdraw:** Clear only what you need; avoid full canvas redraws if possible.
+
+* **Use efficient math:** Pre-calculate where possible; avoid expensive operations inside loops.
+
+* **Manage state wisely:** Keep mutable state outside `animate()` to avoid unnecessary allocations.
+
+* **Throttle input events:** Process `mousemove` or other events efficiently to prevent bottlenecks.
+
+* **Debugging:** Use browser devtools’ worker debugging features; log messages via `postMessage` back to main thread.
+
+---
+
+## Troubleshooting & FAQs
+
+* **Why is my canvas context null?**
+  Make sure you’re using the `canvas` from the `init` message, not querying DOM.
+
+* **Animations don’t start?**
+  Verify you call `animate()` inside `init` and that `requestAnimationFrame` is inside the worker.
+
+* **Resize not working properly?**
+  Ensure you handle the `resize` message by resizing canvas and re-initializing objects.
+
+* **Mouse input not received?**
+  Confirm main app sends `mousemove` messages and you update your mouse state in the worker.
+
+---
 
 ### Example 1: "Cyberpunk Sunset" Theme
 
