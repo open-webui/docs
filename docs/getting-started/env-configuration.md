@@ -1979,45 +1979,58 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 
 ### OneDrive
 
+:::info
+For a step-by-step setup guide, check out our tutorial: [Configuring OneDrive & SharePoint Integration](https://docs.openwebui.com/tutorials/integrations/onedrive-sharepoint/).
+:::
+
 #### `ENABLE_ONEDRIVE_INTEGRATION`
 
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables OneDrive integration.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+-   Type: `bool`
+-   Default: `False`
+-   Description: Enables or disables the Microsoft OneDrive integration feature globally.
+-   Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_ONEDRIVE_PERSONAL`
 
-- Type: `bool`
-- Default: `True`
-- Description: Controls whether the personal OneDrive option appears in the attachment menu. When enabled, users can upload files from their personal Microsoft OneDrive accounts.
+-   Type: `bool`
+-   Default: `True`
+-   Description: Controls whether the "Personal OneDrive" option appears in the attachment menu. Requires `ONEDRIVE_PERSONAL_CLIENT_ID` to be configured.
+-   Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_ONEDRIVE_BUSINESS`
 
-- Type: `bool`
-- Default: `True`
-- Description: Controls whether the work/school OneDrive option appears in the attachment menu. When enabled, users can upload files from their organizational OneDrive/SharePoint accounts.
+-   Type: `bool`
+-   Default: `True`
+-   Description: Controls whether the "Work/School OneDrive" option appears in the attachment menu. Requires `ONEDRIVE_CLIENT_ID` to be configured.
+-   Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ONEDRIVE_CLIENT_ID`
 
-- Type: `str`
-- Default: `None`
-- Description: Specifies the client ID for OneDrive integration.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+-   Type: `str`
+-   Default: `None`
+-   Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive & SharePoint** integration. This is obtained from an Azure App Registration configured for your organization's tenant. **Do not put the personal OneDrive client ID here!**
+-   Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_PERSONAL_CLIENT_ID`
+
+-   Type: `str`
+-   Default: `None`
+-   Description: Specifies the Application (client) ID for the **Personal OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the business OneDrive client ID here!**
+-   Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ONEDRIVE_SHAREPOINT_URL`
 
-- Type: `str`
-- Default: `None`
-- Description: Specifies the SharePoint site URL for OneDrive integration e.g. https://companyname.sharepoint.com.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+-   Type: `str`
+-   Default: `None`
+-   Description: Specifies the root SharePoint site URL for the work/school integration, e.g., `https://companyname.sharepoint.com`.
+-   Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ONEDRIVE_SHAREPOINT_TENANT_ID`
 
-- Type: `str`
-- Default: `None`
-- Description: Specifies the SharePoint tenant ID for OneDrive integration.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+-   Type: `str`
+-   Default: `None`
+-   Description: Specifies the Directory (tenant) ID for the work/school integration. This is obtained from your business-focused Azure App Registration.
+-   Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Web Search
 
