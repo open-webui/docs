@@ -9,6 +9,19 @@ This guide provides essential information on how to interact with the API endpoi
 
 To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication.
 
+## Swagger Documentation Links
+
+:::important
+Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
+:::
+
+Access detailed API documentation for different services provided by Open WebUI:
+
+| Application | Documentation Path      |
+|-------------|-------------------------|
+| Main        | `/docs`                 |
+
+
 ## Notable API Endpoints
 
 ### 📜 Retrieve All Models
@@ -257,18 +270,5 @@ Open WebUI offers a myriad of benefits, making it an essential tool for develope
 
 - **Unified Interface**: Simplify your interactions with different LLMs through a single, integrated platform.
 - **Ease of Implementation**: Quick start integration with comprehensive documentation and community support.
-
-## Swagger Documentation Links
-
-:::important
-Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
-:::
-
-Access detailed API documentation for different services provided by Open WebUI:
-
-| Application | Documentation Path      |
-|-------------|-------------------------|
-| Main        | `/docs`                 |
-
 
 By following these guidelines, you can swiftly integrate and begin utilizing the Open WebUI API. Should you encounter any issues or have questions, feel free to reach out through our Discord Community or consult the FAQs. Happy coding! 🌟
