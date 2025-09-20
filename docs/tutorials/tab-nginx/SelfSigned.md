@@ -26,6 +26,12 @@ Using self-signed certificates is suitable for development or internal use where
 
         location / {
             proxy_pass http://host.docker.internal:3000;
+
+            # Add WebSocket support (Necessary for version 0.5.0 and up)
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
