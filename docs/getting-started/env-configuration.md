@@ -2064,7 +2064,7 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 - Default: `None`
 - Description: Specifies the Application (client) ID for the **Personal OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the business OneDrive client ID here!**
 
-#### `ONEDRIVE_CLIENT_ID_PERSONAL`
+#### `ONEDRIVE_CLIENT_ID_BUSINESS`
 
 - Type: `str`
 - Default: `None`
