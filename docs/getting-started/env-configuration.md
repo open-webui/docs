@@ -2056,15 +2056,19 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive & SharePoint** integration. This is obtained from an Azure App Registration configured for your organization's tenant. **Do not put the personal OneDrive client ID here!**
-- Persistence: This environment variable is a `PersistentConfig` variable.
+- Description: Generic environment variable for the OneDrive Client ID. You should rather use the specific `ONEDRIVE_CLIENT_ID_PERSONAL` or `ONEDRIVE_CLIENT_ID_PERSONAL` variables. This exists as a legacy option for backwards compatibility.
 
-#### `ONEDRIVE_PERSONAL_CLIENT_ID`
+#### `ONEDRIVE_CLIENT_ID_PERSONAL`
 
 - Type: `str`
 - Default: `None`
 - Description: Specifies the Application (client) ID for the **Personal OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the business OneDrive client ID here!**
-- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_CLIENT_ID_PERSONAL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the personal OneDrive client ID here!**
 
 :::info
 This Client ID (also known as Application ID) is obtained from an Azure App Registration within your Microsoft Entra ID (formerly Azure AD) tenant.
