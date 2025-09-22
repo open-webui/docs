@@ -76,6 +76,14 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Default: `False`
 - Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
 
+
+#### `ENABLE_ENFORCE_PASSWORD_POLICY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enforces a basic password policy when users sign up, change their password and when they are created or updated through the API.
+- Persistence: This environment variable is a `PersistentConfig` variable
+
 #### `ENABLE_LOGIN_FORM`
 
 - Type: `bool`
