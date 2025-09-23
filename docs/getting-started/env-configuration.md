@@ -3691,6 +3691,12 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 - Default: `False`
 - Description: Enables or disables OpenTelemetry for observability. When enabled, tracing, metrics, and logging data can be collected and exported to an OTLP endpoint.
 
+#### `ENABLE_OTEL_TRACES`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry traces collection and export. This variable works in conjunction with `ENABLE_OTEL`.
+
 #### `ENABLE_OTEL_METRICS`
 
 - Type: `bool`
