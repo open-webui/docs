@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.19](https://github.com/open-webui/open-webui/releases/tag/v0.6.9), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.30](https://github.com/open-webui/open-webui/releases/tag/v0.6.30), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -2056,15 +2056,19 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive & SharePoint** integration. This is obtained from an Azure App Registration configured for your organization's tenant. **Do not put the personal OneDrive client ID here!**
-- Persistence: This environment variable is a `PersistentConfig` variable.
+- Description: Generic environment variable for the OneDrive Client ID. You should rather use the specific `ONEDRIVE_CLIENT_ID_PERSONAL` or `ONEDRIVE_CLIENT_ID_PERSONAL` variables. This exists as a legacy option for backwards compatibility.
 
-#### `ONEDRIVE_PERSONAL_CLIENT_ID`
+#### `ONEDRIVE_CLIENT_ID_PERSONAL`
 
 - Type: `str`
 - Default: `None`
 - Description: Specifies the Application (client) ID for the **Personal OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the business OneDrive client ID here!**
-- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ONEDRIVE_CLIENT_ID_BUSINESS`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the personal OneDrive client ID here!**
 
 :::info
 This Client ID (also known as Application ID) is obtained from an Azure App Registration within your Microsoft Entra ID (formerly Azure AD) tenant.
@@ -2158,6 +2162,7 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
   - `exa` - Uses the [Exa](https://exa.ai/) search engine.
   - `perplexity` - Uses the [Perplexity AI](https://www.perplexity.ai/) search engine.
   - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
+  - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
@@ -2306,6 +2311,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Default: `None`
 - Description: Sets the Sogou API SK.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the Ollama Cloud Web Search API Key.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `TAVILY_EXTRACT_DEPTH`
@@ -2933,6 +2945,12 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Default: `True`
 - Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.**
 - Usage: For new and secure deployments, **it is recommended to set this to `False`** to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
+
+#### `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`
+
+- Type: `str`
+- Default: Falls back to the value of `WEBUI_SECRET_KEY`.
+- Description: Specifies the secret key used to encrypt and decrypt OAuth client tokens stored server-side in the database. This is a critical security component for OAuth client tokens. If not set, it defaults to using the main `WEBUI_SECRET_KEY`, but it is highly recommended to set it to a unique, securely generated value for production environments. `OAUTH_CLIENT_INFO_ENCRYPTION_KEY` is used in conjunction with OAuth 2.1 MCP server authentication.
 
 #### `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`
 
@@ -3690,6 +3708,12 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables OpenTelemetry for observability. When enabled, tracing, metrics, and logging data can be collected and exported to an OTLP endpoint.
+
+#### `ENABLE_OTEL_TRACES`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables OpenTelemetry traces collection and export. This variable works in conjunction with `ENABLE_OTEL`.
 
 #### `ENABLE_OTEL_METRICS`
 
