@@ -2162,6 +2162,7 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
   - `exa` - Uses the [Exa](https://exa.ai/) search engine.
   - `perplexity` - Uses the [Perplexity AI](https://www.perplexity.ai/) search engine.
   - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
+  - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
@@ -2310,6 +2311,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Default: `None`
 - Description: Sets the Sogou API SK.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the Ollama Cloud Web Search API Key.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `TAVILY_EXTRACT_DEPTH`
