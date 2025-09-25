@@ -39,15 +39,16 @@ You cannot have Microsoft **and** Google as providers simultaneously.
 
 | Environment Variable                  | Default   | Description                                                                                                                             |
 |---------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `WEBUI_URL`                          | —         | **Required.** Your public WebUI address, e.g., `http://localhost:8080`.                                                                |
-| `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `true`    | Persist OAuth config to the database; set to `false` for stateless/containerized environments.                                          |
-| `ENABLE_OAUTH_SIGNUP`                 | `false`   | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`).                                                               |
-| `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`   | Merge OAuth logins based on matching email (⚠️ caution: can be insecure if provider doesn't verify emails).                             |
-| `OAUTH_UPDATE_PICTURE_ON_LOGIN`       | `true`    | Update user profile pictures from OAuth provider with each login.                                                                       |
-| `OAUTH_PICTURE_CLAIM`                 | `picture` | Field in the claim containing the profile picture. Set to empty string to disable picture updates (users receive default icon).         |
-| `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`     | *empty*   | Redirect users to this URL after signout. E.g., `https://your-company.com/logout-success`                                               |
-| `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | **Required.** A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
-| `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`    | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.                       |
+| `WEBUI_URL`                          | —                   | **Required.** Your public WebUI address, e.g., `http://localhost:8080`.                                                        |
+| `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `true`             | Persist OAuth config to the database; set to `false` for stateless/containerized environments.                                 |
+| `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`).                                                      |
+| `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (⚠️ caution: can be insecure if provider doesn't verify emails).                    |
+| `OAUTH_UPDATE_PICTURE_ON_LOGIN`       | `true`             | Update user profile pictures from OAuth provider with each login.                                                              |
+| `OAUTH_PICTURE_CLAIM`                 | `picture`          | Field in the claim containing the profile picture. Set to empty string to disable picture updates (users receive default icon).|
+| `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`     | *empty*            | Redirect users to this URL after signout. E.g., `https://your-company.com/logout-success`                                      |
+| `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster.               |
+| `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server - used for OAuth 2.1 authentication for MCP servers. |
+| `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.              |
 
 :::warning
 
