@@ -1260,8 +1260,8 @@ pip install open-webui[all]
 
 - Type: `str`
 - Default: `HNSW`
-- Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`
-- Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but typically requires a clustered Milvus setup.
+- Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`, `DISKANN`
+- Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but requires a clustered Milvus setup and is not meant for standalone setups.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `MILVUS_METRIC_TYPE`
@@ -1292,6 +1292,18 @@ pip install open-webui[all]
 - Default: `128`
 - Description: Specifies the `nlist` parameter for the IVF_FLAT index type in Milvus. This is the number of cluster units. Only applicable if `MILVUS_INDEX_TYPE` is `IVF_FLAT`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MILVUS_DISKANN_MAX_DEGREE`
+
+- Type: `int`
+- Default: `56`
+- Description: Sets the max degree for Milvus if Milvus is in DISKANN indexing mode. Generally recommended to leave as is.
+
+#### `MILVUS_DISKANN_SEARCH_LIST_SIZE`
+
+- Type: `int`
+- Default: `100`
+- Description: Sets the Milvus DISKANN search list size. Generally recommended to leave as is.
 
 ### OpenSearch
 
