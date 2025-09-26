@@ -1647,7 +1647,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
   - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
   - `ollama` - Uses the Ollama API for embeddings.
   - `openai` - Uses the OpenAI API for embeddings.
-  - `azure` - Uses Azure OpenAI Services for embeddings.
+  - `azure_openai` - Uses Azure OpenAI Services for embeddings.
 - Description: Selects an embedding engine to use for RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
