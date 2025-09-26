@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.30](https://github.com/open-webui/open-webui/releases/tag/v0.6.30), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.31](https://github.com/open-webui/open-webui/releases/tag/v0.6.30), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -3596,6 +3596,12 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `False`
 - Description: Enables or disables public sharing of workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables public sharing of notes.
 
 ## Misc Environment Variables
 
