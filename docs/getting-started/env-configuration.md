@@ -1413,7 +1413,7 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 #### `ENABLE_QDRANT_MULTITENANCY_MODE`
 
 - Type: `bool`
-- Default: `False`
+- Default: `True`
 - Description: Enables multitenancy pattern for Qdrant collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Recommend turn on
 
 :::info
