@@ -2172,7 +2172,8 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
   - `jina` - Uses the [Jina](https://jina.ai/) search engine.
   - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
   - `exa` - Uses the [Exa](https://exa.ai/) search engine.
-  - `perplexity` - Uses the [Perplexity AI](https://www.perplexity.ai/) search engine.
+  - `perplexity` - Uses the [Perplexity API](https://www.perplexity.ai/) to access perplexity's AI models. Calls their AI models, which execute a search and also return a full response.
+  - `perplexity_search` - Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
   - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
   - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
