@@ -31,3 +31,7 @@ with us, as we'd love to feature it here!
 [Deploy Your Own Open WebUI Interface with HTTPS Security](https://henrynavarro.org/deploy-your-own-open-webui-interface-with-https-security-53a6ea2609d7?sk=a5876acd56b44ea60f10f9b13aa24aee) (Medium article by @hdnh2006)
 
 - Learn how to deploy Open WebUI 100% secure through https.
+
+[How to integrate Google Drive with Open WebUI](https://henrynavarro.org/how-to-integrate-google-drive-with-open-webui-e525c8f3f82e?sk=a9f48cd1590e3e8dca052f7fe9f12765) (Medium article by @hdnh2006)
+
+- Google Drive integration in Open WebUI interface tutorial.
