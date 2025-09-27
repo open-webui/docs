@@ -13,7 +13,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.30](https://github.com/open-webui/open-webui/releases/tag/v0.6.30), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.31](https://github.com/open-webui/open-webui/releases/tag/v0.6.30), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -1260,8 +1260,8 @@ pip install open-webui[all]
 
 - Type: `str`
 - Default: `HNSW`
-- Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`
-- Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but typically requires a clustered Milvus setup.
+- Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`, `DISKANN`
+- Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but requires a clustered Milvus setup and is not meant for standalone setups.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `MILVUS_METRIC_TYPE`
@@ -1292,6 +1292,18 @@ pip install open-webui[all]
 - Default: `128`
 - Description: Specifies the `nlist` parameter for the IVF_FLAT index type in Milvus. This is the number of cluster units. Only applicable if `MILVUS_INDEX_TYPE` is `IVF_FLAT`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MILVUS_DISKANN_MAX_DEGREE`
+
+- Type: `int`
+- Default: `56`
+- Description: Sets the max degree for Milvus if Milvus is in DISKANN indexing mode. Generally recommended to leave as is.
+
+#### `MILVUS_DISKANN_SEARCH_LIST_SIZE`
+
+- Type: `int`
+- Default: `100`
+- Description: Sets the Milvus DISKANN search list size. Generally recommended to leave as is.
 
 ### OpenSearch
 
@@ -2160,7 +2172,8 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
   - `jina` - Uses the [Jina](https://jina.ai/) search engine.
   - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
   - `exa` - Uses the [Exa](https://exa.ai/) search engine.
-  - `perplexity` - Uses the [Perplexity AI](https://www.perplexity.ai/) search engine.
+  - `perplexity` - Uses the [Perplexity API](https://www.perplexity.ai/) to access perplexity's AI models. Calls their AI models, which execute a search and also return a full response.
+  - `perplexity_search` - Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
   - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
   - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
@@ -3596,6 +3609,12 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `False`
 - Description: Enables or disables public sharing of workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables public sharing of notes.
 
 ## Misc Environment Variables
 
