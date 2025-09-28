@@ -1013,7 +1013,9 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 :::info
 
-When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBUI_SECRET_KEY value is the same across all instances in order to enable users to continue working if a node is recycled or their session is transferred to a different node. Without it, they will need to sign in again each time the underlying node changes.
+This variable is always needed when using OAUTH, especially in clustered environments, but even in single-process environments.
+
+Otherwise, OAUTH issues may occur.
 
 :::
 
