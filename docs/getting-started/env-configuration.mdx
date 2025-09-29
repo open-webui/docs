@@ -1310,7 +1310,7 @@ pip install open-webui[all]
 #### `ENABLE_MILVUS_MULTITENANCY_MODE`
 
 - Type: `bool`
-- Default: `true`
+- Default: `false`
 - Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
 
 :::info
