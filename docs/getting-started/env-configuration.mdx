@@ -1334,7 +1334,7 @@ pip install open-webui[all]
 :::info **Migration from Legacy Mode to Multitenancy**
 
 **What happens when you enable multitenancy when you already have a normal milvus database with data in it:**
-- Existing collections (pattern: open_webui_{collection_name}) remain in Milvus but **become inaccessible** to Open WebUI
+- Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
 - New data is written to the 5 shared multitenancy collections
 - Application treats knowledge bases as empty until reindexed
 - Files and memories are NOT automatically migrated to the new collection schema and will appear missing
