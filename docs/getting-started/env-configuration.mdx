@@ -1333,7 +1333,9 @@ pip install open-webui[all]
 
 :::
 
-:::info Migration from Legacy Mode to Multitenancy
+:::info
+
+**Migration from Legacy Mode to Multitenancy**
 
 **What happens when you enable multitenancy when you already have a normal milvus database with data in it:**
 - Existing collections (pattern: open_webui_{collection_name}) remain in Milvus but **become inaccessible** to Open WebUI
@@ -1365,7 +1367,10 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 
 :::
 
-:::danger Critical Considerations
+:::danger
+
+**Critical Considerations**
+
 **Before enabling multitenancy on an existing installation:**
 - Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
 - Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
