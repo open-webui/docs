@@ -1305,6 +1305,96 @@ pip install open-webui[all]
 - Default: `100`
 - Description: Sets the Milvus DISKANN search list size. Generally recommended to leave as is.
 
+#### `ENABLE_MILVUS_MULTITENANCY_MODE`
+
+- Type: `bool`
+- Default: `true`
+- Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
+
+:::info
+
+**Benefits of multitenancy mode:**
+- Significantly reduced RAM consumption (5 collections vs potentially hundreds)
+- Lower computational overhead from collection management
+- Faster cold-start times
+- Reduced index maintenance burden
+
+**Technical implementation:**
+
+- All memories go into {prefix}_memories
+- All knowledge bases go into {prefix}_knowledge
+- All uploaded files go into {prefix}_files
+- Web search results go into {prefix}_web_search
+- Hash-based collections go into {prefix}_hash_based
+- Each entry includes a resource_id field matching the original collection name
+- Queries automatically filter by resource_id to maintain data isolation
+
+:::
+
+:::info Migration from Legacy Mode to Multitenancy
+
+**What happens when you enable multitenancy when you already have a normal milvus database with data in it:**
+- Existing collections (pattern: open_webui_{collection_name}) remain in Milvus but **become inaccessible** to Open WebUI
+- New data is written to the 5 shared multitenancy collections
+- Application treats knowledge bases as empty until reindexed
+- Files and memories are NOT automatically migrated to the new collection schema and will appear missing
+
+**Clean migration path from normal Milvus to multitenancy milvus:**
+- Before enabling multitenancy, export any critical knowledge content from the UI if possible
+- Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
+- Navigate to `Admin Settings > Documents > Click Reindex Knowledge Base`
+
+**This rebuilds ONLY knowledge base vectors into the new multitenancy collections**
+**Files, user memories, and web search history are NOT migrated by this operation**
+
+**Verify knowledge bases are accessible and functional**
+- Re-upload files if file-based retrieval is critical (file metadata remains but vectors are not migrated)
+- User chat memories will need to be regenerated through new conversations
+
+**Cleaning up legacy collections:**
+After successful migration (from milvus to multitenancy milvus), legacy collections still consume resources. Remove them manually:
+- Connect to Milvus using the native client (pymilvus or Attu UI)
+- Delete all old collections
+
+**Current UI limitations:**
+- No one-click "migrate and cleanup" button exists
+- Vector DB reset from UI (Admin Settings > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
+- Legacy collections require manual cleanup via Milvus client tools
+
+:::
+
+:::danger Critical Considerations
+**Before enabling multitenancy on an existing installation:**
+- Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
+- Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
+- No automatic rollback: Disabling multitenancy after data is written will not restore access to the shared collections. Data would need manual extraction and re-import.
+
+**For fresh installations:**
+- Multitenancy is recommended and enabled by default (true)
+- No migration concerns exist
+
+**For existing installations with valuable data:**
+- Do not migrate to multitenancy mode if you do not want to handle migration and risk data loss
+- Understand that files and memories require re-upload/regeneration
+- Test migration on a backup/staging environment first
+- Consider if RAM savings justify the migration effort for your use case
+
+**To perform a full reset and switch to multitenancy:**
+- Backup any critical knowledge base content externally
+- Navigate to `Admin Settings > Documents`
+- Click `Reset Vector Storage/Knowledge` (this deletes all active mode collections and stored knowledge metadata)
+- Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
+- Restart Open WebUI
+- Re-upload/re-create knowledge bases from scratch
+
+:::
+
+#### `MILVUS_COLLECTION_PREFIX`
+
+- Type: `str`
+- Default: `open_webui`
+- Description: Sets the prefix for Milvus collection names. In multitenancy mode, collections become `{prefix}_memories`, `{prefix}_knowledge`, etc. In legacy mode, collections are `{prefix}_{collection_name}`. Changing this value creates an entirely separate namespace—existing collections with the old prefix become invisible to Open WebUI but remain in Milvus consuming resources. Use this for true multi-instance isolation on a shared Milvus server, not for migration between modes. Milvus only accepts underscores, hyphens/dashes are not possible and will cause errors.
+
 ### OpenSearch
 
 #### `OPENSEARCH_CERT_VERIFY`
