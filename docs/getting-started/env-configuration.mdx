@@ -1314,7 +1314,6 @@ pip install open-webui[all]
 - Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
 
 :::info
-
 **Benefits of multitenancy mode:**
 - Significantly reduced RAM consumption (5 collections vs potentially hundreds)
 - Lower computational overhead from collection management
@@ -1323,19 +1322,16 @@ pip install open-webui[all]
 
 **Technical implementation:**
 
-- All memories go into {prefix}_memories
-- All knowledge bases go into {prefix}_knowledge
-- All uploaded files go into {prefix}_files
-- Web search results go into {prefix}_web_search
-- Hash-based collections go into {prefix}_hash_based
+- All memories go into `{prefix}_memories`
+- All knowledge bases go into `{prefix}_knowledge`
+- All uploaded files go into `{prefix}_files`
+- Web search results go into `{prefix}_web_search`
+- Hash-based collections go into `{prefix}_hash_based`
 - Each entry includes a resource_id field matching the original collection name
 - Queries automatically filter by resource_id to maintain data isolation
-
 :::
 
-:::info
-
-**Migration from Legacy Mode to Multitenancy**
+:::info **Migration from Legacy Mode to Multitenancy**
 
 **What happens when you enable multitenancy when you already have a normal milvus database with data in it:**
 - Existing collections (pattern: open_webui_{collection_name}) remain in Milvus but **become inaccessible** to Open WebUI
@@ -1364,12 +1360,9 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - No one-click "migrate and cleanup" button exists
 - Vector DB reset from UI (Admin Settings > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
 - Legacy collections require manual cleanup via Milvus client tools
-
 :::
 
-:::warning
-
-**Critical Considerations**
+:::warning **Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
 - Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
@@ -1393,7 +1386,6 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
 - Re-upload/re-create knowledge bases from scratch
-
 :::
 
 #### `MILVUS_COLLECTION_PREFIX`
