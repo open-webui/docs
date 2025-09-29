@@ -68,4 +68,4 @@ Administrators can change the default permissions in the user interface under "u
 
 Administrators can adjust these permissions through the user interface or by setting the corresponding environment variables in the configuration. All permission-related environment variables are marked as `PersistentConfig` variables, meaning they are stored internally after the first launch and can be managed through the Open WebUI interface.
 
-This flexibility allows organizations to implement security policies while still providing users with the tools they need. For more detailed information about environment variables related to permissions, see the [Environment Variable Configuration](../../getting-started/env-configuration.md#workspace-permissions) documentation.
+This flexibility allows organizations to implement security policies while still providing users with the tools they need. For more detailed information about environment variables related to permissions, see the [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration#workspace-permissions) documentation.
