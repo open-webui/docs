@@ -4,7 +4,7 @@ title: "📁 Integrate with OneDrive & SharePoint"
 ---
 
 :::info
-This tutorial provides a step-by-step guide for integrating Open WebUI with **Microsoft OneDrive for Business & SharePoint**, as well as the separate, optional integration for **Personal Microsoft OneDrive** accounts. You can enable one or both integrations.
+This tutorial provides a step-by-step guide for integrating Open WebUI with **Microsoft OneDrive for Business & SharePoint**, as well as the separate, optional integration for **Personal Microsoft OneDrive** accounts. You can enable one or both integrations. This documentation is up to date as of Open WebUI v0.6.32.
 :::
 
 ---
@@ -42,7 +42,8 @@ Open WebUI is a Single-Page Application (SPA) and uses the Microsoft Authenticat
 1.  From your new App Registration's overview page, go to the **Authentication** tab.
 2.  Click **+ Add a platform** and select **Single-page application (SPA)**.
 3.  Under "Redirect URIs", enter the base URL of your Open WebUI instance (e.g., `https://open-webui.yourdomain.com`).
-4.  Click **Configure**.
+4.  **Enable both "Access tokens" and "ID tokens"** under the "Implicit grant and hybrid flows" section.
+5.  Click **Configure**.
 
 ## Step 3: Configure API Permissions
 
@@ -51,10 +52,16 @@ Next, grant the application permission to read files from OneDrive and SharePoin
 1.  From the App Registration menu, go to the **API permissions** tab.
 2.  Click **+ Add a permission** and select **Microsoft Graph**.
 3.  Select **Delegated permissions**.
-4.  In the search box, find and add the following two permissions:
+4.  In the search box, find and add the following permissions:
+    -   `Files.Read`: Allows the app to read files the signed-in user has access to.
     -   `Files.Read.All`: Allows the app to read all files the signed-in user can access.
     -   `Sites.Read.All`: Allows the app to read items in all site collections the signed-in user can access.
-5.  After adding the permissions, you must grant admin consent. Click the **"Grant admin consent for [Your Tenant Name]"** button. The status for these permissions should change to "Granted".
+    -   `User.Read`: Allows the app to read the signed-in user's profile.
+    -   `AllSites.Read`: Legacy SharePoint permission for reading site data.
+    -   `MyFiles.Read`: Allows the app to read the user's personal drive.
+    -   `Sites.Search.All`: Enables file search functionality across sites.
+5.  If your organization uses SharePoint API permissions separately, repeat the process by selecting **SharePoint** instead of Microsoft Graph and add the applicable delegated permissions.
+6.  After adding all permissions, you must grant admin consent. Click the **"Grant admin consent for [Your Tenant Name]"** button. The status for these permissions should change to "Granted".
 
 :::warning Admin Consent is Mandatory
 Open WebUI uses the `.default` scope for a seamless enterprise experience, meaning it relies on pre-approved permissions. If admin consent is not granted here, non-admin users will be blocked from logging in with an "Admin approval required" error.
@@ -98,7 +105,8 @@ To enable support for personal Microsoft accounts, you must create a **second, s
 2.  Give it a distinct name, like "Open WebUI Personal Integration".
 3.  Under "Supported account types," select the option: **"Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)"**.
 4.  Configure the **SPA Redirect URI** with your Open WebUI base URL, just as you did for the business app.
-5.  For this personal registration, no special API permissions or admin consent are required, as users will consent to `OneDrive.ReadWrite` individually.
+5.  **Enable both "Access tokens" and "ID tokens"** under the "Implicit grant and hybrid flows" section.
+6.  For this personal registration, no special API permissions or admin consent are required, as users will consent to `OneDrive.ReadWrite` individually.
 
 ## Step 2: Gather the Client ID for Personal Integration
 
