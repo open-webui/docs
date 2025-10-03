@@ -60,8 +60,6 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
 ```
 
-### Slim Image Variants
-
 For environments with limited storage or bandwidth, Open WebUI offers slim image variants that exclude pre-bundled models. These images are significantly smaller but download required models on first use:
 
 ```bash
@@ -214,6 +212,12 @@ This method installs all necessary dependencies and starts Open WebUI, allowing 
 We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
 
 Continue with the full [getting started guide](/getting-started).
+
+### Desktop App
+
+We also have an **experimental** desktop app, which is actively a **work in progress (WIP)**. While it offers a convenient way to run Open WebUI natively on your system without Docker or manual setup, it is **not yet stable**.  
+
+👉 For stability and production use, we strongly recommend installing via **Docker** or **Python (`uv` or `pip`)**.
 
 ## Sponsors 🙌
 
