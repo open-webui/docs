@@ -39,6 +39,7 @@ You cannot have Microsoft **and** Google as providers simultaneously.
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster.               |
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server - used for OAuth 2.1 authentication for MCP servers. |
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.              |
+| `ENABLE_OAUTH_WITHOUT_EMAIL`        | `false`             | For compatibility. Allows OIDC or other providers to login without an email . Recommended to set to `false`.              |
 
 :::warning
 
