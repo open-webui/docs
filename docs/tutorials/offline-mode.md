@@ -70,7 +70,7 @@ The default local transformer can already handle the text-to-speech function. If
 
 ### I: Embedding Model
 
-For various purposes, you will need an embedding model (e.g. [RAG](/docs/features/rag.md)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+For various purposes, you will need an embedding model (e.g. [RAG](/features/rag.md)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
 
 ```python
 from huggingface_hub import snapshot_download

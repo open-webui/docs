@@ -67,7 +67,7 @@ Below is a list of optional arguments your tools can depend on:
 - `__model__`: A dictionary with model information
 - `__oauth_token__`: A dictionary containing the user's valid, automatically refreshed OAuth token payload. This is the **new, recommended, and secure** way to access user tokens for making authenticated API calls. The dictionary typically contains `access_token`, `id_token`, and other provider-specific data.
 
-For more information about `__oauth_token__` and how to configure this token to be sent to tools, check out the OAuth section in the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/) and the [SSO documentation](https://docs.openwebui.com/features/sso/).
+For more information about `__oauth_token__` and how to configure this token to be sent to tools, check out the OAuth section in the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/) and the [SSO documentation](https://docs.openwebui.com/features/auth/).
 
 Just add them as argument to any method of your Tool class just like `__user__` in the example above.
 

@@ -180,5 +180,5 @@ Restart your Open WebUI instance after setting these environment variables.
 *   **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Remember admin groups are not synced.
 *   **Configuration Errors:** Review the Open WebUI server logs for detailed error messages related to OIDC configuration.
 
-*   Refer to the official [Open WebUI SSO Documentation](/features/sso).
+*   Refer to the official [Open WebUI SSO Documentation](/features/auth).
 *   Consult the [Okta Developer Documentation](https://developer.okta.com/docs/).
