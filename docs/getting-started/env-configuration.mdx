@@ -3020,6 +3020,13 @@ By default, OAuth configurations are stored in the database and managed via the 
 - Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_OAUTH_WITHOUT_EMAIL`
+
+- Type: `bool`
+- Default: `False`
+- Description: For compatibility. Allows OIDC or other providers to login without an email . Recommended to set to `false`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`
