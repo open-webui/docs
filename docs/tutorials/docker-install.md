@@ -21,8 +21,8 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## For Windows and Mac Users
 
-- Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).  
-- Follow the installation instructions on the website.  
+- Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
+- Follow the installation instructions on the website.
 - After installation, **open Docker Desktop** to ensure it's running properly.
 
 ---

@@ -1,9 +1,7 @@
 ---
-sidebar_position: 300 
+sidebar_position: 300
 title: "🔄 Updating Open WebUI"
 ---
-
-
 
 ## Why isn't my Open WebUI updating?
 
@@ -26,7 +24,6 @@ docker rm -f open-webui
 ```bash
 docker pull ghcr.io/open-webui/open-webui:main
 ```
-
 
 :::info
 
@@ -136,9 +133,9 @@ The data is stored in a Docker volume named `open-webui`. The path to the volume
 docker volume inspect open-webui
 ```
 
-This will show you the details of the volume, including the mountpoint, which is usually located in `/var/lib/docker/volumes/open-webui/_data`.  
+This will show you the details of the volume, including the mountpoint, which is usually located in `/var/lib/docker/volumes/open-webui/_data`.
 
-On Windows 10 + WSL 2, Docker volumes are located here (type in the Windows file explorer): 
+On Windows 10 + WSL 2, Docker volumes are located here (type in the Windows file explorer):
 - \\\wsl$\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes
 
 For older versions of Docker (pre-Docker v26.1.4):

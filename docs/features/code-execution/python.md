@@ -52,7 +52,7 @@ Here is an example of a simple Python script that can be executed using Pyodide:
 import pandas as pd
 
 # Create a sample DataFrame
-data = {'Name': ['John', 'Anna', 'Peter'], 
+data = {'Name': ['John', 'Anna', 'Peter'],
         'Age': [28, 24, 35]}
 df = pd.DataFrame(data)
 

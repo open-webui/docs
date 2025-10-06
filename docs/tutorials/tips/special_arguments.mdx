@@ -62,7 +62,6 @@ A `dict` usually destined to go almost directly to the model. Although it is not
   "files": "[The exact same list as __files__]"
 }
 
-
 ```
 
 </details>
@@ -214,7 +213,6 @@ A `list` of the previous messages.
 
 See the `body["messages"]` value above.
 
-
 ### `__chat_id__`
 
 The `str` of the `chat_id`.
@@ -297,7 +295,6 @@ Note that the same files dict can also be accessed via `__metadata__["files"]` (
   }
 ]
 
-
 ```
 
 </details>
@@ -334,7 +331,6 @@ A `str` for the type of task. Its value is just a shorthand for `__metadata__["t
 A `dict` containing the `body` needed to accomplish a given `__task__`. Its value is just a shorthand for `__metadata__["task_body"]` if present, otherwise `None`.
 
 Its structure is the same as `body` above, with modifications like using the appropriate model and system message etc.
-
 
 ### `__tools__`
 

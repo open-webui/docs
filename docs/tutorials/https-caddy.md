@@ -79,11 +79,11 @@ Caddy is a powerful web server that automatically manages TLS certificates for y
 
 ### Installing Caddy
 
-Follow the [guide to set up Caddy's on Ubuntu](https://caddyserver.com/docs/install#debian-ubuntu-raspbian).  
+Follow the [guide to set up Caddy's on Ubuntu](https://caddyserver.com/docs/install#debian-ubuntu-raspbian).
 
 ### Configure Caddy
 
-You're going to need to change the `CaddyFile` to use your domain.  
+You're going to need to change the `CaddyFile` to use your domain.
 
 To do that, edit the file `/etc/caddy/Caddyfile`.
 

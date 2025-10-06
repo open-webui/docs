@@ -10,11 +10,11 @@ Choose the appropriate command based on your hardware setup:
 - **Before Starting**:
 
   Directories for your volumes need to be created on the host, or you can specify a custom location or volume.
-  
+
   The current example utilizes an isolated dir `data`, which is within the same dir as the `docker-stack.yaml`.
-  
+
       - **For example**:
-  
+
         ```bash
         mkdir -p data/open-webui data/chromadb data/ollama
         ```
@@ -35,7 +35,7 @@ Choose the appropriate command based on your hardware setup:
         volumes:
           - ./data/open-webui:/app/backend/data
         environment:
-          DATA_DIR: /app/backend/data 
+          DATA_DIR: /app/backend/data
           OLLAMA_BASE_URLS: http://ollama:11434
           CHROMA_HTTP_PORT: 8000
           CHROMA_HTTP_HOST: chromadb
@@ -66,7 +66,7 @@ Choose the appropriate command based on your hardware setup:
           - IS_PERSISTENT=TRUE
           - ALLOW_RESET=TRUE
           - PERSIST_DIRECTORY=/chroma/chroma
-        ports: 
+        ports:
           - target: 8000
             published: 8000
             mode: overlay
@@ -76,7 +76,7 @@ Choose the appropriate command based on your hardware setup:
             condition: any
             delay: 5s
             max_attempts: 3
-        healthcheck: 
+        healthcheck:
           test: ["CMD-SHELL", "curl localhost:8000/api/v1/heartbeat || exit 1"]
           interval: 10s
           retries: 2
@@ -115,7 +115,7 @@ Choose the appropriate command based on your hardware setup:
     - Ensure *GPU Resource* is enabled in `/etc/nvidia-container-runtime/config.toml` and enable GPU resource advertising by uncommenting the `swarm-resource = "DOCKER_RESOURCE_GPU"`. The docker daemon must be restarted after updating these files on each node.
 
 - **With CPU Support**:
-  
+
     Modify the Ollama Service within `docker-stack.yaml` and remove the lines for `generic_resources:`
 
     ```yaml
@@ -137,7 +137,7 @@ Choose the appropriate command based on your hardware setup:
     ```
 
 - **Deploy Docker Stack**:
-  
+
   ```bash
   docker stack deploy -c docker-stack.yaml -d super-awesome-ai
   ```

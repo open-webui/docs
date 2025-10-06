@@ -162,8 +162,10 @@ If allowing access from the internet, restrict the source IP range to the minimu
 Here is an example configuration for your `.env` file:
 
 ```env
+
 ###############################################
 # LDAP
+
 ###############################################
 ENABLE_LDAP="true"
 LDAP_SERVER_LABEL="Azure AD DS"
@@ -186,8 +188,11 @@ LDAP_ATTRIBUTE_FOR_MAIL="userPrincipalName"
 LDAP_SEARCH_FILTER="(&(objectClass=user)(objectCategory=person))"
 
 # Group Synchronization (Optional)
+
 # ENABLE_LDAP_GROUP_MANAGEMENT="true"
+
 # ENABLE_LDAP_GROUP_CREATION="true"
+
 # LDAP_ATTRIBUTE_FOR_GROUPS="memberOf"
 ```
 *Replace placeholders like `{your_domain}` and `<STRONG-PASSWORD>` with your actual values.*

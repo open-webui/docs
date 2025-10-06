@@ -15,7 +15,7 @@ with us, as we'd love to feature it here!
 [Monitoring Open WebUI with Filters](https://medium.com/@0xthresh/monitor-open-webui-with-datadog-llm-observability-620ef3a598c6) (Medium article by @0xthresh)
 
 - A detailed guide to monitoring the Open WebUI using DataDog LLM observability.
-  
+
 [Building Customized Text-To-SQL Pipelines](https://www.youtube.com/watch?v=y7frgUWrcT4) (YouTube video by Jordan Nanos)
 
 - Learn how to develop tailored text-to-sql pipelines, unlocking the power of data analysis and extraction.

@@ -24,9 +24,9 @@ The following cloud speech to text providers are currently supported. API keys c
 
 To configure a speech to text provider:
 
-- Navigate to the admin settings  
+- Navigate to the admin settings
 - Choose Audio
-- Provider an API key and choose a model from the dropdown  
+- Provider an API key and choose a model from the dropdown
 
 ![alt text](/images/tutorials/stt/stt-config.png)
 

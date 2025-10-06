@@ -40,19 +40,27 @@ cd searxng-docker
 1. Uncomment `SEARXNG_HOSTNAME` from the `.env` file and set it accordingly:
 
 ```bash
+
 # By default listen on https://localhost
+
 # To change this:
+
 # * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
+
 # * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
 
 SEARXNG_HOSTNAME=localhost:8080/
+
 # LETSENCRYPT_EMAIL=<email>
 
 # Optional:
+
 # If you run a very small or a very large instance, you might want to change the amount of used uwsgi workers and threads per worker
+
 # More workers (= processes) means that more search requests can be handled at the same time, but it also causes more resource usage
 
 # SEARXNG_UWSGI_WORKERS=4
+
 # SEARXNG_UWSGI_THREADS=4
 ```
 
@@ -80,10 +88,13 @@ sudo chmod a+rwx searxng-docker/searxng
 <summary>searxng-docker/searxng/limiter.toml</summary>
 
 ```bash
+
 # This configuration file updates the default configuration file
+
 # See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
 
 [botdetection.ip_limit]
+
 # activate link_token method in the ip_limit method
 link_token = false
 
@@ -161,6 +172,7 @@ The default `settings.yml` file contains many engine settings. Below is an extra
 <summary>searxng-docker/searxng/settings.yml</summary>
 
 ```yaml
+
 # see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
 use_default_settings: true
 
@@ -203,15 +215,18 @@ The port in the settings.yml file for SearXNG should match that of the port numb
 
 ```ini
 [uwsgi]
+
 # Who will run the code
 uid = searxng
 gid = searxng
 
 # Number of workers (usually CPU count)
+
 # default value: %k (= number of CPU core, see Dockerfile)
 workers = %k
 
 # Number of threads per worker
+
 # default value: 4 (see Dockerfile)
 threads = 4
 
@@ -243,11 +258,13 @@ log-5xx = true
 buffer-size = 8192
 
 # No keep alive
+
 # See https://github.com/searx/searx-docker/issues/24
 add-header = Connection: close
 
 # uwsgi serves the static files
 static-map = /static=/usr/local/searxng/searx/static
+
 # expires set to one day
 static-expires = /* 86400
 static-gzip-all = True
@@ -278,6 +295,7 @@ services:
 Create a `.env` file for SearXNG:
 
 ```
+
 # SearXNG
 SEARXNG_HOSTNAME=localhost:8080/
 ```
