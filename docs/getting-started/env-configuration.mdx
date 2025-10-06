@@ -1417,7 +1417,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 
 - Type: `str`
 - Default: `open_webui`
-- Description: Sets the prefix for Milvus collection names. In multitenancy mode, collections become `{prefix}_memories`, `{prefix}*knowledge`, etc. In legacy mode, collections are `{prefix}*{collection_name}`. Changing this value creates an entirely separate namespace—existing collections with the old prefix become invisible to Open WebUI but remain in Milvus consuming resources. Use this for true multi-instance isolation on a shared Milvus server, not for migration between modes. Milvus only accepts underscores, hyphens/dashes are not possible and will cause errors.
+- Description: Sets the prefix for Milvus collection names. In multitenancy mode, collections become `{prefix}_memories`, `{prefix}_knowledge`, etc. In legacy mode, collections are `{prefix}_{collection_name}`. Changing this value creates an entirely separate namespace—existing collections with the old prefix become invisible to Open WebUI but remain in Milvus consuming resources. Use this for true multi-instance isolation on a shared Milvus server, not for migration between modes. Milvus only accepts underscores, hyphens/dashes are not possible and will cause errors.
 
 ### OpenSearch
 
