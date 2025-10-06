@@ -11,17 +11,17 @@ The following table lists the available URL parameters, their function, and exam
 
 | **Parameter**         | **Description**                                                                   | **Example**                      |
 |-----------------------|-----------------------------------------------------------------------------------|----------------------------------|
-| `models`              | Specifies the models to be used, as a comma-separated list.                       | `/?models=model1,model2`         |
-| `model`               | Specifies a single model to be used for the chat session.                         | `/?model=model1`                 |
-| `youtube`             | Specifies a YouTube video ID to be transcribed within the chat.                   | `/?youtube=VIDEO_ID`             |
+| `models`              | Specifies the models to be used, as a comma-separated list. | `/?models=model1,model2`         |
+| `model`               | Specifies a single model to be used for the chat session. | `/?model=model1`                 |
+| `youtube`             | Specifies a YouTube video ID to be transcribed within the chat. | `/?youtube=VIDEO_ID`             |
 | `load-url`            | Specifies a Website URL to be fetched and uploaded as a document within the chat. | `/?load-url=https://google.com`  |
-| `web-search`          | Enables web search functionality if set to `true`.                                | `/?web-search=true`              |
-| `tools` or `tool-ids` | Specifies a comma-separated list of tool IDs to activate in the chat.             | `/?tools=tool1,tool2`            |
-| `call`                | Enables a call overlay if set to `true`.                                          | `/?call=true`                    |
-| `q`                   | Sets an initial query or prompt for the chat.                                     | `/?q=Hello%20there`              |
-| `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions.              | `/?temporary-chat=true`          |
-| `code-interpreter`    | Enables the code interpreter feature if set to `true`.                            | `/?code-interpreter=true`        |
-| `image-generation`    | Enables the image generation feature if set to `true`.                            | `/?image-generation=true`        |
+| `web-search`          | Enables web search functionality if set to `true`. | `/?web-search=true`              |
+| `tools` or `tool-ids` | Specifies a comma-separated list of tool IDs to activate in the chat. | `/?tools=tool1,tool2`            |
+| `call`                | Enables a call overlay if set to `true`. | `/?call=true`                    |
+| `q`                   | Sets an initial query or prompt for the chat. | `/?q=Hello%20there`              |
+| `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions. | `/?temporary-chat=true`          |
+| `code-interpreter`    | Enables the code interpreter feature if set to `true`. | `/?code-interpreter=true`        |
+| `image-generation`    | Enables the image generation feature if set to `true`. | `/?image-generation=true`        |
 
 ### 1. **Models and Model Selection**
 
