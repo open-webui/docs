@@ -47,7 +47,7 @@ In the *Admin Settings*, create and save a new connection of type OpenAI API wit
 
 ### Step 4: Adding the Langfuse Filter Pipeline
 
-Next, navigate to *Admin Settings* -> *Pipelines* and add the Langfuse Filter Pipeline. Specify that Pipelines is listening on http://host.docker.internal:9099 (as configured earlier) and install the [Langfuse Filter Pipeline](https://github.com/open-webui/pipelines/blob/039f9c54f8e9f9bcbabde02c2c853e80d25c79e4/examples/filters/langfuse_v3_filter_pipeline.py) by using the *Install from Github URL* option with the following URL:
+Next, navigate to *Admin Settings*->*Pipelines* and add the Langfuse Filter Pipeline. Specify that Pipelines is listening on http://host.docker.internal:9099 (as configured earlier) and install the [Langfuse Filter Pipeline](https://github.com/open-webui/pipelines/blob/039f9c54f8e9f9bcbabde02c2c853e80d25c79e4/examples/filters/langfuse_v3_filter_pipeline.py) by using the *Install from Github URL* option with the following URL:
 
 ```
 https://github.com/open-webui/pipelines/blob/main/examples/filters/langfuse_v3_filter_pipeline.py

@@ -35,6 +35,7 @@ The base configuration for HAProxy to work with Open WebUI is pretty simple.
  #---------------------------------------------------------------------
 
 # Global settings
+
 #---------------------------------------------------------------------
 global
     # to have these messages end up in /var/log/haproxy.log you will
@@ -61,11 +62,13 @@ global
 
  #adjust the dh-param if too low
     tune.ssl.default-dh-param 2048
+
 #---------------------------------------------------------------------
 
 # common defaults that all the 'listen' and 'backend' sections will
 
 # use if not designated in their block
+
 #---------------------------------------------------------------------
 defaults
     mode                    http

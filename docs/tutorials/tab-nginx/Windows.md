@@ -55,11 +55,14 @@ If you want Open WebUI to be accessible over your local LAN, be sure to note you
 Set it up as follows:
 
 ```
+
 #user  nobody;
 worker_processes  1;
 
 #error_log  logs/error.log;
+
 #error_log  logs/error.log  notice;
+
 #error_log  logs/error.log  info;
 
 #pid        logs/nginx.pid;
