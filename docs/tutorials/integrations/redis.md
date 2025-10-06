@@ -15,11 +15,11 @@ This documentation page outlines the steps required to integrate Redis with Open
 
 ### Prerequisites
 
-* A valid Open WebUI instance (running version 1.0 or higher)
-* A Redis container (we will use `docker.io/valkey/valkey:8.0.1-alpine` in this example, which is based on the latest Redis 7.x release)
-* Docker Composer (version 2.0 or higher) installed on your system
-* A Docker network for communication between Open WebUI and Redis
-* Basic understanding of Docker, Redis, and Open WebUI
+- A valid Open WebUI instance (running version 1.0 or higher)
+- A Redis container (we will use `docker.io/valkey/valkey:8.0.1-alpine` in this example, which is based on the latest Redis 7.x release)
+- Docker Composer (version 2.0 or higher) installed on your system
+- A Docker network for communication between Open WebUI and Redis
+- Basic understanding of Docker, Redis, and Open WebUI
 
 ## Setting up Redis
 
@@ -128,8 +128,8 @@ docker exec -it redis-valkey valkey-cli -p 6379 ping
 
 If you encounter issues with Redis or websocket support in Open WebUI, you can refer to the following resources for troubleshooting:
 
-* [Redis Documentation](https://redis.io/docs)
-* [Docker Compose Documentation](https://docs.docker.com/compose/overview/)
-* [sysctl Documentation](https://man7.org/linux/man-pages/man8/sysctl.8.html)
+- [Redis Documentation](https://redis.io/docs)
+- [Docker Compose Documentation](https://docs.docker.com/compose/overview/)
+- [sysctl Documentation](https://man7.org/linux/man-pages/man8/sysctl.8.html)
 
 By following these steps and troubleshooting tips, you should be able to set up Redis with Open WebUI for websocket support and enable real-time communication and updates between clients and your application.

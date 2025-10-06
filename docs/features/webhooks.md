@@ -50,11 +50,11 @@ New user signed up: Tim
 Troubleshooting
 --------------
 
-* Make sure the webhook URL is correct and properly formatted.
-* Verify that the webhook service is enabled and configured correctly.
-* Check the Open WebUI logs for any errors related to the webhook.
-* Verify the connection hasn't been interrupted or blocked by a firewall or proxy.
-* The webhook server could be temporarily unavailable or experiencing high latency.
-* If provided through the webhook service, verify if the Webhook API key is invalid, expired, or revoked.
+- Make sure the webhook URL is correct and properly formatted.
+- Verify that the webhook service is enabled and configured correctly.
+- Check the Open WebUI logs for any errors related to the webhook.
+- Verify the connection hasn't been interrupted or blocked by a firewall or proxy.
+- The webhook server could be temporarily unavailable or experiencing high latency.
+- If provided through the webhook service, verify if the Webhook API key is invalid, expired, or revoked.
 
 Note: The webhook feature in Open WebUI is still evolving, and we plan to add more features and event types in the future.

@@ -47,7 +47,7 @@ This will run the service at port 5050 with all the default configs
 
 - Open the Admin Panel and go to `Settings` -> `Audio`
 - Set your TTS Settings to match the screenshot below
-- _Note: you can specify the TTS Voice here_
+- *Note: you can specify the TTS Voice here*
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBobmOhsMkrO6Tl2kxX39dbuFiQ8cAoNzysIt7f)
 

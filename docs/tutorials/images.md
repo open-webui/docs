@@ -73,23 +73,23 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 
 1. **Model Checkpoints**:
 
-* Download either the `FLUX.1-schnell` or `FLUX.1-dev` model from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
-* Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI. Alternatively, you can create a symbolic link between `models/checkpoints` and `models/unet` to ensure both directories contain the same model checkpoints.
+- Download either the `FLUX.1-schnell` or `FLUX.1-dev` model from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
+- Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI. Alternatively, you can create a symbolic link between `models/checkpoints` and `models/unet` to ensure both directories contain the same model checkpoints.
 
 2. **VAE Model**:
 
-* Download `ae.safetensors` VAE from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
-* Place it in the `models/vae` ComfyUI directory.
+- Download `ae.safetensors` VAE from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+- Place it in the `models/vae` ComfyUI directory.
 
 3. **CLIP Model**:
 
-* Download `clip_l.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* Place it in the `models/clip` ComfyUI directory.
+- Download `clip_l.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+- Place it in the `models/clip` ComfyUI directory.
 
 4. **T5XXL Model**:
 
-* Download either the `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` model from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* Place it in the `models/clip` ComfyUI directory.
+- Download either the `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` model from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+- Place it in the `models/clip` ComfyUI directory.
 
 To integrate ComfyUI into Open WebUI, follow these steps:
 
@@ -99,7 +99,7 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 2. Click on **Settings** and then select the **Images** tab.
 3. In the `Image Generation Engine` field, choose `ComfyUI`.
 4. In the **API URL** field, enter the address where ComfyUI's API is accessible, following this format: `http://<your_comfyui_address>:8188/`.
-   * Set the environment variable `COMFYUI_BASE_URL` to this address to ensure it persists within the WebUI.
+   - Set the environment variable `COMFYUI_BASE_URL` to this address to ensure it persists within the WebUI.
 
 #### Step 2: Verify the Connection and Enable Image Generation
 
@@ -151,9 +151,9 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 2. Set the `Image Generation Engine` field to `Open AI`.
 3. Enter your OpenAI API key.
 4. Choose the model you wish to use. Note that image size options will depend on the selected model:
-   * **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
-   * **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
-   * **GPT-Image-1**: Supports `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
+   - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
+   - **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
+   - **GPT-Image-1**: Supports `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
 
 ### Azure OpenAI
 

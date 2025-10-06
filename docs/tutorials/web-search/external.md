@@ -11,9 +11,9 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 This option allows you to connect Open WebUI to your own self-hosted web search API endpoint. This is useful if you want to:
 
-* Integrate a search engine not natively supported by Open WebUI.
-* Implement custom search logic, filtering, or result processing.
-* Use a private or internal search index.
+- Integrate a search engine not natively supported by Open WebUI.
+- Implement custom search logic, filtering, or result processing.
+- Use a private or internal search index.
 
 ### Open WebUI Setup
 
@@ -31,11 +31,11 @@ This option allows you to connect Open WebUI to your own self-hosted web search 
 
 Open WebUI will interact with your `External Search URL` as follows:
 
-* **Method:** `POST`
-* **Headers:**
-  * `Content-Type: application/json`
-  * `Authorization: Bearer <YOUR_EXTERNAL_SEARCH_API_KEY>`
-* **Request Body (JSON):**
+- **Method:** `POST`
+- **Headers:**
+  - `Content-Type: application/json`
+  - `Authorization: Bearer <YOUR_EXTERNAL_SEARCH_API_KEY>`
+- **Request Body (JSON):**
 
     ```json
     {
@@ -44,10 +44,10 @@ Open WebUI will interact with your `External Search URL` as follows:
     }
     ```
 
-  * `query` (string): The search term entered by the user.
-  * `count` (integer): The suggested maximum number of results Open WebUI expects. Your API can return fewer results if necessary.
+  - `query` (string): The search term entered by the user.
+  - `count` (integer): The suggested maximum number of results Open WebUI expects. Your API can return fewer results if necessary.
 
-* **Expected Response Body (JSON):**
+- **Expected Response Body (JSON):**
     Your API endpoint *must* return a JSON array of search result objects. Each object should have the following structure:
 
     ```json
@@ -66,9 +66,9 @@ Open WebUI will interact with your `External Search URL` as follows:
     ]
     ```
 
-  * `link` (string): The direct URL to the search result.
-  * `title` (string): The title of the web page.
-  * `snippet` (string): A descriptive text snippet from the page content relevant to the query.
+  - `link` (string): The direct URL to the search result.
+  - `title` (string): The title of the web page.
+  - `snippet` (string): A descriptive text snippet from the page content relevant to the query.
 
     If an error occurs or no results are found, your endpoint should ideally return an empty JSON array `[]`.
 

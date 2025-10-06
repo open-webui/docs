@@ -16,11 +16,11 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 3. Set `Web Search Engine` from dropdown menu to `yacy`
 4. Set `Yacy Instance URL` to one of the following examples:
 
-    * `http://yacy:8090` (using the container name and exposed port, suitable for Docker-based setups)
-    * `http://host.docker.internal:8090` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
-    * `https://<yacy.local>:8443` (using a local domain name, suitable for local network access)
-    * `https://yacy.example.com` (using a custom domain name for a self-hosted Yacy instance, suitable for public or private access)
-    * `https://yacy.example.com:8443` (using https over the default Yacy https port)
+    - `http://yacy:8090` (using the container name and exposed port, suitable for Docker-based setups)
+    - `http://host.docker.internal:8090` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
+    - `https://<yacy.local>:8443` (using a local domain name, suitable for local network access)
+    - `https://yacy.example.com` (using a custom domain name for a self-hosted Yacy instance, suitable for public or private access)
+    - `https://yacy.example.com:8443` (using https over the default Yacy https port)
 
 5. Optionally, enter your Yacy username and password if authentication is required for your Yacy instance. If both are left blank, digest authentication will be skipped
 6. Press save

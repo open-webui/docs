@@ -381,10 +381,10 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
 
-* `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
-* `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
-* `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
-* `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
+- `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
+- `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
+- `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
+- `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
 
 **Do note the `/search?q=<query>` part is mandatory.**
 

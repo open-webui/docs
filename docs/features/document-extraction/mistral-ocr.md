@@ -14,32 +14,32 @@ This documentation provides a step-by-step guide to integrating Mistral OCR with
 Prerequisites
 ------------
 
-* Open WebUI instance
-* Mistral AI account
+- Open WebUI instance
+- Mistral AI account
 
 Integration Steps
 ----------------
 
 ### Step 1: Sign Up or Login to Mistral AI console
 
-* Go to `https://console.mistral.ai`
-* Follow the instructions as instructed on the process
-* After successful authorization, you should be welcomed to the Console Home
+- Go to `https://console.mistral.ai`
+- Follow the instructions as instructed on the process
+- After successful authorization, you should be welcomed to the Console Home
 
 ### Step 2: Generate an API key
 
-* Go to `API Keys` or `https://console.mistral.ai/api-keys`
-* Create a new key and make sure to copy it
+- Go to `API Keys` or `https://console.mistral.ai/api-keys`
+- Create a new key and make sure to copy it
 
 ### Step 3: Configure Open WebUI to use Mistral OCR
 
-* Log in to your Open WebUI instance.
-* Navigate to the `Admin Panel` settings menu.
-* Click on `Settings`.
-* Click on the `Documents` tab.
-* Change the `Default` content extraction engine dropdown to `Mistral OCR`.
-* Paste the API Key on the field
-* Save the Admin Panel.
+- Log in to your Open WebUI instance.
+- Navigate to the `Admin Panel` settings menu.
+- Click on `Settings`.
+- Click on the `Documents` tab.
+- Change the `Default` content extraction engine dropdown to `Mistral OCR`.
+- Paste the API Key on the field
+- Save the Admin Panel.
 
 Verifying Mistral OCR
 =====================================
