@@ -33,6 +33,7 @@ The base configuration for HAProxy to work with Open WebUI is pretty simple.
 
 ```
  #---------------------------------------------------------------------
+
 # Global settings
 #---------------------------------------------------------------------
 global
@@ -57,11 +58,13 @@ global
     user        haproxy
     group       haproxy
     daemon
- 
+
  #adjust the dh-param if too low
     tune.ssl.default-dh-param 2048
 #---------------------------------------------------------------------
+
 # common defaults that all the 'listen' and 'backend' sections will
+
 # use if not designated in their block
 #---------------------------------------------------------------------
 defaults
@@ -102,7 +105,7 @@ frontend web
 #Pass SSL Requests to Lets Encrypt
 backend letsencrypt-backend
     server letsencrypt 127.0.0.1:8688
-    
+
 #OWUI Chat
 backend owui_chat
     # add X-FORWARDED-FOR

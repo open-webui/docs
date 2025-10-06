@@ -153,10 +153,10 @@ This prompt ensures critical information is captured while allowing optional det
     **Priority:** {{priority | select:options=["Critical","High","Medium","Low"]:default="Medium":required}}
     **Steps to Reproduce:**
     {{steps | textarea:placeholder="1. Go to...\n2. Click on...\n3. See error...":required}}
-    
+
     **Additional Context:** {{additional_context | textarea:placeholder="Browser version, OS, screenshots, etc. (optional)"}}
     **Workaround:** {{workaround | textarea:placeholder="Any temporary solutions found (optional)"}}
-    
+
     Please format this into a clear and complete bug report document.
     ```
 
@@ -171,7 +171,7 @@ This prompt generates tailored content with required core information and option
 
     ```
     Generate a social media post for {{platform | select:options=["LinkedIn","Twitter","Facebook","Instagram"]:required}}.
-    
+
     **Topic:** {{topic | text:placeholder="e.g., New feature launch":required}}
     **Key Message:** {{key_message | textarea:placeholder="What are the essential points to communicate?":required}}
     **Tone of Voice:** {{tone | select:options=["Professional","Casual","Humorous","Inspirational"]:default="Professional"}}

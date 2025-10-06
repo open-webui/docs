@@ -12,13 +12,13 @@ Welcome to the **Open WebUI Documentation Hub!** Below is a list of essential gu
 
 ---
 
-## ⏱️ Quick Start  
+## ⏱️ Quick Start
 
 Get up and running quickly with our [Quick Start Guide](/getting-started/quick-start).
 
 ---
 
-## 🛠️ Advanced Topics  
+## 🛠️ Advanced Topics
 
 Take a deeper dive into configurations and development tips in our [Advanced Topics Guide](/getting-started/advanced-topics).
 

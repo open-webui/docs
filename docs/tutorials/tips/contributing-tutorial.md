@@ -112,7 +112,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::tip
 
-How to Test Docusaurus Locally  
+How to Test Docusaurus Locally
 You can test your Docusaurus site locally with the following commands:
 
 ```bash

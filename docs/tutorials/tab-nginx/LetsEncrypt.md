@@ -26,7 +26,7 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
 
         location / {
             proxy_pass http://host.docker.internal:3000;
-    
+
             # Add WebSocket support (Necessary for version 0.5.0 and up)
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;

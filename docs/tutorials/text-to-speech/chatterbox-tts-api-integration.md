@@ -47,6 +47,7 @@ Chatterbox can use a good deal of memory and has hardware requirements that migh
 #### Option A: Using uv (Recommended - Faster & Better Dependencies)
 
 ```bash
+
 # Clone the repository
 git clone https://github.com/travisvn/chatterbox-tts-api
 cd chatterbox-tts-api
@@ -62,6 +63,7 @@ cp .env.example .env
 
 # Start the API with FastAPI
 uv run uvicorn app.main:app --host 0.0.0.0 --port 4123
+
 # Or use the main script
 uv run main.py
 ```
@@ -71,6 +73,7 @@ uv run main.py
 #### Option B: Using pip (Traditional)
 
 ```bash
+
 # Clone the repository
 git clone https://github.com/travisvn/chatterbox-tts-api
 cd chatterbox-tts-api
@@ -86,10 +89,12 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Add your voice sample (or use the provided one)
+
 # cp your-voice.mp3 voice-sample.mp3
 
 # Start the API with FastAPI
 uvicorn app.main:app --host 0.0.0.0 --port 4123
+
 # Or use the main script
 python main.py
 ```
@@ -99,12 +104,14 @@ python main.py
 ### 🐳 Docker (Recommended)
 
 ```bash
+
 # Clone and start with Docker Compose
 git clone https://github.com/travisvn/chatterbox-tts-api
 cd chatterbox-tts-api
 
 # Use Docker-optimized environment variables
 cp .env.example.docker .env  # Docker-specific paths, ready to use
+
 # Or: cp .env.example .env    # Local development paths, needs customization
 
 # Choose your deployment method:
@@ -139,6 +146,7 @@ This project includes an optional React-based web UI. Use Docker Compose profile
 ### With Docker Compose Profiles
 
 ```bash
+
 # API only (default behavior)
 docker compose -f docker/docker-compose.yml up -d
 
@@ -159,7 +167,9 @@ docker compose -f docker/docker-compose.cpu.yml --profile frontend up -d    # CP
 For local development, you can run the API and frontend separately:
 
 ```bash
+
 # Start the API first (follow earlier instructions)
+
 # Then run the frontend:
 cd frontend && npm install && npm run dev
 ```

@@ -40,9 +40,9 @@ export const SponsorList = () => {
 
 
 				<div className="flex flex-wrap items-start justify-start gap-5">
-					
+
 				</div>
-			</div>		
+			</div>
 
 
 			<div className="mb-4">
@@ -51,9 +51,9 @@ export const SponsorList = () => {
 
 
 				<div className="flex flex-wrap items-start justify-start gap-5">
-					
+
 				</div>
-			</div>					
+			</div>
 
 			<div className="mb-4">
 				<div className="font-semibold text-xl text-black dark:text-white ">Topaz</div>
@@ -61,7 +61,7 @@ export const SponsorList = () => {
 
 
 				<div className="flex flex-wrap items-start justify-start gap-5">
-					
+
 				</div>
 			</div>		 */}
 

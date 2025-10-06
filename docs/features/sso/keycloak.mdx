@@ -76,6 +76,7 @@ By default, Keycloak 26.x sets Client Authentication to "None", so it needs to b
 Add or modify the following variables in your `.env` file.
 
 ```env
+
 # Enable OAuth2/OIDC Login
 ENABLE_OAUTH_SIGNUP=true
 
@@ -147,9 +148,12 @@ Configure the mapper with the appropriate settings to include group membership.
 Add or modify these variables in your `.env` file:
 
 ```env
+
 # Enable group synchronization
 ENABLE_OAUTH_GROUP_MANAGEMENT=true
+
 # (Optional) Enable Just-In-Time group creation
 ENABLE_OAUTH_GROUP_CREATION=true
+
 # The claim key for groups in the token
 OAUTH_GROUP_CLAIM=groups

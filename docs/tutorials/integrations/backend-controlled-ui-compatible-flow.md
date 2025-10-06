@@ -309,17 +309,18 @@ public String getAssistantResponseWhenReady(String chatId, ChatCompletedRequest 
 For manual polling, you can use:
 
 ```bash
+
 # Poll every few seconds until assistant content is populated
 while true; do
   response=$(curl -s -X GET https://<host>/api/v1/chats/<chatId> \
     -H "Authorization: Bearer <token>")
-  
+
   # Check if assistant message has content (response is ready)
   if echo "$response" | jq '.chat.messages[] | select(.role=="assistant" and .id=="assistant-msg-id") | .content' | grep -v '""' > /dev/null; then
     echo "Assistant response is ready!"
     break
   fi
-  
+
   echo "Waiting for assistant response..."
   sleep 2
 done
@@ -413,6 +414,7 @@ curl -X POST https://<host>/api/v1/chats/<chatId> \
 Assistant responses may be wrapped in markdown code blocks. Here's how to clean them:
 
 ```bash
+
 # Example raw response from assistant
 raw_response='```json
 {

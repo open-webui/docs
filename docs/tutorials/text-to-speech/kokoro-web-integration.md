@@ -38,7 +38,7 @@ Run with: `docker compose up -d`
 1. In OpenWebUI, go to `Admin Panel` → `Settings` → `Audio`
 2. Configure:
    - Text-to-Speech Engine: `OpenAI`
-   - API Base URL: `http://localhost:3000/api/v1`  
+   - API Base URL: `http://localhost:3000/api/v1`
      (If using Docker: `http://host.docker.internal:3000/api/v1`)
    - API Key: `your-api-key` (from step 1)
    - TTS Model: `model_q8f16` (best balance of size/quality)

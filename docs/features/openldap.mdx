@@ -14,7 +14,7 @@ The easiest way to get a test OpenLDAP server running is by using Docker. This `
 version: "3.9"
 services:
   ldap:
-    image: osixia/openldap:1.5.0 
+    image: osixia/openldap:1.5.0
     container_name: openldap
     environment:
       LDAP_ORGANISATION: "Example Inc"
@@ -28,7 +28,7 @@ services:
       - "389:389"
     networks: [ldapnet]
 
-  phpldapadmin: 
+  phpldapadmin:
     image: osixia/phpldapadmin:0.9.0
     environment:
       PHPLDAPADMIN_LDAP_HOSTS: "ldap"
@@ -67,6 +67,7 @@ userPassword: {PLAIN}password123
 **Note on Passwords:** The `userPassword` field is set to a plain text value for simplicity in this test environment. In production, you should always use a hashed password. You can generate a hashed password using `slappasswd` or `openssl passwd`. For example:
 
 ```bash
+
 # Using slappasswd (inside the container)
 docker exec openldap slappasswd -s your_password
 
@@ -110,6 +111,7 @@ Open WebUI reads these environment variables only on the first startup. Subseque
 :::
 
 ```env
+
 # Enable LDAP
 ENABLE_LDAP="true"
 

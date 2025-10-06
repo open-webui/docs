@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # Only use stdlib to avoid needing to install dependencies
 import ast
 import sys

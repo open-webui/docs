@@ -40,7 +40,7 @@ services:
     stdin_open: true
     healthcheck:
       test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
-      
+
 volumes:
   libretranslate_models:
   libretranslate_api_keys:
@@ -51,6 +51,7 @@ volumes:
 Create a new file named `stack.env` in the same directory as your `docker-compose.yml` file. Add the following configuration to the file:
 
 ```bash
+
 # LibreTranslate
 LT_DEBUG="false"
 LT_UPDATE_MODELS="true"

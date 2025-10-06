@@ -10,7 +10,6 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 # Open WebUI
 
-
 **Open WebUI is an [extensible](https://docs.openwebui.com/features/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It supports various LLM runners like **Ollama** and **OpenAI-compatible APIs**, with **built-in inference engine** for RAG, making it a **powerful AI deployment solution**.
 
 Passionate about open-source AI? [Join our team →](https://careers.openwebui.com/)
@@ -147,12 +146,12 @@ The `uv` runtime manager ensures seamless Python environment management for appl
 
 Pick the appropriate installation command for your operating system:
 
-- **macOS/Linux**:  
+- **macOS/Linux**:
   ```bash
   curl -LsSf https://astral.sh/uv/install.sh | sh
   ```
 
-- **Windows**:  
+- **Windows**:
   ```powershell
   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
@@ -161,12 +160,12 @@ Pick the appropriate installation command for your operating system:
 
 Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
 
-- **macOS/Linux**:  
+- **macOS/Linux**:
   ```bash
   DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
   ```
 
-- **Windows**:  
+- **Windows**:
   ```powershell
   $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
   ```
@@ -185,27 +184,27 @@ pip install open-webui[all]
 
 ### Installation with `pip`
 
-For users installing Open WebUI with Python's package manager `pip`, **it is strongly recommended to use Python runtime managers like `uv` or `conda`**. These tools help manage Python environments effectively and avoid conflicts. 
+For users installing Open WebUI with Python's package manager `pip`, **it is strongly recommended to use Python runtime managers like `uv` or `conda`**. These tools help manage Python environments effectively and avoid conflicts.
 
 Python 3.11 is the development environment. Python 3.12 seems to work but has not been thoroughly tested. Python 3.13 is entirely untested and some dependencies do not work with Python 3.13 yet—**use at your own risk**.
 
-1. **Install Open WebUI**:  
+1. **Install Open WebUI**:
 
-   Open your terminal and run the following command:  
+   Open your terminal and run the following command:
    ```bash
    pip install open-webui
    ```
 
-2. **Start Open WebUI**:  
+2. **Start Open WebUI**:
 
-   Once installed, start the server using:  
+   Once installed, start the server using:
    ```bash
    open-webui serve
    ```
 
 ### Updating Open WebUI
 
-To update to the latest version, simply run:  
+To update to the latest version, simply run:
 
 ```bash
 pip install --upgrade open-webui
@@ -221,12 +220,11 @@ Continue with the full [getting started guide](/getting-started).
 
 ### Desktop App
 
-We also have an **experimental** desktop app, which is actively a **work in progress (WIP)**. While it offers a convenient way to run Open WebUI natively on your system without Docker or manual setup, it is **not yet stable**.  
+We also have an **experimental** desktop app, which is actively a **work in progress (WIP)**. While it offers a convenient way to run Open WebUI natively on your system without Docker or manual setup, it is **not yet stable**.
 
 👉 For stability and production use, we strongly recommend installing via **Docker** or **Python (`uv` or `pip`)**.
 
 ## Sponsors 🙌
-
 
 <SponsorList />
 
@@ -258,5 +256,5 @@ We are deeply grateful for the generous grant support provided by:
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>GitHub Accelerator 2024</span>
   </a>
 
-  
+
 </div>

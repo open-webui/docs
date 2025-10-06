@@ -80,11 +80,11 @@ For instance, the popular **Time MCP Server** is documented [here](https://githu
 > Add to your Claude settings:
 >
 > ```json
-> "mcpServers": {   
->   "time": {     
->     "command": "uvx",     
->     "args": ["mcp-server-time", "--local-timezone=America/New_York"]   
->   } 
+> "mcpServers": {
+>   "time": {
+>     "command": "uvx",
+>     "args": ["mcp-server-time", "--local-timezone=America/New_York"]
+>   }
 > }
 > ```
 
@@ -139,6 +139,7 @@ Create the following `Dockerfile` inside your deployment directory:
 FROM python:3.11-slim
 WORKDIR /app
 RUN pip install mcpo uv
+
 # Replace with your MCP server command; example: uvx mcp-server-time
 CMD ["uvx", "mcpo", "--host", "0.0.0.0", "--port", "8000", "--", "uvx", "mcp-server-time", "--local-timezone=America/New_York"]
 ```
@@ -163,7 +164,7 @@ Deploy using Docker Compose, Kubernetes YAML manifests, or your favorite cloud c
 
 ✔️ Your production MCP servers are now effortlessly available via REST APIs!
 
-## 🧑‍💻 Technical Details and Background 
+## 🧑‍💻 Technical Details and Background
 
 ### 🍃 How It Works (Technical Summary)
 
@@ -183,7 +184,7 @@ Deploy using Docker Compose, Kubernetes YAML manifests, or your favorite cloud c
 
 Here's why leveraging MCP servers through OpenAPI via the proxy approach is significantly better and why Open WebUI enthusiastically supports it:
 
-- **User-friendly & Familiar Interface**: No custom clients; just HTTP REST endpoints you already know. 
+- **User-friendly & Familiar Interface**: No custom clients; just HTTP REST endpoints you already know.
 - **Instant Integration**: Immediately compatible with thousands of existing REST/OpenAPI tools, SDKs, and services.
 - **Powerful & Automatic Docs**: Built-in Swagger UI documentation is automatically generated, always accurate, and maintained.
 - **No New Protocol overhead**: Eliminates the necessity to directly handle MCP-specific protocol complexities and socket communication issues.

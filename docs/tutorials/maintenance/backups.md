@@ -2,7 +2,7 @@
 sidebar_position: 1000
 title: "💾 Backups"
 ---
- 
+
  :::warning
 
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
@@ -110,6 +110,7 @@ A model rsync job could look like this:
 SOURCE_DIR="."  # Current directory (where the file structure resides)
 B2_BUCKET="b2://OpenWebUI-backups" # Your Backblaze B2 bucket
 B2_PROFILE="your_rclone_profile" # Your rclone profile name
+
 # Ensure rclone is configured with your B2 credentials
 
 # Define source and destination directories
@@ -224,15 +225,23 @@ exit 0
 
 ```bash
 #!/bin/bash
+
 #
 # Backup script to back up ChromaDB and SQLite to Backblaze B2 bucket
+
 # openwebuiweeklies, maintaining 3 weekly snapshots.
+
 # Snapshots are independent and fully restorable.
+
 # Uses ChromaDB and SQLite native backup mechanisms.
+
 # Excludes audit.log, cache, and uploads directories.
+
 #
 # Ensure rclone is installed and configured correctly.
+
 # Install rclone: https://rclone.org/install/
+
 # Configure rclone: https://rclone.org/b2/
 
 # Source directory (containing ChromaDB and SQLite data)
@@ -306,7 +315,7 @@ echo "Backup completed to $DESTINATION"
 
 ## Point In Time Snapshots
 
-In addition taking backups, users may also wish to create point-in-time snapshots which could be stored locally (on the server), remotely, or both.  
+In addition taking backups, users may also wish to create point-in-time snapshots which could be stored locally (on the server), remotely, or both.
 
 ```bash
 #!/bin/bash

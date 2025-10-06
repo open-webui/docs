@@ -151,6 +151,7 @@ For the most comprehensive monitoring, you can test if models are actually capab
 This test requires an API key and sends a POST request with a simple message to the chat completions endpoint.
 
 ```bash
+
 # Test model response - authenticated POST request
 curl -X POST https://your-open-webui-instance/api/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \

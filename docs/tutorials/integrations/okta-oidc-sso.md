@@ -91,8 +91,11 @@ By default, Okta's Sign-On Policy may not prompt for MFA on every login from the
 To enable Okta OIDC SSO in Open WebUI, you need to set the following core environment variables. Additional variables are required if you wish to enable the optional group management feature.
 
 ```bash
+
 # --- OIDC Core Settings ---
+
 # Enable OAuth signup if you want users to be able to create accounts via Okta
+
 # ENABLE_OAUTH_SIGNUP="true"
 
 # Your Okta application's Client ID
@@ -102,7 +105,9 @@ OAUTH_CLIENT_ID="YOUR_OKTA_CLIENT_ID"
 OAUTH_CLIENT_SECRET="YOUR_OKTA_CLIENT_SECRET"
 
 # Your Okta organization's OIDC discovery URL
+
 # Format: https://<your-okta-domain>/.well-known/openid-configuration
+
 # Or for a specific authorization server: https://<your-okta-domain>/oauth2/<auth-server-id>/.well-known/openid-configuration
 OPENID_PROVIDER_URL="YOUR_OKTA_OIDC_DISCOVERY_URL"
 
@@ -110,22 +115,33 @@ OPENID_PROVIDER_URL="YOUR_OKTA_OIDC_DISCOVERY_URL"
 OAUTH_PROVIDER_NAME="Okta"
 
 # Scopes to request (default is usually sufficient)
+
 # OAUTH_SCOPES="openid email profile groups" # Ensure 'groups' is included if not default
 
 # --- OAuth Group Management (Optional) ---
+
 # Set to "true" only if you configured the Groups Claim in Okta (Step 2)
+
 # and want Open WebUI groups to be managed based on Okta groups upon login.
+
 # This syncs existing groups. Users will be added/removed from Open WebUI groups
+
 # to match their Okta group claims.
+
 # ENABLE_OAUTH_GROUP_MANAGEMENT="true"
 
 # Required only if ENABLE_OAUTH_GROUP_MANAGEMENT is true.
+
 # The claim name in the ID token containing group information (must match Okta config)
+
 # OAUTH_GROUP_CLAIM="groups"
 
 # Optional: Enable Just-in-Time (JIT) creation of groups if they exist in Okta claims but not in Open WebUI.
+
 # Requires ENABLE_OAUTH_GROUP_MANAGEMENT="true".
+
 # If set to false (default), only existing groups will be synced.
+
 # ENABLE_OAUTH_GROUP_CREATION="false"
 ```
 
@@ -156,6 +172,7 @@ When deploying Open WebUI across multiple nodes (e.g., in a Kubernetes cluster o
 :::
 
 ```bash
+
 # Example: Generate a strong secret key (e.g., using openssl rand -hex 32)
 WEBUI_SECRET_KEY="YOUR_UNIQUE_AND_SECURE_SECRET_KEY"
 ```

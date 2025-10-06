@@ -38,6 +38,7 @@ You can load and run various GGUF-format quantized LLMs using Llama.cpp. One imp
 Alternatively, use Python to download programmatically:
 
 ```python
+
 # pip install huggingface_hub hf_transfer
 
 from huggingface_hub import snapshot_download
@@ -97,7 +98,7 @@ To control and query your locally running model directly from Open WebUI:
 2. Go to ⚙️ Admin Settings → Connections → OpenAI Connections
 3. Click ➕ Add Connection and enter:
 
-- URL: `http://127.0.0.1:10000/v1`  
+- URL: `http://127.0.0.1:10000/v1`
   (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker)
 - API Key: `none` (leave blank)
 
