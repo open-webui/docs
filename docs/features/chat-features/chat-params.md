@@ -54,7 +54,6 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 :::
 </details>
 
-
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 
 :::tip **Bonus Tips**
