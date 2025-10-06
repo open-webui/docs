@@ -50,7 +50,7 @@ Move the generated nginx.key and nginx.crt files to a folder of your choice, or 
 
 Open C:\nginx\conf\nginx.conf in a text editor
 
-If you want Open WebUI to be accessible over your local LAN, be sure to note your LAN ip address using `ipconfig` e.g. 192.168.1.15
+If you want Open WebUI to be accessible over your local LAN, be sure to note your LAN ip address using `ipconfig` e.g., 192.168.1.15
 
 Set it up as follows:
 

@@ -4,12 +4,12 @@ title: "🔰 Customizable Banners"
 ---
 
 Overview
---------
+---
 
 Open WebUI provides a feature that allows administrators to create customizable banners with persistence in the `config.json` file. These banners can feature options for content, background color (info, warning, error, or success), and dismissibility. Banners are accessible only to logged-in users, ensuring the confidentiality of sensitive information.
 
 Configuring Banners through the Admin Panel
----------------------------------------------
+---
 
 To configure banners through the admin panel, follow these steps:
 
@@ -23,7 +23,7 @@ To configure banners through the admin panel, follow these steps:
 8. Press `Save` at the bottom of the page to save the banner.
 
 Configuring Banners through Environment Variables
-------------------------------------------------
+---
 
 Alternatively, you can configure banners through environment variables. To do this, you will need to set the `WEBUI_BANNERS` environment variable with a list of dictionaries in the following format:
 
@@ -34,7 +34,7 @@ Alternatively, you can configure banners through environment variables. To do th
 For more information on configuring environment variables in Open WebUI, see [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration#webui_banners).
 
 Environment Variable Description
----------------------------------
+---
 
 - `WEBUI_BANNERS`:
   - Type: list of dict
@@ -42,7 +42,7 @@ Environment Variable Description
   - Description: List of banners to show to users.
 
 Banner Options
-----------------
+---
 
 - `id`: Unique identifier for the banner.
 - `type`: Background color of the banner (info, success, warning, error).
@@ -52,7 +52,7 @@ Banner Options
 - `timestamp`: Timestamp for the banner (optional).
 
 FAQ
-----
+---
 
 - Q: Can I configure banners through the admin panel?
 A: Yes, you can configure banners through the admin panel by navigating to `Admin Panel` -> `Settings` -> `Interface` and clicking on the `+` icon to add a new banner.

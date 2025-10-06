@@ -5,7 +5,7 @@ title: "🔌 Offline Mode"
 
 :::warning
 
-This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](../contributing.mdx).
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/tutorials/tips/contributing-tutorial.md).
 
 :::
 
@@ -49,7 +49,7 @@ Consider if you need to start the application offline from the beginning of your
 
 ### I: Speech-To-Text
 
-The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/docs/tutorials/speech-to-text/stt-config.md) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
+The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/docs/tutorials/speech-to-text/stt-config.md) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g., [Huggingface - Systran](https://huggingface.co/Systran)).
 
 ```python
 from faster_whisper import WhisperModel
@@ -72,7 +72,7 @@ The default local transformer can already handle the text-to-speech function. If
 
 ### I: Embedding Model
 
-For various purposes, you will need an embedding model (e.g. [RAG](/docs/features/rag.md)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+For various purposes, you will need an embedding model (e.g., [RAG](/docs/features/rag.md)). You will first have to download such a model of your choice (e.g., [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
 
 ```python
 from huggingface_hub import snapshot_download
@@ -98,7 +98,7 @@ Follow one of the [guides](https://docs.openwebui.com/category/%EF%B8%8F-text-to
 
 ### II: Embedding Model
 
-In your Open WebUI installation, navigate to `Admin Settings` > `Settings` > `Documents` and select the embedding model you would like to use (e.g. [sentence-transformer/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)). After the selection, click the download button next to it.
+In your Open WebUI installation, navigate to `Admin Settings` > `Settings` > `Documents` and select the embedding model you would like to use (e.g., [sentence-transformer/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)). After the selection, click the download button next to it.
 
 ---
 

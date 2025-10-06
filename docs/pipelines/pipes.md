@@ -9,7 +9,7 @@ Pipes are standalone functions that process inputs and generate responses, possi
 
 <p align="center">
   <a href="#">
-    <img src="/images/pipelines/pipes.png" alt="Pipe Workflow" />
+    ![Pipe Workflow](/images/pipelines/pipes.png)
   </a>
 </p>
 
@@ -17,6 +17,6 @@ Pipes that are defined in your WebUI show up as a new model with an "External" d
 
 <p align="center">
   <a href="#">
-    <img src="/images/pipelines/pipe-model-example.png" alt="Pipe Models in WebUI" />
+    ![Pipe Models in WebUI](/images/pipelines/pipe-model-example.png)
   </a>
 </p>

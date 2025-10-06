@@ -40,7 +40,7 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 
 ::tip
 
-> Tip: Override defaults in your `.env` file or Compose file as needed.
+Override defaults in your `.env` file or Compose file as needed.
 
 :::
 

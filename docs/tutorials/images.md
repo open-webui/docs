@@ -127,7 +127,7 @@ For example, `seed` may need to be renamed to `noise_seed` to match a node ID wi
 
 :::tip
 
-Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
+Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g., `1` or `1, 2`).
 
 :::
 
