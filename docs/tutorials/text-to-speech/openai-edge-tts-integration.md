@@ -4,7 +4,9 @@ title: "🗨️ Edge TTS Using Docker"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # Integrating `openai-edge-tts` 🗣️ with Open WebUI
@@ -52,7 +54,9 @@ This will run the service at port 5050 with all the default configs
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBobmOhsMkrO6Tl2kxX39dbuFiQ8cAoNzysIt7f)
 
 :::info
+
 The default API key is the string `your_api_key_here`. You do not have to change that value if you do not need the added security.
+
 :::
 
 **And that's it! You can end here**
@@ -149,7 +153,9 @@ Generates audio from the input text. Available parameters:
 - **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
 
 :::tip
+
 You can browse available voices and listen to sample previews at [tts.travisvn.com](https://tts.travisvn.com)
+
 :::
 
 Example request with `curl` and saving the output to an mp3 file:
@@ -202,11 +208,13 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 - **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
 :::info
+
 The `/v1` is now optional.
 
 Additionally, there are endpoints for **Azure AI Speech** and **ElevenLabs** for potential future support if custom API endpoints are allowed for these options in Open WebUI.
 
 These can be disabled by setting the environment variable `EXPAND_API=False`.
+
 :::
 
 </details>
@@ -230,9 +238,11 @@ docker run -d -p 5050:5050 \
 ```
 
 :::note
+
 The markdown text is now put through a filter for enhanced readability and support.
 
 You can disable this by setting the environment variable `REMOVE_FILTER=True`.
+
 :::
 
 ## Additional Resources

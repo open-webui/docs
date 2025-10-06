@@ -4,7 +4,9 @@ title: "🗨️ Openedai-speech Using Docker"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 **Integrating `openedai-speech` into Open WebUI using Docker**
@@ -14,9 +16,11 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 -----------------------------
 
 :::info
+
 [openedai-speech](https://github.com/matatonic/openedai-speech) is an OpenAI audio/speech API compatible text-to-speech server.
 
 It serves the `/v1/audio/speech` endpoint and provides a free, private text-to-speech experience with custom voice cloning capabilities. This service is in no way affiliated with OpenAI and does not require an OpenAI API key.
+
 :::
 
 **Requirements**
@@ -220,5 +224,7 @@ For more information about `openedai-speech`, please visit the [GitHub repositor
 [Custom-Voices-HowTo](https://github.com/matatonic/openedai-speech?tab=readme-ov-file#custom-voices-howto)
 
 :::note
+
 You can change the port number in the `docker-compose.yml` file to any open and usable port, but be sure to update the **API Base URL** in Open WebUI Admin Audio settings accordingly.
+
 :::

@@ -476,7 +476,11 @@ async def batch_processor_tool(
 
 #### Message Events ⚠️ DEFAULT MODE ONLY
 
+:::warning
+
 **🚨 CRITICAL WARNING: Message events are INCOMPATIBLE with Native function calling mode!**
+
+:::
 
 Message events (`message`, `chat:message`, `chat:message:delta`, `replace`) allow you to append or modify message content at any stage during tool execution. This enables embedding images, rendering web pages, streaming content updates, and creating rich interactive experiences.
 
@@ -799,8 +803,12 @@ def __init__(self):
     self.citation = False  # REQUIRED - prevents automatic citations from overriding custom ones
 ```
 
+:::warning
+
 **⚠️ Critical Citation Warning:**
 If you set `self.citation = True` (or don't set it to `False`), automatic citations will replace any custom citations you send. Always disable automatic citations when using custom citation events.
+
+:::
 
 <details>
 <summary>Basic Citation Example</summary>

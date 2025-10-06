@@ -12,7 +12,9 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
 ## Swagger Documentation Links
 
 :::important
+
 Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
+
 :::
 
 Access detailed API documentation for different services provided by Open WebUI:

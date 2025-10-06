@@ -20,9 +20,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 # Pipelines: UI-Agnostic OpenAI API Plugin Framework
 
 :::warning
+
 **DO NOT USE PIPELINES IF!**
 
 If your goal is simply to add support for additional providers like Anthropic or basic filters, you likely don't need Pipelines . For those cases, Open WebUI Functions are a better fit—it's built-in, much more convenient, and easier to configure. Pipelines, however, comes into play when you're dealing with computationally heavy tasks (e.g., running large models or complex logic) that you want to offload from your main Open WebUI instance for better performance and scalability.
+
 :::
 
 Welcome to **Pipelines**, an [Open WebUI](https://github.com/open-webui) initiative. Pipelines bring modular, customizable workflows to any UI client supporting OpenAI API specs – and much more! Easily extend functionalities, integrate unique logic, and create dynamic workflows with just a few lines of code.
@@ -56,7 +58,9 @@ Integrating Pipelines with any OpenAI API-compatible UI client is simple. Launch
 ## ⚡ Quick Start with Docker
 
 :::warning
+
 Pipelines are a plugin system with arbitrary code execution — **don't fetch random pipelines from sources you don't trust**.
+
 :::
 
 For a streamlined setup using Docker:
@@ -75,7 +79,9 @@ For a streamlined setup using Docker:
    - Once you've added your pipelines connection and verified it, you will see an icon appear within the API Base URL field for the added connection. When hovered over, the icon itself will be labeled `Pipelines`. Your pipelines should now be active.
 
 :::info
+
 If your Open WebUI is running in a Docker container, replace `localhost` with `host.docker.internal` in the API URL.
+
 :::
 
 3. **Manage Configurations:**
@@ -84,7 +90,9 @@ If your Open WebUI is running in a Docker container, replace `localhost` with `h
    - Select your desired pipeline and modify the valve values directly from the WebUI.
 
 :::tip
+
 If you are unable to connect, it is most likely a Docker networking issue. We encourage you to troubleshoot on your own and share your methods and solutions in the discussions forum.
+
 :::
 
 If you need to install a custom pipeline with additional dependencies:

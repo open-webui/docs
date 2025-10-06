@@ -240,6 +240,7 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Description: Sets the port to run Open WebUI from.
 
 :::info
+
 If you're running the application via Python and using the `open-webui serve` command, you cannot set the port using the `PORT` configuration. Instead, you must specify it directly as a command-line argument using the `--port` flag. For example:
 
 ```bash
@@ -247,6 +248,7 @@ open-webui serve --port 9999
 ```
 
 This will run the Open WebUI on port `9999`. The `PORT` environment variable is disregarded in this mode.
+
 :::
 
 #### `ENABLE_REALTIME_CHAT_SAVE`
@@ -368,7 +370,9 @@ allowing the client to wait indefinitely.
 - Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
 :::note
+
 The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped, depending on your network conditions.
+
 :::
 
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
@@ -1314,6 +1318,7 @@ pip install open-webui[all]
 - Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
 
 :::info
+
 **Benefits of multitenancy mode:**
 - Significantly reduced RAM consumption (5 collections vs potentially hundreds)
 - Lower computational overhead from collection management
@@ -1329,9 +1334,12 @@ pip install open-webui[all]
 - Hash-based collections go into `{prefix}_hash_based`
 - Each entry includes a resource_id field matching the original collection name
 - Queries automatically filter by resource_id to maintain data isolation
+
 :::
 
-:::info **Migration from Legacy Mode to Multitenancy**
+:::info
+
+**Migration from Legacy Mode to Multitenancy**
 
 **What happens when you enable multitenancy when you already have a normal milvus database with data in it:**
 - Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
@@ -1360,9 +1368,12 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - No one-click "migrate and cleanup" button exists
 - Vector DB reset from UI (Admin Settings > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
 - Legacy collections require manual cleanup via Milvus client tools
+
 :::
 
-:::warning **Critical Considerations**
+:::warning
+
+**Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
 - Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
@@ -1386,6 +1397,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
 - Re-upload/re-create knowledge bases from scratch
+
 :::
 
 #### `MILVUS_COLLECTION_PREFIX`
@@ -2124,7 +2136,9 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 ### OneDrive
 
 :::info
+
 For a step-by-step setup guide, check out our tutorial: [Configuring OneDrive & SharePoint Integration](https://docs.openwebui.com/tutorials/integrations/onedrive-sharepoint/).
+
 :::
 
 #### `ENABLE_ONEDRIVE_INTEGRATION`
@@ -2135,8 +2149,10 @@ For a step-by-step setup guide, check out our tutorial: [Configuring OneDrive & 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::warning
+
 Configuring OneDrive integration is a multi-step process that requires creating and correctly configuring an Azure App Registration.
 The authentication flow also depends on a browser pop-up window. Please ensure that your browser's pop-up blocker is disabled for your Open WebUI domain to allow the authentication and file selection window to appear.
+
 :::
 
 #### `ENABLE_ONEDRIVE_PERSONAL`
@@ -2172,8 +2188,10 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 - Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the personal OneDrive client ID here!**
 
 :::info
+
 This Client ID (also known as Application ID) is obtained from an Azure App Registration within your Microsoft Entra ID (formerly Azure AD) tenant.
 When configuring the App Registration in Azure, the Redirect URI must be set to the URL of your Open WebUI instance and configured as a **Single-page application (SPA)** type for the authentication to succeed.
+
 :::
 
 #### `ONEDRIVE_SHAREPOINT_URL`
@@ -2184,7 +2202,9 @@ When configuring the App Registration in Azure, the Redirect URI must be set to 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
+
 This variable is essential for the work/school integration. It should point to the root SharePoint site associated with your tenant, enabling access to SharePoint document libraries.
+
 :::
 
 #### `ONEDRIVE_SHAREPOINT_TENANT_ID`
@@ -2195,7 +2215,9 @@ This variable is essential for the work/school integration. It should point to t
 -   Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
+
 This Tenant ID (also known as Directory ID) is required for the work/school integration. You can find this value on the main overview page of your Azure App Registration in the Microsoft Entra ID portal.
+
 :::
 
 ## Web Search
@@ -2508,7 +2530,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `en`
 - Description: Comma-separated list of language codes to try when fetching YouTube video transcriptions, in priority order.
-- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English. Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English.
+
+:::note
+
+Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+
+:::
+
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Audio
@@ -3035,6 +3064,7 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::warning
+
 **Use with Caution**
 
 Enabling this option bypasses email-based user identification, which is the standard method for uniquely identifying users across authentication systems. When enabled:
@@ -3051,6 +3081,7 @@ This setting is designed for enterprise environments using identity providers th
 - Operate in air-gapped or highly restricted networks where email-based services are unavailable
 
 For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this setting should remain `False`.
+
 :::
 
 #### `OAUTH_UPDATE_PICTURE_ON_LOGIN`
@@ -4037,7 +4068,9 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 - Persistence: No
 
 :::info
+
 When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct it using a combination of `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, and `DATABASE_NAME`. For this automatic construction to occur, **all** of these individual parameters must be provided. If any are missing, the default `DATABASE_URL` (SQLite file) or any explicitly set `DATABASE_URL` will be used instead.
+
 :::
 
 ### Encrypted SQLite with SQLCipher

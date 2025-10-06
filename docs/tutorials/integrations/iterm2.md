@@ -3,7 +3,9 @@ title: "💻 Iterm2 AI Integration"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
+
 :::
 
 # Use your Open WebUI models with Iterm2

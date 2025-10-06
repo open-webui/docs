@@ -57,7 +57,11 @@ Now, add your Langfuse API keys below. If you haven't signed up to Langfuse yet,
 
 ![Open WebUI add Langfuse Pipeline](https://langfuse.com//images/docs/openwebui-add-pipeline.png)
 
+:::note
+
 ***Note:** Capture usage (token counts) for OpenAi models while streaming is enabled, you have to navigate to the model settings in Open WebUI and check the "Usage" [box](https://github.com/open-webui/open-webui/discussions/5770#discussioncomment-10778586) below *Capabilities*.*
+
+:::
 
 ### Step 5: See your traces in Langfuse
 

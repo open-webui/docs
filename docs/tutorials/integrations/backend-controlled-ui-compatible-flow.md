@@ -4,7 +4,9 @@ title: "🔄 Backend-Controlled, UI-Compatible API Flow"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/tutorials/tips/contributing-tutorial.md).
+
 :::
 
 ---
@@ -123,7 +125,11 @@ public void enrichChatWithAssistantMessage(OWUIChatResponse chatResponse, String
 }
 ```
 
+:::note
+
 **Note:** This step can be performed in memory on the response object, or combined with Step 1 by including both user and empty assistant messages in the initial chat creation.
+
+:::
 
 ### Step 3: Update Chat with Assistant Message
 
@@ -914,5 +920,7 @@ You can test your implementation by following the step-by-step CURL examples pro
 - Model names
 
 :::tip
+
 Start with a simple user message and gradually add complexity like knowledge integration and advanced features once the basic flow is working.
+
 :::

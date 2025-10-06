@@ -29,6 +29,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 
 
 :::info
+
 **Remove any existing data in the Docker volume (NOT RECOMMENDED UNLESS ABSOLUTELY NECCESSARY!)**. Skip this step entirely if not needed and move on to the last step:
 
    If you want to start with a clean slate, you can remove the existing data in the Docker volume. Be careful, as this will delete all your chat histories and other data.
@@ -38,6 +39,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 ```bash
 docker volume rm open-webui
 ```
+
 :::
 
 3. **Start the container again with the updated image and existing volume attached**:

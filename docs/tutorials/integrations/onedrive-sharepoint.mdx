@@ -4,7 +4,9 @@ title: "📁 Integrate with OneDrive & SharePoint"
 ---
 
 :::info
+
 This tutorial provides a step-by-step guide for integrating Open WebUI with **Microsoft OneDrive for Business & SharePoint**, as well as the separate, optional integration for **Personal Microsoft OneDrive** accounts. You can enable one or both integrations. This documentation is up to date as of Open WebUI v0.6.32.
+
 :::
 
 ---
@@ -63,8 +65,11 @@ Next, grant the application permission to read files from OneDrive and SharePoin
 5.  If your organization uses SharePoint API permissions separately, repeat the process by selecting **SharePoint** instead of Microsoft Graph and add the applicable delegated permissions.
 6.  After adding all permissions, you must grant admin consent. Click the **"Grant admin consent for [Your Tenant Name]"** button. The status for these permissions should change to "Granted".
 
-:::warning Admin Consent is Mandatory
+:::warning
+
+Admin Consent is Mandatory
 Open WebUI uses the `.default` scope for a seamless enterprise experience, meaning it relies on pre-approved permissions. If admin consent is not granted here, non-admin users will be blocked from logging in with an "Admin approval required" error.
+
 :::
 
 ## Step 4: Gather Credentials for Business Integration
@@ -131,8 +136,11 @@ After setting your environment variables and restarting your Open WebUI instance
 1.  In Open WebUI, open the attachment menu (+) in the chat input. You should see menu items for **"Microsoft OneDrive (work/school)"** and/or **"Microsoft OneDrive (personal)"**, depending on your configuration.
 2.  Clicking either option should trigger a pop-up window for Microsoft authentication.
 
-:::caution Disable Pop-up Blockers!
+:::caution
+
+Disable Pop-up Blockers!
 The OneDrive file picker and authentication flow happen in a pop-up window. If nothing happens when you click a OneDrive option, it is almost certainly because your browser is blocking pop-ups. **You must disable the pop-up blocker for your Open WebUI domain** for the integration to work.
+
 :::
 
 You have now successfully configured OneDrive integration, providing seamless file access for your users.

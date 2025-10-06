@@ -54,7 +54,9 @@ docker run -d -p 3000:8080 -e WEBUI_AUTH=False -v open-webui:/app/backend/data -
 ```
 
 :::warning
+
 You cannot switch between single-user mode and multi-account mode after this change.
+
 :::
 
 #### Advanced Configuration: Connecting to Ollama on a Different Server

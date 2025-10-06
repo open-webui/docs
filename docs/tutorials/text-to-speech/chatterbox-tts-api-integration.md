@@ -6,7 +6,9 @@ title: "🗨️ Chatterbox TTS — Voice Cloning"
 # Chatterbox TTS — Voice Cloning
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 ## What is `Chatterbox TTS API`?
@@ -33,7 +35,9 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 - CPU: Works but slower — GPU recommended for production
 
 :::info
+
 Chatterbox can use a good deal of memory and has hardware requirements that might be higher than you're used to with other local TTS solutions. If you have trouble meeting the requirements, you might find [OpenAI Edge TTS](https://docs.openwebui.com/tutorials/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](https://docs.openwebui.com/tutorials/text-to-speech/Kokoro-FastAPI-integration) to be suitable replacements.
+
 :::
 
 ## ⚡️ Quick start
@@ -197,7 +201,9 @@ To use Chatterbox TTS API with Open WebUI, follow these steps:
   - Response splitting: `Paragraphs`
 
 :::info
+
 The default API key is the string `none` (no API key required)
+
 :::
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://lm17s1uz51.ufs.sh/f/EsgO8cDHBTOUjUe3QjHytHQ0xqn2CishmXgGfeJ4o983TUMO)

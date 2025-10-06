@@ -6,7 +6,9 @@ title: "🐋 Run DeepSeek R1 Dynamic 1.58-bit with Llama.cpp"
 A huge shoutout to **UnslothAI** for their incredible efforts! Thanks to their hard work, we can now run the **full DeepSeek-R1** 671B parameter model in its dynamic 1.58-bit quantized form (compressed to just 131GB) on **Llama.cpp**! And the best part? You no longer have to despair about needing massive enterprise-class GPUs or servers — it’s possible to run this model on your personal machine (albeit slowly for most consumer hardware).  
 
 :::note
+
 The only true **DeepSeek-R1** model on Ollama is the **671B version** available here: [https://ollama.com/library/deepseek-r1:671b](https://ollama.com/library/deepseek-r1:671b). Other versions are **distilled** models.
+
 :::
 
 This guide focuses on running the **full DeepSeek-R1 Dynamic 1.58-bit quantized model** using **Llama.cpp** integrated with **Open WebUI**. For this tutorial, we’ll demonstrate the steps with an **M4 Max + 128GB RAM** machine. You can adapt the settings to your own configuration.  
@@ -25,7 +27,9 @@ You can either:
 Head over to [Unsloth’s Hugging Face page](https://huggingface.co/unsloth/DeepSeek-R1-GGUF) and download the appropriate **dynamic quantized version** of DeepSeek-R1. For this tutorial, we’ll use the **1.58-bit (131GB)** version, which is highly optimized yet remains surprisingly functional.
 
 :::tip
+
 Know your "working directory" — where your Python script or terminal session is running. The model files will download to a subfolder of that directory by default, so be sure you know its path! For example, if you're running the command below in `/Users/yourname/Documents/projects`, your downloaded model will be saved under `/Users/yourname/Documents/projects/DeepSeek-R1-GGUF`.
+
 :::
 
 To understand more about UnslothAI’s development process and why these dynamic quantized versions are so efficient, check out their blog post: [UnslothAI DeepSeek R1 Dynamic Quantization](https://unsloth.ai/blog/deepseekr1-dynamic).  
@@ -56,8 +60,10 @@ DeepSeek-R1-GGUF/
 ```
 
 :::info
+
 🛠️ Update paths in the later steps to **match your specific directory structure**. For example, if your script was in `/Users/tim/Downloads`, the full path to the GGUF file would be:  
 `/Users/tim/Downloads/DeepSeek-R1-GGUF/DeepSeek-R1-UD-IQ1_S/DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf`.
+
 :::
 
 ## Step 3: Make Sure Open WebUI is Installed and Running  
@@ -95,6 +101,7 @@ Here’s the command to start the server:
 ```
 
 :::tip
+
 🔑 **Parameters to Customize Based on Your Machine:**  
 
 - **`--model`:** Replace `/[your-directory]/` with the path where the GGUF files were downloaded in Step 2.  
@@ -121,11 +128,13 @@ http://127.0.0.1:10000
 ```
 
 :::info
+
 🖥️ **Llama.cpp Server Running**  
 
 ![Server Screenshot](/images/tutorials/deepseek/serve.png)  
 
 After running the command, you should see a message confirming the server is active and listening on port 10000.
+
 :::
 
 Be sure to **keep this terminal session running**, as it serves the model for all subsequent steps.
@@ -139,11 +148,13 @@ Be sure to **keep this terminal session running**, as it serves the model for al
    - API Key: `none`
 
 :::info
+
 🖥️ **Adding Connection in Open WebUI**  
 
 ![Connection Screenshot](/images/tutorials/deepseek/connection.png)  
 
 After running the command, you should see a message confirming the server is active and listening on port 10000.
+
 :::
 
 Once the connection is saved, you can start querying **DeepSeek-R1** directly from Open WebUI! 🎉  
