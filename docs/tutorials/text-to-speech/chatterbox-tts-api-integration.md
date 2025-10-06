@@ -139,7 +139,7 @@ curl -X POST http://localhost:4123/v1/audio/speech \
 ```
 
 <details>
-<summary><strong>🚀 Running with the Frontend Interface</strong></summary>
+<summary>**🚀 Running with the Frontend Interface**</summary>
 
 This project includes an optional React-based web UI. Use Docker Compose profiles to easily opt in or out of the frontend:
 

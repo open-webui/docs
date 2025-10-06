@@ -130,7 +130,6 @@ class Valves(BaseModel):
 For example:
 If you're creating a filter that converts responses into uppercase, you might allow users to configure whether every output gets totally capitalized via a valve like `TRANSFORM_UPPERCASE: bool = True/False`.
 
-
 ##### Configuring Valves with Dropdown Menus (Enums)
 
 You can enhance the user experience for your filter's settings by providing dropdown menus instead of free-form text inputs for certain `Valves`. This is achieved using `json_schema_extra` with the `enum` keyword in your Pydantic `Field` definitions.
@@ -230,7 +229,6 @@ In the world of Open WebUI, the `inlet` function does this important prep work o
 🚀 **Your Task**:
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
-
 ##### 🍳 Why Would You Use the `inlet`?
 1. **Adding Context**: Automatically append crucial information to the user’s input, especially if their text is vague or incomplete. For example, you might add "You are a friendly assistant" or "Help this user troubleshoot a software bug."
 
@@ -239,7 +237,6 @@ Modify and return the `body`. The modified version of the `body` is what the LLM
 3. **Sanitizing Input**: Remove unwanted characters, strip potentially harmful or confusing symbols (like excessive whitespace or emojis), or replace sensitive information.
 
 4. **Streamlining User Input**: If your model’s output improves with additional guidance, you can use the `inlet` to inject clarifying instructions automatically!
-
 
 ##### 💡 Example Use Cases: Build on Food Prep
 
@@ -260,7 +257,6 @@ def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 
 📖 **What Happens?**
 - Any user input like "What are some good dinner ideas?" now carries the Italian theme because we’ve set the system context! Cheesecake might not show up as an answer, but pasta sure will.
-
 
 ###### 🔪 Example 2: Cleaning Input (Remove Odd Characters)
 Suppose the input from the user looks messy or includes unwanted symbols like `!!!`, making the conversation inefficient or harder for the model to parse. You can clean it up while preserving the core content.

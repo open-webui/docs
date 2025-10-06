@@ -3,7 +3,6 @@ sidebar_position: 2
 title: "Environment Variables"
 ---
 
-
 # Environment Variables List
 
 :::info

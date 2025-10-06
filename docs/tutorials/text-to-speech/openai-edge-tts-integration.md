@@ -66,7 +66,6 @@ The default API key is the string `your_api_key_here`. You do not have to change
 <details>
   <summary>Running with Python</summary>
 
-
 ### 🐍 Running with Python
 
 If you prefer to run this project directly with Python, follow these steps to set up a virtual environment, install dependencies, and start the server.
@@ -138,7 +137,6 @@ You can now interact with the API at `http://localhost:5050/v1/audio/speech` and
 
 <details>
   <summary>Usage details</summary>
-
 
 ##### Endpoint: `/v1/audio/speech` (aliased with `/audio/speech`)
 

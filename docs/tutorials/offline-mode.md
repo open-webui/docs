@@ -49,7 +49,7 @@ Consider if you need to start the application offline from the beginning of your
 
 ### I: Speech-To-Text
 
-The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/docs/tutorials/speech-to-text/stt-config.md) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
+The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/docs/tutorials/speech-to-text/stt-config) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
 
 ```python
 from faster_whisper import WhisperModel
@@ -72,7 +72,7 @@ The default local transformer can already handle the text-to-speech function. If
 
 ### I: Embedding Model
 
-For various purposes, you will need an embedding model (e.g. [RAG](/docs/features/rag.md)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+For various purposes, you will need an embedding model (e.g. [RAG](/docs/features/rag)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
 
 ```python
 from huggingface_hub import snapshot_download

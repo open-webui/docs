@@ -3,8 +3,6 @@ sidebar_position: 2
 title: "🛠️ Development"
 ---
 
-
-
 ## Writing A Custom Toolkit
 
 Toolkits are defined in a single Python file, with a top level docstring with metadata and a `Tools` class.
@@ -1593,7 +1591,6 @@ In the Tools definition metadata you can specify custom packages. When you click
 Keep in mind that as pip is used in the same process as Open WebUI, the UI will be completely unresponsive during the installation.
 
 No measures are taken to handle package conflicts with Open WebUI's requirements. That means that specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
-
 
 <details>
 <summary>Example</summary>

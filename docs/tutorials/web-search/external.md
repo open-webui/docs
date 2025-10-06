@@ -88,17 +88,14 @@ EXPECTED_BEARER_TOKEN = "your_secret_token_here"
 
 app = FastAPI()
 
-
 class SearchRequest(BaseModel):
     query: str
     count: int
-
 
 class SearchResult(BaseModel):
     link: str
     title: str | None
     snippet: str | None
-
 
 @app.post("/search")
 async def external_search(
@@ -131,7 +128,6 @@ async def external_search(
         print(f"Error during DuckDuckGo search: {e}")
 
     return results
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8888)
