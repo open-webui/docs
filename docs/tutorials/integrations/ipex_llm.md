@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::note
 
-This guide is verified with Open WebUI setup through [Manual Installation](/getting-started/index).
+This guide is verified with Open WebUI setup through [Manual Installation](docs/getting-started/index.md).
 
 :::
 
