@@ -4,10 +4,12 @@ title: "🔎 Open WebUI RAG Tutorial"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-# Tutorial: Configuring RAG with Open WebUI Documentation
+## Tutorial: Configuring RAG with Open WebUI Documentation
 
 In this tutorial, you will learn how to use **Retrieval-Augmented Generation (RAG)** with Open WebUI to load real-world documentation as a knowledge base. We will walk through how to use the latest **Open WebUI Documentation** as an example for this setup.
 
@@ -80,12 +82,12 @@ Follow these steps to set up RAG with **Open WebUI Documentation**:
 
 2. **Example Queries**:
 
-   ```
+   ```txt
    User: "How do I configure environment variables?"
    System: "Refer to Section 3.2: Use the `.env` file to manage configurations."
    ```
 
-   ```
+   ```txt
    User: "How do I update Open WebUI using Docker?"
    System: "Refer to `docker/updating.md`: Use `docker pull` and restart the container."
    ```

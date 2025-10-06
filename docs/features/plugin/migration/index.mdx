@@ -30,6 +30,7 @@ Here’s an overview of what changed:
 
 #### Example:
 ```python
+
 # Full API flow with parsing (new function):
 from open_webui.main import chat_completion
 
@@ -70,7 +71,7 @@ Follow this guide to smoothly update your project.
 
 ---
 
-### 🔄 1. Shifting from `apps` to `routers` 
+### 🔄 1. Shifting from `apps` to `routers`
 
 All apps have been renamed and relocated under `open_webui.routers`. This affects imports in your codebase.
 
@@ -84,24 +85,22 @@ Quick changes for import paths:
 | `open_webui.apps.retrieval`       | `open_webui.routers.retrieval`    |
 | `open_webui.apps.webui`           | `open_webui.main`                 |
 
+### 📜 An Important Example
 
-### 📜 An Important Example  
+To clarify the special case of the main app (`webui`), here’s a simple rule of thumb:
 
-To clarify the special case of the main app (`webui`), here’s a simple rule of thumb:  
-
-- **Was in `webui`?** It’s now in the project’s root or `open_webui.main`.  
-- For example:  
-    - **Before (0.4):**  
-      ```python  
-      from open_webui.apps.webui.models import SomeModel  
-      ```  
-    - **After (0.5):**  
-      ```python  
-      from open_webui.models import SomeModel  
-      ```  
+- **Was in `webui`?** It’s now in the project’s root or `open_webui.main`.
+- For example:
+    - **Before (0.4):**
+      ```python
+      from open_webui.apps.webui.models import SomeModel
+      ```
+    - **After (0.5):**
+      ```python
+      from open_webui.models import SomeModel
+      ```
 
 In general, **just replace `open_webui.apps` with `open_webui.routers`—except for `webui`, which is now `open_webui.main`!**
-
 
 ---
 
@@ -117,6 +116,7 @@ from open_webui.apps.openai import main as openai
 
 #### After:
 ```python
+
 # Separate router imports
 from open_webui.routers.ollama import generate_chat_completion
 from open_webui.routers.openai import generate_chat_completion
@@ -125,7 +125,11 @@ from open_webui.routers.openai import generate_chat_completion
 from open_webui.main import chat_completion
 ```
 
-**💡 Pro Tip:** Prioritize the unified endpoint (`chat_completion`) for simplicity and future compatibility.
+:::tip
+
+Prioritize the unified endpoint (`chat_completion`) for simplicity and future compatibility.
+
+:::
 
 ### 📝 **Additional Note: Choosing Between `main.chat_completion` and `utils.chat.generate_chat_completion`**
 
@@ -143,6 +147,7 @@ Depending on your use case, you can choose between:
 
 #### Example:
 ```python
+
 # Use this for the full API flow with parsing:
 from open_webui.main import chat_completion
 
@@ -152,18 +157,18 @@ from open_webui.utils.chat import generate_chat_completion
 
 ---
 
-### 📋 3. Adapting to Updated Function Signatures  
+### 📋 3. Adapting to Updated Function Signatures
 
 We’ve updated the **function signatures** to better fit the new architecture. If you're looking for a direct replacement, start with the lightweight utility function `generate_chat_completion` from `open_webui.utils.chat`. For the full API flow, use the new unified `chat_completion` function in `open_webui.main`.
 
-#### Function Signature Changes:  
+#### Function Signature Changes:
 
 | **Old**                                 | **Direct Successor (New)**             | **Unified Option (New)**               |
 |-----------------------------------------|-----------------------------------------|-----------------------------------------|
 | `openai.generate_chat_completion(form_data: dict, user: UserModel)` | `generate_chat_completion(request: Request, form_data: dict, user: UserModel)` | `chat_completion(request: Request, form_data: dict, user: UserModel)` |
 
-- **Direct Successor (`generate_chat_completion`)**: A lightweight, 1:1 replacement for previous `ollama`/`openai` methods.  
-- **Unified Option (`chat_completion`)**: Use this for the complete API flow, including file parsing and additional functionality.  
+- **Direct Successor (`generate_chat_completion`)**: A lightweight, 1:1 replacement for previous `ollama`/`openai` methods.
+- **Unified Option (`chat_completion`)**: Use this for the complete API flow, including file parsing and additional functionality.
 
 #### Example:
 
@@ -201,13 +206,11 @@ from fastapi import Request
 
 from open_webui.utils.chat import generate_chat_completion
 
-
 class User(BaseModel):
     id: str
     email: str
     name: str
     role: str
-
 
 class Pipe:
     def __init__(self):

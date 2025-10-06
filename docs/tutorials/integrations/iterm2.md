@@ -3,7 +3,9 @@ title: "💻 Iterm2 AI Integration"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
+
 :::
 
 # Use your Open WebUI models with Iterm2
@@ -68,7 +70,7 @@ whole response will be copied into my terminal automatically.
 The script should do this: \(ai.prompt)
 ```
 
-You can read more about the Iterm2 prompt in the [original documentation](https://gitlab.com/gnachman/iterm2/-/wikis/AI-Prompt).
+You can read more about the Iterm2 prompt in the [Iterm2 documentation](https://gitlab.com/gnachman/iterm2/-/wikis/AI-Prompt).
 
 ---
 
@@ -76,7 +78,7 @@ You can read more about the Iterm2 prompt in the [original documentation](https:
 
 Since the iTerm2 AI plugin does not automatically list your custom models, you'll need to add your preferred one manually.
 In your Open WebUI instance, navigate to `Admin Panel` > `Settings` > `Models`, and then click on your preferred LLM.
-Below the user-given name, you'll find the actual model name that you need to enter into iTerm2 (e.g. name: Gemma3 - model name: `/models/gemma3-27b-it-Q4_K_M.gguf`).
+Below the user-given name, you'll find the actual model name that you need to enter into iTerm2 (e.g., name: Gemma3 - model name: `/models/gemma3-27b-it-Q4_K_M.gguf`).
 
 ---
 
@@ -89,7 +91,7 @@ Set your preferred amount of tokens here. Typically, your inference tool will al
 ### Adjust the URL
 
 This is a crucial step: you need to direct the iTerm2 AI plugin requests to your Open WebUI instance.
-Either use an actual domain name if the instance is hosted somewhere (e.g. `https://example.com/api/chat/completions`) or your localhost setup (e.g. `http://localhost:8080/api/chat/completions`).
+Either use an actual domain name if the instance is hosted somewhere (e.g., `https://example.com/api/chat/completions`) or your localhost setup (e.g., `http://localhost:8080/api/chat/completions`).
 You can find more information about the URLs in the [API Endpoints guide](/docs/getting-started/api-endpoints.md).
 
 ---

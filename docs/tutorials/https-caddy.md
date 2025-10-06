@@ -4,10 +4,12 @@ title: "🔒 HTTPS using Caddy"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-# HTTPS using Caddy
+## HTTPS Using Caddy
 
 Ensuring secure communication between your users and the Open WebUI is paramount. HTTPS (HyperText Transfer Protocol Secure) encrypts the data transmitted, protecting it from eavesdroppers and tampering. By configuring Caddy as a reverse proxy, you can seamlessly add HTTPS to your Open WebUI deployment, enhancing both security and trustworthiness.
 
@@ -15,20 +17,19 @@ This guide is simple walkthrough to set up a Ubuntu server with Caddy as a rever
 
 There's a few steps we'll follow to get everything set up:
 
-
-- [HTTPS using Caddy](#https-using-caddy)
-  - [Docker](#docker)
-    - [Installing Docker](#installing-docker)
-  - [OpenWebUI](#openwebui)
-    - [Installing OpenWebUI](#installing-openwebui)
-  - [Caddy](#caddy)
-    - [Installing Caddy](#installing-caddy)
-    - [Configure Caddy](#configure-caddy)
-  - [Testing HTTPS](#testing-https)
-  - [Updating Open WebUI](#updating-open-webui)
-    - [Stopping Open WebUI](#stopping-open-webui)
-    - [Pulling the latest image](#pulling-the-latest-image)
-    - [Starting Open WebUI](#starting-open-webui)
+- [HTTPS Using Caddy](#https-using-caddy)
+- [Docker](#docker)
+  - [Installing Docker](#installing-docker)
+- [OpenWebUI](#openwebui)
+  - [Installing OpenWebUI](#installing-openwebui)
+- [Caddy](#caddy)
+  - [Installing Caddy](#installing-caddy)
+  - [Configure Caddy](#configure-caddy)
+- [Testing HTTPS](#testing-https)
+- [Updating Open WebUI](#updating-open-webui)
+  - [Stopping Open WebUI](#stopping-open-webui)
+  - [Pulling the latest image](#pulling-the-latest-image)
+  - [Starting Open WebUI](#starting-open-webui)
 
 ## Docker
 
@@ -55,7 +56,7 @@ cd ~/open-webui
 
 ### Installing OpenWebUI
 
-Create a `docker-compose.yml` file in the `~/open-webui` directory.  I've left in a commented section for setting some environment varibles for Qdrant, but you can follow that for any other [environment variables](https://docs.openwebui.com/getting-started/env-configuration) you might need to set.
+Create a `docker-compose.yml` file in the `~/open-webui` directory. I've left in a commented section for setting some environment varibles for Qdrant, but you can follow that for any other [environment variables](https://docs.openwebui.com/getting-started/env-configuration) you might need to set.
 
 ```yaml
 services:
@@ -72,18 +73,17 @@ services:
         restart: unless-stopped
 ```
 
-
 ## Caddy
 
 Caddy is a powerful web server that automatically manages TLS certificates for you, making it an excellent choice for serving Open WebUI over HTTPS.
 
 ### Installing Caddy
 
-Follow the [guide to set up Caddy's on Ubuntu](https://caddyserver.com/docs/install#debian-ubuntu-raspbian).  
+Follow the [guide to set up Caddy's on Ubuntu](https://caddyserver.com/docs/install#debian-ubuntu-raspbian).
 
 ### Configure Caddy
 
-You're going to need to change the `CaddyFile` to use your domain.  
+You're going to need to change the `CaddyFile` to use your domain.
 
 To do that, edit the file `/etc/caddy/Caddyfile`.
 

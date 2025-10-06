@@ -15,7 +15,7 @@ The easiest way to get a test OpenLDAP server running is by using Docker. This `
 version: "3.9"
 services:
   ldap:
-    image: osixia/openldap:1.5.0 
+    image: osixia/openldap:1.5.0
     container_name: openldap
     environment:
       LDAP_ORGANISATION: "Example Inc"
@@ -29,7 +29,7 @@ services:
       - "389:389"
     networks: [ldapnet]
 
-  phpldapadmin: 
+  phpldapadmin:
     image: osixia/phpldapadmin:0.9.0
     environment:
       PHPLDAPADMIN_LDAP_HOSTS: "ldap"
@@ -68,6 +68,7 @@ userPassword: {PLAIN}password123
 **Note on Passwords:** The `userPassword` field is set to a plain text value for simplicity in this test environment. In production, you should always use a hashed password. You can generate a hashed password using `slappasswd` or `openssl passwd`. For example:
 
 ```bash
+
 # Using slappasswd (inside the container)
 docker exec openldap slappasswd -s your_password
 
@@ -105,10 +106,13 @@ Now, configure your Open WebUI instance to use the LDAP server for authenticatio
 Set the following environment variables for your Open WebUI instance.
 
 :::info
+
 Open WebUI reads these environment variables only on the first startup. Subsequent changes must be made in the Admin settings panel of the UI unless you have `ENABLE_PERSISTENT_CONFIG=false`.
+
 :::
 
 ```env
+
 # Enable LDAP
 ENABLE_LDAP="true"
 
@@ -134,11 +138,11 @@ LDAP_SEARCH_FILTER="(uid=%(user)s)" # More secure and performant
 
 Alternatively, you can configure these settings directly in the UI:
 
-1.  Log in as an administrator.
-2.  Navigate to **Settings** > **General**.
-3.  Enable **LDAP Authentication**.
-4.  Fill in the fields corresponding to the environment variables above.
-5.  Save the settings and restart Open WebUI.
+1. Log in as an administrator.
+2. Navigate to **Settings** > **General**.
+3. Enable **LDAP Authentication**.
+4. Fill in the fields corresponding to the environment variables above.
+5. Save the settings and restart Open WebUI.
 
 ## 5. Logging In
 
@@ -187,15 +191,15 @@ openldap | ... conn=1001 op=0 RESULT tag=97 err=49 text=
 **Cause:** The LDAP server rejected the bind attempt because the distinguished name (DN) or the password was incorrect. This happens during the second bind attempt, where Open WebUI tries to authenticate with the user's provided credentials.
 
 **Solution:**
-1.  **Verify the Password:** Ensure you are using the correct plaintext password. The `userPassword` value in the LDIF file is what the server expects. If it's a hash, you must provide the original plaintext password.
-2.  **Check the User DN:** The DN used for the bind (`uid=jdoe,ou=users,dc=example,dc=org`) must be correct.
-3.  **Test with `ldapwhoami`:** Verify the credentials directly against the LDAP server to isolate the issue from Open WebUI.
+1. **Verify the Password:** Ensure you are using the correct plaintext password. The `userPassword` value in the LDIF file is what the server expects. If it's a hash, you must provide the original plaintext password.
+2. **Check the User DN:** The DN used for the bind (`uid=jdoe,ou=users,dc=example,dc=org`) must be correct.
+3. **Test with `ldapwhoami`:** Verify the credentials directly against the LDAP server to isolate the issue from Open WebUI.
     ```bash
     ldapwhoami -x -H ldap://localhost:389 \
       -D "uid=jdoe,ou=users,dc=example,dc=org" -w "password123"
     ```
     If this command fails with `ldap_bind: Invalid credentials (49)`, the problem is with the credentials or the LDAP server's password configuration, not Open WebUI.
-4.  **Reset the Password:** If you don't know the password, reset it using `ldapmodify` or `ldappasswd`. It's often easiest to use a `{PLAIN}` password for initial testing and then switch to a secure hash like `{SSHA}`.
+4. **Reset the Password:** If you don't know the password, reset it using `ldapmodify` or `ldappasswd`. It's often easiest to use a `{PLAIN}` password for initial testing and then switch to a secure hash like `{SSHA}`.
 
     **Example LDIF to change password:**
     ```ldif title="change_password.ldif"

@@ -4,7 +4,9 @@ title: "🗨️ Kokoro-FastAPI Using Docker"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 ## What is `Kokoro-FastAPI`?
@@ -81,7 +83,9 @@ services:
 ```
 
 :::info
+
 You may need to install and configure [the NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+
 :::
 
 ### CPU Version (ONNX optimized inference)
@@ -117,7 +121,9 @@ To use Kokoro-FastAPI with Open WebUI, follow these steps:
   - TTS Voice: `af_bella` # also accepts mapping of existing OAI voices for compatibility
 
 :::info
+
 The default API key is the string `not-needed`. You do not have to change that value if you do not need the added security.
+
 :::
 
 ## Building the Docker Container

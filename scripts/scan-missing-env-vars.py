@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+
 # Only use stdlib to avoid needing to install dependencies
 import ast
 import sys
 import urllib.request
 import os
-
 
 def find_env_vars(code, filename):
     tree = ast.parse(code)
@@ -169,12 +169,10 @@ def find_env_vars(code, filename):
                 if env_vars_found[env_var]["type"] == "str": # Only set type if still default str, otherwise keep more specific type
                      env_vars_found[env_var]["type"] = context["type"]
 
-
     visitor = EnvVarVisitor()
     visitor.visit(tree)
     visitor.finalize_env_vars(filename, env_vars_found)  # Pass filename to finalize
     return env_vars_found
-
 
 def main():
     if len(sys.argv) < 2:
@@ -208,7 +206,6 @@ def main():
                     all_env_vars_with_context[env_var]["default"] = context["default"]
                 if all_env_vars_with_context[env_var]["type"] == "str": # Only update type if still default str, keep more specific type
                     all_env_vars_with_context[env_var]["type"] = context["type"]
-
 
     except urllib.error.URLError as e:
         print(f"Failed to open URL: {e}")
@@ -287,7 +284,6 @@ def main():
         print(env_var)
     if not diff:
         print("None")
-
 
 if __name__ == "__main__":
     main()

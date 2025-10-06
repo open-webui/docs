@@ -1,9 +1,7 @@
 ---
-sidebar_position: 300 
+sidebar_position: 300
 title: "🔄 Updating Open WebUI"
 ---
-
-
 
 ## Why isn't my Open WebUI updating?
 
@@ -27,8 +25,8 @@ docker rm -f open-webui
 docker pull ghcr.io/open-webui/open-webui:main
 ```
 
-
 :::info
+
 **Remove any existing data in the Docker volume (NOT RECOMMENDED UNLESS ABSOLUTELY NECCESSARY!)**. Skip this step entirely if not needed and move on to the last step:
 
    If you want to start with a clean slate, you can remove the existing data in the Docker volume. Be careful, as this will delete all your chat histories and other data.
@@ -38,6 +36,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 ```bash
 docker volume rm open-webui
 ```
+
 :::
 
 3. **Start the container again with the updated image and existing volume attached**:
@@ -126,6 +125,12 @@ volumes:
 
 In this example, Watchtower is integrated with the `docker-compose.yml` file and watches the Open WebUI container for updates every 5 minutes.
 
+:::info
+
+After updating, it's a good practice to clear your browser cache to ensure you are running the latest version of the web interface.
+
+:::
+
 ## Persistent Data in Docker Volumes
 
 The data is stored in a Docker volume named `open-webui`. The path to the volume is not directly accessible, but you can inspect the volume with the following command:
@@ -134,13 +139,13 @@ The data is stored in a Docker volume named `open-webui`. The path to the volume
 docker volume inspect open-webui
 ```
 
-This will show you the details of the volume, including the mountpoint, which is usually located in `/var/lib/docker/volumes/open-webui/_data`.  
+This will show you the details of the volume, including the mountpoint, which is usually located in `/var/lib/docker/volumes/open-webui/_data`.
 
-On Windows 10 + WSL 2, Docker volumes are located here (type in the Windows file explorer): 
+On Windows 10 + WSL 2, Docker volumes are located here (type in the Windows file explorer):
 - \\\wsl$\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes
 
 For older versions of Docker (pre-Docker v26.1.4):
 - \\\wsl$\docker-desktop-data\data\docker\volumes
 - \\\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes
 
-_(Windows answer credit to StackOverflow user sarye-haddadi; [link to original SO post](https://stackoverflow.com/questions/43181654/locating-data-volumes-in-docker-desktop-windows))_
+*(Windows answer credit to StackOverflow user sarye-haddadi; [link to original SO post](https://stackoverflow.com/questions/43181654/locating-data-volumes-in-docker-desktop-windows))*

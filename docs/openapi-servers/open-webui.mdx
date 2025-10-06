@@ -67,31 +67,32 @@ Admins can manage shared tool servers available to all or selected users across 
 - Add the tool server URL just as you would in user settings.
 - These tools are treated similarly to Open WebUI’s built-in tools.
 
-
 #### Main Difference: Where Are Requests Made From?
 
 The primary distinction between **User Tool Servers** and **Global Tool Servers** is where the API connection and requests are actually made:
 
-- **User Tool Servers**  
+- **User Tool Servers**
   - Requests to the tool server are performed **directly from your browser** (the client).
   - This means you can safely connect to localhost URLs (like `http://localhost:8000`)—even exposing private or development-only endpoints such as your local filesystem or dev tools—without risking exposure to the wider internet or other users.
   - Your connection is isolated; only your browser can access that tool server.
 
-- **Global Tool Servers**  
+- **Global Tool Servers**
   - Requests are sent **from the Open WebUI backend/server** (not your browser).
-  - The backend must be able to reach the tool server URL you specify—so `localhost` means the backend server's localhost, _not_ your computer's.
+  - The backend must be able to reach the tool server URL you specify—so `localhost` means the backend server's localhost, *not* your computer's.
   - Use this for sharing tools with other users across the deployment, but be mindful: since the backend makes the requests, you cannot access your personal local resources (like your own filesystem) through this method.
   - Think security! Only expose remote/global endpoints that are safe and meant to be accessed by multiple users.
 
 **Summary Table:**
 
-| Tool Server Type   | Request Origin        | Use Localhost?     | Use Case Example                        |
+| Tool Server Type   | Request Origin        | Use Localhost? | Use Case Example                        |
 | ------------------ | -------------------- | ------------------ | ---------------------------------------- |
 | User Tool Server   | User's Browser (Client-side) | Yes (private to you) | Personal tools, local dev/testing        |
 | Global Tool Server | Open WebUI Backend (Server-side) | No (unless running on the backend itself) | Team/shared tools, enterprise integrations |
 
-:::tip 
+:::tip
+
 User Tool Servers are best for personal or experimental tools, especially those running on your own machine, while Global Tool Servers are ideal for production or shared environments where everyone needs access to the same tools.
+
 :::
 
 ### 👉 Optional: Using a Config File with mcpo
@@ -114,7 +115,7 @@ This means:
 
 ✅ Good:
 
-http://localhost:8000/time  
+http://localhost:8000/time
 http://localhost:8000/memory
 
 🚫 Not valid:
@@ -163,14 +164,16 @@ Here’s what that looks like:
 - Once toggled on, they function the same way as user tools.
 - Admins can control access to global tools via role-based permissions.
 
-This is ideal for team setups or shared environments, where commonly-used tools (e.g. document search, memory, or web lookup) should be centrally accessible by multiple users.
+This is ideal for team setups or shared environments, where commonly-used tools (e.g., document search, memory, or web lookup) should be centrally accessible by multiple users.
 
 ---
 
 ## (Optional) Step 4: Use "Native" Function Calling (ReACT-style) Tool Use 🧠
 
 :::info
+
 For this to work effectively, **your selected model must support native tool calling**. Some local models claim support but often produce poor results. We strongly recommend using GPT-4o or another OpenAI model that supports function calling natively for the best experience.
+
 :::
 
 Want to enable ReACT-style (Reasoning + Acting) native function calls directly inside your conversations? You can switch Open WebUI to use native function calling.

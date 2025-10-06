@@ -4,13 +4,15 @@ title: "💠 SQLite Database Overview"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-> [!WARNING]  
+> [!WARNING]
 > This documentation was created/updated based on version 0.6.30.
 
-# Open-WebUI Internal SQLite Database
+## Open-WebUI Internal SQLite Database
 
 For Open-WebUI, the SQLite database serves as the backbone for user management, chat history, file storage, and various other core functionalities. Understanding this structure is essential for anyone looking to contribute to or maintain the project effectively.
 
@@ -18,7 +20,7 @@ For Open-WebUI, the SQLite database serves as the backbone for user management, 
 
 You can find the SQLite database at `root` -> `data` -> `webui.db`
 
-```
+```txt
 📁 Root (/)
 ├── 📁 data
 │   ├── 📁 cache
@@ -177,7 +179,7 @@ Things to know about the auth table:
 | created_at      | BigInteger    | -               | Creation timestamp              |
 | updated_at      | BigInteger    | -               | Last update timestamp           |
 
-# File Table
+## File Table
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**       |
 | --------------- | ------------- | --------------- | --------------------- |
@@ -423,7 +425,7 @@ Things to know about the tag table:
 | info              | JSON          | nullable         | Additional user info       |
 | oauth_sub         | Text          | UNIQUE           | OAuth subject identifier   |
 
-# Entity Relationship Diagram
+## Entity Relationship Diagram
 
 To help visualize the relationship between the tables, refer to the below Entity Relationship Diagram (ERD) generated with Mermaid.
 

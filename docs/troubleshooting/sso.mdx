@@ -13,7 +13,12 @@ Most OAUTH flows require the application's external URL ("redirect URI") so the 
 ✅ Solution:
 - Navigate to: **Admin Settings > General**
 - Ensure your **WebUI URL** field is filled in and points to your deployed instance (e.g., `https://yourwebui.yourdomain.com`)
-📌 Tip: Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
+
+:::tip
+
+Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
+
+:::
 
 ---
 
@@ -24,7 +29,7 @@ This is by far the **most common cause** of OAUTH breakage. If you misspell, omi
 
 #### ❌ Non-Existent Variables People Often Use:
 - `OIDC_CONFIG` → Use `OPENID_PROVIDER_URL` instead
-- `WEBUI_OIDC_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead  
+- `WEBUI_OIDC_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
 - `WEBUI_ENABLE_SSO` → Use `ENABLE_OAUTH_SIGNUP` instead
 - `WEBUI_AUTH_TYPE` → This doesn't exist - configure provider-specific variables instead
 - `OPENID_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
@@ -32,9 +37,10 @@ This is by far the **most common cause** of OAUTH breakage. If you misspell, omi
 
 #### ✅ Correct OIDC Variables:
 ```bash
+
 # Required for OIDC
 OAUTH_CLIENT_ID=your_client_id
-OAUTH_CLIENT_SECRET=your_client_secret  
+OAUTH_CLIENT_SECRET=your_client_secret
 OPENID_PROVIDER_URL=https://your-provider/.well-known/openid-configuration
 ENABLE_OAUTH_SIGNUP=true
 
@@ -46,6 +52,7 @@ OPENID_REDIRECT_URI=https://your-domain/oauth/oidc/callback
 
 #### ✅ Correct Microsoft Variables:
 ```bash
+
 # Use these for Microsoft Entra ID
 MICROSOFT_CLIENT_ID=your_client_id
 MICROSOFT_CLIENT_SECRET=your_client_secret
@@ -61,7 +68,11 @@ ENABLE_OAUTH_SIGNUP=true
   - If self-hosting, confirm these variables are present in your Docker Compose, Kubernetes manifest, or `.env` file
 - Restart your backend/app after changing variables so the new values are loaded
 
-📌 Tip: Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly named, missing entirely, or using outdated variable names!
+:::tip
+
+Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly named, missing entirely, or using outdated variable names!
+
+:::
 
 ---
 
@@ -140,7 +151,11 @@ Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Az
 ❌ Wrong: https://ai.company.com/callback
 ```
 
-📌 Tip: When in doubt, recheck your provider registration and regenerate client secrets if needed.
+:::tip
+
+When in doubt, recheck your provider registration and regenerate client secrets if needed.
+
+:::
 
 ---
 
@@ -156,6 +171,7 @@ A **new and tricky problem**: If you use NGINX (or another reverse proxy) with s
 
 **Example NGINX Configuration:**
 ```nginx
+
 # Disable caching for login / OAuth / websockets endpoints
 location ~* ^/(api|oauth|callback|login|ws|websocket) {
     proxy_no_cache 1;
@@ -173,7 +189,11 @@ location ~* ^/(api|oauth|callback|login|ws|websocket) {
 }
 ```
 
+:::warning
+
 📌 Warning: Never cache OAUTH or login endpoints! Caching can "poison" the session or deliver stale tokens, causing bizarre auth errors.
+
+:::
 
 ---
 
@@ -190,17 +210,22 @@ location ~* ^/(api|oauth|callback|login|ws|websocket) {
 
 #### For NGINX Proxy Manager:
 ```nginx
+
 # Remove or adjust problematic cookie settings
+
 # ❌ Problematic:
+
 # proxy_cookie_path / "/; Secure; HttpOnly; SameSite=None";
 
 # ✅ Better:
 proxy_cookie_flags ~ secure samesite=lax;
+
 # or remove cookie manipulation entirely
 ```
 
 #### Environment Variable Cookie Settings:
 ```bash
+
 # Recommended cookie settings for OAuth
 WEBUI_SESSION_COOKIE_SAME_SITE=lax
 WEBUI_AUTH_COOKIE_SAME_SITE=lax
@@ -221,8 +246,9 @@ WEBUI_AUTH_COOKIE_SECURE=true     # Set to false if using HTTP
 
 ✅ **Solutions:**
 ```bash
+
 # Increase OAuth timeouts
-AIOHTTP_CLIENT_TIMEOUT=600         # Very high number is needed here, since model responses that take a lot of time also rely on this timeout variable (e.g. a model that is reasoning for 5+ minutes)
+AIOHTTP_CLIENT_TIMEOUT=600         # Very high number is needed here, since model responses that take a lot of time also rely on this timeout variable (e.g., a model that is reasoning for 5+ minutes)
 AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=30
 ```
 
@@ -241,12 +267,14 @@ AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=30
 
 1. **Check Cookie Domain Configuration:**
 ```bash
+
 # Ensure cookies are set for the correct domain
 WEBUI_URL=https://your-exact-domain.com  # Must match exactly - check if you have a different value set in the admin panel
 ```
 
 2. **Session Configuration:**
 ```bash
+
 # Ensure session handling is properly configured
 WEBUI_SECRET_KEY=your_very_secure_random_key_here
 OAUTH_SESSION_TOKEN_ENCRYPTION_KEY=another_secure_key_here
@@ -260,6 +288,7 @@ OAUTH_SESSION_TOKEN_ENCRYPTION_KEY=another_secure_key_here
 
 #### Required Configuration for Clusters:
 ```bash
+
 # Redis for session synchronization (required for multi-instance)
 REDIS_URL=redis://your-redis:6379/0
 WEBSOCKET_REDIS_URL=redis://your-redis:6379/0
@@ -283,9 +312,10 @@ WEBSOCKET_MANAGER=redis
 
 ✅ **Correct Microsoft Setup:**
 ```bash
+
 # Use Microsoft-specific variables, not generic OIDC
 MICROSOFT_CLIENT_ID=your_azure_app_id
-MICROSOFT_CLIENT_SECRET=your_azure_app_secret  
+MICROSOFT_CLIENT_SECRET=your_azure_app_secret
 MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
 MICROSOFT_OAUTH_SCOPE=openid email profile
 MICROSOFT_REDIRECT_URI=https://your-domain/oauth/microsoft/callback
@@ -325,13 +355,18 @@ Recent versions of Open WebUI moved from URL-based tokens to cookie-based tokens
 Enable debug logging and trace the OAuth flow:
 
 ```bash
+
 # Enable detailed logging
 GLOBAL_LOG_LEVEL=DEBUG
 
 # Check logs for these key steps:
+
 # 1. GET /oauth/{provider}/login - Should return 302 redirect
+
 # 2. User authenticates with provider
+
 # 3. GET /oauth/{provider}/callback?code=... - Should return 200 or redirect
+
 # 4. User should be logged in
 ```
 
@@ -339,6 +374,7 @@ GLOBAL_LOG_LEVEL=DEBUG
 Check if user accounts are being created:
 
 ```bash
+
 # Access your container
 docker exec -it your-openwebui-container sh
 
@@ -363,7 +399,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 
 ### Key Log Messages to Watch For:
 - `OAuth callback error: mismatching_state` → Session/cookie issue
-- `httpcore.ReadTimeout` → Network timeout issue  
+- `httpcore.ReadTimeout` → Network timeout issue
 - `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established
 - `404` on callback URLs → Redirect URI misconfiguration
 
@@ -383,7 +419,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | ⏱️ Timeout problems          | Increase `AIOHTTP_CLIENT_TIMEOUT` values                    |
 | 🔐 CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
 | 🔀 Multi-instance problems    | Configure Redis and shared secrets                          |
-| Still stuck?                  | Check debug logs, test without proxy, verify provider setup |
+| Still stuck? | Check debug logs, test without proxy, verify provider setup |
 
 ---
 

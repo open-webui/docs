@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "⚙️ Valves"
 ---
 
-# Valves
+## Valves
 
 `Valves` (see the dedicated [Valves & UserValves](/features/plugin/valves) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
 
