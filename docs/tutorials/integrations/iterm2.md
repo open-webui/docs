@@ -3,7 +3,9 @@ title: "💻 Iterm2 AI Integration"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
+
 :::
 
 # Use your Open WebUI models with Iterm2
@@ -115,6 +117,7 @@ Within your terminal session, open the prompt input field by pressing **command 
 This will lead you back to the terminal with an additional window bound to the session frame. The result of your query will be displayed within this overlay. To send the command to your terminal, move your cursor to the target line and use **shift + enter** (⇧⌤).
 
 :::info
+
 There can be more than one line of response. If so, you can navigate with the arrow keys to edit the commands as needed.
 
 :::

@@ -12,7 +12,9 @@ To enable community sharing, follow these steps:
 3. Toggle on **Enable Community Sharing** within the **General** settings tab.
 
 :::note
+
 **Note:** Only Admins can toggle the **Enable Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community.
+
 :::
 
 This will enable community sharing for all users on your Open WebUI instance.
@@ -37,9 +39,11 @@ When you select `Share to Open WebUI Community`:
   - **Public, Full History**: Anyone on the internet can view the full regeneration history of your chat.
 
 :::note
+
 Note: You can change the permission level of your shared chats on the community platform at any time from your openwebui.com account.
 
 **Currently, shared chats on the community website cannot be found through search. However, future updates are planned to allow public chats to be discoverable by the public if their permission is set to `Public` or `Public, Full History`.**
+
 :::
 
 Example of a shared chat to the community platform website: https://openwebui.com/c/iamg30/5e3c569f-905e-4d68-a96d-8a99cc65c90f
@@ -95,7 +99,9 @@ To delete a shared chat link:
 Once deleted, the shared link will no longer be valid, and users will not be able to view the shared chat.
 
 :::note
+
 **Note:** Chats shared to the community platform cannot be deleted. To change the access level of a chat shared to the community platform:
+
 :::
 
 1. Log in to your Open WebUI account on openwebui.com.

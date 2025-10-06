@@ -10,7 +10,9 @@ Groups allow administrators to
 - Specify access to a resource for a group to either "read" or "write" (write access implies read)
 
 :::info
+
 Note that the permissions model is permissive. If a user is a member of two groups that define different permissions for a resource, the most permissive permission is applied.
+
 :::
 
 ### Group Structure

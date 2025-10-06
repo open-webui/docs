@@ -4,7 +4,9 @@ title: "🎨 Image Generation"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # 🎨 Image Generation
@@ -117,11 +119,16 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 6. Set `Set Default Model` to the name of the model file being used, such as `flux1-dev.safetensors`
 
 :::info
+
 You may need to adjust an `Input Key` or two within Open WebUI's `ComfyUI Workflow Nodes` section to match a node within your workflow.
 For example, `seed` may need to be renamed to `noise_seed` to match a node ID within your imported workflow.
+
 :::
+
 :::tip
+
 Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
+
 :::
 
 6. Click `Save` to apply the settings and enjoy image generation with ComfyUI integrated into Open WebUI!
@@ -166,9 +173,11 @@ Image generation with Azure OpenAI Dall-E or GPT-Image is supported with Open We
 5. Enter your Azure OpenAI API key.
 
 :::tip
+
 Alternative API endpoint URL tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` - you can find your endpoint name on https://ai.azure.com/resource/overview, and model name on https://ai.azure.com/resource/deployments.
 You can also copy Target URI from your deployment detailed page, but remember to delete strings after model name.
 For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the API endpoint URL in Open WebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
+
 :::
 
 =======
@@ -208,7 +217,9 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 3. After the image has finished generating, it will be returned automatically in chat.
 
 :::tip
-    You can also edit the LLM's response and enter your image generation prompt as the message
+
+You can also edit the LLM's response and enter your image generation prompt as the message
     to send off for image generation instead of using the actual response provided by the
     LLM.
+
 :::

@@ -4,7 +4,9 @@ title: "SearXNG"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 This guide provides instructions on how to set up web search capabilities in Open WebUI using SearXNG in Docker.
@@ -103,7 +105,9 @@ rm searxng-docker/searxng/settings.yml
 **Step 7: Create a Fresh `settings.yml` File**
 
 :::note
+
 On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi`.ini. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
+
 :::
 
 7. Bring up the container momentarily to generate a fresh settings.yml file:
@@ -313,7 +317,9 @@ docker compose up -d
 ```
 
 :::note
+
 On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi`.ini. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
+
 :::
 
 **Configure SearXNG for Open WebUI Integration**
@@ -357,7 +363,9 @@ docker compose up -d
 ```
 
 :::warning
+
 Without adding JSON format support, SearXNG will block queries from Open WebUI and you'll encounter `403 Client Error: Forbidden` errors in your Open WebUI logs.
+
 :::
 
 Alternatively, you can run SearXNG directly using `docker run`:

@@ -4,7 +4,9 @@ title: "🔒 HTTPS using HAProxy"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # HAProxy Configuration for Open WebUI
@@ -116,7 +118,9 @@ You will see that we have ACL records (routers) for both Open WebUI and Let's En
 You can use either the subdomain method or the path method for routing traffic to Open WebUI. The subdomain method requires a dedicated subdomain (e.g., chat.yourdomain.com), while the path method allows you to access Open WebUI through a specific path on your domain (e.g., yourdomain.com/owui/). Choose the method that best suits your needs and update the configuration accordingly.
 
 :::info
+
 You will need to expose port 80 and 443 to your HAProxy server. These ports are required for Let's Encrypt to validate your domain and for HTTPS traffic. You will also need to ensure your DNS records are properly configured to point to your HAProxy server. If you are running HAProxy at home, you will need to use port forwarding in your router to forward ports 80 and 443 to your HAProxy server.
+
 :::
 
 ## Issuing SSL Certificates with Let's Encrypt
@@ -132,7 +136,9 @@ Then combine the key and certificate into a PEM file that HAProxy can use:
 ```cat /tmp/haproxy.crt /tmp/haproxy.key > /etc/haproxy/certs/haproxy.pem```
 
 :::info
+
 Make sure you update the HAProxy configuration based on your needs and configuration.
+
 :::
 
 Once you have your HAProxy configuration set up, you can use certbot to obtain and manage your SSL certificates. Certbot will handle the validation process with Let's Encrypt and automatically update your certificates when they are close to expiring (assuming you use the certbot auto-renewal service).
@@ -170,5 +176,7 @@ If you would like to have something manage your HAProxy configuration and Let's 
 https://github.com/shadowdao/haproxy-manager
 
 :::warning
+
 Please do not expose port 8000 publicly if you use the script or container!
+
 :::

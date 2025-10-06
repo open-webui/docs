@@ -4,7 +4,9 @@ title: "🪶 Apache Tika Extraction"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 ## 🪶 Apache Tika Extraction
@@ -159,7 +161,9 @@ Instructions to run the script:
 5. The script will output a message indicating whether Apache Tika is working correctly
 
 :::note
+
 Note: If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
+
 :::
 
 ### Conclusion

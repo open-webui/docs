@@ -22,7 +22,9 @@ This is the most common problem—and it's typically caused by issues during you
   - Custom extractors (depending on your document types)
 
 ::tip
+
 📌 Tip: Try uploading a document and preview the extracted content. If it's blank or missing key sections, you need to adjust your extractor settings or use a different engine.
+
 :::
 
 ---
@@ -39,7 +41,9 @@ Open WebUI is designed to work with models that have limited context windows by 
   - 🔍 Toggle on "Full Context Mode" — This injects more comprehensive content into the model prompt.
 
 :::warning
+
 📌 Warning: Be mindful of context limits—if your model can't handle more tokens, it will still get cut off.
+
 :::
 
 ---
@@ -77,7 +81,9 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 - Compare performance to Ollama—notice the dramatic accuracy difference when more web content can be processed!
 
 ::tip
+
 📌 Tip: For web search and complex document analysis, stick with models that support 8192+ token contexts in production use cases.
+
 :::
 
 ---
@@ -113,7 +119,9 @@ This error indicates a misconfigured or missing embedding model. When Open WebUI
 - If you're using a remote/external embedding tool, make sure it's running and accessible to Open WebUI.
 
 ::tip
+
 📌 Tip: After fixing the configuration, try re-embedding a document and verify no error is shown in the logs.
+
 :::
 
 ---

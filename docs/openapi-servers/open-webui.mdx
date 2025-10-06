@@ -90,8 +90,10 @@ The primary distinction between **User Tool Servers** and **Global Tool Servers*
 | User Tool Server   | User's Browser (Client-side) | Yes (private to you) | Personal tools, local dev/testing        |
 | Global Tool Server | Open WebUI Backend (Server-side) | No (unless running on the backend itself) | Team/shared tools, enterprise integrations |
 
-:::tip 
+:::tip
+
 User Tool Servers are best for personal or experimental tools, especially those running on your own machine, while Global Tool Servers are ideal for production or shared environments where everyone needs access to the same tools.
+
 :::
 
 ### 👉 Optional: Using a Config File with mcpo
@@ -170,7 +172,9 @@ This is ideal for team setups or shared environments, where commonly-used tools 
 ## (Optional) Step 4: Use "Native" Function Calling (ReACT-style) Tool Use 🧠
 
 :::info
+
 For this to work effectively, **your selected model must support native tool calling**. Some local models claim support but often produce poor results. We strongly recommend using GPT-4o or another OpenAI model that supports function calling natively for the best experience.
+
 :::
 
 Want to enable ReACT-style (Reasoning + Acting) native function calls directly inside your conversations? You can switch Open WebUI to use native function calling.

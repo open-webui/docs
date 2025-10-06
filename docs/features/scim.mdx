@@ -26,12 +26,15 @@ Configure SCIM by setting these environment variables:
 - **`SCIM_ENABLED`**: Set to `true` to enable SCIM support (default: `false`)
 - **`SCIM_TOKEN`**: The bearer token for SCIM authentication (required when SCIM is enabled)
 
-:::warning Security Note
+:::warning
+
+Security Note
 The SCIM token should be a secure, randomly generated string. You can generate one using:
 ```bash
 openssl rand -base64 32
 ```
 Keep this token secure as it provides access to user management operations.
+
 :::
 
 ### Example Configuration

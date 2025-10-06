@@ -58,5 +58,7 @@ Troubleshooting
 - If provided through the webhook service, verify if the Webhook API key is invalid, expired, or revoked.
 
 :::note
+
 Note: The webhook feature in Open WebUI is still evolving, and we plan to add more features and event types in the future.
+
 :::

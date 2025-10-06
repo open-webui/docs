@@ -15,7 +15,9 @@ Most OAUTH flows require the application's external URL ("redirect URI") so the 
 - Ensure your **WebUI URL** field is filled in and points to your deployed instance (e.g., `https://yourwebui.yourdomain.com`)
 
 ::tip
+
 📌 Tip: Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
+
 :::
 
 ---
@@ -65,7 +67,9 @@ ENABLE_OAUTH_SIGNUP=true
 - Restart your backend/app after changing variables so the new values are loaded
 
 ::tip
+
 📌 Tip: Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly named, missing entirely, or using outdated variable names!
+
 :::
 
 ---
@@ -146,7 +150,9 @@ Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Az
 ```
 
 ::tip
+
 📌 Tip: When in doubt, recheck your provider registration and regenerate client secrets if needed.
+
 :::
 
 ---
@@ -181,7 +187,9 @@ location ~* ^/(api|oauth|callback|login|ws|websocket) {
 ```
 
 :::warning
+
 📌 Warning: Never cache OAUTH or login endpoints! Caching can "poison" the session or deliver stale tokens, causing bizarre auth errors.
+
 :::
 
 ---

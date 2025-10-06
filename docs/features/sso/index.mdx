@@ -15,18 +15,21 @@ Open WebUI supports several forms of federated authentication:
 1. Trusted Header
 
 :::info
+
 For more information about all environment variables, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
 It is highly recommended to check the environment variable page, to get more details about how to set the variable and what values are expected.
 
 :::
 
 :::tip
+
 Need help with troubleshooting your SSO setup?
 Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting/sso)
 
 :::
 
 :::danger
+
 Right now, you can only configure one OAUTH provider at a time.
 You cannot have Microsoft **and** Google as providers simultaneously.
 
@@ -49,6 +52,7 @@ You cannot have Microsoft **and** Google as providers simultaneously.
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.              |
 
 :::warning
+
 **Critical Configuration Notes:**
 
 1. **WEBUI_URL Must Be Set First**: Configure `WEBUI_URL` in the Admin Panel before enabling OAuth, as it's used for redirect URIs.
@@ -129,6 +133,7 @@ The following environment variables are used:
 1. `OPENID_REDIRECT_URI` - The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
 
 :::warning
+
 **Common OIDC Mistakes:**
 - Using non-existent environment variables like `OIDC_CONFIG` or `WEBUI_OIDC_CLIENT_ID`
 - Forgetting to set `OPENID_PROVIDER_URL` (this is mandatory for OIDC)
@@ -147,6 +152,7 @@ You can configure the following environment variables to match the roles returne
 1. `OAUTH_ADMIN_ROLES` - A comma-separated list of roles that are allowed to log in as an admin (receive open webui role `admin`).
 
 :::info
+
 If changing the role of a logged in user, they will need to log out and log back in to receive the new role.
 
 :::
@@ -161,20 +167,28 @@ You can configure the following environment variables:
 1. `OAUTH_GROUP_CLAIM` - The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
 1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
 
-:::warning Strict Group Synchronization
+:::warning
+
+Strict Group Synchronization
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
 
 *   Users will be **added** to Open WebUI groups that match their OAuth claims.
 *   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session.
 
 Ensure all necessary groups are correctly configured in your OAuth provider and included in the group claim (`OAUTH_GROUP_CLAIM`).
+
 :::
 
-:::warning Admin Users
+:::warning
+
+Admin Users
 Admin users' group memberships are **not** automatically updated via OAuth group management.
+
 :::
 
-:::info Login Required for Updates
+:::info
+
+Login Required for Updates
 
 If a user's groups change in the OAuth provider, they will need to log out of Open WebUI and log back in for the changes to be reflected.
 
@@ -186,6 +200,7 @@ Open WebUI is able to delegate authentication to an authenticating reverse proxy
 There are several example configurations that are provided in this page.
 
 :::danger
+
 Incorrect configuration can allow users to authenticate as any user on your Open WebUI instance.
 Make sure to allow only the authenticating proxy access to Open WebUI, such as setting `HOST=127.0.0.1` to only listen on the loopback interface.
 
@@ -275,6 +290,7 @@ volumes:
 ```
 
 :::warning
+
 If you run Tailscale in the same network context as Open WebUI, then by default users will be able to directly reach out to Open WebUI without going through the Serve proxy.
 You will need use Tailscale's ACLs to restrict access to only port 443.
 

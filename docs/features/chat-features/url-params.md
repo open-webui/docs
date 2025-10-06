@@ -96,8 +96,12 @@ The following table lists the available URL parameters, their function, and exam
 
 <details>
 <summary>Example Use Case</summary>
-:::tip **Temporary Chat Session**
+
+:::tip
+
+**Temporary Chat Session**
 Suppose a user wants to initiate a quick chat session without saving the history. They can do so by setting `temporary-chat=true` in the URL. This provides a disposable chat environment ideal for one-time interactions.
+
 :::
 </details>
 

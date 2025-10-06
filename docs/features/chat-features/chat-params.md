@@ -21,8 +21,12 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 
 <details>
 <summary>Example Use Case</summary>
-:::tip **Per-chat basis**:
+
+:::tip
+
+**Per-chat basis**:
 Suppose a user wants to set a custom system prompt for a specific conversation. They can do so by accessing the **Chat Controls** section and modifying the **System Prompt** field. These changes will only apply to the current chat session.
+
 :::
 </details>
 
@@ -34,8 +38,12 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 
 <details>
 <summary>Example Use Case</summary>
-:::tip **Per-account basis**:
+
+:::tip
+
+**Per-account basis**:
 Suppose a user wants to set their own system prompt for their account. They can do so by accessing the **Settings** menu and modifying the **System Prompt** field.
+
 :::
 </details>
 
@@ -49,14 +57,20 @@ Suppose a user wants to set their own system prompt for their account. They can 
 
 <details>
 <summary>Example Use Case</summary>
-:::tip **Per-model basis**:
+
+:::tip
+
+**Per-model basis**:
 Suppose an administrator wants to set a default system prompt for a specific model. They can do so by accessing the **Models** section and modifying the **System Prompt** field for the corresponding model. Any chat instances using this model will automatically use the model's system prompt and advanced parameters.
+
 :::
 </details>
 
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 
-:::tip **Bonus Tips**
+:::tip
+
+**Bonus Tips**
 **This tip applies for both administrators and user accounts. To achieve maximum flexibility with your system prompts, we recommend considering the following setup:**
 
 - Assign your primary System Prompt (**i.e., to give an LLM a defining character**) you want to use in your **General** settings **System Prompt** field. This sets it on a per-account level and allows it to work as the system prompt across all your LLMs without requiring adjustments within a model from the **Workspace** section.
@@ -64,4 +78,5 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 - For your secondary System Prompt (**i.e, to give an LLM a task to perform**), choose whether to place it in the **System Prompt** field within the **Chat Controls** sidebar (on a per-chat basis) or the **Models** section of the **Workspace** section (on a per-model basis) for Admins, allowing you to set them directly. This allows your account-level system prompt to work in conjunction with either the per-chat level system prompt provided by **Chat Controls**, or the per-model level system prompt provided by **Models**.
 
 - As an administrator, you should assign your LLM parameters on a per-model basis using **Models** section for optimal flexibility. For both of these secondary System Prompts, ensure to set them in a manner that maximizes flexibility and minimizes required adjustments across different per-account or per-chat instances. It is essential for both your Admin account as well as all User accounts to understand the priority order by which system prompts within **Chat Controls** and the **Models** section will be applied to the **LLM**.
+
 :::

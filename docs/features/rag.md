@@ -4,6 +4,7 @@ title: "🔎 Retrieval Augmented Generation (RAG)"
 ---
 
 :::warning
+
 If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
 
 **Why This Is Critical for Web Search:**
@@ -28,7 +29,9 @@ You can also load documents into the workspace area with their access by startin
 For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can.
 
 :::tip
+
 Web pages often contain extraneous information such as navigation and footer. For better results, link to a raw or reader-friendly version of the page.
+
 :::
 
 ## RAG Template Customization

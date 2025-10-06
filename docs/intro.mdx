@@ -33,9 +33,11 @@ Passionate about open-source AI? [Join our team →](https://careers.openwebui.c
 ![Open WebUI Demo](/images/demo.gif)
 
 :::tip
+
 **Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** — **[Speak with Our Sales Team Today!](mailto:sales@openwebui.com)**
 
 Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
+
 :::
 
 <TopBanners />
@@ -43,6 +45,7 @@ Get **enhanced capabilities**, including **custom theming and branding**, **Serv
 ## Quick Start with Docker 🐳
 
 :::info
+
 **WebSocket** support is required for Open WebUI to function correctly. Ensure that your network configuration allows WebSocket connections.
 
 :::
@@ -90,7 +93,9 @@ After installation, you can access Open WebUI at [http://localhost:3000](http://
 ### Using the Dev Branch 🌙
 
 :::warning
+
 The `:dev` branch contains the latest unstable features and changes. Use it at your own risk as it may have bugs or incomplete features.
+
 :::
 
 If you want to try out the latest bleeding-edge features and are okay with occasional instability, you can use the `:dev` tag like this:
@@ -126,6 +131,7 @@ docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock
 ## Manual Installation
 
 :::info
+
 ### Platform Compatibility
 Open WebUI works on macOS, Linux (x86_64 and ARM64, including Raspberry Pi and other ARM boards), and Windows.
 
@@ -165,7 +171,8 @@ Once `uv` is installed, running Open WebUI is a breeze. Use the command below, e
   $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
   ```
 
-:::note 
+:::note
+
 **For PostgreSQL Support:**
 
 The default installation now uses a slimmed-down package. If you need **PostgreSQL support**, install with all optional dependencies:
@@ -173,6 +180,7 @@ The default installation now uses a slimmed-down package. If you need **PostgreS
 ```bash
 pip install open-webui[all]
 ```
+
 :::
 
 ### Installation with `pip`

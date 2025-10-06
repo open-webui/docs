@@ -115,7 +115,9 @@ environment:
 ```
 
 :::note
+
 **Important Note:** Unlike `GLOBAL_LOG_LEVEL`, these app-specific variables might not affect logging from *all* third-party modules. They primarily control logging within Open WebUI's codebase.
+
 :::
 
 By understanding and utilizing these logging mechanisms, you can effectively monitor, debug, and gain insights into your Open WebUI instance.
