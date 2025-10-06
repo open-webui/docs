@@ -20,7 +20,7 @@ This guide focuses on running the **full DeepSeek-R1 Dynamic 1.58-bit quantized 
 You can either:
 
 - [Download the prebuilt binaries](https://github.com/ggerganov/llama.cpp/releases)
-- **Or build it yourself**: Follow the instructions here: [Llama.cpp Build Guide](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md)
+- **Or build it yourself**: Follow the instructions in the [Llama.cpp Build Guide](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md)
 
 ## Step 2: Download the Model Provided by UnslothAI
 
@@ -70,7 +70,7 @@ DeepSeek-R1-GGUF/
 
 ## Step 3: Make Sure Open WebUI is Installed and Running
 
-If you don’t already have **Open WebUI** installed, no worries! It’s a simple setup. Just follow the [Open WebUI documentation here](https://docs.openwebui.com/). Once installed, start the application — we’ll connect it in a later step to interact with the DeepSeek-R1 model.
+If you don’t already have **Open WebUI** installed, no worries! It’s a simple setup. Just follow the [Open WebUI documentation](https://docs.openwebui.com/). Once installed, start the application — we’ll connect it in a later step to interact with the DeepSeek-R1 model.
 
 ## Step 4: Serve the Model Using Llama.cpp
 

@@ -38,7 +38,7 @@ To learn more about Bedrock, visit: [Amazon Bedrock's Official Page](https://aws
 
 Before we can integrate with Bedrock, you first have to verify that you have access to at least one, but preferably many, of the available Base Models. At the time of this writing (Feb 2025), there were 47 base models available. You can see in the screenshot below that I have access to multiple models. You'll know if you have access to a model if it says "✅ Access Granted" next to the model. If you don't have access to any models, you will get an error on the next step.
 
-AWS provides good documentation for request accessing / enabling these models here: [Amazon Bedrock's Model Access Docs](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html)
+AWS provides good documentation for request accessing / enabling these models in the [Amazon Bedrock's Model Access Docs](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html)
 
 ![Amazon Bedrock Base Models](/images/tutorials/amazon-bedrock/amazon-bedrock-base-models.png)
 
@@ -55,7 +55,7 @@ For reference, here is a simple mapping between the endpoints:
 | `/chat/completions`     | converse or converse_stream    |
 | `/embeddings`           | invoke_model           |
 
-The BAG repo can be found here: [Bedrock Access Gateway Repo](https://github.com/aws-samples/bedrock-access-gateway)
+The BAG repo can be found in the [Bedrock Access Gateway Repo](https://github.com/aws-samples/bedrock-access-gateway)
 
 To set-up the BAG, follow the below steps:
 

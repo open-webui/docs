@@ -52,7 +52,7 @@ In order to configure this option, you need to gather the following environment 
 
 For a complete list of the available S3 endpoint URLs, see: [Amazon S3 Regular Endpoints](https://docs.aws.amazon.com/general/latest/gr/s3.html)
 
-See all the `Cloud Storage` configuration options here: [Open-WebUI Cloud Storage Config](https://docs.openwebui.com/getting-started/env-configuration#cloud-storage)
+See all the `Cloud Storage` configuration options in the [Open-WebUI Cloud Storage Config](https://docs.openwebui.com/getting-started/env-configuration#cloud-storage) documentation.
 
 ## 2. Run Open-WebUI
 

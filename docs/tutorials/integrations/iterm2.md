@@ -70,7 +70,7 @@ whole response will be copied into my terminal automatically.
 The script should do this: \(ai.prompt)
 ```
 
-You can read more about the Iterm2 prompt in the [original documentation](https://gitlab.com/gnachman/iterm2/-/wikis/AI-Prompt).
+You can read more about the Iterm2 prompt in the [Iterm2 documentation](https://gitlab.com/gnachman/iterm2/-/wikis/AI-Prompt).
 
 ---
 
