@@ -25,7 +25,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 1. **Models and Model Selection**
 
-- **Description**: The `models` and `model` parameters allow you to specify which [language models](/features/workspace/models) should be used for a particular chat session.
+- **Description**: The `models` and `model` parameters allow you to specify which [language models](/features/workspace/models.md) should be used for a particular chat session.
 - **How to Set**: You can use either `models` for multiple models or `model` for a single model.
 - **Example**:
   - `/?models=model1,model2` – This initializes the chat with `model1` and `model2`.

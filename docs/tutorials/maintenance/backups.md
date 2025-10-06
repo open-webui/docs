@@ -227,6 +227,7 @@ exit 0
 #!/bin/bash
 
 #
+
 # Backup script to back up ChromaDB and SQLite to Backblaze B2 bucket
 
 # openwebuiweeklies, maintaining 3 weekly snapshots.
@@ -238,6 +239,7 @@ exit 0
 # Excludes audit.log, cache, and uploads directories.
 
 #
+
 # Ensure rclone is installed and configured correctly.
 
 # Install rclone: https://rclone.org/install/

@@ -16,7 +16,7 @@ Most OAUTH flows require the application's external URL ("redirect URI") so the 
 
 ::tip
 
-📌 Tip: Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
+Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
 
 :::
 
@@ -70,7 +70,7 @@ ENABLE_OAUTH_SIGNUP=true
 
 ::tip
 
-📌 Tip: Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly named, missing entirely, or using outdated variable names!
+Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly named, missing entirely, or using outdated variable names!
 
 :::
 
@@ -153,7 +153,7 @@ Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Az
 
 ::tip
 
-📌 Tip: When in doubt, recheck your provider registration and regenerate client secrets if needed.
+When in doubt, recheck your provider registration and regenerate client secrets if needed.
 
 :::
 
@@ -248,7 +248,7 @@ WEBUI_AUTH_COOKIE_SECURE=true     # Set to false if using HTTP
 ```bash
 
 # Increase OAuth timeouts
-AIOHTTP_CLIENT_TIMEOUT=600         # Very high number is needed here, since model responses that take a lot of time also rely on this timeout variable (e.g. a model that is reasoning for 5+ minutes)
+AIOHTTP_CLIENT_TIMEOUT=600         # Very high number is needed here, since model responses that take a lot of time also rely on this timeout variable (e.g., a model that is reasoning for 5+ minutes)
 AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=30
 ```
 

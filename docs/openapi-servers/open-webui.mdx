@@ -78,7 +78,7 @@ The primary distinction between **User Tool Servers** and **Global Tool Servers*
 
 - **Global Tool Servers**
   - Requests are sent **from the Open WebUI backend/server** (not your browser).
-  - The backend must be able to reach the tool server URL you specify—so `localhost` means the backend server's localhost, _not_ your computer's.
+  - The backend must be able to reach the tool server URL you specify—so `localhost` means the backend server's localhost, *not* your computer's.
   - Use this for sharing tools with other users across the deployment, but be mindful: since the backend makes the requests, you cannot access your personal local resources (like your own filesystem) through this method.
   - Think security! Only expose remote/global endpoints that are safe and meant to be accessed by multiple users.
 
@@ -164,7 +164,7 @@ Here’s what that looks like:
 - Once toggled on, they function the same way as user tools.
 - Admins can control access to global tools via role-based permissions.
 
-This is ideal for team setups or shared environments, where commonly-used tools (e.g. document search, memory, or web lookup) should be centrally accessible by multiple users.
+This is ideal for team setups or shared environments, where commonly-used tools (e.g., document search, memory, or web lookup) should be centrally accessible by multiple users.
 
 ---
 
