@@ -36,29 +36,29 @@ For more information on configuring environment variables in Open WebUI, see [En
 Environment Variable Description
 ---------------------------------
 
-* `WEBUI_BANNERS`:
-  * Type: list of dict
-  * Default: `[]`
-  * Description: List of banners to show to users.
+- `WEBUI_BANNERS`:
+  - Type: list of dict
+  - Default: `[]`
+  - Description: List of banners to show to users.
 
 Banner Options
 ----------------
 
-* `id`: Unique identifier for the banner.
-* `type`: Background color of the banner (info, success, warning, error).
-* `title`: Title of the banner.
-* `content`: Content of the banner.
-* `dismissible`: Whether the banner is dismissible or not.
-* `timestamp`: Timestamp for the banner (optional).
+- `id`: Unique identifier for the banner.
+- `type`: Background color of the banner (info, success, warning, error).
+- `title`: Title of the banner.
+- `content`: Content of the banner.
+- `dismissible`: Whether the banner is dismissible or not.
+- `timestamp`: Timestamp for the banner (optional).
 
 FAQ
 ----
 
-* Q: Can I configure banners through the admin panel?
+- Q: Can I configure banners through the admin panel?
 A: Yes, you can configure banners through the admin panel by navigating to `Admin Panel` -> `Settings` -> `Interface` and clicking on the `+` icon to add a new banner.
-* Q: Can I configure banners through environment variables?
+- Q: Can I configure banners through environment variables?
 A: Yes, you can configure banners through environment variables by setting the `WEBUI_BANNERS` environment variable with a list of dictionaries.
-* Q: What is the format for the `WEBUI_BANNERS` environment variable?
+- Q: What is the format for the `WEBUI_BANNERS` environment variable?
 A: The format for the `WEBUI_BANNERS` environment variable is a list of dictionaries with the following keys: `id`, `type`, `title`, `content`, `dismissible`, and `timestamp`.
-* Q: Can I make banners dismissible?
+- Q: Can I make banners dismissible?
 A: Yes, you can make banners dismissible by setting the `dismissible` key to `True` in the banner configuration or by toggling dismissibility for a banner within the UI.
