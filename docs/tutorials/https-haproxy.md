@@ -40,7 +40,7 @@ global
     # to have these messages end up in /var/log/haproxy.log you will
     # need to:
     #
-    # 1) configure syslog to accept network log events.  This is done
+    # 1) configure syslog to accept network log events. This is done
     #    by adding the '-r' option to the SYSLOGD_OPTIONS in
     #    /etc/sysconfig/syslog
     #
@@ -116,7 +116,7 @@ backend owui_chat
     server chat <ip>:3000
 ```
 
-You will see that we have ACL records (routers) for both Open WebUI and Let's Encrypt.  To use WebSocket with OWUI, you need to have an SSL configured, and the easiest way to do that is to use Let's Encrypt.
+You will see that we have ACL records (routers) for both Open WebUI and Let's Encrypt. To use WebSocket with OWUI, you need to have an SSL configured, and the easiest way to do that is to use Let's Encrypt.
 
 You can use either the subdomain method or the path method for routing traffic to Open WebUI. The subdomain method requires a dedicated subdomain (e.g., chat.yourdomain.com), while the path method allows you to access Open WebUI through a specific path on your domain (e.g., yourdomain.com/owui/). Choose the method that best suits your needs and update the configuration accordingly.
 
@@ -151,7 +151,7 @@ You can validate the HAProxy configuration by running `haproxy -c -f /etc/haprox
 To ensure HAProxy starts with the system, `systemctl enable haproxy`.
 
 When you have HAProxy configured, you can use Let's encrypt to issue your valid SSL certificate.
-First, you will need to register with Let's Encrypt.  You should only need to do this one time:
+First, you will need to register with Let's Encrypt. You should only need to do this one time:
 
 `certbot register --agree-tos --email your@email.com --non-interactive`
 

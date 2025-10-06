@@ -56,7 +56,7 @@ cd ~/open-webui
 
 ### Installing OpenWebUI
 
-Create a `docker-compose.yml` file in the `~/open-webui` directory.  I've left in a commented section for setting some environment varibles for Qdrant, but you can follow that for any other [environment variables](https://docs.openwebui.com/getting-started/env-configuration) you might need to set.
+Create a `docker-compose.yml` file in the `~/open-webui` directory. I've left in a commented section for setting some environment varibles for Qdrant, but you can follow that for any other [environment variables](https://docs.openwebui.com/getting-started/env-configuration) you might need to set.
 
 ```yaml
 services:

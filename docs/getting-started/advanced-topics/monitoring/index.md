@@ -73,7 +73,7 @@ See the [Open WebUI API documentation](https://docs.openwebui.com/getting-starte
 
 **How to Test with `curl` (Authenticated):**
 
-You'll need an API key to access this endpoint.  See the "Authentication Setup" section below for instructions on generating an API key.
+You'll need an API key to access this endpoint. See the "Authentication Setup" section below for instructions on generating an API key.
 
 ```bash
    # Authenticated model connectivity check
