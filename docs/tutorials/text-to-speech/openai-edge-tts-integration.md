@@ -17,7 +17,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 It uses the [edge-tts](https://github.com/rany2/edge-tts) package, which leverages the Edge browser's free "Read Aloud" feature to emulate a request to Microsoft / Azure in order to receive very high quality text-to-speech for free.
 
-[Sample the voices here](https://tts.travisvn.com)
+[Sample the voices](https://tts.travisvn.com)
 
 <details>
   <summary>How is it different from 'openedai-speech'?</summary>

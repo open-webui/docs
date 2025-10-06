@@ -32,7 +32,7 @@ This will open the `config.yaml` file in your editor. Here you can change the se
 :::info
 
 Currently the `ollama` provider does not support authentication so we cannot use this provider with Open WebUI.
-However Ollama and Open WebUI both have compatibility with OpenAI API spec. Read more about the specification in the [Ollama blog post](https://ollama.com/blog/openai-compatibility).
+However Ollama and Open WebUI both have compatibility with OpenAI API spec. Read more about the specification in the [Ollama blog post on OpenAI compatibility](https://ollama.com/blog/openai-compatibility).
 We can still setup continue.dev to use the openai provider which will allow us to use Open WebUI's authentication token.
 
 :::
