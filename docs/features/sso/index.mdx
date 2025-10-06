@@ -224,7 +224,6 @@ When a request is authenticated via `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`, and the t
 - The header value must be a comma-separated list of group names (e.g., `X-User-Groups: admins,editors,users`).
 - If the header is not present or empty, the user's group memberships will not be updated.
 - User will be unassigned from groups not present in the header.
-- Group creation via trusted header is not automatic; only existing groups in Open WebUI will be assigned.
 
 ### Tailscale Serve
 
