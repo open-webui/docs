@@ -16,6 +16,7 @@ This guide focuses on running the **full DeepSeek-R1 Dynamic 1.58-bit quantized 
 ## Step 1: Install Llama.cpp  
 
 You can either:  
+
 - [Download the prebuilt binaries](https://github.com/ggerganov/llama.cpp/releases)  
 - **Or build it yourself**: Follow the instructions here: [Llama.cpp Build Guide](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md)  
 
@@ -23,14 +24,14 @@ You can either:
 
 Head over to [Unsloth’s Hugging Face page](https://huggingface.co/unsloth/DeepSeek-R1-GGUF) and download the appropriate **dynamic quantized version** of DeepSeek-R1. For this tutorial, we’ll use the **1.58-bit (131GB)** version, which is highly optimized yet remains surprisingly functional.
 
-
 :::tip
-Know your "working directory" — where your Python script or terminal session is running. The model files will download to a subfolder of that directory by default, so be sure you know its path! For example, if you're running the command below in `/Users/yourname/Documents/projects`, your downloaded model will be saved under `/Users/yourname/Documents/projects/DeepSeek-R1-GGUF`. 
+Know your "working directory" — where your Python script or terminal session is running. The model files will download to a subfolder of that directory by default, so be sure you know its path! For example, if you're running the command below in `/Users/yourname/Documents/projects`, your downloaded model will be saved under `/Users/yourname/Documents/projects/DeepSeek-R1-GGUF`.
 :::
 
 To understand more about UnslothAI’s development process and why these dynamic quantized versions are so efficient, check out their blog post: [UnslothAI DeepSeek R1 Dynamic Quantization](https://unsloth.ai/blog/deepseekr1-dynamic).  
 
 Here’s how to download the model programmatically:  
+
 ```python
 # Install Hugging Face dependencies before running this:
 # pip install huggingface_hub hf_transfer
@@ -45,6 +46,7 @@ snapshot_download(
 ```
 
 Once the download completes, you’ll find the model files in a directory structure like this:  
+
 ```
 DeepSeek-R1-GGUF/
 ├── DeepSeek-R1-UD-IQ1_S/
@@ -62,18 +64,19 @@ DeepSeek-R1-GGUF/
 
 If you don’t already have **Open WebUI** installed, no worries! It’s a simple setup. Just follow the [Open WebUI documentation here](https://docs.openwebui.com/). Once installed, start the application — we’ll connect it in a later step to interact with the DeepSeek-R1 model.  
 
-
 ## Step 4: Serve the Model Using Llama.cpp  
 
 Now that the model is downloaded, the next step is to run it using **Llama.cpp’s server mode**. Before you begin:  
 
 1. **Locate the `llama-server` binary.**  
    If you built from source (as outlined in Step 1), the `llama-server` executable will be located in `llama.cpp/build/bin`. Navigate to this directory by using the `cd` command:  
+
    ```bash
    cd [path-to-llama-cpp]/llama.cpp/build/bin
    ```
 
    Replace `[path-to-llama-cpp]` with the location where you cloned or built Llama.cpp. For example:  
+
    ```bash
    cd ~/Documents/workspace/llama.cpp/build/bin
    ```
@@ -82,6 +85,7 @@ Now that the model is downloaded, the next step is to run it using **Llama.cpp�
    Use the full path to the downloaded GGUF files created in Step 2. When serving the model, specify the first part of the split GGUF files (e.g., `DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf`).  
 
 Here’s the command to start the server:  
+
 ```bash
 ./llama-server \
     --model /[your-directory]/DeepSeek-R1-GGUF/DeepSeek-R1-UD-IQ1_S/DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf \
@@ -90,7 +94,6 @@ Here’s the command to start the server:
     --n-gpu-layers 40
 ```
 
-
 :::tip
 🔑 **Parameters to Customize Based on Your Machine:**  
 
@@ -98,9 +101,11 @@ Here’s the command to start the server:
 - **`--port`:** The server default is `8080`, but feel free to change it based on your port availability.  
 - **`--ctx-size`:** Determines context length (number of tokens). You can increase it if your hardware allows, but be cautious of rising RAM/VRAM usage.  
 - **`--n-gpu-layers`:** Set the number of layers you want to offload to your GPU for faster inference. The exact number depends on your GPU’s memory capacity — reference Unsloth’s table for specific recommendations.
+
 :::
 
 For example, if your model was downloaded to `/Users/tim/Documents/workspace`, your command would look like this:  
+
 ```bash
 ./llama-server \
     --model /Users/tim/Documents/workspace/DeepSeek-R1-GGUF/DeepSeek-R1-UD-IQ1_S/DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf \
@@ -110,6 +115,7 @@ For example, if your model was downloaded to `/Users/tim/Documents/workspace`, y
 ```
 
 Once the server starts, it will host a **local OpenAI-compatible API** endpoint at:  
+
 ```
 http://127.0.0.1:10000
 ```

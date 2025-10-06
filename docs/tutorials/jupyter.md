@@ -10,7 +10,6 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 > [!WARNING]
 > This documentation was created based on the current version (0.5.16) and is constantly being updated.
 
-
 # Jupyter Notebook Integration
 
 Starting in v0.5.11, Open-WebUI released a new feature called `Jupyter Notebook Support in Code Interpreter`. This feature allow you to integrate Open-WebUI with Jupyter. There have already been several improvements to this feauture over the subsequent releases, so review the release notes carefully.

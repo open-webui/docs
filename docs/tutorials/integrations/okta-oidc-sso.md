@@ -15,9 +15,9 @@ This documentation page outlines the steps required to integrate Okta OIDC Singl
 
 ### Prerequisites
 
-*   A new or existing Open WebUI instance.
-*   An Okta account with administrative privileges to create and configure applications.
-*   Basic understanding of OIDC, Okta application configuration, and Open WebUI environment variables.
+* A new or existing Open WebUI instance.
+* An Okta account with administrative privileges to create and configure applications.
+* Basic understanding of OIDC, Okta application configuration, and Open WebUI environment variables.
 
 ## Setting up Okta
 
@@ -25,33 +25,33 @@ First, you need to configure an OIDC application within your Okta organization a
 
 ### 1. Create/Configure OIDC Application in Okta
 
-1.  Log in to your Okta Admin Console.
-2.  Navigate to **Applications > Applications**.
-3.  Either create a new **OIDC - OpenID Connect** application (choose **Web Application** as the type) or select an existing one you wish to use for Open WebUI.
+1. Log in to your Okta Admin Console.
+2. Navigate to **Applications > Applications**.
+3. Either create a new **OIDC - OpenID Connect** application (choose **Web Application** as the type) or select an existing one you wish to use for Open WebUI.
 
     ![Okta Create App](/images/tutorials/okta/okta-auth-create-app.png)
 
-4.  During setup or in the application's **General** settings tab, configure the **Sign-in redirect URIs**. Add the URI for your Open WebUI instance, followed by `/oauth/oidc/callback`. Example: `https://your-open-webui.com/oauth/oidc/callback`.
-5.  Take note of the **Client ID** and **Client secret** provided on the application's **General** tab. You will need these for the Open WebUI configuration.
+4. During setup or in the application's **General** settings tab, configure the **Sign-in redirect URIs**. Add the URI for your Open WebUI instance, followed by `/oauth/oidc/callback`. Example: `https://your-open-webui.com/oauth/oidc/callback`.
+5. Take note of the **Client ID** and **Client secret** provided on the application's **General** tab. You will need these for the Open WebUI configuration.
 
     ![Okta Client Key](/images/tutorials/okta/okta-auth-clientkey.png)
 
-6.  Ensure the correct users or groups are assigned to this application under the **Assignments** tab.
+6. Ensure the correct users or groups are assigned to this application under the **Assignments** tab.
 
 ### 2. Add a Groups Claim to the ID Token
 
 **(Optional)** To enable automatic group management in Open WebUI based on Okta groups, you need to configure Okta to send the user's group memberships in the ID token. If you only need SSO login and prefer to manage groups manually within Open WebUI, you can skip this section.
 
-1.  In the Admin Console, go to **Applications > Applications** and select your OIDC client app.
-2.  Go to the **Sign On** tab and click **Edit** in the **OpenID Connect ID Token** section.
-3.  In the **Group claim type** section, select **Filter**.
-4.  In the **Group claims filter** section:
-    *   Enter `groups` as the claim name (or use the default if present).
-    *   Select **Matches regex** from the dropdown.
-    *   Enter `.*` in the regex field. This will include all groups the user is a member of. You can use a more specific regex if needed.
-5.  Click **Save**.
-6.  Click the **Back to applications** link.
-7.  From the **More** button dropdown menu for your application, click **Refresh Application Data**.
+1. In the Admin Console, go to **Applications > Applications** and select your OIDC client app.
+2. Go to the **Sign On** tab and click **Edit** in the **OpenID Connect ID Token** section.
+3. In the **Group claim type** section, select **Filter**.
+4. In the **Group claims filter** section:
+    * Enter `groups` as the claim name (or use the default if present).
+    * Select **Matches regex** from the dropdown.
+    * Enter `.*` in the regex field. This will include all groups the user is a member of. You can use a more specific regex if needed.
+5. Click **Save**.
+6. Click the **Back to applications** link.
+7. From the **More** button dropdown menu for your application, click **Refresh Application Data**.
 
 *For more advanced group claim configurations, refer to the Okta documentation on [customizing tokens](https://developer.okta.com/docs/guides/customize-tokens-returned-from-okta/main/) and [group functions](https://developer.okta.com/docs/reference/okta-expression-language/#group-functions).*
 
@@ -59,21 +59,21 @@ First, you need to configure an OIDC application within your Okta organization a
 
 To enhance security, you can enforce Multi-Factor Authentication (MFA) for users logging into Open WebUI via Okta. This example demonstrates how to set up Google Authenticator as an additional factor.
 
-1.  **Configure an Authenticator**:
-    *   In the Okta Admin Console, navigate to **Security > Authenticators**.
-    *   Click **Add Authenticator** and add **Google Authenticator**.
-    *   During setup, you can set **"User verification"** to **"Required"** to enhance security.
+1. **Configure an Authenticator**:
+    * In the Okta Admin Console, navigate to **Security > Authenticators**.
+    * Click **Add Authenticator** and add **Google Authenticator**.
+    * During setup, you can set **"User verification"** to **"Required"** to enhance security.
 
-2.  **Create and Apply a Sign-On Policy**:
-    *   Go to **Security > Authenticators**, then click the **Sign On** tab.
-    *   Click **Add a policy** to create a new policy (e.g., "WebUI MFA Policy").
-    *   In the policy you just created, click **Add rule**.
-    *   Configure the rule:
-        *   Set **"IF User's IP is"** to **"Anywhere"**.
-        *   Set **"THEN Access is"** to **"Allowed after successful authentication"**.
-        *   Under **"AND User must authenticate with"**, select **"Password + Another factor"**.
-        *   Ensure your desired factor (e.g., Google Authenticator) is included under **"AND Possession factor constraints are"**.
-    *   Finally, assign this policy to your Open WebUI application. Go to **Applications > Applications**, select your OIDC app, and under the **Sign On** tab, select the policy you created.
+2. **Create and Apply a Sign-On Policy**:
+    * Go to **Security > Authenticators**, then click the **Sign On** tab.
+    * Click **Add a policy** to create a new policy (e.g., "WebUI MFA Policy").
+    * In the policy you just created, click **Add rule**.
+    * Configure the rule:
+        * Set **"IF User's IP is"** to **"Anywhere"**.
+        * Set **"THEN Access is"** to **"Allowed after successful authentication"**.
+        * Under **"AND User must authenticate with"**, select **"Password + Another factor"**.
+        * Ensure your desired factor (e.g., Google Authenticator) is included under **"AND Possession factor constraints are"**.
+    * Finally, assign this policy to your Open WebUI application. Go to **Applications > Applications**, select your OIDC app, and under the **Sign On** tab, select the policy you created.
 
 Now, when users log in to Open WebUI, they will be required to provide their Okta password and an additional verification code from Google Authenticator.
 
@@ -132,8 +132,9 @@ To *also* enable automatic Just-in-Time (JIT) creation of groups that exist in O
 
 :::warning Group Membership Management
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI will be **strictly synchronized** with the groups received in their Okta claims upon each login. This means:
-*   Users will be **added** to Open WebUI groups that match their Okta claims.
-*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their Okta claims for that login session.
+
+* Users will be **added** to Open WebUI groups that match their Okta claims.
+* Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their Okta claims for that login session.
 
 Ensure that all necessary groups are correctly configured and assigned within Okta and included in the group claim.
 :::
@@ -155,7 +156,6 @@ If this key is not consistent across all nodes, users may be forced to log in ag
 If you intend to *only* allow logins via Okta (and potentially other configured OAuth providers), you can disable the standard email/password login form by setting the following environment variable:
 :::
 
-
 ```bash
 ENABLE_LOGIN_FORM="false"
 ```
@@ -168,17 +168,17 @@ Restart your Open WebUI instance after setting these environment variables.
 
 ## Verification
 
-1.  Navigate to your Open WebUI login page. You should see a button labeled "Login with Okta" (or whatever you set for `OAUTH_PROVIDER_NAME`).
-2.  Click the button and authenticate through the Okta login flow.
-3.  Upon successful authentication, you should be redirected back to Open WebUI and logged in.
-4.  If `ENABLE_OAUTH_GROUP_MANAGEMENT` is true, log in as a non-admin user. Their groups within Open WebUI should now strictly reflect their current group memberships in Okta (any memberships in groups *not* in the Okta claim will be removed). If `ENABLE_OAUTH_GROUP_CREATION` is also true, any groups present in the user's Okta claims that did not previously exist in Open WebUI should now have been created automatically. Note that admin users' groups are not automatically updated via SSO.
-5.  Check the Open WebUI server logs for any OIDC or group-related errors if you encounter issues.
+1. Navigate to your Open WebUI login page. You should see a button labeled "Login with Okta" (or whatever you set for `OAUTH_PROVIDER_NAME`).
+2. Click the button and authenticate through the Okta login flow.
+3. Upon successful authentication, you should be redirected back to Open WebUI and logged in.
+4. If `ENABLE_OAUTH_GROUP_MANAGEMENT` is true, log in as a non-admin user. Their groups within Open WebUI should now strictly reflect their current group memberships in Okta (any memberships in groups *not* in the Okta claim will be removed). If `ENABLE_OAUTH_GROUP_CREATION` is also true, any groups present in the user's Okta claims that did not previously exist in Open WebUI should now have been created automatically. Note that admin users' groups are not automatically updated via SSO.
+5. Check the Open WebUI server logs for any OIDC or group-related errors if you encounter issues.
 
 ## Troubleshooting
 
-*   **400 Bad Request/Redirect URI Mismatch:** Double-check that the **Sign-in redirect URI** in your Okta application exactly matches `<your-open-webui-url>/oauth/oidc/callback`.
-*   **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Remember admin groups are not synced.
-*   **Configuration Errors:** Review the Open WebUI server logs for detailed error messages related to OIDC configuration.
+* **400 Bad Request/Redirect URI Mismatch:** Double-check that the **Sign-in redirect URI** in your Okta application exactly matches `<your-open-webui-url>/oauth/oidc/callback`.
+* **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Remember admin groups are not synced.
+* **Configuration Errors:** Review the Open WebUI server logs for detailed error messages related to OIDC configuration.
 
-*   Refer to the official [Open WebUI SSO Documentation](/features/sso).
-*   Consult the [Okta Developer Documentation](https://developer.okta.com/docs/).
+* Refer to the official [Open WebUI SSO Documentation](/features/sso).
+* Consult the [Okta Developer Documentation](https://developer.okta.com/docs/).

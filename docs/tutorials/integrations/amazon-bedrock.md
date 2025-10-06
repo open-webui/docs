@@ -15,14 +15,12 @@ In this tutorial, we'll explore one of the most common and popular approaches to
 
 ## Prerequisites
 
-
 In order to follow this tutorial, you must have the following:
 
 - An active AWS account
 - An active AWS Access Key and Secret Key
 - IAM permissions in AWS to enable Bedrock models or already enabled models
 - Docker installed on your system
-
 
 ## What is Amazon Bedrock
 
@@ -42,13 +40,11 @@ AWS provides good documentation for request accessing / enabling these models he
 
 ![Amazon Bedrock Base Models](/images/tutorials/amazon-bedrock/amazon-bedrock-base-models.png)
 
-
 ## Step 2: Configure the Bedrock Access Gateway
 
 Now that we have access to at least one Bedrock base model, we need to configure the Bedrock Access Gateway, or BAG. You can think of the BAG as kind of proxy or middleware developed by AWS that wraps around AWS native endpoints/SDK for Bedrock and, in turn, exposes endpoints that are compatible with OpenAI's schema, which is what Open-WebUI requires.
 
 For reference, here is a simple mapping between the endpoints:
-
 
 | OpenAI Endpoint       | Bedrock Method         |
 |-----------------------|------------------------|
@@ -60,6 +56,7 @@ For reference, here is a simple mapping between the endpoints:
 The BAG repo can be found here: [Bedrock Access Gateway Repo](https://github.com/aws-samples/bedrock-access-gateway)
 
 To set-up the BAG, follow the below steps:
+
 - Clone the BAG repo
 - Remove the default `dockerfile`
 - Change the name of the `Dockerfile_ecs` to `Dockerfile`

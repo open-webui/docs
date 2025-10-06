@@ -22,8 +22,8 @@ Before integrating Open WebUI as a AI chatbot browser assistant in Mozilla Firef
 
 1. Click on the hamburger button (three horizontal lines button at the top right corner, just below the `X` button)
 2. Open up Firefox settings
-2. Click on the `Firefox Labs` section
-3. Toggle on `AI Chatbot`
+3. Click on the `Firefox Labs` section
+4. Toggle on `AI Chatbot`
 
 Alternatively, you can enable AI Chatbot through the `about:config` page (described in the next section).
 

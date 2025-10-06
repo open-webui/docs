@@ -19,7 +19,6 @@ This guide provides three methods to set up HTTPS:
 
 Choose the method that best fits your deployment needs.
 
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -42,7 +41,6 @@ import Windows from './tab-nginx/Windows.md';
     <Windows />
   </TabItem>
 </Tabs>
-
 
 ## Next Steps
 

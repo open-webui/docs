@@ -31,5 +31,4 @@ If you are using Ollama from your computer (not running inside a container),
 
 Once inside open-webui, navigate to Settings > Admin Settings > Connections and create a new Ollama API connection to `http://10.0.2.2:[OLLAMA PORT]`. By default, the Ollama port is 11434.
 
-
 Refer to the Podman [documentation](https://podman.io/) for advanced configurations.

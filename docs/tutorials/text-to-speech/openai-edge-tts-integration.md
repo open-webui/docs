@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 # Integrating `openai-edge-tts` 🗣️ with Open WebUI
 
-## What is `openai-edge-tts`? 
+## What is `openai-edge-tts`?
 
 [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where you can define the endpoint URL, like with Open WebUI.
 
@@ -58,7 +58,6 @@ The default API key is the string `your_api_key_here`. You do not have to change
 **And that's it! You can end here**
 
 # Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
-
 
 <details>
   <summary>Running with Python</summary>
@@ -203,7 +202,7 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 - **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
 :::info
-The `/v1` is now optional. 
+The `/v1` is now optional.
 
 Additionally, there are endpoints for **Azure AI Speech** and **ElevenLabs** for potential future support if custom API endpoints are allowed for these options in Open WebUI.
 
@@ -231,7 +230,7 @@ docker run -d -p 5050:5050 \
 ```
 
 :::note
-The markdown text is now put through a filter for enhanced readability and support. 
+The markdown text is now put through a filter for enhanced readability and support.
 
 You can disable this by setting the environment variable `REMOVE_FILTER=True`.
 :::

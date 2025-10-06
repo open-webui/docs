@@ -57,6 +57,7 @@ Access detailed API documentation for different services provided by Open WebUI:
   ```
   
 - **Python Example**:
+
   ```python
   import requests
   

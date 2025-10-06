@@ -8,7 +8,7 @@ Open WebUI implements a structured role-based access control system with three p
 | **Role**      | **Description**                                   | **Default Creation**             |
 |---------------|---------------------------------------------------|----------------------------------|
 | Administrator | System administrator with full control            | First user account               |
-| Regular User  | Standard user with limited permissions            | Subsequent approved users        | 
+| Regular User  | Standard user with limited permissions            | Subsequent approved users        |
 | Pending       | Unapproved user awaiting administrator activation | New registrations (configurable) |
 
 ### Role Assignment
@@ -29,8 +29,9 @@ When set to "pending", new users must be manually approved by an administrator b
 ## User Groups
 
 Groups allow administrators to
+
 * assign permissions to multiple users at once, simplifying access management
-* limit access to specific resources (Models, Tools, etc) by setting their access to "private" then opening access to 
+* limit access to specific resources (Models, Tools, etc) by setting their access to "private" then opening access to
 specific groups
 * Group access to a resource can be set as "read" or "write"
 

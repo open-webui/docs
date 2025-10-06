@@ -49,6 +49,7 @@ This enables server-side orchestration while still making replies show up in the
 The assistant message needs to be added to the chat response object in memory as a critical prerequisite before triggering the completion. This step is essential because the Open WebUI frontend expects assistant messages to exist in a specific structure.
 
 The assistant message must appear in both locations:
+
 - `chat.messages[]` - The main message array
 - `chat.history.messages[<assistantId>]` - The indexed message history
 
@@ -272,9 +273,11 @@ curl -X POST https://<host>/api/chat/completions \
 Assistant responses can be handled in two ways depending on your implementation needs:
 
 #### Option A: Stream Processing (Recommended)
+
 If using `stream: true` in the completion request, you can process the streamed response in real-time and wait for the stream to complete. This is the approach used by the OpenWebUI web interface and provides immediate feedback.
 
 #### Option B: Polling Approach
+
 For implementations that cannot handle streaming, poll the chat endpoint until the response is ready. Use a retry mechanism with exponential backoff:
 
 ```java
@@ -419,6 +422,7 @@ echo "$cleaned_response" | jq '.'
 ```
 
 This cleaning process handles:
+
 - Removal of ````json` prefix
 - Removal of ```` suffix
 - Trimming whitespace
@@ -797,24 +801,29 @@ This cleaning process handles:
 #### Required vs Optional Fields
 
 **Chat Creation - Required Fields:**
+
 - `title` - Chat title (string)
 - `models` - Array of model names (string[])
 - `messages` - Initial message array
 
 **Chat Creation - Optional Fields:**
+
 - `files` - Knowledge files for RAG (defaults to empty array)
 - `tags` - Chat tags (defaults to empty array)
 - `params` - Model parameters (defaults to empty object)
 
 **Message Structure - User Message:**
+
 - **Required:** `id`, `role`, `content`, `timestamp`, `models`
 - **Optional:** `parentId` (for threading)
 
 **Message Structure - Assistant Message:**
+
 - **Required:** `id`, `role`, `content`, `parentId`, `modelName`, `modelIdx`, `timestamp`
 - **Optional:** Additional metadata fields
 
 **ChatCompletionsRequest - Required Fields:**
+
 - `chat_id` - Target chat ID
 - `id` - Assistant message ID
 - `messages` - Array of ChatCompletionMessage
@@ -822,6 +831,7 @@ This cleaning process handles:
 - `session_id` - Session identifier
 
 **ChatCompletionsRequest - Optional Fields:**
+
 - `stream` - Enable streaming (defaults to false)
 - `background_tasks` - Control automatic tasks
 - `features` - Enable/disable features
@@ -832,22 +842,27 @@ This cleaning process handles:
 #### Field Constraints
 
 **Timestamps:**
+
 - Format: Unix timestamp in milliseconds
 - Example: `1720000000000` (July 4, 2024, 00:00:00 UTC)
 
 **UUIDs:**
+
 - All ID fields should use valid UUID format
 - Example: `550e8400-e29b-41d4-a716-446655440000`
 
 **Model Names:**
+
 - Must match available models in your Open WebUI instance
 - Common examples: `gpt-4o`, `gpt-3.5-turbo`, `claude-3-sonnet`
 
 **Session IDs:**
+
 - Can be any unique string identifier
 - Recommendation: Use UUID format for consistency
 
 **Knowledge File Status:**
+
 - Valid values: `"processed"`, `"processing"`, `"error"`
 - Only use `"processed"` files for completions
 
@@ -878,6 +893,7 @@ Use the Open WebUI backend APIs to:
 7. **Fetch the final chat** - Retrieve and parse the completed conversation
 
 **Enhanced Capabilities:**
+
 - **RAG Integration** - Include knowledge collections for context-aware responses
 - **Asynchronous Processing** - Handle long-running AI operations with streaming or polling
 - **Response Parsing** - Clean and validate JSON responses from the assistant
@@ -890,6 +906,7 @@ The key advantage of this approach is that it maintains full compatibility with 
 ## Testing
 
 You can test your implementation by following the step-by-step CURL examples provided above. Make sure to replace placeholder values with your actual:
+
 - Host URL
 - Authentication token
 - Chat IDs

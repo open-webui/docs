@@ -14,16 +14,20 @@ HAProxy (High Availability Proxy) is specialized load-balancing and reverse prox
 ## Install HAProxy and Let's Encrypt
 
 First, install HAProxy and Let's Encrypt's certbot:
+
 ### Redhat derivatives
+
 ```sudo dnf install haproxy certbot openssl -y```
+
 ### Debian derivatives
+
 ```sudo apt install haproxy certbot openssl -y```
 
 ## HAProxy Configuration Basics
 
 HAProxy's configuration is by default stored in ```/etc/haproxy/haproxy.cfg```. This file contains all the configuration directives that determine how HAProxy will operate.
 
-The base configuration for HAProxy to work with Open WebUI is pretty simple. 
+The base configuration for HAProxy to work with Open WebUI is pretty simple.
 
 ```
  #---------------------------------------------------------------------
@@ -51,8 +55,8 @@ global
     user        haproxy
     group       haproxy
     daemon
-	
-	#adjust the dh-param if too low
+ 
+ #adjust the dh-param if too low
     tune.ssl.default-dh-param 2048
 #---------------------------------------------------------------------
 # common defaults that all the 'listen' and 'backend' sections will
@@ -78,16 +82,16 @@ defaults
 
 #http
 frontend web
-	#Non-SSL
+ #Non-SSL
     bind 0.0.0.0:80
-	#SSL/TLS
-	bind 0.0.0.0:443 ssl crt /path/to/ssl/folder/
+ #SSL/TLS
+ bind 0.0.0.0:443 ssl crt /path/to/ssl/folder/
 
     #Let's Encrypt SSL
     acl letsencrypt-acl path_beg /.well-known/acme-challenge/
     use_backend letsencrypt-backend if letsencrypt-acl
 
-	#Subdomain method
+ #Subdomain method
     acl chat-acl hdr(host) -i subdomain.domain.tld
     #Path Method
     acl chat-acl path_beg /owui/
@@ -103,7 +107,7 @@ backend owui_chat
     option forwardfor
     # add X-CLIENT-IP
     http-request add-header X-CLIENT-IP %[src]
-	http-request set-header X-Forwarded-Proto https if { ssl_fc }
+ http-request set-header X-Forwarded-Proto https if { ssl_fc }
     server chat <ip>:3000
 ```
 
@@ -155,12 +159,13 @@ cat /etc/letsencrypt/live/{domain}/fullchain.pem /etc/letsencrypt/live/{domain}/
 chmod 600 /etc/haproxy/certs/{domain}.pem
 chown haproxy:haproxy /etc/haproxy/certs/{domain}.pem
 ```
+
 You can then restart HAProxy to apply the new certificate:
 `systemctl restart haproxy`
 
 ## HAProxy Manager (Easy Deployment Option)
 
-If you would like to have something manage your HAProxy configuration and Let's Encrypt SSLs automatically, I have written a simple python script and created a docker container you can use to create and manage your HAProxy config and manage the Let's Encrypt certificate lifecycle. 
+If you would like to have something manage your HAProxy configuration and Let's Encrypt SSLs automatically, I have written a simple python script and created a docker container you can use to create and manage your HAProxy config and manage the Let's Encrypt certificate lifecycle.
 
 https://github.com/shadowdao/haproxy-manager
 

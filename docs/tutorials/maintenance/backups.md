@@ -7,17 +7,17 @@ title: "💾 Backups"
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
- #  Backing Up Your Instance
+# Backing Up Your Instance
 
- Nobody likes losing data! 
+ Nobody likes losing data!
 
  If you're self-hosting Open WebUI, then you may wish to institute some kind of formal backup plan in order to ensure that you retain a second and third copy of parts of your configuration.
 
- This guide is intended to recommend some basic recommendations for how users might go about doing that. 
+ This guide is intended to recommend some basic recommendations for how users might go about doing that.
 
  This guide assumes that the user has installed Open WebUI via Docker (or intends to do so)
 
- ## Ensuring data persistence
+## Ensuring data persistence
 
 Firstly, before deploying your stack with Docker, ensure that your Docker Compose uses a persistent data store. If you're using the Docker Compose [from the Github repository](https://github.com/open-webui/open-webui/blob/main/docker-compose.yaml) that's already taken care of. But it's easy to cook up your own variations and forget to verify this.
 
@@ -25,7 +25,7 @@ Docker containers are ephemeral and data must be persisted to ensure its surviva
 
 ## Using Docker volumes
 
-If you're using the Docker Compose from the project repository, you will be deploying Open Web UI using Docker volumes. 
+If you're using the Docker Compose from the project repository, you will be deploying Open Web UI using Docker volumes.
 
 For Ollama and Open WebUI the mounts are:
 
@@ -43,7 +43,7 @@ open-webui:
 
 To find the actual bind path on host, run:
 
-`docker volume inspect ollama` 
+`docker volume inspect ollama`
 
 and
 
@@ -67,7 +67,7 @@ services:
       - /opt/open-webui:/app/backend/data
 ```
 
-If this is how you've deployed your instance, you'll want to note the paths on root. 
+If this is how you've deployed your instance, you'll want to note the paths on root.
 
 ## Scripting A Backup Job
 
@@ -81,7 +81,7 @@ However your instance is provisioned, it's worth inspecting the app's data store
 └── webui.db
 ```
 
-## Files in persistent data store 
+## Files in persistent data store
 
 | File/Directory | Description |
 |---|---|
@@ -97,7 +97,7 @@ The first way to back up the application data is to take a file level backup app
 
 There's an almost infinite number of ways in which technical services can be backed up, but `rsync` remains a popular favorite for incremental jobs and so will be used as a demonstration.
 
-Users could target the entire `data` directory to back up all the instance data at once or create more selective backup jobs targeting individual components. You could add more descriptive names for the targets also. 
+Users could target the entire `data` directory to back up all the instance data at once or create more selective backup jobs targeting individual components. You could add more descriptive names for the targets also.
 
 A model rsync job could look like this:
 
@@ -154,9 +154,9 @@ exit 0
 
 ## Rsync Job With Container Interruption
 
-To maintain data integrity, it's generally recommended to run database backups on cold filesystems. Our default model backup job can be modified slightly to bring down the stack before running the backup script and bring it back after. 
+To maintain data integrity, it's generally recommended to run database backups on cold filesystems. Our default model backup job can be modified slightly to bring down the stack before running the backup script and bring it back after.
 
-The downside of this approach, of course, is that it will entail instance downtime. Consider running the job at times you won't be using the instance or taking "software" dailies (on the running data) and more robust weeklies (on cold data). 
+The downside of this approach, of course, is that it will entail instance downtime. Consider running the job at times you won't be using the instance or taking "software" dailies (on the running data) and more robust weeklies (on cold data).
 
 ```bash
 #!/bin/bash
@@ -335,6 +335,7 @@ fi
 
 exit 0
 ```
+
 ## Crontab For Scheduling
 
 Once you've added your backup script and provisioned your backup storage, you'll want to QA the scripts to make sure that they're running as expected. Logging is highly advisable.
@@ -349,9 +350,9 @@ In addition to scripting your own backup jobs, you can find commercial offerings
 
 # Host Level Backups
 
-Your Open WebUI instance might be provisioned on a host (physical or virtualised) which you control. 
+Your Open WebUI instance might be provisioned on a host (physical or virtualised) which you control.
 
-Host level backups involve creating snapshots or backups but of the entire VM rather than running applications. 
+Host level backups involve creating snapshots or backups but of the entire VM rather than running applications.
 
 Some may wish to leverage them as their primary or only protection while others may wish to layer them in as additional data protections.
 

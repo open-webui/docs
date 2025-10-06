@@ -15,7 +15,6 @@ This guide is simple walkthrough to set up a Ubuntu server with Caddy as a rever
 
 There's a few steps we'll follow to get everything set up:
 
-
 - [HTTPS using Caddy](#https-using-caddy)
   - [Docker](#docker)
     - [Installing Docker](#installing-docker)
@@ -71,7 +70,6 @@ services:
         #     - "QDRANT_URI=https://example.com"
         restart: unless-stopped
 ```
-
 
 ## Caddy
 

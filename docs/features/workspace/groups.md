@@ -4,6 +4,7 @@ title: "🔐 Groups"
 ---
 
 Groups allow administrators to
+
 * assign permissions to multiple users at once, simplifying access management
 * limit access to specific resources (Models, Tools, etc) by setting their access to "private" then opening access to specific groups
 * Specify access to a resource for a group to either "read" or "write" (write access implies read)
