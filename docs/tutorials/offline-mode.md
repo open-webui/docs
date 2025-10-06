@@ -16,7 +16,6 @@ If you want to run Open WebUI in offline mode, you have to consider your install
 The offline mode of Open WebUI lets you run the application without the need for an active internet connection. This allows you to create an 'air-gapped' environment for your LLMs and tools (a fully 'air-gapped' environment requires isolating the instance from the internet).
 
 :::info
-
 **Disabled functionality when offline mode is enabled:**
 
 - Automatic version update checks
@@ -38,7 +37,6 @@ The offline mode has to be enabled via the [environment variable](https://docs.o
 Apply the environment variable depending on your way of deploying Open WebUI.
 
 :::tip
-
 Consider if you need to start the application offline from the beginning of your deployment. If your use case does not require immediate offline capability, follow **approach II** for an easier setup.
 
 :::

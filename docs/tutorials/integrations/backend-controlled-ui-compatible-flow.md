@@ -123,7 +123,9 @@ public void enrichChatWithAssistantMessage(OWUIChatResponse chatResponse, String
 }
 ```
 
+:::note
 **Note:** This step can be performed in memory on the response object, or combined with Step 1 by including both user and empty assistant messages in the initial chat creation.
+:::
 
 ### Step 3: Update Chat with Assistant Message
 

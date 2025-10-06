@@ -15,21 +15,18 @@ Open WebUI supports several forms of federated authentication:
 1. Trusted Header
 
 :::info
-
 For more information about all environment variables, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
 It is highly recommended to check the environment variable page, to get more details about how to set the variable and what values are expected.
 
 :::
 
 :::tip
-
 Need help with troubleshooting your SSO setup?
 Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting/sso)
 
 :::
 
 :::danger
-
 Right now, you can only configure one OAUTH provider at a time.
 You cannot have Microsoft **and** Google as providers simultaneously.
 
@@ -52,7 +49,6 @@ You cannot have Microsoft **and** Google as providers simultaneously.
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.              |
 
 :::warning
-
 **Critical Configuration Notes:**
 
 1. **WEBUI_URL Must Be Set First**: Configure `WEBUI_URL` in the Admin Panel before enabling OAuth, as it's used for redirect URIs.
@@ -133,7 +129,6 @@ The following environment variables are used:
 1. `OPENID_REDIRECT_URI` - The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
 
 :::warning
-
 **Common OIDC Mistakes:**
 - Using non-existent environment variables like `OIDC_CONFIG` or `WEBUI_OIDC_CLIENT_ID`
 - Forgetting to set `OPENID_PROVIDER_URL` (this is mandatory for OIDC)
@@ -152,7 +147,6 @@ You can configure the following environment variables to match the roles returne
 1. `OAUTH_ADMIN_ROLES` - A comma-separated list of roles that are allowed to log in as an admin (receive open webui role `admin`).
 
 :::info
-
 If changing the role of a logged in user, they will need to log out and log back in to receive the new role.
 
 :::
@@ -192,7 +186,6 @@ Open WebUI is able to delegate authentication to an authenticating reverse proxy
 There are several example configurations that are provided in this page.
 
 :::danger
-
 Incorrect configuration can allow users to authenticate as any user on your Open WebUI instance.
 Make sure to allow only the authenticating proxy access to Open WebUI, such as setting `HOST=127.0.0.1` to only listen on the loopback interface.
 
@@ -282,7 +275,6 @@ volumes:
 ```
 
 :::warning
-
 If you run Tailscale in the same network context as Open WebUI, then by default users will be able to directly reach out to Open WebUI without going through the Serve proxy.
 You will need use Tailscale's ACLs to restrict access to only port 443.
 

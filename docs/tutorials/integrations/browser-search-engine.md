@@ -83,7 +83,9 @@ If you wish to utilize a specific model for your search, modify the URL format t
 https://<your-open-webui-url>/?models=<model_id>&q=%s
 ```
 
+:::note
 **Note:** The model ID will need to be URL-encoded. Special characters like spaces or slashes need to be encoded (e.g., `my model` becomes `my%20model`).
+:::
 
 ## Example Usage
 

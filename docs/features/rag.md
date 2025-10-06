@@ -4,7 +4,6 @@ title: "🔎 Retrieval Augmented Generation (RAG)"
 ---
 
 :::warning
-
 If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
 
 **Why This Is Critical for Web Search:**

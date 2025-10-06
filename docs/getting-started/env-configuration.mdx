@@ -12,7 +12,6 @@ environment variables, providing their types, default values, and descriptions.
 As new variables are introduced, this page will be updated to reflect the growing configuration options.
 
 :::info
-
 This page is up-to-date with Open WebUI release version [v0.6.32](https://github.com/open-webui/open-webui/releases/tag/v0.6.32), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
@@ -20,7 +19,6 @@ This page is up-to-date with Open WebUI release version [v0.6.32](https://github
 ### Important Note on `PersistentConfig` Environment Variables
 
 :::note
-
 When launching Open WebUI for the first time, all environment variables are treated equally and can be used to configure the application. However, for environment variables marked as `PersistentConfig`, their values are persisted and stored internally.
 
 After the initial launch, if you restart the container, `PersistentConfig` environment variables will no longer use the external environment variable values. Instead, they will use the internally stored values.
@@ -52,7 +50,6 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::warning
-
 This variable has to be set before you start using OAuth/SSO for authentication.
 Since this is a persistent config environment variable, you can only change it through one of the following options:
 
@@ -84,7 +81,6 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::danger
-
 This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration/#enable_oauth_signup)
 is also being used and set to `True`. Failure to do so will result in the inability to login.
 
@@ -187,7 +183,6 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
 
 :::info
-
 This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
 
 :::
@@ -262,7 +257,6 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 - Description: Sets a system-wide minimum value for the number of tokens to batch together before sending them to the client during a streaming response. This allows an administrator to enforce a baseline level of performance and stability across the entire system by preventing excessively small chunk sizes that can cause high CPU load. The final chunk size used for a response will be the highest value set among this global variable, the model's advanced parameters, or the per-chat settings. The default is 1, which applies no minimum batching at the global level.
 
 :::info
-
 It is recommended to set this to a high single-digit or low double-digit value if you run Open WebUI with high concurrency, many users, and very fast streaming models.
 
 :::
@@ -292,7 +286,6 @@ It is recommended to set this to a high single-digit or low double-digit value i
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 When setting this environment variable in a `.env` file, make sure to escape the quotes by wrapping the entire value in double quotes and using escaped quotes (`\"`) for the inner quotes. Example:
 
 ```
@@ -354,7 +347,6 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 such as connections to Ollama and OpenAI endpoints.
 
 :::info
-
 This is the maximum amount of time the client will wait for a response before timing out.
 If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
 allowing the client to wait indefinitely.
@@ -738,7 +730,6 @@ The format for the JSON response is strictly:
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 When enabling `ENABLE_AUTOCOMPLETE_GENERATION`, ensure that you also configure `AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH` and `AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE` accordingly.
 
 :::
@@ -888,7 +879,6 @@ JSON format: { "tags": ["tag1", "tag2", "tag3"] }
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::note
-
 The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of endpoint URLs, such as `/api/v1/messages, /api/v1/channels`.
 
 :::
@@ -901,7 +891,6 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::warning
-
 Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.  
 
 **Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.** Never use `-1` in a production environment.
@@ -945,7 +934,6 @@ requests initiated by third-party websites, but only over HTTPS.
 - Description: Sets the `SameSite` attribute for session cookies.
 
 :::warning
-
 When `ENABLE_OAUTH_SIGNUP` is enabled, setting `WEBUI_SESSION_COOKIE_SAME_SITE` to `strict` can cause login failures. This is because Open WebUI uses a session cookie to validate the callback from the OAuth provider, which helps prevent CSRF attacks.
 
 However, a `strict` session cookie is not sent with the callback request, leading to potential login issues. If you experience this problem, use the default `lax` value instead.
@@ -972,7 +960,6 @@ requests initiated by third-party websites, but only over HTTPS.
 - Description: Sets the `SameSite` attribute for auth cookies.
 
 :::info
-
 If the value is not set, `WEBUI_SESSION_COOKIE_SAME_SITE` will be used as a fallback.
 
 :::
@@ -984,7 +971,6 @@ If the value is not set, `WEBUI_SESSION_COOKIE_SAME_SITE` will be used as a fall
 - Description: Sets the `Secure` attribute for auth cookies if set to `True`.
 
 :::info
-
 If the value is not set, `WEBUI_SESSION_COOKIE_SECURE` will be used as a fallback.
 
 :::
@@ -996,7 +982,6 @@ If the value is not set, `WEBUI_SESSION_COOKIE_SECURE` will be used as a fallbac
 - Description: This setting enables or disables authentication.
 
 :::danger
-
 If set to `False`, authentication will be disabled for your Open WebUI instance. However, it's
 important to note that turning off authentication is only possible for fresh installations without
 any existing users. If there are already users registered, you cannot disable authentication
@@ -1012,7 +997,6 @@ directly. Ensure that no users are present in the database if you intend to turn
 - Description: Overrides the randomly generated string used for JSON Web Token.
 
 :::info
-
 This variable is always needed when using OAUTH, especially in clustered environments, but even in single-process environments.
 
 Otherwise, OAUTH issues may occur.
@@ -1026,7 +1010,6 @@ Otherwise, OAUTH issues may occur.
 - Description: When enabled, the application makes automatic update checks and notifies you about version updates.
 
 :::info
-
 If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always set to `false` automatically.
 
 :::
@@ -1038,7 +1021,6 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 - Description: Disables Open WebUI's network connections for update checks and automatic model downloads.
 
 :::info
-
 **Disabled when enabled:**
 
 - Automatic version update checks (see flag `ENABLE_VERSION_UPDATE_CHECK`)
@@ -1081,7 +1063,6 @@ Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
 - Description: Sets a list of further allowed schemes for Cross-Origin Resource Sharing (CORS). Allows you to specify additional custom URL schemes, beyond the standard `http` and `https`, that are permitted as valid origins for Cross-Origin Resource Sharing (CORS).
 
 :::info
-
 This is particularly useful for scenarios such as:
  - Integrating with desktop applications that use custom protocols (e.g., `app://`, `custom-app-scheme://`).
  - Local development environments or testing setups that might employ non-standard schemes (e.g., `file://` if applicable, or `electron://`).
@@ -1128,7 +1109,6 @@ modeling files for reranking.
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
 :::note
-
 PostgreSQL Dependencies
 To use `pgvector`, ensure you have PostgreSQL dependencies installed:
 
@@ -1429,7 +1409,6 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 ### PGVector
 
 :::note
-
 PostgreSQL Dependencies
 To use `pgvector`, ensure you have PostgreSQL dependencies installed:
 
@@ -1458,7 +1437,6 @@ pip install open-webui[all]
 - Description: Creates the vector extension in the database
 
 :::info
-
 If set to `false`, open-webui will assume the postgreSQL database where embeddings will be stored is pre-configured with the `vector` extension. This also allows open-webui to run as a non superuser database user.
 
 :::
@@ -1488,7 +1466,6 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
 - Description: Use gPRC interface whenever possible.
 
 :::info
-
 If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabled and certificate signed by a private CA, set the environment variable `GRPC_DEFAULT_SSL_ROOTS_FILE_PATH` to the path of your PEM-encoded CA certificates file. See the [gRPC Core Docs](https://grpc.github.io/grpc/core/md_doc_environment_variables.html) for more information.
 
 :::
@@ -1518,7 +1495,6 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 - Description: Enables multitenancy pattern for Qdrant collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Recommend turn on
 
 :::info
-
 This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to  `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledges.
 
 The Qdrant collections created in the previous pattern will still consume resources.
@@ -1532,7 +1508,6 @@ Currently, there is no button in the UI to only reset the vector DB. If you want
 :::
 
 :::danger
-
 If you decide to use the multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Admin Settings` > `Documents` to reset vector and knowledge, which will delete all collections with the `open_webui` prefix and all stored knowledge.
 
 :::
@@ -1656,9 +1631,7 @@ When using Pinecone as the vector store, the following environment variables are
 When using S3 Vector Bucket as the vector store, the following environment variables are used to control its behavior. Make sure to set these variables in your `.env` file or deployment environment.
 
 :::info
-
 Note: this configuration assumes that AWS credentials will be available to your Open WebUI environment. This could be through environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through IAM role permissions.
-
 :::
 
 #### `S3_VECTOR_BUCKET_NAME`
@@ -1907,7 +1880,6 @@ Provide a clear and direct response to the user's query, including inline citati
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the values are reasonable to prevent excessive file uploads and potential performance issues.
 
 :::
@@ -2104,7 +2076,6 @@ Strictly return in JSON format:
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGLE_DRIVE_CLIENT_ID` and `GOOGLE_DRIVE_API_KEY` correctly, and have reviewed Google's terms of service and usage guidelines.
 
 :::
@@ -2236,7 +2207,6 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". If you were using the old name, please update your configurations to use "WEB_LOADER_CONCURRENT_REQUESTS" as the old variable name is now deprecated and will not be recognized. This renaming clarifies its function, as it specifically controls the concurrency of the web *loader* component that fetches content from search results, not the initial search engine query itself.
 
 :::
@@ -2442,7 +2412,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 When using `playwright`, you have two options:
 
 1. If `PLAYWRIGHT_WS_URI` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
@@ -2458,7 +2427,6 @@ When using `playwright`, you have two options:
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::tip
-
 Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Reducing the size of the Open WebUI container
@@ -2508,7 +2476,12 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `en`
 - Description: Comma-separated list of language codes to try when fetching YouTube video transcriptions, in priority order.
-- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English. Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English.
+
+:::note
+Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+:::
+
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Audio
@@ -2983,7 +2956,6 @@ Strictly return in JSON format:
 ## OAuth
 
 :::info
-
 You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
 
 :::
@@ -2996,7 +2968,6 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::danger
-
 `ENABLE_LOGIN_FORM` must be set to `False` when `ENABLE_OAUTH_SIGNUP` is set to `True`. Failure to do so will result in the inability to login.
 
 :::
@@ -3008,7 +2979,6 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 - Description: Controls whether OAuth-related settings are persisted in the database after the first launch.
 
 :::info
-
 By default, OAuth configurations are stored in the database and managed via the Admin Panel after the initial setup. Set this variable to `False` to force Open WebUI to **always** read OAuth settings from the environment variables on every restart. This is ideal for environments using GitOps or immutable infrastructure where configuration is managed exclusively through external files (e.g., Docker Compose, Kubernetes ConfigMaps).
 
 :::
@@ -3061,7 +3031,6 @@ For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this settin
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
 :::
@@ -3086,7 +3055,6 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Description: Specifies the secret key used to encrypt and decrypt OAuth tokens stored server-side in the database. This is a critical security component for protecting user credentials at rest. If not set, it defaults to using the main `WEBUI_SECRET_KEY`, but it is highly recommended to set it to a unique, securely generated value for production environments.
 
 :::warning
-
 **Required for Multi-Replica Deployments**
 In any production environment running more than one instance of Open WebUI (e.g., Docker Swarm, Kubernetes), this variable **MUST** be explicitly set to a persistent, shared secret. If left unset, each replica will generate or use a different key, causing session decryption to fail intermittently as user requests are load-balanced across instances.
 
@@ -3113,7 +3081,6 @@ In any production environment running more than one instance of Open WebUI (e.g.
 See https://support.google.com/cloud/answer/6158849?hl=en
 
 :::info
-
 You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 
 :::
@@ -3149,7 +3116,6 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app
 
 :::info
-
 You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 
 :::
@@ -3191,7 +3157,6 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 
 :::info
-
 You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 
 :::
@@ -3272,7 +3237,6 @@ See https://open.feishu.cn/document/sso/web-application-sso/login-overview
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::danger
-
 The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
 Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
 
@@ -3330,7 +3294,6 @@ Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_P
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
-
 If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture claim is disabled and the user profile pictures will not be saved.
 
 :::
@@ -3770,7 +3733,6 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Description: Sets the endpoint URL for S3 storage.
 
 :::info
-
 If the endpoint is an S3-compatible provider like MinIO that uses a TLS certificate signed by a private CA, set the environment variable `AWS_CA_BUNDLE` to the path of your PEM-encoded CA certificates file. See the [Amazon SDK Docs](https://docs.aws.amazon.com/sdkref/latest/guide/feature-gen-config.html) for more information.
 
 :::
@@ -3981,7 +3943,6 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 - Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. This variable takes precedence over individual database connection parameters if explicitly set.
 
 :::info
-
 **For PostgreSQL support, ensure you installed with `pip install open-webui[all]` instead of the basic installation.**
 Supports SQLite, Postgres, and encrypted SQLite via SQLCipher.
 **Changing the URL does not migrate data between databases.**
@@ -4052,7 +4013,6 @@ To enable encryption, you must configure two environment variables:
 When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
 
 :::danger
-
 - The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
 - The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
 
@@ -4079,7 +4039,6 @@ Ensure the database password is kept secure, as it is needed to decrypt and acce
 - Description: Specifies the database pool max overflow.
 
 :::info
-
 More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.max_overflow).
 
 :::
@@ -4091,7 +4050,6 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Specifies the database pool timeout in seconds to get a connection.
 
 :::info
-
 More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool.params.timeout).
 
 :::
@@ -4103,7 +4061,6 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Specifies the database pool recycle time in seconds.
 
 :::info
-
 More information about this setting can be found [here](https://docs.sqlalchemy.org/en/20/core/pooling.html#setting-pool-recycle).
 
 :::
@@ -4132,7 +4089,6 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
   - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with mTLS)_
 
 :::info
-
 When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app state will occur as the workers would be unable to communicate.
 
 :::
@@ -4155,7 +4111,6 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
 
 :::info
-
 This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
 
 :::
@@ -4173,7 +4128,6 @@ This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
 - Description: Enables websocket support in Open WebUI.
 
 :::info
-
 When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
 
 :::
@@ -4185,7 +4139,6 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Description: Specifies the websocket manager to use (in this case, Redis).
 
 :::info
-
 When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
@@ -4197,7 +4150,6 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Description: Specifies the URL of the Redis instance or cluster host for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
 
 :::info
-
 When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
 
 :::
@@ -4220,7 +4172,6 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Description: Specifies that websocket should communicate with a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `WEBSOCKET_REDIS_URL` and/or `REDIS_URL` must also be defined.
 
 :::info
-
 This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 
 :::
@@ -4234,7 +4185,6 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 - Description: Controls the number of worker processes that Uvicorn spawns to handle requests. Each worker runs its own instance of the application in a separate process.
 
 :::info
-
 When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
 
 If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-instance setups are set accordingly.

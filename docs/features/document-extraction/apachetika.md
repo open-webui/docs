@@ -158,7 +158,9 @@ Instructions to run the script:
 4. Run the script using the following command: `python verify_tika.py`
 5. The script will output a message indicating whether Apache Tika is working correctly
 
+:::note
 Note: If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
+:::
 
 ### Conclusion
 
