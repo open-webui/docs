@@ -87,6 +87,7 @@ Choose the integration that best suits your needs and follow the instructions to
 
 Supported languages for the LibreTranslate pipeline & function:
 Really just all the languages that can be found within LibreTranslate, but here is the list:
+
 ```
 Albanian, Arabic, Azerbaijani, Bengali, Bulgarian, Catalan, Valencian, Chinese, Czech, Danish, Dutch, English, Flemish, Esperanto, Estonian, Finnish, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Irish, Italian, Japanese, Korean, Latvian, Lithuanian, Malay, Persian, Polish, Portuguese, Romanian, Moldavian, Moldovan, Russian, Slovak, Slovenian, Spanish, Castilian, Swedish, Tagalog, Thai, Turkish, Ukrainian, Urdu
 ```

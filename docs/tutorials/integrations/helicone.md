@@ -21,7 +21,6 @@ By enabling Helicone, you can log LLM requests, evaluate and experiment with pro
 - **Debug capabilities** to troubleshoot issues with model responses
 - **Cost tracking** for your LLM usage across providers
 
-
 ## How to integrate Helicone with OpenWebUI
 
 <iframe

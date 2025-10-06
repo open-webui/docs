@@ -74,7 +74,7 @@ Let's get the user interface (what you see in your browser) up and running first
      ```bash
      npm install --force
      ```
-     
+
      *Some setups need this to get around version issues.*
 
 2. **Start the Frontend Development Server:**
@@ -86,7 +86,6 @@ Let's get the user interface (what you see in your browser) up and running first
      This command launches the frontend development server. If the steps were followed successfully, it will usually indicate the server is running and provide a local URL.
 
      🎉 **Access the Frontend:** Open your web browser and go to [http://localhost:5173](http://localhost:5173). You should see a message indicating that Open WebUI's frontend is running and is waiting for the backend to be available. Don't worry about that message yet! Let's set up the backend next. **Keep this terminal running** – it's serving your frontend!
-
 
 ### 2.5: Build the Frontend (Recommended)
 
@@ -101,7 +100,6 @@ npm run build
 - This command generates an optimized, production-ready build of the frontend and places the static files in the `build` directory.
 - If the build completes successfully (without errors), you're ready! If there are errors, address them before proceeding.
 - You don't need to do anything more with `build` for local development, but building ensures your code will not break in production or during deployment.
-
 
 ### 3. Backend Setup (API and Server)
 

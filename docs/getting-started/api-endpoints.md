@@ -21,7 +21,6 @@ Access detailed API documentation for different services provided by Open WebUI:
 |-------------|-------------------------|
 | Main        | `/docs`                 |
 
-
 ## Notable API Endpoints
 
 ### 📜 Retrieve All Models
@@ -57,6 +56,7 @@ Access detailed API documentation for different services provided by Open WebUI:
   ```
   
 - **Python Example**:
+
   ```python
   import requests
   

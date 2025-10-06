@@ -44,23 +44,26 @@ Features permissions control access to specialized capabilities within Open WebU
 By default, Open WebUI applies the following permission settings:
 
 **Workspace Permissions**:
-- Models Access: Disabled (`USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS=False`)
-- Knowledge Access: Disabled (`USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS=False`)
-- Prompts Access: Disabled (`USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS=False`)
-- Tools Access: Disabled (`USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=False`)
+
+* Models Access: Disabled (`USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS=False`)
+* Knowledge Access: Disabled (`USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS=False`)
+* Prompts Access: Disabled (`USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS=False`)
+* Tools Access: Disabled (`USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=False`)
 
 **Chat Permissions**:
-- Allow Chat Controls: Enabled
-- Allow File Upload: Enabled (`USER_PERMISSIONS_CHAT_FILE_UPLOAD=True`)
-- Allow Chat Delete: Enabled (`USER_PERMISSIONS_CHAT_DELETE=True`)
-- Allow Chat Edit: Enabled (`USER_PERMISSIONS_CHAT_EDIT=True`)
-- Allow Temporary Chat: Enabled (`USER_PERMISSIONS_CHAT_TEMPORARY=True`)
+
+* Allow Chat Controls: Enabled
+* Allow File Upload: Enabled (`USER_PERMISSIONS_CHAT_FILE_UPLOAD=True`)
+* Allow Chat Delete: Enabled (`USER_PERMISSIONS_CHAT_DELETE=True`)
+* Allow Chat Edit: Enabled (`USER_PERMISSIONS_CHAT_EDIT=True`)
+* Allow Temporary Chat: Enabled (`USER_PERMISSIONS_CHAT_TEMPORARY=True`)
 
 **Features Permissions**:
-- Web Search: Enabled (`ENABLE_RAG_WEB_SEARCH=True`)
-- Image Generation: Enabled (`ENABLE_IMAGE_GENERATION=True`)
-- Code Interpreter: Enabled (`USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
-- Direct Tool Servers: Disabled (`USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS=False`)
+
+* Web Search: Enabled (`ENABLE_RAG_WEB_SEARCH=True`)
+* Image Generation: Enabled (`ENABLE_IMAGE_GENERATION=True`)
+* Code Interpreter: Enabled (`USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
+* Direct Tool Servers: Disabled (`USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS=False`)
 
 Administrators can change the default permissions in the user interface under "users" in the admin panel.
 

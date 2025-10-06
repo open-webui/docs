@@ -191,7 +191,7 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 
 ## Using Image Generation
 
-#### Method 1:
+#### Method 1
 
 1. Toggle the `Image Generation` switch to on.
 2. Enter your image generation prompt.
@@ -199,7 +199,7 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 
 ![Image Generation Tutorial](/images/tutorial_image_generation_2.png)
 
-#### Method 2:
+#### Method 2
 
 ![Image Generation Tutorial](/images/tutorial_image_generation.png)
 

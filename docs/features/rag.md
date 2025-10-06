@@ -61,6 +61,7 @@ A variety of parsers extract content from local and remote documents. For more, 
 When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](https://github.com/open-webui/docs/blob/main/docs/getting-started/env-configuration.md) environment variables to use.
 
 ### Detailed Instructions
+
 1. Create an OAuth 2.0 client and configure both the Authorized JavaScript origins & Authorized redirect URI to be the URL (include the port if any) you use to access your Open-WebUI instance.
 1. Make a note of the Client ID associated with that OAuth client.
 1. Make sure that you enable both Google Drive API and Google Picker API for your project.

@@ -12,8 +12,11 @@ This guide explains how to optimize your setup by configuring a dedicated, light
 ---
 
 > [!TIP]
+>
 >## Why Does Open-WebUI Feel Slow?
+>
 >By default, Open-WebUI has several background tasks that can make it feel like magic but can also place a heavy load on local resources:
+>
 >- **Title Generation**
 >- **Tag Generation**
 >- **Autocomplete Generation** (this function triggers on every keystroke)

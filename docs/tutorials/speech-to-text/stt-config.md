@@ -34,9 +34,8 @@ To configure a speech to text provider:
 
 In addition the instance settings provisioned in the admin panel, there are also a couple of user-level settings that can provide additional functionality.
 
-*   **STT Settings:** Contains settings related to Speech-to-Text functionality.
-*   **Speech-to-Text Engine:** Determines the engine used for speech recognition (Default or Web API).
- 
+- **STT Settings:** Contains settings related to Speech-to-Text functionality.
+- **Speech-to-Text Engine:** Determines the engine used for speech recognition (Default or Web API).
 
 ![alt text](/images/tutorials/stt/user-settings.png)
 
