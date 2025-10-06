@@ -104,6 +104,7 @@ Users could target the entire `data` directory to back up all the instance data 
 A model rsync job could look like this:
 
 ```bash
+
 #!/bin/bash
 
 # Configuration
@@ -162,6 +163,7 @@ To maintain data integrity, it's generally recommended to run database backups o
 The downside of this approach, of course, is that it will entail instance downtime. Consider running the job at times you won't be using the instance or taking "software" dailies (on the running data) and more robust weeklies (on cold data).
 
 ```bash
+
 #!/bin/bash
 
 # Configuration
@@ -224,6 +226,7 @@ exit 0
 ## Model Backup Script Using SQLite & ChromaDB Backup Functions To B2 Remote
 
 ```bash
+
 #!/bin/bash
 
 #
@@ -320,6 +323,7 @@ echo "Backup completed to $DESTINATION"
 In addition taking backups, users may also wish to create point-in-time snapshots which could be stored locally (on the server), remotely, or both.
 
 ```bash
+
 #!/bin/bash
 
 # Configuration

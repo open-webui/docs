@@ -98,11 +98,11 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `source`,
 `citation`                     | Add a source/citation, or code execution result      | For code: See [below.](/docs/features/plugin/events/index.mdx#source-or-citation-and-code-execution) |
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
-| `confirmation` 
+| `confirmation`
 (needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
-| `input` 
+| `input`
 (needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ...}`                                     |
-| `execute` 
+| `execute`
 (needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |
 
 **Other/Advanced types:**

@@ -206,13 +206,11 @@ from fastapi import Request
 
 from open_webui.utils.chat import generate_chat_completion
 
-
 class User(BaseModel):
     id: str
     email: str
     name: str
     role: str
-
 
 class Pipe:
     def __init__(self):
