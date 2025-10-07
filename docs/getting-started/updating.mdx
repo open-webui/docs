@@ -125,6 +125,10 @@ volumes:
 
 In this example, Watchtower is integrated with the `docker-compose.yml` file and watches the Open WebUI container for updates every 5 minutes.
 
+:::info
+After updating, it's a good practice to clear your browser cache to ensure you are running the latest version of the web interface.
+:::
+
 ## Persistent Data in Docker Volumes
 
 The data is stored in a Docker volume named `open-webui`. The path to the volume is not directly accessible, but you can inspect the volume with the following command:
