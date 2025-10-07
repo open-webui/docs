@@ -55,7 +55,7 @@ docker run --gpus all -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docli
 - fill in an **object value** as described at https://github.com/docling-project/docling-serve/blob/main/docs/usage.md#picture-description-options
 - Save the changes.
 
-  #### Make sure the object value is a valid JSON! Working examples below
+#### Make sure the object value is a valid JSON! Working examples below
 
   ![image](https://github.com/user-attachments/assets/f6524949-fb47-4686-9c81-6ab8fdda6db1)
 

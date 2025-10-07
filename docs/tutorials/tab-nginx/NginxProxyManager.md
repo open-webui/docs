@@ -9,7 +9,7 @@ This setup enables HTTPS access, which is necessary for using voice input featur
 - A domain name (free options like DuckDNS or paid ones like Namecheap/GoDaddy).
 - Basic knowledge of Docker and DNS configuration.
 
-#### Steps
+#### Nginx Proxy Manager Steps
 
 1. **Create Directories for Nginx Files:**
 
