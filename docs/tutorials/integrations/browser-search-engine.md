@@ -59,7 +59,7 @@ WEBUI_URL=https://<your-open-webui-url>
     - **Keyword**: webui (or any keyword you prefer)
     - **URL with %s in place of query**:
 
-      ```
+      ```txt
       https://<your-open-webui-url>/?q=%s
       ```
 
@@ -81,7 +81,7 @@ Alternatively:
 
 If you wish to utilize a specific model for your search, modify the URL format to include the model ID:
 
-```
+```txt
 https://<your-open-webui-url>/?models=<model_id>&q=%s
 ```
 
@@ -95,7 +95,7 @@ https://<your-open-webui-url>/?models=<model_id>&q=%s
 
 Once the search engine is set up, you can perform searches directly from the address bar. Simply type your chosen keyword followed by your query:
 
-```
+```txt
 webui your search query
 ```
 

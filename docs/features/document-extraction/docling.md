@@ -13,15 +13,13 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 This documentation provides a step-by-step guide to integrating Docling with Open WebUI. Docling is a document processing library designed to transform a wide range of file formats—including PDFs, Word documents, spreadsheets, HTML, and images—into structured data such as JSON or Markdown. With built-in support for layout detection, table parsing, and language-aware processing, Docling streamlines document preparation for AI applications like search, summarization, and retrieval-augmented generation, all through a unified and extensible interface.
 
-Prerequisites
----
+## Prerequisites
 
 - Open WebUI instance
 - Docker installed on your system
 - Docker network set up for Open WebUI
 
-Integration Steps
----
+## Integration Steps
 
 ### Step 1: Run the Docker Command for Docling-Serve
 
@@ -83,8 +81,7 @@ docker run --gpus all -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docli
 }
 ```
 
-Verifying Docling in Docker
-=====================================
+# Verifying Docling in Docker
 
 To verify that Docling is working correctly in a Docker environment, you can follow these steps:
 

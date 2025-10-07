@@ -13,14 +13,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 This documentation provides a step-by-step guide to integrating Mistral OCR with Open WebUI. Mistral OCR is an optical character recognition library designed to extract text from a variety of image-based file formats—including scanned PDFs, images, and handwritten documents—into structured data such as JSON or plain text. With advanced support for multilingual text recognition, layout analysis, and handwriting interpretation, Mistral OCR simplifies the process of digitizing and processing documents for AI applications like search, summarization, and data extraction, all through a robust and customizable interface.
 
-Prerequisites
----
+## Prerequisites
 
 - Open WebUI instance
 - Mistral AI account
 
-Integration Steps
----
+## Integration Steps
 
 ### Step 1: Sign Up or Login to Mistral AI console
 
@@ -43,8 +41,7 @@ Integration Steps
 - Paste the API Key on the field
 - Save the Admin Panel.
 
-Verifying Mistral OCR
-=====================================
+# Verifying Mistral OCR
 
 To verify that Mistral OCR is working correctly in script, please refer to `https://docs.mistral.ai/capabilities/document/`
 

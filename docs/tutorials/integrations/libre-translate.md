@@ -9,13 +9,11 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-Overview
----
+## Overview
 
 LibreTranslate is a free and open-source machine translation API that supports a wide range of languages. LibreTranslate is a self hosted, offline capable, and easy to setup, and unlike other APIs, it doesn't rely on proprietary providers such as Google or Azure to perform translations. Instead, its translation engine is powered by the open source [Argos Translate](https://github.com/argosopentech/argos-translate) library. You can integrate LibreTranslate with Open WebUI to leverage its machine translation capabilities. This documentation provides a step-by-step guide to setting up LibreTranslate in Docker and configuring the integration within Open WebUI.
 
-Setting up LibreTranslate in Docker
----
+## Setting up LibreTranslate in Docker
 
 To set up LibreTranslate in Docker, follow these steps:
 
@@ -76,8 +74,7 @@ docker-compose up -d
 
 This will start the LibreTranslate service in detached mode.
 
-Configuring the Integration in Open WebUI
----
+## Configuring the Integration in Open WebUI
 
 Once you have LibreTranslate up and running in Docker, you can configure the integration within Open WebUI. There are several community integrations available, including:
 
@@ -91,19 +88,17 @@ Choose the integration that best suits your needs and follow the instructions to
 Supported languages for the LibreTranslate pipeline & function:
 Really just all the languages that can be found within LibreTranslate, but here is the list:
 
-```
+```txt
 Albanian, Arabic, Azerbaijani, Bengali, Bulgarian, Catalan, Valencian, Chinese, Czech, Danish, Dutch, English, Flemish, Esperanto, Estonian, Finnish, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Irish, Italian, Japanese, Korean, Latvian, Lithuanian, Malay, Persian, Polish, Portuguese, Romanian, Moldavian, Moldovan, Russian, Slovak, Slovenian, Spanish, Castilian, Swedish, Tagalog, Thai, Turkish, Ukrainian, Urdu
 ```
 
-Troubleshooting
----
+## Troubleshooting
 
 - Make sure the LibreTranslate service is running and accessible.
 - Verify that the Docker configuration is correct.
 - Check the LibreTranslate logs for any errors.
 
-Benefits of Integration
----
+## Benefits of Integration
 
 Integrating LibreTranslate with Open WebUI provides several benefits, including:
 
@@ -111,7 +106,6 @@ Integrating LibreTranslate with Open WebUI provides several benefits, including:
 - Improved text analysis and processing.
 - Enhanced functionality for language-related tasks.
 
-Conclusion
----
+## Conclusion
 
 Integrating LibreTranslate with Open WebUI is a straightforward process that can enhance the functionality of your Open WebUI instance. By following the steps outlined in this documentation, you can set up LibreTranslate in Docker and configure the integration within Open WebUI.

@@ -107,12 +107,12 @@ Choose the appropriate command based on your hardware setup:
 
     ```
 
-  - **Additional Requirements**:
+- **Additional Requirements**:
 
       1. Ensure CUDA is Enabled, follow your OS and GPU instructions for that.
       2. Enable Docker GPU support, see [Nvidia Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html " on Nvidia's site.")
       3. Follow the [Guide here on configuring Docker Swarm to with with your GPU](https://gist.github.com/tomlankhorst/33da3c4b9edbde5c83fc1244f010815c#configuring-docker-to-work-with-your-gpus)
-    - Ensure *GPU Resource* is enabled in `/etc/nvidia-container-runtime/config.toml` and enable GPU resource advertising by uncommenting the `swarm-resource = "DOCKER_RESOURCE_GPU"`. The docker daemon must be restarted after updating these files on each node.
+  - Ensure *GPU Resource* is enabled in `/etc/nvidia-container-runtime/config.toml` and enable GPU resource advertising by uncommenting the `swarm-resource = "DOCKER_RESOURCE_GPU"`. The docker daemon must be restarted after updating these files on each node.
 
 - **With CPU Support**:
 
