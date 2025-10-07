@@ -54,7 +54,7 @@ If you want Open WebUI to be accessible over your local LAN, be sure to note you
 
 Set it up as follows:
 
-```
+```conf
 
 #user  nobody;
 worker_processes  1;

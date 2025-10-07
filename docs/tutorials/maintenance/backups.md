@@ -75,7 +75,7 @@ If this is how you've deployed your instance, you'll want to note the paths on r
 
 However your instance is provisioned, it's worth inspecting the app's data store on your server to understand what data you'll be backing up. You should see something like this:
 
-```
+```txt
 ├── audit.log
 ├── cache/
 ├── uploads/

@@ -98,7 +98,7 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
 
 Community-contributed tutorials must include the the following:
 
-```
+```txt
 
 :::warning
 

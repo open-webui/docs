@@ -53,7 +53,7 @@ snapshot_download(
 
 Once the download completes, you’ll find the model files in a directory structure like this:
 
-```
+```txt
 DeepSeek-R1-GGUF/
 ├── DeepSeek-R1-UD-IQ1_S/
 │   ├── DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf
@@ -125,7 +125,7 @@ For example, if your model was downloaded to `/Users/tim/Documents/workspace`, y
 
 Once the server starts, it will host a **local OpenAI-compatible API** endpoint at:
 
-```
+```txt
 http://127.0.0.1:10000
 ```
 

@@ -294,8 +294,7 @@ services:
 
 Create a `.env` file for SearXNG:
 
-```
-
+```env
 # SearXNG
 SEARXNG_HOSTNAME=localhost:8080/
 ```

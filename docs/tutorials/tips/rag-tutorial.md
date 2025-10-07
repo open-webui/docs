@@ -82,12 +82,12 @@ Follow these steps to set up RAG with **Open WebUI Documentation**:
 
 2. **Example Queries**:
 
-   ```
+   ```txt
    User: "How do I configure environment variables?"
    System: "Refer to Section 3.2: Use the `.env` file to manage configurations."
    ```
 
-   ```
+   ```txt
    User: "How do I update Open WebUI using Docker?"
    System: "Refer to `docker/updating.md`: Use `docker pull` and restart the container."
    ```

@@ -110,7 +110,7 @@ To start, let's confirm what's in our Jupyter directory. As you can see from the
 
 Let's run our first prompt. Make sure you've selected the `Code Execution` button.
 
-```
+```txt
 Prompt: Create two CSV files using fake data. The first CSV should be created using vanilla python and the second CSV should be created using the pandas library. Name the CSVs data1.csv and data2.csv
 ```
 
@@ -124,7 +124,7 @@ We can see the CSVs were created and are now accessible within Jupyter.
 
 Let's run our second prompt. Again, make sure you've selected the `Code Execution` button.
 
-```
+```txt
 Prompt: Create several visualizations in python using matplotlib and seaborn and save them to jupyter
 ```
 
@@ -138,7 +138,7 @@ We can see the visualizations were created and are now accessible within Jupyter
 
 Let's run our last prompt together. In this prompt, we'll create an entirely new notebook using just a prompt.
 
-```
+```txt
 Prompt: Write python code to read and write json files and save it to my notebook called notebook.ipynb
 ```
 

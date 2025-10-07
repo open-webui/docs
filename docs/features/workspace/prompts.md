@@ -85,7 +85,7 @@ By default, all custom input variables are **optional**, meaning users can leave
 
 To make a variable **required** (mandatory), add the `:required` flag:
 
-```
+```txt
 {{mandatory_field | text:required}}
 {{optional_field | text}}
 ```
@@ -127,7 +127,7 @@ Create a reusable prompt where the article content is required but additional pa
 - **Command:** `/summarize_article`
 - **Prompt Content:**
 
-    ```
+    ```txt
     Please summarize the following article. {{article_text | textarea:placeholder="Paste the full text of the article here...":required}}
 
     {{summary_length | select:options=["Brief (3 bullets)","Detailed (5 bullets)","Executive Summary"]:default="Brief (3 bullets)"}}
@@ -146,7 +146,7 @@ This prompt ensures critical information is captured while allowing optional det
 - **Command:** `/bug_report`
 - **Prompt Content:**
 
-    ```
+    ```txt
     Generate a bug report with the following details:
 
     **Summary:** {{summary | text:placeholder="A brief summary of the issue":required}}
@@ -169,7 +169,7 @@ This prompt generates tailored content with required core information and option
 - **Command:** `/social_post`
 - **Prompt Content:**
 
-    ```
+    ```txt
     Generate a social media post for {{platform | select:options=["LinkedIn","Twitter","Facebook","Instagram"]:required}}.
 
     **Topic:** {{topic | text:placeholder="e.g., New feature launch":required}}
@@ -189,7 +189,7 @@ Generate structured meeting minutes with required basics and optional details.
 - **Command:** `/meeting_minutes`
 - **Prompt Content:**
 
-    ```
+    ```txt
     # Meeting Minutes
 
     **Date:** {{meeting_date | date:required}}
@@ -220,7 +220,7 @@ A flexible template for reviewing various types of content.
 - **Command:** `/content_review`
 - **Prompt Content:**
 
-    ```
+    ```txt
     Please review the following {{content_type | select:options=["Blog Post","Marketing Copy","Documentation","Email","Presentation"]:required}}:
 
     **Content Title:** {{title | text:required}}

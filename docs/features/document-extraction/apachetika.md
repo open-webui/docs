@@ -13,15 +13,13 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 This documentation provides a step-by-step guide to integrating Apache Tika with Open WebUI. Apache Tika is a content analysis toolkit that can be used to detect and extract metadata and text content from over a thousand different file types. All of these file types can be parsed through a single interface, making Tika useful for search engine indexing, content analysis, translation, and much more.
 
-Prerequisites
----
+## Prerequisites
 
 - Open WebUI instance
 - Docker installed on your system
 - Docker network set up for Open WebUI
 
-Integration Steps
----
+## Integration Steps
 
 ### Step 1: Create a Docker Compose File or Run the Docker Command for Apache Tika
 
@@ -72,8 +70,7 @@ To use Apache Tika as the context extraction engine in Open WebUI, follow these 
 - Update the context extraction engine URL to `http://tika:9998`.
 - Save the changes.
 
-Verifying Apache Tika in Docker
-=====================================
+# Verifying Apache Tika in Docker
 
 To verify that Apache Tika is working correctly in a Docker environment, you can follow these steps:
 
@@ -97,7 +94,7 @@ curl -X GET http://localhost:9998/tika
 
 This command should return the following response:
 
-```
+```txt
 This is Tika Server. Please PUT
 ```
 
@@ -170,15 +167,13 @@ Note: If you encounter any issues, ensure that the Apache Tika container is runn
 
 By following these steps, you can verify that Apache Tika is working correctly in a Docker environment. You can test the setup by sending a file for analysis, verifying the server is running with a GET request, or use a script to automate the process. If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
 
-Troubleshooting
----
+## Troubleshooting
 
 - Make sure the Apache Tika service is running and accessible from the Open WebUI instance.
 - Check the Docker logs for any errors or issues related to the Apache Tika service.
 - Verify that the context extraction engine URL is correctly configured in Open WebUI.
 
-Benefits of Integration
----
+## Benefits of Integration
 
 Integrating Apache Tika with Open WebUI provides several benefits, including:
 
@@ -186,7 +181,6 @@ Integrating Apache Tika with Open WebUI provides several benefits, including:
 - **Support for Multiple File Formats**: Apache Tika supports a wide range of file formats, making it an ideal solution for organizations that work with diverse file types.
 - **Enhanced Content Analysis**: Apache Tika's advanced content analysis capabilities can help you extract valuable insights from your files.
 
-Conclusion
----
+## Conclusion
 
 Integrating Apache Tika with Open WebUI is a straightforward process that can improve the metadata extraction capabilities of your Open WebUI instance. By following the steps outlined in this documentation, you can easily set up Apache Tika as a context extraction engine for Open WebUI.

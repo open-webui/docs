@@ -31,7 +31,7 @@ HAProxy's configuration is by default stored in ```/etc/haproxy/haproxy.cfg```. 
 
 The base configuration for HAProxy to work with Open WebUI is pretty simple.
 
-```
+```shell
  #---------------------------------------------------------------------
 
 # Global settings
@@ -133,7 +133,7 @@ You will need to expose port 80 and 443 to your HAProxy server. These ports are 
 
 Before starting HAProxy, you will want to generate a self signed certificate to use as a placeholder until Let's Encrypt issues a proper one. Here's how to generate a self-signed certificate:
 
-```
+```shell
 openssl req -x509 -newkey rsa:2048 -keyout /tmp/haproxy.key -out /tmp/haproxy.crt -days 3650 -nodes -subj "/CN=localhost"
 ```
 
@@ -160,13 +160,13 @@ First, you will need to register with Let's Encrypt. You should only need to do 
 
 Then you can request your certificate:
 
-```
+```shell
 certbot certonly -n --standalone --preferred-challenges http --http-01-port-8688 -d yourdomain.com
 ```
 
 Once the certificate is issued, you will need to merge the certificate and private key files into a single PEM file that HAProxy can use.
 
-```
+```shell
 cat /etc/letsencrypt/live/{domain}/fullchain.pem /etc/letsencrypt/live/{domain}/privkey.pem > /etc/haproxy/certs/{domain}.pem
 chmod 600 /etc/haproxy/certs/{domain}.pem
 chown haproxy:haproxy /etc/haproxy/certs/{domain}.pem
