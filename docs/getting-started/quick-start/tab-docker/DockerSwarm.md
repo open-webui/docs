@@ -21,7 +21,7 @@ Choose the appropriate command based on your hardware setup:
 
 - **With GPU Support**:
 
-  #### Docker-stack.yaml
+#### Docker-stack.yaml
 
     ```yaml
     version: '3.9'

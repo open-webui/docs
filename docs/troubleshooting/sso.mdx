@@ -14,7 +14,7 @@ Most OAUTH flows require the application's external URL ("redirect URI") so the 
 - Navigate to: **Admin Settings > General**
 - Ensure your **WebUI URL** field is filled in and points to your deployed instance (e.g., `https://yourwebui.yourdomain.com`)
 
-::tip
+:::tip
 
 Check for typos! OAUTH is strict—URLs must match exactly, including `https://`.
 
@@ -68,7 +68,7 @@ ENABLE_OAUTH_SIGNUP=true
   - If self-hosting, confirm these variables are present in your Docker Compose, Kubernetes manifest, or `.env` file
 - Restart your backend/app after changing variables so the new values are loaded
 
-::tip
+:::tip
 
 Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment variable incorrectly named, missing entirely, or using outdated variable names!
 
@@ -151,7 +151,7 @@ Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Az
 ❌ Wrong: https://ai.company.com/callback
 ```
 
-::tip
+:::tip
 
 When in doubt, recheck your provider registration and regenerate client secrets if needed.
 

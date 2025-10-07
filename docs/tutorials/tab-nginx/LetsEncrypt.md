@@ -7,7 +7,7 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
 - **Certbot** installed on your system.
 - DNS records properly configured to point to your server.
 
-#### Steps
+#### Let's Encrypt Steps
 
 1. **Create Directories for Nginx Files:**
 

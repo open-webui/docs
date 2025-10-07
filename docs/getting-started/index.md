@@ -7,6 +7,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 <TopBanners />
 
+--- 
+
 Welcome to the **Open WebUI Documentation Hub!** Below is a list of essential guides and resources to help you get started, manage, and develop with Open WebUI.
 
 ---

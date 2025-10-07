@@ -13,7 +13,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 We appreciate your interest in contributing tutorials to the Open WebUI documentation. Follow the steps below to set up your environment and submit your tutorial.
 
-## Steps
+## Contributing Steps
 
 1. **Fork the `openwebui/docs` GitHub Repository**
 
