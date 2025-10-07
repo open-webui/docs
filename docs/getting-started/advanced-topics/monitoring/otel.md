@@ -38,7 +38,7 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 | `OTEL_SERVICE_NAME`                  | `open-webui`                    | Service name (tagged in traces and metrics)         |
 | `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | *(empty)*      | Basic Auth credentials if Collector requires them   |
 
-::tip
+:::tip
 
 Override defaults in your `.env` file or Compose file as needed.
 
