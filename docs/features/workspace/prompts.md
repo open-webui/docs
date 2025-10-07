@@ -11,7 +11,7 @@ The Prompts interface provides several key features for managing your custom pro
 
 * **Create**: Design new prompts with customizable titles, access levels, and content.
 * **Share**: Share prompts with other users based on configured access permissions.
-* **Access Control**: Set visibility and usage permissions for each prompt (refer to [Permissions](./permissions.md) for more details).
+* **Access Control**: Set visibility and usage permissions for each prompt (refer to [Permissions](/features/rbac/permissions) for more details).
 * **Slash Commands**: Quickly access prompts using custom slash commands during chat sessions.
 
 ### Creating and Editing Prompts
@@ -231,7 +231,7 @@ A flexible template for reviewing various types of content.
 Prompt management is controlled by the following permission settings:
 
 * **Prompts Access**: Users need the `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS` permission to create and manage prompts.
-* For detailed information about configuring permissions, refer to the [Permissions documentation](./permissions.md).
+* For detailed information about configuring permissions, refer to the [Permissions documentation](/features/rbac/permissions).
 
 ### Best Practices
 
