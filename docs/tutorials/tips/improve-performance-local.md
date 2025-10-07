@@ -3,7 +3,7 @@ sidebar_position: 12
 title: "⚡ Improve Local LLM Performance with Dedicated Task Models"
 ---
 
-# Improve Performance with Dedicated Task Models
+## Improve Performance with Dedicated Task Models
 
 Open-WebUI provides several automated features—such as title generation, tag creation, autocomplete, and search query generation—to enhance the user experience. However, these features can generate multiple simultaneous requests to your local model, which may impact performance on systems with limited resources.
 

@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# Helicone Integration with Open WebUI
+## Helicone Integration with Open WebUI
 
 Helicone is an open-source LLM observability platform for developers to monitor, debug, and improve **production-ready** applications, including your Open WebUI deployment.
 

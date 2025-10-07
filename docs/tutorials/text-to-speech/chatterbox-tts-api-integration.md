@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "🗨️ Chatterbox TTS — Voice Cloning"
 ---
 
-# Chatterbox TTS — Voice Cloning
+## Chatterbox TTS — Voice Cloning
 
 :::warning
 
@@ -138,7 +138,9 @@ curl -X POST http://localhost:4123/v1/audio/speech \
   --output test.wav
 ```
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>**🚀 Running with the Frontend Interface**</summary>
 
 This project includes an optional React-based web UI. Use Docker Compose profiles to easily opt in or out of the frontend:
@@ -218,7 +220,7 @@ The default API key is the string `none` (no API key required)
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://lm17s1uz51.ufs.sh/f/EsgO8cDHBTOUjUe3QjHytHQ0xqn2CishmXgGfeJ4o983TUMO)
 
-# Please ⭐️ star the [repo on GitHub](https://github.com/travisvn/chatterbox-tts-api) to support development
+## Please ⭐️ star the [repo on GitHub](https://github.com/travisvn/chatterbox-tts-api) to support development
 
 ## Need help?
 

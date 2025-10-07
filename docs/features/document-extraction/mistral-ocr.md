@@ -41,7 +41,7 @@ This documentation provides a step-by-step guide to integrating Mistral OCR with
 - Paste the API Key on the field
 - Save the Admin Panel.
 
-# Verifying Mistral OCR
+## Verifying Mistral OCR
 
 To verify that Mistral OCR is working correctly in script, please refer to `https://docs.mistral.ai/capabilities/document/`
 

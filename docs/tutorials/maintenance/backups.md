@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# Backing Up Your Instance
+## Backing Up Your Instance
 
  Nobody likes losing data!
 
@@ -93,7 +93,7 @@ However your instance is provisioned, it's worth inspecting the app's data store
 | `vector_db/` | Directory containing the ChromaDB vector database. |
 | `webui.db` | SQLite database for persistent storage of other instance data |
 
-# File Level Backup Approaches
+## File Level Backup Approaches
 
 The first way to back up the application data is to take a file level backup approach ensuring that the persistent Open Web UI data is properly backed up.
 
@@ -359,13 +359,13 @@ Once you've added your backup script and provisioned your backup storage, you'll
 
 Set your new script(s) up to run using crontabs according to your desired run frequency.
 
-# Commercial Utilities
+## Commercial Utilities
 
 In addition to scripting your own backup jobs, you can find commercial offerings which generally work by installing agents on your server that will abstract the complexities of running backups. These are beyond the purview of this article but provide convenient solutions.
 
 ---
 
-# Host Level Backups
+## Host Level Backups
 
 Your Open WebUI instance might be provisioned on a host (physical or virtualised) which you control.
 
@@ -373,7 +373,7 @@ Host level backups involve creating snapshots or backups but of the entire VM ra
 
 Some may wish to leverage them as their primary or only protection while others may wish to layer them in as additional data protections.
 
-# How Many Backups Do I Need?
+## How Many Backups Do I Need?
 
 The amount of backups that you will wish to take depends on your personal level of risk tolerance. However, remember that it's best practice to *not* consider the application itself to be a backup copy (even if it lives in the cloud!). That means that if you've provisioned your instance on a VPS, it's still a reasonable recommendation to keep two (independent) backup copies.
 
@@ -396,7 +396,7 @@ This backup plan is a little more complicated but also more comprehensive .. it 
 | Daily Incremental | Cloud Storage (B2) | rsync | Daily incremental backup pushed to a Backblaze B2 cloud storage bucket. |
 | Weekly Incremental | On-site Storage (Home NAS) | rsync | Weekly incremental backup pulled from the server to on-site storage (e.g., a home NAS). |
 
-# Additional Topics
+## Additional Topics
 
 In the interest of keeping this guide reasonably thorough these additional subjects were ommitted but may be worth your consideration depending upon how much time you have to dedicate to setting up and maintaining a data protection plan for your instance:
 

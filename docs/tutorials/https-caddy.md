@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# HTTPS Using Caddy
+## HTTPS Using Caddy
 
 Ensuring secure communication between your users and the Open WebUI is paramount. HTTPS (HyperText Transfer Protocol Secure) encrypts the data transmitted, protecting it from eavesdroppers and tampering. By configuring Caddy as a reverse proxy, you can seamlessly add HTTPS to your Open WebUI deployment, enhancing both security and trustworthiness.
 
@@ -18,18 +18,18 @@ This guide is simple walkthrough to set up a Ubuntu server with Caddy as a rever
 There's a few steps we'll follow to get everything set up:
 
 - [HTTPS Using Caddy](#https-using-caddy)
-  - [Docker](#docker)
-    - [Installing Docker](#installing-docker)
-  - [OpenWebUI](#openwebui)
-    - [Installing OpenWebUI](#installing-openwebui)
-  - [Caddy](#caddy)
-    - [Installing Caddy](#installing-caddy)
-    - [Configure Caddy](#configure-caddy)
-  - [Testing HTTPS](#testing-https)
-  - [Updating Open WebUI](#updating-open-webui)
-    - [Stopping Open WebUI](#stopping-open-webui)
-    - [Pulling the latest image](#pulling-the-latest-image)
-    - [Starting Open WebUI](#starting-open-webui)
+- [Docker](#docker)
+  - [Installing Docker](#installing-docker)
+- [OpenWebUI](#openwebui)
+  - [Installing OpenWebUI](#installing-openwebui)
+- [Caddy](#caddy)
+  - [Installing Caddy](#installing-caddy)
+  - [Configure Caddy](#configure-caddy)
+- [Testing HTTPS](#testing-https)
+- [Updating Open WebUI](#updating-open-webui)
+  - [Stopping Open WebUI](#stopping-open-webui)
+  - [Pulling the latest image](#pulling-the-latest-image)
+  - [Starting Open WebUI](#starting-open-webui)
 
 ## Docker
 

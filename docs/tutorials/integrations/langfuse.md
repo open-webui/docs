@@ -3,7 +3,7 @@ sidebar_position: 20
 title: "🪢 Monitoring and Debugging with Langfuse"
 ---
 
-# Langfuse Integration with Open WebUI
+## Langfuse Integration with Open WebUI
 
 [Langfuse](https://langfuse.com/) ([GitHub](https://github.com/langfuse/langfuse)) offers open source observability and evaluations for Open WebUI. By enabling the Langfuse integration, you can trace your application data with Langfuse to develop, monitor, and improve the use of Open WebUI, including:
 

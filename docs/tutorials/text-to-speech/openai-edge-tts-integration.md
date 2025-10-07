@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# Integrating `openai-edge-tts` 🗣️ with Open WebUI
+## Integrating `openai-edge-tts` 🗣️ with Open WebUI
 
 ## What is `openai-edge-tts`?
 
@@ -19,8 +19,10 @@ It uses the [edge-tts](https://github.com/rany2/edge-tts) package, which leverag
 
 [Sample the voices](https://tts.travisvn.com)
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-  <summary>How is it different from 'openedai-speech'?</summary>
+  <!-- markdownlint-disable-next-line MD033 -->
+<summary>How is it different from 'openedai-speech'?</summary>
 
 Similar to [openedai-speech](https://github.com/matatonic/openedai-speech), [openai-edge-tts](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API endpoint that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where the OpenAI Speech endpoint is callable and the server endpoint URL can be configured.
 
@@ -61,10 +63,12 @@ The default API key is the string `your_api_key_here`. You do not have to change
 
 **And that's it! You can end here**
 
-# Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
+## Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-  <summary>Running with Python</summary>
+  <!-- markdownlint-disable-next-line MD033 -->
+<summary>Running with Python</summary>
 
 ### 🐍 Running with Python
 
@@ -135,8 +139,10 @@ You can now interact with the API at `http://localhost:5050/v1/audio/speech` and
 
 </details>
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-  <summary>Usage details</summary>
+  <!-- markdownlint-disable-next-line MD033 -->
+<summary>Usage details</summary>
 
 ##### Endpoint: `/v1/audio/speech` (aliased with `/audio/speech`)
 

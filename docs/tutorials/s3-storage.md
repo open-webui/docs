@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# 🪣 Switching to S3 Storage
+## 🪣 Switching to S3 Storage
 
 This guide provides instructions on how to switch the default `local` storage in Open WebUI config to Amazon S3.
 
@@ -30,7 +30,7 @@ Direct from AWS' website:
 
 To learn more about S3, visit: [Amazon S3's Official Page](https://aws.amazon.com/s3/)
 
-# How to Set-Up
+## How to Set-Up
 
 ## 1. Required environment variables
 

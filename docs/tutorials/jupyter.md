@@ -12,7 +12,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 > [!WARNING]
 > This documentation was created based on the current version (0.5.16) and is constantly being updated.
 
-# Jupyter Notebook Integration
+## Jupyter Notebook Integration
 
 Starting in v0.5.11, Open-WebUI released a new feature called `Jupyter Notebook Support in Code Interpreter`. This feature allow you to integrate Open-WebUI with Jupyter. There have already been several improvements to this feauture over the subsequent releases, so review the release notes carefully.
 
@@ -33,7 +33,7 @@ Here is the target configuration we're going to set-up through this tutorial.
 
 ![Code Execution Configuration](/images/tutorials/jupyter/jupyter-code-execution.png)
 
-# Step 1: Launch OUI and Jupyter
+## Step 1: Launch OUI and Jupyter
 
 To accomplish this, I used `docker-compose` to launch a stack that includes both services, along with my LLMs, but this should also work if run each docker container separately.
 
@@ -82,7 +82,7 @@ When accessing the Jupyter service, you will need the `JUPYTER_TOKEN` defined ab
 
 ![Code Execution Configuration](/images/tutorials/jupyter/jupyter-token.png)
 
-# Step 2: Configure Code Execution for Jupyter
+## Step 2: Configure Code Execution for Jupyter
 
 Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI's Code Execution to use Jupyter under Admin Panel -> Settings -> Code Execution. Since Open-WebUI is constantly releasing and improving this feature, I recommend always reviewing the possible configuraitons in the [`configs.py` file](https://github.com/open-webui/open-webui/blob/6fedd72e3973e1d13c9daf540350cd822826bf27/backend/open_webui/routers/configs.py#L72) for the latest and greatest. As of v0.5.16, this includes the following:
 

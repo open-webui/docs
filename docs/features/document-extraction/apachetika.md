@@ -70,7 +70,7 @@ To use Apache Tika as the context extraction engine in Open WebUI, follow these 
 - Update the context extraction engine URL to `http://tika:9998`.
 - Save the changes.
 
-# Verifying Apache Tika in Docker
+## Verifying Apache Tika in Docker
 
 To verify that Apache Tika is working correctly in a Docker environment, you can follow these steps:
 

@@ -17,7 +17,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# Installing Docker
+## Installing Docker
 
 ## For Windows and Mac Users
 
