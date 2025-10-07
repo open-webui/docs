@@ -84,7 +84,9 @@ sudo chmod a+rwx searxng-docker/searxng
 
 5. Create a non-restrictive `searxng-docker/searxng/limiter.toml` config file:
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>searxng-docker/searxng/limiter.toml</summary>
 
 ```bash
@@ -168,7 +170,9 @@ sed -i 's/bind_address: "0.0.0.0"/bind_address: "127.0.0.1"/' searxng-docker/sea
 
 The default `settings.yml` file contains many engine settings. Below is an extract of what the default `settings.yml` file might look like:
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>searxng-docker/searxng/settings.yml</summary>
 
 ```yaml
@@ -210,7 +214,9 @@ The port in the settings.yml file for SearXNG should match that of the port numb
 
 9. Ensure your `searxng-docker/searxng/uwsgi.ini` file matches the following:
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>searxng-docker/searxng/uwsgi.ini</summary>
 
 ```ini

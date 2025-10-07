@@ -3,7 +3,7 @@ sidebar_position: 2
 title: "Environment Variables"
 ---
 
-# Environment Variables List
+## Environment Variables List
 
 :::info
 
@@ -13,7 +13,7 @@ For a complete list of all Open WebUI environment variables, see the [Environmen
 
 The following is a summary of the environment variables for speech to text (STT).
 
-# Environment Variables For Speech To Text (STT)
+## Environment Variables For Speech To Text (STT)
 
 | Variable | Description |
 |----------|-------------|

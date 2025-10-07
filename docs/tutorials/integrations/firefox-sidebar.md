@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## 🦊 Firefox AI Chatbot Sidebar
 
-# Integrating Open WebUI as a Local AI Chatbot Browser Assistant in Mozilla Firefox
+## Integrating Open WebUI as a Local AI Chatbot Browser Assistant in Mozilla Firefox
 
 ## Prerequisites
 
@@ -36,11 +36,11 @@ Alternatively, you can enable AI Chatbot through the `about:config` page (descri
 3. Search for `browser.ml.chat.enabled` and toggle it to `true` if it's not already enabled through Firefox Labs
 4. Search for `browser.ml.chat.hideLocalhost` and toggle it to `false`
 
-### browser.ml.chat.prompts.#
+### browser.ml.chat.prompts.{#}
 
 To add custom prompts, follow these steps:
 
-1. Search for `browser.ml.chat.prompts.#` (replace `#` with a number, e.g., `0`, `1`, `2`, etc.)
+1. Search for `browser.ml.chat.prompts.{#}` (replace `{#}` with a number, e.g., `0`, `1`, `2`, etc.)
 2. Click the `+` button to add a new prompt
 3. Enter the prompt label, value, and ID (e.g., `{"id":"My Prompt", "value": "This is my custom prompt.", "label": "My Prompt"}`)
 4. Repeat the process to add more prompts as desired

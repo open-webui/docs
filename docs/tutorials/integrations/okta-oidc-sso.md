@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# 🔗 Okta OIDC SSO Integration
+## 🔗 Okta OIDC SSO Integration
 
 ## Overview
 

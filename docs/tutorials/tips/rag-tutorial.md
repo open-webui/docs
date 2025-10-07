@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# Tutorial: Configuring RAG with Open WebUI Documentation
+## Tutorial: Configuring RAG with Open WebUI Documentation
 
 In this tutorial, you will learn how to use **Retrieval-Augmented Generation (RAG)** with Open WebUI to load real-world documentation as a knowledge base. We will walk through how to use the latest **Open WebUI Documentation** as an example for this setup.
 

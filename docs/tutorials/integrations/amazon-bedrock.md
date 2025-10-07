@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ---
 
-# Integrating Open-WebUI with Amazon Bedrock
+## Integrating Open-WebUI with Amazon Bedrock
 
 In this tutorial, we'll explore one of the most common and popular approaches to integrate Open-WebUI with Amazon Bedrock.
 
@@ -32,7 +32,7 @@ Direct from AWS' website:
 
 To learn more about Bedrock, visit: [Amazon Bedrock's Official Page](https://aws.amazon.com/bedrock/)
 
-# Integration Steps
+## Integration Steps
 
 ## Step 1: Verify access to Amazon Bedrock Base Models
 

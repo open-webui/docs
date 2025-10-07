@@ -3,7 +3,7 @@ sidebar_position: 6
 title: "📄 Document Extraction"
 ---
 
-# Document Extraction in Open WebUI
+## Document Extraction in Open WebUI
 
 Open WebUI provides powerful document extraction capabilities that allow you to process and analyze various types of documents within your RAG (Retrieval Augmented Generation) workflows. Document extraction is essential for transforming unstructured document content into structured data that can be effectively used by language models.
 

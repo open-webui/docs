@@ -81,7 +81,7 @@ docker run --gpus all -p 5001:5001 -e DOCLING_SERVE_ENABLE_UI=true quay.io/docli
 }
 ```
 
-# Verifying Docling in Docker
+## Verifying Docling in Docker
 
 To verify that Docling is working correctly in a Docker environment, you can follow these steps:
 

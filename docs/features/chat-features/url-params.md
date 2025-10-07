@@ -94,7 +94,9 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?image-generation=true`
 - **Behavior**: Activates the image generation button to generate an image.
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>Example Use Case</summary>
 
 :::tip

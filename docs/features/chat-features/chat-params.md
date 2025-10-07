@@ -19,7 +19,9 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 - **How to set**: Users can modify the system prompt and advanced parameters for a specific chat instance within the right-hand sidebar's **Chat Controls** section in Open WebUI.
 - **Override capabilities**: Users are restricted from overriding the **System Prompt** or specific **Advanced Parameters** already set by an administrator on a per-model basis (**#2**). This ensures consistency and adherence to model-specific settings.
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>Example Use Case</summary>
 
 :::tip
@@ -36,7 +38,9 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 - **How to set**: Users can set their own system prompt and advanced parameters for their account within the **General** section of the **Settings** menu in Open WebUI.
 - **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that such parameters can still be overridden if an administrator has already set the **System Prompt** or specific **Advanced Parameters** on a per-model basis for the particular model being used.
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>Example Use Case</summary>
 
 :::tip
@@ -55,7 +59,9 @@ Suppose a user wants to set their own system prompt for their account. They can 
 - **Context length preservation:** When a model's **System Prompt** or specific **Advanced Parameters** are set manually in the **Workspace** section by an Admin, said **System Prompt** or manually set **Advanced Parameters** cannot be overridden or adjusted on a per-account basis within the **General** settings or **Chat Controls** section by a **User** account. This ensures consistency and prevents excessive reloading of the model whenever a user's context length setting changes.
 - **Model precedence:** If a model's **System Prompt** or specific **Advanced Parameters** value is pre-set in the Workspace section by an Admin, any context length changes made by a **User** account in the **General** settings or **Chat Controls** section will be disregarded, maintaining the pre-configured value for that model. Be advised that parameters left untouched by an **Admin** account can still be manually adjusted by a **User** account on a per-account or per-chat basis.
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>Example Use Case</summary>
 
 :::tip

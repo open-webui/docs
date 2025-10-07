@@ -15,7 +15,7 @@ This guide is verified with Open WebUI setup through [Manual Installation](docs/
 
 :::
 
-# Local LLM Setup with IPEX-LLM on Intel GPU
+## Local LLM Setup with IPEX-LLM on Intel GPU
 
 :::info
 

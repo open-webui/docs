@@ -3,7 +3,7 @@ sidebar_position: 1
 title: "🛠️ Local Development Guide"
 ---
 
-# Ready to Contribute to Open WebUI? Let's Get Started! 🚀
+## Ready to Contribute to Open WebUI? Let's Get Started! 🚀
 
 Excited to dive into Open WebUI development? This comprehensive guide will walk you through setting up your **local development environment** quickly and easily. Whether you're a seasoned developer or just starting out, we'll get you ready to tweak the frontend, enhance the backend, and contribute to the future of Open WebUI! Let's get your development environment up and running in simple, detailed steps!
 
