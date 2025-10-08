@@ -14,6 +14,7 @@ Alternatively, if you have [Chocolatey](https://chocolatey.org/) installed, you 
 
 1. Open a command prompt or PowerShell.
 2. Run the following command to install OpenSSL:
+
    ```bash
    choco install openssl -y
    ```
@@ -21,10 +22,13 @@ Alternatively, if you have [Chocolatey](https://chocolatey.org/) installed, you 
 ---
 
 ### **Verify Installation**
+
 After installation, open a command prompt and type:
+
 ```bash
 openssl version
 ```
+
 If it displays the OpenSSL version (e.g., `OpenSSL 3.x.x ...`), it is installed correctly.
 
 #### Step 2: Installing nginx
@@ -46,16 +50,19 @@ Move the generated nginx.key and nginx.crt files to a folder of your choice, or 
 
 Open C:\nginx\conf\nginx.conf in a text editor
 
-If you want Open WebUI to be accessible over your local LAN, be sure to note your LAN ip address using `ipconfig` e.g. 192.168.1.15
+If you want Open WebUI to be accessible over your local LAN, be sure to note your LAN ip address using `ipconfig` e.g., 192.168.1.15
 
 Set it up as follows:
 
-```
+```conf
+
 #user  nobody;
 worker_processes  1;
 
 #error_log  logs/error.log;
+
 #error_log  logs/error.log  notice;
+
 #error_log  logs/error.log  info;
 
 #pid        logs/nginx.pid;
@@ -145,4 +152,4 @@ Run nginx by running `nginx`. If an nginx service is already started, you can re
 
 ---
 
-You should now be able to access Open WebUI on https://192.168.1.15 (or your own LAN ip as appropriate). Be sure to allow windows firewall access as needed. 
+You should now be able to access Open WebUI on https://192.168.1.15 (or your own LAN ip as appropriate). Be sure to allow windows firewall access as needed.

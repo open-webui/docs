@@ -4,10 +4,12 @@ title: "🎨 Image Generation"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-# 🎨 Image Generation
+## 🎨 Image Generation
 
 Open WebUI supports image generation through three backends: **AUTOMATIC1111**, **ComfyUI**, and **OpenAI DALL·E**. This guide will help you set up and use either of these options.
 
@@ -20,13 +22,13 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
 1. Ensure that you have [AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) installed.
 2. Launch AUTOMATIC1111 with additional flags to enable API access:
 
-   ```
+   ```python
    ./webui.sh --api --listen
    ```
 
 3. For Docker installation of WebUI with the environment variables preset, use the following command:
 
-   ```
+   ```docker
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
@@ -36,7 +38,7 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
 2. Set the `Image Generation Engine` field to `Default (Automatic1111)`.
 3. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
 
-   ```
+   ```txt
    http://<your_automatic1111_address>:7860/
    ```
 
@@ -51,19 +53,19 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 1. Download and extract the ComfyUI software package from [GitHub](https://github.com/comfyanonymous/ComfyUI) to your desired directory.
 2. To start ComfyUI, run the following command:
 
-   ```
+   ```python
    python main.py
    ```
 
    For systems with low VRAM, launch ComfyUI with additional flags to reduce memory usage:
 
-   ```
+   ```python
    python main.py --lowvram
    ```
 
 3. For Docker installation of WebUI with the environment variables preset, use the following command:
 
-   ```
+   ```docker
    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e COMFYUI_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
    ```
 
@@ -73,23 +75,23 @@ ComfyUI provides an alternative interface for managing and interacting with imag
 
 1. **Model Checkpoints**:
 
-* Download either the `FLUX.1-schnell` or `FLUX.1-dev` model from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
-* Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI. Alternatively, you can create a symbolic link between `models/checkpoints` and `models/unet` to ensure both directories contain the same model checkpoints.
+- Download either the `FLUX.1-schnell` or `FLUX.1-dev` model from the [black-forest-labs HuggingFace page](https://huggingface.co/black-forest-labs).
+- Place the model checkpoint(s) in both the `models/checkpoints` and `models/unet` directories of ComfyUI. Alternatively, you can create a symbolic link between `models/checkpoints` and `models/unet` to ensure both directories contain the same model checkpoints.
 
 2. **VAE Model**:
 
-* Download `ae.safetensors` VAE from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
-* Place it in the `models/vae` ComfyUI directory.
+- Download `ae.safetensors` VAE from [here](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors).
+- Place it in the `models/vae` ComfyUI directory.
 
 3. **CLIP Model**:
 
-* Download `clip_l.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* Place it in the `models/clip` ComfyUI directory.
+- Download `clip_l.safetensors` from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+- Place it in the `models/clip` ComfyUI directory.
 
 4. **T5XXL Model**:
 
-* Download either the `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` model from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
-* Place it in the `models/clip` ComfyUI directory.
+- Download either the `t5xxl_fp16.safetensors` or `t5xxl_fp8_e4m3fn.safetensors` model from [here](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main).
+- Place it in the `models/clip` ComfyUI directory.
 
 To integrate ComfyUI into Open WebUI, follow these steps:
 
@@ -99,7 +101,7 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 2. Click on **Settings** and then select the **Images** tab.
 3. In the `Image Generation Engine` field, choose `ComfyUI`.
 4. In the **API URL** field, enter the address where ComfyUI's API is accessible, following this format: `http://<your_comfyui_address>:8188/`.
-   * Set the environment variable `COMFYUI_BASE_URL` to this address to ensure it persists within the WebUI.
+   - Set the environment variable `COMFYUI_BASE_URL` to this address to ensure it persists within the WebUI.
 
 #### Step 2: Verify the Connection and Enable Image Generation
 
@@ -117,11 +119,16 @@ To integrate ComfyUI into Open WebUI, follow these steps:
 6. Set `Set Default Model` to the name of the model file being used, such as `flux1-dev.safetensors`
 
 :::info
+
 You may need to adjust an `Input Key` or two within Open WebUI's `ComfyUI Workflow Nodes` section to match a node within your workflow.
 For example, `seed` may need to be renamed to `noise_seed` to match a node ID within your imported workflow.
+
 :::
+
 :::tip
-Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g. `1` or `1, 2`).
+
+Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g., `1` or `1, 2`).
+
 :::
 
 6. Click `Save` to apply the settings and enjoy image generation with ComfyUI integrated into Open WebUI!
@@ -151,9 +158,9 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 2. Set the `Image Generation Engine` field to `Open AI`.
 3. Enter your OpenAI API key.
 4. Choose the model you wish to use. Note that image size options will depend on the selected model:
-   * **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
-   * **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
-   * **GPT-Image-1**: Supports `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
+   - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
+   - **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
+   - **GPT-Image-1**: Supports `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
 
 ### Azure OpenAI
 
@@ -166,9 +173,11 @@ Image generation with Azure OpenAI Dall-E or GPT-Image is supported with Open We
 5. Enter your Azure OpenAI API key.
 
 :::tip
+
 Alternative API endpoint URL tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` - you can find your endpoint name on https://ai.azure.com/resource/overview, and model name on https://ai.azure.com/resource/deployments.
 You can also copy Target URI from your deployment detailed page, but remember to delete strings after model name.
 For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the API endpoint URL in Open WebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
+
 :::
 
 =======
@@ -191,7 +200,7 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 
 ## Using Image Generation
 
-#### Method 1:
+#### Method 1
 
 1. Toggle the `Image Generation` switch to on.
 2. Enter your image generation prompt.
@@ -199,7 +208,7 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 
 ![Image Generation Tutorial](/images/tutorial_image_generation_2.png)
 
-#### Method 2:
+#### Method 2
 
 ![Image Generation Tutorial](/images/tutorial_image_generation.png)
 
@@ -208,7 +217,9 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 3. After the image has finished generating, it will be returned automatically in chat.
 
 :::tip
-    You can also edit the LLM's response and enter your image generation prompt as the message
+
+You can also edit the LLM's response and enter your image generation prompt as the message
     to send off for image generation instead of using the actual response provided by the
     LLM.
+
 :::

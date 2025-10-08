@@ -12,7 +12,9 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
 ## Swagger Documentation Links
 
 :::important
+
 Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
+
 :::
 
 Access detailed API documentation for different services provided by Open WebUI:
@@ -20,7 +22,6 @@ Access detailed API documentation for different services provided by Open WebUI:
 | Application | Documentation Path      |
 |-------------|-------------------------|
 | Main        | `/docs`                 |
-
 
 ## Notable API Endpoints
 
@@ -55,11 +56,12 @@ Access detailed API documentation for different services provided by Open WebUI:
         ]
       }'
   ```
-  
+
 - **Python Example**:
+
   ```python
   import requests
-  
+
   def chat_with_model(token):
       url = 'http://localhost:3000/api/chat/completions'
       headers = {
@@ -132,7 +134,7 @@ To utilize external data in RAG responses, you first need to upload the files. T
 
   ```python
   import requests
-  
+
   def upload_file(token, file_path):
       url = 'http://localhost:3000/api/v1/files/'
       headers = {
@@ -246,7 +248,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
 
   ```python
   import requests
-  
+
   def chat_with_collection(token, model, query, collection_id):
       url = 'http://localhost:3000/api/chat/completions'
       headers = {

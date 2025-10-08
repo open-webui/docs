@@ -3,9 +3,9 @@ sidebar_position: 3
 title: "⚙️ Valves"
 ---
 
-# Valves
+## Valves
 
-`Valves` (see the dedicated [Valves & UserValves](../features/plugin/valves/index.mdx) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
+`Valves` (see the dedicated [Valves & UserValves](/docs/features/plugin/valves/index.mdx) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
 
 `Valves` are set as a subclass of the `Pipeline` class, and initialized as part of the `__init__` method of the `Pipeline` class.
 

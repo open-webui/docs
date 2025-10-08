@@ -3,7 +3,7 @@ sidebar_position: 7
 title: "❓ FAQ"
 ---
 
-# FAQ
+## FAQ
 
 **What's the difference between Functions and Pipelines?**
 

@@ -3,8 +3,6 @@ sidebar_position: 2
 title: "🛠️ Development"
 ---
 
-
-
 ## Writing A Custom Toolkit
 
 Toolkits are defined in a single Python file, with a top level docstring with metadata and a `Tools` class.
@@ -46,7 +44,7 @@ class Tools:
         # example usage of valves
         if self.valves.api_key != "42":
             return "Wrong API key"
-        return string[::-1] 
+        return string[::-1]
 ```
 
 ### Type Hints
@@ -54,7 +52,7 @@ Each tool must have type hints for arguments. The types may also be nested, such
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
-Valves and UserValves are used for specifying customizable settings of the Tool, you can read more on the dedicated [Valves & UserValves](../valves/index.mdx) page.
+Valves and UserValves are used for specifying customizable settings of the Tool, you can read more on the dedicated [Valves & UserValves page](/features/plugin/valves/index.mdx).
 
 ### Optional Arguments
 Below is a list of optional arguments your tools can depend on:
@@ -92,14 +90,14 @@ class Tools:
         """
         if not __oauth_token__ or "access_token" not in __oauth_token__:
             return "Error: User is not authenticated via OAuth or token is unavailable."
-            
+
         access_token = __oauth_token__["access_token"]
-        
+
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get("https://api.my-service.com/v1/profile", headers=headers)
@@ -182,14 +180,14 @@ class Tools:
     def __init__(self):
         # Add a note about function calling mode requirements
         self.description = "This tool requires Default function calling mode for full functionality"
-        
+
     async def interactive_tool(self, prompt: str, __event_emitter__=None) -> str:
         """
         ⚠️ This tool requires function_calling = "default" for proper event emission
         """
         if not __event_emitter__:
             return "Event emitter not available - ensure Default function calling mode is enabled"
-            
+
         # Safe to use message events in Default mode
         await __event_emitter__({
             "type": "message",
@@ -206,12 +204,12 @@ async def universal_tool(self, prompt: str, __event_emitter__=None, __metadata__
     """
     # Check if we're in native mode (this is a rough heuristic)
     is_native_mode = __metadata__ and __metadata__.get("params", {}).get("function_calling") == "native"
-    
+
     if __event_emitter__:
         if is_native_mode:
             # Use only compatible event types in native mode
             await __event_emitter__({
-                "type": "status", 
+                "type": "status",
                 "data": {"description": "Processing in native mode...", "done": False}
             })
         else:
@@ -220,15 +218,15 @@ async def universal_tool(self, prompt: str, __event_emitter__=None, __metadata__
                 "type": "message",
                 "data": {"content": "Processing with full event support..."}
             })
-    
+
     # ... tool logic here
-    
+
     if __event_emitter__:
         await __event_emitter__({
-            "type": "status", 
+            "type": "status",
             "data": {"description": "Completed successfully", "done": True}
         })
-    
+
     return "Tool execution completed"
 ```
 
@@ -250,39 +248,39 @@ async def universal_tool(self, prompt: str, __event_emitter__=None, __metadata__
 ```python
 async def debug_events_tool(self, __event_emitter__=None, __metadata__=None) -> str:
     """Debug tool to test event emitter functionality"""
-    
+
     if not __event_emitter__:
         return "No event emitter available"
-    
+
     # Test various event types
     test_events = [
         {"type": "status", "data": {"description": "Testing status events", "done": False}},
         {"type": "message", "data": {"content": "Testing message events (may not work in native mode)"}},
         {"type": "notification", "data": {"content": "Testing notification events"}},
     ]
-    
+
     mode_info = "Unknown"
     if __metadata__:
         mode_info = __metadata__.get("params", {}).get("function_calling", "default")
-    
+
     await __event_emitter__({
-        "type": "status", 
+        "type": "status",
         "data": {"description": f"Function calling mode: {mode_info}", "done": False}
     })
-    
+
     for i, event in enumerate(test_events):
         await asyncio.sleep(1)  # Space out events
         await __event_emitter__(event)
         await __event_emitter__({
-            "type": "status", 
+            "type": "status",
             "data": {"description": f"Sent event {i+1}/{len(test_events)}", "done": False}
         })
-    
+
     await __event_emitter__({
-        "type": "status", 
+        "type": "status",
         "data": {"description": "Event testing complete", "done": True}
     })
-    
+
     return f"Event testing completed in {mode_info} mode. Check for missing or flickering content."
 ```
 
@@ -299,7 +297,7 @@ Status events add live status updates to a message while it's performing steps. 
 await __event_emitter__({
     "type": "status",
     "data": {
-        "description": "Message that shows up in the chat", 
+        "description": "Message that shows up in the chat",
         "done": False,        # False = still processing, True = completed
         "hidden": False       # False = visible, True = auto-hide when done
     }
@@ -322,7 +320,7 @@ async def data_processing_tool(
         Processes a large data file with status updates
         ✅ Works in both Default and Native function calling modes
         """
-        
+
         if not __event_emitter__:
             return "Processing completed (no status updates available)"
 
@@ -331,19 +329,19 @@ async def data_processing_tool(
             "type": "status",
             "data": {"description": "Loading data file...", "done": False}
         })
-        
+
         # Simulate loading time
         await asyncio.sleep(2)
-        
+
         # Step 2: Processing
         await __event_emitter__({
             "type": "status",
             "data": {"description": "Analyzing 10,000 records...", "done": False}
         })
-        
+
         # Simulate processing time
         await asyncio.sleep(3)
-        
+
         # Step 3: Completion
         await __event_emitter__({
             "type": "status",
@@ -365,50 +363,50 @@ async def api_integration_tool(
         Integrates with external API with comprehensive status tracking
         ✅ Compatible with both function calling modes
         """
-        
+
         if not __event_emitter__:
             return "API integration completed (no status available)"
-            
+
         try:
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": "Connecting to API...", "done": False}
             })
-            
+
             # Simulate API connection
             await asyncio.sleep(1.5)
-            
+
             await __event_emitter__({
-                "type": "status", 
+                "type": "status",
                 "data": {"description": "Authenticating...", "done": False}
             })
-            
+
             # Simulate authentication
             await asyncio.sleep(1)
-            
+
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": "Fetching data...", "done": False}
             })
-            
+
             # Simulate data fetching
             await asyncio.sleep(2)
-            
+
             # Success status
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": "API integration successful", "done": True}
             })
-            
+
             return "Successfully retrieved 150 records from the API"
-            
+
         except Exception as e:
             # Error status - always visible for debugging
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": f"Error: {str(e)}", "done": True, "hidden": False}
             })
-            
+
             return f"API integration failed: {str(e)}"
 ```
 </details>
@@ -424,19 +422,19 @@ async def batch_processor_tool(
         Processes items in batches with detailed progress tracking
         ✅ Works perfectly in both function calling modes
         """
-        
+
         if not __event_emitter__ or not items:
             return "Batch processing completed"
-        
+
         total_items = len(items)
         batch_size = 10
         completed = 0
-        
+
         for i in range(0, total_items, batch_size):
             batch = items[i:i + batch_size]
             batch_num = (i // batch_size) + 1
             total_batches = (total_items + batch_size - 1) // batch_size
-            
+
             # Update status for current batch
             await __event_emitter__({
                 "type": "status",
@@ -445,22 +443,22 @@ async def batch_processor_tool(
                     "done": False
                 }
             })
-            
+
             # Simulate batch processing
             await asyncio.sleep(1)
-            
+
             completed += len(batch)
-            
+
             # Progress update
             progress_pct = int((completed / total_items) * 100)
             await __event_emitter__({
-                "type": "status", 
+                "type": "status",
                 "data": {
                     "description": f"Progress: {completed}/{total_items} items ({progress_pct}%)",
                     "done": False
                 }
             })
-        
+
         # Final completion status
         await __event_emitter__({
             "type": "status",
@@ -469,14 +467,18 @@ async def batch_processor_tool(
                 "done": True
             }
         })
-        
+
         return f"Successfully processed {total_items} items in {total_batches} batches"
 ```
 </details>
 
 #### Message Events ⚠️ DEFAULT MODE ONLY
 
+:::warning
+
 **🚨 CRITICAL WARNING: Message events are INCOMPATIBLE with Native function calling mode!**
+
+:::
 
 Message events (`message`, `chat:message`, `chat:message:delta`, `replace`) allow you to append or modify message content at any stage during tool execution. This enables embedding images, rendering web pages, streaming content updates, and creating rich interactive experiences.
 
@@ -512,37 +514,37 @@ async def streaming_content_tool(
         Streams content updates during processing
         ⚠️ REQUIRES function_calling = "default" - Will not work in Native mode!
         """
-        
+
         # Check function calling mode (rough detection)
         mode = "unknown"
         if __metadata__:
             mode = __metadata__.get("params", {}).get("function_calling", "default")
-        
+
         if mode == "native":
             return "❌ This tool requires Default function calling mode. Message streaming is not supported in Native mode due to content overwriting issues."
-        
+
         if not __event_emitter__:
             return "Event emitter not available"
-        
+
         # Stream progressive content updates
         content_chunks = [
             "🔍 **Phase 1: Research**\nGathering information about your query...\n\n",
-            "📊 **Phase 2: Analysis**\nAnalyzing gathered data patterns...\n\n", 
+            "📊 **Phase 2: Analysis**\nAnalyzing gathered data patterns...\n\n",
             "✨ **Phase 3: Synthesis**\nGenerating insights and recommendations...\n\n",
             "📝 **Phase 4: Final Report**\nCompiling comprehensive results...\n\n"
         ]
-        
+
         accumulated_content = ""
-        
+
         for i, chunk in enumerate(content_chunks):
             accumulated_content += chunk
-            
+
             # Append this chunk to the message
             await __event_emitter__({
                 "type": "message",
                 "data": {"content": chunk}
             })
-            
+
             # Show progress status
             await __event_emitter__({
                 "type": "status",
@@ -551,16 +553,16 @@ async def streaming_content_tool(
                     "done": False
                 }
             })
-            
+
             # Simulate processing time
             await asyncio.sleep(2)
-        
+
         # Final completion
         await __event_emitter__({
             "type": "status",
             "data": {"description": "Content streaming complete!", "done": True}
         })
-        
+
         return "Content streaming completed successfully. All phases processed."
 ```
 </details>
@@ -576,10 +578,10 @@ async def live_dashboard_tool(
         Creates a live-updating dashboard using content replacement
         ⚠️ ONLY WORKS in Default function calling mode
         """
-        
+
         # Verify we're not in Native mode
         mode = __metadata__.get("params", {}).get("function_calling", "default") if __metadata__ else "default"
-        
+
         if mode == "native":
             return """
 ❌ **Native Mode Incompatibility**
@@ -591,44 +593,45 @@ This dashboard tool cannot function in Native mode because:
 
 **Solution:** Switch to Default function calling mode in Model Settings → Advanced Params → Function Calling = "Default"
 """
-        
+
         if not __event_emitter__:
             return "Dashboard created (static mode - no live updates)"
-        
+
         # Create initial dashboard
         initial_dashboard = """
+
 # 📊 Live System Dashboard
 
 ## System Status: 🟡 Initializing...
 
 ### Current Metrics:
 - **CPU Usage**: Loading...
-- **Memory**: Loading... 
+- **Memory**: Loading...
 - **Active Users**: Loading...
 - **Response Time**: Loading...
 
 ---
 *Last Updated: Initializing...*
 """
-        
+
         await __event_emitter__({
             "type": "replace",
             "data": {"content": initial_dashboard}
         })
-        
+
         # Simulate live data updates
         updates = [
             {
                 "status": "🟢 Online",
-                "cpu": "23%", 
+                "cpu": "23%",
                 "memory": "64%",
                 "users": "1,247",
                 "response": "145ms"
             },
             {
-                "status": "🟢 Optimal", 
+                "status": "🟢 Optimal",
                 "cpu": "18%",
-                "memory": "61%", 
+                "memory": "61%",
                 "users": "1,352",
                 "response": "132ms"
             },
@@ -636,15 +639,16 @@ This dashboard tool cannot function in Native mode because:
                 "status": "🟡 Busy",
                 "cpu": "67%",
                 "memory": "78%",
-                "users": "1,891", 
+                "users": "1,891",
                 "response": "234ms"
             }
         ]
-        
+
         for i, data in enumerate(updates):
             await asyncio.sleep(3)  # Simulate data collection delay
-            
+
             updated_dashboard = f"""
+
 # 📊 Live System Dashboard
 
 ## System Status: {data['status']}
@@ -659,24 +663,24 @@ This dashboard tool cannot function in Native mode because:
 *Last Updated: {datetime.now().strftime('%H:%M:%S')}*
 *Update {i+1}/{len(updates)}*
 """
-            
+
             # Replace entire dashboard content
             await __event_emitter__({
-                "type": "replace", 
+                "type": "replace",
                 "data": {"content": updated_dashboard}
             })
-            
+
             # Status update
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": f"Dashboard updated ({i+1}/{len(updates)})", "done": False}
             })
-        
+
         await __event_emitter__({
             "type": "status",
             "data": {"description": "Live dashboard monitoring complete", "done": True}
         })
-        
+
         return "Dashboard monitoring session completed."
 ```
 </details>
@@ -692,15 +696,15 @@ async def adaptive_content_tool(
         Adapts behavior based on function calling mode
         ✅ Provides best possible experience in both modes
         """
-        
+
         # Detect function calling mode
         mode = "default"  # Default assumption
         if __metadata__:
             mode = __metadata__.get("params", {}).get("function_calling", "default")
-        
+
         if not __event_emitter__:
             return f"Generated {content_type} content (no real-time updates available)"
-        
+
         # Mode-specific behavior
         if mode == "native":
             # Use only compatible events in Native mode
@@ -708,16 +712,17 @@ async def adaptive_content_tool(
                 "type": "status",
                 "data": {"description": f"Generating {content_type} content in Native mode...", "done": False}
             })
-            
+
             await asyncio.sleep(2)
-            
+
             await __event_emitter__({
-                "type": "status", 
+                "type": "status",
                 "data": {"description": "Content generation complete", "done": True}
             })
-            
+
             # Return content normally - no message events
             return f"""
+
 # {content_type.title()} Content
 
 **Mode**: Native Function Calling (Limited Event Support)
@@ -726,41 +731,41 @@ Generated content here... This content is returned as the tool result rather tha
 
 *Note: Live content updates are not available in Native mode due to event compatibility limitations.*
 """
-            
+
         else:  # Default mode
             # Full message event functionality available
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": "Generating content with full streaming support...", "done": False}
             })
-            
-            # Stream content progressively  
+
+            # Stream content progressively
             progressive_content = [
                 f"# {content_type.title()} Content\n\n**Mode**: Default Function Calling ✅\n\n",
                 "## Section 1: Introduction\nStreaming content in real-time...\n\n",
-                "## Section 2: Details\nAdding detailed information...\n\n", 
+                "## Section 2: Details\nAdding detailed information...\n\n",
                 "## Section 3: Conclusion\nFinalizing content delivery...\n\n",
                 "*✅ Content streaming completed successfully!*"
             ]
-            
+
             for i, chunk in enumerate(progressive_content):
                 await __event_emitter__({
                     "type": "message",
                     "data": {"content": chunk}
                 })
-                
+
                 await __event_emitter__({
-                    "type": "status", 
+                    "type": "status",
                     "data": {"description": f"Streaming section {i+1}/{len(progressive_content)}...", "done": False}
                 })
-                
+
                 await asyncio.sleep(1.5)
-            
+
             await __event_emitter__({
                 "type": "status",
                 "data": {"description": "Content streaming complete!", "done": True}
             })
-            
+
             return "Content has been streamed above with full Default mode capabilities."
 ```
 </details>
@@ -799,8 +804,12 @@ def __init__(self):
     self.citation = False  # REQUIRED - prevents automatic citations from overriding custom ones
 ```
 
+:::warning
+
 **⚠️ Critical Citation Warning:**
 If you set `self.citation = True` (or don't set it to `False`), automatic citations will replace any custom citations you send. Always disable automatic citations when using custom citation events.
+
+:::
 
 <details>
 <summary>Basic Citation Example</summary>
@@ -809,7 +818,7 @@ If you set `self.citation = True` (or don't set it to `False`), automatic citati
 class Tools:
     def __init__(self):
         self.citation = False  # Disable automatic citations
-    
+
     async def research_tool(
             self, topic: str, __event_emitter__=None
         ) -> str:
@@ -817,15 +826,15 @@ class Tools:
         Researches a topic and provides proper citations
         ✅ Works identically in both Default and Native modes
         """
-        
+
         if not __event_emitter__:
             return "Research completed (citations not available)"
-        
+
         # Simulate research findings
         sources = [
             {
                 "title": "Advanced AI Systems",
-                "url": "https://example.com/ai-systems", 
+                "url": "https://example.com/ai-systems",
                 "content": "Artificial intelligence systems have evolved significantly...",
                 "author": "Dr. Jane Smith",
                 "date": "2024-03-15"
@@ -833,12 +842,12 @@ class Tools:
             {
                 "title": "Machine Learning Fundamentals",
                 "url": "https://example.com/ml-fundamentals",
-                "content": "The core principles of machine learning include...", 
+                "content": "The core principles of machine learning include...",
                 "author": "Prof. John Doe",
                 "date": "2024-02-20"
             }
         ]
-        
+
         # Emit citations for each source
         for source in sources:
             await __event_emitter__({
@@ -855,12 +864,12 @@ class Tools:
                         }
                     ],
                     "source": {
-                        "name": source["title"], 
+                        "name": source["title"],
                         "url": source["url"]
                     }
                 }
             })
-        
+
         return f"Research on '{topic}' completed. Found {len(sources)} relevant sources with detailed citations."
 ```
 </details>
@@ -876,17 +885,17 @@ async def comprehensive_analysis_tool(
         Performs comprehensive analysis with multiple source types
         ✅ Full compatibility across all function calling modes
         """
-        
+
         if not __event_emitter__:
             return "Analysis completed"
-        
+
         # Multiple source types with rich metadata
         research_sources = {
             "academic": [
                 {
                     "title": "Neural Network Architecture in Modern AI",
                     "authors": ["Dr. Sarah Chen", "Prof. Michael Rodriguez"],
-                    "journal": "Journal of AI Research", 
+                    "journal": "Journal of AI Research",
                     "volume": "Vol. 45, Issue 2",
                     "pages": "123-145",
                     "doi": "10.1000/182",
@@ -898,7 +907,7 @@ async def comprehensive_analysis_tool(
                 {
                     "title": "Industry AI Implementation Trends",
                     "url": "https://tech-insights.com/ai-trends-2024",
-                    "site_name": "TechInsights", 
+                    "site_name": "TechInsights",
                     "published": "2024-03-01",
                     "content": "Recent industry surveys show that 78% of companies are implementing AI solutions..."
                 }
@@ -913,9 +922,9 @@ async def comprehensive_analysis_tool(
                 }
             ]
         }
-        
+
         citation_count = 0
-        
+
         # Process academic sources
         for source in research_sources["academic"]:
             citation_count += 1
@@ -929,7 +938,7 @@ async def comprehensive_analysis_tool(
                             "source": source["title"],
                             "authors": source["authors"],
                             "journal": source["journal"],
-                            "volume": source["volume"], 
+                            "volume": source["volume"],
                             "pages": source["pages"],
                             "doi": source["doi"],
                             "publication_date": source["date"],
@@ -937,17 +946,17 @@ async def comprehensive_analysis_tool(
                         }
                     ],
                     "source": {
-                        "name": f"{source['title']} - {source['journal']}", 
+                        "name": f"{source['title']} - {source['journal']}",
                         "url": f"https://doi.org/{source['doi']}"
                     }
                 }
             })
-        
+
         # Process web sources
         for source in research_sources["web_sources"]:
             citation_count += 1
             await __event_emitter__({
-                "type": "citation", 
+                "type": "citation",
                 "data": {
                     "document": [source["content"]],
                     "metadata": [
@@ -966,7 +975,7 @@ async def comprehensive_analysis_tool(
                     }
                 }
             })
-        
+
         # Process reports
         for source in research_sources["reports"]:
             citation_count += 1
@@ -979,7 +988,7 @@ async def comprehensive_analysis_tool(
                             "date_accessed": datetime.now().isoformat(),
                             "source": source["title"],
                             "organization": source["organization"],
-                            "report_number": source["report_number"], 
+                            "report_number": source["report_number"],
                             "publication_date": source["date"],
                             "type": "research_report"
                         }
@@ -990,14 +999,15 @@ async def comprehensive_analysis_tool(
                     }
                 }
             })
-        
+
         return f"""
+
 # Analysis Complete
 
 Comprehensive analysis of '{query}' has been completed using {citation_count} authoritative sources:
 
 - **{len(research_sources['academic'])}** Academic journal articles
-- **{len(research_sources['web_sources'])}** Industry web sources  
+- **{len(research_sources['web_sources'])}** Industry web sources
 - **{len(research_sources['reports'])}** Research reports
 
 All sources have been properly cited and are available for review by clicking the citation links above.
@@ -1016,28 +1026,28 @@ async def database_query_tool(
         Queries database and provides data citations
         ✅ Works perfectly in both function calling modes
         """
-        
+
         if not __event_emitter__:
             return "Database query executed"
-        
+
         # Simulate database results with citation metadata
         query_results = [
             {
                 "record_id": "USR_001247",
                 "data": "John Smith, Software Engineer, joined 2023-01-15",
-                "table": "employees", 
+                "table": "employees",
                 "last_updated": "2024-03-10T14:30:00Z",
                 "updated_by": "admin_user"
             },
             {
-                "record_id": "USR_001248", 
+                "record_id": "USR_001248",
                 "data": "Jane Wilson, Product Manager, joined 2023-02-20",
                 "table": "employees",
-                "last_updated": "2024-03-08T09:15:00Z", 
+                "last_updated": "2024-03-08T09:15:00Z",
                 "updated_by": "hr_system"
             }
         ]
-        
+
         # Create citations for each database record
         for i, record in enumerate(query_results):
             await __event_emitter__({
@@ -1061,15 +1071,16 @@ async def database_query_tool(
                     }
                 }
             })
-        
+
         return f"""
+
 # Database Query Results
 
 Executed query: `{sql_query}`
 
 Retrieved **{len(query_results)}** records with complete citation metadata. Each record includes:
 - Record ID and source table
-- Last modification timestamp  
+- Last modification timestamp
 - Update attribution
 - Full audit trail
 
@@ -1090,7 +1101,7 @@ await __event_emitter__({
 })
 ```
 
-**File Events**  
+**File Events**
 ```python
 await __event_emitter__({
     "type": "files", # or "chat:message:files"
@@ -1101,7 +1112,7 @@ await __event_emitter__({
 **Follow-up Events**
 ```python
 await __event_emitter__({
-    "type": "chat:message:follow_ups", 
+    "type": "chat:message:follow_ups",
     "data": {"follow_ups": ["What about X?", "Tell me more about Y"]}
 })
 ```
@@ -1117,13 +1128,13 @@ await __event_emitter__({
 **Tag Events**
 ```python
 await __event_emitter__({
-    "type": "chat:tags", 
+    "type": "chat:tags",
     "data": {"tags": ["research", "analysis", "completed"]}
 })
 ```
 
 **Error Events**
-```python  
+```python
 await __event_emitter__({
     "type": "chat:message:error",
     "data": {"content": "Error message to display"}
@@ -1141,7 +1152,7 @@ await __event_emitter__({
 **Input Request Events**
 ```python
 await __event_emitter__({
-    "type": "input", 
+    "type": "input",
     "data": {"prompt": "Please enter additional information:"}
 })
 ```
@@ -1202,7 +1213,7 @@ Choosing the right function calling mode is crucial for your tool's functionalit
 - Educational tools that show step-by-step processes
 - Any tool that needs `message`, `replace`, or `chat:message` events
 
-**Choose Native Mode For:**  
+**Choose Native Mode For:**
 - Simple API calls or database queries
 - Basic calculations or data transformations
 - Tools that only need status updates and citations
@@ -1218,64 +1229,64 @@ async def mode_adaptive_tool(
         Tool that adapts its behavior based on function calling mode
         ✅ Provides optimal experience in both modes
         """
-        
+
         # Detect current mode
         mode = "default"
         if __metadata__:
             mode = __metadata__.get("params", {}).get("function_calling", "default")
-        
+
         is_native_mode = (mode == "native")
-        
+
         if not __event_emitter__:
             return "Tool executed successfully (no event support)"
-        
+
         # Always safe: status updates work in both modes
         await __event_emitter__({
             "type": "status",
             "data": {"description": f"Running in {mode} mode...", "done": False}
         })
-        
+
         # Mode-specific logic
         if is_native_mode:
             # Native mode: use compatible events only
             await __event_emitter__({
-                "type": "status", 
+                "type": "status",
                 "data": {"description": "Processing with native efficiency...", "done": False}
             })
-            
+
             # Simulate processing
             await asyncio.sleep(1)
-            
+
             # Return results directly - no message streaming
             result = f"Query '{query}' processed successfully in Native mode."
-            
+
         else:
-            # Default mode: full event capabilities  
+            # Default mode: full event capabilities
             await __event_emitter__({
                 "type": "message",
                 "data": {"content": f"🔍 **Processing Query**: {query}\n\n"}
             })
-            
+
             await __event_emitter__({
-                "type": "status", 
+                "type": "status",
                 "data": {"description": "Analyzing with full streaming...", "done": False}
             })
-            
+
             await asyncio.sleep(1)
-            
+
             await __event_emitter__({
                 "type": "message",
                 "data": {"content": "📊 **Results**: Analysis complete with detailed findings.\n\n"}
             })
-            
+
             result = "Query processed with full Default mode capabilities."
-        
+
         # Final status (works in both modes)
         await __event_emitter__({
             "type": "status",
             "data": {"description": "Processing complete!", "done": True}
         })
-        
+
         return result
 ```
 </details>
@@ -1289,7 +1300,7 @@ async def mode_adaptive_tool(
 - **Cause**: Using message events in Native mode
 - **Solution**: Switch to Default mode or use status events instead
 
-**Issue: Tool seems unresponsive**  
+**Issue: Tool seems unresponsive**
 - **Cause**: Function calling not enabled for model
 - **Solution**: Enable tools in Model settings or via `+` button
 
@@ -1298,7 +1309,7 @@ async def mode_adaptive_tool(
 - **Solution**: Ensure parameter is included in tool method signature
 
 **Issue: Citations being overwritten**
-- **Cause**: `self.citation = True` (or not set to False)  
+- **Cause**: `self.citation = True` (or not set to False)
 - **Solution**: Set `self.citation = False` in `__init__` method
 
 **Diagnostic Tool:**
@@ -1309,33 +1320,33 @@ async def event_diagnostics_tool(
         """
         Comprehensive diagnostic tool for event emitter debugging
         """
-        
+
         report = ["# 🔍 Event Emitter Diagnostic Report\n"]
-        
+
         # Check event emitter availability
         if __event_emitter__:
             report.append("✅ Event emitter is available\n")
         else:
             report.append("❌ Event emitter is NOT available\n")
             return "".join(report)
-        
-        # Check metadata availability  
+
+        # Check metadata availability
         if __metadata__:
             mode = __metadata__.get("params", {}).get("function_calling", "default")
             report.append(f"✅ Function calling mode: **{mode}**\n")
         else:
             report.append("⚠️ Metadata not available (mode unknown)\n")
             mode = "unknown"
-        
+
         # Check user context
         if __user__:
             report.append("✅ User context available\n")
         else:
             report.append("⚠️ User context not available\n")
-        
+
         # Test compatible events (work in both modes)
         report.append("\n## Testing Compatible Events:\n")
-        
+
         try:
             await __event_emitter__({
                 "type": "status",
@@ -1344,19 +1355,19 @@ async def event_diagnostics_tool(
             report.append("✅ Status events: WORKING\n")
         except Exception as e:
             report.append(f"❌ Status events: FAILED - {str(e)}\n")
-        
+
         try:
             await __event_emitter__({
-                "type": "notification", 
+                "type": "notification",
                 "data": {"content": "Test notification"}
             })
             report.append("✅ Notification events: WORKING\n")
         except Exception as e:
             report.append(f"❌ Notification events: FAILED - {str(e)}\n")
-        
+
         # Test problematic events (broken in Native mode)
         report.append("\n## Testing Mode-Dependent Events:\n")
-        
+
         try:
             await __event_emitter__({
                 "type": "message",
@@ -1365,20 +1376,20 @@ async def event_diagnostics_tool(
             report.append("✅ Message events: SENT (may disappear in Native mode)\n")
         except Exception as e:
             report.append(f"❌ Message events: FAILED - {str(e)}\n")
-        
+
         # Final status
         await __event_emitter__({
-            "type": "status", 
+            "type": "status",
             "data": {"description": "Diagnostic complete", "done": True}
         })
-        
+
         # Mode-specific recommendations
         report.append("\n## Recommendations:\n")
-        
+
         if mode == "native":
             report.append("""
 ⚠️ **Native Mode Detected**: Limited event support
-- ✅ Use: status, citation, notification, files events  
+- ✅ Use: status, citation, notification, files events
 - ❌ Avoid: message, replace, chat:message events
 - 💡 Switch to Default mode for full functionality
 """)
@@ -1394,7 +1405,7 @@ async def event_diagnostics_tool(
 - Ensure function calling is enabled
 - Verify model supports tool calling
 """)
-        
+
         return "".join(report)
 ```
 </details>
@@ -1404,6 +1415,7 @@ async def event_diagnostics_tool(
 
 **Always Compatible (Both Modes):**
 ```python
+
 # Status updates - perfect for progress tracking
 await __event_emitter__({
     "type": "status",
@@ -1412,14 +1424,14 @@ await __event_emitter__({
 
 # Citations - essential for source attribution
 await __event_emitter__({
-    "type": "citation", 
+    "type": "citation",
     "data": {
         "document": ["Content"],
         "source": {"name": "Source", "url": "https://example.com"}
     }
 })
 
-# Notifications - user alerts  
+# Notifications - user alerts
 await __event_emitter__({
     "type": "notification",
     "data": {"content": "Task completed!"}
@@ -1428,24 +1440,25 @@ await __event_emitter__({
 
 **Default Mode Only (Broken in Native):**
 ```python
+
 # ⚠️ These will flicker/disappear in Native mode
 
-# Progressive content streaming  
+# Progressive content streaming
 await __event_emitter__({
-    "type": "message", 
+    "type": "message",
     "data": {"content": "Streaming content..."}
 })
 
 # Content replacement
 await __event_emitter__({
     "type": "replace",
-    "data": {"content": "New complete content"}  
+    "data": {"content": "New complete content"}
 })
 
 # Delta updates
 await __event_emitter__({
     "type": "chat:message:delta",
-    "data": {"content": "Additional content"} 
+    "data": {"content": "Additional content"}
 })
 ```
 
@@ -1487,7 +1500,7 @@ from fastapi.responses import HTMLResponse
 def create_visualization_tool(self, data: str) -> HTMLResponse:
     """
     Creates an interactive data visualization that embeds in the chat.
-    
+
     :param data: The data to visualize
     """
     html_content = """
@@ -1509,7 +1522,7 @@ def create_visualization_tool(self, data: str) -> HTMLResponse:
     </body>
     </html>
     """
-    
+
     headers = {"Content-Disposition": "inline"}
     return HTMLResponse(content=html_content, headers=headers)
 ```
@@ -1535,7 +1548,7 @@ When embedding external content, several security options can be configured thro
 Rich UI embedding is perfect for:
 
 - **Interactive dashboards**: Real-time data visualization and controls
-- **Form interfaces**: Complex input forms with validation and dynamic behavior  
+- **Form interfaces**: Complex input forms with validation and dynamic behavior
 - **Charts and graphs**: Interactive plotting with libraries like Plotly, D3.js, or Chart.js
 - **Media players**: Video, audio, or interactive media content
 - **Custom widgets**: Specialized UI components for specific tool functionality
@@ -1562,7 +1575,7 @@ async def create_dashboard():
         </script>
     </div>
     """
-    
+
     return HTMLResponse(
         content=html,
         headers={"Content-Disposition": "inline"}
@@ -1579,7 +1592,6 @@ Keep in mind that as pip is used in the same process as Open WebUI, the UI will 
 
 No measures are taken to handle package conflicts with Open WebUI's requirements. That means that specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
 
-
 <details>
 <summary>Example</summary>
 
@@ -1589,6 +1601,7 @@ title: myToolName
 author: myName
 funding_url: [any link here will be shown behind a `Heart` button for users to show their support to you]
 version: 1.0.0
+
 # the version is displayed in the UI to help users keep track of updates.
 license: GPLv3
 description: [recommended]

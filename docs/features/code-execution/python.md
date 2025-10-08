@@ -17,16 +17,16 @@ The Open WebUI frontend includes a self-contained WASM (WebAssembly) Python envi
 
 Pyodide code execution is configured to load only packages configured in scripts/prepare-pyodide.js and then added to "CodeBlock.svelte". The following Pyodide packages are currently supported in Open WebUI:
 
-* micropip
-* packaging
-* requests
-* beautifulsoup4
-* numpy
-* pandas
-* matplotlib
-* scikit-learn
-* scipy
-* regex
+- micropip
+- packaging
+- requests
+- beautifulsoup4
+- numpy
+- pandas
+- matplotlib
+- scikit-learn
+- scipy
+- regex
 
 These libraries can be used to perform various tasks, such as data manipulation, machine learning, and web scraping. If the package you're wanting to run is not compiled inside of the Pyodide we ship with Open WebUIm, the package will not be able to be used.
 
@@ -36,13 +36,13 @@ To execute Python code, ask an LLM within a chat to write a Python script for yo
 
 ## Tips for Using Python Code Execution
 
-* When writing Python code, keep in mind that the code would be running in a Pyodide environment when executed. You can inform the LLM of this by mentioning "Pyodide environment" when asking for code.
-* Research the Pyodide documentation to understand the capabilities and limitations of the environment.
-* Experiment with different libraries and scripts to explore the possibilities of Python code execution in Open WebUI.
+- When writing Python code, keep in mind that the code would be running in a Pyodide environment when executed. You can inform the LLM of this by mentioning "Pyodide environment" when asking for code.
+- Research the Pyodide documentation to understand the capabilities and limitations of the environment.
+- Experiment with different libraries and scripts to explore the possibilities of Python code execution in Open WebUI.
 
 ## Pyodide Documentation
 
-* [Pyodide Documentation](https://pyodide.org/en/stable/)
+- [Pyodide Documentation](https://pyodide.org/en/stable/)
 
 ## Code Example
 
@@ -52,7 +52,7 @@ Here is an example of a simple Python script that can be executed using Pyodide:
 import pandas as pd
 
 # Create a sample DataFrame
-data = {'Name': ['John', 'Anna', 'Peter'], 
+data = {'Name': ['John', 'Anna', 'Peter'],
         'Age': [28, 24, 35]}
 df = pd.DataFrame(data)
 

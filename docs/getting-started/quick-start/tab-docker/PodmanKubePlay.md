@@ -63,7 +63,7 @@ For Nvidia GPU support, you need to replace the container image with `ghcr.io/op
 
 :::important
 
-To successfully have the open-webui container access the GPU(s), 
+To successfully have the open-webui container access the GPU(s),
 you will need to have the Container Device Interface (CDI) for the GPU you wish to access installed in your Podman Machine. You can check [Podman GPU container access](https://podman-desktop.io/docs/podman/gpu).
 
 :::

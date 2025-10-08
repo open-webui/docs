@@ -4,41 +4,44 @@ title: "🔐 Groups"
 ---
 
 Groups allow administrators to
-* assign permissions to multiple users at once, simplifying access management
-* limit access to specific resources (Models, Tools, etc) by setting their access to "private" then opening access to specific groups
-* Specify access to a resource for a group to either "read" or "write" (write access implies read)
+
+- assign permissions to multiple users at once, simplifying access management
+- limit access to specific resources (Models, Tools, etc) by setting their access to "private" then opening access to specific groups
+- Specify access to a resource for a group to either "read" or "write" (write access implies read)
 
 :::info
+
 Note that the permissions model is permissive. If a user is a member of two groups that define different permissions for a resource, the most permissive permission is applied.
+
 :::
 
 ### Group Structure
 
 Each group in Open WebUI contains:
 
-* A unique identifier
-* Name and description
-* Owner/creator reference
-* List of member user IDs
-* Permission configuration
-* Additional metadata
+- A unique identifier
+- Name and description
+- Owner/creator reference
+- List of member user IDs
+- Permission configuration
+- Additional metadata
 
 ### Group Management
 
 Groups can be:
 
-* **Created manually** by administrators through the user interface
-* **Synced automatically** from OAuth providers when `ENABLE_OAUTH_GROUP_MANAGEMENT` is enabled
-* **Created automatically** from OAuth claims when both `ENABLE_OAUTH_GROUP_MANAGEMENT` and`ENABLE_OAUTH_GROUP_CREATION`
+- **Created manually** by administrators through the user interface
+- **Synced automatically** from OAuth providers when `ENABLE_OAUTH_GROUP_MANAGEMENT` is enabled
+- **Created automatically** from OAuth claims when both `ENABLE_OAUTH_GROUP_MANAGEMENT` and`ENABLE_OAUTH_GROUP_CREATION`
   are enabled
 
 ### OAuth Group Integration
 
 When OAuth group management is enabled, user group memberships are synchronized with groups received in OAuth claims:
 
-* Users are added to Open WebUI groups that match their OAuth claims
-* Users are removed from groups not present in their OAuth claims
-* With `ENABLE_OAUTH_GROUP_CREATION` enabled, groups from OAuth claims that don't exist in Open WebUI are automatically
+- Users are added to Open WebUI groups that match their OAuth claims
+- Users are removed from groups not present in their OAuth claims
+- With `ENABLE_OAUTH_GROUP_CREATION` enabled, groups from OAuth claims that don't exist in Open WebUI are automatically
   created
 
 ## Group Permissions

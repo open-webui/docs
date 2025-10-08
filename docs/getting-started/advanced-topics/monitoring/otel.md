@@ -10,6 +10,7 @@ Open WebUI supports **distributed tracing and metrics** export via the OpenTelem
 The fastest way to get started with observability is with the pre-configured Docker Compose:
 
 ```bash
+
 # Spin up Open WebUI and the latest Grafana LGTM stack, all-in-one
 docker compose -f docker-compose.otel.yaml up -d
 ```
@@ -21,7 +22,7 @@ The `docker-compose.otel.yaml` file sets up these components:
 | **grafana** | 3000 (UI), 4317 (OTLP/gRPC), 4318 (HTTP) | Grafana LGTM (Loki+Grafana+Tempo+Mimir) all-in-one   |
 | **open-webui** | 8088 (default) → 8080                     | WebUI, OTEL enabled, exposes on host port 8088          |
 
-After startup, access the Grafana dashboard at [http://localhost:3000](http://localhost:3000)  
+After startup, access the Grafana dashboard at [http://localhost:3000](http://localhost:3000)
 Login: `admin` / `admin`
 
 ## ⚙️ Environment Variables
@@ -37,7 +38,11 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 | `OTEL_SERVICE_NAME`                  | `open-webui`                    | Service name (tagged in traces and metrics)         |
 | `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | *(empty)*      | Basic Auth credentials if Collector requires them   |
 
-> Tip: Override defaults in your `.env` file or Compose file as needed.
+:::tip
+
+Override defaults in your `.env` file or Compose file as needed.
+
+:::
 
 ```yaml
   open-webui:
@@ -101,7 +106,7 @@ docker run -d --name open-webui \
 - Double-check `ENABLE_OTEL` and `ENABLE_OTEL_METRICS` are both set to `true`
 - Is the endpoint correct? (`OTEL_EXPORTER_OTLP_ENDPOINT`)
 - Inspect logs from Open WebUI (`docker logs open-webui`) for OTLP errors
-- Collector's OTLP port (`4317`) should be open and reachable. Try:  
+- Collector's OTLP port (`4317`) should be open and reachable. Try:
   `curl http://localhost:4317` (replace host as needed)
 
 **Authentication required?**

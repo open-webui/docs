@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "🌊 MermaidJS Rendering"
 ---
 
-# 🌊 MermaidJS Rendering Support in Open WebUI
+## 🌊 MermaidJS Rendering Support in Open WebUI
 
 ## Overview
 
@@ -13,8 +13,8 @@ Open WebUI supports rendering of visually appealing MermaidJS diagrams, flowchar
 
 To generate a MermaidJS diagram, simply ask an LLM within any chat to create a diagram or chart using MermaidJS. For example, you can ask the LLM to:
 
-* "Create a flowchart for a simple decision-making process for me using Mermaid. Explain how the flowchart works."
-* "Use Mermaid to visualize a decision tree to determine whether it's suitable to go for a walk outside."
+- "Create a flowchart for a simple decision-making process for me using Mermaid. Explain how the flowchart works."
+- "Use Mermaid to visualize a decision tree to determine whether it's suitable to go for a walk outside."
 
 Note that for the LLM's response to be rendered correctly, it must begin with the word `mermaid` followed by the MermaidJS code. You can reference the [MermaidJS documentation](https://mermaid.js.org/intro/) to ensure the syntax is correct and provide structured prompts to the LLM to guide it towards generating better MermaidJS syntax.
 
@@ -28,8 +28,8 @@ If the model generates MermaidJS syntax, but the visualization does not render, 
 
 Once your visualization is displayed, you can:
 
-* Zoom in and out to examine it more closely.
-* Copy the original MermaidJS code used to generate the visualization by clicking the copy button at the top-right corner of the display area.
+- Zoom in and out to examine it more closely.
+- Copy the original MermaidJS code used to generate the visualization by clicking the copy button at the top-right corner of the display area.
 
 ### Example
 

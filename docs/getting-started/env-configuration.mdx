@@ -3,7 +3,6 @@ sidebar_position: 4
 title: "🌍 Environment Variable Configuration"
 ---
 
-
 ## Overview
 
 Open WebUI provides a large range of environment variables that allow you to customize and configure
@@ -171,7 +170,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets a custom text that will be included when you copy a message in the chat. E.g. `"This text is AI generated"` -> will add "This text is AI generated" to every message, when copied.
+- Description: Sets a custom text that will be included when you copy a message in the chat. e.g., `"This text is AI generated"` -> will add "This text is AI generated" to every message, when copied.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `THREAD_POOL_SIZE`
@@ -240,6 +239,7 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Description: Sets the port to run Open WebUI from.
 
 :::info
+
 If you're running the application via Python and using the `open-webui serve` command, you cannot set the port using the `PORT` configuration. Instead, you must specify it directly as a command-line argument using the `--port` flag. For example:
 
 ```bash
@@ -247,6 +247,7 @@ open-webui serve --port 9999
 ```
 
 This will run the Open WebUI on port `9999`. The `PORT` environment variable is disregarded in this mode.
+
 :::
 
 #### `ENABLE_REALTIME_CHAT_SAVE`
@@ -368,7 +369,9 @@ allowing the client to wait indefinitely.
 - Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
 :::note
+
 The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped, depending on your network conditions.
+
 :::
 
 #### `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST`
@@ -502,15 +505,19 @@ when using OpenAI-compatible endpoints.
 `DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE`:
 
 ```
+
 ### Task:
 Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+
 ### Guidelines:
 - The title should clearly represent the main theme or subject of the conversation.
 - Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
 - Write the title in the chat's primary language; default to English if multilingual.
 - Prioritize accuracy over excessive creativity; keep it clear and simple.
+
 ### Output:
 JSON format: { "title": "your concise title here" }
+
 ### Examples:
 - { "title": "📉 Stock Market Trends" },
 - { "title": "🍪 Perfect Chocolate Chip Recipe" },
@@ -518,6 +525,7 @@ JSON format: { "title": "your concise title here" }
 - { "title": "Remote Work Productivity Tips" },
 - { "title": "Artificial Intelligence in Healthcare" },
 - { "title": "🎮 Video Game Development Insights" }
+
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:2}}
@@ -542,8 +550,10 @@ JSON format: { "title": "your concise title here" }
 `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`:
 
 ```
+
 ### Task:
 Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+
 ### Guidelines:
 - Write all follow-up questions from the user’s point of view, directed to the assistant.
 - Make questions concise, clear, and directly related to the discussed topic(s).
@@ -551,8 +561,10 @@ Suggest 3-5 relevant follow-up questions or prompts that the user might naturall
 - If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
 - Use the conversation's primary language; default to English if multilingual.
 - Response must be a JSON array of strings, no extra text or formatting.
+
 ### Output:
 JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:6}}
@@ -576,7 +588,7 @@ Your task is to choose and return the correct tool(s) from the list of available
 
 - Return only the JSON object, without any additional text or explanation.
 
-- If no tools match the query, return an empty array: 
+- If no tools match the query, return an empty array:
    {
      "tool_calls": []
    }
@@ -758,45 +770,49 @@ When enabling `ENABLE_AUTOCOMPLETE_GENERATION`, ensure that you also configure `
 `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`:
 
 ```
+
 ### Task:
-You are an autocompletion system. Continue the text in `<text>` based on the **completion type** in `<type>` and the given language.  
+You are an autocompletion system. Continue the text in `<text>` based on the **completion type** in `<type>` and the given language.
 
 ### **Instructions**:
-1. Analyze `<text>` for context and meaning.  
-2. Use `<type>` to guide your output:  
-   - **General**: Provide a natural, concise continuation.  
-   - **Search Query**: Complete as if generating a realistic search query.  
-3. Start as if you are directly continuing `<text>`. Do **not** repeat, paraphrase, or respond as a model. Simply complete the text.  
+1. Analyze `<text>` for context and meaning.
+2. Use `<type>` to guide your output:
+   - **General**: Provide a natural, concise continuation.
+   - **Search Query**: Complete as if generating a realistic search query.
+3. Start as if you are directly continuing `<text>`. Do **not** repeat, paraphrase, or respond as a model. Simply complete the text.
 4. Ensure the continuation:
-   - Flows naturally from `<text>`.  
-   - Avoids repetition, overexplaining, or unrelated ideas.  
-5. If unsure, return: `{ "text": "" }`.  
+   - Flows naturally from `<text>`.
+   - Avoids repetition, overexplaining, or unrelated ideas.
+5. If unsure, return: `{ "text": "" }`.
 
 ### **Output Rules**:
 - Respond only in JSON format: `{ "text": "<your_completion>" }`.
 
 ### **Examples**:
-#### Example 1:  
-Input:  
-<type>General</type>  
-<text>The sun was setting over the horizon, painting the sky</text>  
-Output:  
+
+#### Example 1:
+Input:
+<type>General</type>
+<text>The sun was setting over the horizon, painting the sky</text>
+Output:
 { "text": "with vibrant shades of orange and pink." }
 
-#### Example 2:  
-Input:  
-<type>Search Query</type>  
-<text>Top-rated restaurants in</text>  
-Output:  
-{ "text": "New York City for Italian cuisine." }  
+#### Example 2:
+Input:
+<type>Search Query</type>
+<text>Top-rated restaurants in</text>
+Output:
+{ "text": "New York City for Italian cuisine." }
 
 ---
+
 ### Context:
 <chat_history>
 {{MESSAGES:END:6}}
 </chat_history>
-<type>{{TYPE}}</type>  
-<text>{{PROMPT}}</text>  
+<type>{{TYPE}}</type>
+<text>{{PROMPT}}</text>
+
 #### Output:
 ```
 
@@ -843,11 +859,12 @@ Output:
 `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE`:
 
 ```
+
 ### Task:
 Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
 
 ### Guidelines:
-- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
+- Start with high-level domains (e.g., Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
 - Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
 - If content is too short (less than 3 messages) or too diverse, use only ["General"]
 - Use the chat's primary language; default to English if multilingual
@@ -902,7 +919,7 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 :::warning
 
-Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.  
+Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.
 
 **Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.** Never use `-1` in a production environment.
 
@@ -1052,7 +1069,7 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 - OAuth authentication providers
 - Web search and RAG with external APIs
 
-Read more about `offline mode` in this [guide](/docs/tutorials/offline-mode.md).
+Read more about `offline mode` in the [offline mode guide](/docs/tutorials/offline-mode.md).
 
 :::
 
@@ -1314,6 +1331,7 @@ pip install open-webui[all]
 - Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
 
 :::info
+
 **Benefits of multitenancy mode:**
 - Significantly reduced RAM consumption (5 collections vs potentially hundreds)
 - Lower computational overhead from collection management
@@ -1329,9 +1347,12 @@ pip install open-webui[all]
 - Hash-based collections go into `{prefix}_hash_based`
 - Each entry includes a resource_id field matching the original collection name
 - Queries automatically filter by resource_id to maintain data isolation
+
 :::
 
-:::info **Migration from Legacy Mode to Multitenancy**
+:::info
+
+**Migration from Legacy Mode to Multitenancy**
 
 **What happens when you enable multitenancy when you already have a normal milvus database with data in it:**
 - Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
@@ -1360,9 +1381,12 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - No one-click "migrate and cleanup" button exists
 - Vector DB reset from UI (Admin Settings > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
 - Legacy collections require manual cleanup via Milvus client tools
+
 :::
 
-:::warning **Critical Considerations**
+:::warning
+
+**Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
 - Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
@@ -1386,6 +1410,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
 - Re-upload/re-create knowledge bases from scratch
+
 :::
 
 #### `MILVUS_COLLECTION_PREFIX`
@@ -1723,18 +1748,18 @@ Note: this configuration assumes that AWS credentials will be available to your 
 
 #### `DOCLING_OCR_ENGINE`
 
-- Type: `str`  
-- Default: `tesseract`  
-- Description: Specifies the OCR engine used by Docling.  
-  Supported values include: `tesseract` (default), `easyocr`, `ocrmac`, `rapidocr`, and `tesserocr`.  
+- Type: `str`
+- Default: `tesseract`
+- Description: Specifies the OCR engine used by Docling.
+  Supported values include: `tesseract` (default), `easyocr`, `ocrmac`, `rapidocr`, and `tesserocr`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DOCLING_OCR_LANG`
 
-- Type: `str`  
-- Default: `eng,fra,deu,spa` (when using the default `tesseract` engine)  
-- Description: Specifies the OCR language(s) to be used with the configured `DOCLING_OCR_ENGINE`.  
-  The format and available language codes depend on the selected OCR engine.  
+- Type: `str`
+- Default: `eng,fra,deu,spa` (when using the default `tesseract` engine)
+- Description: Specifies the OCR language(s) to be used with the configured `DOCLING_OCR_ENGINE`.
+  The format and available language codes depend on the selected OCR engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Retrieval Augmented Generation (RAG)
@@ -1802,6 +1827,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
 `DEFAULT_RAG_TEMPLATE`:
 
 ```
+
 ### Task:
 Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id="1">).
 
@@ -2028,6 +2054,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE`:
 
 ```
+
 ### Task:
 Analyze the chat history to determine the necessity of generating search queries, in the given language. By default, **prioritize generating 1-3 broad and relevant search queries** unless it is absolutely certain that no additional information is required. The aim is to retrieve comprehensive, updated, and valuable information even with minimal uncertainty. If no search is unequivocally needed, return an empty list.
 
@@ -2041,7 +2068,7 @@ Analyze the chat history to determine the necessity of generating search queries
 - Always prioritize providing actionable and broad queries that maximize informational coverage.
 
 ### Output:
-Strictly return in JSON format: 
+Strictly return in JSON format:
 {
   "queries": ["query1", "query2"]
 }
@@ -2124,7 +2151,9 @@ When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGL
 ### OneDrive
 
 :::info
+
 For a step-by-step setup guide, check out our tutorial: [Configuring OneDrive & SharePoint Integration](https://docs.openwebui.com/tutorials/integrations/onedrive-sharepoint/).
+
 :::
 
 #### `ENABLE_ONEDRIVE_INTEGRATION`
@@ -2135,8 +2164,10 @@ For a step-by-step setup guide, check out our tutorial: [Configuring OneDrive & 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::warning
+
 Configuring OneDrive integration is a multi-step process that requires creating and correctly configuring an Azure App Registration.
 The authentication flow also depends on a browser pop-up window. Please ensure that your browser's pop-up blocker is disabled for your Open WebUI domain to allow the authentication and file selection window to appear.
+
 :::
 
 #### `ENABLE_ONEDRIVE_PERSONAL`
@@ -2172,8 +2203,10 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 - Description: Specifies the Application (client) ID for the **Work/School (Business) OneDrive** integration. This requires a separate Azure App Registration configured to support personal Microsoft accounts. **Do not put the personal OneDrive client ID here!**
 
 :::info
+
 This Client ID (also known as Application ID) is obtained from an Azure App Registration within your Microsoft Entra ID (formerly Azure AD) tenant.
 When configuring the App Registration in Azure, the Redirect URI must be set to the URL of your Open WebUI instance and configured as a **Single-page application (SPA)** type for the authentication to succeed.
+
 :::
 
 #### `ONEDRIVE_SHAREPOINT_URL`
@@ -2184,7 +2217,9 @@ When configuring the App Registration in Azure, the Redirect URI must be set to 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
+
 This variable is essential for the work/school integration. It should point to the root SharePoint site associated with your tenant, enabling access to SharePoint document libraries.
+
 :::
 
 #### `ONEDRIVE_SHAREPOINT_TENANT_ID`
@@ -2195,7 +2230,9 @@ This variable is essential for the work/school integration. It should point to t
 -   Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
+
 This Tenant ID (also known as Directory ID) is required for the work/school integration. You can find this value on the main overview page of your Azure App Registration in the Microsoft Entra ID portal.
+
 :::
 
 ## Web Search
@@ -2508,7 +2545,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `en`
 - Description: Comma-separated list of language codes to try when fetching YouTube video transcriptions, in priority order.
-- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English. Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+- Example: If set to `es,de`, Spanish transcriptions will be attempted first, then German if Spanish was not available, and lastly English.
+
+:::note
+
+Note: If none of the specified languages are available and `en` was not in your list, the system will automatically try English as a final fallback.
+
+:::
+
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Audio
@@ -2722,6 +2766,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 `DEFAULT_IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`:
 
 ```
+
 ### Task:
 Generate a detailed prompt for am image generation task based on the given language and context. Describe the image as if you were explaining it to someone who cannot see it. Include relevant details, colors, shapes, and any other important elements.
 
@@ -3027,6 +3072,33 @@ By default, OAuth configurations are stored in the database and managed via the 
 - Description: If enabled, merges OAuth accounts with existing accounts using the same email
 address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to potential account takeovers.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_OAUTH_WITHOUT_EMAIL`
+- Type: `bool`
+- Default: `False`
+- Description: Enables authentication with OpenID Connect (OIDC) providers that do not support or expose an email scope. When enabled, Open WebUI will create and manage user accounts without requiring an email address from the OAuth provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+**Use with Caution**
+
+Enabling this option bypasses email-based user identification, which is the standard method for uniquely identifying users across authentication systems. When enabled:
+
+- User accounts will be created using the `sub` claim (or the claim specified in `OAUTH_SUB_CLAIM`) as the primary identifier
+- Email-based features such as password recovery, email notifications, and account merging via `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` will not function properly
+- Ensure your OIDC provider's `sub` claim is stable and unique to prevent authentication conflicts
+
+Only enable this if your identity provider does not support email scope and you have alternative user identification mechanisms in place.
+
+This setting is designed for enterprise environments using identity providers that:
+- Use employee IDs, usernames, or other non-email identifiers as the primary user claim
+- Have privacy policies that prevent sharing email addresses via OAuth
+- Operate in air-gapped or highly restricted networks where email-based services are unavailable
+
+For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this setting should remain `False`.
+
+:::
 
 #### `OAUTH_UPDATE_PICTURE_ON_LOGIN`
 
@@ -3356,7 +3428,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: `*`
-- Description: Specifies the allowed domains for OAuth authentication. (e.g. "example1.com,example2.com").
+- Description: Specifies the allowed domains for OAuth authentication. (e.g., "example1.com,example2.com").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## LDAP
@@ -3373,7 +3445,6 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Description: Sets the label of the LDAP server.
 - Persistence: This environment variable is a `PersistentConfig` variable.
-
 
 #### `LDAP_SERVER_HOST`
 
@@ -3808,7 +3879,7 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 - Type: `str`
 - Description: Set the access key for Azure Storage.
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
- 
+
 ### OpenTelemetry Configuration
 
 #### `ENABLE_OTEL`
@@ -4012,7 +4083,9 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 - Persistence: No
 
 :::info
+
 When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct it using a combination of `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, and `DATABASE_NAME`. For this automatic construction to occur, **all** of these individual parameters must be provided. If any are missing, the default `DATABASE_URL` (SQLite file) or any explicitly set `DATABASE_URL` will be used instead.
+
 :::
 
 ### Encrypted SQLite with SQLCipher
@@ -4021,8 +4094,8 @@ For enhanced security, Open WebUI supports at-rest encryption for its primary SQ
 
 To enable encryption, you must configure two environment variables:
 
-1.  Set `DATABASE_TYPE="sqlite+sqlcipher"`.
-1.  Set `DATABASE_PASSWORD="your-secure-password"`.
+1. Set `DATABASE_TYPE="sqlite+sqlcipher"`.
+1. Set `DATABASE_PASSWORD="your-secure-password"`.
 
 When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
 
@@ -4103,8 +4176,8 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Specifies the URL of the Redis instance or cluster host for storing application state.
 - Examples:
   - `redis://localhost:6379/0`
-  - `rediss://:password@localhost:6379/0` _(with password and TLS)_
-  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` _(with mTLS)_
+  - `rediss://:password@localhost:6379/0` *(with password and TLS)*
+  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` *(with mTLS)*
 
 :::info
 
@@ -4200,6 +4273,30 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 
 :::
 
+#### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
+- Type: `bool`
+- Default: `False`
+- Description: Enables Redis-based session storage for OAuth authentication flows using the StarSessions middleware. When enabled, OAuth session state is stored in Redis instead of browser cookies, which can help resolve CSRF errors in multi-replica deployments where session data needs to be shared across pods.
+- Persistence: This is an experimental environment variable.
+
+:::warning
+**Experimental Feature - Known Limitations**
+
+This feature is currently experimental and has known compatibility issues:
+
+- **Redis Sentinel and Redis Cluster configurations are not yet supported** and will cause authentication failures if this setting is enabled
+- Only basic Redis setups (single instance or standard Redis URL) are currently compatible
+- This feature was introduced to address CSRF "mismatching_state" errors in multi-pod deployments, but it is disabled by default due to ongoing compatibility work
+
+**Only enable this setting if:**
+- You are experiencing persistent CSRF errors during OAuth login in a multi-replica deployment
+- You are using a basic Redis setup (not Sentinel or Cluster)
+- You have confirmed that `WEBUI_SECRET_KEY` is set to the same value across all replicas
+- You understand this is an experimental feature that may change or be removed in future releases
+
+For most deployments, the default browser cookie-based session management is sufficient and more stable.
+:::
+
 ### Uvicorn Settings
 
 #### `UVICORN_WORKERS`
@@ -4224,7 +4321,7 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 - Default: Not set (no Cache-Control header added)
 - Description: Sets the Cache-Control header for all HTTP responses. Supports standard directives like `public`, `private`, `no-cache`, `no-store`, `must-revalidate`, `max-age=seconds`, etc. If an invalid value is provided, defaults to `"no-store, max-age=0"` (no caching).
 - Examples:
-  - `"private, max-age=86400"` - Cache privately for 24 hours  
+  - `"private, max-age=86400"` - Cache privately for 24 hours
   - `"public, max-age=3600, must-revalidate"` - Cache publicly for 1 hour, then revalidate
   - `"no-cache, no-store, must-revalidate"` - Never cache
 
