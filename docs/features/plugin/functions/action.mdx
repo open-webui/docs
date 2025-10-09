@@ -11,14 +11,14 @@ A scaffold of Action code can be found [in the community section](https://openwe
 
 An example of a graph visualization Action can be seen in the video below.
 
-<p align="center">
+<div align="center">
 	<a href="#">
 		<img
 			src="/images/pipelines/graph-viz-action.gif"
 			alt="Graph Visualization Action"
 		/>
 	</a>
-</p>
+</div>
 
 ## Action Function Architecture
 
@@ -32,11 +32,11 @@ Actions follow a specific class structure with an `action` method as the main en
 class Action:
     def __init__(self):
         self.valves = self.Valves()
-    
+
     class Valves(BaseModel):
         # Configuration parameters
         parameter_name: str = "default_value"
-    
+
     async def action(self, body: dict, __user__=None, __event_emitter__=None, __event_call__=None):
         # Action implementation
         return {"content": "Modified message content"}
@@ -60,7 +60,7 @@ Actions can utilize Open WebUI's real-time event system for interactive experien
 
 ### Event Emitter (`__event_emitter__`)
 
-**For more information about Events and Event emitters, [see here](https://docs.openwebui.com/features/plugin/events/).**
+**For more information about Events and Event emitters, see [Events and Event Emitters](https://docs.openwebui.com/features/plugin/events/).**
 
 Send real-time updates to the frontend during action execution:
 
@@ -68,10 +68,10 @@ Send real-time updates to the frontend during action execution:
 async def action(self, body: dict, __event_emitter__=None):
     # Send status updates
     await __event_emitter__({
-        "type": "status", 
+        "type": "status",
         "data": {"description": "Processing request..."}
     })
-    
+
     # Send notifications
     await __event_emitter__({
         "type": "notification",
@@ -92,7 +92,7 @@ async def action(self, body: dict, __event_call__=None):
             "message": "Are you sure you want to proceed?"
         }
     })
-    
+
     # Request user input
     user_input = await __event_call__({
         "type": "input",
@@ -127,7 +127,7 @@ actions = [
     },
     {
         "id": "translate",
-        "name": "Translate", 
+        "name": "Translate",
         "icon_url": "data:image/svg+xml;base64,..."
     }
 ]
@@ -137,7 +137,7 @@ async def action(self, body: dict, __id__=None, **kwargs):
         # Summarization logic
         return {"content": "Summary: ..."}
     elif __id__ == "translate":
-        # Translation logic  
+        # Translation logic
         return {"content": "Translation: ..."}
 ```
 
@@ -157,10 +157,10 @@ async def action(self, body: dict, __event_emitter__=None):
         "type": "status",
         "data": {"description": "Starting background processing..."}
     })
-    
+
     # Perform time-consuming operation
     result = await some_long_running_function()
-    
+
     return {"content": f"Processing completed: {result}"}
 ```
 
@@ -170,7 +170,7 @@ Actions can work with uploaded files and generate new media:
 ```python
 async def action(self, body: dict):
     message = body
-    
+
     # Access uploaded files
     if message.get("files"):
         for file in message["files"]:
@@ -178,7 +178,7 @@ async def action(self, body: dict):
             if file["type"] == "image":
                 # Image processing logic
                 pass
-    
+
     # Return new files
     return {
         "content": "Analysis complete",
@@ -199,7 +199,7 @@ Actions can access user information and respect permissions:
 async def action(self, body: dict, __user__=None):
     if __user__["role"] != "admin":
         return {"content": "This action requires admin privileges"}
-    
+
     user_name = __user__["name"]
     return {"content": f"Hello {user_name}, admin action completed"}
 ```
@@ -252,7 +252,7 @@ class Action:
             "type": "status",
             "data": {"description": "Processing message..."}
         })
-        
+
         # Get user confirmation
         response = await __event_call__({
             "type": "confirmation",
@@ -261,14 +261,14 @@ class Action:
                 "message": "Do you want to enhance this message?"
             }
         })
-        
+
         if not response:
             return {"content": "Action cancelled by user"}
-        
+
         # Process the message
         original_content = body.get("content", "")
         enhanced_content = f"Enhanced: {original_content}"
-        
+
         return {"content": enhanced_content}
 ```
 

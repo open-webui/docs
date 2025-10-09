@@ -4,7 +4,9 @@ title: "💡 Special Arguments"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # 💡 Special Arguments
@@ -59,7 +61,6 @@ A `dict` usually destined to go almost directly to the model. Although it is not
   "metadata": "[The exact same dict as __metadata__]",
   "files": "[The exact same list as __files__]"
 }
-
 
 ```
 
@@ -212,7 +213,6 @@ A `list` of the previous messages.
 
 See the `body["messages"]` value above.
 
-
 ### `__chat_id__`
 
 The `str` of the `chat_id`.
@@ -295,14 +295,13 @@ Note that the same files dict can also be accessed via `__metadata__["files"]` (
   }
 ]
 
-
 ```
 
 </details>
 
 ### `__request__`
 
-An instance of `fastapi.Request`. You can read more at the [migration page](../../features/plugin/migration/index.mdx) or at [fastapi's documentation](https://fastapi.tiangolo.com/reference/request/).
+An instance of `fastapi.Request`. You can read more in the [migration page](/docs/features/plugin/migration/index.mdx) or in [fastapi's documentation](https://fastapi.tiangolo.com/reference/request/).
 
 ### `__task__`
 
@@ -332,7 +331,6 @@ A `str` for the type of task. Its value is just a shorthand for `__metadata__["t
 A `dict` containing the `body` needed to accomplish a given `__task__`. Its value is just a shorthand for `__metadata__["task_body"]` if present, otherwise `None`.
 
 Its structure is the same as `body` above, with modifications like using the appropriate model and system message etc.
-
 
 ### `__tools__`
 

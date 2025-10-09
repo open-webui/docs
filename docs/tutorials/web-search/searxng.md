@@ -4,7 +4,9 @@ title: "SearXNG"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 This guide provides instructions on how to set up web search capabilities in Open WebUI using SearXNG in Docker.
@@ -38,19 +40,27 @@ cd searxng-docker
 1. Uncomment `SEARXNG_HOSTNAME` from the `.env` file and set it accordingly:
 
 ```bash
+
 # By default listen on https://localhost
+
 # To change this:
+
 # * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
+
 # * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
 
 SEARXNG_HOSTNAME=localhost:8080/
+
 # LETSENCRYPT_EMAIL=<email>
 
 # Optional:
+
 # If you run a very small or a very large instance, you might want to change the amount of used uwsgi workers and threads per worker
+
 # More workers (= processes) means that more search requests can be handled at the same time, but it also causes more resource usage
 
 # SEARXNG_UWSGI_WORKERS=4
+
 # SEARXNG_UWSGI_THREADS=4
 ```
 
@@ -74,14 +84,19 @@ sudo chmod a+rwx searxng-docker/searxng
 
 5. Create a non-restrictive `searxng-docker/searxng/limiter.toml` config file:
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>searxng-docker/searxng/limiter.toml</summary>
 
 ```bash
+
 # This configuration file updates the default configuration file
+
 # See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
 
 [botdetection.ip_limit]
+
 # activate link_token method in the ip_limit method
 link_token = false
 
@@ -103,7 +118,9 @@ rm searxng-docker/searxng/settings.yml
 **Step 7: Create a Fresh `settings.yml` File**
 
 :::note
+
 On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi`.ini. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
+
 :::
 
 7. Bring up the container momentarily to generate a fresh settings.yml file:
@@ -153,10 +170,13 @@ sed -i 's/bind_address: "0.0.0.0"/bind_address: "127.0.0.1"/' searxng-docker/sea
 
 The default `settings.yml` file contains many engine settings. Below is an extract of what the default `settings.yml` file might look like:
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>searxng-docker/searxng/settings.yml</summary>
 
 ```yaml
+
 # see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
 use_default_settings: true
 
@@ -194,20 +214,25 @@ The port in the settings.yml file for SearXNG should match that of the port numb
 
 9. Ensure your `searxng-docker/searxng/uwsgi.ini` file matches the following:
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
+<!-- markdownlint-disable-next-line MD033 -->
 <summary>searxng-docker/searxng/uwsgi.ini</summary>
 
 ```ini
 [uwsgi]
+
 # Who will run the code
 uid = searxng
 gid = searxng
 
 # Number of workers (usually CPU count)
+
 # default value: %k (= number of CPU core, see Dockerfile)
 workers = %k
 
 # Number of threads per worker
+
 # default value: 4 (see Dockerfile)
 threads = 4
 
@@ -239,11 +264,13 @@ log-5xx = true
 buffer-size = 8192
 
 # No keep alive
+
 # See https://github.com/searx/searx-docker/issues/24
 add-header = Connection: close
 
 # uwsgi serves the static files
 static-map = /static=/usr/local/searxng/searx/static
+
 # expires set to one day
 static-expires = /* 86400
 static-gzip-all = True
@@ -273,7 +300,7 @@ services:
 
 Create a `.env` file for SearXNG:
 
-```
+```env
 # SearXNG
 SEARXNG_HOSTNAME=localhost:8080/
 ```
@@ -313,7 +340,9 @@ docker compose up -d
 ```
 
 :::note
+
 On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi`.ini. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
+
 :::
 
 **Configure SearXNG for Open WebUI Integration**
@@ -357,7 +386,9 @@ docker compose up -d
 ```
 
 :::warning
+
 Without adding JSON format support, SearXNG will block queries from Open WebUI and you'll encounter `403 Client Error: Forbidden` errors in your Open WebUI logs.
+
 :::
 
 Alternatively, you can run SearXNG directly using `docker run`:
@@ -381,10 +412,10 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
 
-* `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
-* `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
-* `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
-* `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
+- `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
+- `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
+- `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
+- `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
 
 **Do note the `/search?q=<query>` part is mandatory.**
 

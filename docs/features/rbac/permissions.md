@@ -15,41 +15,43 @@ Administrators can manage permissions in the following ways:
 
 Workspace permissions control access to core components of the Open WebUI platform:
 
-* **Models Access**: Toggle to allow users to access and manage custom models. (Environment variable: `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`)
-* **Knowledge Access**: Toggle to allow users to access and manage knowledge bases. (Environment variable: `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`)
-* **Prompts Access**: Toggle to allow users to access and manage saved prompts. (Environment variable: `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`)
-* **Tools Access**: Toggle to allow users to access and manage tools. (Environment variable: `USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS`) *Note: Enabling this gives users the ability to upload arbitrary code to the server.*
+- **Models Access**: Toggle to allow users to access and manage custom models. (Environment variable: `USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS`)
+- **Knowledge Access**: Toggle to allow users to access and manage knowledge bases. (Environment variable: `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`)
+- **Prompts Access**: Toggle to allow users to access and manage saved prompts. (Environment variable: `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`)
+- **Tools Access**: Toggle to allow users to access and manage tools. (Environment variable: `USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS`) *Note: Enabling this gives users the ability to upload arbitrary code to the server.*
 
 ## Chat Permissions
 
 Chat permissions determine what actions users can perform within chat conversations:
 
-* **Allow Chat Controls**: Toggle to enable access to chat control options.
-* **Allow File Upload**: Toggle to permit users to upload files during chat sessions. (Environment variable: `USER_PERMISSIONS_CHAT_FILE_UPLOAD`)
-* **Allow Chat Delete**: Toggle to permit users to delete chat conversations. (Environment variable: `USER_PERMISSIONS_CHAT_DELETE`)
-* **Allow Chat Edit**: Toggle to permit users to edit messages in chat conversations. (Environment variable: `USER_PERMISSIONS_CHAT_EDIT`)
-* **Allow Temporary Chat**: Toggle to permit users to create temporary chat sessions. (Environment variable: `USER_PERMISSIONS_CHAT_TEMPORARY`)
+- **Allow Chat Controls**: Toggle to enable access to chat control options.
+- **Allow File Upload**: Toggle to permit users to upload files during chat sessions. (Environment variable: `USER_PERMISSIONS_CHAT_FILE_UPLOAD`)
+- **Allow Chat Delete**: Toggle to permit users to delete chat conversations. (Environment variable: `USER_PERMISSIONS_CHAT_DELETE`)
+- **Allow Chat Edit**: Toggle to permit users to edit messages in chat conversations. (Environment variable: `USER_PERMISSIONS_CHAT_EDIT`)
+- **Allow Temporary Chat**: Toggle to permit users to create temporary chat sessions. (Environment variable: `USER_PERMISSIONS_CHAT_TEMPORARY`)
 
 ## Features Permissions
 
 Features permissions control access to specialized capabilities within Open WebUI:
 
-* **Web Search**: Toggle to allow users to perform web searches during chat sessions. (Environment variable: `ENABLE_RAG_WEB_SEARCH`)
-* **Image Generation**: Toggle to allow users to generate images. (Environment variable: `ENABLE_IMAGE_GENERATION`)
-* **Code Interpreter**: Toggle to allow users to use the code interpreter feature. (Environment variable: `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
-* **Direct Tool Servers**: Toggle to allow users to connect directly to tool servers. (Environment variable: `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`)
+- **Web Search**: Toggle to allow users to perform web searches during chat sessions. (Environment variable: `ENABLE_RAG_WEB_SEARCH`)
+- **Image Generation**: Toggle to allow users to generate images. (Environment variable: `ENABLE_IMAGE_GENERATION`)
+- **Code Interpreter**: Toggle to allow users to use the code interpreter feature. (Environment variable: `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
+- **Direct Tool Servers**: Toggle to allow users to connect directly to tool servers. (Environment variable: `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`)
 
 ## Default Permission Settings
 
 By default, Open WebUI applies the following permission settings:
 
 **Workspace Permissions**:
+
 - Models Access: Disabled (`USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS=False`)
 - Knowledge Access: Disabled (`USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS=False`)
 - Prompts Access: Disabled (`USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS=False`)
 - Tools Access: Disabled (`USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=False`)
 
 **Chat Permissions**:
+
 - Allow Chat Controls: Enabled
 - Allow File Upload: Enabled (`USER_PERMISSIONS_CHAT_FILE_UPLOAD=True`)
 - Allow Chat Delete: Enabled (`USER_PERMISSIONS_CHAT_DELETE=True`)
@@ -57,6 +59,7 @@ By default, Open WebUI applies the following permission settings:
 - Allow Temporary Chat: Enabled (`USER_PERMISSIONS_CHAT_TEMPORARY=True`)
 
 **Features Permissions**:
+
 - Web Search: Enabled (`ENABLE_RAG_WEB_SEARCH=True`)
 - Image Generation: Enabled (`ENABLE_IMAGE_GENERATION=True`)
 - Code Interpreter: Enabled (`USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)

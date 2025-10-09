@@ -21,13 +21,17 @@ This is the most common problem—and it's typically caused by issues during you
   - Docling
   - Custom extractors (depending on your document types)
 
-📌 Tip: Try uploading a document and preview the extracted content. If it's blank or missing key sections, you need to adjust your extractor settings or use a different engine.
+:::tip
+
+Try uploading a document and preview the extracted content. If it's blank or missing key sections, you need to adjust your extractor settings or use a different engine.
+
+:::
 
 ---
 
 ### 2. Only a Small Part of the Document is Being Used 📄➡️✂️
 
-Open WebUI is designed to work with models that have limited context windows by default. For instance, many local models (e.g. Ollama's default models) are limited to 2048 tokens. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
+Open WebUI is designed to work with models that have limited context windows by default. For instance, many local models (e.g., Ollama's default models) are limited to 2048 tokens. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
 
 ✅ Solutions:
 
@@ -36,7 +40,11 @@ Open WebUI is designed to work with models that have limited context windows by 
   - 💡 Enable "Bypass Embedding and Retrieval" — This sends full content directly without applying strict retrieval filters.
   - 🔍 Toggle on "Full Context Mode" — This injects more comprehensive content into the model prompt.
 
+:::warning
+
 📌 Warning: Be mindful of context limits—if your model can't handle more tokens, it will still get cut off.
+
+:::
 
 ---
 
@@ -72,7 +80,11 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 - Try GPT-4, GPT-4o, Claude 3, Gemini 1.5, or Mixtral with 8k+ context
 - Compare performance to Ollama—notice the dramatic accuracy difference when more web content can be processed!
 
-📌 Tip: For web search and complex document analysis, stick with models that support 8192+ token contexts in production use cases.
+:::tip
+
+For web search and complex document analysis, stick with models that support 8192+ token contexts in production use cases.
+
+:::
 
 ---
 
@@ -106,7 +118,11 @@ This error indicates a misconfigured or missing embedding model. When Open WebUI
 - Save the embedding model again—even if it's already selected. This forces a recheck/download.
 - If you're using a remote/external embedding tool, make sure it's running and accessible to Open WebUI.
 
-📌 Tip: After fixing the configuration, try re-embedding a document and verify no error is shown in the logs.
+:::tip
+
+After fixing the configuration, try re-embedding a document and verify no error is shown in the logs.
+
+:::
 
 ---
 

@@ -61,23 +61,23 @@ By leveraging custom input variables, you can move beyond static text and build 
 
 **How It Works**
 
-1.  **Create a prompt** with one or more custom variables using the syntax below.
-2.  **Use the prompt's slash command** in the chat input.
-3.  An **"Input Variables" popup window** will appear with a form field for each variable you defined.
-4.  **Fill out the form** and click `Save`. Note that by default, all fields are optional unless explicitly marked as required.
-5.  The variables in your prompt will be replaced with your input, and the final prompt will be sent to the model.
+1. **Create a prompt** with one or more custom variables using the syntax below.
+2. **Use the prompt's slash command** in the chat input.
+3. An **"Input Variables" popup window** will appear with a form field for each variable you defined.
+4. **Fill out the form** and click `Save`. Note that by default, all fields are optional unless explicitly marked as required.
+5. The variables in your prompt will be replaced with your input, and the final prompt will be sent to the model.
 
 **Syntax**
 
 There are two ways to define a custom variable:
 
-1.  **Simple Input**: `{{variable_name}}`
-    *   This creates a standard, single-line `text` type input field in the popup window.
-    *   The field will be optional by default.
+1. **Simple Input**: `{{variable_name}}`
+    * This creates a standard, single-line `text` type input field in the popup window.
+    * The field will be optional by default.
 
-2.  **Typed Input**: `{{variable_name | [type][:property="value"]}}`
-    *   This allows you to specify the type of input field (e.g., a dropdown, a date picker) and configure its properties.
-    *   The field will be optional by default unless you add the `:required` flag.
+2. **Typed Input**: `{{variable_name | [type][:property="value"]}}`
+    * This allows you to specify the type of input field (e.g., a dropdown, a date picker) and configure its properties.
+    * The field will be optional by default unless you add the `:required` flag.
 
 **Required vs Optional Variables**
 
@@ -85,15 +85,16 @@ By default, all custom input variables are **optional**, meaning users can leave
 
 To make a variable **required** (mandatory), add the `:required` flag:
 
-```
+```txt
 {{mandatory_field | text:required}}
 {{optional_field | text}}
 ```
 
 When a field is marked as required:
-- The form will display a visual indicator (asterisk) next to the field label
-- Users cannot submit the form without providing a value
-- Browser validation will prevent form submission if required fields are empty
+
+* The form will display a visual indicator (asterisk) next to the field label
+* Users cannot submit the form without providing a value
+* Browser validation will prevent form submission if required fields are empty
 
 **Input Types Overview**
 
@@ -123,9 +124,10 @@ You can specify different input types to build rich, user-friendly forms. Here i
 
 Create a reusable prompt where the article content is required but additional parameters are optional.
 
-*   **Command:** `/summarize_article`
-*   **Prompt Content:**
-    ```
+* **Command:** `/summarize_article`
+* **Prompt Content:**
+
+    ```txt
     Please summarize the following article. {{article_text | textarea:placeholder="Paste the full text of the article here...":required}}
 
     {{summary_length | select:options=["Brief (3 bullets)","Detailed (5 bullets)","Executive Summary"]:default="Brief (3 bullets)"}}
@@ -134,38 +136,42 @@ Create a reusable prompt where the article content is required but additional pa
 
     {{include_quotes | checkbox}} Include key quotes from the article
     ```
+
     When you type `/summarize_article`, a modal will appear with a required text area for the article, and optional fields for customizing the summary style.
 
 **2. Advanced Bug Report Generator**
 
 This prompt ensures critical information is captured while allowing optional details.
 
-*   **Command:** `/bug_report`
-*   **Prompt Content:**
-    ```
+* **Command:** `/bug_report`
+* **Prompt Content:**
+
+    ```txt
     Generate a bug report with the following details:
 
     **Summary:** {{summary | text:placeholder="A brief summary of the issue":required}}
     **Priority:** {{priority | select:options=["Critical","High","Medium","Low"]:default="Medium":required}}
     **Steps to Reproduce:**
     {{steps | textarea:placeholder="1. Go to...\n2. Click on...\n3. See error...":required}}
-    
+
     **Additional Context:** {{additional_context | textarea:placeholder="Browser version, OS, screenshots, etc. (optional)"}}
     **Workaround:** {{workaround | textarea:placeholder="Any temporary solutions found (optional)"}}
-    
+
     Please format this into a clear and complete bug report document.
     ```
+
     This creates a form where title, priority, and steps are mandatory, but additional context and workarounds are optional.
 
 **3. Social Media Post Generator with Smart Defaults**
 
 This prompt generates tailored content with required core information and optional customizations.
 
-*   **Command:** `/social_post`
-*   **Prompt Content:**
-    ```
+* **Command:** `/social_post`
+* **Prompt Content:**
+
+    ```txt
     Generate a social media post for {{platform | select:options=["LinkedIn","Twitter","Facebook","Instagram"]:required}}.
-    
+
     **Topic:** {{topic | text:placeholder="e.g., New feature launch":required}}
     **Key Message:** {{key_message | textarea:placeholder="What are the essential points to communicate?":required}}
     **Tone of Voice:** {{tone | select:options=["Professional","Casual","Humorous","Inspirational"]:default="Professional"}}
@@ -180,9 +186,10 @@ This prompt generates tailored content with required core information and option
 
 Generate structured meeting minutes with required basics and optional details.
 
-*   **Command:** `/meeting_minutes`
-*   **Prompt Content:**
-    ```
+* **Command:** `/meeting_minutes`
+* **Prompt Content:**
+
+    ```txt
     # Meeting Minutes
 
     **Date:** {{meeting_date | date:required}}
@@ -210,9 +217,10 @@ Generate structured meeting minutes with required basics and optional details.
 
 A flexible template for reviewing various types of content.
 
-*   **Command:** `/content_review`
-*   **Prompt Content:**
-    ```
+* **Command:** `/content_review`
+* **Prompt Content:**
+
+    ```txt
     Please review the following {{content_type | select:options=["Blog Post","Marketing Copy","Documentation","Email","Presentation"]:required}}:
 
     **Content Title:** {{title | text:required}}
