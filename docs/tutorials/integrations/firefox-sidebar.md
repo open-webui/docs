@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## 🦊 Firefox AI Chatbot Sidebar
 
-## Integrating Open WebUI as a Local AI Chatbot Browser Assistant in Mozilla Firefox
+# Integrating Open WebUI as a Local AI Chatbot Browser Assistant in Mozilla Firefox
 
 ## Prerequisites
 

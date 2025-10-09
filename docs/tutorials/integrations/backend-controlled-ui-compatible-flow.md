@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ---
 
-## Backend-Controlled, UI-Compatible API Flow
+# Backend-Controlled, UI-Compatible API Flow
 
 This tutorial demonstrates how to implement server-side orchestration of Open WebUI conversations while ensuring that assistant replies appear properly in the frontend UI. This approach requires zero frontend involvement and allows complete backend control over the chat flow.
 This tutorial has been verified to work with Open WebUI version v0.6.15. Future versions may introduce changes in behavior or API structure.

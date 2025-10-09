@@ -19,7 +19,7 @@ This documentation provides a step-by-step guide to integrating Apache Tika with
 - Docker installed on your system
 - Docker network set up for Open WebUI
 
-## Integration Steps
+# Integration Steps
 
 ### Step 1: Create a Docker Compose File or Run the Docker Command for Apache Tika
 

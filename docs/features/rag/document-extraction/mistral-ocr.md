@@ -18,7 +18,7 @@ This documentation provides a step-by-step guide to integrating Mistral OCR with
 - Open WebUI instance
 - Mistral AI account
 
-## Integration Steps
+# Integration Steps
 
 ### Step 1: Sign Up or Login to Mistral AI console
 

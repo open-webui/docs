@@ -19,7 +19,7 @@ This documentation provides a step-by-step guide to integrating Docling with Ope
 - Docker installed on your system
 - Docker network set up for Open WebUI
 
-## Integration Steps
+# Integration Steps
 
 ### Step 1: Run the Docker Command for Docling-Serve
 

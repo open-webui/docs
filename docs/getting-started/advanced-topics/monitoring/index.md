@@ -3,7 +3,7 @@ sidebar_position: 6
 title: "📊 Monitoring Your Open WebUI"
 ---
 
-## Keep Your Open WebUI Healthy with Monitoring 🩺
+# Keep Your Open WebUI Healthy with Monitoring 🩺
 
 Monitoring your Open WebUI instance is crucial for ensuring it runs reliably, performs well, and allows you to quickly identify and resolve any issues. This guide outlines three levels of monitoring, from basic availability checks to in-depth model response testing.
 
