@@ -3,12 +3,12 @@ sidebar_position: 2
 title: "Environment Variables"
 ---
 
-
-# Environment Variables List
-
+## Environment Variables List
 
 :::info
+
 For a complete list of all Open WebUI environment variables, see the [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration) page.
+
 :::
 
 The following is a summary of the environment variables for speech to text (STT).

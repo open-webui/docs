@@ -4,7 +4,9 @@ title: "🔒 HTTPS using Nginx"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # HTTPS using Nginx
@@ -19,7 +21,6 @@ This guide provides three methods to set up HTTPS:
 
 Choose the method that best fits your deployment needs.
 
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -28,6 +29,7 @@ import SelfSigned from './tab-nginx/SelfSigned.md';
 import LetsEncrypt from './tab-nginx/LetsEncrypt.md';
 import Windows from './tab-nginx/Windows.md';
 
+<!-- markdownlint-disable-next-line MD033 -->
 <Tabs>
   <TabItem value="NginxProxyManager" label="Nginx Proxy Manager">
     <NginxProxyManager />
@@ -42,7 +44,6 @@ import Windows from './tab-nginx/Windows.md';
     <Windows />
   </TabItem>
 </Tabs>
-
 
 ## Next Steps
 

@@ -4,7 +4,9 @@ title: "📁 Integrate with OneDrive & SharePoint"
 ---
 
 :::info
+
 This tutorial provides a step-by-step guide for integrating Open WebUI with **Microsoft OneDrive for Business & SharePoint**, as well as the separate, optional integration for **Personal Microsoft OneDrive** accounts. You can enable one or both integrations. This documentation is up to date as of Open WebUI v0.6.32.
+
 :::
 
 ---
@@ -28,31 +30,31 @@ This is the primary integration for organizational use. Follow these steps to al
 
 First, you need to register an application in your organization's Microsoft Entra ID (formerly Azure AD) tenant.
 
-1.  Navigate to the [Microsoft Entra ID admin center](https://entra.microsoft.com/).
-2.  Go to **Identity** > **Applications** > **App registrations**.
-3.  Select **+ New registration**.
-4.  Give your application a descriptive name, such as "Open WebUI Business Integration".
-5.  Under "Supported account types," select **"Accounts in this organizational directory only (Single tenant)"** or **"Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant)"**.
-6.  Leave the "Redirect URI" section blank for now. Click **Register**.
+1. Navigate to the [Microsoft Entra ID admin center](https://entra.microsoft.com/).
+2. Go to **Identity** > **Applications** > **App registrations**.
+3. Select **+ New registration**.
+4. Give your application a descriptive name, such as "Open WebUI Business Integration".
+5. Under "Supported account types," select **"Accounts in this organizational directory only (Single tenant)"** or **"Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant)"**.
+6. Leave the "Redirect URI" section blank for now. Click **Register**.
 
 ## Step 2: Configure the SPA Redirect URI
 
 Open WebUI is a Single-Page Application (SPA) and uses the Microsoft Authentication Library (MSAL). It is critical to configure the Redirect URI correctly.
 
-1.  From your new App Registration's overview page, go to the **Authentication** tab.
-2.  Click **+ Add a platform** and select **Single-page application (SPA)**.
-3.  Under "Redirect URIs", enter the base URL of your Open WebUI instance (e.g., `https://open-webui.yourdomain.com`).
-4.  **Enable both "Access tokens" and "ID tokens"** under the "Implicit grant and hybrid flows" section.
-5.  Click **Configure**.
+1. From your new App Registration's overview page, go to the **Authentication** tab.
+2. Click **+ Add a platform** and select **Single-page application (SPA)**.
+3. Under "Redirect URIs", enter the base URL of your Open WebUI instance (e.g., `https://open-webui.yourdomain.com`).
+4. **Enable both "Access tokens" and "ID tokens"** under the "Implicit grant and hybrid flows" section.
+5. Click **Configure**.
 
 ## Step 3: Configure API Permissions
 
 Next, grant the application permission to read files from OneDrive and SharePoint on behalf of your users.
 
-1.  From the App Registration menu, go to the **API permissions** tab.
-2.  Click **+ Add a permission** and select **Microsoft Graph**.
-3.  Select **Delegated permissions**.
-4.  In the search box, find and add the following permissions:
+1. From the App Registration menu, go to the **API permissions** tab.
+2. Click **+ Add a permission** and select **Microsoft Graph**.
+3. Select **Delegated permissions**.
+4. In the search box, find and add the following permissions:
     -   `Files.Read`: Allows the app to read files the signed-in user has access to.
     -   `Files.Read.All`: Allows the app to read all files the signed-in user can access.
     -   `Sites.Read.All`: Allows the app to read items in all site collections the signed-in user can access.
@@ -60,11 +62,14 @@ Next, grant the application permission to read files from OneDrive and SharePoin
     -   `AllSites.Read`: Legacy SharePoint permission for reading site data.
     -   `MyFiles.Read`: Allows the app to read the user's personal drive.
     -   `Sites.Search.All`: Enables file search functionality across sites.
-5.  If your organization uses SharePoint API permissions separately, repeat the process by selecting **SharePoint** instead of Microsoft Graph and add the applicable delegated permissions.
-6.  After adding all permissions, you must grant admin consent. Click the **"Grant admin consent for [Your Tenant Name]"** button. The status for these permissions should change to "Granted".
+5. If your organization uses SharePoint API permissions separately, repeat the process by selecting **SharePoint** instead of Microsoft Graph and add the applicable delegated permissions.
+6. After adding all permissions, you must grant admin consent. Click the **"Grant admin consent for [Your Tenant Name]"** button. The status for these permissions should change to "Granted".
 
-:::warning Admin Consent is Mandatory
+:::warning
+
+Admin Consent is Mandatory
 Open WebUI uses the `.default` scope for a seamless enterprise experience, meaning it relies on pre-approved permissions. If admin consent is not granted here, non-admin users will be blocked from logging in with an "Admin approval required" error.
+
 :::
 
 ## Step 4: Gather Credentials for Business Integration
@@ -79,10 +84,12 @@ From the **Overview** page of the App Registration you just created, copy the fo
 Set the following environment variables in your Open WebUI deployment to enable the work/school integration:
 
 ```bash
+
 # Enable the OneDrive integration feature globally
 ENABLE_ONEDRIVE_INTEGRATION=true
 
 # --- Business & SharePoint Configuration ---
+
 # The Application (client) ID from your Business App Registration
 ONEDRIVE_CLIENT_ID_BUSINESS="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
@@ -101,12 +108,12 @@ To enable support for personal Microsoft accounts, you must create a **second, s
 
 ## Step 1: Create a Separate App Registration for Personal Accounts
 
-1.  Navigate back to **App registrations** in Microsoft Entra ID and select **+ New registration**.
-2.  Give it a distinct name, like "Open WebUI Personal Integration".
-3.  Under "Supported account types," select the option: **"Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)"**.
-4.  Configure the **SPA Redirect URI** with your Open WebUI base URL, just as you did for the business app.
-5.  **Enable both "Access tokens" and "ID tokens"** under the "Implicit grant and hybrid flows" section.
-6.  For this personal registration, no special API permissions or admin consent are required, as users will consent to `OneDrive.ReadWrite` individually.
+1. Navigate back to **App registrations** in Microsoft Entra ID and select **+ New registration**.
+2. Give it a distinct name, like "Open WebUI Personal Integration".
+3. Under "Supported account types," select the option: **"Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts (e.g., Skype, Xbox)"**.
+4. Configure the **SPA Redirect URI** with your Open WebUI base URL, just as you did for the business app.
+5. **Enable both "Access tokens" and "ID tokens"** under the "Implicit grant and hybrid flows" section.
+6. For this personal registration, no special API permissions or admin consent are required, as users will consent to `OneDrive.ReadWrite` individually.
 
 ## Step 2: Gather the Client ID for Personal Integration
 
@@ -117,7 +124,9 @@ From the **Overview** page of this new "Personal" App Registration, copy the **A
 Add the following environment variable to your Open WebUI deployment:
 
 ```bash
+
 # --- Personal Account Configuration (Optional) ---
+
 # The Application (client) ID from your *second*, Personal App Registration
 ONEDRIVE_CLIENT_ID_PERSONAL="zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
 ```
@@ -128,11 +137,14 @@ ONEDRIVE_CLIENT_ID_PERSONAL="zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
 
 After setting your environment variables and restarting your Open WebUI instance, verify the integration.
 
-1.  In Open WebUI, open the attachment menu (+) in the chat input. You should see menu items for **"Microsoft OneDrive (work/school)"** and/or **"Microsoft OneDrive (personal)"**, depending on your configuration.
-2.  Clicking either option should trigger a pop-up window for Microsoft authentication.
+1. In Open WebUI, open the attachment menu (+) in the chat input. You should see menu items for **"Microsoft OneDrive (work/school)"** and/or **"Microsoft OneDrive (personal)"**, depending on your configuration.
+2. Clicking either option should trigger a pop-up window for Microsoft authentication.
 
-:::caution Disable Pop-up Blockers!
+:::caution
+
+Disable Pop-up Blockers!
 The OneDrive file picker and authentication flow happen in a pop-up window. If nothing happens when you click a OneDrive option, it is almost certainly because your browser is blocking pop-ups. **You must disable the pop-up blocker for your Open WebUI domain** for the integration to work.
+
 :::
 
 You have now successfully configured OneDrive integration, providing seamless file access for your users.

@@ -4,7 +4,9 @@ title: "🌐 Browser Search Engine"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # Browser Search Engine Integration
@@ -57,7 +59,7 @@ WEBUI_URL=https://<your-open-webui-url>
     - **Keyword**: webui (or any keyword you prefer)
     - **URL with %s in place of query**:
 
-      ```
+      ```txt
       https://<your-open-webui-url>/?q=%s
       ```
 
@@ -79,17 +81,21 @@ Alternatively:
 
 If you wish to utilize a specific model for your search, modify the URL format to include the model ID:
 
-```
+```txt
 https://<your-open-webui-url>/?models=<model_id>&q=%s
 ```
 
+:::note
+
 **Note:** The model ID will need to be URL-encoded. Special characters like spaces or slashes need to be encoded (e.g., `my model` becomes `my%20model`).
+
+:::
 
 ## Example Usage
 
 Once the search engine is set up, you can perform searches directly from the address bar. Simply type your chosen keyword followed by your query:
 
-```
+```txt
 webui your search query
 ```
 

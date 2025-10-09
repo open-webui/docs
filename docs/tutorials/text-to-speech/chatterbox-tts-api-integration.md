@@ -6,12 +6,14 @@ title: "🗨️ Chatterbox TTS — Voice Cloning"
 # Chatterbox TTS — Voice Cloning
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-## What is `Chatterbox TTS API`? 
+## What is `Chatterbox TTS API`?
 
-[Chatterbox TTS API](https://github.com/travisvn/chatterbox-tts-api) is an API wrapper that allows for voice cloning and text-to-speech, serving as a direct substitute for the OpenAI Speech API endpoint. 
+[Chatterbox TTS API](https://github.com/travisvn/chatterbox-tts-api) is an API wrapper that allows for voice cloning and text-to-speech, serving as a direct substitute for the OpenAI Speech API endpoint.
 
 [![Link to Resemble AI voice samples](https://img.shields.io/badge/listen-demo_samples-blue)](https://resemble-ai.github.io/chatterbox_demopage/)
 
@@ -32,11 +34,11 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 - GPU: CUDA (Nvidia), Apple M-series (MPS)
 - CPU: Works but slower — GPU recommended for production
 
-
 :::info
-Chatterbox can use a good deal of memory and has hardware requirements that might be higher than you're used to with other local TTS solutions. If you have trouble meeting the requirements, you might find [OpenAI Edge TTS](https://docs.openwebui.com/tutorials/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](https://docs.openwebui.com/tutorials/text-to-speech/Kokoro-FastAPI-integration) to be suitable replacements.
-:::
 
+Chatterbox can use a good deal of memory and has hardware requirements that might be higher than you're used to with other local TTS solutions. If you have trouble meeting the requirements, you might find [OpenAI Edge TTS](https://docs.openwebui.com/tutorials/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](https://docs.openwebui.com/tutorials/text-to-speech/Kokoro-FastAPI-integration) to be suitable replacements.
+
+:::
 
 ## ⚡️ Quick start
 
@@ -45,6 +47,7 @@ Chatterbox can use a good deal of memory and has hardware requirements that migh
 #### Option A: Using uv (Recommended - Faster & Better Dependencies)
 
 ```bash
+
 # Clone the repository
 git clone https://github.com/travisvn/chatterbox-tts-api
 cd chatterbox-tts-api
@@ -60,6 +63,7 @@ cp .env.example .env
 
 # Start the API with FastAPI
 uv run uvicorn app.main:app --host 0.0.0.0 --port 4123
+
 # Or use the main script
 uv run main.py
 ```
@@ -69,6 +73,7 @@ uv run main.py
 #### Option B: Using pip (Traditional)
 
 ```bash
+
 # Clone the repository
 git clone https://github.com/travisvn/chatterbox-tts-api
 cd chatterbox-tts-api
@@ -84,10 +89,12 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Add your voice sample (or use the provided one)
+
 # cp your-voice.mp3 voice-sample.mp3
 
 # Start the API with FastAPI
 uvicorn app.main:app --host 0.0.0.0 --port 4123
+
 # Or use the main script
 python main.py
 ```
@@ -97,12 +104,14 @@ python main.py
 ### 🐳 Docker (Recommended)
 
 ```bash
+
 # Clone and start with Docker Compose
 git clone https://github.com/travisvn/chatterbox-tts-api
 cd chatterbox-tts-api
 
 # Use Docker-optimized environment variables
 cp .env.example.docker .env  # Docker-specific paths, ready to use
+
 # Or: cp .env.example .env    # Local development paths, needs customization
 
 # Choose your deployment method:
@@ -129,14 +138,17 @@ curl -X POST http://localhost:4123/v1/audio/speech \
   --output test.wav
 ```
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-<summary><strong>🚀 Running with the Frontend Interface</strong></summary>
+<!-- markdownlint-disable-next-line MD033 -->
+<summary>**🚀 Running with the Frontend Interface**</summary>
 
 This project includes an optional React-based web UI. Use Docker Compose profiles to easily opt in or out of the frontend:
 
 ### With Docker Compose Profiles
 
 ```bash
+
 # API only (default behavior)
 docker compose -f docker/docker-compose.yml up -d
 
@@ -157,7 +169,9 @@ docker compose -f docker/docker-compose.cpu.yml --profile frontend up -d    # CP
 For local development, you can run the API and frontend separately:
 
 ```bash
+
 # Start the API first (follow earlier instructions)
+
 # Then run the frontend:
 cd frontend && npm install && npm run dev
 ```
@@ -183,7 +197,6 @@ The frontend uses a reverse proxy to route requests, so when running with `--pro
 
 </details>
 
-
 ## Setting up Open WebUI to use `Chatterbox TTS API`
 
 We recommend running with the frontend interface so you can upload the audio files for the voices you'd like to use before configuring Open WebUI's settings. If started correctly (see guide above), you can visit `http://localhost:4321` to access the frontend.
@@ -200,20 +213,20 @@ To use Chatterbox TTS API with Open WebUI, follow these steps:
   - Response splitting: `Paragraphs`
 
 :::info
-The default API key is the string `none` (no API key required)
-:::
 
+The default API key is the string `none` (no API key required)
+
+:::
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://lm17s1uz51.ufs.sh/f/EsgO8cDHBTOUjUe3QjHytHQ0xqn2CishmXgGfeJ4o983TUMO)
 
-# Please ⭐️ star the [repo on GitHub](https://github.com/travisvn/chatterbox-tts-api) to support development
+## Please ⭐️ star the [repo on GitHub](https://github.com/travisvn/chatterbox-tts-api) to support development
 
-
-## Need help? 
+## Need help?
 
 Chatterbox can be challenging to get running the first time, and you may want to try different install options if you run into issues with a particular one.
 
 For more information on `chatterbox-tts-api`, you can visit the [GitHub repo](https://github.com/travisvn/chatterbox-tts-api)
 
 - 📖 **Documentation**: See [API Documentation](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/API_README.md) and [Docker Guide](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/DOCKER_README.md)
-- 💬 **Discord**: [Join the Discord for this project](http://chatterboxtts.com/discord) 
+- 💬 **Discord**: [Join the Discord for this project](http://chatterboxtts.com/discord)

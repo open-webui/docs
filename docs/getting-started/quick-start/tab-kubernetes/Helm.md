@@ -8,7 +8,7 @@ Helm helps you manage Kubernetes applications.
 - Kubernetes cluster is set up.
 - Helm is installed.
 
-## Steps
+## Helm Steps
 
 1. **Add Open WebUI Helm Repository:**
 

@@ -28,17 +28,17 @@ You cannot have Microsoft **and** Google as providers simultaneously.
 
 | Environment Variable                  | Default   | Description                                                                                                                             |
 |---------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `WEBUI_URL`                           | —                  | **Required.** Your public WebUI address, e.g., `http://localhost:8080`.                                                        |
-| `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `true`             | Persist OAuth config to the database; set to `false` for stateless/containerized environments.                                 |
-| `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`).                                                      |
-| `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails).                       |
-| `OAUTH_UPDATE_PICTURE_ON_LOGIN`       | `true`             | Update user profile pictures from OAuth provider with each login.                                                              |
+| `WEBUI_URL`                           | —                  | **Required.** Your public WebUI address, e.g., `http://localhost:8080`. |
+| `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `true`             | Persist OAuth config to the database; set to `false` for stateless/containerized environments. |
+| `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`). |
+| `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails). |
+| `OAUTH_UPDATE_PICTURE_ON_LOGIN`       | `true`             | Update user profile pictures from OAuth provider with each login. |
 | `OAUTH_PICTURE_CLAIM`                 | `picture`          | Field in the claim containing the profile picture. Set to empty string to disable picture updates (users receive default icon).|
 | `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`     | *empty*            | Redirect users to this URL after signout. E.g., `https://your-company.com/logout-success`                                      |
 | `WEBUI_SECRET_KEY`                    | *empty*            | MUST be set - especially in clustered environments. Otherwise session issues and weird OAuth issues will occur                 |
-| `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster.               |
+| `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server - used for OAuth 2.1 authentication for MCP servers. |
-| `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`.              |
+| `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. |
 
 :::warning
 
@@ -60,10 +60,10 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 
 **How It Works:**
 
-1.  **Server-Side Storage:** Instead of storing large `access_token` and `id_token` values in browser cookies, the entire token payload is now encrypted and stored securely in the Open WebUI database in a new `oauth_session` table.
-2.  **Secure Session Cookie:** The user's browser is sent a single, small, and secure `httponly` cookie named `oauth_session_id`. This cookie acts as an opaque identifier, containing no sensitive information itself.
-3.  **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
-4.  **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
+1. **Server-Side Storage:** Instead of storing large `access_token` and `id_token` values in browser cookies, the entire token payload is now encrypted and stored securely in the Open WebUI database in a new `oauth_session` table.
+2. **Secure Session Cookie:** The user's browser is sent a single, small, and secure `httponly` cookie named `oauth_session_id`. This cookie acts as an opaque identifier, containing no sensitive information itself.
+3. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
+4. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
@@ -156,20 +156,28 @@ You can configure the following environment variables:
 1. `OAUTH_GROUP_CLAIM` - The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
 1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
 
-:::warning Strict Group Synchronization
+:::warning
+
+Strict Group Synchronization
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
 
 *   Users will be **added** to Open WebUI groups that match their OAuth claims.
 *   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session.
 
 Ensure all necessary groups are correctly configured in your OAuth provider and included in the group claim (`OAUTH_GROUP_CLAIM`).
+
 :::
 
-:::warning Admin Users
+:::warning
+
+Admin Users
 Admin users' group memberships are **not** automatically updated via OAuth group management.
+
 :::
 
-:::info Login Required for Updates
+:::info
+
+Login Required for Updates
 
 If a user's groups change in the OAuth provider, they will need to log out of Open WebUI and log back in for the changes to be reflected.
 
@@ -193,9 +201,8 @@ When the `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` environment variable is set, Open Web
 
 For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing a HTTP header of `X-User-Email: example@example.com` would authenticate the request with the email `example@example.com`.
 
-Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists. 
+Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
 If `WEBUI_AUTH_TRUSTED_NAME_HEADER` is not set, the email address is used as user name.
-
 
 #### Group Management
 
@@ -343,7 +350,6 @@ services:
     ports:
       - 4180:4180/tcp
 ```
-
 
 ### Authentik
 

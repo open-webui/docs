@@ -4,7 +4,9 @@ title: "⚛️ Continue.dev VS Code Extension with Open WebUI"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
+
 :::
 
 # Integrating Continue.dev VS Code Extension with Open WebUI
@@ -30,7 +32,7 @@ This will open the `config.yaml` file in your editor. Here you can change the se
 :::info
 
 Currently the `ollama` provider does not support authentication so we cannot use this provider with Open WebUI.
-However Ollama and Open WebUI both have compatibility with OpenAI API spec. Read more about the specification in the [Ollama blog post](https://ollama.com/blog/openai-compatibility).
+However Ollama and Open WebUI both have compatibility with OpenAI API spec. Read more about the specification in the [Ollama blog post on OpenAI compatibility](https://ollama.com/blog/openai-compatibility).
 We can still setup continue.dev to use the openai provider which will allow us to use Open WebUI's authentication token.
 
 :::
@@ -150,7 +152,7 @@ env:
 ### APIBase
 
 This is a crucial step: you need to direct the continue.dev extension requests to your Open WebUI instance.
-Either use an actual domain name if the instance is hosted somewhere (e.g. `https://example.com/api`) or your localhost setup (e.g. `http://localhost:3000/api`).
+Either use an actual domain name if the instance is hosted somewhere (e.g., `https://example.com/api`) or your localhost setup (e.g., `http://localhost:3000/api`).
 You can find more information about the URLs in the [API Endpoints guide](/docs/getting-started/api-endpoints.md).
 
 ```yaml

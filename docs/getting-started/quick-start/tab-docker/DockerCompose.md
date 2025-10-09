@@ -6,7 +6,11 @@ If you don't have Docker installed, check out our [Docker installation tutorial]
 
 Docker Compose requires an additional package, `docker-compose-v2`.
 
+:::warning
+
 **Warning:** Older Docker Compose tutorials may reference version 1 syntax, which uses commands like `docker-compose build`. Ensure you use version 2 syntax, which uses commands like `docker compose build` (note the space instead of a hyphen).
+
+:::
 
 ## Example `docker-compose.yml`
 
@@ -40,7 +44,11 @@ volumes:
   open-webui:
 ```
 
+:::note
+
 **Note:** Slim images download required models (whisper, embedding models) on first use, which may result in longer initial startup times but significantly smaller image sizes.
+
+:::
 
 ## Starting the Services
 
@@ -56,7 +64,11 @@ A useful helper script called `run-compose.sh` is included with the codebase. Th
 
 ---
 
+:::note
+
 **Note:** For Nvidia GPU support, you change the image from `ghcr.io/open-webui/open-webui:main` to `ghcr.io/open-webui/open-webui:cuda` and add the following to your service definition in the `docker-compose.yml` file:
+
+:::
 
 ```yaml
 deploy:

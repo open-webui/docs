@@ -67,14 +67,14 @@ Let's get the user interface (what you see in your browser) up and running first
      npm install
      ```
 
-     This will install all frontend dependencies listed in `package.json`.  
+     This will install all frontend dependencies listed in `package.json`.
 
      *Note: Depending on your Open WebUI version, you might see compatibility warnings or errors. If so, just run:*
 
      ```bash
      npm install --force
      ```
-     
+
      *Some setups need this to get around version issues.*
 
 2. **Start the Frontend Development Server:**
@@ -86,7 +86,6 @@ Let's get the user interface (what you see in your browser) up and running first
      This command launches the frontend development server. If the steps were followed successfully, it will usually indicate the server is running and provide a local URL.
 
      🎉 **Access the Frontend:** Open your web browser and go to [http://localhost:5173](http://localhost:5173). You should see a message indicating that Open WebUI's frontend is running and is waiting for the backend to be available. Don't worry about that message yet! Let's set up the backend next. **Keep this terminal running** – it's serving your frontend!
-
 
 ### 2.5: Build the Frontend (Recommended)
 
@@ -101,7 +100,6 @@ npm run build
 - This command generates an optimized, production-ready build of the frontend and places the static files in the `build` directory.
 - If the build completes successfully (without errors), you're ready! If there are errors, address them before proceeding.
 - You don't need to do anything more with `build` for local development, but building ensures your code will not break in production or during deployment.
-
 
 ### 3. Backend Setup (API and Server)
 
@@ -137,7 +135,7 @@ VS Code's integrated terminal feature makes managing multiple terminals incredib
 
      - `conda create --name open-webui python=3.11`: This command creates a new Conda environment named `open-webui` using Python version 3.11. If you chose a different Python 3.11.x version, that's fine.
      - `conda activate open-webui`: This command activates the newly created Conda environment. Once activated, your terminal prompt will usually change to indicate you are in the `open-webui` environment (e.g., it might show `(open-webui)` at the beginning of the line).
-  
+
     **Make sure you activate the environment in your backend terminal before proceeding.**
 
      *(Using Conda is optional but strongly recommended for managing Python dependencies and avoiding conflicts.)* If you choose not to use Conda, ensure you are using Python 3.11 or higher and proceed to the next step, but be aware of potential dependency conflicts.
@@ -234,7 +232,7 @@ Hot reload (or hot module replacement - HMR) is a fantastic development feature 
    - Alternatively, you can try clearing your browser cache or opening the frontend in a private/incognito browser window.
 4. **Dependency Issues (Frontend):** Outdated or corrupted frontend dependencies can sometimes interfere with hot reloading. Try refreshing your frontend dependencies:
    - In your *frontend* terminal, run:
-  
+
      ```bash
      rm -rf node_modules && npm install
      ```
@@ -260,7 +258,7 @@ We warmly welcome your contributions to Open WebUI! Your help is valuable in mak
    This helps ensure that your contribution aligns with the project's goals and avoids wasted effort on features that might not be merged.
 4. **Create a Separate Branch for Your Work:** **Never commit directly to the `dev` branch.** Always create a new branch for each feature or bug fix you are working on. This keeps your changes isolated and makes it easier to manage and submit pull requests.
    - To create a new branch (e.g., named `my-feature-branch`) based on the `dev` branch:
-  
+
      ```bash
      git checkout dev
      git pull origin dev # Ensure your local dev branch is up-to-date
