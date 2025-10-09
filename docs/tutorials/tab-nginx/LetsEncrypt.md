@@ -1,120 +1,257 @@
 ### Let's Encrypt
 
-Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for production environments.
+Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for securing your production environment. 🔐
+
+This guide uses a two-phase approach:
+
+1.  **Phase 1:** Temporarily run Nginx to prove you own the domain and get a certificate from Let's Encrypt.
+2.  **Phase 2:** Reconfigure Nginx to use the new certificate for a secure HTTPS connection.
 
 #### Prerequisites
 
-- **Certbot** installed on your system.
-- DNS records properly configured to point to your server.
+  * A **domain name** (e.g., `my-webui.com`) with a **DNS `A` record** pointing to your server's public IP address.
+  * **Docker** and **Docker Compose** installed on your server.
+  * Basic understanding of running commands in a terminal.
 
-#### Steps
+:::info
+**Heads up\!** Let's Encrypt **cannot** issue certificates for an IP address. You **must** use a domain name.
+:::
 
-1. **Create Directories for Nginx Files:**
+-----
+
+### Step 1: Initial Setup for Certificate Validation
+
+First, we'll set up the necessary files and a temporary Nginx configuration that allows Let's Encrypt's servers to verify your domain.
+
+1. **Make sure you followed the [Prerequisites](#prerequisites) above.**
+
+2. **Create the Directory Structure**
+
+    From your project's root directory, run this command to create folders for your Nginx configuration and Let's Encrypt certificates:
 
     ```bash
-    mkdir -p conf.d ssl
+    mkdir -p nginx/conf.d ssl/certbot/conf ssl/certbot/www
     ```
 
-2. **Create Nginx Configuration File:**
+3. **Create a Temporary Nginx Configuration**
 
-    **`conf.d/open-webui.conf`:**
+    Create the file `nginx/conf.d/open-webui.conf`. This initial config only listens on port 80 and serves the validation files for Certbot.
+
+    ⚠️ **Remember to replace `<YOUR_DOMAIN_NAME>`** with your actual domain.
 
     ```nginx
+    # nginx/conf.d/open-webui.conf
+
     server {
         listen 80;
-        server_name your_domain_or_IP;
+        listen [::]:80;
+        server_name <YOUR_DOMAIN_NAME>;
 
+        # Route for Let's Encrypt validation challenges
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+
+        # All other requests will be ignored for now
         location / {
-            proxy_pass http://host.docker.internal:3000;
-    
-            # Add WebSocket support (Necessary for version 0.5.0 and up)
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            # (Optional) Disable proxy buffering for better streaming response from models
-            proxy_buffering off;
-
-            # (Optional) Increase max request size for large attachments and long audio messages
-            client_max_body_size 20M;
-            proxy_read_timeout 10m;
+            return 404;
         }
     }
     ```
 
-3. **Simplified Let's Encrypt Script:**
+4. **Update Your `docker-compose.yml`**
 
-    **`enable_letsencrypt.sh`:**
-
-    ```bash
-    #!/bin/bash
-
-    # Description: Simplified script to obtain and install Let's Encrypt SSL certificates using Certbot.
-
-    DOMAIN="your_domain_or_IP"
-    EMAIL="your_email@example.com"
-
-    # Install Certbot if not installed
-    if ! command -v certbot &> /dev/null; then
-        echo "Certbot not found. Installing..."
-        sudo apt-get update
-        sudo apt-get install -y certbot python3-certbot-nginx
-    fi
-
-    # Obtain SSL certificate
-    sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$EMAIL"
-
-    # Reload Nginx to apply changes
-    sudo systemctl reload nginx
-
-    echo "Let's Encrypt SSL certificate has been installed and Nginx reloaded."
-    ```
-
-    **Make the script executable:**
-
-    ```bash
-    chmod +x enable_letsencrypt.sh
-    ```
-
-4. **Update Docker Compose Configuration:**
-
-    Add the Nginx service to your `docker-compose.yml`:
+    Add the `nginx` service to your `docker-compose.yml` and ensure your `open-webui` service is configured to use the shared Docker network.
 
     ```yaml
     services:
       nginx:
         image: nginx:alpine
+        restart: always
         ports:
+          # Expose HTTP and HTTPS ports to the host machine
           - "80:80"
           - "443:443"
         volumes:
-          - ./conf.d:/etc/nginx/conf.d
-          - ./ssl:/etc/nginx/ssl
+          # Mount Nginx configs and SSL certificate data
+          - ./nginx/conf.d:/etc/nginx/conf.d
+          - ./ssl/certbot/conf:/etc/letsencrypt
+          - ./ssl/certbot/www:/var/www/certbot
         depends_on:
           - open-webui
+        networks:
+          - open-webui-network
+
+      open-webui:
+        # Your existing open-webui configuration...
+        # ...
+        # Ensure it's on the same network
+        networks:
+          - open-webui-network
+        # Expose the port internally to the Docker network.
+        # You do NOT need to publish it to the host (e.g., no `ports` section is needed here).
+        expose:
+          - 8080
+
+    networks:
+        open-webui-network:
+            driver: bridge
     ```
 
-5. **Start Nginx Service:**
+-----
+
+### Step 2: Obtain the SSL Certificate
+
+Now we'll run a script that uses Docker to fetch the certificate.
+
+1.  **Create the Certificate Request Script**
+
+    Create an executable script named `enable_letsencrypt.sh` in your project root.
+
+    ⚠️ **Remember to replace `<YOUR_DOMAIN_NAME>` and `<YOUR_EMAIL_ADDRESS>`** with your actual information.
 
     ```bash
+    #!/bin/bash
+    # enable_letsencrypt.sh
+
+    DOMAIN="<YOUR_DOMAIN_NAME>"
+    EMAIL="<YOUR_EMAIL_ADDRESS>"
+
+    echo "### Obtaining SSL certificate for $DOMAIN ###"
+
+    # Start Nginx to serve the challenge
     docker compose up -d nginx
+
+    # Run Certbot in a container to get the certificate
+    docker run --rm \
+      -v "./ssl/certbot/conf:/etc/letsencrypt" \
+      -v "./ssl/certbot/www:/var/www/certbot" \
+      certbot/certbot certonly \
+      --webroot \
+      --webroot-path=/var/www/certbot \
+      --email "$EMAIL" \
+      --agree-tos \
+      --no-eff-email \
+      --force-renewal \
+      -d "$DOMAIN"
+
+    if [[ $? != 0 ]]; then
+        echo "Error: Failed to obtain SSL certificate."
+        docker compose stop nginx
+        exit 1
+    fi
+
+    # Stop Nginx before we apply the final config
+    docker compose stop nginx
+    echo "### Certificate obtained successfully! ###"
     ```
 
-6. **Run the Let's Encrypt Script:**
+2.  **Make the Script Executable**
 
-    Execute the script to obtain and install the SSL certificate:
+    ```bash
+    chmod +x enable_letsencrypt.sh
+    ```
+
+3.  **Run the Script**
+
+    Execute the script. It will automatically start Nginx, request the certificate, and then stop Nginx.
 
     ```bash
     ./enable_letsencrypt.sh
     ```
 
-#### Access the WebUI
+-----
 
-Access Open WebUI via HTTPS at:
+### Step 3: Finalize Nginx Configuration for HTTPS
 
-[https://your_domain_or_IP](https://your_domain_or_IP)
+With the certificate saved in your `ssl` directory, you can now update the Nginx configuration to enable HTTPS.
+
+1.  **Update the Nginx Configuration for SSL**
+
+    **Replace the entire contents** of `nginx/conf.d/open-webui.conf` with the final configuration below.
+
+    ⚠️ **Replace all 4 instances of `<YOUR_DOMAIN_NAME>`** with your domain.
+
+    ```nginx
+    # nginx/conf.d/open-webui.conf
+
+    # Redirect all HTTP traffic to HTTPS
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name <YOUR_DOMAIN_NAME>;
+
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
+
+    # Main HTTPS server block
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2 on;
+        server_name <YOUR_DOMAIN_NAME>;
+
+        # SSL certificate paths
+        ssl_certificate /etc/letsencrypt/live/<YOUR_DOMAIN_NAME>/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/<YOUR_DOMAIN_NAME>/privkey.pem;
+
+        # Security enhancements
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:ECDHE-RSA-AES128-GCM-SHA256';
+        ssl_prefer_server_ciphers off;
+
+        location / {
+            proxy_pass http://open-webui:8080;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 10m;
+            proxy_buffering off;
+            client_max_body_size 20M;
+        }
+    }
+    ```
+
+2.  **Launch All Services**
+
+    Start both Nginx and Open WebUI with the final, secure configuration.
+
+    ```bash
+    docker compose up -d
+    ```
+
+-----
+
+### Step 4: Access Your Secure WebUI
+
+You can now access your Open WebUI instance securely via HTTPS.
+
+➡️ **`https://<YOUR_DOMAIN_NAME>`**
+
+-----
+
+### (Optional) Step 5: Setting Up Automatic Renewal
+
+Let's Encrypt certificates expire every 90 days. You should set up a `cron` job to renew them automatically.
+
+1.  Open the crontab editor:
+
+    ```bash
+    sudo crontab -e
+    ```
+
+2.  Add the following line to run a renewal check every day at 3:30 AM. It will only renew if the certificate is close to expiring.
+
+    ```cron
+    30 3 * * * /usr/bin/docker run --rm -v "<absolute_path>/ssl/certbot/conf:/etc/letsencrypt" -v "<absolute_path>/ssl/certbot/www:/var/www/certbot" certbot/certbot renew --quiet --webroot --webroot-path=/var/www/certbot --deploy-hook "/usr/bin/docker compose -f <absolute_path>/docker-compose.yml restart nginx"
+    ```
