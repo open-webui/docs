@@ -3028,6 +3028,31 @@ By default, OAuth configurations are stored in the database and managed via the 
 address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to potential account takeovers.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_OAUTH_WITHOUT_EMAIL`
+- Type: `bool`
+- Default: `False`
+- Description: Enables authentication with OpenID Connect (OIDC) providers that do not support or expose an email scope. When enabled, Open WebUI will create and manage user accounts without requiring an email address from the OAuth provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+**Use with Caution**
+
+Enabling this option bypasses email-based user identification, which is the standard method for uniquely identifying users across authentication systems. When enabled:
+
+- User accounts will be created using the `sub` claim (or the claim specified in `OAUTH_SUB_CLAIM`) as the primary identifier
+- Email-based features such as password recovery, email notifications, and account merging via `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` will not function properly
+- Ensure your OIDC provider's `sub` claim is stable and unique to prevent authentication conflicts
+
+Only enable this if your identity provider does not support email scope and you have alternative user identification mechanisms in place.
+
+This setting is designed for enterprise environments using identity providers that:
+- Use employee IDs, usernames, or other non-email identifiers as the primary user claim
+- Have privacy policies that prevent sharing email addresses via OAuth
+- Operate in air-gapped or highly restricted networks where email-based services are unavailable
+
+For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this setting should remain `False`.
+:::
+
 #### `OAUTH_UPDATE_PICTURE_ON_LOGIN`
 
 - Type: `bool`
