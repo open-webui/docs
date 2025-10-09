@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-## Running Open WebUI in offline mode 🔌
+# Running Open WebUI in offline mode 🔌
 
 If you want to run Open WebUI in offline mode, you have to consider your installation approach and adjust your desired features accordingly. In this guide, we will go over the different ways of achieving a mostly similar setup to the online version.
 

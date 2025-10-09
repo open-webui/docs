@@ -3,7 +3,7 @@ sidebar_position: 5
 title: "📜 Logging in Open WebUI"
 ---
 
-## Understanding Open WebUI Logging 🪵
+# Understanding Open WebUI Logging 🪵
 
 Logging is essential for debugging, monitoring, and understanding how Open WebUI is behaving. This guide explains how logging works in both the **browser client** (frontend) and the **application server/backend**.
 

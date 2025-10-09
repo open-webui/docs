@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-## 🔗 Redis Websocket Support
+# 🔗 Redis Websocket Support
 
 ## Overview
 

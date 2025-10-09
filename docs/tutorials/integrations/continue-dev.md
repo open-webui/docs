@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-## Integrating Continue.dev VS Code Extension with Open WebUI
+# Integrating Continue.dev VS Code Extension with Open WebUI
 
 ## Download Extension
 

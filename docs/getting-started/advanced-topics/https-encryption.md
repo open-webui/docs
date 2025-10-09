@@ -3,7 +3,7 @@ sidebar_position: 6
 title: "🔒 Enabling HTTPS Encryption"
 ---
 
-## Secure Your Open WebUI with HTTPS 🔒
+# Secure Your Open WebUI with HTTPS 🔒
 
 This guide explains how to enable HTTPS encryption for your Open WebUI instance. While **HTTPS is not strictly required** for basic operation, it's highly recommended for security and is **necessary for certain features like Voice Calls** to function in modern web browsers.
 
