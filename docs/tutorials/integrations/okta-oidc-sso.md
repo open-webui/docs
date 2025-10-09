@@ -4,7 +4,9 @@ title: "🔗 Okta OIDC SSO Integration"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # 🔗 Okta OIDC SSO Integration
@@ -77,8 +79,11 @@ To enhance security, you can enforce Multi-Factor Authentication (MFA) for users
 
 Now, when users log in to Open WebUI, they will be required to provide their Okta password and an additional verification code from Google Authenticator.
 
-:::note Re-authentication Frequency
+:::note
+
+Re-authentication Frequency
 By default, Okta's Sign-On Policy may not prompt for MFA on every login from the same device or browser to improve user experience. If you require MFA for every session, you can adjust this setting within the policy rule you created. Look for the **"Prompt for re-authentication"** setting and set it to **"Every sign-in attempt"**.
+
 :::
 
 ## Configuring Open WebUI
@@ -86,8 +91,11 @@ By default, Okta's Sign-On Policy may not prompt for MFA on every login from the
 To enable Okta OIDC SSO in Open WebUI, you need to set the following core environment variables. Additional variables are required if you wish to enable the optional group management feature.
 
 ```bash
+
 # --- OIDC Core Settings ---
+
 # Enable OAuth signup if you want users to be able to create accounts via Okta
+
 # ENABLE_OAUTH_SIGNUP="true"
 
 # Your Okta application's Client ID
@@ -97,7 +105,9 @@ OAUTH_CLIENT_ID="YOUR_OKTA_CLIENT_ID"
 OAUTH_CLIENT_SECRET="YOUR_OKTA_CLIENT_SECRET"
 
 # Your Okta organization's OIDC discovery URL
+
 # Format: https://<your-okta-domain>/.well-known/openid-configuration
+
 # Or for a specific authorization server: https://<your-okta-domain>/oauth2/<auth-server-id>/.well-known/openid-configuration
 OPENID_PROVIDER_URL="YOUR_OKTA_OIDC_DISCOVERY_URL"
 
@@ -105,22 +115,33 @@ OPENID_PROVIDER_URL="YOUR_OKTA_OIDC_DISCOVERY_URL"
 OAUTH_PROVIDER_NAME="Okta"
 
 # Scopes to request (default is usually sufficient)
+
 # OAUTH_SCOPES="openid email profile groups" # Ensure 'groups' is included if not default
 
 # --- OAuth Group Management (Optional) ---
+
 # Set to "true" only if you configured the Groups Claim in Okta (Step 2)
+
 # and want Open WebUI groups to be managed based on Okta groups upon login.
+
 # This syncs existing groups. Users will be added/removed from Open WebUI groups
+
 # to match their Okta group claims.
+
 # ENABLE_OAUTH_GROUP_MANAGEMENT="true"
 
 # Required only if ENABLE_OAUTH_GROUP_MANAGEMENT is true.
+
 # The claim name in the ID token containing group information (must match Okta config)
+
 # OAUTH_GROUP_CLAIM="groups"
 
 # Optional: Enable Just-in-Time (JIT) creation of groups if they exist in Okta claims but not in Open WebUI.
+
 # Requires ENABLE_OAUTH_GROUP_MANAGEMENT="true".
+
 # If set to false (default), only existing groups will be synced.
+
 # ENABLE_OAUTH_GROUP_CREATION="false"
 ```
 
@@ -130,29 +151,39 @@ To enable group synchronization based on Okta claims, set `ENABLE_OAUTH_GROUP_MA
 
 To *also* enable automatic Just-in-Time (JIT) creation of groups that exist in Okta but not yet in Open WebUI, set `ENABLE_OAUTH_GROUP_CREATION="true"`. You can leave this as `false` if you only want to manage memberships for groups that already exist in Open WebUI.
 
-:::warning Group Membership Management
+:::warning
+
+Group Membership Management
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI will be **strictly synchronized** with the groups received in their Okta claims upon each login. This means:
 *   Users will be **added** to Open WebUI groups that match their Okta claims.
 *   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their Okta claims for that login session.
 
 Ensure that all necessary groups are correctly configured and assigned within Okta and included in the group claim.
+
 :::
 
-:::info Session Persistence in Multi-Node Deployments
+:::info
+
+Session Persistence in Multi-Node Deployments
 
 When deploying Open WebUI across multiple nodes (e.g., in a Kubernetes cluster or behind a load balancer), it is crucial to ensure session persistence for a seamless user experience, especially with SSO. Set the `WEBUI_SECRET_KEY` environment variable to the **same secure, unique value** on **all** Open WebUI instances.
+
 :::
 
 ```bash
+
 # Example: Generate a strong secret key (e.g., using openssl rand -hex 32)
 WEBUI_SECRET_KEY="YOUR_UNIQUE_AND_SECURE_SECRET_KEY"
 ```
 
 If this key is not consistent across all nodes, users may be forced to log in again if their session is routed to a different node, as the session token signed by one node will not be valid on another. By default, the Docker image generates a random key on first start, which is unsuitable for multi-node setups.
 
-:::tip Disabling the Standard Login Form
+:::tip
+
+Disabling the Standard Login Form
 
 If you intend to *only* allow logins via Okta (and potentially other configured OAuth providers), you can disable the standard email/password login form by setting the following environment variable:
+
 :::
 
 
@@ -160,8 +191,11 @@ If you intend to *only* allow logins via Okta (and potentially other configured 
 ENABLE_LOGIN_FORM="false"
 ```
 
-:::danger Important Prerequisite
+:::danger
+
+Important Prerequisite
 Setting `ENABLE_LOGIN_FORM="false"` **requires** `ENABLE_OAUTH_SIGNUP="true"` to be set as well. If you disable the login form without enabling OAuth signup, **users (including administrators) will be unable to log in.** Ensure at least one OAuth provider is configured and `ENABLE_OAUTH_SIGNUP` is enabled before disabling the standard login form.
+
 :::
 
 Restart your Open WebUI instance after setting these environment variables.

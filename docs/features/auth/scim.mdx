@@ -26,17 +26,21 @@ Configure SCIM by setting these environment variables:
 - **`SCIM_ENABLED`**: Set to `true` to enable SCIM support (default: `false`)
 - **`SCIM_TOKEN`**: The bearer token for SCIM authentication (required when SCIM is enabled)
 
-:::warning Security Note
+:::warning
+
+Security Note
 The SCIM token should be a secure, randomly generated string. You can generate one using:
 ```bash
 openssl rand -base64 32
 ```
 Keep this token secure as it provides access to user management operations.
+
 :::
 
 ### Example Configuration
 
 ```bash
+
 # Enable SCIM
 export SCIM_ENABLED=true
 
@@ -59,7 +63,6 @@ When configuring your identity provider, use the following settings:
 2. Set the SCIM connector base URL to: `https://your-domain.com/api/v1/scim/v2/`
 3. Set authentication to "HTTP Header"
 4. Add Authorization header with value: `Bearer your-scim-token`
-
 
 ## Supported SCIM Operations
 
@@ -137,6 +140,7 @@ Supported filter operators:
 You can test SCIM endpoints using curl:
 
 ```bash
+
 # Test authentication and list users
 curl -H "Authorization: Bearer your-scim-token" \
   https://your-domain.com/api/v1/scim/v2/Users

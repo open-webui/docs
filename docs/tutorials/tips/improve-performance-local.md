@@ -3,7 +3,7 @@ sidebar_position: 12
 title: "⚡ Improve Local LLM Performance with Dedicated Task Models"
 ---
 
-# Improve Performance with Dedicated Task Models
+## Improve Performance with Dedicated Task Models
 
 Open-WebUI provides several automated features—such as title generation, tag creation, autocomplete, and search query generation—to enhance the user experience. However, these features can generate multiple simultaneous requests to your local model, which may impact performance on systems with limited resources.
 
@@ -12,8 +12,11 @@ This guide explains how to optimize your setup by configuring a dedicated, light
 ---
 
 > [!TIP]
+>
 >## Why Does Open-WebUI Feel Slow?
+>
 >By default, Open-WebUI has several background tasks that can make it feel like magic but can also place a heavy load on local resources:
+>
 >- **Title Generation**
 >- **Tag Generation**
 >- **Autocomplete Generation** (this function triggers on every keystroke)

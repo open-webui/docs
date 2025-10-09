@@ -45,7 +45,6 @@ For Nvidia GPU support, add `--gpus all` to the `docker run` command:
 docker run -d -p 3000:8080 --gpus all -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:cuda
 ```
 
-
 #### Single-User Mode (Disabling Login)
 
 To bypass the login page for a single-user setup, set the `WEBUI_AUTH` environment variable to `False`:
@@ -55,7 +54,9 @@ docker run -d -p 3000:8080 -e WEBUI_AUTH=False -v open-webui:/app/backend/data -
 ```
 
 :::warning
+
 You cannot switch between single-user mode and multi-account mode after this change.
+
 :::
 
 #### Advanced Configuration: Connecting to Ollama on a Different Server

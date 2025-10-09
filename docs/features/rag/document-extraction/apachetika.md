@@ -4,22 +4,22 @@ title: "🪶 Apache Tika Extraction"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 ## 🪶 Apache Tika Extraction
 
 This documentation provides a step-by-step guide to integrating Apache Tika with Open WebUI. Apache Tika is a content analysis toolkit that can be used to detect and extract metadata and text content from over a thousand different file types. All of these file types can be parsed through a single interface, making Tika useful for search engine indexing, content analysis, translation, and much more.
 
-Prerequisites
-------------
+## Prerequisites
 
-* Open WebUI instance
-* Docker installed on your system
-* Docker network set up for Open WebUI
+- Open WebUI instance
+- Docker installed on your system
+- Docker network set up for Open WebUI
 
-Integration Steps
-----------------
+# Integration Steps
 
 ### Step 1: Create a Docker Compose File or Run the Docker Command for Apache Tika
 
@@ -62,16 +62,15 @@ Note that if you choose to use the Docker run command, you'll need to specify th
 
 To use Apache Tika as the context extraction engine in Open WebUI, follow these steps:
 
-* Log in to your Open WebUI instance.
-* Navigate to the `Admin Panel` settings menu.
-* Click on `Settings`.
-* Click on the `Documents` tab.
-* Change the `Default` content extraction engine dropdown to `Tika`.
-* Update the context extraction engine URL to `http://tika:9998`.
-* Save the changes.
+- Log in to your Open WebUI instance.
+- Navigate to the `Admin Panel` settings menu.
+- Click on `Settings`.
+- Click on the `Documents` tab.
+- Change the `Default` content extraction engine dropdown to `Tika`.
+- Update the context extraction engine URL to `http://tika:9998`.
+- Save the changes.
 
- Verifying Apache Tika in Docker
-=====================================
+## Verifying Apache Tika in Docker
 
 To verify that Apache Tika is working correctly in a Docker environment, you can follow these steps:
 
@@ -95,7 +94,7 @@ curl -X GET http://localhost:9998/tika
 
 This command should return the following response:
 
-```
+```txt
 This is Tika Server. Please PUT
 ```
 
@@ -145,10 +144,10 @@ Instructions to run the script:
 
 ### Prerequisites
 
-* Python 3.x must be installed on your system
-* `requests` library must be installed (you can install it using pip: `pip install requests`)
-* Apache Tika Docker container must be running (use `docker run -p 9998:9998 apache/tika` command)
-* Replace `"test.txt"` with the path to the file you want to send to Apache Tika
+- Python 3.x must be installed on your system
+- `requests` library must be installed (you can install it using pip: `pip install requests`)
+- Apache Tika Docker container must be running (use `docker run -p 9998:9998 apache/tika` command)
+- Replace `"test.txt"` with the path to the file you want to send to Apache Tika
 
 ### Running the Script
 
@@ -158,29 +157,30 @@ Instructions to run the script:
 4. Run the script using the following command: `python verify_tika.py`
 5. The script will output a message indicating whether Apache Tika is working correctly
 
+:::note
+
 Note: If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
+
+:::
 
 ### Conclusion
 
 By following these steps, you can verify that Apache Tika is working correctly in a Docker environment. You can test the setup by sending a file for analysis, verifying the server is running with a GET request, or use a script to automate the process. If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
 
-Troubleshooting
---------------
+## Troubleshooting
 
-* Make sure the Apache Tika service is running and accessible from the Open WebUI instance.
-* Check the Docker logs for any errors or issues related to the Apache Tika service.
-* Verify that the context extraction engine URL is correctly configured in Open WebUI.
+- Make sure the Apache Tika service is running and accessible from the Open WebUI instance.
+- Check the Docker logs for any errors or issues related to the Apache Tika service.
+- Verify that the context extraction engine URL is correctly configured in Open WebUI.
 
-Benefits of Integration
-----------------------
+## Benefits of Integration
 
 Integrating Apache Tika with Open WebUI provides several benefits, including:
 
-* **Improved Metadata Extraction**: Apache Tika's advanced metadata extraction capabilities can help you extract accurate and relevant data from your files.
-* **Support for Multiple File Formats**: Apache Tika supports a wide range of file formats, making it an ideal solution for organizations that work with diverse file types.
-* **Enhanced Content Analysis**: Apache Tika's advanced content analysis capabilities can help you extract valuable insights from your files.
+- **Improved Metadata Extraction**: Apache Tika's advanced metadata extraction capabilities can help you extract accurate and relevant data from your files.
+- **Support for Multiple File Formats**: Apache Tika supports a wide range of file formats, making it an ideal solution for organizations that work with diverse file types.
+- **Enhanced Content Analysis**: Apache Tika's advanced content analysis capabilities can help you extract valuable insights from your files.
 
-Conclusion
-----------
+## Conclusion
 
 Integrating Apache Tika with Open WebUI is a straightforward process that can improve the metadata extraction capabilities of your Open WebUI instance. By following the steps outlined in this documentation, you can easily set up Apache Tika as a context extraction engine for Open WebUI.

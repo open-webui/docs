@@ -5,7 +5,7 @@ title: "❓ FAQ"
 
 #### 🌐 Q: Why isn't my local OpenAPI tool server accessible from the WebUI interface?
 
-**A:** If your tool server is running locally (e.g. http://localhost:8000), browser-based clients may be restricted from accessing it due to CORS (Cross-Origin Resource Sharing) policies.
+**A:** If your tool server is running locally (e.g., http://localhost:8000), browser-based clients may be restricted from accessing it due to CORS (Cross-Origin Resource Sharing) policies.
 
 Make sure to explicitly enable CORS headers in your OpenAPI server. For example, if you're using FastAPI, you can add:
 
@@ -21,9 +21,9 @@ app.add_middleware(
 )
 ```
 
-Also, if Open WebUI is served over HTTPS (e.g. https://yourdomain.com), your local server must meet one of the following conditions:
+Also, if Open WebUI is served over HTTPS (e.g., https://yourdomain.com), your local server must meet one of the following conditions:
 
-- Be accessed from the same domain using HTTPS (e.g. https://localhost:8000).
+- Be accessed from the same domain using HTTPS (e.g., https://localhost:8000).
 - OR run on localhost (127.0.0.1) to allow browsers to relax security for local development.
 - Otherwise, browsers may block insecure requests from HTTPS pages to HTTP APIs due to mixed-content rules.
 
@@ -46,13 +46,12 @@ It is important to set a custom operationId for all endpoints.
 
 ---
 
-
 #### 🚀 Q: Why choose OpenAPI over MCP?
 
 **A:** OpenAPI wins over MCP in most real-world scenarios due to its simplicity, tooling ecosystem, stability, and developer-friendliness. Here's why:
 
 - ✅ **Reuse Your Existing Code**: If you’ve built REST APIs before, you're mostly done—you don’t need to rewrite your logic. Just define a compliant OpenAPI spec and expose your current code as a tool server.
-  
+
   With MCP, you had to reimplement your tool logic inside a custom protocol layer, duplicating work and increasing the surface area to maintain.
 
 - 💼 **Less to Maintain & Debug**: OpenAPI fits naturally into modern dev workflows. You can test endpoints with Postman, inspect logs with built-in APIs, troubleshoot easily with mature ecosystem tools—and often without modifying your core app at all.
@@ -70,7 +69,6 @@ It is important to set a custom operationId for all endpoints.
 - 🔄 **Future-Proof & Extensible**: OpenAPI evolves with API standards and remains forward-compatible. MCP, by contrast, was bespoke and experimental—often requiring changes as the surrounding ecosystem changed.
 
 🧵 Bottom line: OpenAPI lets you do more with less effort, less code duplication, and fewer surprises. It’s a production-ready, developer-friendly route to powering LLM tools—without rebuilding everything from scratch.
-
 
 ---
 
@@ -174,5 +172,5 @@ You can also modularize completely by creating one OpenAPI server per tool if yo
 
 ---
 
-🙋 Have more questions? Visit the GitHub discussions for help and feedback from the community:  
+🙋 Have more questions? Visit the GitHub discussions for help and feedback from the community:
 👉 [Community Discussions](https://github.com/open-webui/openapi-servers/discussions)

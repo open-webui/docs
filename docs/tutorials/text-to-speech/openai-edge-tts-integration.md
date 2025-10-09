@@ -4,21 +4,25 @@ title: "🗨️ Edge TTS Using Docker"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # Integrating `openai-edge-tts` 🗣️ with Open WebUI
 
-## What is `openai-edge-tts`? 
+## What is `openai-edge-tts`?
 
 [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where you can define the endpoint URL, like with Open WebUI.
 
 It uses the [edge-tts](https://github.com/rany2/edge-tts) package, which leverages the Edge browser's free "Read Aloud" feature to emulate a request to Microsoft / Azure in order to receive very high quality text-to-speech for free.
 
-[Sample the voices here](https://tts.travisvn.com)
+[Sample the voices](https://tts.travisvn.com)
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-  <summary>How is it different from 'openedai-speech'?</summary>
+  <!-- markdownlint-disable-next-line MD033 -->
+<summary>How is it different from 'openedai-speech'?</summary>
 
 Similar to [openedai-speech](https://github.com/matatonic/openedai-speech), [openai-edge-tts](https://github.com/travisvn/openai-edge-tts) is a text-to-speech API endpoint that mimics the OpenAI API endpoint, allowing for a direct substitute in scenarios where the OpenAI Speech endpoint is callable and the server endpoint URL can be configured.
 
@@ -47,22 +51,25 @@ This will run the service at port 5050 with all the default configs
 
 - Open the Admin Panel and go to `Settings` -> `Audio`
 - Set your TTS Settings to match the screenshot below
-- _Note: you can specify the TTS Voice here_
+- *Note: you can specify the TTS Voice here*
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBobmOhsMkrO6Tl2kxX39dbuFiQ8cAoNzysIt7f)
 
 :::info
+
 The default API key is the string `your_api_key_here`. You do not have to change that value if you do not need the added security.
+
 :::
 
 **And that's it! You can end here**
 
-# Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
+## Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
 
-
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-  <summary>Running with Python</summary>
-  
+  <!-- markdownlint-disable-next-line MD033 -->
+<summary>Running with Python</summary>
+
 ### 🐍 Running with Python
 
 If you prefer to run this project directly with Python, follow these steps to set up a virtual environment, install dependencies, and start the server.
@@ -79,6 +86,7 @@ cd openai-edge-tts
 Create and activate a virtual environment to isolate dependencies:
 
 ```bash
+
 # For macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
@@ -131,9 +139,11 @@ You can now interact with the API at `http://localhost:5050/v1/audio/speech` and
 
 </details>
 
+<!-- markdownlint-disable-next-line MD033 -->
 <details>
-  <summary>Usage details</summary>
-  
+  <!-- markdownlint-disable-next-line MD033 -->
+<summary>Usage details</summary>
+
 ##### Endpoint: `/v1/audio/speech` (aliased with `/audio/speech`)
 
 Generates audio from the input text. Available parameters:
@@ -150,7 +160,9 @@ Generates audio from the input text. Available parameters:
 - **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
 
 :::tip
+
 You can browse available voices and listen to sample previews at [tts.travisvn.com](https://tts.travisvn.com)
+
 :::
 
 Example request with `curl` and saving the output to an mp3 file:
@@ -203,11 +215,13 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 - **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
 :::info
-The `/v1` is now optional. 
+
+The `/v1` is now optional.
 
 Additionally, there are endpoints for **Azure AI Speech** and **ElevenLabs** for potential future support if custom API endpoints are allowed for these options in Open WebUI.
 
 These can be disabled by setting the environment variable `EXPAND_API=False`.
+
 :::
 
 </details>
@@ -231,9 +245,11 @@ docker run -d -p 5050:5050 \
 ```
 
 :::note
-The markdown text is now put through a filter for enhanced readability and support. 
+
+The markdown text is now put through a filter for enhanced readability and support.
 
 You can disable this by setting the environment variable `REMOVE_FILTER=True`.
+
 :::
 
 ## Additional Resources

@@ -80,11 +80,11 @@ For instance, the popular **Time MCP Server** is documented [here](https://githu
 > Add to your Claude settings:
 >
 > ```json
-> "mcpServers": {   
->   "time": {     
->     "command": "uvx",     
->     "args": ["mcp-server-time", "--local-timezone=America/New_York"]   
->   } 
+> "mcpServers": {
+>   "time": {
+>     "command": "uvx",
+>     "args": ["mcp-server-time", "--local-timezone=America/New_York"]
+>   }
 > }
 > ```
 
@@ -119,11 +119,10 @@ Simply call the auto-generated API endpoints directly via HTTP clients, AI agent
 Assuming you started the above server command (`uvx mcp-server-time`):
 
 - Visit your local API documentation at `http://localhost:8000/docs`.
-- Select a generated endpoint (e.g. `/get_current_time`) and use the provided interactive form.
+- Select a generated endpoint (e.g., `/get_current_time`) and use the provided interactive form.
 - Click "**Execute**" and instantly receive your response.
 
 No setup complexity—just instant REST APIs.
-
 
 ## 🚀 Deploying in Production (Example)
 
@@ -139,6 +138,7 @@ Create the following `Dockerfile` inside your deployment directory:
 FROM python:3.11-slim
 WORKDIR /app
 RUN pip install mcpo uv
+
 # Replace with your MCP server command; example: uvx mcp-server-time
 CMD ["uvx", "mcpo", "--host", "0.0.0.0", "--port", "8000", "--", "uvx", "mcp-server-time", "--local-timezone=America/New_York"]
 ```
@@ -163,7 +163,7 @@ Deploy using Docker Compose, Kubernetes YAML manifests, or your favorite cloud c
 
 ✔️ Your production MCP servers are now effortlessly available via REST APIs!
 
-## 🧑‍💻 Technical Details and Background 
+## 🧑‍💻 Technical Details and Background
 
 ### 🍃 How It Works (Technical Summary)
 
@@ -183,7 +183,7 @@ Deploy using Docker Compose, Kubernetes YAML manifests, or your favorite cloud c
 
 Here's why leveraging MCP servers through OpenAPI via the proxy approach is significantly better and why Open WebUI enthusiastically supports it:
 
-- **User-friendly & Familiar Interface**: No custom clients; just HTTP REST endpoints you already know. 
+- **User-friendly & Familiar Interface**: No custom clients; just HTTP REST endpoints you already know.
 - **Instant Integration**: Immediately compatible with thousands of existing REST/OpenAPI tools, SDKs, and services.
 - **Powerful & Automatic Docs**: Built-in Swagger UI documentation is automatically generated, always accurate, and maintained.
 - **No New Protocol overhead**: Eliminates the necessity to directly handle MCP-specific protocol complexities and socket communication issues.
@@ -191,7 +191,6 @@ Here's why leveraging MCP servers through OpenAPI via the proxy approach is sign
 - **Future-Proof**: MCP proxy uses existing, stable, standard REST/OpenAPI formats guaranteed long-term community support and evolution.
 
 🌟 **Bottom line:** MCP-to-OpenAPI makes your powerful MCP-based AI tools broadly accessible through intuitive, reliable, and scalable REST endpoints. Open WebUI proudly supports and recommends this best-in-class approach.
-
 
 ## 📢 Community & Support
 
