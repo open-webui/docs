@@ -4200,6 +4200,30 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 
 :::
 
+#### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
+- Type: `bool`
+- Default: `False`
+- Description: Enables Redis-based session storage for OAuth authentication flows using the StarSessions middleware. When enabled, OAuth session state is stored in Redis instead of browser cookies, which can help resolve CSRF errors in multi-replica deployments where session data needs to be shared across pods.
+- Persistence: This is an experimental environment variable.
+
+:::warning
+**Experimental Feature - Known Limitations**
+
+This feature is currently experimental and has known compatibility issues:
+
+- **Redis Sentinel and Redis Cluster configurations are not yet supported** and will cause authentication failures if this setting is enabled
+- Only basic Redis setups (single instance or standard Redis URL) are currently compatible
+- This feature was introduced to address CSRF "mismatching_state" errors in multi-pod deployments, but it is disabled by default due to ongoing compatibility work
+
+**Only enable this setting if:**
+- You are experiencing persistent CSRF errors during OAuth login in a multi-replica deployment
+- You are using a basic Redis setup (not Sentinel or Cluster)
+- You have confirmed that `WEBUI_SECRET_KEY` is set to the same value across all replicas
+- You understand this is an experimental feature that may change or be removed in future releases
+
+For most deployments, the default browser cookie-based session management is sufficient and more stable.
+:::
+
 ### Uvicorn Settings
 
 #### `UVICORN_WORKERS`
