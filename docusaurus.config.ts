@@ -128,6 +128,10 @@ const config: Config = {
 							label: "FAQ",
 							to: "faq",
 						},
+						{
+							label: "Help Improve The Docs",
+							to: "https://github.com/open-webui/docs",
+						},
 					],
 				},
 				{
@@ -140,6 +144,10 @@ const config: Config = {
 						{
 							label: "Discord",
 							href: "https://discord.gg/5rJgQTnV4s",
+						},
+						{
+							label: "Reddit",
+							href: "https://www.reddit.com/r/OpenWebUI/",
 						},
 						{
 							label: "𝕏",
@@ -156,6 +164,10 @@ const config: Config = {
 						},
 						{
 							label: "About",
+							to: "https://openwebui.com",
+						},
+						{
+							label: "Report a Vulnerability / Responsible Disclosure",
 							to: "https://openwebui.com",
 						},
 					],
