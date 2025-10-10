@@ -231,7 +231,7 @@ Open WebUI also supports image generation through the **Google Studio API**.
 3. Set the `API Base URL` to `https://generativelanguage.googleapis.com/v1beta`.
 4. Enter your Google AI Studio [API key](https://aistudio.google.com/api-keys).
 5. Enter the model you wish to use from these [available models](https://ai.google.dev/gemini-api/docs/imagen#model-versions).
-6. Set the image size to one of the available [aspect ratios](https://ai.google.dev/gemini-api/docs/image-generation#aspect_ratios).
+6. Set the image size to one of the available [image sizes](https://ai.google.dev/gemini-api/docs/image-generation#aspect_ratios).
 
 :::info
 
