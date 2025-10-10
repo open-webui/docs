@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2  
-title: "⚙️ Tools"  
+sidebar_position: 2
+title: "⚙️ Tools"
 ---
 
 # ⚙️ What are Tools?
@@ -19,11 +19,9 @@ Here are just a few examples of what Tools let your AI assistant do:
 - 🖼️ Image Generation: Create images from your prompts.
 - 🔊 Voice Output: Generate AI voices using ElevenLabs.
 
-Explore ready-to-use tools here:  
-🧰 [Tools Showcase](https://openwebui.com/tools)
+Explore ready-to-use tools in the 🧰 [Tools Showcase](https://openwebui.com/tools)
 
 ---
-
 
 ## 📦 How to Install Tools
 
@@ -34,10 +32,13 @@ There are two easy ways to install Tools in Open WebUI:
 3. Enter your Open WebUI instance’s IP address or URL.
 4. Click “Import to WebUI” — done!
 
-🛑 Safety Tip: Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code.
+:::warning
+
+Safety Tip: Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code.
+
+:::
 
 ---
-
 
 ## 🔧 How to Use Tools in Open WebUI
 
@@ -49,7 +50,11 @@ You have two ways to enable a Tool for your model:
 
 While chatting, click the ➕ icon in the input area. You’ll see a list of available Tools — you can enable any of them on the fly for that session.
 
-💡 Tip: Enabling a Tool gives the model permission to use it — but it may not use it unless it's useful for the task.
+:::tip
+
+Tip: Enabling a Tool gives the model permission to use it — but it may not use it unless it's useful for the task.
+
+:::
 
 ### ✏️ Option 2: Enable by Default (Recommended for Frequent Use)
 1. Go to: Workspace ➡️ Models
@@ -87,16 +92,16 @@ This is the default setting in Open WebUI.
 
 Here, your LLM doesn’t need to natively support function calling. Instead, we guide the model using smart tool selection prompt template to select and use a Tool.
 
-✅ Works with almost any model  
-✅ Great way to unlock Tools with basic or local models  
+✅ Works with almost any model
+✅ Great way to unlock Tools with basic or local models
 ❗ Not as reliable or flexible as Native Mode when chaining tools
 
 ### 🟢 Native Mode (Function Calling Built-In)
 
 If your model does support “native” function calling (like GPT-4o or GPT-3.5-turbo-1106), you can use this powerful mode to let the LLM decide — in real time — when and how to call multiple Tools during a single chat message.
 
-✅ Fast, accurate, and can chain multiple Tools in one response  
-✅ The most natural and advanced experience  
+✅ Fast, accurate, and can chain multiple Tools in one response
+✅ The most natural and advanced experience
 ❗ Requires a model that actually supports native function calling
 
 ### ✳️ How to Switch Between Modes
@@ -111,7 +116,7 @@ Want to enable native function calling in your chats? Here's how:
 
 That’s it! Your chat is now using true native Tool support (as long as the model supports it).
 
-➡️ We recommend using GPT-4o or another OpenAI model for the best native function-calling experience.  
+➡️ We recommend using GPT-4o or another OpenAI model for the best native function-calling experience.
 🔎 Some local models may claim support, but often struggle with accurate or complex Tool usage.
 
 💡 Summary:
@@ -119,7 +124,7 @@ That’s it! Your chat is now using true native Tool support (as long as the mod
 | Mode     | Who it’s for                     | Pros                                    | Cons                                 |
 |----------|----------------------------------|-----------------------------------------|--------------------------------------|
 | Default  | Any model                         | Broad compatibility, safer, flexible    | May be less accurate or slower       |
-| Native   | GPT-4o, etc.                      | Fast, smart, excellent tool chaining     | Needs proper function call support   |
+| Native   | GPT-4o, etc. | Fast, smart, excellent tool chaining     | Needs proper function call support   |
 
 Choose the one that works best for your setup — and remember, you can always switch on the fly via Chat Controls.
 

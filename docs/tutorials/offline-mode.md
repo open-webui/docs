@@ -4,7 +4,9 @@ title: "🔌 Offline Mode"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](../contributing.mdx).
+
 :::
 
 # Running Open WebUI in offline mode 🔌
@@ -70,7 +72,7 @@ The default local transformer can already handle the text-to-speech function. If
 
 ### I: Embedding Model
 
-For various purposes, you will need an embedding model (e.g. [RAG](/docs/features/rag.md)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+For various purposes, you will need an embedding model (e.g. [RAG](/features/rag)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
 
 ```python
 from huggingface_hub import snapshot_download

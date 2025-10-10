@@ -17,7 +17,7 @@ This guide explains **what events are**, **how you can trigger them** from your 
 
 - Events are sent using the `__event_emitter__` helper for one-way updates, or `__event_call__` when you need user input or a response (e.g., confirmation, input, etc.).
 
-**Metaphor:**  
+**Metaphor:**
 Think of Events like push notifications and modal dialogs that your plugin can trigger, making the chat experience richer and more interactive.
 
 ---
@@ -58,6 +58,7 @@ result = await __event_call__(
         },
     }
 )
+
 # result will contain the user's input value
 ```
 
@@ -95,13 +96,14 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
 | `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
 | `input` <br/>(needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ...}`                                     |
-| `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |
+| `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |                                                                    |
 
 **Other/Advanced types:**
 
 - You can define your own types and handle them at the UI layer (or use upcoming event-extension mechanisms).
 
 ### ❗ Details on Specific Event Types
+
 ### `status`
 
 Show a status/progress update in the UI:
@@ -388,6 +390,7 @@ response = await __event_call__({
         "placeholder": "Name"
     }
 })
+
 # response will be: {"value": "user's answer"}
 ```
 

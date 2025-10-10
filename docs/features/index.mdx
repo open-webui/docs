@@ -222,7 +222,6 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 💻 Model Management
 
-
 - 🛠️ **Model Builder**: All models can be built and edited with a persistent model builder mode within the models edit page.
 
 - 📚 **Knowledge Support for Models**: The ability to attach tools, functions, and knowledge collections directly to models from a model's edit page, enhancing the information available to each model.
@@ -412,7 +411,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI's backend and Ollama. This key feature eliminates the need to expose Ollama over the local area network (LAN). Requests made to the `/ollama/api` route from Open WebUI are seamlessly redirected to Ollama from the backend, enhancing overall system security and providing an additional layer of protection.
 
-- 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/features/sso).
+- 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/features/auth).
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`. This is an ideal solution for fresh installations without existing users or can be useful for demonstration purposes.
 

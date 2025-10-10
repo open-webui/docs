@@ -4,7 +4,9 @@ title: "Tavily"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](https://docs.openwebui.com/contributing).
+
 :::
 
 ## Overview
@@ -58,9 +60,11 @@ Ensure you have:
 
 - **Search Parameters**: Explore advanced options (e.g., domain filtering) in the [Tavily API Documentation](https://docs.tavily.com/docs/introduction).
 - **Environment Variables**: Set the `TAVILY_API_KEY` in your `.env` file or Docker command:
+
   ```bash
   -e TAVILY_API_KEY="your_tavily_api_key"
   ```
+
   See [Environment Variable Configuration](https://docs.openwebui.com/environment).
 - **RAG Integration**: Combine Tavily results with local data using Retrieval Augmented Generation. Refer to [RAG Documentation](https://docs.openwebui.com/features/rag).
 

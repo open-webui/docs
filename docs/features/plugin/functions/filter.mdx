@@ -5,7 +5,7 @@ title: "🪄 Filter Function"
 
 # 🪄 Filter Function: Modify Inputs and Outputs
 
-Welcome to the comprehensive guide on Filter Functions in Open WebUI! Filters are a flexible and powerful **plugin system** for modifying data *before it's sent to the Large Language Model (LLM)* (input) or *after it’s returned from the LLM* (output). Whether you’re transforming inputs for better context or cleaning up outputs for improved readability, **Filter Functions** let you do it all.  
+Welcome to the comprehensive guide on Filter Functions in Open WebUI! Filters are a flexible and powerful **plugin system** for modifying data *before it's sent to the Large Language Model (LLM)* (input) or *after it’s returned from the LLM* (output). Whether you’re transforming inputs for better context or cleaning up outputs for improved readability, **Filter Functions** let you do it all.
 
 This guide will break down **what Filters are**, how they work, their structure, and everything you need to know to build powerful and user-friendly filters of your own. Let’s dig in, and don’t worry—I’ll use metaphors, examples, and tips to make everything crystal clear! 🌟
 
@@ -26,7 +26,7 @@ Here’s a quick summary of what Filters do:
 2. **Intercept Model Outputs (Stream Function)**: Capture and adjust the AI’s responses **as they’re generated** by the model. This is useful for real-time modifications, like filtering out sensitive information or formatting the output for better readability.
 3. **Modify Model Outputs (Outlet Function)**: Adjust the AI's response **after it’s processed**, before showing it to the user. This can help refine, log, or adapt the data for a cleaner user experience.
 
-> **Key Concept:** Filters are not standalone models but tools that enhance or transform the data traveling *to* and *from* models.  
+> **Key Concept:** Filters are not standalone models but tools that enhance or transform the data traveling *to* and *from* models.
 
 Filters are like **translators or editors** in the AI workflow: you can intercept and change the conversation without interrupting the flow.
 
@@ -44,7 +44,7 @@ from typing import Optional
 
 class Filter:
     # Valves: Configuration options for the filter
-    class Valves(BaseModel):  
+    class Valves(BaseModel):
         pass
 
     def __init__(self):
@@ -54,7 +54,7 @@ class Filter:
     def inlet(self, body: dict) -> dict:
         # This is where you manipulate user inputs.
         print(f"inlet called: {body}")
-        return body  
+        return body
 
     def stream(self, event: dict) -> dict:
         # This is where you modify streamed chunks of model output.
@@ -127,9 +127,8 @@ class Valves(BaseModel):
     OPTION_NAME: str = "Default Value"
 ```
 
-For example:  
+For example:
 If you're creating a filter that converts responses into uppercase, you might allow users to configure whether every output gets totally capitalized via a valve like `TRANSFORM_UPPERCASE: bool = True/False`.
-
 
 ##### Configuring Valves with Dropdown Menus (Enums)
 
@@ -219,29 +218,27 @@ Using `enum` for your `Valves` options makes your filters more user-friendly and
 
 #### 2️⃣ **`inlet` Function (Input Pre-Processing)**
 
-
 The `inlet` function is like **prepping food before cooking**. Imagine you’re a chef: before the ingredients go into the recipe (the LLM in this case), you might wash vegetables, chop onions, or season the meat. Without this step, your final dish could lack flavor, have unwashed produce, or simply be inconsistent.
 
-In the world of Open WebUI, the `inlet` function does this important prep work on the **user input** before it’s sent to the model. It ensures the input is as clean, contextual, and helpful as possible for the AI to handle.  
+In the world of Open WebUI, the `inlet` function does this important prep work on the **user input** before it’s sent to the model. It ensures the input is as clean, contextual, and helpful as possible for the AI to handle.
 
-📥 **Input**:  
+📥 **Input**:
 - **`body`**: The raw input from Open WebUI to the model. It is in the format of a chat-completion request (usually a dictionary that includes fields like the conversation's messages, model settings, and other metadata). Think of this as your recipe ingredients.
 
-🚀 **Your Task**:  
+🚀 **Your Task**:
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
-
 
 ##### 🍳 Why Would You Use the `inlet`?
 1. **Adding Context**: Automatically append crucial information to the user’s input, especially if their text is vague or incomplete. For example, you might add "You are a friendly assistant" or "Help this user troubleshoot a software bug."
-   
+
 2. **Formatting Data**: If the input requires a specific format, like JSON or Markdown, you can transform it before sending it to the model.
 
 3. **Sanitizing Input**: Remove unwanted characters, strip potentially harmful or confusing symbols (like excessive whitespace or emojis), or replace sensitive information.
 
 4. **Streamlining User Input**: If your model’s output improves with additional guidance, you can use the `inlet` to inject clarifying instructions automatically!
 
-
 ##### 💡 Example Use Cases: Build on Food Prep
+
 ###### 🥗 Example 1: Adding System Context
 Let’s say the LLM is a chef preparing a dish for Italian cuisine, but the user hasn’t mentioned "This is for Italian cooking." You can ensure the message is clear by appending this context before sending the data to the model.
 
@@ -260,7 +257,6 @@ def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 📖 **What Happens?**
 - Any user input like "What are some good dinner ideas?" now carries the Italian theme because we’ve set the system context! Cheesecake might not show up as an answer, but pasta sure will.
 
-
 ###### 🔪 Example 2: Cleaning Input (Remove Odd Characters)
 Suppose the input from the user looks messy or includes unwanted symbols like `!!!`, making the conversation inefficient or harder for the model to parse. You can clean it up while preserving the core content.
 
@@ -275,14 +271,16 @@ def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 📖 **What Happens?**
 - Before: `"How can I debug this issue!!!"` ➡️ Sent to the model as `"How can I debug this issue"`
 
+:::note
+
 Note: The user feels the same, but the model processes a cleaner and easier-to-understand query.
 
+:::
 
 ##### 📊 How `inlet` Helps Optimize Input for the LLM:
 - Improves **accuracy** by clarifying ambiguous queries.
 - Makes the AI **more efficient** by removing unnecessary noise like emojis, HTML tags, or extra punctuation.
 - Ensures **consistency** by formatting user input to match the model’s expected patterns or schemas (like, say, JSON for a specific use case).
-
 
 💭 **Think of `inlet` as the sous-chef in your kitchen**—ensuring everything that goes into the model (your AI "recipe") has been prepped, cleaned, and seasoned to perfection. The better the input, the better the output!
 
@@ -328,14 +326,14 @@ def stream(self, event: dict) -> dict:
             delta["content"] = delta["content"].replace("😊", "")  # Strip emojis
     return event
 ```
-📖 **Before:** `"Hi 😊"`  
+📖 **Before:** `"Hi 😊"`
 📖 **After:** `"Hi"`
 
 ---
 
 #### 4️⃣ **`outlet` Function (Output Post-Processing)**
 
-The `outlet` function is like a **proofreader**: tidy up the AI's response (or make final changes) *after it’s processed by the LLM.*  
+The `outlet` function is like a **proofreader**: tidy up the AI's response (or make final changes) *after it’s processed by the LLM.*
 
 📤 **Input**:
 - **`body`**: This contains **all current messages** in the chat (user history + LLM replies).
@@ -351,7 +349,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     for message in body["messages"]:
         message["content"] = message["content"].replace("<API_KEY>", "[REDACTED]")
-    return body 
+    return body
 ```
 
 ---
@@ -368,7 +366,7 @@ Want the LLM to always know it's assisting a customer in troubleshooting softwar
 class Filter:
     def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
         context_message = {
-            "role": "system", 
+            "role": "system",
             "content": "You're a software troubleshooting assistant."
         }
         body.setdefault("messages", []).insert(0, context_message)
@@ -393,7 +391,7 @@ class Filter:
 
 ---
 
-## 🚧 Potential Confusion: Clear FAQ 🛑  
+## 🚧 Potential Confusion: Clear FAQ 🛑
 
 ### **Q: How Are Filters Different From Pipe Functions?**
 
@@ -420,6 +418,6 @@ By now, you’ve learned:
 
 ---
 
-🚀 **Your Turn**: Start experimenting! What small tweak or context addition could elevate your Open WebUI experience? Filters are fun to build, flexible to use, and can take your models to the next level!  
+🚀 **Your Turn**: Start experimenting! What small tweak or context addition could elevate your Open WebUI experience? Filters are fun to build, flexible to use, and can take your models to the next level!
 
 Happy coding! ✨

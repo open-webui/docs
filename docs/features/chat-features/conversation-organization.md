@@ -32,13 +32,16 @@ You can give each folder a unique personality and context. By hovering over a fo
 
 ### Example Use Case
 
-:::tip **Creating a 'Python Expert' Project**
+:::tip
+
+**Creating a 'Python Expert' Project**
 Imagine you are working on a Python project. You can create a folder called "Python Expert".
 
-1.  **Edit the folder** and set the System Prompt to something like: `You are an expert Python developer. You provide clean, efficient, and well-documented code. When asked for code, you prioritize clarity and adherence to PEP 8 standards.`
-2.  **Attach Knowledge** by linking a knowledge base which contains a PDF of your project's technical specification, or a specific library's documentation.
-3.  **Activate/Select the folder** by clicking on it.
-4.  Now, any new chat you start will automatically have this expert persona, the context of your documents and is saved within the folder, ensuring you get highly relevant and specialized assistance for your project.
+1. **Edit the folder** and set the System Prompt to something like: `You are an expert Python developer. You provide clean, efficient, and well-documented code. When asked for code, you prioritize clarity and adherence to PEP 8 standards.`
+2. **Attach Knowledge** by linking a knowledge base which contains a PDF of your project's technical specification, or a specific library's documentation.
+3. **Activate/Select the folder** by clicking on it.
+4. Now, any new chat you start will automatically have this expert persona, the context of your documents and is saved within the folder, ensuring you get highly relevant and specialized assistance for your project.
+
 :::
 
 ## Tagging Conversations
@@ -51,6 +54,9 @@ Tags provide an additional layer of organization by allowing you to label conver
 
 ### Example Use Case
 
-:::tip **Tagging by Topic**
+:::tip
+
+**Tagging by Topic**
 If you frequently discuss certain topics, such as "marketing" or "development," you can tag conversations with these terms. Later, when you search for a specific tag, all relevant conversations will be quickly accessible.
+
 :::

@@ -10,7 +10,7 @@ With [Watchtower](https://containrrr.dev/watchtower/), you can automate the upda
 docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
 ```
 
-_(Replace `open-webui` with your container's name if it's different.)_
+*(Replace `open-webui` with your container's name if it's different.)*
 
 ### Option 2: Manual Update
 

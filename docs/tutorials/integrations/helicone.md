@@ -4,7 +4,9 @@ sidebar_position: 19
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # Helicone Integration with Open WebUI
@@ -21,7 +23,6 @@ By enabling Helicone, you can log LLM requests, evaluate and experiment with pro
 - **Debug capabilities** to troubleshoot issues with model responses
 - **Cost tracking** for your LLM usage across providers
 
-
 ## How to integrate Helicone with OpenWebUI
 
 <iframe
@@ -36,7 +37,7 @@ By enabling Helicone, you can log LLM requests, evaluate and experiment with pro
 
 ### Step 1: Create a Helicone account and generate your API key
 
-Create a [Helicone account](https://www.helicone.ai/) and log in to generate an [API key here](https://us.helicone.ai/settings/api-keys).
+Create a [Helicone account](https://www.helicone.ai/) and log in to generate an [API key](https://us.helicone.ai/settings/api-keys).
 
 *— Make sure to generate a [write only API key](https://docs.helicone.ai/helicone-headers/helicone-auth). This ensures you only allow logging data to Helicone without read access to your private data.*
 
@@ -78,4 +79,4 @@ You should see the requests you have made through your Open WebUI interface alre
 
 ## Learn more
 
-For a comprehensive guide on Helicone, you can check out [Helicone's documentation here](https://docs.helicone.ai/getting-started/quick-start).
+For a comprehensive guide on Helicone, you can check out [Helicone's documentation](https://docs.helicone.ai/getting-started/quick-start).
