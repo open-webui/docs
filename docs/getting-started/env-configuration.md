@@ -81,8 +81,23 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 
 - Type: `bool`
 - Default: `False`
-- Description: Enforces a basic password policy when users sign up, change their password and when they are created or updated through the API.
-- Persistence: This environment variable is a `PersistentConfig` variable
+- Description: Enforces a password policy when users sign up, change their password, or are managed via the API.When enabled, passwords must contain at least one uppercase letter, one lowercase letter, one digit, and one special symbol. The minimum length and the set of allowed symbols can be configured using `USER_PASSWORD_MIN_LENGTH` and `USER_PASSWORD_POLICY_SYMBOLS` respectively.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PASSWORD_MIN_LENGTH`
+
+- Type: `int`
+- Default: `12`
+- Description: Sets the minimum required password length when `ENABLE_ENFORCE_PASSWORD_POLICY` is active.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PASSWORD_POLICY_SYMBOLS`
+
+- Type: `str`
+- Default: `!@#$%^&*`
+- Description: Defines the set of special characters from which at least one must be included in the password when `ENABLE_ENFORCE_PASSWORD_POLICY` is active.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 
 #### `ENABLE_LOGIN_FORM`
 
