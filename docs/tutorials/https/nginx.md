@@ -24,10 +24,10 @@ Choose the method that best fits your deployment needs.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-import NginxProxyManager from './tab-nginx/NginxProxyManager.md';
-import SelfSigned from './tab-nginx/SelfSigned.md';
-import LetsEncrypt from './tab-nginx/LetsEncrypt.md';
-import Windows from './tab-nginx/Windows.md';
+import NginxProxyManager from '../tab-nginx/NginxProxyManager.md';
+import SelfSigned from '../tab-nginx/SelfSigned.md';
+import LetsEncrypt from '../tab-nginx/LetsEncrypt.md';
+import Windows from '../tab-nginx/Windows.md';
 
 <!-- markdownlint-disable-next-line MD033 -->
 <Tabs>
