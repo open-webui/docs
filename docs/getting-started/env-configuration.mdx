@@ -2348,6 +2348,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the API key for Mojeek Search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `PERPLEXITY_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key for Perplexity API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `SERPSTACK_API_KEY`
 
 - Type: `str`
@@ -2383,12 +2390,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `str`
 - Description: Sets the SearchAPI engine.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `TAVILY_API_KEY`
-
-- Type: `str`
-- Description: Sets the API key for Tavily search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `JINA_API_KEY`
@@ -2459,13 +2460,6 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the Ollama Cloud Web Search API Key.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `TAVILY_EXTRACT_DEPTH`
-
-- Type: `str`
-- Default: `basic`
-- Description: Specifies the extract depth for Tavily search results.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 ### Web Loader Configuration
 
 #### `WEB_LOADER_ENGINE`
@@ -2532,12 +2526,14 @@ When `WEB_LOADER_ENGINE` is set to `tavily`, the following variables are used:
 - **`TAVILY_API_KEY`**:
   - Type: `str`
   - Default: `None`
-  - Description: Your API key for the Tavily service.
+  - Description: Your API key for the Tavily search API.
+  - Persistence: This environment variable is a `PersistentConfig` variable.
 
 - **`TAVILY_EXTRACT_DEPTH`**:
   - Type: `int`
   - Default: `basic`
-  - Description: The depth of content extraction for the Tavily loader.
+  - Description: Specifies the extract depth for Tavily search results.
+  - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### External Loader (`external`)
 
@@ -2547,11 +2543,13 @@ When `WEB_LOADER_ENGINE` is set to `external`, the following variables are used:
   - Type: `str`
   - Default: `None`
   - Description: The URL of your custom external web loader service.
+  - Persistence: This environment variable is a `PersistentConfig` variable.
 
 - **`EXTERNAL_WEB_LOADER_API_KEY`**:
   - Type: `str`
   - Default: `None`
   - Description: An optional API key for authenticating with your external web loader service.
+  - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### YouTube Loader
 
