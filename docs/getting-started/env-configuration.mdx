@@ -921,7 +921,9 @@ The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of end
 
 Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.
 
-**Always set a reasonable expiration time (e.g., `3600s`, `1h`, etc.) in production to limit the lifespan of authentication tokens.** Never use `-1` in a production environment.
+**Always set a reasonable expiration time in production environments (e.g., `3600s`, `1h`, `7d` etc.) to limit the lifespan of authentication tokens.**
+
+**NEVER use `-1` in a production environment.**
 
 If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change your `WEBUI_SECRET_KEY` to immediately invalidate all existing tokens.
 
