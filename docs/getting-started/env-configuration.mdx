@@ -2474,63 +2474,84 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `safe_web`
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
-  - `requests` - Uses the Requests module with enhanced error handling.
-  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+  - `safe_web` - Uses the built-in `SafeWebBaseLoader` for basic, safe web content fetching.
+  - `playwright` - Uses Playwright for more advanced web page rendering and interaction. Requires additional configuration.
+  - `firecrawl` - Uses the FireCrawl service for crawling and extracting web data. Requires an API key.
+  - `tavily` - Uses the Tavily service for in-depth web content extraction. Requires an API key.
+  - `external` - Uses a custom, external web loader service.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
 
-When using `playwright`, you have two options:
-
-1. If `PLAYWRIGHT_WS_URI` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
-2. If `PLAYWRIGHT_WS_URI` is set, Open WebUI will connect to a remote browser instance instead of installing dependencies locally.
+Each web loader engine has its own set of required environment variables. See the sections below for details on how to configure each one.
 
 :::
 
-#### `PLAYWRIGHT_WS_URL`
+#### Playwright Loader (`playwright`)
 
-- Type: `str`
-- Default: `None`
-- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`
-- Persistence: This environment variable is a `PersistentConfig` variable.
+When `WEB_LOADER_ENGINE` is set to `playwright`, the following variables are used:
+
+- **`PLAYWRIGHT_TIMEOUT`**:
+  - Type: `int`
+  - Default: `None`
+  - Description: Specifies the timeout for Playwright requests.
+
+- **`PLAYWRIGHT_WS_URL`**:
+  - Type: `str`
+  - Default: `None`
+  - Description: The WebSocket URL of a remote Playwright browser instance (e.g., `ws://playwright:3000`). If set, Open WebUI will connect to this remote browser instead of installing dependencies locally.
 
 :::tip
 
 Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
-- Reducing the size of the Open WebUI container
-- Using a different browser other than the default Chromium
-- Connecting to a non-headless (GUI) browser
+- Reducing the size of the Open WebUI container.
+- Using a different browser other than the default Chromium.
+- Connecting to a non-headless (GUI) browser for debugging.
 
 :::
 
-#### `FIRECRAWL_API_BASE_URL`
+#### FireCrawl Loader (`firecrawl`)
 
-- Type: `str`
-- Default: `https://api.firecrawl.dev`
-- Description: Sets the base URL for Firecrawl API.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+When `WEB_LOADER_ENGINE` is set to `firecrawl`, the following variables are used:
 
-#### `FIRECRAWL_API_KEY`
+- **`FIRECRAWL_API_KEY`**:
+  - Type: `str`
+  - Default: `None`
+  - Description: Your API key for the FireCrawl service.
 
-- Type: `str`
-- Default: `None`
-- Description: Sets the API key for Firecrawl API.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+- **`FIRECRAWL_API_BASE_URL`**:
+  - Type: `str`
+  - Default: `https://api.firecrawl.dev`
+  - Description: The base URL for the FireCrawl API.
 
-#### `PERPLEXITY_API_KEY`
+#### Tavily Loader (`tavily`)
 
-- Type: `str`
-- Default: `None`
-- Description: Sets the API key for Perplexity API.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+When `WEB_LOADER_ENGINE` is set to `tavily`, the following variables are used:
 
-#### `PLAYWRIGHT_TIMEOUT`
+- **`TAVILY_API_KEY`**:
+  - Type: `str`
+  - Default: `None`
+  - Description: Your API key for the Tavily service.
 
-- Type: `int`
-- Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the timeout for Playwright requests.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+- **`TAVILY_EXTRACT_DEPTH`**:
+  - Type: `int`
+  - Default: `basic`
+  - Description: The depth of content extraction for the Tavily loader.
+
+#### External Loader (`external`)
+
+When `WEB_LOADER_ENGINE` is set to `external`, the following variables are used:
+
+- **`EXTERNAL_WEB_LOADER_URL`**:
+  - Type: `str`
+  - Default: `None`
+  - Description: The URL of your custom external web loader service.
+
+- **`EXTERNAL_WEB_LOADER_API_KEY`**:
+  - Type: `str`
+  - Default: `None`
+  - Description: An optional API key for authenticating with your external web loader service.
 
 ### YouTube Loader
 
