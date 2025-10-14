@@ -1,0 +1,127 @@
+---
+sidebar_position: 4
+title: "📚 Citations"
+---
+
+# Citations in OpenWebUI
+
+Citations allow pipes to provide source references and metadata for generated responses, enabling users to verify information and explore sources. This guide covers the complete citation system in OpenWebUI.
+
+## Citation Event Structure
+
+### Basic Citation Event
+
+```python
+await __event_emitter__({
+    "type": "source",  # or "citation"
+    "data": {
+        "source": {
+            "name": "Display Name",
+            "url": "https://example.com",  # Optional
+            "id": "unique_id",  # Optional
+            "type": "web_search_results",  # Optional
+    
+        },
+        "document": [
+            "Text snippet 1",
+            "Text snippet 2"
+        ],
+        "metadata": [
+            {
+                "source": "https://source-url.com",
+                "date_accessed": "2025-01-01T12:00:00Z"
+            }
+        ]
+    }
+})
+```
+
+### Complete Metadata Properties
+
+The `metadata` array supports extensive customization:
+
+#### Basic Properties
+```python
+{
+    "source": "https://source-url.com",      # Source URL
+    "name": "[1]",                          # Override inline display name
+    "date_accessed": "2025-01-01T12:00:00Z", # ISO timestamp
+    "title": "Full Document Title",         # Document title
+    "description": "Document description",   # Meta description
+    "language": "en"                        # Content language
+}
+```
+
+#### File Integration
+```python
+{
+    "file_id": "file_abc123",  # Makes citation clickable → opens file
+    "page": 42                 # Jump to page 43 (0-indexed, displays as 1-indexed)
+}
+```
+
+#### Relevance Scoring
+```python
+{
+    "distance": 0.85  # Relevance score (-1 to 1), shows as percentage
+}
+```
+
+#### Custom Parameters
+You can add any custom metadata for your pipe's specific needs:
+```python
+{
+    "query": "original search term",
+    "section": "Chapter 5",
+    "confidence": 0.95,
+    "custom_field": "any_value"
+}
+```
+
+## Frontend Integration
+
+### Display Priority
+
+The frontend uses this priority for citation display:
+
+1. **Inline Display**: `metadata[0].name` → `metadata[0].source` → `source.name`
+2. **Modal Title**: `source.name` → `metadata[0].source`  
+3. **Modal URL**: `metadata[0].file_id` → `source.url` → `metadata[0].source`
+
+### Citation Replacement
+
+OpenWebUI automatically replaces citation markers in text:
+
+- Looks for patterns: `[1]`, `[2]`, `[1,2,3]`
+- Replaces with clickable `<source_id>` elements
+- Maps to sources by array index (1-indexed)
+
+## Advanced Features
+
+### Multiple Documents per Citation
+
+```python
+{
+    "source": {"name": "Research Paper"},
+    "document": [
+        "First relevant excerpt",
+        "Second relevant excerpt", 
+        "Third relevant excerpt"
+    ],
+    "metadata": [
+        {"page": 1, "section": "Introduction"},
+        {"page": 5, "section": "Methods"},
+        {"page": 12, "section": "Results"}
+    ]
+}
+```
+
+### Relevance Scoring Display
+
+```python
+{
+    "document": ["Highly relevant content"],
+    "metadata": [{"distance": 0.95}],  # Shows as 95% relevance
+    "distances": [0.95]  # Alternative format
+}
+```
