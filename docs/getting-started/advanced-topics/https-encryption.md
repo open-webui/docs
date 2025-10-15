@@ -47,7 +47,7 @@ The best HTTPS solution depends on your existing infrastructure and technical ex
 
 ## 📚 Explore Deployment Tutorials for Step-by-Step Guides
 
-For detailed, practical instructions and community-contributed tutorials on setting up HTTPS encryption with various solutions, please visit the **[Deployment Tutorials](../../tutorials/deployment/)** section.
+For detailed, practical instructions and community-contributed tutorials on setting up HTTPS encryption with various solutions, please visit the **[Deployment Tutorials](../../../tutorials/deployment/)** section.
 
 These tutorials often provide specific, step-by-step guides for different environments and HTTPS solutions, making the process easier to follow.
 
