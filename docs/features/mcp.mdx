@@ -46,7 +46,11 @@ Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-
 ## ❓ FAQ
 
 **Do you support stdio or SSE transports?**
-No. Open WebUI only supports **MCP via Streamable HTTP**.
+Native MCP support in Open WebUI is **Streamable HTTP only**. This design choice reflects our architecture: Open WebUI is a **web-based, multi-tenant environment**, not a local desktop process.
+
+Browsers operate within strict **sandboxed and event-driven HTTP constraints**, making long-lived stdio or SSE connections difficult to maintain securely across users and sessions.
+
+If you need to bridge those other MCP transports, check out [**mcpo**](https://github.com/open-webui/mcpo) — an open-source proxy that translates **stdio or SSE-based MCP servers into OpenAPI-compatible endpoints**. It effectively lets you run traditional MCP tools inside Open WebUI without modifying their transport layer.
 
 **Is MCP considered stable here?**
 Supported and improving. The broader ecosystem is still evolving; expect occasional breaking changes.
