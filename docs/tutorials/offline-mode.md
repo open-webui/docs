@@ -120,7 +120,7 @@ services:
       - OFFLINE_MODE=True
       - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - WHISPER_MODEL=Systran/faster-whisper-large-v3
-    volume:
+    volumes:
       - ./open-webui-data:/app/backend/data
       - ./models/sentence-transformers/all-MiniLM-L6-v2:/app/backend/data/cache/embedding/models/
       - ./models/Systran/faster-whisper-large-v3:/app/backend/data/cache/whisper/models/
