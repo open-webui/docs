@@ -91,11 +91,11 @@ const config: Config = {
 				//   label: "Blog",
 				// },
 
-				{
-					to: "blog",
-					label: "Blog",
-					position: "left",
-				},
+				// {
+				//   href: "/blog",
+				//   label: "Blog",
+				//   position: "left",
+				// },
 				{
 					href: "https://github.com/open-webui/open-webui",
 					position: "right",

@@ -179,7 +179,7 @@ is also being used and set to `True`. Failure to do so will result in the inabil
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
 
-#### `MODELS_CACHE_TTL`
+### `MODELS_CACHE_TTL`
 
 - Type: `int`
 - Default: `1`
@@ -3312,11 +3312,6 @@ See https://open.feishu.cn/document/sso/web-application-sso/login-overview
 
 - Type: `str`
 - Description: Sets the client secret for OIDC.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `OAUTH_CLIENT_SECRET_FILE`
-- Type: `str`
-- Description: Reads the client secret for OIDC from file, alternative to OAUTH_CLIENT_SECRET.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OPENID_PROVIDER_URL`
