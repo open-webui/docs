@@ -637,6 +637,10 @@ div.special_table + table tr:nth-child(even) {
 	min-height: 100vh;
 }
 
+.header-discord-link {
+	margin-right: 16px;
+}
+
 .header-github-link::before {
 	content: "";
 	width: 24px;
