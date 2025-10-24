@@ -649,6 +649,10 @@ div.special_table + table tr:nth-child(even) {
 	}
 }
 
+.header-discord-link {
+	margin-right: 16px;
+}
+
 .header-github-link::before {
 	content: "";
 	width: 24px;
