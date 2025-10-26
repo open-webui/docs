@@ -9,12 +9,12 @@ export const SponsorList = () => {
 		// 	description: "Does your interface have a backend yet? Try n8n",
 		// },
 
-		{
-			imgSrc: "/sponsors/logos/warp.png",
-			url: "https://warp.dev/open-webui",
-			name: "Warp",
-			description: "The intelligent terminal for developers",
-		},
+		// {
+		// 	imgSrc: "/sponsors/logos/warp.png",
+		// 	url: "https://warp.dev/open-webui",
+		// 	name: "Warp",
+		// 	description: "The intelligent terminal for developers",
+		// },
 		// {
 		// 	imgSrc: "/sponsors/logos/tailscale.png",
 		// 	url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
