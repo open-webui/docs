@@ -77,28 +77,9 @@ const config: Config = {
 				srcDark: "images/logo-dark.png",
 			},
 			items: [
-				// {
-				// 	type: "docSidebar",
-				// 	position: "left",
-				// 	sidebarId: "pipelines",
-				// 	label: "Pipelines",
-				// },
-
-				// {
-				//   type: "docSidebar",
-				//   sidebarId: "blog",
-				//   position: "left",
-				//   label: "Blog",
-				// },
-
 				{
 					to: "blog",
 					label: "Blog",
-					position: "left",
-				},
-				{
-					href: "/",
-					label: "Docs",
 					position: "left",
 				},
 				{
