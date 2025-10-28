@@ -191,7 +191,7 @@ There are several example configurations that are provided in this page.
 :::danger
 
 Incorrect configuration can allow users to authenticate as any user on your Open WebUI instance.
-Make sure to allow only the authenticating proxy access to Open WebUI, such as setting `HOST=127.0.0.1` to only listen on the loopback interface.
+Make sure to allow only the authenticating proxy access to Open WebUI, such as by not opening any ports directly to the container, or by setting `HOST=127.0.0.1` so that it only listens on the loopback interface.
 
 :::
 
@@ -250,7 +250,6 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - HOST=127.0.0.1
       - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=Tailscale-User-Login
       - WEBUI_AUTH_TRUSTED_NAME_HEADER=Tailscale-User-Name
     restart: unless-stopped
@@ -301,7 +300,6 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - HOST=127.0.0.1
       - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=Cf-Access-Authenticated-User-Email
     restart: unless-stopped
   cloudflared:
@@ -330,7 +328,6 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - 'HOST=127.0.0.1'
       - 'WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-Forwarded-Email'
       - 'WEBUI_AUTH_TRUSTED_NAME_HEADER=X-Forwarded-User'
     restart: unless-stopped
