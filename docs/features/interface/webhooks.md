@@ -5,56 +5,101 @@ title: "🪝 Webhook Integrations"
 
 ## Overview
 
-Open WebUI provides a webhook feature that allows you to receive notifications automatically whenever new users sign up to your instance. This is done by providing a webhook URL to Open WebUI, which will then send notifications to that URL when a new user account is created.
+Open WebUI offers two distinct webhook integrations to help you stay informed about events happening within your instance. These webhooks allow you to receive automated notifications in external services like Discord, Slack, or any other application that supports incoming webhooks.
 
-## Configuring Webhooks in Open WebUI
+There are two types of webhooks available:
 
-You will need to obtain a webhook URL from an external service that supports webhooks, such as a Discord channel or a Slack workspace. This URL will be used to receive notifications from Open WebUI.
+1.  **Admin Webhook:** A system-wide webhook that notifies administrators about new user sign-ups.
+2.  **User Webhook:** A personal webhook that notifies individual users when a response to their chat is ready, especially useful for long-running tasks.
 
-To configure webhooks in Open WebUI, you have two options:
+## 1. Admin Webhook: New User Notifications
 
-### Option 1: Configure through the Admin Interface
+This webhook is designed for administrators to monitor new user registration on the Open WebUI instance.
 
-1. Log in to your Open WebUI instance as an administrator.
-2. Navigate to the `Admin Panel`.
-3. Click the `Settings` tab located at the top.
-4. From there, navigate to the `General` sectionn of the setting in the admin panel.
-5. Locate the `Webhook URL` field and enter the webhook URL.
-6. Save the changes.
+### Use Case
 
-### Option 2: Configure through Environment Variables
+- **User Registration Tracking:** Receive a real-time notification in a dedicated Slack or Discord channel whenever a new user creates an account. This helps you keep track of your user base and welcome new members.
 
-Alternatively, you can configure the webhook URL by setting the `WEBHOOK_URL` environment variable. For more information on environment variables in Open WebUI, see [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration/#webhook_url).
+### Configuration
 
-### Step 3: Verify the Webhook
+You can configure the admin webhook in two ways:
 
-To verify that the webhook is working correctly, create a new user account in Open WebUI. If the webhook is configured correctly, you should receive a notification at the specified webhook URL.
+#### Option 1: Through the Admin Panel
 
-## Webhook Payload Format
+1.  Log in as an administrator.
+2.  Navigate to **Admin Panel > Settings > General**.
+3.  Locate the **"Webhook URL"** field.
+4.  Enter the webhook URL provided by your external service (e.g., Discord, Slack).
+5.  Click **"Save"**.
 
-The webhook payload sent by Open WebUI is in plain text and contains a simple notification message about the new user account. The payload format is as follows:
+#### Option 2: Through Environment Variables
 
-```txt
-New user signed up: <username>
+You can also set the webhook URL using the `WEBHOOK_URL` environment variable. For more details, refer to the [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration/#webhook_url) documentation.
+
+### Payload Format
+
+When a new user signs up, Open WebUI will send a `POST` request to the configured URL with a JSON payload containing the new user's details.
+
+**Payload Example:**
+
+```json
+{
+  "event": "new_user",
+  "user": {
+    "email": "tim@example.com",
+    "name": "Tim"
+  }
+}
 ```
 
-For example, if a user named "Tim" signs up, the payload sent would be:
+## 2. User Webhook: Chat Response Notifications
 
-```txt
-New user signed up: Tim
+This webhook allows individual users to receive a notification when a model has finished generating a response to their prompt. It's particularly useful for long-running tasks where you might navigate away from the Open WebUI tab.
+
+### Use Case
+
+- **Long-Running Task Alerts:** If you submit a complex prompt that takes several minutes to process, you can close the browser tab and still be notified the moment the response is ready. This allows you to work on other tasks without having to constantly check the Open WebUI interface.
+
+### How it Works
+
+The notification is only sent if you are **not actively using the WebUI**. If you have the tab open and focused, the webhook will not be triggered, preventing unnecessary notifications.
+
+### Configuration
+
+1.  Click on your profile picture in the bottom-left corner to open the settings menu.
+2.  Navigate to **Settings > Account**.
+3.  Locate the **"Notification Webhook"** field.
+4.  Enter your personal webhook URL.
+5.  Click **"Save"**.
+
+### Payload Format
+
+When a chat response is ready and you are inactive, Open WebUI will send a `POST` request to your webhook URL with a JSON payload containing details about the chat.
+
+**Payload Example:**
+
+```json
+{
+  "event": "chat_response",
+  "chat": {
+    "id": "abc-123-def-456",
+    "title": "My Awesome Conversation",
+    "last_message": "This is the prompt I submitted."
+  }
+}
 ```
 
 ## Troubleshooting
 
-- Make sure the webhook URL is correct and properly formatted.
-- Verify that the webhook service is enabled and configured correctly.
-- Check the Open WebUI logs for any errors related to the webhook.
-- Verify the connection hasn't been interrupted or blocked by a firewall or proxy.
-- The webhook server could be temporarily unavailable or experiencing high latency.
-- If provided through the webhook service, verify if the Webhook API key is invalid, expired, or revoked.
+If you're not receiving webhook notifications, here are a few things to check:
+
+-   **Verify the URL:** Ensure the webhook URL is correct and properly pasted into the settings field.
+-   **Service Configuration:** Double-check that the webhook is set up correctly in the external service (e.g., Discord, Slack).
+-   **Firewall/Proxy:** Make sure your network or firewall is not blocking outgoing requests from the Open WebUI server.
+-   **Open WebUI Logs:** Check the Open WebUI server logs for any error messages related to webhook failures.
 
 :::note
 
-Note: The webhook feature in Open WebUI is still evolving, and we plan to add more features and event types in the future.
+The webhook features in Open WebUI are continuously being improved. Stay tuned for more event types and customization options in future updates.
 
 :::
