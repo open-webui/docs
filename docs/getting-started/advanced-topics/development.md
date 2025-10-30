@@ -162,6 +162,27 @@ VS Code's integrated terminal feature makes managing multiple terminals incredib
 
 🎉 **Congratulations!** If you have followed all the steps, you should now have both the frontend and backend development servers running locally. Go back to your browser tab where you accessed the frontend (usually [http://localhost:5173](http://localhost:5173)). **Refresh the page.** You should now see the full Open WebUI application running in your browser, connected to your local backend!
 
+## Testing From Another Device (Phone, Tablet, etc.)  
+
+Want to open your dev instance from your phone or another computer on the same Wi-Fi?  
+
+1. Find your dev-machine’s LAN IP, e.g. `192.168.1.42`.  
+2. **Frontend only (quick check):**  
+   - Keep the backend on `localhost`.  
+   - From your phone browse to `http://192.168.1.42:5173`.  
+3. **Full stack (frontend + backend):**  
+   - In `backend/dev.sh` **add your LAN address to the CORS list**, e.g.  
+
+     ```bash
+     export CORS_ALLOW_ORIGIN="http://localhost:5173;http://localhost:8080;http://192.168.1.42:5173"
+     ```
+
+   - Restart the backend (`sh dev.sh`).  
+   - From your phone browse to `http://192.168.1.42:5173`.  
+   - All API calls will now be allowed from that origin.  
+
+> **Security note:** The wildcard `"*"` works too, but do **not** ship that to production.  
+
 ## Troubleshooting Common Issues
 
 Here are solutions to some common problems you might encounter during setup or development:

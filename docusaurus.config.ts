@@ -77,32 +77,20 @@ const config: Config = {
 				srcDark: "images/logo-dark.png",
 			},
 			items: [
-				// {
-				// 	type: "docSidebar",
-				// 	position: "left",
-				// 	sidebarId: "pipelines",
-				// 	label: "Pipelines",
-				// },
-
-				// {
-				//   type: "docSidebar",
-				//   sidebarId: "blog",
-				//   position: "left",
-				//   label: "Blog",
-				// },
-
 				{
 					to: "blog",
 					label: "Blog",
 					position: "left",
 				},
 				{
+					label: "GitHub",
 					href: "https://github.com/open-webui/open-webui",
 					position: "right",
 					className: "header-github-link",
 					"aria-label": "GitHub repository",
 				},
 				{
+					label: "Discord",
 					href: "https://discord.com/invite/5rJgQTnV4s",
 					position: "right",
 					className: "header-discord-link",
