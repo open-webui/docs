@@ -5,54 +5,73 @@ title: "🔰 Customizable Banners"
 
 ## Overview
 
-Open WebUI provides a feature that allows administrators to create customizable banners with persistence in the `config.json` file. These banners can feature options for content, background color (info, warning, error, or success), and dismissibility. Banners are accessible only to logged-in users, ensuring the confidentiality of sensitive information.
+Open WebUI allows administrators to display custom banners to logged-in users. This feature is useful for making announcements, displaying system-wide alerts, or sharing important information. Banners are persistent and can be configured to be dismissible by users.
 
-## Configuring Banners through the Admin Panel
+You can configure banners in two ways: through the Admin Panel for a user-friendly experience, or via environment variables for automated or GitOps-style deployments.
 
-To configure banners through the admin panel, follow these steps:
+## Configuring Banners
 
-1. Log in to your Open WebUI instance as an administrator.
-2. Navigate to the `Admin Panel` -> `Settings` -> `Interface`.
-3. Locate the `Banners` option directly above the `Default Prompt Suggestions` option.
-4. Click on the `+` icon to add a new banner.
-5. Select the banner type and set the banner text as desired.
-6. Choose whether the banner is dismissible or not.
-7. Set the timestamp for the banner (optional).
-8. Press `Save` at the bottom of the page to save the banner.
+### Option 1: Using the Admin Panel
 
-## Configuring Banners through Environment Variables
+This is the most straightforward way to manage banners.
 
-Alternatively, you can configure banners through environment variables. To do this, you will need to set the `WEBUI_BANNERS` environment variable with a list of dictionaries in the following format:
+1.  **Log in** to your Open WebUI instance as an administrator.
+2.  Navigate to the **Admin Panel** > **Settings** > **Interface**.
+3.  Locate the **"Banners"** section.
+4.  Click the **+** icon to add a new banner.
 
-```json
-[{"id": "string","type": "string [info, success, warning, error]","title": "string","content": "string","dismissible": False,"timestamp": 1000}]
+You can then configure the following options for each banner:
+
+-   **Type:** The color and style of the banner. Choose from:
+    -   `info` (Blue)
+    -   `success` (Green)
+    -   `warning` (Yellow)
+    -   `error` (Red)
+-   **Title:** The main heading of the banner.
+-   **Content:** The main text or message of the banner.
+-   **Dismissible:** If toggled on, users can close the banner. Dismissed banners are stored in the user's browser, so they will not reappear for that user unless their browser cache is cleared. If toggled off, the banner will always be visible.
+
+5.  Click **"Save"** at the bottom of the page to apply your changes.
+
+### Option 2: Using Environment Variables
+
+For automated deployments, you can configure banners using the `WEBUI_BANNERS` environment variable. The variable should be a JSON string representing a list of banner objects.
+
+**Environment Variable:**
+
+-   `WEBUI_BANNERS`
+    -   **Type:** `string` (containing a JSON list of objects)
+    -   **Default:** `[]`
+    -   **Description:** A list of banner objects to be displayed to users.
+
+**Example:**
+
+Here is an example of how to set the `WEBUI_BANNERS` variable in a `docker-compose.yml` file:
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - 'WEBUI_BANNERS=[{"id":"update-2024-07-26","type":"info","title":"System Update","content":"A system update is scheduled for this Friday at 10 PM. Expect brief downtime.","dismissible":true},{"id":"policy-reminder","type":"warning","title":"Policy Reminder","content":"Please remember to adhere to the company-wide usage policy.","dismissible":false}]'
 ```
 
-For more information on configuring environment variables in Open WebUI, see [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration#webui_banners).
+## Banner Object Properties
 
-## Environment Variable Description
+Each banner object in the JSON list has the following properties:
 
-- `WEBUI_BANNERS`:
-  - Type: list of dict
-  - Default: `[]`
-  - Description: List of banners to show to users.
+-   `id` (string, required): A unique identifier for the banner. This is used to track which banners a user has dismissed.
+-   `type` (string, required): The style of the banner. Must be one of `info`, `success`, `warning`, or `error`.
+-   `title` (string, required): The title text displayed on the banner.
+-   `content` (string, required): The main message of the banner.
+-   `dismissible` (boolean, required): Determines if the user can close the banner. `true` means it can be dismissed; `false` means it cannot.
+-   `timestamp` (integer, optional): **Note:** While this field is present in the configuration, it is not currently used by the frontend. The timestamp does not affect whether a banner is displayed or not.
 
-## Banner Options
+## Troubleshooting
 
-- `id`: Unique identifier for the banner.
-- `type`: Background color of the banner (info, success, warning, error).
-- `title`: Title of the banner.
-- `content`: Content of the banner.
-- `dismissible`: Whether the banner is dismissible or not.
-- `timestamp`: Timestamp for the banner (optional).
-
-## FAQ
-
-- Q: Can I configure banners through the admin panel?
-A: Yes, you can configure banners through the admin panel by navigating to `Admin Panel` -> `Settings` -> `Interface` and clicking on the `+` icon to add a new banner.
-- Q: Can I configure banners through environment variables?
-A: Yes, you can configure banners through environment variables by setting the `WEBUI_BANNERS` environment variable with a list of dictionaries.
-- Q: What is the format for the `WEBUI_BANNERS` environment variable?
-A: The format for the `WEBUI_BANNERS` environment variable is a list of dictionaries with the following keys: `id`, `type`, `title`, `content`, `dismissible`, and `timestamp`.
-- Q: Can I make banners dismissible?
-A: Yes, you can make banners dismissible by setting the `dismissible` key to `True` in the banner configuration or by toggling dismissibility for a banner within the UI.
+-   **Banner Not Appearing:**
+    -   Ensure the JSON format for the `WEBUI_BANNERS` environment variable is correct. It must be a valid JSON array of objects.
+    -   Check the Open WebUI server logs for any errors related to parsing the `WEBUI_BANNERS` variable.
+-   **Banner Cannot Be Dismissed:**
+    -   Verify that the `dismissible` property for the banner is set to `true` in your configuration.
+    -   If a banner is not dismissible, it is by design and cannot be closed by the user.
