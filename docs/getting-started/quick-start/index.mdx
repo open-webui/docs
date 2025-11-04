@@ -12,6 +12,7 @@ import Podman from './tab-docker/Podman.md';
 import PodmanKubePlay from './tab-docker/PodmanKubePlay.md';
 import ManualDocker from './tab-docker/ManualDocker.md';
 import DockerSwarm from './tab-docker/DockerSwarm.md';
+import WSL from './tab-docker/WSL.md';
 import DockerUpdating from './tab-docker/DockerUpdating.md';
 import Helm from './tab-kubernetes/Helm.md';
 import Venv from './tab-python/Venv.md';
@@ -69,6 +70,11 @@ Choose your preferred installation method below:
       <TabItem value="swarm" label="Docker Swarm">
         <div className='mt-5'>
           <DockerSwarm />
+        </div>
+      </TabItem>
+      <TabItem value="wsl" label="WSL">
+        <div className='mt-5'>
+          <WSL />
         </div>
       </TabItem>
     </Tabs>
