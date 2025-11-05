@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## 👁️ Mistral OCR
 
-This documentation provides a step-by-step guide to integrating Mistral OCR with Open WebUI. Mistral OCR is an optical character recognition library designed to extract text from a variety of image-based file formats—including scanned PDFs, images, and handwritten documents—into structured data such as JSON or plain text. With advanced support for multilingual text recognition, layout analysis, and handwriting interpretation, Mistral OCR simplifies the process of digitizing and processing documents for AI applications like search, summarization, and data extraction, all through a robust and customizable interface.
+This documentation provides a step-by-step guide to integrating Mistral OCR with Open WebUI. Mistral OCR is an optical character recognition library designed to extract text from a variety of image-based file formats—including scanned PDFs, images, and handwritten documents—into structured data such as JSON or plain text. With advanced support for multilingual text recognition, layout analysis, and handwriting interpretation, Mistral OCR simplifies the process of digitizing and processing documents for AI applications like search, summarization, and data extraction, all through a robust and customizable interface. The Mistral Document loader in Open WebUI supports custom endpoints and models, allowing you to use alternative OCR services such as [LiteLLM OCR](https://docs.litellm.ai/docs/ocr) for enhanced flexibility and integration options.
 
 ## Prerequisites
 
@@ -41,9 +41,21 @@ This documentation provides a step-by-step guide to integrating Mistral OCR with
 - Paste the API Key on the field
 - Save the Admin Panel.
 
+:::info Custom Endpoints Support
+
+Custom endpoints are also supported, for example **[LiteLLM OCR](https://docs.litellm.ai/docs/ocr)** endpoint. To use a custom endpoint:
+
+1. Fill in the **custom endpoint** URL field
+2. Define the **custom model** to use
+3. Select **Base64** as the PDF transfer method (upload is currently only supported with the official Mistral API)
+
+**Note:** For the Mistral API, both methods work, but the upload method (where PDFs are deleted afterwards) is a bit faster than the Base64 method.
+
+:::
+
 ## Verifying Mistral OCR
 
-To verify that Mistral OCR is working correctly in script, please refer to `https://docs.mistral.ai/capabilities/document/`
+To verify that Mistral OCR functions correctly, upload a PDF in a chat and check the OCR results. More information is available at `https://docs.mistral.ai/capabilities/document_ai/basic_ocr`.
 
 ### Conclusion
 
