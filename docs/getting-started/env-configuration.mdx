@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.32](https://github.com/open-webui/open-webui/releases/tag/v0.6.32), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.35](https://github.com/open-webui/open-webui/releases/tag/v0.6.35), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -1745,6 +1745,13 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Description: Specifies the Mistral OCR API key to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `MISTRAL_OCR_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.mistral.ai/v1`
+- Description: Configures custom Mistral OCR API endpoints for flexible deployment options, allowing users to point to self-hosted or alternative Mistral OCR instances.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
 
 - Type: `str`
@@ -2755,19 +2762,18 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Description: Sets the API key to use for text-to-speech.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-## Image Generation
+### Elevenlabs Text-to-Speech
 
-#### `IMAGE_GENERATION_ENGINE`
+#### `ELEVENLABS_API_BASE_URL`
 
 - Type: `str`
-- Options:
-  - `openai` - Uses OpenAI DALL-E for image generation.
-  - `comfyui` - Uses ComfyUI engine for image generation.
-  - `automatic1111` - Uses AUTOMATIC1111 engine for image generation.
-  - `gemini` - Uses Gemini for image generation.
-- Default: `openai`
-- Description: Specifies the engine to use for image generation.
+- Default: `https://api.elevenlabs.io`
+- Description: Configures custom ElevenLabs API endpoints, enabling support for EU residency API requirements and other regional deployments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+## Image Generation
+
+### General Settings
 
 #### `ENABLE_IMAGE_GENERATION`
 
@@ -2780,7 +2786,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables image prompt generation.
+- Description: Enables or disables automatic enhancement of user prompts for better image generation results.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`
@@ -2791,11 +2797,9 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 `DEFAULT_IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`:
-
 ```
-
 ### Task:
-Generate a detailed prompt for am image generation task based on the given language and context. Describe the image as if you were explaining it to someone who cannot see it. Include relevant details, colors, shapes, and any other important elements.
+Generate a detailed prompt for an image generation task based on the given language and context. Describe the image as if you were explaining it to someone who cannot see it. Include relevant details, colors, shapes, and any other important elements.
 
 ### Guidelines:
 - Be descriptive and detailed, focusing on the most important aspects of the image.
@@ -2815,78 +2819,193 @@ Strictly return in JSON format:
 </chat_history>
 ```
 
+---
+
+### Image Creation
+
+#### `IMAGE_GENERATION_ENGINE`
+
+- Type: `str`
+- Options:
+  - `openai` - Uses OpenAI DALL-E for image generation.
+  - `comfyui` - Uses ComfyUI engine for image generation.
+  - `automatic1111` - Uses AUTOMATIC1111 engine for image generation.
+  - `gemini` - Uses Gemini for image generation.
+- Default: `openai`
+- Description: Specifies the engine to use for image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `IMAGE_GENERATION_MODEL`
+
+- Type: `str`
+- Default: ``
+- Description: Default model to use for image generation (e.g., `dall-e-3`, `gemini-2.0-flash-exp`).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `IMAGE_SIZE`
 
 - Type: `str`
 - Default: `512x512`
-- Description: Sets the default image size to generate.
+- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `IMAGE_STEPS`
 
 - Type: `int`
 - Default: `50`
-- Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111.
+- Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111 engines.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGE_GENERATION_MODEL`
+---
+
+### Image Editing
+
+#### `IMAGE_EDIT_ENGINE`
 
 - Type: `str`
-- Description: Default model to use for image generation
+- Options:
+  - `openai` - Uses OpenAI DALL-E for image editing.
+  - `gemini` - Uses Gemini for image editing.
+  - `comfyui` - Uses ComfyUI engine for image editing.
+- Default: `openai`
+- Description: Configures the engine used for image editing operations, enabling modification of existing images using text prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### AUTOMATIC1111
-
-#### `AUTOMATIC1111_BASE_URL`
+#### `IMAGE_EDIT_MODEL`
 
 - Type: `str`
-- Description: Specifies the URL to AUTOMATIC1111's Stable Diffusion API.
+- Default: ``
+- Description: Specifies the model to use for image editing operations within the selected engine (e.g., `dall-e-2`, `gemini-2.5-flash`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `AUTOMATIC1111_API_AUTH`
+#### `IMAGE_EDIT_SIZE`
 
 - Type: `str`
-- Description: Sets the AUTOMATIC1111 API authentication.
+- Default: ``
+- Description: Defines the output dimensions for edited images in WIDTHxHEIGHT format (e.g., `1024x1024`). Leave empty to preserve original dimensions.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `AUTOMATIC1111_CFG_SCALE`
+---
 
-- Type: `float`
-- Description: Sets the scale for AUTOMATIC1111 inference.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+### OpenAI DALL-E
 
-#### `AUTOMATIC1111_SAMPLER`
+#### Image Generation
+
+##### `IMAGES_OPENAI_API_BASE_URL`
 
 - Type: `str`
-- Description: Sets the sampler for AUTOMATIC1111 inference.
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `AUTOMATIC1111_SCHEDULER`
+##### `IMAGES_OPENAI_API_VERSION`
 
 - Type: `str`
-- Description: Sets the scheduler for AUTOMATIC1111 inference.
+- Default: `${OPENAI_API_VERSION}`
+- Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation endpoint. Required for Azure OpenAI deployments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+##### `IMAGES_OPENAI_API_KEY`
+
+- Type: `str`
+- Default: `${OPENAI_API_KEY}`
+- Description: Sets the API key to use for DALL-E image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### Image Editing
+
+##### `IMAGES_EDIT_OPENAI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${OPENAI_API_BASE_URL}`
+- Description: Configures the OpenAI API base URL specifically for image editing operations, allowing separate endpoints from image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+##### `IMAGES_EDIT_OPENAI_API_VERSION`
+
+- Type: `str`
+- Default: ``
+- Description: Specifies the OpenAI API version for image editing, enabling support for Azure OpenAI deployments with versioned endpoints.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+##### `IMAGES_EDIT_OPENAI_API_KEY`
+
+- Type: `str`
+- Default: `${OPENAI_API_KEY}`
+- Description: Provides authentication for OpenAI image editing API requests, with support for separate keys from image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+---
+
+### Gemini
+
+#### Image Generation
+
+##### `IMAGES_GEMINI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${GEMINI_API_BASE_URL}`
+- Description: Specifies the URL to Gemini's image generation API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+##### `IMAGES_GEMINI_API_KEY`
+
+- Type: `str`
+- Default: `${GEMINI_API_KEY}`
+- Description: Sets the Gemini API key for image generation.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+##### `IMAGES_GEMINI_ENDPOINT_METHOD`
+
+- Type: `str`
+- Options:
+  - `predict` - Uses the predict endpoint (default for Imagen models).
+  - `generateContent` - Uses the generateContent endpoint (for Gemini 2.5 Flash and newer models).
+- Default: ``
+- Description: Specifies the Gemini API endpoint method for image generation, supporting both legacy Imagen models and newer Gemini models with image generation capabilities.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### Image Editing
+
+##### `IMAGES_EDIT_GEMINI_API_BASE_URL`
+
+- Type: `str`
+- Default: `${GEMINI_API_BASE_URL}`
+- Description: Configures the Gemini API base URL for image editing operations with Gemini models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+##### `IMAGES_EDIT_GEMINI_API_KEY`
+
+- Type: `str`
+- Default: `${GEMINI_API_KEY}`
+- Description: Provides authentication for Gemini image editing API requests.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+---
 
 ### ComfyUI
 
-#### `COMFYUI_BASE_URL`
+#### Image Generation
+
+##### `COMFYUI_BASE_URL`
 
 - Type: `str`
-- Description: Specifies the URL to the ComfyUI image generation API.
+- Default: ``
+- Description: Specifies the URL to the ComfyUI image generation API (e.g., `http://127.0.0.1:8188`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `COMFYUI_API_KEY`
+##### `COMFYUI_API_KEY`
 
 - Type: `str`
-- Description: Sets the API key for ComfyUI.
+- Default: ``
+- Description: Sets the API key for ComfyUI authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `COMFYUI_WORKFLOW`
+##### `COMFYUI_WORKFLOW`
 
-- Type: `str`
+- Type: `str` (JSON)
 - Default:
-
-```
+```json
 {
   "3": {
     "inputs": {
@@ -2896,22 +3015,10 @@ Strictly return in JSON format:
       "sampler_name": "euler",
       "scheduler": "normal",
       "denoise": 1,
-      "model": [
-        "4",
-        0
-      ],
-      "positive": [
-        "6",
-        0
-      ],
-      "negative": [
-        "7",
-        0
-      ],
-      "latent_image": [
-        "5",
-        0
-      ]
+      "model": ["4", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
     },
     "class_type": "KSampler",
     "_meta": {
@@ -2941,10 +3048,7 @@ Strictly return in JSON format:
   "6": {
     "inputs": {
       "text": "Prompt",
-      "clip": [
-        "4",
-        1
-      ]
+      "clip": ["4", 1]
     },
     "class_type": "CLIPTextEncode",
     "_meta": {
@@ -2954,10 +3058,7 @@ Strictly return in JSON format:
   "7": {
     "inputs": {
       "text": "",
-      "clip": [
-        "4",
-        1
-      ]
+      "clip": ["4", 1]
     },
     "class_type": "CLIPTextEncode",
     "_meta": {
@@ -2966,14 +3067,8 @@ Strictly return in JSON format:
   },
   "8": {
     "inputs": {
-      "samples": [
-        "3",
-        0
-      ],
-      "vae": [
-        "4",
-        2
-      ]
+      "samples": ["3", 0],
+      "vae": ["4", 2]
     },
     "class_type": "VAEDecode",
     "_meta": {
@@ -2983,10 +3078,7 @@ Strictly return in JSON format:
   "9": {
     "inputs": {
       "filename_prefix": "ComfyUI",
-      "images": [
-        "8",
-        0
-      ]
+      "images": ["8", 0]
     },
     "class_type": "SaveImage",
     "_meta": {
@@ -2996,60 +3088,69 @@ Strictly return in JSON format:
 }
 ```
 
-- Description: Sets the ComfyUI workflow.
+- Description: Defines the ComfyUI workflow configuration in JSON format. Export from ComfyUI using "Save (API Format)" to ensure compatibility.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### Gemini
+##### `COMFYUI_WORKFLOW_NODES`
 
-#### `GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the URL to Gemini's API.
+- Type: `list[dict]`
+- Default: `[]`
+- Description: Specifies the ComfyUI workflow node mappings for image generation, defining which nodes handle prompt, model, dimensions, and other parameters. Configured automatically via the admin UI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `GEMINI_API_KEY`
+#### Image Editing
+
+##### `IMAGES_EDIT_COMFYUI_BASE_URL`
 
 - Type: `str`
-- Default: `None`
-- Description: Sets the Gemini API key.
+- Default: ``
+- Description: Configures the ComfyUI base URL for image editing operations, enabling self-hosted ComfyUI workflows for image manipulation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGES_GEMINI_API_BASE_URL`
+##### `IMAGES_EDIT_COMFYUI_API_KEY`
 
 - Type: `str`
-- Default: `None`
-- Description: Specifies the URL to Gemini's image generation API.
+- Default: ``
+- Description: Provides authentication for ComfyUI image editing API requests when the ComfyUI instance requires API key authentication.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGES_GEMINI_API_KEY`
+##### `IMAGES_EDIT_COMFYUI_WORKFLOW`
 
-- Type: `str`
-- Default: `None`
-- Description: Sets the Gemini API key for image generation.
+- Type: `str` (JSON)
+- Default: ``
+- Description: Defines the ComfyUI workflow configuration in JSON format for image editing operations. Must include nodes for image input, prompt, and output. Export from ComfyUI using "Save (API Format)".
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-### OpenAI DALL-E
+##### `IMAGES_EDIT_COMFYUI_WORKFLOW_NODES`
 
-#### `IMAGES_OPENAI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+- Type: `list[dict]`
+- Default: `[]`
+- Description: Specifies the ComfyUI workflow node mappings for image editing, defining which nodes handle image input, prompt, model, dimensions, and other parameters. Configured automatically via the admin UI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGES_OPENAI_API_VERSION`
+---
+
+### AUTOMATIC1111
+
+#### `AUTOMATIC1111_BASE_URL`
 
 - Type: `str`
-- Default: `${OPENAI_API_VERSION}`
-- Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation. If the Azure OpenAI service is used, this needs to be configured.
+- Default: ``
+- Description: Specifies the URL to AUTOMATIC1111's Stable Diffusion API (e.g., `http://127.0.0.1:7860`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `IMAGES_OPENAI_API_KEY`
+#### `AUTOMATIC1111_API_AUTH`
 
 - Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Sets the API key to use for DALL-E image generation.
+- Default: ``
+- Description: Sets the AUTOMATIC1111 API authentication credentials if required.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUTOMATIC1111_PARAMS`
+
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Additional parameters in JSON format to pass to AUTOMATIC1111 API requests (e.g., `{"cfg_scale": 7, "sampler_name": "Euler a", "scheduler": "normal"}`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## OAuth
@@ -3449,6 +3550,13 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `admin`
 - Description: Sets the roles that are considered administrators.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_ROLES_SEPARATOR`
+
+- Type: `str`
+- Default: `,`
+- Description: Allows custom role separators for for splitting the `OAUTH_*_ROLES` variables. Meant for OAuth roles that contain commas; useful for roles specified in LDAP syntax or other systems where commas are part of role names.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_ALLOWED_DOMAINS`
