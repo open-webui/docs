@@ -737,8 +737,33 @@ The format for the JSON response is strictly:
 - Type: `str` (JSON array)
 - Default: `[]`
 - Description: Specifies a JSON array of tool server connection configurations. Each connection should define the necessary parameters to connect to external tool servers that implement the OpenAPI/MCPO protocol. The JSON must be properly formatted or it will fallback to an empty array.
-- Example: `'[{"name": "example-server", "url": "https://api.example.com", "api_key": "your-key"}]'`
+- Example: 
+```json
+[
+  {
+    "type": "openapi",
+    "url": "example-url",
+    "spec_type": "url",
+    "spec": "",
+    "path": "openapi.json",
+    "auth_type": "none",
+    "key": "",
+    "config": { "enable": true },
+    "info": {
+      "id": "",
+      "name": "example-server",
+      "description": "MCP server description."
+    }
+  }
+]
+```
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as new features are added.
+
+:::
 
 ### Autocomplete
 
