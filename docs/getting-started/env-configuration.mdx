@@ -3108,13 +3108,6 @@ By default, OAuth configurations are stored in the database and managed via the 
 - Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `OAUTH_ROLES_SEPARATOR`
-
-- Type: `str`
-- Default: `,`
-- Description: Allows custom role separators for OAuth roles that contain commas, useful for roles specified in LDAP syntax or other systems where commas are part of role names.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
 - Type: `bool`
@@ -3478,7 +3471,8 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: `,`
-- Description: Sets the separator used for splitting the `OAUTH_*_ROLES` variables.
+- Description: Allows custom role separators for for splitting the `OAUTH_*_ROLES` variables. Meant for OAuth roles that contain commas; useful for roles specified in LDAP syntax or other systems where commas are part of role names.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_ALLOWED_DOMAINS`
 
