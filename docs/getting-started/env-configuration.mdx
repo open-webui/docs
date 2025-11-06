@@ -1055,11 +1055,16 @@ directly. Ensure that no users are present in the database if you intend to turn
 - Docker Default: Randomly generated on first start
 - Description: Overrides the randomly generated string used for JSON Web Token.
 
-:::info
+:::warning
 
-This variable is always needed when using OAUTH, especially in clustered environments, but even in single-process environments.
+**Required for Multi-Worker and Multi-Node Deployments AND HIGHLY RECOMMENDED IN SINGLE-WORKER ENVIRONMENTS**
 
-Otherwise, OAUTH issues may occur.
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set this variable. Without it, the following issues will occur:
+
+- Session management will fail across workers
+- Application state will be inconsistent between instances
+- Websocket connections will not function properly in distributed setups
+- Users may experience intermittent authentication failures
 
 :::
 
@@ -4305,18 +4310,33 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 ### Redis
 
-#### `REDIS_URL`
-
 - Type: `str`
 - Description: Specifies the URL of the Redis instance or cluster host for storing application state.
 - Examples:
   - `redis://localhost:6379/0`
   - `rediss://:password@localhost:6379/0` *(with password and TLS)*
-  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0 ?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt &ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` *(with mTLS)*
+  - `rediss://redis-cluster.redis.svc.cluster.local:6379/0?ssl_cert_reqs=required&ssl_certfile=/tls/redis/tls.crt&ssl_keyfile=/tls/redis/tls.key&ssl_ca_certs=/tls/redis/ca.crt` *(with mTLS)*
+
+:::warning
+
+**Required for Multi-Worker and Multi-Node Deployments**
+
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set the `REDIS_URL` value. Without it, the following issues will occur:
+
+- Session management will fail across workers
+- Application state will be inconsistent between instances
+- Websocket connections will not function properly in distributed setups
+- Users may experience intermittent authentication failures
+
+Redis serves as the central state store that allows multiple Open WebUI instances to coordinate and share critical application data.
+
+:::
 
 :::info
 
-When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the REDIS_URL value is set. Without it, session, persistency and consistency issues in the app state will occur as the workers would be unable to communicate.
+**Single Instance Deployments**
+
+If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required**. The application will function normally without it.
 
 :::
 
@@ -4355,9 +4375,16 @@ This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
 - Default: `True`
 - Description: Enables websocket support in Open WebUI.
 
-:::info
+:::warning
 
-When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the ENABLE_WEBSOCKET_SUPPORT value is set. Without it, websocket consistency and persistency issues will occur.
+**Required for Multi-Worker and Multi-Node Deployments**
+
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set this variable. Without it, the following issues will occur:
+
+- Session management will fail across workers
+- Application state will be inconsistent between instances
+- Websocket connections will not function properly in distributed setups
+- Users may experience intermittent authentication failures
 
 :::
 
@@ -4367,9 +4394,16 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Default: `redis`
 - Description: Specifies the websocket manager to use (in this case, Redis).
 
-:::info
+:::warning
 
-When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_MANAGER value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+**Required for Multi-Worker and Multi-Node Deployments**
+
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set this variable. Without it, the following issues will occur:
+
+- Session management will fail across workers
+- Application state will be inconsistent between instances
+- Websocket connections will not function properly in distributed setups
+- Users may experience intermittent authentication failures
 
 :::
 
@@ -4379,9 +4413,16 @@ When deploying Open WebUI in a multi-node/worker cluster with a load balancer, y
 - Default: `${REDIS_URL}`
 - Description: Specifies the URL of the Redis instance or cluster host for websocket communication. It is distinct from `REDIS_URL` and in practice, it is recommended to set both.
 
-:::info
+:::warning
 
-When deploying Open WebUI in a multi-node/worker cluster with a load balancer, you must ensure that the WEBSOCKET_REDIS_URL value is set and a key-value NoSQL database like Redis is used. Without it, websocket consistency and persistency issues will occur.
+**Required for Multi-Worker and Multi-Node Deployments**
+
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set this variable. Without it, the following issues will occur:
+
+- Session management will fail across workers
+- Application state will be inconsistent between instances
+- Websocket connections will not function properly in distributed setups
+- Users may experience intermittent authentication failures
 
 :::
 
@@ -4444,7 +4485,7 @@ For most deployments, the default browser cookie-based session management is suf
 
 When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
 
-If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-instance setups are set accordingly.
+If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-worker setups are set accordingly.
 
 :::
 
