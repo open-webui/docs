@@ -1745,6 +1745,13 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Description: Specifies the Mistral OCR API key to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `MISTRAL_OCR_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.mistral.ai/v1`
+- Description: Configures custom Mistral OCR API endpoints for flexible deployment options, allowing users to point to self-hosted or alternative Mistral OCR instances.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
 
 - Type: `str`
@@ -2755,6 +2762,15 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Description: Sets the API key to use for text-to-speech.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Elevenlabs Text-to-Speech
+
+#### `ELEVENLABS_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.elevenlabs.io`
+- Description: Configures custom ElevenLabs API endpoints, enabling support for EU residency API requirements and other regional deployments.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ## Image Generation
 
 #### `IMAGE_GENERATION_ENGINE`
@@ -3090,6 +3106,13 @@ By default, OAuth configurations are stored in the database and managed via the 
 - Type: `str`
 - Default: `None`
 - Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_ROLES_SEPARATOR`
+
+- Type: `str`
+- Default: `,`
+- Description: Allows custom role separators for OAuth roles that contain commas, useful for roles specified in LDAP syntax or other systems where commas are part of role names.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
