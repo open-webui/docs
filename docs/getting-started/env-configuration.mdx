@@ -3562,7 +3562,12 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `,`
 - Description: Allows custom role separators for for splitting the `OAUTH_*_ROLES` variables. Meant for OAuth roles that contain commas; useful for roles specified in LDAP syntax or other systems where commas are part of role names.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_GROUPS_SEPARATOR`
+
+- Type: `str`
+- Default: `;`
+- Description: Specifies the delimiter used to parse multiple group names from the OAuth group claim. This separator is used when the identity provider returns group memberships as a delimited string rather than an array. Useful when integrating with systems that use non-standard separators or when group names themselves contain commas.
 
 #### `OAUTH_ALLOWED_DOMAINS`
 
