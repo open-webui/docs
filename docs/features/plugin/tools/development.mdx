@@ -1587,7 +1587,7 @@ The embedded content automatically inherits responsive design and integrates sea
 #### CORS and Direct Tools
 
 Direct external tools are tools that run directly from the browser. In this case, the tool is called by JavaScript in the user's browser.
-Because we depend on the Content-Disposition header, when using CORS on a remote tool server, the OpenWeb UI cannot read that header due to Access-Control-Expose-Headers, which prevents certain headers from being read from the fetch result.
+Because we depend on the Content-Disposition header, when using CORS on a remote tool server, the Open WebUI cannot read that header due to Access-Control-Expose-Headers, which prevents certain headers from being read from the fetch result.
 To prevent this, you must set Access-Control-Expose-Headers to Content-Disposition. Check the example below of a tool using Node.js:
 
 
