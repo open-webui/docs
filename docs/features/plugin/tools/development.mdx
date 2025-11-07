@@ -1582,7 +1582,46 @@ async def create_dashboard():
     )
 ```
 
-The embedded content automatically inherits responsive design and integrates seamlessly with the chat interface, providing a native-feeling experience for users interacting with your tools.
+The embedded content automatically inherits responsive design and integrates seamlessly with the chat interface, providing a native-feeling experience for users interacting with your tools.  
+
+#### CORS and Direct Tools
+
+Direct external tools are tools that run directly from the browser. In this case, the tool is called by JavaScript in the user's browser.
+Because we depend on the Content-Disposition header, when using CORS on a remote tool server, the Open WebUI cannot read that header due to Access-Control-Expose-Headers, which prevents certain headers from being read from the fetch result.
+To prevent this, you must set Access-Control-Expose-Headers to Content-Disposition. Check the example below of a tool using Node.js:
+
+
+```javascript
+const app = express();
+const cors = require('cors');
+
+app.use(cors())
+
+app.get('/tools/dashboard', (req,res) => {
+    let html = `
+        <div style="padding: 20px;">
+            <h2>System Dashboard</h2>
+            <canvas id="myChart" width="400" height="200"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const ctx = document.getElementById('myChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: { /* your chart data */ }
+                });
+            </script>
+        </div>
+    `
+    res.set({
+        'Content-Disposition': 'inline'
+        ,'Access-Control-Expose-Headers':'Content-Disposition'
+    })
+    res.send(html)
+})
+```
+
+More info about the header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Expose-Headers
+
 
 ## External packages
 
