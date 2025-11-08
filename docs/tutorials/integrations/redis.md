@@ -142,6 +142,20 @@ WEBSOCKET_MANAGER="redis"
 WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
 ```
 
+:::tip
+
+For WebSocket connections to work correctly, especially when your Open WebUI instance is accessed from a different domain, you must also configure the `CORS_ALLOW_ORIGIN` environment variable. This variable tells the server which origins are permitted to access its resources.
+
+For example, if you access Open WebUI from `https://my-open-webui.com`, you should set:
+
+```bash
+CORS_ALLOW_ORIGIN="https://my-open-webui.com"
+```
+
+Forgetting to set this variable is a common cause of WebSocket connection issues. You can also provide a semicolon-separated list of origins.
+
+:::
+
 :::info
 
 **Redis Database Numbers**
