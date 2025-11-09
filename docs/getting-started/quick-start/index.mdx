@@ -8,6 +8,7 @@ import TabItem from '@theme/TabItem';
 import { TopBanners } from "@site/src/components/TopBanners";
 
 import DockerCompose from './tab-docker/DockerCompose.md';
+import Extension from './tab-docker/DockerDesktopExtension.md';
 import Podman from './tab-docker/Podman.md';
 import PodmanKubePlay from './tab-docker/PodmanKubePlay.md';
 import ManualDocker from './tab-docker/ManualDocker.md';
@@ -55,19 +56,25 @@ Choose your preferred installation method below:
         </div>
       </TabItem>
 
+      <TabItem value="extension" label="Extension">
+        <div className='mt-5'>
+          <Extension />
+        </div>
+      </TabItem>
+
       <TabItem value="podman" label="Podman">
         <div className='mt-5'>
           <Podman />
         </div>
       </TabItem>
 
-    <TabItem value="podman-kube-play" label="Podman Kube Play">
+    <TabItem value="podman-kube-play" label="Kube Play">
       <div className='mt-5'>
         <PodmanKubePlay />
       </div>
     </TabItem>
 
-      <TabItem value="swarm" label="Docker Swarm">
+      <TabItem value="swarm" label="Swarm">
         <div className='mt-5'>
           <DockerSwarm />
         </div>
