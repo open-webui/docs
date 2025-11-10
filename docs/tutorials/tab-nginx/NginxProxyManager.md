@@ -84,7 +84,7 @@ If you access your UI at `https://openwebui.hello.duckdns.org`, you must set:
 CORS_ALLOW_ORIGIN="https://openwebui.hello.duckdns.org"
 ```
 
-You can also provide a comma-separated list of allowed domains. **Do not skip this step.**
+You can also provide a semicolon-separated list of allowed domains. **Do not skip this step.**
 
 :::
 

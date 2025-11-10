@@ -158,7 +158,7 @@ If you access your UI at `https://my-open-webui.com`, you must set:
 CORS_ALLOW_ORIGIN="https://my-open-webui.com"
 ```
 
-You can also provide a comma-separated list of allowed domains. **Do not skip this step in a production or reverse-proxied setup.**
+You can also provide a semicolon-separated list of allowed domains. **Do not skip this step in a production or reverse-proxied setup.**
 
 :::
 
