@@ -46,6 +46,7 @@ Redis becomes **mandatory** in the following scenarios:
 **Critical Requirement**
 
 Without Redis in multi-worker or multi-instance scenarios, you will experience:
+
 - Session management failures across workers
 - Inconsistent application state between instances
 - Non-functional websocket connections
@@ -127,6 +128,7 @@ To enable Redis support in Open WebUI, you need to configure different environme
 ### Basic Configuration (All Deployments)
 
 For **all deployments** using Redis (single or multi-instance), set the following base environment variable:
+
 ```bash
 REDIS_URL="redis://redis-valkey:6379/0"
 ```
@@ -136,23 +138,27 @@ This variable configures the primary Redis connection for application state mana
 ### Websocket Configuration
 
 To enable websocket support specifically, add these additional environment variables:
+
 ```bash
 ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
 WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
 ```
 
-:::tip
+:::danger Critical: Configure CORS for WebSocket Connections
 
-For WebSocket connections to work correctly, especially when your Open WebUI instance is accessed from a different domain, you must also configure the `CORS_ALLOW_ORIGIN` environment variable. This variable tells the server which origins are permitted to access its resources.
+A very common and difficult-to-debug issue with WebSocket connections is a misconfigured Cross-Origin Resource Sharing (CORS) policy. If your Open WebUI instance is accessed from a different domain or port than the backend (e.g., behind a reverse proxy), you **must** set the `CORS_ALLOW_ORIGIN` environment variable. This variable tells the server which origins are permitted to access its resources.
 
-For example, if you access Open WebUI from `https://my-open-webui.com`, you should set:
+Failure to configure this correctly will cause WebSocket connections to fail silently or with cryptic browser errors and forgetting to set this variable is a common cause of WebSocket connection issues.
+
+**Example:**
+If you access your UI at `https://my-open-webui.com`, you must set:
 
 ```bash
 CORS_ALLOW_ORIGIN="https://my-open-webui.com"
 ```
 
-Forgetting to set this variable is a common cause of WebSocket connection issues. You can also provide a semicolon-separated list of origins.
+You can also provide a semicolon-separated list of allowed domains. **Do not skip this step in a production or reverse-proxied setup.**
 
 :::
 
@@ -161,6 +167,7 @@ Forgetting to set this variable is a common cause of WebSocket connection issues
 **Redis Database Numbers**
 
 Notice the different database numbers (`/0` vs `/1`) in the URLs:
+
 - `REDIS_URL` uses database `0` for general application state
 - `WEBSOCKET_REDIS_URL` uses database `1` for websocket-specific data
 
@@ -169,6 +176,7 @@ This separation helps isolate different types of data. You can use the same data
 :::
 
 ### Optional Configuration
+
 ```bash
 REDIS_KEY_PREFIX="open-webui"
 ```
@@ -178,6 +186,7 @@ The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Re
 ### Complete Example Configuration
 
 Here's a complete example showing all Redis-related environment variables:
+
 ```bash
 # Required for multi-worker/multi-instance deployments
 REDIS_URL="redis://redis-valkey:6379/0"
@@ -194,6 +203,7 @@ REDIS_KEY_PREFIX="open-webui"
 ### Docker Run Example
 
 When running Open WebUI using Docker, connect it to the same Docker network and include all necessary Redis variables:
+
 ```bash
 docker run -d \
   --name open-webui \
@@ -213,6 +223,7 @@ docker run -d \
 **Important Note on Service Names**
 
 In the examples above, we use `redis://redis-valkey:6379` because:
+
 - `redis-valkey` is the container name defined in the docker-compose.yml
 - Docker's internal DNS resolves this name to the correct IP address within the network
 - This is the recommended approach for Docker deployments
@@ -224,6 +235,7 @@ Do **not** use `127.0.0.1` or `localhost` when connecting from one container to 
 ### Multi-Worker Configuration
 
 If you're running multiple Uvicorn workers on a single host, add this variable:
+
 ```bash
 UVICORN_WORKERS="4"  # Adjust based on your CPU cores
 REDIS_URL="redis://redis-valkey:6379/0"  # Required when UVICORN_WORKERS > 1
@@ -234,6 +246,7 @@ REDIS_URL="redis://redis-valkey:6379/0"  # Required when UVICORN_WORKERS > 1
 **Critical: Redis Required for UVICORN_WORKERS > 1**
 
 If you set `UVICORN_WORKERS` to any value greater than 1, you **must** configure `REDIS_URL`. Failing to do so will cause:
+
 - Session state to be lost between requests
 - Authentication to fail intermittently
 - Application configuration to be inconsistent
@@ -246,6 +259,7 @@ If you set `UVICORN_WORKERS` to any value greater than 1, you **must** configure
 ### Verify Redis Connection
 
 First, confirm that your Redis instance is running and accepting connections:
+
 ```bash
 docker exec -it redis-valkey valkey-cli -p 6379 ping
 ```
@@ -259,6 +273,7 @@ After starting your Open WebUI instance with the proper Redis configuration, che
 #### Check for General Redis Connection
 
 Look for log messages indicating Redis is being used for application state:
+
 ```bash
 docker logs open-webui 2>&1 | grep -i redis
 ```
@@ -266,11 +281,13 @@ docker logs open-webui 2>&1 | grep -i redis
 #### Check for Websocket Redis Connection
 
 If you have enabled websocket support, you should see this specific log message:
+
 ```
 DEBUG:open_webui.socket.main:Using Redis to manage websockets.
 ```
 
 To check this specifically:
+
 ```bash
 docker logs open-webui 2>&1 | grep "Using Redis to manage websockets"
 ```
@@ -278,6 +295,7 @@ docker logs open-webui 2>&1 | grep "Using Redis to manage websockets"
 ### Verify Redis Keys
 
 You can also verify that Open WebUI is actually writing data to Redis:
+
 ```bash
 # List all Open WebUI keys
 docker exec -it redis-valkey valkey-cli --scan --pattern "open-webui*"
@@ -305,11 +323,13 @@ If you're logged out randomly or see authentication errors, Redis is likely not 
 #### Issue: "Connection to Redis failed"
 
 **Symptoms:**
+
 - Error messages about Redis connection in logs
 - Application fails to start or crashes
 - Websockets don't work
 
 **Solutions:**
+
 1. Verify Redis container is running: `docker ps | grep redis`
 2. Check Redis is healthy: `docker exec -it redis-valkey valkey-cli ping`
 3. Verify network connectivity: `docker network inspect openwebui-network`
@@ -319,6 +339,7 @@ If you're logged out randomly or see authentication errors, Redis is likely not 
 #### Issue: "Session lost after page refresh" (with UVICORN_WORKERS > 1)
 
 **Symptoms:**
+
 - Users are logged out randomly
 - Authentication works but doesn't persist
 - Different behavior on each page refresh
@@ -327,6 +348,7 @@ If you're logged out randomly or see authentication errors, Redis is likely not 
 
 **Solution:**
 Add the `REDIS_URL` environment variable:
+
 ```bash
 REDIS_URL="redis://redis-valkey:6379/0"
 ```
@@ -334,11 +356,13 @@ REDIS_URL="redis://redis-valkey:6379/0"
 #### Issue: "Websockets not working"
 
 **Symptoms:**
+
 - Real-time chat updates don't appear
 - Need to refresh page to see new messages
 - Connection errors in browser console
 
 **Solutions:**
+
 1. Verify all websocket environment variables are set:
    - `ENABLE_WEBSOCKET_SUPPORT="true"`
    - `WEBSOCKET_MANAGER="redis"`
@@ -349,12 +373,14 @@ REDIS_URL="redis://redis-valkey:6379/0"
 #### Issue: "Multiple Open WebUI instances interfering with each other"
 
 **Symptoms:**
+
 - Configuration changes affect other instances
 - Sessions conflict between deployments
 - Unexpected behavior when running multiple Open WebUI installations
 
 **Solution:**
 Use different `REDIS_KEY_PREFIX` values for each installation:
+
 ```bash
 # Instance 1
 REDIS_KEY_PREFIX="openwebui-prod"
@@ -366,14 +392,18 @@ REDIS_KEY_PREFIX="openwebui-dev"
 #### Issue: "Redis memory usage growing continuously"
 
 **Symptoms:**
+
 - Redis memory usage increases over time
 - Container eventually runs out of memory
 
 **Solutions:**
+
 1. Configure Redis maxmemory policy:
+
 ```yml
    command: "valkey-server --save 30 1 --maxmemory 256mb --maxmemory-policy allkeys-lru"
 ```
+
 2. Monitor Redis memory: `docker exec -it redis-valkey valkey-cli info memory`
 3. Clear old keys if needed: `docker exec -it redis-valkey valkey-cli FLUSHDB`
 
