@@ -1187,6 +1187,13 @@ pip install open-webui[all]
 
 :::
 
+:::info
+
+Only PGVector and ChromaDB will be consistently maintained by the Open WebUI team.
+The other vector stores are community-added vector databases.
+
+:::
+
 ### ChromaDB
 
 #### `CHROMA_TENANT`
@@ -1288,6 +1295,13 @@ pip install open-webui[all]
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Milvus
+
+:::warning
+
+Milvus is not actively maintained by the Open WebUI team. It is an addition by the community and is maintained by the community.
+If you want to use Milvus, be careful when upgrading Open WebUI (crate backups and snapshots for rollbacks) in case internal changes in Open WebUI lead to breakage.
+
+:::
 
 #### `MILVUS_URI`
 
@@ -1425,9 +1439,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
 - No automatic rollback: Disabling multitenancy after data is written will not restore access to the shared collections. Data would need manual extraction and re-import.
 
-**For fresh installations:**
-- Multitenancy is recommended and enabled by default (true)
-- No migration concerns exist
+For fresh installations, no migration concerns exist
 
 **For existing installations with valuable data:**
 - Do not migrate to multitenancy mode if you do not want to handle migration and risk data loss
@@ -1442,6 +1454,17 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
 - Re-upload/re-create knowledge bases from scratch
+
+:::
+
+:::warning
+
+The mapping of multitenancy relies on current Open WebUI naming conventions for collection names.
+
+If Open WebUI changes how it generates collection names (e.g., "user-memory-" prefix, "file-" prefix, web search patterns, or hash formats), this mapping will break and route data to incorrect collections.
+POTENTIALLY CAUSING HUGE DATA CORRUPTION, DATA CONSISTENCY ISSUES AND INCORRECT DATA MAPPING INSIDE THE DATABASE.
+
+If you use Multitenancy Mode, you should always check for any changes to the collection names and data mapping before upgrading, and upgrade carefully (snapshots and backups for rollbacks)!
 
 :::
 
@@ -1522,6 +1545,13 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
 
 ### Qdrant
 
+:::warning
+
+Qdrant is not actively maintained by the Open WebUI team. It is an addition by the community and is maintained by the community.
+If you want to use Qdrant, be careful when upgrading Open WebUI (crate backups and snapshots for rollbacks) in case internal changes in Open WebUI lead to breakage.
+
+:::
+
 #### `QDRANT_API_KEY`
 
 - Type: `str`
@@ -1591,6 +1621,17 @@ Currently, there is no button in the UI to only reset the vector DB. If you want
 :::danger
 
 If you decide to use the multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Admin Settings` > `Documents` to reset vector and knowledge, which will delete all collections with the `open_webui` prefix and all stored knowledge.
+
+:::
+
+:::warning
+
+The mapping of multitenancy relies on current Open WebUI naming conventions for collection names.
+
+If Open WebUI changes how it generates collection names (e.g., "user-memory-" prefix, "file-" prefix, web search patterns, or hash formats), this mapping will break and route data to incorrect collections.
+POTENTIALLY CAUSING HUGE DATA CORRUPTION, DATA CONSISTENCY ISSUES AND INCORRECT DATA MAPPING INSIDE THE DATABASE.
+
+If you use Multitenancy Mode, you should always check for any changes to the collection names and data mapping before upgrading, and upgrade carefully (snapshots and backups for rollbacks)!
 
 :::
 
