@@ -4466,6 +4466,46 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 
 :::
 
+#### `WEBSOCKET_REDIS_OPTIONS`
+
+- Type: `str`
+- Default: `{}`
+- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client. This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as a valid Python dictionary. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here] (https://redis.readthedocs.io/en/stable/connections.html) can be used.
+
+#### `WEBSOCKET_SERVER_LOGGING`
+
+- Type: `bool`
+- Default: `false`
+- Description: Controls logging for SocketIO server related to websocket operations.
+
+:::warning
+
+**This can be very verbose, it is only recommended to use this flag when debugging Redis related issues.**
+
+#### `WEBSOCKET_SERVER_ENGINEIO_LOGGING`
+
+- Type: `bool`
+- Default: `false`
+- Description: Controls logging for EngineIO server related to websocket operations.
+
+:::warning
+
+**This can be very verbose, it is only recommended to use this flag when debugging Redis related issues.**
+
+
+#### `WEBSOCKET_SERVER_PING_TIMEOUT`
+
+- Type: `int`
+- Default: `20`
+- Description: The timeout for a ping to Redis in seconds.
+
+#### `WEBSOCKET_SERVER_PING_INTERVAL`
+
+- Type: `int`
+- Default: `25`
+- Description: The frequency for a ping to Redis in seconds.
+
+
 #### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
 - Type: `bool`
 - Default: `False`
