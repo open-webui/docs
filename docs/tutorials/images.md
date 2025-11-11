@@ -59,7 +59,7 @@ Before installing ComfyUI, ensure your system meets the following requirements:
   - AMD (Requires ROCm Toolkit on Linux)
   - Intel (including Arc series)
   - Apple Silicon (M1/M2)
-- **CPU (can use the -`cpu` parameter, but is slower)
+- **CPU:** (can use the -`cpu` parameter, but is slower)
 - **Git:** You will need [Git](https://git-scm.com/downloads) to clone the repository.
 
 ### Manual Installation
@@ -223,11 +223,17 @@ Since Open WebUI typically runs inside Docker, you must ensure the container can
 
 Once you have ComfyUI installed and running, you can connect it to Open WebUI from the admin settings.
 
+### ComfyUI Image Generation
+
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
 
 2. **Enable and Configure ComfyUI:**
     - Ensure the **Image Generation** toggle at the top of the page is enabled.
     - Under the **Create Image** section, set the **Image Generation Engine** to `ComfyUI`.
+    - **Model**: Select the base model to be used for generating the image.
+    - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
+    - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
+    - **Image Prompt Generation**: When enabled, this feature uses a language model to automatically generate a more detailed and creative prompt based on your initial input, which can lead to better image results.
     - In the **ComfyUI Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
     - Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
     - If your ComfyUI instance requires an API key, enter it in the **ComfyUI API Key** field.
@@ -247,6 +253,89 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 
 5. **Save Configuration:**
     - Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
+
+### ComfyUI Image Editing
+
+Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
+
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
+
+2. **Configure Image Editing:**
+    - Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.
+    - **Model**: Select the model to be used for the editing task.
+    - **Image Size**: Specify the desired resolution for the output image.
+    - **ComfyUI Base URL** and **API Key**: These fields are shared with the image generation settings.
+    - **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
+    - **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
+
+### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
+
+Understanding the node ID mapping is often the biggest hurdle in integrating ComfyUI with an external service like Open WebUI. Integrating ComfyUI via API requires mapping Open WebUI's generic controls (e.g., "Model," "Width," "Prompt") to specific node inputs within your static ComfyUI workflow JSON.
+
+#### 1. Identifying Node IDs and Input Keys in ComfyUI
+
+Before configuring Open WebUI, you must examine your exported workflow JSON files directly in a text editor. The Node ID is the unique number ComfyUI uses to identify the node in the JSON structure. The top-level keys in the JSON object are the node IDs.
+
+**Identify the Input Key (The Parameter Name)**
+
+The Input Key is the exact parameter name within that node's JSON structure that you need to change (e.g., `seed`, `width`, `unet_name`).
+
+1. **Examine the JSON**: Look at your API workflow JSON (`workflow_api.json`).
+2. **Find the Node ID**: Locate the section corresponding to the node's ID (e.g., `"3"`).
+3. **Identify the Key**: Within the `"inputs"` block, find the variable you want to control.
+
+**Example: KSampler Node (ID 3)**
+
+```json
+"3": {
+  "inputs": {
+    "seed": 12345,
+    "steps": 20,
+    "model": [ "75", 0 ],
+    ...
+  },
+  "class_type": "KSampler",
+}
+```
+In this example, the Input Keys are `seed` and `steps`.
+
+#### 2. Mapping in Open WebUI
+
+In the Open WebUI settings under **ComfyUI Workflow Nodes**, you will see a list of hard-coded parameters (e.g., `Prompt`, `Model`, `Seed`). For each parameter, you must provide two pieces of information from your workflow:
+
+- **Input Key (Left Field)**: The specific parameter name from the node's `inputs` block in your workflow JSON (e.g., `text`, `unet_name`, `seed`).
+- **Node ID (Right Field)**: The corresponding ID of the node you want to control (e.g., `6`, `39`, `3`).
+
+This tells Open WebUI to find the node with the given ID and modify the value of the specified input key.
+
+**Example: Mapping KSampler Seed**
+
+Let's say you want to control the `seed` in your KSampler node, which has an ID of `3`. In the `Seed` section of the Open WebUI settings:
+
+| Open WebUI Parameter | Input Key (Left Field) | Node ID (Right Field) |
+|----------------------|------------------------|-----------------------|
+| `Seed`               | `seed`                 | `3`                   |
+
+#### 3. Handling Complex/Multimodal Nodes (Qwen Example)
+
+For specialized nodes, the Input Key may not be a simple text.
+
+| Parameter   | Input Key (Left Field) | Node ID (Right Field) | Note                                                                                             |
+|-------------|------------------------|-----------------------|--------------------------------------------------------------------------------------------------|
+| **Prompt**  | `prompt`               | `76`                  | The key is still `prompt`, but it targets the specialized TextEncodeQwenImageEdit node (76).         |
+| **Model**   | `unet_name`            | `37`                  | You must use the exact input key `unet_name` to control the model file name in the UNETLoader.    |
+| **Image Input** | `image`                | `78`                  | The key is `image`. This passes the filename of the source image to the LoadImage node.          |
+
+#### 4. Troubleshooting Mismatch Errors
+
+If ComfyUI stalls or gives a validation error, consult the log and the JSON structure:
+
+| Error Type | Cause & Debugging | Solution |
+|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Value not in list: unet_name: 'xyz.safetensors'` | You mapped the correct node ID (e.g., 37), but the value being passed (e.g., `xyz.safetensors`) is not a valid model name for that node type (e.g., accidentally sending a VAE model to a UNET loader). | Correct the model name set in Open WebUI for either image generation or editing, ensuring both model names matche the type of model the ComfyUI node is expecting. |
+| `Missing input <key>` | Your workflow requires an input (e.g., `cfg` or `sampler_name`), but Open WebUI did not send a value because the field was not mapped. | Either hardcode the value in the workflow JSON, or map the required input key to the correct node ID. |
+
+By meticulously matching the Node ID and the specific Input Key, you ensure Open WebUI correctly overwrites the default values in your workflow JSON before submitting the prompt to ComfyUI.
 
 ### Configuring with SwarmUI
 
