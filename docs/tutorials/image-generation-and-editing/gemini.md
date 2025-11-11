@@ -1,13 +1,13 @@
 ---
 sidebar_position: 5
-title: "🏋🏽 Gemini"
+title: "🎨 Gemini"
 ---
 
 :::warning
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-Open WebUI also supports image generation through the **Google Studio API**.
+Open WebUI also supports image generation through the **Google AI Studio API** also known as the **Gemini API**.
 
 ### Initial Setup
 
@@ -26,6 +26,7 @@ Open WebUI also supports image generation through the **Google Studio API**.
 :::info
 
 This feature appears to only work for models supported with this endpoint: `https://generativelanguage.googleapis.com/v1beta/models/<MODEL_NAME>:predict`.
+This is the OpenAI **BETA** endpoint, which Google provides for experimental OpenAI compatibility.
 
 Google Imagen models use this endpoint while Gemini models use a different endpoint ending with `:generateContent`
 
@@ -39,7 +40,7 @@ Gemini model endpoint example:
 - `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`.
 - [Documentation for Gemini models](https://ai.google.dev/gemini-api/docs/image-generation)
 
-Trying to call a Gemini model, such as gemini-2.5-flash-image aka *Nano Banana* will result in an error due to the difference in supported endpoints.
+Trying to call a Gemini model, such as gemini-2.5-flash-image aka *Nano Banana* would result in an error due to the difference in supported endpoints for Image Generation.
 
 `400: [ERROR: models/gemini-2.5-flash-image is not found for API version v1beta, or is not supported for predict. Call ListModels to see the list of available models and their supported methods.]`
 
