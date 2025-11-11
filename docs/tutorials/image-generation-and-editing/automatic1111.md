@@ -14,15 +14,15 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
 1. Ensure that you have [AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) installed.
 2. Launch AUTOMATIC1111 with additional flags to enable API access:
 
-   ```python
-   ./webui.sh --api --listen
-   ```
+```python
+/webui.sh --api --listen
+```
 
 3. For Docker installation of WebUI with the environment variables preset, use the following command:
 
-   ```docker
-   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-   ```
+```docker
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
 
 ### Setting Up Open WebUI with AUTOMATIC1111
 
@@ -30,8 +30,8 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
 2. Set the `Image Generation Engine` field to `Default (Automatic1111)`.
 3. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
 
-   ```txt
-   http://<your_automatic1111_address>:7860/
-   ```
+```txt
+http://<your_automatic1111_address>:7860/
+```
 
-   If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, use `http://host.docker.internal:7860/` as your address.
+If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, use `http://host.docker.internal:7860/` as your address.

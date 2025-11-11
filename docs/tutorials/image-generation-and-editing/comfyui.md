@@ -31,7 +31,8 @@ A manual installation gives you the most control and ensures you are running the
 
 To avoid conflicts with other Python projects, it's best to install ComfyUI in a dedicated virtual environment.
 
-:::tip Choose Your Environment Manager
+:::tip
+**Choose Your Environment Manager**
 We recommend **Miniconda** for simplicity across all operating systems. If you are on Linux and prefer a lighter tool, **pyenv** is an excellent alternative.
 :::
 
@@ -40,20 +41,20 @@ We recommend **Miniconda** for simplicity across all operating systems. If you a
 - **Install Miniconda:** Download and install it from the [official website](https://docs.anaconda.com/free/miniconda/index.html#latest-miniconda-installer-links).
 - **Create and activate the environment:**
 
-    ```bash
-    conda create -n comfyenv python=3.13
-    conda activate comfyenv
-    ```
+```bash
+conda create -n comfyenv python=3.13
+conda activate comfyenv
+```
 
 **Option B: Using pyenv (Linux/macOS)**
 
 - **Install Python (if needed):** Ensure Python 3.12 or 3.13 is installed via pyenv (e.g., `pyenv install 3.13.0`).
 - **Create and activate the environment:**
 
-    ```bash
-    pyenv virtualenv 3.13.0 comfyenv
-    pyenv activate comfyenv
-    ```
+```bash
+pyenv virtualenv 3.13.0 comfyenv
+pyenv activate comfyenv
+```
 
 #### 2. Clone the ComfyUI Repository
 
@@ -70,18 +71,19 @@ Install the required Python packages, including PyTorch for your specific GPU. *
 
 - **For NVIDIA GPUs (Recommended):**
 
-    ```bash
-    pip install torch torchvision torchaudio index-url https://download.pytorch.org/whl/cu130
-    pip install -r requirements.txt
-    ```
+```bash
+pip install torch torchvision torchaudio index-url https://download.pytorch.org/whl/cu130
+pip install -r requirements.txt
+```
 
 - **For AMD GPUs (Linux/ROCm):**
-    This installation is required for GPU acceleration via the ROCm toolkit.
 
-    ```bash
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.4
-    pip install -r requirements.txt
-    ```
+This installation is required for GPU acceleration via the ROCm toolkit.
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.4
+pip install -r requirements.txt
+```
 
 - **For other platforms or CPU-only:** Refer to the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/).
 
@@ -95,18 +97,18 @@ Before running ComfyUI for the first time, it is highly recommended to install t
 
 1. **Create Custom Node Directory:**
 
-    ```bash
-    cd ComfyUI
-    mkdir -p custom_nodes
-    ```
+```bash
+cd ComfyUI
+mkdir -p custom_nodes
+```
 
 2. **Install ComfyUI Manager:** This provides a graphical interface to install all other extensions and manage models easily.
 
-    ```bash
-    cd custom_nodes
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git
-    cd ..
-    ```
+```bash
+cd custom_nodes
+git clone https://github.com/ltdrdata/ComfyUI-Manager.git
+cd ..
+```
 
 3. **Install Initial Custom Nodes:** After running ComfyUI for the first time, use the Manager to install necessary nodes like **ComfyUI-Custom-Scripts** and **ComfyUI-Impact-Pack**.
 
@@ -137,9 +139,9 @@ If you already have a collection of Stable Diffusion models from another UI (lik
 2. **Rename the File:** Rename or copy this file to `extra_model_paths.yaml`.
 3. **Edit the Configuration:** Open `extra_model_paths.yaml` in a text editor. The file contains commented-out examples. To point to an existing AUTOMATIC1111 installation, you can uncomment the `a111:` section and set the `base_path` to your `stable-diffusion-webui` directory.
 
-    **Example for sharing with AUTOMATIC1111:**
+**Example for sharing with AUTOMATIC1111:**
 
-    ```yaml
+```yaml
     a111:
         base_path: D:\stable-diffusion-webui\ # Use the correct path for your system
     
@@ -153,7 +155,7 @@ If you already have a collection of Stable Diffusion models from another UI (lik
                       models/RealESRGAN
         embeddings: embeddings
         controlnet: models/ControlNet
-    ```
+```
 
 You can also define custom paths for your models and even for custom nodes. After saving the file, you must **restart ComfyUI** for the changes to take effect.
 
@@ -165,22 +167,23 @@ Since Open WebUI typically runs inside Docker, you must ensure the container can
 2. **Firewall Check:** If the host firewall (UFW) is active, ensure port 8188 is allowed (`sudo ufw allow 8188/tcp`).
 
 3. **Docker Run Command (Linux Native Docker):**
-    For Linux users not running Docker Desktop, you must explicitly map the host gateway when running the Open WebUI container.
+For Linux users not running Docker Desktop, you must explicitly map the host gateway when running the Open WebUI container.
 
-    ```docker
-    docker run -d -p 3000:8080 \
-      --add-host=host.docker.internal:host-gateway \
-      -e COMFYUI_BASE_URL=http://host.docker.internal:8188/ \
-      -e ENABLE_IMAGE_GENERATION=True \
-      -v open-webui:/app/backend/data \
-      --name open-webui \
-      --restart always \
-      ghcr.io/open-webui/open-webui:main
-    ```
+```docker
+docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -e COMFYUI_BASE_URL=http://host.docker.internal:8188/ \
+  -e ENABLE_IMAGE_GENERATION=True \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
+```
 
-    :::warning Debugging Network Stalls
-    If Open WebUI stalls when connecting, the issue is usually missing the `--add-host=host.docker.internal:host-gateway` flag in your Docker run command.
-    :::
+:::warning
+**Debugging Network Stalls**
+If Open WebUI stalls when connecting, the issue is usually missing the `--add-host=host.docker.internal:host-gateway` flag in your Docker run command.
+:::
 
 Once you have ComfyUI installed and running, you can connect it to Open WebUI from the admin settings.
 
@@ -189,31 +192,35 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
 
 2. **Enable and Configure ComfyUI:**
-    - Ensure the **Image Generation** toggle at the top of the page is enabled.
-    - Under the **Create Image** section, set the **Image Generation Engine** to `ComfyUI`.
-    - **Model**: Select the base model to be used for generating the image.
-    - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
-    - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
-    - **Image Prompt Generation**: When enabled, this feature uses a language model to automatically generate a more detailed and creative prompt based on your initial input, which can lead to better image results.
-    - In the **ComfyUI Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
-    - Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
-    - If your ComfyUI instance requires an API key, enter it in the **ComfyUI API Key** field.
+
+- Ensure the **Image Generation** toggle at the top of the page is enabled.
+- Under the **Create Image** section, set the **Image Generation Engine** to `ComfyUI`.
+- **Model**: Select the base model to be used for generating the image.
+- **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
+- **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
+- **Image Prompt Generation**: When enabled, this feature uses a language model to automatically generate a more detailed and creative prompt based on your initial input, which can lead to better image results.
+- In the **ComfyUI Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
+- Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
+- If your ComfyUI instance requires an API key, enter it in the **ComfyUI API Key** field.
 
 3. **Upload Your ComfyUI Workflow:**
-    - First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then toggle **"Dev Mode"** with a description that states "Enable dev mode options (API save, etc.)"**.
-    - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Save (API Format)"** button. This will prompt you to give a name to the file. Name it something memorable and download the file.
-    - Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
+
+- First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then toggle **"Dev Mode"** with a description that states "Enable dev mode options (API save, etc.)"**.
+- While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Save (API Format)"** button. This will prompt you to give a name to the file. Name it something memorable and download the file.
+- Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
 
 4. **Map Workflow Nodes:**
-    - After the workflow is imported, you must map the node IDs from your workflow to the corresponding fields in Open WebUI (e.g., `Prompt`, `Model`, `Seed`). This tells Open WebUI which inputs in your ComfyUI workflow to control.
-    - You can find the node ID by clicking on a node in ComfyUI and viewing its details.
 
-    :::info
-    You may need to adjust an `Input Key` within Open WebUI's `ComfyUI Workflow Nodes` section to match a node in your workflow. For example, the default `seed` key might need to be changed to `noise_seed` depending on your workflow's structure.
-    :::
+- After the workflow is imported, you must map the node IDs from your workflow to the corresponding fields in Open WebUI (e.g., `Prompt`, `Model`, `Seed`). This tells Open WebUI which inputs in your ComfyUI workflow to control.
+- You can find the node ID by clicking on a node in ComfyUI and viewing its details.
+
+:::info
+You may need to adjust an `Input Key` within Open WebUI's `ComfyUI Workflow Nodes` section to match a node in your workflow. For example, the default `seed` key might need to be changed to `noise_seed` depending on your workflow's structure.
+:::
 
 5. **Save Configuration:**
-    - Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
+
+- Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
 
 ### ComfyUI Image Editing
 
@@ -222,12 +229,13 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
 
 2. **Configure Image Editing:**
-    - Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.
-    - **Model**: Select the model to be used for the editing task.
-    - **Image Size**: Specify the desired resolution for the output image.
-    - **ComfyUI Base URL** and **API Key**: These fields are shared with the image generation settings.
-    - **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
-    - **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
+
+- Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.
+- **Model**: Select the model to be used for the editing task.
+- **Image Size**: Specify the desired resolution for the output image.
+- **ComfyUI Base URL** and **API Key**: These fields are shared with the image generation settings.
+- **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
+- **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
 
 ### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
 
@@ -284,9 +292,9 @@ For specialized nodes, the Input Key may not be a simple text.
 
 | Parameter   | Input Key (Left Field) | Node ID (Right Field) | Note                                                                                             |
 |-------------|------------------------|-----------------------|--------------------------------------------------------------------------------------------------|
-| **Prompt**  | `prompt`               | `76`                  | The key is still `prompt`, but it targets the specialized TextEncodeQwenImageEdit node (76).         |
-| **Model**   | `unet_name`            | `37`                  | You must use the exact input key `unet_name` to control the model file name in the UNETLoader.    |
-| **Image Input** | `image`                | `78`                  | The key is `image`. This passes the filename of the source image to the LoadImage node.          |
+| **Prompt**  | `prompt`               | `76`                  | The key is still `prompt`, but it targets the specialized TextEncodeQwenImageEdit node (76).     |
+| **Model**   | `unet_name`            | `37`                  | You must use the exact input key `unet_name` to control the model file name in the UNETLoader.   |
+| **Image Input** | `image`            | `78`                  | The key is `image`. This passes the filename of the source image to the LoadImage node.          |
 
 #### 4. Troubleshooting Mismatch Errors
 
