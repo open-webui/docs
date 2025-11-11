@@ -258,6 +258,7 @@ The Input Key is the exact parameter name within that node's JSON structure that
   "class_type": "KSampler",
 }
 ```
+
 In this example, the Input Keys are `seed` and `steps`.
 
 #### 2. Mapping in Open WebUI
@@ -298,11 +299,57 @@ If ComfyUI stalls or gives a validation error, consult the log and the JSON stru
 
 By meticulously matching the Node ID and the specific Input Key, you ensure Open WebUI correctly overwrites the default values in your workflow JSON before submitting the prompt to ComfyUI.
 
-### Configuring with SwarmUI
+## Example Setup: Qwen Image Generation and Editing
 
-SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `ComfyUI Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as [Step one: Configure Open WebUI Settings](https://github.com/open-webui/docs/edit/main/docs/features/images.md#step-1-configure-open-webui-settings) as outlined above.
+This section provides a supplementary guide on setting up the Qwen models for both image generation and editing.
+
+### Qwen Image Generation
+
+#### Model Download
+
+- **Diffusion Model**: [qwen_image_fp8_e4m3fn.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_fp8_e4m3fn.safetensors)
+- **Text Encoder**: [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
+- **VAE**: [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)
+
+#### Model Storage Location
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 diffusion_models/
+│   │   └── qwen_image_fp8_e4m3fn.safetensors
+│   ├── 📂 vae/
+│   │   └── qwen_image_vae.safetensors
+│   └── 📂 text_encoders/
+│       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
+```
+
+### Qwen Image Editing
+
+#### Model Download
+
+- **Diffusion Model**: [qwen_image_edit_fp8_e4m3fn.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_fp8_e4m3fn.safetensors)
+- **Text Encoder**: [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
+- **VAE**: [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)
+
+#### Model Storage Location
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 diffusion_models/
+│   │   └── qwen_image_edit_fp8_e4m3fn.safetensors
+│   ├── 📂 vae/
+│   │   └── qwen_image_vae.safetensors
+│   └── 📂 text_encoders/
+│       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
+```
+
+## Configuring with SwarmUI
+
+SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `ComfyUI Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for [ComfyUI Image Generation](#comfyui-image-generation) outlined above.
 ![Install SwarmUI with LAN Access](https://github.com/user-attachments/assets/a6567e13-1ced-4743-8d8e-be526207f9f6)
 
-#### SwarmUI API URL
+### SwarmUI API URL
 
 The address you will input as the ComfyUI Base URL will look like: `http://<your_swarmui_address>:7801/ComfyBackendDirect`
