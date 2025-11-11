@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🗨️ Chatterbox TTS — Voice Cloning"
+title: "🧬 Chatterbox TTS — Voice Cloning"
 ---
 
 # Chatterbox TTS — Voice Cloning

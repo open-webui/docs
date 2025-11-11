@@ -1,6 +1,6 @@
 ---
 sidebar_position: 12
-title: "Serply"
+title: "📄 Serply"
 ---
 
 :::warning

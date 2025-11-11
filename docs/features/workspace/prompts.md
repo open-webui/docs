@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "📚 Prompts"
+title: "📜 Prompts"
 ---
 
 The `Prompts` section of the `Workspace` within Open WebUI enables users to create, manage, and share custom prompts. This feature streamlines interactions with AI models by allowing users to save frequently used prompts and easily access them through slash commands.

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "Bing"
+title: "🗺️ Bing"
 ---
 
 :::warning

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 9
-title: "SearchApi"
+title: "🔌 SearchApi"
 ---
 
 :::warning

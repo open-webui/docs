@@ -1,6 +1,6 @@
 ---
 sidebar_position: 14
-title: "Tavily"
+title: "🎯 Tavily"
 ---
 
 :::warning

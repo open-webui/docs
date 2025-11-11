@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🗨️ Kokoro-FastAPI Using Docker"
+title: "💖 Kokoro-FastAPI Using Docker"
 ---
 
 :::warning

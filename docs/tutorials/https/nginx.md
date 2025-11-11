@@ -1,6 +1,6 @@
 ---
 sidebar_position: 200
-title: "🔒 HTTPS using Nginx"
+title: "🚀 HTTPS using Nginx"
 ---
 
 :::warning

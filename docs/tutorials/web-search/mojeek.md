@@ -1,6 +1,6 @@
 ---
 sidebar_position: 8
-title: "Mojeek"
+title: "🕵️ Mojeek"
 ---
 
 :::warning

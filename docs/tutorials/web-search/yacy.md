@@ -1,6 +1,6 @@
 ---
 sidebar_position: 16
-title: "Yacy"
+title: "🧑‍🤝‍🧑 Yacy"
 ---
 
 :::warning
