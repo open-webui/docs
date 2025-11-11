@@ -82,11 +82,11 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Description: Toggles email, password, sign-in and "or" (only when `ENABLE_OAUTH_SIGNUP` is set to True) elements.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `ENABLE_PASSWORD_BASED_LOGIN`
+#### `ENABLE_PASSWORD_AUTH`
 
 - Type: `bool`
 - Default: `True`
-- Description: Allows both password and SSO authentication methods to coexist when set to True. When set to False, **while SSO is enabled (`ENABLE_OAUTH_SIGNUP`=True)**, it disables all password-based login attempts on the /signin and /ldap endpoints, enforcing strict SSO-only authentication. Disable this setting in production environments with fully configured SSO to prevent credential-based account takeover attacks; keep it enabled if you require password authentication as a backup or have not yet completed SSO configuration. Should never be disabled if OAUTH/SSO is not being used.
+- Description: Allows both password and SSO authentication methods to coexist when set to True. When set to False, it disables all password-based login attempts on the /signin and /ldap endpoints, enforcing strict SSO-only authentication. Disable this setting in production environments with fully configured SSO to prevent credential-based account takeover attacks; keep it enabled if you require password authentication as a backup or have not yet completed SSO configuration. Should never be disabled if OAUTH/SSO is not being used.
 
 :::danger
 
