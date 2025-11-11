@@ -26,7 +26,6 @@ Before you can use image generation, you must ensure that the **Image Generation
 :::tip
 
 You can also edit the LLM's response and enter your image generation prompt as the message
-    to send off for image generation instead of using the actual response provided by the
-    LLM.
+to send off for image generation instead of using the actual response provided by the LLM.
 
 :::
