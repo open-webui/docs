@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "🎨 Image Router Image Generation"
+title: "🧭 Image Router"
 ---
 
 :::warning

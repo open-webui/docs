@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🎨 ComfyUI Image Generation"
+title: "🔀 ComfyUI"
 ---
 
 :::warning

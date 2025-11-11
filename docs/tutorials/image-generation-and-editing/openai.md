@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🎨 OpenAI Image Generation"
+title: "🧠 OpenAI"
 ---
 
 :::warning

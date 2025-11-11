@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🎨 AUTOMATIC1111 Image Generation"
+title: "🎛️ AUTOMATIC1111"
 ---
 
 :::warning

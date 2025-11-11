@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "🎨 Gemini Image Generation"
+title: "🏋🏽 Gemini"
 ---
 
 :::warning
