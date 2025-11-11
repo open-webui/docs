@@ -25,15 +25,17 @@ Open WebUI also supports image generation through the **Google Studio API**.
 
 :::info
 
-This feature appears to only work for models supported with this endpoint: `https://generativelanguage.googleapis.com/v1beta/models/<MODEL_NAME>:predict`. 
+This feature appears to only work for models supported with this endpoint: `https://generativelanguage.googleapis.com/v1beta/models/<MODEL_NAME>:predict`.
 
-Google Imagen models use this endpoint while Gemini models use a different endpoint ending with `:generateContent` 
+Google Imagen models use this endpoint while Gemini models use a different endpoint ending with `:generateContent`
 
 Imagen model endpoint example:
+
 - `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict`.
 - [Documentation for Imagen models](https://ai.google.dev/gemini-api/docs/imagen)
 
 Gemini model endpoint example:
+
 - `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`.
 - [Documentation for Gemini models](https://ai.google.dev/gemini-api/docs/image-generation)
 
