@@ -71,6 +71,23 @@ docker-compose up -d
 - Set the scheme to HTTP (default), enable ``Websockets support`` and point to your Docker IP (if docker with open-webui is running on the same computer as NGINX manager, this will be the same IP as earlier (example: ``192.168.0.6``)
 - Select the SSL certificate generated earlier, force SSL, and enable HTTP/2.
 
+:::danger Critical: Configure CORS for WebSocket Connections
+
+A very common and difficult-to-debug issue with WebSocket connections is a misconfigured Cross-Origin Resource Sharing (CORS) policy. When running Open WebUI behind a reverse proxy like Nginx Proxy Manager, you **must** set the `CORS_ALLOW_ORIGIN` environment variable in your Open WebUI configuration.
+
+Failure to do so will cause WebSocket connections to fail, even if you have enabled "Websockets support" in Nginx Proxy Manager.
+
+**Example:**
+If you access your UI at `https://openwebui.hello.duckdns.org`, you must set:
+
+```bash
+CORS_ALLOW_ORIGIN="https://openwebui.hello.duckdns.org"
+```
+
+You can also provide a semicolon-separated list of allowed domains. **Do not skip this step.**
+
+:::
+
 6. **Add your url to open-webui (otherwise getting HTTPS error):**
 
 - Go to your open-webui → Admin Panel → Settings → General
