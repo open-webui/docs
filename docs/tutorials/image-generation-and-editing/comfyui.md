@@ -20,7 +20,7 @@ Before installing ComfyUI, ensure your system meets the following requirements:
   - AMD (Requires ROCm Toolkit on Linux)
   - Intel (including Arc series)
   - Apple Silicon (M1/M2)
-- **CPU:** (can use the -`cpu` parameter, but is slower)
+- **CPU:** (can use the `-cpu` parameter, but is slower)
 - **Git:** You will need [Git](https://git-scm.com/downloads) to clone the repository.
 
 ### Manual Installation
@@ -343,6 +343,56 @@ This section provides a supplementary guide on setting up the Qwen models for bo
 │   │   └── qwen_image_vae.safetensors
 │   └── 📂 text_encoders/
 │       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
+```
+
+## Example Setup: FLUX.1 Image Generation
+
+This section provides a supplementary guide on setting up the FLUX.1 models for image generation.
+
+### FLUX.1 Dev
+
+#### Model Download
+
+- **Diffusion Model**: [flux1-dev.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors)
+- **Text Encoder 1**: [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true)
+- **Text Encoder 2**: [t5xxl_fp16.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors?download=true) (Recommended when your VRAM is greater than 32GB)
+- **VAE**: [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true)
+
+#### Model Storage Location
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 diffusion_models/
+│   │   └── flux1-dev.safetensors
+│   ├── 📂 vae/
+│   │   └── ae.safetensors
+│   └── 📂 text_encoders/
+│       ├── clip_l.safetensors
+│       └── t5xxl_fp16.safetensors
+```
+
+### FLUX.1 Schnell
+
+#### Model Download
+
+- **Diffusion Model**: [flux1-schnell.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors)
+- **Text Encoder 1**: [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true)
+- **Text Encoder 2**: [t5xxl_fp8_e4m3fn.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors?download=true) (Recommended when your VRAM is greater than 32GB)
+- **VAE**: [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true)
+
+#### Model Storage Location
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 diffusion_models/
+│   │   └── flux1-schnell.safetensors
+│   ├── 📂 vae/
+│   │   └── ae.safetensors
+│   └── 📂 text_encoders/
+│       ├── clip_l.safetensors
+│       └── t5xxl_fp8_e4m3fn.safetensors
 ```
 
 ## Configuring with SwarmUI
