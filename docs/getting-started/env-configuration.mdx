@@ -1135,7 +1135,7 @@ If you experience Websocket issues, check the logs of Open WebUI.
 If you see lines like this `engineio.base_server:_log_error_once:354 - https://yourdomain.com is not an accepted origin.` then you need to configure your CORS_ALLOW_ORIGIN more broadly.
 
 Example:
-CORS_ALLOW_ORIGIN: "https://yourdomain.com;http://yourdomain.com;https://yourhostname;http://<your ip address>;http://localhost:3000"
+CORS_ALLOW_ORIGIN: "https://yourdomain.com;http://yourdomain.com;https://yourhostname;http://youripaddress;http://localhost:3000"
 
 Add all valid IPs, Domains and Hostnames one might access your Open WebUI to the variable.
 Once you did, no more websocket issues or warnings in the console should occur.
