@@ -1824,6 +1824,83 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Description: Sets the API key for authenticating with the external document loader service.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `EXTERNAL_DOCUMENT_LOADER_HTTP_METHOD`
+
+- Type: `str`
+- Default: `PUT`
+- Description: HTTP method for external document loader requests.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_ENDPOINT`
+
+- Type: `str`
+- Default: `/process`
+- Description: API endpoint path for the external document loader.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_REQUEST_FORMAT`
+
+- Type: `str`
+- Default: `binary`
+- Description: Request format for document uploads. Options: `binary`, `multipart`, `base64`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_FILE_FIELD_NAME`
+
+- Type: `str`
+- Default: `file`
+- Description: Form field name for the file in multipart requests.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_FILENAME_FIELD_NAME`
+
+- Type: `str`
+- Default: `""`
+- Description: Optional separate form field name for the filename in multipart requests.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_PARAMS`
+
+- Type: `dict`
+- Default: `{}`
+- Description: JSON object for additional request body parameters.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_QUERY_PARAMS`
+
+- Type: `dict`
+- Default: `{}`
+- Description: JSON object for URL query parameters.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_HEADERS`
+
+- Type: `dict`
+- Default: `{}`
+- Description: JSON object for custom HTTP headers.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_RESPONSE_CONTENT_PATH`
+
+- Type: `str`
+- Default: `page_content`
+- Description: JSON path to extract content from the response.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_RESPONSE_METADATA_PATH`
+
+- Type: `str`
+- Default: `metadata`
+- Description: JSON path to extract metadata from the response.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_RESPONSE_TYPE`
+
+- Type: `str`
+- Default: `object`
+- Description: Response format type. Options: `object`, `array`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `TIKA_SERVER_URL`
 
 - Type: `str`
