@@ -1,6 +1,6 @@
 ---
 sidebar_position: 24
-title: "🔌 Offline Mode"
+title: "✈️ Offline Mode"
 ---
 
 :::warning

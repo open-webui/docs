@@ -1,6 +1,6 @@
 ---
 sidebar_position: 17
-title: "External"
+title: "↗️ External"
 ---
 
 :::warning

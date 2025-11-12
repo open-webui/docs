@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "Google PSE"
+title: "🎨 Google PSE"
 ---
 
 :::warning

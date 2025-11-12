@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🔐 Groups"
+title: "👥 Groups"
 ---
 
 Groups allow administrators to
