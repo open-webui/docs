@@ -18,9 +18,11 @@ Before installing ComfyUI, ensure your system meets the following requirements:
 - **GPU:**
   - NVIDIA (recommended)
   - AMD (Requires ROCm Toolkit on Linux)
-  - Intel (including Arc series)
+  - Intel  (includes Arc series, supports IPEX)
   - Apple Silicon (M1/M2)
-- **CPU:** (can use the `-cpu` parameter, but is slower)
+  - Ascend NPU
+  - Cambricon MLU
+- **CPU:** (can use the `-cpu` parameter, but will be slower)
 - **Git:** You will need [Git](https://git-scm.com/downloads) to clone the repository.
 
 ### Manual Installation
