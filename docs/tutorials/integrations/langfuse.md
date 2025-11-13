@@ -1,6 +1,6 @@
 ---
 sidebar_position: 20
-title: "🪢 Monitoring and Debugging with Langfuse"
+title: "Monitoring and Debugging with Langfuse"
 ---
 
 ## Langfuse Integration with Open WebUI

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🛠️ Local Development Guide"
+title: "Local Development Guide"
 ---
 
 # Ready to Contribute to Open WebUI? Let's Get Started! 🚀

@@ -1,5 +1,5 @@
 ---
-title: "🕵🏻‍♀️ Monitor your LLM requests with Helicone"
+title: "Monitor your LLM requests with Helicone"
 sidebar_position: 19
 ---
 

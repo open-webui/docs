@@ -1,6 +1,6 @@
 ---
 sidebar_position: 17
-title: "🪝 Webhook Integrations"
+title: "Webhook Integrations"
 ---
 
 ## Overview
@@ -9,8 +9,8 @@ Open WebUI offers two distinct webhook integrations to help you stay informed ab
 
 There are two types of webhooks available:
 
-1.  **Admin Webhook:** A system-wide webhook that notifies administrators about new user sign-ups.
-2.  **User Webhook:** A personal webhook that notifies individual users when a response to their chat is ready, especially useful for long-running tasks.
+1. **Admin Webhook:** A system-wide webhook that notifies administrators about new user sign-ups.
+2. **User Webhook:** A personal webhook that notifies individual users when a response to their chat is ready, especially useful for long-running tasks.
 
 ## 1. Admin Webhook: New User Notifications
 
@@ -26,11 +26,11 @@ You can configure the admin webhook in two ways:
 
 #### Option 1: Through the Admin Panel
 
-1.  Log in as an administrator.
-2.  Navigate to **Admin Panel > Settings > General**.
-3.  Locate the **"Webhook URL"** field.
-4.  Enter the webhook URL provided by your external service (e.g., Discord, Slack).
-5.  Click **"Save"**.
+1. Log in as an administrator.
+2. Navigate to **Admin Panel > Settings > General**.
+3. Locate the **"Webhook URL"** field.
+4. Enter the webhook URL provided by your external service (e.g., Discord, Slack).
+5. Click **"Save"**.
 
 #### Option 2: Through Environment Variables
 
@@ -66,11 +66,11 @@ The notification is only sent if you are **not actively using the WebUI**. If yo
 
 ### Configuration
 
-1.  Click on your profile picture in the bottom-left corner to open the settings menu.
-2.  Navigate to **Settings > Account**.
-3.  Locate the **"Notification Webhook"** field.
-4.  Enter your personal webhook URL.
-5.  Click **"Save"**.
+1. Click on your profile picture in the bottom-left corner to open the settings menu.
+2. Navigate to **Settings > Account**.
+3. Locate the **"Notification Webhook"** field.
+4. Enter your personal webhook URL.
+5. Click **"Save"**.
 
 ### Payload Format
 
@@ -93,10 +93,10 @@ When a chat response is ready and you are inactive, Open WebUI will send a `POST
 
 If you're not receiving webhook notifications, here are a few things to check:
 
--   **Verify the URL:** Ensure the webhook URL is correct and properly pasted into the settings field.
--   **Service Configuration:** Double-check that the webhook is set up correctly in the external service (e.g., Discord, Slack).
--   **Firewall/Proxy:** Make sure your network or firewall is not blocking outgoing requests from the Open WebUI server.
--   **Open WebUI Logs:** Check the Open WebUI server logs for any error messages related to webhook failures.
+- **Verify the URL:** Ensure the webhook URL is correct and properly pasted into the settings field.
+- **Service Configuration:** Double-check that the webhook is set up correctly in the external service (e.g., Discord, Slack).
+- **Firewall/Proxy:** Make sure your network or firewall is not blocking outgoing requests from the Open WebUI server.
+- **Open WebUI Logs:** Check the Open WebUI server logs for any error messages related to webhook failures.
 
 :::note
 

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 25
-title: "🔠 LibreTranslate Integration"
+title: "LibreTranslate Integration"
 ---
 
 :::warning

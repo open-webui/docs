@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🔎 Open WebUI RAG Tutorial"
+title: "Open WebUI RAG Tutorial"
 ---
 
 :::warning

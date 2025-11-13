@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🔗 Pipes"
+title: "Pipes"
 ---
 
 ## Pipes

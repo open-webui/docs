@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🔑 Roles"
+title: "Roles"
 ---
 
 Open WebUI implements a structured role-based access control system with three primary user roles:

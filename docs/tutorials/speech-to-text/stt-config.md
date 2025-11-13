@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "⚙️ Configuration"
+title: "Configuration"
 ---
 
 Open Web UI supports both local, browser, and remote speech to text.

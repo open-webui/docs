@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🔄 Backend-Controlled, UI-Compatible API Flow"
+title: "Backend-Controlled, UI-Compatible API Flow"
 ---
 
 :::warning

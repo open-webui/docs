@@ -4,14 +4,14 @@ Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for
 
 This guide uses a two-phase approach:
 
-1.  **Phase 1:** Temporarily run Nginx to prove you own the domain and get a certificate from Let's Encrypt.
-2.  **Phase 2:** Reconfigure Nginx to use the new certificate for a secure HTTPS connection.
+1. **Phase 1:** Temporarily run Nginx to prove you own the domain and get a certificate from Let's Encrypt.
+2. **Phase 2:** Reconfigure Nginx to use the new certificate for a secure HTTPS connection.
 
 #### Prerequisites
 
-  * A **domain name** (e.g., `my-webui.com`) with a **DNS `A` record** pointing to your server's public IP address.
-  * **Docker** and **Docker Compose** installed on your server.
-  * Basic understanding of running commands in a terminal.
+* A **domain name** (e.g., `my-webui.com`) with a **DNS `A` record** pointing to your server's public IP address.
+* **Docker** and **Docker Compose** installed on your server.
+* Basic understanding of running commands in a terminal.
 
 :::info
 **Heads up\!** Let's Encrypt **cannot** issue certificates for an IP address. You **must** use a domain name.
@@ -104,7 +104,7 @@ First, we'll set up the necessary files and a temporary Nginx configuration that
 
 Now we'll run a script that uses Docker to fetch the certificate.
 
-1.  **Create the Certificate Request Script**
+1. **Create the Certificate Request Script**
 
     Create an executable script named `enable_letsencrypt.sh` in your project root.
 
@@ -146,13 +146,13 @@ Now we'll run a script that uses Docker to fetch the certificate.
     echo "### Certificate obtained successfully! ###"
     ```
 
-2.  **Make the Script Executable**
+2. **Make the Script Executable**
 
     ```bash
     chmod +x enable_letsencrypt.sh
     ```
 
-3.  **Run the Script**
+3. **Run the Script**
 
     Execute the script. It will automatically start Nginx, request the certificate, and then stop Nginx.
 
@@ -166,7 +166,7 @@ Now we'll run a script that uses Docker to fetch the certificate.
 
 With the certificate saved in your `ssl` directory, you can now update the Nginx configuration to enable HTTPS.
 
-1.  **Update the Nginx Configuration for SSL**
+1. **Update the Nginx Configuration for SSL**
 
     **Replace the entire contents** of `nginx/conf.d/open-webui.conf` with the final configuration below.
 
@@ -222,7 +222,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
     }
     ```
 
-2.  **Launch All Services**
+2. **Launch All Services**
 
     Start both Nginx and Open WebUI with the final, secure configuration.
 
@@ -244,13 +244,13 @@ You can now access your Open WebUI instance securely via HTTPS.
 
 Let's Encrypt certificates expire every 90 days. You should set up a `cron` job to renew them automatically.
 
-1.  Open the crontab editor:
+1. Open the crontab editor:
 
     ```bash
     sudo crontab -e
     ```
 
-2.  Add the following line to run a renewal check every day at 3:30 AM. It will only renew if the certificate is close to expiring.
+2. Add the following line to run a renewal check every day at 3:30 AM. It will only renew if the certificate is close to expiring.
 
     ```cron
     30 3 * * * /usr/bin/docker run --rm -v "<absolute_path>/ssl/certbot/conf:/etc/letsencrypt" -v "<absolute_path>/ssl/certbot/www:/var/www/certbot" certbot/certbot renew --quiet --webroot --webroot-path=/var/www/certbot --deploy-hook "/usr/bin/docker compose -f <absolute_path>/docker-compose.yml restart nginx"

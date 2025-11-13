@@ -1,6 +1,6 @@
 ---
 sidebar_position: 0
-title: "🤖 Models"
+title: "Models"
 ---
 
 The `Models` section of the `Workspace` within Open WebUI is a powerful tool that allows you to create and manage custom models tailored to specific purposes. This section serves as a central hub for all your modelfiles, providing a range of features to edit, clone, share, export, and hide your models.

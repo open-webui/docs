@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: "📊 Monitoring Your Open WebUI"
+title: "Monitoring Your Open WebUI"
 ---
 
 # Keep Your Open WebUI Healthy with Monitoring 🩺

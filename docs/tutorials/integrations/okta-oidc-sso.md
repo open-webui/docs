@@ -1,6 +1,6 @@
 ---
 sidebar_position: 40
-title: "🔗 Okta OIDC SSO Integration"
+title: "Okta OIDC SSO Integration"
 ---
 
 :::warning

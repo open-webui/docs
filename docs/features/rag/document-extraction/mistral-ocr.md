@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4000
-title: "👁️ Mistral OCR"
+title: "Mistral OCR"
 ---
 
 :::warning

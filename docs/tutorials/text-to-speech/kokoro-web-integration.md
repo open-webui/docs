@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🌐 Kokoro Web - Effortless TTS for Open WebUI"
+title: "Kokoro Web - Effortless TTS for Open WebUI"
 ---
 
 :::warning

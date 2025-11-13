@@ -1,6 +1,6 @@
 ---
 sidebar_position: 11
-title: "⚡ Serper"
+title: "Serper"
 ---
 
 :::warning

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4000
-title: "🪶 Apache Tika Extraction"
+title: "Apache Tika Extraction"
 ---
 
 :::warning

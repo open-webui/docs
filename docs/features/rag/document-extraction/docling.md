@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4000
-title: "🐤 Docling Document Extraction"
+title: "Docling Document Extraction"
 ---
 
 :::warning

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🔀 ComfyUI"
+title: "ComfyUI"
 ---
 
 :::warning

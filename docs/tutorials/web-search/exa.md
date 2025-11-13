@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "✨ Exa AI"
+title: "Exa AI"
 ---
 
 :::warning

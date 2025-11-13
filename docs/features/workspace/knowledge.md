@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🧠 Knowledge"
+title: "Knowledge"
 ---
 
  Knowledge part of Open WebUI is like a memory bank that makes your interactions even more powerful and context-aware. Let's break down what "Knowledge" really means in Open WebUI, how it works, and why it’s incredibly helpful for enhancing your experience.

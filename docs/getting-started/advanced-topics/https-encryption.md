@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: "🔒 Enabling HTTPS Encryption"
+title: "Enabling HTTPS Encryption"
 ---
 
 # Secure Your Open WebUI with HTTPS 🔒

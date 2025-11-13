@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🌊 Edge TTS Using Docker"
+title: "Edge TTS Using Docker"
 ---
 
 :::warning

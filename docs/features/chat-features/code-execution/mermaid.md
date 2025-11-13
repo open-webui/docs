@@ -1,9 +1,9 @@
 ---
 sidebar_position: 3
-title: "🌊 MermaidJS Rendering"
+title: "MermaidJS Rendering"
 ---
 
-## 🌊 MermaidJS Rendering Support in Open WebUI
+## MermaidJS Rendering Support in Open WebUI
 
 ## Overview
 

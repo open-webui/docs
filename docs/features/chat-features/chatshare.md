@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "📤 Chat Sharing"
+title: "Chat Sharing"
 ---
 
 ### Enabling Community Sharing
