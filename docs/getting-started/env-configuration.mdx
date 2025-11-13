@@ -2048,7 +2048,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 - Type: `int`
 - Default: `1`
-- Description: Sets the batch size for embedding in RAG (Retrieval-Augmented Generator) models.
+- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000) process documents faster by sending more API requests, but may exceed API rate limits, while lower values (1-10) are more stable but slower. Default is 1 (safest option if you are API rate limit constrained, but slowest option). This setting only applies to external embedding engines, not the default SentenceTransformers engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
