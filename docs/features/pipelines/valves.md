@@ -5,7 +5,7 @@ title: "Valves"
 
 ## Valves
 
-`Valves` (see the dedicated [Valves & UserValves](/features/plugin/valves) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
+`Valves` (see the dedicated [Valves & UserValves](/features/plugin/development/valves) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
 
 `Valves` are set as a subclass of the `Pipeline` class, and initialized as part of the `__init__` method of the `Pipeline` class.
 
