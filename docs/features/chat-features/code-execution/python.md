@@ -3,6 +3,8 @@ sidebar_position: 2
 title: "Python Code Execution"
 ---
 
+# 🐍 Python Code Execution
+
 ## Overview
 
 Open WebUI allows for the client-side execution of Python code in the browser, utilizing Pyodide to run scripts within a code block in a chat. This feature enables Large Language Models (LLMs) to generate Python scripts that can be executed directly in the browser, leveraging a range of libraries supported by Pyodide.
