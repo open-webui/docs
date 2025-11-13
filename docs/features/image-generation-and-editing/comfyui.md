@@ -9,159 +9,11 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ComfyUI is a powerful and modular node-based GUI for Stable Diffusion. It gives users a high degree of control over the image generation process. Learn more or download it from its [GitHub page](https://github.com/comfyanonymous/ComfyUI).
 
-### System Requirements
-
-Before installing ComfyUI, ensure your system meets the following requirements:
-
-- **Operating System:** Windows, Linux, or macOS (including Apple Silicon M-series).
-- **Python:** Python 3.12 is recommended. Python 3.13 is supported, but some custom nodes may have compatibility issues. **(Note: Python 3.11+ is generally required for modern PyTorch setups.)**
-- **GPU:**
-  - NVIDIA (recommended)
-  - AMD (Requires ROCm Toolkit on Linux)
-  - Intel  (includes Arc series, supports IPEX)
-  - Apple Silicon (M1/M2)
-  - Ascend NPU
-  - Cambricon MLU
-- **CPU:** (can use the `-cpu` parameter, but will be slower)
-- **Git:** You will need [Git](https://git-scm.com/downloads) to clone the repository.
-
-### Manual Installation
-
-A manual installation gives you the most control and ensures you are running the latest version of ComfyUI.
-
-#### 1. Create a Virtual Environment (Recommended)
-
-To avoid conflicts with other Python projects, it's best to install ComfyUI in a dedicated virtual environment.
-
-:::tip
-**Choose Your Environment Manager**
-We recommend **Miniconda** for simplicity across all operating systems. If you are on Linux and prefer a lighter tool, **pyenv** is an excellent alternative.
-:::
-
-**Option A: Using Miniconda (Cross-Platform)**
-
-- **Install Miniconda:** Download and install it from the [official website](https://docs.anaconda.com/free/miniconda/index.html#latest-miniconda-installer-links).
-- **Create and activate the environment:**
-
-```bash
-conda create -n comfyenv python=3.13
-conda activate comfyenv
-```
-
-**Option B: Using pyenv (Linux/macOS)**
-
-- **Install Python (if needed):** Ensure Python 3.12 or 3.13 is installed via pyenv (e.g., `pyenv install 3.13.0`).
-- **Create and activate the environment:**
-
-```bash
-pyenv virtualenv 3.13.0 comfyenv
-pyenv activate comfyenv
-```
-
-#### 2. Clone the ComfyUI Repository
-
-Use Git to clone the official ComfyUI repository:
-
-```bash
-git clone https://github.com/comfyanonymous/ComfyUI.git
-cd ComfyUI
-```
-
-#### 3. Install Dependencies
-
-Install the required Python packages, including PyTorch for your specific GPU. **Ensure your environment (`(comfyenv)` or `(conda env)`) is active.**
-
-- **For NVIDIA GPUs (Recommended):**
-
-```bash
-pip install torch torchvision torchaudio index-url https://download.pytorch.org/whl/cu130
-pip install -r requirements.txt
-```
-
-- **For AMD GPUs (Linux/ROCm):**
-
-This installation is required for GPU acceleration via the ROCm toolkit.
-
-```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.4
-pip install -r requirements.txt
-```
-
-- **For other platforms or CPU-only:** Refer to the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/).
-
-#### 4. Download Models
-
-You need to place your Stable Diffusion models (checkpoints, VAEs, LoRAs, etc.) in the `ComfyUI/models/` subdirectories. For example, place checkpoint models (`.safetensors` or `.ckpt`) in `ComfyUI/models/checkpoints/`.
-
-### Post-Installation Setup (Essential for Extensions)
-
-Before running ComfyUI for the first time, it is highly recommended to install the [ComfyUI-Manager](https://github.com/Comfy-Org/ComfyUI-Manager) extension. **ComfyUI-Manager** is a an extension designed to enhance the usability of ComfyUI. It offers management functions to **install, remove, disable, and enable** various custom nodes of ComfyUI. Furthermore, this extension provides a hub feature and convenience functions to access a wide range of information within ComfyUI.
-
-1. **Create Custom Node Directory:**
-
-```bash
-cd ComfyUI
-mkdir -p custom_nodes
-```
-
-2. **Install ComfyUI Manager:** This provides a graphical interface to install all other extensions and manage models easily.
-
-```bash
-cd custom_nodes
-git clone https://github.com/ltdrdata/ComfyUI-Manager.git
-cd ..
-```
-
-3. **Install Initial Custom Nodes:** After running ComfyUI for the first time, use the Manager to install necessary nodes like **ComfyUI-Custom-Scripts** and **ComfyUI-Impact-Pack**.
-
-#### 5. Start ComfyUI
-
 To run ComfyUI and make it accessible to Open WebUI, you must start it with the `--listen` flag to bind to `0.0.0.0`. This allows it to accept connections from other computers on your network.
-
-**Standard Start (Sufficient VRAM):**
-
-```bash
-python main.py --listen 0.0.0.0
-```
-
-**Low VRAM Start (Recommended for 16GB VRAM or less, especially AMD/Multimodal Models):**
-The `--lowvram` flag aggressively moves models to system RAM when idle.
-
-```bash
-python main.py --listen 0.0.0.0 --lowvram
-```
 
 Once running, the ComfyUI interface will be available at `http://<your_comfyui_ip>:8188`.
 
-### Sharing Models with `extra_model_paths.yaml`
-
-If you already have a collection of Stable Diffusion models from another UI (like AUTOMATIC1111) or want to keep your models in a central location, you can use the `extra_model_paths.yaml` file to tell ComfyUI where to find them.
-
-1. **Locate the Example File:** In the root of your `ComfyUI` directory, you will find a file named `extra_model_paths.yaml.example`.
-2. **Rename the File:** Rename or copy this file to `extra_model_paths.yaml`.
-3. **Edit the Configuration:** Open `extra_model_paths.yaml` in a text editor. The file contains commented-out examples. To point to an existing AUTOMATIC1111 installation, you can uncomment the `a111:` section and set the `base_path` to your `stable-diffusion-webui` directory.
-
-**Example for sharing with AUTOMATIC1111:**
-
-```yaml
-    a111:
-        base_path: D:\stable-diffusion-webui\ # Use the correct path for your system
-    
-        checkpoints: models/Stable-diffusion
-        vae: models/VAE
-        loras: |
-             models/Lora
-             models/LyCORIS
-        upscale_models: |
-                      models/ESRGAN
-                      models/RealESRGAN
-        embeddings: embeddings
-        controlnet: models/ControlNet
-```
-
-You can also define custom paths for your models and even for custom nodes. After saving the file, you must **restart ComfyUI** for the changes to take effect.
-
-### Connecting ComfyUI to Open WebUI
+## Connecting ComfyUI to Open WebUI
 
 Since Open WebUI typically runs inside Docker, you must ensure the container can reach the host-based ComfyUI application via `host.docker.internal`.
 
@@ -182,74 +34,69 @@ docker run -d -p 3000:8080 \
   ghcr.io/open-webui/open-webui:main
 ```
 
-:::warning
-**Debugging Network Stalls**
-If Open WebUI stalls when connecting, the issue is usually missing the `--add-host=host.docker.internal:host-gateway` flag in your Docker run command.
-:::
-
 Once you have ComfyUI installed and running, you can connect it to Open WebUI from the admin settings.
 
-### ComfyUI Image Generation
+### Create Image (Image Generation)
 
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
 
 2. **Enable and Configure ComfyUI:**
+    - Ensure the **Image Generation** toggle at the top of the page is enabled.
+    - Under the **Create Image** section, set the **Image Generation Engine** to `ComfyUI`.
+    - **Model**: Select the base model to be used for generating the image.
+    - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
+    - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
+    - **Image Prompt Generation**: When enabled, this feature uses a language model to automatically generate a more detailed and creative prompt based on your initial input, which can lead to better image results.
+    - In the **ComfyUI Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
+    - Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
+    - If your ComfyUI instance requires an API key, enter it in the **ComfyUI API Key** field.
 
-- Ensure the **Image Generation** toggle at the top of the page is enabled.
-- Under the **Create Image** section, set the **Image Generation Engine** to `ComfyUI`.
-- **Model**: Select the base model to be used for generating the image.
-- **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
-- **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
-- **Image Prompt Generation**: When enabled, this feature uses a language model to automatically generate a more detailed and creative prompt based on your initial input, which can lead to better image results.
-- In the **ComfyUI Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
-- Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
-- If your ComfyUI instance requires an API key, enter it in the **ComfyUI API Key** field.
+    ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
 
-![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
+3. **Upload Your ComfyUI Workflow:**
+    - First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then toggle **"Dev Mode"** with a description that states "Enable dev mode options (API save, etc.)"**.
+    - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Save (API Format)"** button. This will prompt you to give a name to the file. Name it something memorable and download the file.
+    - Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
 
-1. **Upload Your ComfyUI Workflow:**
+    ![Screenshot of the ComfyUI Workflow section in Open WebUI, showing the upload button.](/images/image-generation-and-editing/comfyui-workflow-upload.png)
 
-- First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then toggle **"Dev Mode"** with a description that states "Enable dev mode options (API save, etc.)"**.
-- While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Save (API Format)"** button. This will prompt you to give a name to the file. Name it something memorable and download the file.
-- Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
+4. **Map Workflow Nodes:**
+    - After the workflow is imported, you must map the node IDs from your workflow to the corresponding fields in Open WebUI (e.g., `Prompt`, `Model`, `Seed`). This tells Open WebUI which inputs in your ComfyUI workflow to control.
+    - You can find the node ID by clicking on a node in ComfyUI and viewing its details.
 
-![Screenshot of the ComfyUI Workflow section in Open WebUI, showing the upload button.](/images/image-generation-and-editing/comfyui-workflow-upload.png)
+    ![Screenshot of the ComfyUI Workflow Nodes section in Open WebUI, showing the mapping fields.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
-1. **Map Workflow Nodes:**
+    :::info
+    You may need to adjust an `Input Key` within Open WebUI's `ComfyUI Workflow Nodes` section to match a node in your workflow. For example, the default `seed` key might need to be changed to `noise_seed` depending on your workflow's structure.
+    :::
 
-- After the workflow is imported, you must map the node IDs from your workflow to the corresponding fields in Open WebUI (e.g., `Prompt`, `Model`, `Seed`). This tells Open WebUI which inputs in your ComfyUI workflow to control.
-- You can find the node ID by clicking on a node in ComfyUI and viewing its details.
+    :::tip
+    Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g., `1` or `1, 2`).
+    :::
 
-![Screenshot of the ComfyUI Workflow Nodes section in Open WebUI, showing the mapping fields.](/images/image-generation-and-editing/comfyui-node-mapping.png)
+5. **Save Configuration:**
+    - Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
 
-:::info
-You may need to adjust an `Input Key` within Open WebUI's `ComfyUI Workflow Nodes` section to match a node in your workflow. For example, the default `seed` key might need to be changed to `noise_seed` depending on your workflow's structure.
-:::
-
-:::tip
-Some workflows, such as ones that use any of the Flux models, may utilize multiple nodes IDs that is necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g., `1` or `1, 2`).
-:::
-
-1. **Save Configuration:**
-
-- Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
-
-### ComfyUI Image Editing
+## Edit Image
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
 
 2. **Configure Image Editing:**
+    - Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.
+    - **Model**: Select the model to be used for the editing task.
+    - **Image Size**: Specify the desired resolution for the output image.
+    - **ComfyUI Base URL** and **API Key**: These fields are shared with the image generation settings.
+    - **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
+    - **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
 
-- Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.
-- **Model**: Select the model to be used for the editing task.
-- **Image Size**: Specify the desired resolution for the output image.
-- **ComfyUI Base URL** and **API Key**: These fields are shared with the image generation settings.
-- **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
-- **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
+    ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image editing.](/images/image-generation-and-editing/comfyui-editing-settings.png)
 
-![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image editing.](/images/image-generation-and-editing/comfyui-editing-settings.png)
+
+
+
+
 
 ### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
 
