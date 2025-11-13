@@ -1,7 +1,11 @@
 ---
-sidebar_position: 24
+sidebar_position: 300
 title: "Offline Mode"
 ---
+
+import { TopBanners } from "@site/src/components/TopBanners";
+
+<TopBanners />
 
 :::warning
 
@@ -49,7 +53,7 @@ Consider if you need to start the application offline from the beginning of your
 
 ### I: Speech-To-Text
 
-The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/docs/tutorials/speech-to-text/stt-config.md) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
+The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/audio/speech-to-text/stt-config.md) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
 
 ```python
 from faster_whisper import WhisperModel
@@ -87,14 +91,6 @@ The contents of the download directory must be copied to `/app/backend/data/cach
 ### Running Open WebUI with internet connection during setup
 
 This is the easiest approach to achieving the offline setup with almost all features available in the online version. Apply only the features you want to use for your deployment.
-
-### II: Speech-To-Text
-
-Follow the [guide](./speech-to-text/stt-config.md).
-
-### II: Text-To-Speech
-
-Follow one of the [guides](https://docs.openwebui.com/category/%EF%B8%8F-text-to-speech).
 
 ### II: Embedding Model
 

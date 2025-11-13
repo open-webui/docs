@@ -2,8 +2,6 @@
 
 Using Docker Compose simplifies the management of multi-container Docker applications.
 
-If you don't have Docker installed, check out our [Docker installation tutorial](docs/tutorials/docker-install.md).
-
 Docker Compose requires an additional package, `docker-compose-v2`.
 
 :::warning

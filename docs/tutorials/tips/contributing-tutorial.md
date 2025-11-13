@@ -15,7 +15,7 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 
 ## Contributing Steps
 
-1. **Fork the `openwebui/docs` GitHub Repository**
+1. **Fork the `open-webui/docs` GitHub Repository**
 
    - Navigate to the [Open WebUI Docs Repository](https://github.com/open-webui/docs) on GitHub.
    - Click the **Fork** button at the top-right corner to create a copy under your GitHub account.
