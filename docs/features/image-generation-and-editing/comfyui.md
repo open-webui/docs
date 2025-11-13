@@ -36,7 +36,7 @@ docker run -d -p 3000:8080 \
 
 Once you have ComfyUI installed and running, you can connect it to Open WebUI from the admin settings.
 
-### Create Image (Image Generation)
+## Create Image (Image Generation)
 
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
 
@@ -92,10 +92,6 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
     - **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
 
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image editing.](/images/image-generation-and-editing/comfyui-editing-settings.png)
-
-
-
-
 
 
 ### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
