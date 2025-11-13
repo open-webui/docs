@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-title: "📖 Pipeline Tutorials"
+title: "Pipeline Tutorials"
 ---
 
 ## Pipeline Tutorials

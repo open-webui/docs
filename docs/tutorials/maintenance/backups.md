@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1000
-title: "💾 Backups"
+title: "Backups"
 ---
 
  :::warning

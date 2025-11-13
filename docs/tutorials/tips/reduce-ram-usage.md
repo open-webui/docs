@@ -1,6 +1,6 @@
 ---
 sidebar_position: 10
-title: "✂️ Reduce RAM Usage"
+title: "Reduce RAM Usage"
 ---
 
 ## Reduce RAM Usage

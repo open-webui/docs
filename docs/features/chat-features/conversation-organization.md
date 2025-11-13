@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "🗂️ Organizing Conversations"
+title: "Organizing Conversations"
 ---
 
 Open WebUI provides powerful organization features that help users manage their conversations. You can easily categorize and tag conversations, making it easier to find and retrieve them later. The two primary ways to organize conversations are through **Folders** and **Tags**.

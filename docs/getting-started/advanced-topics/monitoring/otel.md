@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-title: "🔭 OpenTelemetry"
+title: "OpenTelemetry"
 ---
 
 Open WebUI supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with modern observability stacks such as **Grafana LGTM (Loki, Grafana, Tempo, Mimir)**, as well as **Jaeger**, **Tempo**, and **Prometheus** to monitor requests, database/Redis queries, response times, and more in real-time.

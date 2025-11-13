@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🔎 Retrieval Augmented Generation (RAG)"
+title: "Retrieval Augmented Generation (RAG)"
 ---
 
 :::warning

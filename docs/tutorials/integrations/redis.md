@@ -1,6 +1,6 @@
 ---
 sidebar_position: 30
-title: "🔗 Redis Websocket Support"
+title: "Redis Websocket Support"
 ---
 
 :::warning

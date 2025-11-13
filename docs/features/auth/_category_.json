@@ -1,4 +1,7 @@
 {
-	"label": "🤝 Federated Authentication",
-	"position": 0
+	"label": "Federated Authentication",
+	"position": 0,
+	"link": {
+		"type": "generated-index"
+	}
 }

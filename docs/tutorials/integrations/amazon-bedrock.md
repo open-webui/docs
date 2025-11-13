@@ -1,6 +1,6 @@
 ---
 sidebar_position: 31
-title: "🪨 Integrate with Amazon Bedrock"
+title: "Integrate with Amazon Bedrock"
 ---
 
 :::warning

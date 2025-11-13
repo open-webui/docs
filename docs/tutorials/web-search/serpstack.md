@@ -1,6 +1,6 @@
 ---
 sidebar_position: 13
-title: "📚 Serpstack"
+title: "Serpstack"
 ---
 
 :::warning

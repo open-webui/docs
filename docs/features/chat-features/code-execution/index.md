@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "▶️ Code Execution"
+title: "Code Execution"
 ---
 
 Open WebUI offers powerful code execution capabilities directly within your chat interface, enabling you to transform ideas into actionable results without leaving the platform.

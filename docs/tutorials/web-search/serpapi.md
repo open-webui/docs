@@ -1,6 +1,6 @@
 ---
 sidebar_position: 15
-title: "🐍 SerpApi"
+title: "SerpApi"
 ---
 
 :::warning

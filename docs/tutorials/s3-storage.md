@@ -1,6 +1,6 @@
 ---
 sidebar_position: 320
-title: "🪣 Switching to S3 Storage"
+title: "Switching to S3 Storage"
 ---
 
 :::warning

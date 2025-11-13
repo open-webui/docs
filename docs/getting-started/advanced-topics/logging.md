@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "📜 Logging in Open WebUI"
+title: "Logging in Open WebUI"
 ---
 
 # Understanding Open WebUI Logging 🪵

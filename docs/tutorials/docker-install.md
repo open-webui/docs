@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: 🐳 Installing Docker
+title: "Installing Docker"
 ---
 
 :::info

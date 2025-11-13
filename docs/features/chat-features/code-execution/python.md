@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🐍 Python Code Execution"
+title: "Python Code Execution"
 ---
 
 # 🐍 Python Code Execution

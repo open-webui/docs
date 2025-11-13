@@ -1,6 +1,6 @@
 ---
 sidebar_position: 12
-title: "⚡ Improve Local LLM Performance with Dedicated Task Models"
+title: "Improve Local LLM Performance with Dedicated Task Models"
 ---
 
 ## Improve Performance with Dedicated Task Models

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "🧭 Image Router"
+title: "Image Router"
 ---
 
 :::warning
