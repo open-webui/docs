@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🐋 Run DeepSeek R1 Dynamic 1.58-bit with Llama.cpp"
+title: "Run DeepSeek R1 Dynamic 1.58-bit with Llama.cpp"
 ---
 
 A huge shoutout to **UnslothAI** for their incredible efforts! Thanks to their hard work, we can now run the **full DeepSeek-R1** 671B parameter model in its dynamic 1.58-bit quantized form (compressed to just 131GB) on **Llama.cpp**! And the best part? You no longer have to despair about needing massive enterprise-class GPUs or servers — it’s possible to run this model on your personal machine (albeit slowly for most consumer hardware).

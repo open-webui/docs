@@ -1,6 +1,6 @@
 ---
 sidebar_position: 400
-title: "🔗 API Endpoints"
+title: "API Endpoints"
 ---
 
 This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.

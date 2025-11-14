@@ -1,6 +1,6 @@
 ---
-sidebar_position: 7
-title: "📢 Channels"
+sidebar_position: 1000
+title: "Channels"
 ---
 
 Soon...

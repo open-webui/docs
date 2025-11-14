@@ -1,5 +1,5 @@
 ---
-title: "💻 Iterm2 AI Integration"
+title: "Iterm2 AI Integration"
 ---
 
 :::warning

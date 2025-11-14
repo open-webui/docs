@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: "📄 Document Extraction"
+title: "Document Extraction"
 ---
 
 ## Document Extraction in Open WebUI

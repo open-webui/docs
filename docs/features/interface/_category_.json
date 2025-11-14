@@ -1,4 +1,7 @@
 {
-	"label": "🔌 Interface",
-	"position": 4
+	"label": "Interface",
+	"position": 900,
+	"link": {
+		"type": "generated-index"
+	}
 }

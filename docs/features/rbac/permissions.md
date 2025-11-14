@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "🔒 Permissions"
+title: "Permissions"
 ---
 
 The `Permissions` section of the `Workspace` within Open WebUI allows administrators to configure access controls and feature availability for users. This powerful system enables fine-grained control over what users can access and modify within the application.

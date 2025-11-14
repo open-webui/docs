@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "🔗 URL Parameters"
+title: "URL Parameters"
 ---
 
 In Open WebUI, chat sessions can be customized through various URL parameters. These parameters allow you to set specific configurations, enable features, and define model settings on a per-chat basis. This approach provides flexibility and control over individual chat sessions directly from the URL.
@@ -47,7 +47,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 4. **Web Search**
 
-- **Description**: Enabling `web-search` allows the chat session to access [web search](/category/-web-search) functionality.
+- **Description**: Enabling `web-search` allows the chat session to access [web search](/category/web-search/) functionality.
 - **How to Set**: Set this parameter to `true` to enable web search.
 - **Example**: `/?web-search=true`
 - **Behavior**: If enabled, the chat can retrieve web search results as part of its responses.

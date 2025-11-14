@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "🌍 Environment Variable Configuration"
+title: "Environment Variable Configuration"
 ---
 
 ## Overview
@@ -1113,7 +1113,7 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 - OAuth authentication providers
 - Web search and RAG with external APIs
 
-Read more about `offline mode` in the [offline mode guide](/docs/tutorials/offline-mode.md).
+Read more about `offline mode` in the [offline mode guide](/tutorials/offline-mode).
 
 :::
 
@@ -1133,7 +1133,26 @@ Read more about `offline mode` in the [offline mode guide](/docs/tutorials/offli
 
 - Type: `str`
 - Default: `*`
-- Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS).
+- Description: Sets the allowed origins for Cross-Origin Resource Sharing (CORS). Smicolon ';' separated list of allowed origins.
+
+:::warning
+
+**This variable is required to be set**, otherwise you may experience Websocket issues and weird "\{\}" responses or "Unexpected token 'd', "data: \{"id"... is not valid JSON".
+
+:::
+
+:::info
+
+If you experience Websocket issues, check the logs of Open WebUI.
+If you see lines like this `engineio.base_server:_log_error_once:354 - https://yourdomain.com is not an accepted origin.` then you need to configure your CORS_ALLOW_ORIGIN more broadly.
+
+Example:
+CORS_ALLOW_ORIGIN: "https://yourdomain.com;http://yourdomain.com;https://yourhostname;http://youripaddress;http://localhost:3000"
+
+Add all valid IPs, Domains and Hostnames one might access your Open WebUI to the variable.
+Once you did, no more websocket issues or warnings in the console should occur.
+
+:::
 
 #### `CORS_ALLOW_CUSTOM_SCHEME`
 
@@ -1315,23 +1334,26 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 
 :::
 
-#### `MILVUS_URI`
+#### `MILVUS_URI` **(Required)**
 
 - Type: `str`
 - Default: `${DATA_DIR}/vector_db/milvus.db`
+- Example (Remote): `http://your-server-ip:19530`
 - Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
 
 #### `MILVUS_DB`
 
 - Type: `str`
 - Default: `default`
+- Example: `default`
 - Description: Specifies the database to connect to within a Milvus instance.
 
-#### `MILVUS_TOKEN`
+#### `MILVUS_TOKEN` **(Required for remote connections with authentication)**
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies an optional connection token for Milvus.
+- Example: `root:password` (format: `username:password`)
+- Description: Specifies an optional connection token for Milvus. Required when connecting to a remote Milvus server with authentication enabled. Format is `username:password`.
 
 #### `MILVUS_INDEX_TYPE`
 
@@ -2038,7 +2060,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 - Type: `int`
 - Default: `1`
-- Description: Sets the batch size for embedding in RAG (Retrieval-Augmented Generator) models.
+- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000) process documents faster by sending more API requests, but may exceed API rate limits, while lower values (1-10) are more stable but slower. Default is 1 (safest option if you are API rate limit constrained, but slowest option). This setting only applies to external embedding engines, not the default SentenceTransformers engine.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_EMBEDDING_CONTENT_PREFIX`

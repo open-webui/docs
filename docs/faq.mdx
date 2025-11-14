@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1200
-title: "📋 FAQ"
+title: "❓ FAQ"
 ---
 
 import { TopBanners } from "@site/src/components/TopBanners";
@@ -98,7 +98,7 @@ To do this, configure your **Ollama model params** to allow a larger context win
 
 ### **Q: Is MCP (Model Context Protocol) supported in Open WebUI?**
 
-**A:** [Yes, Open WebUI officially supports MCP Tool Servers—but exclusively through an **OpenAPI-compliant proxy**](/openapi-servers/mcp) ([openapi-servers](https://github.com/open-webui/openapi-servers)) for optimal compatibility, security, and maintainability.
+**A:** [Yes, Open WebUI officially supports MCP Tool Servers—but exclusively through an **OpenAPI-compliant proxy**](/features/plugin/tools/openapi-servers/mcp) ([openapi-servers](https://github.com/open-webui/openapi-servers)) for optimal compatibility, security, and maintainability.
 
 To bridge MCP (and other backend protocols), we provide a purpose-built proxy implementation available at: 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo)
 
@@ -116,6 +116,10 @@ In summary: MCP is supported — as long as the MCP Tool Server is fronted by an
 **A:** We aim to ship **major releases weekly**, with **bug fixes and minor updates delivered as needed**. However, this is not a rigid schedule—some weeks may see multiple releases, while others might have none at all.
 
 To stay informed, you can follow release notes and announcements on our [GitHub Releases page](https://github.com/open-webui/open-webui/releases).
+
+### **Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?**
+
+The assumption that bundling the frontend with the backend is unscalable comes from a misunderstanding of how modern Single-Page Applications work. Open WebUI’s frontend is a static SPA, meaning it consists only of HTML, CSS, and JavaScript files with no runtime coupling to the backend. Because these files are static, lightweight, and require no separate server, including them in the same image has no impact on scalability. This approach simplifies deployment, ensures every replica serves the exact same assets, and eliminates unnecessary moving parts. If you prefer, you can still host the SPA on any CDN or static hosting service and point it to a remote backend, but packaging both together is the standard and most practical method for containerized SPAs.
 
 ### **Q: Is Open WebUI scalable for large organizations or enterprise deployments?**
 

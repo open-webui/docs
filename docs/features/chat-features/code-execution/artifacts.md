@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🏺 Artifacts"
+title: "Artifacts"
 ---
 
 ## What are Artifacts and how do I use them in Open WebUI?

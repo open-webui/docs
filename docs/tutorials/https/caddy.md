@@ -1,6 +1,6 @@
 ---
 sidebar_position: 202
-title: "🔒 HTTPS using Caddy"
+title: "HTTPS using Caddy"
 ---
 
 :::warning

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4100
-title: "🦊 Firefox AI Chatbot Sidebar"
+title: "Firefox AI Chatbot Sidebar"
 ---
 
 :::warning

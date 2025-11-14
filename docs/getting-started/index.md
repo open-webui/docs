@@ -1,5 +1,5 @@
 ---
-sidebar_position: 200
+sidebar_position: 100
 title: "🚀 Getting Started"
 ---
 

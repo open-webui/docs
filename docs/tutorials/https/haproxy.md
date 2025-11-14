@@ -1,6 +1,6 @@
 ---
 sidebar_position: 201
-title: "🔒 HTTPS using HAProxy"
+title: "HTTPS using HAProxy"
 ---
 
 :::warning

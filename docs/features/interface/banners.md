@@ -1,6 +1,6 @@
 ---
 sidebar_position: 13
-title: "🔰 Customizable Banners"
+title: "Customizable Banners"
 ---
 
 ## Overview

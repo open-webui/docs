@@ -1,6 +1,6 @@
 {
-	"label": "💡 Tips & Tricks",
-	"position": 900,
+	"label": "Tips & Tricks",
+	"position": 0,
 	"link": {
 		"type": "generated-index"
 	}
