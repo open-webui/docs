@@ -117,6 +117,10 @@ In summary: MCP is supported — as long as the MCP Tool Server is fronted by an
 
 To stay informed, you can follow release notes and announcements on our [GitHub Releases page](https://github.com/open-webui/open-webui/releases).
 
+### **Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?**
+
+The assumption that bundling the frontend with the backend is unscalable comes from a misunderstanding of how modern Single-Page Applications work. Open WebUI’s frontend is a static SPA, meaning it consists only of HTML, CSS, and JavaScript files with no runtime coupling to the backend. Because these files are static, lightweight, and require no separate server, including them in the same image has no impact on scalability. This approach simplifies deployment, ensures every replica serves the exact same assets, and eliminates unnecessary moving parts. If you prefer, you can still host the SPA on any CDN or static hosting service and point it to a remote backend, but packaging both together is the standard and most practical method for containerized SPAs.
+
 ### **Q: Is Open WebUI scalable for large organizations or enterprise deployments?**
 
 **A:** Yes—**Open WebUI is architected for massive scalability and production readiness.** It’s already trusted in deployments supporting extremely high user counts—**think tens or even hundreds of thousands of seats**—used by universities, multinational enterprises, and major organizations worldwide.
