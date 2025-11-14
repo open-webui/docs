@@ -91,7 +91,7 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 :::danger
 
 This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration/#enable_oauth_signup)
-is also being used and set to `True`. Failure to do so will result in the inability to login.
+is also being used and set to `True`. **Never disable this if OAUTH/SSO is not being used.** Failure to do so will result in the inability to login.
 
 :::
 
@@ -415,6 +415,13 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Type: `str`
 - Default: `./static`
 - Description: Specifies the directory for static files, such as the favicon.
+
+#### `AUDIT_LOGS_FILE_PATH`
+
+- Type: `str`
+- Default: `${DATA_DIR}/audit.log`
+- Description: Configures where the audit log file is stored. Enables storing logs in separate volumes or custom locations for better organization and persistence.
+- Example: `/var/log/openwebui/audit.log`, `/mnt/logs/audit.log`
 
 ### Ollama
 
@@ -2416,6 +2423,7 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
   - `perplexity_search` - Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
   - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
   - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
+  - `azure_ai_search`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
@@ -2552,6 +2560,29 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Specifies the search engine to use for SerpAPI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `AZURE_AI_SEARCH_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: API key (query key or admin key) for authenticating with Azure AI Search service. Required for using Azure AI Search as a web search provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AZURE_AI_SEARCH_ENDPOINT`
+
+- Type: `str`
+- Default: `None`
+- Description: Azure Search service endpoint URL. Specifies which Azure Search service instance to connect to.
+- Example: `https://myservice.search.windows.net`, `https://company-search.search.windows.net`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AZURE_AI_SEARCH_INDEX_NAME`
+
+- Type: `str`
+- Default: `None`
+- Description: Name of the search index to query within your Azure Search service. Different indexes can contain different types of searchable content.
+- Example: `my-search-index`, `documents-index`, `knowledge-base`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `SOUGOU_API_SID`
 
 - Type: `str`
@@ -2637,6 +2668,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `None`
 - Description: Sets the API key for Perplexity API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PERPLEXITY_SEARCH_API_URL`
+
+- Type: `str`
+- Default: `api.perplexity.ai/search`
+- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default. This enables flexibility in routing search requests to alternative providers or internal proxies.
+- Example: `my-litellm-server.com/search`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PLAYWRIGHT_TIMEOUT`
@@ -2824,6 +2863,14 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Description: Sets the output format for Azure Text to Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Voice Mode
+
+#### `VOICE_MODE_PROMPT_TEMPLATE`
+- Type: `str`
+- Default: The value of `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE` environment variable.
+- Description: Configures a custom system prompt for voice mode interactions. Allows administrators to control how the AI responds in voice conversations (style, length, tone). Leave empty to use the default prompt optimized for voice conversations, or provide custom instructions to tailor the voice assistant's behavior.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### OpenAI Text-to-Speech
