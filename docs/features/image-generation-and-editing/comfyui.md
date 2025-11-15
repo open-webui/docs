@@ -84,6 +84,8 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 5. **Save Configuration:**
     - Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
 
+![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
+
 ## Edit Image
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
@@ -99,6 +101,8 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
     - **Map Workflow Nodes**: Just as with image generation, you must map the node IDs from your editing workflow to the corresponding fields in Open WebUI. Common fields for editing workflows include `Image`, `Prompt`, and `Model`.
 
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image editing.](/images/image-generation-and-editing/comfyui-editing-settings.png)
+
+![Screenshot of an image being edited in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-edit-image-in-chat.png)
 
 
 ### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
