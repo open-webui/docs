@@ -13,6 +13,8 @@ To run ComfyUI and make it accessible to Open WebUI, you must start it with the 
 
 Once running, the ComfyUI interface will be available at `http://<your_comfyui_ip>:8188`.
 
+![Screenshot of the ComfyUI server startup command with the --listen flag highlighted.](/images/image-generation-and-editing/comfyui-listen-flag.png)
+
 ## Connecting ComfyUI to Open WebUI
 
 Since Open WebUI typically runs inside Docker, you must ensure the container can reach the host-based ComfyUI application via `host.docker.internal`.
@@ -54,8 +56,13 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
 
 3. **Upload Your ComfyUI Workflow:**
-    - First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then toggle **"Dev Mode"** with a description that states "Enable dev mode options (API save, etc.)"**.
-    - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Save (API Format)"** button. This will prompt you to give a name to the file. Name it something memorable and download the file.
+    - First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then search for and toggle on the **"Dev Mode"** option with a description that states **"Enable dev mode options (API save, etc.)"**.
+
+    ![Screenshot of the ComfyUI settings with the "Dev Mode" toggle highlighted.](/images/image-generation-and-editing/comfyui-dev-mode.png)
+
+    - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Export (API)"** button found in the **File** sub-menu after clicking on the ComfyUI logo. This will prompt you to name the file. Name it something memorable and download it.
+
+    ![Screenshot of the "Save (API Format)" button in the ComfyUI interface.](/images/image-generation-and-editing/comfyui-save-api-format.png)
     - Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
 
     ![Screenshot of the ComfyUI Workflow section in Open WebUI, showing the upload button.](/images/image-generation-and-editing/comfyui-workflow-upload.png)
@@ -77,6 +84,8 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 5. **Save Configuration:**
     - Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
 
+![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
+
 ## Edit Image
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
@@ -93,6 +102,8 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
 
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image editing.](/images/image-generation-and-editing/comfyui-editing-settings.png)
 
+![Screenshot of an image being edited in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-edit-image-in-chat.png)
+
 
 ### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
 
@@ -101,6 +112,8 @@ Understanding the node ID mapping is often the biggest hurdle in integrating Com
 #### 1. Identifying Node IDs and Input Keys in ComfyUI
 
 Before configuring Open WebUI, you must examine your exported workflow JSON files directly in a text editor. The Node ID is the unique number ComfyUI uses to identify the node in the JSON structure. The top-level keys in the JSON object are the node IDs.
+
+![Screenshot of the ComfyUI interface with a node selected, highlighting the node ID in the properties panel.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
 **Identify the Input Key (The Parameter Name)**
 
