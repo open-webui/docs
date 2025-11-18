@@ -2379,6 +2379,19 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 - Description: Enables proxy set by `http_proxy` and `https_proxy` during web search content fetching.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `WEB_FETCH_FILTER_LIST`
+
+- Type: `string` (comma-separated list)
+- Default: `""` (empty, but default blocklist is always applied)
+- Description: Configures additional URL filtering rules for web fetch operations to prevent Server-Side Request Forgery (SSRF) attacks. The system includes a default blocklist that protects against access to cloud metadata endpoints (AWS, Google Cloud, Azure, Alibaba Cloud). Entries without a ! prefix are treated as an allow list (only these domains are permitted), while entries with a ! prefix are added to the block list (these domains are always denied). The default blocklist includes !169.254.169.254, !fd00:ec2::254, !metadata.google.internal, !metadata.azure.com, and !100.100.100.200. Custom entries are merged with the default blocklist.
+
+:::info
+Example:
+
+Block additional domains: WEB_FETCH_FILTER_LIST="!internal.company.com,!192.168.1.1"
+Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org"
+:::
+
 #### `WEB_SEARCH_RESULT_COUNT`
 
 - Type: `int`
