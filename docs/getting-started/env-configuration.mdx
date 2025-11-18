@@ -4472,6 +4472,11 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 - Default: `{}`
 - Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client. This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as a valid Python dictionary. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here] (https://redis.readthedocs.io/en/stable/connections.html) can be used.
 
+:::warning
+
+**AWS SSM and Docker compose cannot ingest raw JSON, as such you need top escape any double quotes like the following:**
+`{\"retry_on_timeout\": true, \"socket_connect_timeout\": 5, \"socket_timeout\": 5, \"max_connections\": 8}`
+
 #### `WEBSOCKET_SERVER_LOGGING`
 
 - Type: `bool`
