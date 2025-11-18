@@ -1572,6 +1572,36 @@ pip install open-webui[all]
 - Default: `1536`
 - Description: Specifies the maximum vector length for PGVector initialization.
 
+#### `PGVECTOR_INDEX_METHOD`
+
+- Type: `str`
+- Default: ``
+- Description: Specifies the index type to use for vector similarity search: `ivfflat` for fast approximate nearest neighbor search on large datasets, or HNSW for superior recall and query performance with moderate memory overhead. If `PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH` is larger than 2000, the value `hnsw`is automatically set, otherwise `ivfflat` is used.
+
+#### `PGVECTOR_USE_HALFVEC`
+
+- Type: `str`
+- Default: `false`
+- Description: Enables half-precision (16-bit) vector storage instead of standard 32-bit floats, reducing storage and index size by approximately 50% without significant impact on search accuracy. Mandatory for vectors longer than 2000.
+
+#### `PGVECTOR_IVFFLAT_LISTS`
+
+- Type: `str`
+- Default: `100`
+- Description: Controls the number of k-means clusters created by the `ivfflat index; higher values create smaller clusters for faster queries but may reduce recall accuracy.
+
+#### `PGVECTOR_HNSW_M`
+
+- Type: `str`
+- Default: `16`
+- Description: Sets the maximum degree of each node in the HNSW graph, controlling the number of connections between vectors; higher values improve recall at the cost of index build time and memory usage.
+
+#### `PGVECTOR_HNSW_EF_CONSTRUCTION`
+
+- Type: `str`
+- Default: `64`
+- Description: Defines the candidate list size during HNSW index building; higher values improve index quality and recall but significantly slow down the build process, and should generally be kept at 2x the value of `m`.
+
 #### `PGVECTOR_CREATE_EXTENSION`
 
 - Type: `str`
