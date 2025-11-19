@@ -3007,6 +3007,27 @@ Strictly return in JSON format:
 
 ### Gemini
 
+:::tip
+
+One minimalistic working setup for Gemini can look like this:
+
+- Create Image
+  - Model: `gemini-2.5-flash-image`
+  - Image Size: `2816x1536`
+  - Image Prompt Generation: on
+  - Image Generation Engine: `Gemini`
+  - Gemini Base URL: `https://generativelanguage.googleapis.com/v1beta`
+  - Gemini API Key: Enter your API Key
+  - Gemini Endpoint Method: `generateContent`
+- Edit Image
+  - Image Edit Engine: `Gemini`
+  - Model: `gemini-2.5-flash-image`
+  - Image Size: (can be left empty)
+  - Gemini Base URL: `https://generativelanguage.googleapis.com/v1beta`
+  - Gemini API Key: Enter your API Key
+
+:::
+
 #### Image Generation
 
 ##### `IMAGES_GEMINI_API_BASE_URL`
