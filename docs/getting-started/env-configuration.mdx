@@ -109,6 +109,14 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets a default Language Model.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_PINNED_MODELS`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Comma-separated list of model IDs to pin by default for new users who haven't customized their pinned models. This provides a pre-selected set of frequently used models in the model selector for new accounts.
+- Example: `gpt-4,claude-3-opus,llama-3-70b`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `DEFAULT_USER_ROLE`
 
 - Type: `str`
@@ -928,29 +936,48 @@ JSON format: { "tags": ["tag1", "tag2", "tag3"] }
 
 ### API Key Endpoint Restrictions
 
-#### `ENABLE_API_KEY`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables API key authentication.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `ENABLE_API_KEY_ENDPOINT_RESTRICTIONS`
+#### `ENABLE_API_KEYS`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables API key endpoint restrictions for added security and configurability.
+- Description: Enables the API key creation feature, allowing users to generate API keys for programmatic access to Open WebUI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `API_KEY_ALLOWED_ENDPOINTS`
+:::info
+
+This variable replaces the deprecated `ENABLE_API_KEY` environment variable.
+
+:::
+
+#### `ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables API key endpoint restrictions for added security and configurability, allowing administrators to limit which endpoints can be accessed using API keys.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This variable replaces the deprecated `ENABLE_API_KEY_ENDPOINT_RESTRICTIONS` environment variable.
+
+:::
+
+#### `API_KEYS_ALLOWED_ENDPOINTS`
 
 - Type: `str`
 - Description: Specifies a comma-separated list of allowed API endpoints when API key endpoint restrictions are enabled.
+- Example: `/api/v1/messages,/api/v1/channels,/api/v1/chat/completions`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::note
 
-The value of `API_KEY_ALLOWED_ENDPOINTS` should be a comma-separated list of endpoint URLs, such as `/api/v1/messages, /api/v1/channels`.
+The value of `API_KEYS_ALLOWED_ENDPOINTS` should be a comma-separated list of endpoint URLs, such as `/api/v1/messages, /api/v1/channels`.
+
+:::
+
+:::info
+
+This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment variable.
 
 :::
 
@@ -1584,6 +1611,49 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
 
 :::
 
+#### `PGVECTOR_INDEX_METHOD`
+
+- Type: `str`
+- Options:
+  - `ivfflat` - Uses inverted file with flat compression, better for datasets with many dimensions.
+  - `hnsw` - Uses Hierarchical Navigable Small World graphs, generally provides better query performance.
+- Default: Not specified (pgvector will use its default)
+- Description: Specifies the index method for pgvector. The choice affects query performance and index build time.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+When choosing an index method, consider your dataset size and query patterns. HNSW generally provides better query performance but uses more memory, while IVFFlat can be more memory-efficient for larger datasets.
+
+:::
+
+#### `PGVECTOR_HNSW_M`
+
+- Type: `int`
+- Default: `16`
+- Description: HNSW index parameter that controls the maximum number of bi-directional connections per layer during index construction. Higher values improve recall but increase index size and build time. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `hnsw`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PGVECTOR_HNSW_EF_CONSTRUCTION`
+
+- Type: `int`
+- Default: `64`
+- Description: HNSW index parameter that controls the size of the dynamic candidate list during index construction. Higher values improve index quality but increase build time. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `hnsw`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PGVECTOR_IVFFLAT_LISTS`
+
+- Type: `int`
+- Default: `100`
+- Description: IVFFlat index parameter that specifies the number of inverted lists (clusters) to create. A good starting point is `rows / 1000` for up to 1M rows and `sqrt(rows)` for over 1M rows. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `ivfflat`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+For IVFFlat indexes, choosing the right number of lists is crucial for query performance. Too few lists will result in slow queries, while too many will increase index size without significant performance gains.
+
+:::
+
 ### Qdrant
 
 :::warning
@@ -1939,6 +2009,19 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Default: `0.5`
 - Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword search, 0 means only vector search.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enhances BM25 hybrid search by enriching indexed text with document metadata including filenames, titles, sections, and snippets. This improves keyword recall for metadata-based queries, allowing searches to match on document names and structural elements in addition to content.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+Enabling this feature increases the text volume indexed by BM25, which may impact storage requirements and indexing performance. However, it significantly improves search results when users query based on document names, titles, or structural elements rather than just content.
+
+:::
 
 #### `RAG_TEMPLATE`
 
@@ -3052,6 +3135,14 @@ Strictly return in JSON format:
 - Description: Sets the API key to use for DALL-E image generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+##### `IMAGES_OPENAI_API_PARAMS`
+
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters for DALL-E models (e.g., `{"quality": "hd"}` for dall-e-3).
+- Example: `{"quality": "hd", "style": "vivid"}`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### Image Editing
 
 ##### `IMAGES_EDIT_OPENAI_API_BASE_URL`
@@ -3991,6 +4082,12 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `True`
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_API_KEYS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sets the permission for API key creation feature for users. When enabled, users will have the ability to create and manage API keys for programmatic access.
 
 ### Workspace Permissions
 
