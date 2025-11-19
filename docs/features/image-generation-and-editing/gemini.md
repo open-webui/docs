@@ -15,7 +15,7 @@ Open WebUI also supports image generation through the **Google AI Studio API** a
 2. You may need to create a project and enable the `Generative Language API` in addition to adding billing information.
 
 :::warning
-If you are utilizing a free API key, it is imperative to have a payment method on file. The absence of a valid payment method is a frequent cause of errors during the setup process.
+If you are utilizing a free API key, it is vital to have a payment method on file. The absence of a valid payment method is a frequent cause of errors during the setup process.
 :::
 
 :::tip
