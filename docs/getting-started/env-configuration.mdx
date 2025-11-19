@@ -4477,6 +4477,8 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 **AWS SSM and Docker compose cannot ingest raw JSON, as such you need top escape any double quotes like the following:**
 `{\"retry_on_timeout\": true, \"socket_connect_timeout\": 5, \"socket_timeout\": 5, \"max_connections\": 8}`
 
+:::
+
 #### `WEBSOCKET_SERVER_LOGGING`
 
 - Type: `bool`
@@ -4486,6 +4488,8 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 :::warning
 
 **This can be very verbose, it is only recommended to use this flag when debugging Redis related issues.**
+
+:::
 
 #### `WEBSOCKET_SERVER_ENGINEIO_LOGGING`
 
@@ -4497,6 +4501,7 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 
 **This can be very verbose, it is only recommended to use this flag when debugging Redis related issues.**
 
+:::
 
 #### `WEBSOCKET_SERVER_PING_TIMEOUT`
 
@@ -4509,7 +4514,6 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 - Type: `int`
 - Default: `25`
 - Description: The frequency for a ping to Redis in seconds.
-
 
 #### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
 - Type: `bool`
