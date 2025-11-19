@@ -1627,6 +1627,18 @@ More info about the header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Re
 
 In the Tools definition metadata you can specify custom packages. When you click `Save` the line will be parsed and `pip install` will be run on all requirements at once.
 
+:::warning
+
+**🚨 CRITICAL WARNING: Potential for Package Version Conflicts**
+
+When multiple tools define different versions of the same package (e.g., Tool A requires `pandas==1.5.0` and Tool B requires `pandas==2.0.0`), Open WebUI installs them in a non-deterministic order. This can lead to unpredictable behavior and break one or more of your tools.
+
+**The only robust solution to this problem is to use an OpenAPI tool server.**
+
+We strongly recommend using an [OpenAPI tool server](/features/plugin/tools/openapi-servers/) to avoid these dependency conflicts.
+
+:::
+
 Keep in mind that as pip is used in the same process as Open WebUI, the UI will be completely unresponsive during the installation.
 
 No measures are taken to handle package conflicts with Open WebUI's requirements. That means that specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
