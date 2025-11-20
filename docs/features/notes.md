@@ -3,7 +3,7 @@ sidebar_position: 1300
 title: "Notes"
 ---
 
-The **Notes** feature in Open WebUI provides a dedicated workspace for content creation and knowledge management. While your chats history preserves your linear conversations, **Notes** allow you to curate specific content—such as long-form drafts, coding cheatsheets, or reusable prompt libraries—that exists independently of any single conversation. These notes can be developed using AI tools and seamlessly injected into new chats as context.
+The **Notes** feature in Open WebUI provides a dedicated workspace for content creation and knowledge management. While normal chats within Open WebUI preserves your linear conversations, **Notes** allow you to curate specific content, such as long-form drafts or coding cheatsheets that exists independently of any single conversation. These notes can be written and enhanced using your LLMs and seamlessly injected into new chats as context.
 
 ## The Note Editor
 
@@ -24,12 +24,14 @@ Notes utilizes a context-aware **Floating Toolbar** for formatting, rather than 
 * **Styling:** **Bold**, *Italic*, Underline, and ~~Strikethrough~~.
 * **Code:** Inline code formatting `</>`.
 
-:::info Toolbar in Chats
-While this toolbar is native to the Notes workspace, it can also be enabled for standard Chats. To see this toolbar in your main chat input:
+While this toolbar is native to the Notes workspace, it can also be enabled for standard Chats.
+
+:::info  To see this toolbar in your main chat input:
 
 1. Go to **Settings > Interface**.
 2. Toggle **Rich Text Input for Chat** to ON.
 3. Toggle **Show Formatting Toolbar** to ON.
+
 :::
 
 ### Input Tools & Metrics
@@ -41,7 +43,7 @@ While this toolbar is native to the Notes workspace, it can also be enabled for 
 
 ## AI Integration
 
-Notes are integrated directly with your LLMs, turning the editor into an AI-assisted workspace. Click the **AI (Sparkle/Star)** button at the bottom right of the screen to access these features.
+LLMs are directly integrated with your notes, turning the editor into an AI-assisted workspace. Click the **AI (Sparkle/Star)** button at the bottom right of the screen to access these features.
 
 ### 1. Enhance
 
@@ -125,17 +127,17 @@ RAG (Documents) uses vector search, which is probabilistic—it might miss a cru
 
 Sometimes you need to analyze data (like error logs) but need to clean it first.
 
-* **Scenario:** You have a server error log containing sensitive API keys. Paste the log into a Note, manually delete the keys or use **Enhance** to "Anonymize this text," and *then* attach the sanitized Note to a chat to ask the AI for a solution. This prevents leaking sensitive data into your main chat history or embeddings.
+* **Scenario:** You have a server error log containing sensitive API keys. Paste the log into a Note, manually delete the keys or use **Enhance** to "Anonymize this text", and *then* attach the sanitized Note to a chat to ask the AI for a solution. This prevents leaking sensitive data into your main chat history or embeddings.
 
 ---
 
 ## Limitations
 
-It is important to understand how Notes function technically compared to other features like "Documents."
+It is important to understand how Notes function technically compared to other features like "Documents".
 
 ### Context Injection vs. Vector Search
 
-* **Documents (RAG):** When you upload a file to "Documents," the system uses vector search to find relevant *chunks* of the file based on your query. It is probabilistic.
+* **Documents (RAG):** When you upload a file to "Documents". the system uses vector search to find relevant *chunks* of the file based on your query. It is probabilistic.
 * **Notes (Deterministic):** When you attach a Note, you are performing **manual context injection**. The system does not guess; it forces the LLM to read the *entire* note. This guarantees the model sees the information, but it requires you to select the correct note manually.
 
 ### Context Window Usage
