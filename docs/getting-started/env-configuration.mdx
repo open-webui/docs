@@ -1100,6 +1100,43 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 :::
 
+#### `ENABLE_PASSWORD_VALIDATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables password complexity validation for user accounts. When enabled, passwords must meet the complexity requirements defined by `PASSWORD_VALIDATION_REGEX_PATTERN` during signup, password updates, and user creation operations. This helps enforce stronger password policies across the application.
+
+:::info
+
+Password validation is applied to:
+- New user registration (signup)
+- Password changes through user settings
+- Admin-initiated user creation
+- Password resets
+
+Existing users with passwords that don't meet the new requirements are **not automatically forced to update their passwords**, but will need to meet the requirements when they next change their password.
+
+:::
+
+#### `PASSWORD_VALIDATION_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$`
+- Description: Regular expression pattern used to validate password complexity when `ENABLE_PASSWORD_VALIDATION` is enabled. The default pattern requires passwords to be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+
+:::warning
+
+**Custom Pattern Considerations**
+
+When defining a custom regex pattern, ensure it:
+- Is a valid regular expression that Python's `re` module can compile
+- Balances security requirements with user experience
+- Is thoroughly tested before deployment to avoid locking users out
+
+Invalid regex patterns will cause password validation to fail, potentially preventing user registration and password changes.
+
+:::
+
 #### `WEBUI_SECRET_KEY`
 
 - Type: `str`
