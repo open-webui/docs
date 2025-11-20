@@ -270,6 +270,12 @@ This will run the Open WebUI on port `9999`. The `PORT` environment variable is 
 - Default: `False`
 - Description: When enabled, the system saves each chunk of streamed chat data to the database in real time to ensure maximum data persistency. This feature provides robust data recovery and allows accurate session tracking. However, the tradeoff is increased latency, as saving to the database introduces a delay. Disabling this feature can improve performance and reduce delays, but it risks potential data loss in the event of a system failure or crash. Use based on your application's requirements and acceptable tradeoffs.
 
+#### `ENABLE_CHAT_RESPONSE_BASE64_IMAGE_URL_CONVERSION`
+
+- Type: `bool`
+- Default: `False`
+- Description: When set to true, it automatically uploads base64-encoded images exceeding 1KB in markdown and converts them into image file URLs to reduce the size of response text. Some multimodal models directly output images as Base64 strings within the Markdown content. This results in larger response bodies, placing strain on CPU, network, Redis, and database resources.
+
 #### `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE`
 
 - Type: `int`
