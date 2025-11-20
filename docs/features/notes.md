@@ -53,6 +53,15 @@ The **Enhance** feature allows you to use AI as an in-place editor.
 2. Click **Enhance**.
 3. The LLM (selected in the Note's Controls) will rewrite your text directly in the editor with enhancement in mind.
 
+:::info Custom Control
+If you need a specific style or tone (e.g., "Rewrite this to be more professional"), use the **Chat** sidebar instead:
+
+1. Select your text.
+2. Click the **Chat** button.
+3. Enable the **Edit** toggle if you need to modify the context manually.
+4. Instruct the AI to rewrite the selection according to your specific needs.
+:::
+
 ### 2. Chat (Sidebar)
 
 The **Chat** button opens a dedicated sidebar conversation focused specifically on the note's content. This is a "Chat with Data" mode.
