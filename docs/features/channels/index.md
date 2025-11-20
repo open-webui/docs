@@ -72,7 +72,7 @@ You can reference other channels directly within a conversation using the `#` sy
 3. **Usage:** `Please post those screenshots in #screenshots instead.`
 
 :::warning Access Control
-If a user **does not** have access to view a linked channel (e.g., `#admin-only`) within a channel they **do** have access to (e.g., `#general-caht`), the channel link will appear to them as **`#Unknown`**, and clicking it will have no effect.
+If a user **does not** have access to view a linked channel (e.g., `#admin-only`) within a channel they **do** have access to (e.g., `#general-chat`), the linked channel will appear to them as **`#Unknown`**, and clicking it will have no effect.
 :::
 
 ### Message Interactions
