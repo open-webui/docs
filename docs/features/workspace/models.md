@@ -109,7 +109,7 @@ You cannot clone a raw Base Model directly; you must create a custom model first
 - **Discover a Model**: At the bottom of the page, you can explore and download presets made by the Open WebUI community.
 
 :::info Downloading Raw Models
-To download new raw Base Models (like `Llama-3.2-3B-Instruct-GGUF:Q8_0` or `Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`), navigate to **Settings > Connections > Ollama**. Alternatively, type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector to pull directly from Hugging Face.
+To download new raw Base Models (like `Llama-3.2-3B-Instruct-GGUF:Q8_0` or `Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`), navigate to **Settings > Connections > Ollama**. Alternatively, type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector to pull directly from Hugging Face. This action will create a button within the model selector labeled "Pull [Model Name]" that will begin downloading the model from its source once clicked.
 :::
 
 ## Model Switching in Chat
