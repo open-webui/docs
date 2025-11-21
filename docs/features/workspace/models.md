@@ -4,9 +4,9 @@ title: "Models"
 sidebar_label: "Models"
 ---
 
-The `Models` section of the `Workspace` within Open WebUI is a powerful tool that allows you to create and manage custom models tailored to specific purposes. 
+The `Models` section of the `Workspace` within Open WebUI is a powerful tool that allows you to create and manage custom models tailored to specific purposes.
 
-While backends like Ollama have their own `Modelfile` format, Open WebUI employs a robust internal **Preset System**. This allows you to "wrap" any model (including GPT-4, Claude, or local Llama 3) to permanently bind specific **System Prompts**, **Knowledge Collections**, **Tools**, and **Dynamic Variables** to it.
+While backends like Ollama have their own `Modelfile` format, Open WebUI employs a robust internal **Preset System**. This allows you to "wrap" any model (including GPT-4, Claude, or local Llama 3) to bind specific **System Prompts**, **Knowledge Collections**, **Tools**, and **Dynamic Variables** to it.
 
 This section serves as a central hub for all your models, providing a range of features to edit, clone, share, export, and hide your custom agents.
 
@@ -71,8 +71,8 @@ Clicking **Show** on **Advanced Params** allows you to fine-tune the inference g
 
 You can transform a generic model into a specialized agent by toggling specific capabilities and binding resources.
 
-- **Knowledge**: Instead of manually selecting documents for every chat, you can permanently bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files.
-- **Tools**: Force specific tools to be enabled by default (e.g., enabling the **Calculator** tool permanently for a "Math Bot").
+- **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files.
+- **Tools**: Force specific tools to be enabled by default (e.g., always enable the **Calculator** tool for a "Math Bot").
 - **Filters**: Attach specific Pipelines/Filters (e.g., a Profanity Filter or PII Redaction script) to run exclusively on this model.
 - **Actions**: Attach actionable scripts like `Add to Memories` or `Button` triggers.
 - **Capabilities**: Granularly control what the model is allowed to do:
