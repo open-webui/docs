@@ -1,3 +1,5 @@
+import {marked} from 'marked';
+
 export const TopBanner = ({
 	item,
 	bannerClassName = "h-18 ",
@@ -49,7 +51,7 @@ export const TopBanner = ({
 
 				{description && (
 					<div className="mt-1 line-clamp-1 text-right text-xs font-semibold text-gray-600 dark:text-gray-300">
-						{item.description}
+						<div dangerouslySetInnerHTML={{__html: marked(item.description)}} />
 					</div>
 				)}
 			</div>
