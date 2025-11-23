@@ -162,6 +162,16 @@ Now we'll run a script that uses Docker to fetch the certificate.
 
 -----
 
+### Important: Caching Configuration
+
+When using NGINX with Open WebUI, proper caching is crucial for performance while ensuring authentication remains secure. The configuration below includes:
+
+- **Cached**: Static assets (CSS, JS, fonts, images) for better performance
+- **Not Cached**: Authentication endpoints, API calls, SSO/OAuth callbacks, and session data
+- **Result**: Faster page loads without breaking login functionality
+
+The configuration below implements these rules automatically.
+
 ### Step 3: Finalize Nginx Configuration for HTTPS
 
 With the certificate saved in your `ssl` directory, you can now update the Nginx configuration to enable HTTPS.
@@ -180,7 +190,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
         listen 80;
         listen [::]:80;
         server_name <YOUR_DOMAIN_NAME>;
-
+    
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
         }
@@ -206,6 +216,44 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
         ssl_ciphers 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:ECDHE-RSA-AES128-GCM-SHA256';
         ssl_prefer_server_ciphers off;
 
+        # Caching: NEVER cache auth endpoints, API calls, or dynamic content
+        # This prevents login issues while improving performance for static assets
+        location ~* ^/(auth|api|oauth|admin|signin|signup|signout|login|logout|sso)/ {
+            proxy_pass http://open-webui:8080;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 10m;
+            proxy_buffering off;
+            client_max_body_size 20M;
+
+            # Explicitly disable caching for auth/API endpoints
+            proxy_no_cache 1;
+            proxy_cache_bypass 1;
+            add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
+            add_header Pragma "no-cache" always;
+            expires -1;
+        }
+
+        # Static assets can be cached (CSS, JS, fonts, images)
+        location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            proxy_pass http://open-webui:8080;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # Cache static assets for 7 days
+            expires 7d;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # Default location for all other requests (main app)
         location / {
             proxy_pass http://open-webui:8080;
             proxy_http_version 1.1;
@@ -218,6 +266,9 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             proxy_read_timeout 10m;
             proxy_buffering off;
             client_max_body_size 20M;
+
+            # Allow browser caching of the main app, but revalidate
+            add_header Cache-Control "public, max-age=300, must-revalidate";
         }
     }
     ```
