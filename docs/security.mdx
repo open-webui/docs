@@ -44,20 +44,46 @@ Our commitment to a single, central reporting mechanism is rooted in both techni
 
 ## Reporting Guidelines
 
-To ensure a constructive and rapid remediation process, please adhere to the following requirements:
+**[You can find the latest version of the security guidelines here.](https://github.com/open-webui/open-webui/security)**
 
-1. **Submit Detailed Reports Only**: Vague or generic statements such as “I found a vulnerability” without actionable details will not be accepted and are classified as spam.
-2. **Demonstrate Understanding**: Clear, concise descriptions backed by evidence of impact or exploitability are required. Please specify components, affected versions, and steps to reproduce.
-3. **Proof of Concept Required**: Submissions must include a working proof of concept (PoC). Private forks may be used for responsible disclosure—access must be shared with relevant maintainers.
-4. **Remediation Guidance Expected**: High-quality reports are most valuable when accompanied by proposed patches or direct, actionable steps for mitigation. This streamlines our review and resolution timeline, and demonstrates commitment to the project’s ongoing robustness.
+To ensure constructive, actionable reports that genuinely improve security, all submissions must meet the following requirements:
 
-Contributors who not only identify a vulnerability but also present a robust, ready-to-merge fix help accelerate our response and strengthen the community. We do recognize and prioritize such efforts, and there may be additional opportunities for appreciation for those who provide comprehensive solutions.
+1. **Report MUST be a vulnerability**: A security vulnerability is an exploitable weakness where the system behaves in an unintended way, allowing attackers to bypass security controls, gain unauthorized access, execute arbitrary code, or escalate privileges. Configuration options, missing features, and expected protocol behavior are not vulnerabilities.
 
-All non-compliant or off-topic submissions will be closed. Repeat misuse may result in being banned from contributing to the project.
+2. **No Vague Reports**: Submissions such as "I found a vulnerability" without any details will be treated as spam and will not be accepted.
 
-## Communication and Compensation
+3. **In-Depth Understanding Required**: Reports must reflect a clear understanding of the codebase and provide specific details about the vulnerability, including the affected components and potential impacts.
 
-All threat assessments and follow-up are reviewed by the core project team, allowing us to directly evaluate, prioritize, and address the issue. While we promote responsible disclosure and highly value skilled contributions, the process—including recognition—remains at the sole discretion of the maintainers, and is handled within GitHub. Contributors offering actionable fixes may receive additional acknowledgment depending on the impact of their report.
+4. **Proof of Concept (PoC) is Mandatory**: Each submission must include a well-documented proof of concept that demonstrates the vulnerability. A PoC must show what security boundary was crossed (Confidentiality, Integrity, Availability, Authenticity, Non-repudiation), how this vulnerability was abused, and what actions the attacker can now perform. Valid PoCs include step-by-step reproduction instructions with exact commands, complete exploit code with detailed execution instructions, or screenshots/videos demonstrating the exploit (supplementary to written steps). If confidentiality is a concern, reporters are encouraged to create a private fork of the repository and share access with the maintainers. Reports lacking valid evidence may be disregarded. We will notify you if we struggle to reproduce the exploit using your PoC, but if we repeatedly cannot reproduce it, the report may be closed.
+
+5. **Required Patch or Actionable Remediation Plan Submission**: Along with the PoC, reporters must provide a patch or actionable steps to remediate the identified vulnerability. This helps us evaluate and implement fixes rapidly and demonstrates commitment to the project's ongoing robustness.
+
+6. **Streamlined Merging Process**: When vulnerability reports meet the above criteria, we can consider provided patches for immediate merging, similar to regular pull requests. Well-structured and thorough submissions will expedite the process of enhancing our security.
+
+7. **Default Configuration Testing**: All vulnerability reports must be tested and reproducible using Open WebUI's out-of-the-box default configuration. Claims of vulnerabilities that only manifest with explicitly weakened security settings may be discarded. However, if you believe you have found a security issue that affects default configurations, represents a genuine bypass of intended security controls, or works only with non-default configurations but the configuration in question is likely to be used by production deployments, then we absolutely want to hear about it. This policy is intended to filter configuration issues and deployment problems, not to discourage legitimate security research.
+
+8. **Threat Model Understanding Required**: Reports must demonstrate understanding of Open WebUI's self-hosted, authenticated, role-based access control architecture. Comparing Open WebUI to services with fundamentally different security models without acknowledging the architectural differences may result in report rejection.
+
+9. **CVSS Scoring Accuracy**: If you include a CVSS score with your report, it must accurately reflect the vulnerability according to CVSS methodology. Common errors include rating PR:N (None) when authentication is required, scoring hypothetical attack chains instead of the actual vulnerability, or inflating severity without evidence. We will adjust inaccurate CVSS scores. Intentionally inflated scores may result in report rejection. If you cite other CVEs to support your report, ensure they are genuinely comparable in vulnerability type, threat model, and attack vector. Citing CVEs from different product categories, different vulnerability classes, or different deployment models will lead us to suspect the use of AI in your report.
+
+10. **Admin Actions Are Out of Scope**: Vulnerabilities that require an administrator to actively perform unsafe actions are not considered valid vulnerabilities. Admins have full system control and are expected to understand the security implications of their actions and configurations. This includes but is not limited to adding malicious external servers (models, tools, webhooks), pasting untrusted code into Functions/Tools, or intentionally weakening security settings. Reports requiring admin negligence or social engineering of admins may be rejected. However, if you believe you have found a vulnerability that affects admins and is not caused by admin negligence or intentionally malicious actions, then we absolutely want to hear about it. This policy is intended to filter social engineering attacks on admins and similar malicious actions, not to discourage legitimate security research.
+
+11. **AI Report Transparency**: Due to an extreme spike in AI-aided vulnerability reports, you must disclose if AI was used in any capacity—whether for writing the report, generating the PoC, or identifying the vulnerability. AI-aided vulnerability reports will not be rejected by default. However, if we suspect you used AI but did not disclose it to us, we will be asking tough follow-up questions to validate your understanding of the reported vulnerability and Open WebUI itself. If we suspect you used AI but you did not disclose it and your report ends up being invalid, not a vulnerability, or not reproducible, then you may be banned from reporting future vulnerabilities. This measure was necessary due to the extreme rise in clearly AI-written vulnerability reports where the vast majority were not vulnerabilities, were faulty configurations rather than real vulnerabilities, did not provide a PoC, violated the rules outlined here, had a clear lack of understanding of Open WebUI, wrote comments with conflicting information, or used illogical arguments.
+
+Non-compliant submissions will be closed, and repeat extreme violators may be banned. Our goal is to foster a constructive reporting environment where quality submissions promote better security for all users. Contributors who not only identify a vulnerability but also present a robust, ready-to-merge fix help accelerate our response and strengthen the community.
+
+If you feel like you are not able to follow all outlined requirements for vulnerability-specific reasons, still do report it—we will check every report either way.
+
+## For Non-Vulnerability Related Security Concerns
+
+If your concern does not meet the vulnerability requirements outlined above, is not a vulnerability, but is still related to security concerns, then use the following channels instead:
+
+- **Documentation issues/improvement ideas**: Open an issue in our [Documentation Repository](https://github.com/open-webui/docs)
+- **Feature requests**: Create a discussion in [GitHub Discussions - Ideas](https://github.com/open-webui/open-webui/discussions/) to discuss with the community if this feature request is wanted by multiple people
+- **Configuration help**: Ask the community for help and guidance on our [Discord Server](https://discord.gg/5rJgQTnV4s) or on [Reddit](https://www.reddit.com/r/OpenWebUI/)
+- **General issues**: Use our [Issue Tracker](https://github.com/open-webui/open-webui/issues)
+
+Examples of non-vulnerability, still security-related concerns include suggestions for better default configuration values, security hardening recommendations, deployment best practices guidance, unclear configuration instructions, need for additional security documentation, feature requests for optional security enhancements (2FA, audit logging, etc.), and general security questions about production deployment. Please use the adequate channel for your specific issue.
 
 ## Product Security Process
 
