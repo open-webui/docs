@@ -1194,6 +1194,19 @@ Read more about `offline mode` in the [offline mode guide](/tutorials/offline-mo
 
 :::
 
+#### `HF_HUB_OFFLINE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Tells Hugging Face that we want to launch in offline mode, so to not connect to hugging face and prevent all automatic model downloads
+
+:::info
+
+Downloads of models, sentence transformers and other configurable items will NOT WORK when this is set to `True`.
+RAG will also not work on a default installation, if this is set to `True`.
+
+:::
+
 #### `RESET_CONFIG_ON_START`
 
 - Type: `bool`
