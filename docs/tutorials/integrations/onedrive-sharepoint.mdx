@@ -84,7 +84,6 @@ From the **Overview** page of the App Registration you just created, copy the fo
 Set the following environment variables in your Open WebUI deployment to enable the work/school integration:
 
 ```bash
-
 # Enable the OneDrive integration feature globally
 ENABLE_ONEDRIVE_INTEGRATION=true
 
@@ -99,6 +98,12 @@ ONEDRIVE_SHAREPOINT_TENANT_ID="yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
 # The root URL of your SharePoint instance
 ONEDRIVE_SHAREPOINT_URL="https://your-tenant-name.sharepoint.com"
 ```
+
+:::info
+
+After setting these variables and restarting Open WebUI, you must also enable the OneDrive toggle in the admin panel. See the Final Step section below for details.
+
+:::
 
 ---
 
