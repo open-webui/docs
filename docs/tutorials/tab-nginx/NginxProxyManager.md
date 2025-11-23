@@ -77,6 +77,20 @@ A very common and difficult-to-debug issue with WebSocket connections is a misco
 
 Failure to do so will cause WebSocket connections to fail, even if you have enabled "Websockets support" in Nginx Proxy Manager.
 
+:::
+
+:::tip Caching Best Practice
+
+While Nginx Proxy Manager handles most configuration automatically, be aware that:
+
+- **Static assets** (CSS, JS, images) are cached by default for better performance
+- **Authentication endpoints** should never be cached
+- If you add custom caching rules in NPM's "Advanced" tab, ensure you exclude paths like `/api/`, `/auth/`, `/signup/` , `/signin/`, `/sso/`, `/admin/`, `/signout/`, `/oauth/`, `/login/`, and `/logout/`
+
+The default NPM configuration handles this correctly - only modify caching if you know what you're doing.
+
+:::
+
 **Example:**
 If you access your UI at `https://openwebui.hello.duckdns.org`, you must set:
 
