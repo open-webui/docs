@@ -75,27 +75,14 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-    #                  '$status $body_bytes_sent "$http_referer" '
-    #                  '"$http_user_agent" "$http_x_forwarded_for"';
-
-    #access_log  logs/access.log  main;
-
     sendfile        on;
-    #tcp_nopush     on;
-
-    #keepalive_timeout  0;
     keepalive_timeout  120;
 
-    #gzip  on;
-
-    # needed to properly handle websockets (streaming)
     map $http_upgrade $connection_upgrade {
         default upgrade;
         ''      close;
     }
 
-    # Redirect all HTTP traffic to HTTPS
     server {
         listen 80;
         server_name 192.168.1.15;
@@ -103,28 +90,19 @@ http {
         return 301 https://$host$request_uri;
     }
 
-    # Handle HTTPS traffic
     server {
         listen 443 ssl;
         server_name 192.168.1.15;
 
-        # SSL Settings (ensure paths are correct)
         ssl_certificate C:\\nginx\\nginx.crt;
         ssl_certificate_key C:\\nginx\\nginx.key;
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_ciphers ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
         ssl_prefer_server_ciphers on;
 
-        # OCSP Stapling
-        #ssl_stapling on;
-        #ssl_stapling_verify on;
-
-        # Proxy settings to your local service
-        location / {
-            # proxy_pass should point to your running localhost version of open-webui
+        location ~* ^/(auth|api|oauth|admin|signin|signup|signout|login|logout|sso)/ {
             proxy_pass http://localhost:8080;
 
-            # Add WebSocket support (Necessary for version 0.5.0 and up)
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $connection_upgrade;
@@ -134,15 +112,42 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
-            # (Optional) Disable proxy buffering for better streaming response from models
             proxy_buffering off;
-
-            # (Optional) Increase max request size for large attachments and long audio messages
             client_max_body_size 20M;
             proxy_read_timeout 10m;
+
+            add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+            expires -1;
+        }
+
+        location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            proxy_pass http://localhost:8080;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            
+            expires 7d;
+            add_header Cache-Control "public, immutable";
+        }
+
+        location / {
+            proxy_pass http://localhost:8080;
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_buffering off;
+            client_max_body_size 20M;
+            proxy_read_timeout 10m;
+
+            add_header Cache-Control "public, max-age=300, must-revalidate";
         }
     }
-
 }
 ```
 
