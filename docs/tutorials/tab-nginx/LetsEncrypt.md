@@ -190,7 +190,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
         listen 80;
         listen [::]:80;
         server_name <YOUR_DOMAIN_NAME>;
-    
+
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
         }
@@ -200,24 +200,19 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
         }
     }
 
-    # Main HTTPS server block
     server {
         listen 443 ssl;
         listen [::]:443 ssl;
         http2 on;
         server_name <YOUR_DOMAIN_NAME>;
 
-        # SSL certificate paths
         ssl_certificate /etc/letsencrypt/live/<YOUR_DOMAIN_NAME>/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/<YOUR_DOMAIN_NAME>/privkey.pem;
 
-        # Security enhancements
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_ciphers 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:ECDHE-RSA-AES128-GCM-SHA256';
         ssl_prefer_server_ciphers off;
 
-        # Caching: NEVER cache auth endpoints, API calls, or dynamic content
-        # This prevents login issues while improving performance for static assets
         location ~* ^/(auth|api|oauth|admin|signin|signup|signout|login|logout|sso)/ {
             proxy_pass http://open-webui:8080;
             proxy_http_version 1.1;
@@ -231,7 +226,6 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             proxy_buffering off;
             client_max_body_size 20M;
 
-            # Explicitly disable caching for auth/API endpoints
             proxy_no_cache 1;
             proxy_cache_bypass 1;
             add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
@@ -239,7 +233,6 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             expires -1;
         }
 
-        # Static assets can be cached (CSS, JS, fonts, images)
         location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
             proxy_pass http://open-webui:8080;
             proxy_http_version 1.1;
@@ -253,7 +246,6 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             add_header Cache-Control "public, immutable";
         }
 
-        # Default location for all other requests (main app)
         location / {
             proxy_pass http://open-webui:8080;
             proxy_http_version 1.1;
@@ -267,7 +259,6 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             proxy_buffering off;
             client_max_body_size 20M;
 
-            # Allow browser caching of the main app, but revalidate
             add_header Cache-Control "public, max-age=300, must-revalidate";
         }
     }
