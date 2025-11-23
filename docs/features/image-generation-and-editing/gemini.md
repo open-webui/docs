@@ -14,6 +14,14 @@ Open WebUI also supports image generation through the **Google AI Studio API** a
 1. Obtain an [API key](https://aistudio.google.com/api-keys) from Google AI Studio.
 2. You may need to create a project and enable the `Generative Language API` in addition to adding billing information.
 
+:::warning
+If you are utilizing a free API key, it is vital to have a payment method on file. The absence of a valid payment method is a frequent cause of errors during the setup process.
+:::
+
+:::tip
+Alternatively, if you are using Vertex AI, you can create an API key in Google Cloud instead of a service account. This key will function correctly, provided it is assigned the appropriate permissions.
+:::
+
 ### Configuring Open WebUI
 
 1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
@@ -22,6 +30,28 @@ Open WebUI also supports image generation through the **Google AI Studio API** a
 4. Enter your Google AI Studio [API key](https://aistudio.google.com/api-keys).
 5. Enter the model you wish to use from these [available models](https://ai.google.dev/gemini-api/docs/imagen#model-versions).
 6. Set the image size to one of the available [image sizes](https://ai.google.dev/gemini-api/docs/image-generation#aspect_ratios).
+
+### Example Minimal Setup
+
+One minimalistic working setup for Gemini can look like this:
+
+#### Create Image
+
+- **Create Image Model**: `gemini-2.5-flash-image`
+- **Image Size**: `2816x1536`
+- **Image Prompt Generation**: on
+- **Image Generation Engine**: `Gemini`
+- **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
+- **Gemini API Key**: Enter your API Key
+- **Gemini Endpoint Method**: `generateContent`
+
+#### Edit Image
+
+- **Image Edit Engine**: `Gemini`
+- **Model**: `gemini-2.5-flash-image`
+- **Image Size**: (can be left empty)
+- **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
+- **Gemini API Key**: Enter your API Key
 
 ![Screenshot of the Open WebUI Images settings page with Gemini selected and the API key, model, and image size fields highlighted.](/images/image-generation-and-editing/gemini-settings.png)
 

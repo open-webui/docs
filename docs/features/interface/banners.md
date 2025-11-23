@@ -62,10 +62,10 @@ Each banner object in the JSON list has the following properties:
 
 -   `id` (string, required): A unique identifier for the banner. This is used to track which banners a user has dismissed.
 -   `type` (string, required): The style of the banner. Must be one of `info`, `success`, `warning`, or `error`.
--   `title` (string, required): The title text displayed on the banner.
+-   `title` (string, optional): The title text displayed on the banner.
 -   `content` (string, required): The main message of the banner.
 -   `dismissible` (boolean, required): Determines if the user can close the banner. `true` means it can be dismissed; `false` means it cannot.
--   `timestamp` (integer, optional): **Note:** While this field is present in the configuration, it is not currently used by the frontend. The timestamp does not affect whether a banner is displayed or not.
+-   `timestamp` (integer, required): **Note:** While this field is present in the configuration, it is not currently used by the frontend. The timestamp does not affect whether a banner is displayed or not.
 
 ## Troubleshooting
 
