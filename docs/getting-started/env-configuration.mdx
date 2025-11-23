@@ -128,6 +128,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets the default role assigned to new users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_GROUP_ID`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the default group ID to assign to new users upon registration.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `PENDING_USER_OVERLAY_TITLE`
 
 - Type: `str`
@@ -334,6 +341,24 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Default: `False`
 - Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration for local Whisper and embeddings.
 
+#### `DOCKER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Indicates whether Open WebUI is running inside a Docker container. Used internally for environment detection.
+
+#### `USE_CUDA`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether to use CUDA acceleration for local models. When set to `true`, attempts to detect and use available NVIDIA GPUs.
+
+#### `DEVICE_TYPE`
+
+- Type: `str`
+- Default: `cpu`
+- Description: Specifies the device type for model execution. Automatically set to `cuda` if CUDA is available and enabled, or `mps` for Apple Silicon.
+
 #### `EXTERNAL_PWA_MANIFEST_URL`
 
 - Type: `str`
@@ -370,6 +395,12 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
 ```
+
+:::warning
+
+NEVER set this env var to `debug` in production.
+
+:::
 
 ### AIOHTTP Client
 
@@ -430,12 +461,51 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Default: `./static`
 - Description: Specifies the directory for static files, such as the favicon.
 
+### Logging
+
+#### `GLOBAL_LOG_LEVEL`
+
+- Type: `str`
+- Default: `INFO`
+- Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+
 #### `AUDIT_LOGS_FILE_PATH`
 
 - Type: `str`
 - Default: `${DATA_DIR}/audit.log`
 - Description: Configures where the audit log file is stored. Enables storing logs in separate volumes or custom locations for better organization and persistence.
 - Example: `/var/log/openwebui/audit.log`, `/mnt/logs/audit.log`
+
+#### `AUDIT_LOG_FILE_ROTATION_SIZE`
+
+- Type: `str`
+- Default: `10MB`
+- Description: Specifies the maximum size of the audit log file before rotation occurs (e.g., `10MB`, `100MB`, `1GB`).
+
+#### `AUDIT_UVICORN_LOGGER_NAMES`
+
+- Type: `str`
+- Default: `uvicorn.access`
+- Description: Comma-separated list of logger names to capture for audit logging. Defaults to Uvicorn's access logger.
+
+#### `AUDIT_LOG_LEVEL`
+
+- Type: `str`
+- Default: `NONE`
+- Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses.
+
+#### `MAX_BODY_LOG_SIZE`
+
+- Type: `int`
+- Default: `2048`
+- Description: Sets the maximum size in bytes for request/response bodies in audit logs. Bodies larger than this are truncated.
+
+#### `AUDIT_EXCLUDED_PATHS`
+
+- Type: `str`
+- Default: `/chats,/chat,/folders`
+- Description: Comma-separated list of URL paths to exclude from audit logging. Paths are matched without leading slashes.RetryTo run code, enable code execution and file creation in Settings > Capabilities.Claude can make mistakes. Please double-check responses.
 
 ### Ollama
 
@@ -1293,7 +1363,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1710,6 +1780,49 @@ For IVFFlat indexes, choosing the right number of lists is crucial for query per
 
 :::
 
+#### `PGVECTOR_USE_HALFVEC`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the use of `halfvec` data type instead of `vector` for storing embeddings. Required when `PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH` exceeds 2000 dimensions, as the `vector` type has a 2000-dimension limit.
+
+#### `PGVECTOR_PGCRYPTO`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables pgcrypto extension for encrypting sensitive data within PGVector. When enabled, `PGVECTOR_PGCRYPTO_KEY` must be set.
+
+#### `PGVECTOR_PGCRYPTO_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the encryption key for pgcrypto when `PGVECTOR_PGCRYPTO` is enabled. Must be a secure, randomly generated key.
+
+#### `PGVECTOR_POOL_SIZE`
+
+- Type: `int`
+- Default: `None`
+- Description: Sets the number of connections to maintain in the PGVector database connection pool. If not set, uses SQLAlchemy defaults.
+
+#### `PGVECTOR_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the maximum number of connections that can be created beyond `PGVECTOR_POOL_SIZE` when the pool is exhausted.
+
+#### `PGVECTOR_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Sets the timeout in seconds for acquiring a connection from the PGVector pool.
+
+#### `PGVECTOR_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the time in seconds after which connections are recycled in the PGVector pool to prevent stale connections.
+
+
 ### Qdrant
 
 :::warning
@@ -1849,6 +1962,32 @@ When using Pinecone as the vector store, the following environment variables are
 - Default: `aws`
 - Options: `aws`, `gcp`, `azure`
 - Description: Specifies the cloud provider where the Pinecone index is hosted.
+
+### Weaviate
+
+#### `WEAVIATE_HTTP_HOST`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the hostname of the Weaviate server for HTTP connections.
+
+#### `WEAVIATE_HTTP_PORT`
+
+- Type: `int`
+- Default: `8080`
+- Description: Specifies the HTTP port for connecting to the Weaviate server.
+
+#### `WEAVIATE_GRPC_PORT`
+
+- Type: `int`
+- Default: `50051`
+- Description: Specifies the gRPC port for connecting to the Weaviate server.
+
+#### `WEAVIATE_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key for authenticating with Weaviate server.
 
 ### Oracle 23ai Vector Search (oracle23ai)
 
@@ -2531,6 +2670,14 @@ Block additional domains: WEB_FETCH_FILTER_LIST="!internal.company.com,!192.168.
 Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org"
 :::
 
+#### `WEB_SEARCH_DOMAIN_FILTER_LIST`
+
+- Type: `list` of `str`
+- Default: `[]`
+- Description: Comma-separated list of domains to filter web search results. Domains prefixed with `!` are blocked; domains without prefix create an allowlist (only those domains permitted).
+- Example: `wikipedia.org,github.com,!malicious-site.com`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEB_SEARCH_RESULT_COUNT`
 
 - Type: `int`
@@ -2576,6 +2723,7 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
   - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
   - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
   - `azure_ai_search`
+  - `yacy`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
@@ -2763,6 +2911,91 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Specifies the extract depth for Tavily search results.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `YACY_QUERY_URL`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the query URL for YaCy search engine integration. Should point to a YaCy instance's search API endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YACY_USERNAME`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the username for authenticated access to YaCy search engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YACY_PASSWORD`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the password for authenticated access to YaCy search engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_WEB_SEARCH_URL`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the URL of an external web search service API endpoint for custom search integrations.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_WEB_SEARCH_API_KEY`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for authenticating with the external web search service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_WEB_LOADER_URL`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the URL of an external web content loader service for fetching and processing web pages.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `EXTERNAL_WEB_LOADER_API_KEY`
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for authenticating with the external web loader service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PERPLEXITY_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key for Perplexity API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PERPLEXITY_SEARCH_API_URL`
+
+- Type: `str`
+- Default: `api.perplexity.ai/search`
+- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default. This enables flexibility in routing search requests to alternative providers or internal proxies.
+- Example: `my-litellm-server.com/search`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PERPLEXITY_MODEL`
+
+- Type: `str`
+- Default: `sonar`
+- Description: Specifies the Perplexity AI model to use for search queries when using `Perplexity` as the web search engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+`Perplexity` is different from `perplexity_search`.
+If you use `perplexity_search`, this variable is not relevant to you.
+
+:::
+
+#### `PERPLEXITY_SEARCH_CONTEXT_USAGE`
+
+- Type: `str`
+- Default: `medium`
+- Description: Controls the amount of search context used by Perplexity AI. Options typically include `low`, `medium`, `high`.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+`Perplexity` is different from `perplexity_search`.
+If you use `perplexity`, this variable is not relevant to you.
+
+:::
+
 ### Web Loader Configuration
 
 #### `WEB_LOADER_ENGINE`
@@ -2813,21 +3046,6 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: `None`
 - Description: Sets the API key for Firecrawl API.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `PERPLEXITY_API_KEY`
-
-- Type: `str`
-- Default: `None`
-- Description: Sets the API key for Perplexity API.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `PERPLEXITY_SEARCH_API_URL`
-
-- Type: `str`
-- Default: `api.perplexity.ai/search`
-- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default. This enables flexibility in routing search requests to alternative providers or internal proxies.
-- Example: `my-litellm-server.com/search`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PLAYWRIGHT_TIMEOUT`
@@ -3676,6 +3894,20 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 - Description: Sets the redirect URI for Microsoft OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `MICROSOFT_CLIENT_LOGIN_BASE_URL`
+
+- Type: `str`
+- Default: `https://login.microsoftonline.com`
+- Description: Sets the base login URL for Microsoft OAuth authentication. Allows configuration of alternative login endpoints for government clouds or custom deployments.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `MICROSOFT_CLIENT_PICTURE_URL`
+
+- Type: `str`
+- Default: `https://graph.microsoft.com/v1.0/me/photo/$value`
+- Description: Specifies the Microsoft Graph API endpoint for retrieving user profile pictures during OAuth authentication.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### GitHub
 
 See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
@@ -3844,6 +4076,20 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables OAuth group management.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_OAUTH_GROUP_CREATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, groups from OAuth claims that don't exist in Open WebUI will be automatically created.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_BLOCKED_GROUPS`
+
+- Type: `str`
+- Default: `[]`
+- Description: JSON array of group names that are blocked from accessing the application. Users belonging to these groups will be denied access even if they have valid OAuth credentials.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_ROLES_CLAIM`
@@ -4549,6 +4795,18 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 
 :::
 
+#### `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
+
+- Type: `float`
+- Default: `None`
+- Description: Sets the minimum time interval in seconds between user active status updates in the database. Helps reduce write operations for high-traffic instances. Set to `0.0` to update on every activity.
+
+#### `ENABLE_QUERIES_CACHE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables query result caching to improve database performance by storing and reusing frequently accessed data.
+
 ### Encrypted SQLite with SQLCipher
 
 For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
@@ -4820,9 +5078,10 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 - Description: The frequency for a ping to Redis in seconds.
 
 #### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
+
 - Type: `bool`
 - Default: `False`
-- Description: Enables Redis-based session storage for OAuth authentication flows using the StarSessions middleware. When enabled, OAuth session state is stored in Redis instead of browser cookies, which can help resolve CSRF errors in multi-replica deployments where session data needs to be shared across pods.
+- Description: Enables Redis-based session storage for OAuth authentication flows using the StarSessions middleware. When enabled, OAuth session state is stored in Redis instead of browser cookies, which can help resolve CSRF errors in multi-replica deployments where session data needs to be shared across pods. Experimental feature that enables Redis-based session storage for OAuth flows using StarSessions middleware, helping resolve CSRF errors in multi-replica deployments.
 - Persistence: This is an experimental environment variable.
 
 :::warning
