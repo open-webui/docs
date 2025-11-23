@@ -23,11 +23,9 @@ Using self-signed certificates is suitable for development or internal use where
         ssl_certificate_key /etc/nginx/ssl/nginx.key;
         ssl_protocols TLSv1.2 TLSv1.3;
 
-        # Auth/API endpoints: NO caching (critical for login/sessions)
         location ~* ^/(auth|api|oauth|admin|signin|signup|signout|login|logout|sso)/ {
             proxy_pass http://host.docker.internal:3000;
 
-            # Add WebSocket support (Necessary for version 0.5.0 and up)
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
@@ -48,7 +46,6 @@ Using self-signed certificates is suitable for development or internal use where
             expires -1;
         }
 
-        # Static assets: Enable caching for performance
         location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
             proxy_pass http://host.docker.internal:3000;
             proxy_http_version 1.1;
@@ -58,11 +55,9 @@ Using self-signed certificates is suitable for development or internal use where
             add_header Cache-Control "public, immutable";
         }
 
-        # Default location
         location / {
             proxy_pass http://host.docker.internal:3000;
 
-            # Add WebSocket support (Necessary for version 0.5.0 and up)
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
@@ -72,14 +67,11 @@ Using self-signed certificates is suitable for development or internal use where
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
-            # (Optional) Disable proxy buffering for better streaming response from models
             proxy_buffering off;
 
-            # (Optional) Increase max request size for large attachments and long audio messages
             client_max_body_size 20M;
             proxy_read_timeout 10m;
 
-            # Light caching with revalidation
             add_header Cache-Control "public, max-age=300, must-revalidate";
         }
     }
