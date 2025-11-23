@@ -156,7 +156,7 @@ const config: Config = {
 						},
 						{
 							label: "Report a Vulnerability / Responsible Disclosure",
-							to: "https://openwebui.com",
+							to: "https://github.com/open-webui/open-webui/security",
 						},
 					],
 				},
