@@ -351,7 +351,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether to use CUDA acceleration for local models. When set to `true`, attempts to detect and use available NVIDIA GPUs.
+- Description: Controls whether to use CUDA acceleration for local models. When set to `true`, attempts to detect and use available NVIDIA GPUs. The code reads the environment variable `USE_CUDA_DOCKER` to set this internal boolean variable.
 
 #### `DEVICE_TYPE`
 
@@ -385,6 +385,12 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the SSL assert fingerprint to use.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_COMPRESSION_MIDDLEWARE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables gzip compression middleware for HTTP responses, reducing bandwidth usage and improving load times.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
 
@@ -435,6 +441,24 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 
 - Type: `int`
 - Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+
+#### `AIOHTTP_CLIENT_SESSION_SSL`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs.
+
+#### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
+
+- Type: `int`
+- Default: `10`
+- Description: Sets the timeout in seconds for retrieving data from tool servers via AIOHTTP client.
+
+#### `AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
 
 ### Directories
 
@@ -2956,14 +2980,14 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `PERPLEXITY_API_KEY`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string (' ')
 - Description: Sets the API key for Perplexity API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PERPLEXITY_SEARCH_API_URL`
 
 - Type: `str`
-- Default: `api.perplexity.ai/search`
+- Default: `https://api.perplexity.ai/search`
 - Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default. This enables flexibility in routing search requests to alternative providers or internal proxies.
 - Example: `my-litellm-server.com/search`
 - Persistence: This environment variable is a `PersistentConfig` variable.
