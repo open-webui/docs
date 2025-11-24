@@ -25,9 +25,10 @@ The offline mode of Open WebUI lets you run the application without the need for
 
 **Disabled functionality when offline mode is enabled:**
 
-- Automatic version update checks
-- Downloads of embedding models from Hugging Face Hub
-  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
+- Automatic version update checks (controlled by `ENABLE_VERSION_UPDATE_CHECK`)
+- Downloads of embedding models from Hugging Face Hub (controlled by `HF_HUB_OFFLINE`)
+  - If you did not download an embedding model prior to activating offline mode, RAG, web search and document analysis functionality will not work properly
+- Automatic model updates for embeddings, reranking, and Whisper models
 - Update notifications in the UI
 
 **Still functional:**
@@ -40,8 +41,31 @@ The offline mode of Open WebUI lets you run the application without the need for
 
 ## How to enable offline mode?
 
-The offline mode has to be enabled via the [environment variable](https://docs.openwebui.com/getting-started/env-configuration#offline_mode) `OFFLINE_MODE`.
-Apply the environment variable depending on your way of deploying Open WebUI.
+Offline mode requires setting multiple environment variables to fully disconnect Open WebUI from external network dependencies. The primary variables are:
+
+**Required Environment Variables:**
+
+- `OFFLINE_MODE=true` - Disables version checks and prevents automatic model downloads
+- `HF_HUB_OFFLINE=1` - Tells Hugging Face Hub to operate in offline mode, preventing all automatic downloads
+
+**Optional but Recommended:**
+
+- `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of embedding models
+- `RAG_RERANKING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of reranking models  
+- `WHISPER_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of Whisper models
+
+Apply these environment variables depending on your deployment method.
+
+:::warning Critical: HF_HUB_OFFLINE Behavior
+
+When `HF_HUB_OFFLINE=1` is set:
+- **Downloads of models, sentence transformers, and other Hugging Face content will NOT WORK**
+- RAG will not work on a default installation if this is enabled without pre-downloading models
+- Only pre-downloaded models in the correct cache directories will be accessible
+
+This variable provides the strictest offline enforcement but requires careful preparation.
+
+:::
 
 :::tip
 
@@ -113,7 +137,16 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     restart: unless-stopped
     environment:
-      - OFFLINE_MODE=True
+      # Core offline mode settings
+      - OFFLINE_MODE=true
+      - HF_HUB_OFFLINE=1
+      
+      # Disable automatic model updates
+      - RAG_EMBEDDING_MODEL_AUTO_UPDATE=false
+      - RAG_RERANKING_MODEL_AUTO_UPDATE=false
+      - WHISPER_MODEL_AUTO_UPDATE=false
+      
+      # Specify pre-downloaded models
       - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - WHISPER_MODEL=Systran/faster-whisper-large-v3
     volumes:

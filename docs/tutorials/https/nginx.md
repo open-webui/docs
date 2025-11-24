@@ -19,6 +19,14 @@ This guide provides three methods to set up HTTPS:
 - **Let's Encrypt**: Perfect for production environments requiring trusted SSL certificates, using docker.
 - **Windows+Self-Signed**: Simplified instructions for development and internal use on windows, no docker required.
 
+:::danger Critical: Configure CORS for WebSocket Connections
+
+A very common and difficult-to-debug issue with WebSocket connections is a misconfigured Cross-Origin Resource Sharing (CORS) policy. When running Open WebUI behind a reverse proxy like Nginx Proxy Manager, you **must** set the `CORS_ALLOW_ORIGIN` environment variable in your Open WebUI configuration.
+
+Failure to do so will cause WebSocket connections to fail, even if you have enabled "Websockets support" in Nginx Proxy Manager.
+
+:::
+
 Choose the method that best fits your deployment needs.
 
 import Tabs from '@theme/Tabs';
