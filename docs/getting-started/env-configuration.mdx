@@ -200,6 +200,12 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
 
+:::info
+
+If you are running larger instances, you WILL NEED to set this to a higher value like multiple hundreds if not thousands (e.g. `1000`) otherwise your app may get stuck the default pool size (which is 40 threads) is full and will not react anymore.
+
+:::
+
 #### `MODELS_CACHE_TTL`
 
 - Type: `int`
@@ -1613,6 +1619,14 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 - Queries automatically filter by resource_id to maintain data isolation
 
 :::
+
+| Collection Variable | Default Name (Suffix) | Trigger / Routing Logic in the Code | Purpose |
+| :--- | :--- | :--- | :--- |
+| `HASH_BASED_COLLECTION` | `_hash_based` | Collection name is a **63-char hex string** (SHA256 hash). | Caching direct URL fetches (Websites) with the `#` feature. |
+| `MEMORY_COLLECTION` | `_memories` | Collection name starts with **`user-memory-`**. | Storing user-specific long-term memories of the experimental memory system. |
+| `FILE_COLLECTION` | `_files` | Collection name starts with **`file-`**. | Storing uploaded documents (PDFs, DOCX, etc.). |
+| `WEB_SEARCH_COLLECTION`| `_web_search` | Collection name starts with **`web-search-`**. | Storing transient results from search engine queries. |
+| `KNOWLEDGE_COLLECTION` | `_knowledge` | **Everything else** (Default fallback). | Storing explicitly created Knowledge Bases. |
 
 :::info
 
