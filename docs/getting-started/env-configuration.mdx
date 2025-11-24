@@ -1614,6 +1614,14 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 
 :::
 
+| Collection Variable | Default Name (Suffix) | Trigger / Routing Logic in the Code | Purpose |
+| :--- | :--- | :--- | :--- |
+| `HASH_BASED_COLLECTION` | `_hash_based` | Collection name is a **63-char hex string** (SHA256 hash). | Caching direct URL fetches (Websites) with the `#` feature. |
+| `MEMORY_COLLECTION` | `_memories` | Collection name starts with **`user-memory-`**. | Storing user-specific long-term memories of the experimental memory system. |
+| `FILE_COLLECTION` | `_files` | Collection name starts with **`file-`**. | Storing uploaded documents (PDFs, DOCX, etc.). |
+| `WEB_SEARCH_COLLECTION`| `_web_search` | Collection name starts with **`web-search-`**. | Storing transient results from search engine queries. |
+| `KNOWLEDGE_COLLECTION` | `_knowledge` | **Everything else** (Default fallback). | Storing explicitly created Knowledge Bases. |
+
 :::info
 
 **Migration from Legacy Mode to Multitenancy**
