@@ -200,6 +200,12 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `0`
 - Description: Sets the thread pool size for FastAPI/AnyIO blocking calls. By default (when set to `0`) FastAPI/AnyIO use `40` threads. In case of large instances and many concurrent users, it may be needed to increase `THREAD_POOL_SIZE` to prevent blocking.
 
+:::info
+
+If you are running larger instances, you WILL NEED to set this to a higher value like multiple hundreds if not thousands (e.g. `1000`) otherwise your app may get stuck the default pool size (which is 40 threads) is full and will not react anymore.
+
+:::
+
 #### `MODELS_CACHE_TTL`
 
 - Type: `int`
