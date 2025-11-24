@@ -3041,6 +3041,20 @@ When using `playwright`, you have two options:
 
 :::
 
+#### `WEB_LOADER_TIMEOUT`
+
+- Type: `int`
+- Default: `10000`
+- Description: Specifies the request timeout (in ms) for the `safe_web` loader engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `WEB_LOADER_RETRY_COUNT`
+
+- Type: `int`
+- Default: `3`
+- Description: Sets the max amount of fetch retries for a single URL in the `safe_web` loader engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `PLAYWRIGHT_WS_URL`
 
 - Type: `str`
