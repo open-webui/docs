@@ -2462,6 +2462,26 @@ Only increase this variable's value if it does - otherwise you might run into un
 
 :::
 
+#### `ENABLE_ASYNC_EMBEDDING`
+
+- Type: `bool`
+- Default: `true`
+- Description: Runs embedding tasks asynchronously (parallelized) for maximum performance. Only works for Ollama, OpenAI and Azure OpenAI, does not affect sentence transformer setups.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+It may be needed to increase the value of `THREAD_POOL_SIZE` if many other users are simultaneously using your Open WebUI instance while having async embeddings turned on to prevent
+
+:::warning
+
+Enabling this will potentially send thousands of requests per minute.
+If you are embedding locally, ensure that you can handle this amount of requests, otherwise turn this off to return to sequential embedding (slower but will always work).
+If you are embedding externally via API, ensure your rate limits are high enough to handle parallel embedding.
+(Usually, OpenAI can handle thousands of embedding requests per minute, even on the lowest API tier).
+
+:::
+
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
 
 - Type: `str`
