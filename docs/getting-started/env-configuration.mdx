@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.35](https://github.com/open-webui/open-webui/releases/tag/v0.6.35), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.39](https://github.com/open-webui/open-webui/releases/tag/v0.6.39), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -2167,24 +2167,93 @@ Note: this configuration assumes that AWS credentials will be available to your 
 
 - Type: `str`
 - Default: `http://docling:5001`
-- Description: Specifies the URL for the Docling server. Requires Docling version 1.0.0 or later.
+- Description: Specifies the URL for the Docling server. Requires Docling version 2.0.0 or later for full compatibility with the new parameter-based configuration system.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `DOCLING_OCR_ENGINE`
+:::warning
+
+**Docling 2.0.0+ Required**
+
+The Docling integration has been refactored to use server-side parameter passing. If you are using Docling:
+
+1. Upgrade to Docling server version 2.0.0 or later
+2. Migrate all individual `DOCLING_*` configuration variables to the `DOCLING_PARAMS` JSON object
+3. Remove all deprecated `DOCLING_*` environment variables from your configuration
+4. Add `DOCLING_API_KEY` if your server requires authentication
+
+The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LANG`, etc.) are no longer supported and will be ignored.
+
+:::
+
+#### `DOCLING_API_KEY`
 
 - Type: `str`
-- Default: `tesseract`
-- Description: Specifies the OCR engine used by Docling.
-  Supported values include: `tesseract` (default), `easyocr`, `ocrmac`, `rapidocr`, and `tesserocr`.
+- Default: `None`
+- Description: Sets the API key for authenticating with the Docling server. Required when the Docling server has authentication enabled.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
-#### `DOCLING_OCR_LANG`
+#### `DOCLING_PARAMS`
 
-- Type: `str`
-- Default: `eng,fra,deu,spa` (when using the default `tesseract` engine)
-- Description: Specifies the OCR language(s) to be used with the configured `DOCLING_OCR_ENGINE`.
-  The format and available language codes depend on the selected OCR engine.
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Specifies all Docling processing parameters in JSON format. This is the primary configuration method for Docling processing options. All previously individual Docling settings are now configured through this single JSON object.
+  
+  **Supported Parameters:**
+  - `do_ocr` (bool): Enable OCR processing
+  - `force_ocr` (bool): Force OCR even when text layer exists
+  - `ocr_engine` (str): OCR engine to use (`tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`)
+  - `ocr_lang` (str): OCR language codes (e.g., `eng,fra,deu,spa`)
+  - `pdf_backend` (str): PDF processing backend
+  - `table_mode` (str): Table extraction mode
+  - `pipeline` (str): Processing pipeline to use
+  - `do_picture_description` (bool): Enable image description generation
+  - `picture_description_mode` (str): Mode for picture descriptions
+  - `picture_description_local` (str): Local model for picture descriptions
+  - `picture_description_api` (str): API endpoint for picture descriptions
+  - `vlm_pipeline_model_api` (str): Vision-language model API configuration
+
+- Example:
+```json
+{
+  "do_ocr": true,
+  "ocr_engine": "tesseract",
+  "ocr_lang": "eng,fra,deu,spa",
+  "force_ocr": false,
+  "do_picture_description": true,
+  "picture_description_mode": "api",
+  "vlm_pipeline_model_api": "openai://gpt-4o"
+}
+```
+
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+**Migration from Individual Docling Variables**
+
+If you were previously using individual `DOCLING_*` environment variables (such as `DOCLING_OCR_ENGINE`, `DOCLING_OCR_LANG`, etc.), these are now deprecated. You must migrate to using `DOCLING_PARAMS` as a single JSON configuration object.
+
+**Example Migration:**
+```bash
+# Old configuration (deprecated)
+DOCLING_OCR_ENGINE=tesseract
+DOCLING_OCR_LANG=eng,fra
+DOCLING_DO_OCR=true
+
+# New configuration (required)
+DOCLING_PARAMS='{"do_ocr": true, "ocr_engine": "tesseract", "ocr_lang": "eng,fra"}'
+```
+
+:::
+
+:::warning
+
+When setting this environment variable in a `.env` file, ensure proper JSON formatting and escape quotes as needed:
+```
+DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": \"eng,fra,deu,spa\"}"
+```
+
+:::
 
 ## Retrieval Augmented Generation (RAG)
 
@@ -2383,8 +2452,35 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 - Type: `int`
 - Default: `1`
-- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000) process documents faster by sending more API requests, but may exceed API rate limits, while lower values (1-10) are more stable but slower. Default is 1 (safest option if you are API rate limit constrained, but slowest option). This setting only applies to external embedding engines, not the default SentenceTransformers engine.
+- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000 (not recommended)) may process documents faster by sending less, but larger API requests. Some external APIs do not support batching or sending more than 1 chunk per request. In such casey you must leave this at `1`. Default is 1 (safest option if the API does not support batching / more than 1 chunk per request). This setting only applies to external embedding engines, not the default SentenceTransformers engine. 
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+Check if your API and embedding model supports batched processing.
+Only increase this variable's value if it does - otherwise you might run into unexpected issues.
+
+:::
+
+#### `ENABLE_ASYNC_EMBEDDING`
+
+- Type: `bool`
+- Default: `true`
+- Description: Runs embedding tasks asynchronously (parallelized) for maximum performance. Only works for Ollama, OpenAI and Azure OpenAI, does not affect sentence transformer setups.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+It may be needed to increase the value of `THREAD_POOL_SIZE` if many other users are simultaneously using your Open WebUI instance while having async embeddings turned on to prevent
+
+:::warning
+
+Enabling this will potentially send thousands of requests per minute.
+If you are embedding locally, ensure that you can handle this amount of requests, otherwise turn this off to return to sequential embedding (slower but will always work).
+If you are embedding externally via API, ensure your rate limits are high enough to handle parallel embedding.
+(Usually, OpenAI can handle thousands of embedding requests per minute, even on the lowest API tier).
+
+:::
 
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
 
