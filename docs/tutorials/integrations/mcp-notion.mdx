@@ -239,14 +239,14 @@ If you are using **Method 1 (Streamable HTTP)**, you must perform the On-Demand 
 
 ![Chat Interface Toggle: Shows the chat input bar with the '+' menu open, 'Integrations' selected, and the 'Notion' tool toggled ON.](/images/mcp-notion/notion-setup-step6.png)
 
-5.  **Authorize:** (Method 1 Only) If this is your first time connecting via Streamable HTTP, you will be redirected to a "Connect with Notion MCP" screen.
+5.  **Authorize:** (Method 1 Only) You will be redirected to a "Connect with Notion MCP" screen.
     *   Ensure the correct **Workspace** (the one you configured in step 1) is selected in the dropdown.
     *   Click **Continue**.
 
-:::note Frequent Re-authentication
+:::note Security: Frequent Re-authentication
 For security reasons, Notion's OAuth session may expire after a period of inactivity or if you restart your Open WebUI instance. If this happens, you will see a `Failed to connect to MCP server 'ntn'` error. 
 
-This is **intended behavior** by Notion to keep your workspace secure. To fix it, revist steps 1-4 of this option to complete the "Connect with Notion MCP" authorization flow again, which will refresh your session.
+This is **intended behavior** by Notion to keep your workspace secure. To refresh your session, revist steps 1-4 of this option to complete the "Connect with Notion MCP" authorization flow again, which will refresh your session.
 :::
 
 ![Notion OAuth Screen: Shows the 'Connect with Notion MCP' authorization page with the workspace dropdown selected.](/images/mcp-notion/notion-setup-step7.png)
