@@ -21,10 +21,14 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Prerequisites
 
-Regardless of the connection method chosen, you must first create an internal integration within Notion.
+:::info Note for Streamable HTTP
+If you plan to use **Method 1 (Streamable HTTP)**, the OAuth flow may handle the integration creation automatically. However, we highly recommend following the steps below regardless. This ensures you have granular control over page permissions and a valid **Internal Integration Secret** available for troubleshooting or manual configuration.
+:::
+
+Regardless of the connection method chosen, you should create an internal integration within Notion to ensure you have the necessary credentials and permission scopes.
 
 ### 1. Create Internal Integration
-1.  Navigate to [Notion My Integrations](https://www.notion.so/my-integrations).
+1.  Navigate to **[Notion My Integrations](https://www.notion.so/my-integrations)**.
 2.  Click the **+ New integration** button.
 3.  Fill in the required fields:
     *   **Integration Name:** Give it a recognizable name (e.g., "Open WebUI MCP").
@@ -50,9 +54,9 @@ Once saved, you will be directed to the configuration page.
 3.  Click **Save changes** if you modified any capabilities.
 
 :::warning Security: Risk to Workspace Data
-While the Notion MCP server limits the scope of the API (e.g., databases cannot be deleted), exposing your workspace to LLMs carries a **non-zero risk** to your data.
+While the Notion MCP server limits the scope of the API (e.g., databases cannot be deleted), exposing your workspace to LLMs carries a **non-zero risk**.
 
-**Security-conscious users** can create a safer, **Read-Only** integration by unchecking **Update content** and **Insert content** in this step. The AI will be able to search and answer questions based on your notes but will be physically unable to modify or create pages.
+**Security-conscious users** can create a safer, **Read-Only** integration by unchecking **Update content** and **Insert content**. The AI will be able to search and answer questions based on your notes but will be physically unable to modify or create pages.
 :::
 
 :::danger Secret Safety
@@ -246,7 +250,7 @@ If you are using **Method 1 (Streamable HTTP)**, you must perform the On-Demand 
 :::note Security: Frequent Re-authentication
 For security reasons, Notion's OAuth session may expire after a period of inactivity or if you restart your Open WebUI instance. If this happens, you will see a `Failed to connect to MCP server 'ntn'` error. 
 
-This is **intended behavior** by Notion to keep your workspace secure. To refresh your session, revist steps 1-4 of this option to complete the "Connect with Notion MCP" authorization flow again, which will refresh your session.
+This is **intended behavior** by Notion to keep your workspace secure. To refresh your session, revisit steps 1-4 of this option to complete the "Connect with Notion MCP" authorization flow again.
 :::
 
 ![Notion OAuth Screen: Shows the 'Connect with Notion MCP' authorization page with the workspace dropdown selected.](/images/mcp-notion/notion-setup-step7.png)
@@ -260,7 +264,7 @@ You can configure a specific model to have Notion access enabled by default for 
 4.  Check the box for **Notion**.
 5.  Click **Save & Update**.
 
-## Best Practice: Create a Notion Agent
+## Building a Specialized Notion Agent
 
 For the most reliable experience, we recommend creating a dedicated "Notion Assistant" model. This allows you to provide a specialized **System Prompt**, a helpful **Knowledge Base**, and quick-start **Prompt Suggestions** that teaches the model how to navigate Notion's structure.
 
@@ -335,7 +339,6 @@ You are the Notion Workspace Manager, an intelligent agent connected directly to
 ```
 </details>
 
-
 7.  **Attach Knowledge Base:**
     *   In the **Knowledge** section, click **Select Knowledge**.
     *   In the modal that appears, find and select the **Notion MCP Docs** knowledge base you created in Step 1.
@@ -343,7 +346,7 @@ You are the Notion Workspace Manager, an intelligent agent connected directly to
 :::warning Performance Tuning
 While the knowledge base helps the model understand Notion's capabilities, injecting large amounts of documentation can sometimes interfere with tool calling on smaller models (overloading the context).
 
-If you notice the model failing to call tools correctly or hallucinating parameters, **detach the knowledge base** and rely solely on the System Prompt provided above or use your own custom system prompt.
+If you notice the model failing to call tools correctly or hallucinating parameters, **detach the knowledge base** and rely solely on the System Prompt provided above.
 :::
 
 8.  **Add Prompt Suggestions:**
@@ -362,99 +365,15 @@ Under the **Prompts** section, click the **+** button to add a few helpful start
 
 ![Model Creation Screen: Shows the model settings with Name 'Notion Assistant', description, and the Notion System Prompt filled out.](/images/mcp-notion/notion-setup-step11.png)
 
-## Supported Tools & Usage
-
-Once enabled, the model will have access to a powerful suite of tools to manage your Notion workspace. The server automatically handles converting Notion's block-based structure into Markdown for the AI, and converts the AI's Markdown back into Notion blocks.
+## Supported Tools
 
 :::tip Workflow Best Practice
 LLMs cannot "browse" Notion like a human. For most actions, the model first needs to know the **Page ID or URL**. Always ask the model to **search** for a page first before asking it to read or modify it.
 :::
 
-## 🔎 Search & Retrieval  
+This integration supports a wide range of tools for searching, reading, creating, and updating Notion pages and databases.
 
-- **`notion-search`** – Full‑text / metadata search across Notion (and linked tools)  
-  - **Input:** query string (e.g., `ready for dev`)  
-  - **Returns:** list of object IDs + brief metadata  
-  - **Prompt example:** “Find all project pages that mention **‘ready for dev’**.”  
-  - **Note:** IDs returned here are required for almost every other command.  
-
-- **`notion-fetch`** *(aka `read-page`)* – Pull a page or database content by URL or ID  
-  - **Input:** page/database URL **or** ID  
-  - **Returns:** Markdown‑formatted content of the page/database  
-  - **Prompt example:** “What are the product requirements from this ticket `https://notion.so/page-url`?”  
-  - **Note:** Gives you a clean Markdown view, ready for further processing.  
-
-## 🛠️ Content Management  
-
-- **`notion-create-pages`** – Create a brand‑new page
-  - **Input:** parent page ID, title, property map, body (Markdown format)
-  - **Returns:** new page ID & URL
-  - **Prompt example:** “Create a meeting‑notes page for today’s stand‑up with action items.”
-  - **Key:** **Parent page ID is mandatory**.
-
-- **`notion-update-page`** – Patch a page’s **properties** (status, tags, dates, etc.)
-  - **Input:** page ID + property map
-  - **Returns:** updated page object
-  - **Prompt example:** “Change the status of this task from **‘In Progress’** to **‘Complete’**.”
-  - **Key:** Does **not** edit the page’s body blocks.
-
-- **`notion-append-block`** – Add a block (text, checklist, heading, etc.) to the end of a page
-  - **Input:** page ID + block payload (JSON format)
-  - **Returns:** updated page version
-  - **Prompt example:** “Add a checklist item to the bottom of the shopping‑list page.”
-
-- **`notion-move-pages`** – Move one or many pages/databases under a new parent
-  - **Input:** source page/database ID(s) + destination parent ID
-  - **Returns:** new parent relationship (page now lives under the target)
-  - **Prompt example:** “Move my weekly meeting‑notes page to the **‘Team Meetings’** page.”
-
-- **`notion-duplicate-page`** – Clone a page (asynchronous – returns a job ID)
-  - **Input:** source page ID (optional target parent)
-  - **Returns:** job ID → duplicated page ID once the job finishes
-  - **Prompt example:** “Duplicate my project‑template page for the new Q3 initiative.”
-
-## 📊 Database Management  
-
-- **`notion-create-database`** – Spin up a new database with a custom schema
-  - **Input:** parent page ID, title, property definitions (type, name, options)
-  - **Returns:** new database ID & URL
-  - **Prompt example:** “Create a database to track customer feedback with fields for **name**, **priority**, and **status**.”
-
-- **`notion-update-database`** – Alter a database’s schema (add/rename fields) or rename the DB itself
-  - **Input:** database ID + schema changes (add property, rename, etc.)
-  - **Returns:** updated database object
-  - **Prompt example:** “Add a **‘Status’** field to our project database to track completion.”
-
-## 💬 Collaboration & Workspace  
-
-- **`notion-create-comment`** – Post a comment on a page
-  - **Input:** page ID + comment text
-  - **Returns:** comment ID & timestamp
-  - **Prompt example:** “Leave a note on the quarterly review page about budget concerns.”
-
-- **`notion-get-comments`** – List every comment on a page (supports pagination)
-  - **Input:** page ID
-  - **Returns:** array of comment objects
-  - **Prompt example:** “List all comments on the project‑requirements section.”
-
-- **`notion-get-users`** – Fetch **all** workspace members
-  - **Input:** *(none)*
-  - **Returns:** array of user objects
-  - **Prompt example:** “Who are the members of this workspace?”
-
-- **`notion-get-user`** – Get a single user’s profile (by ID or email)
-  - **Input:** user ID or email address
-  - **Returns:** user object (name, avatar, email, etc.)
-  - **Prompt example:** “Look up the profile of the person assigned to this task.”
-
-- **`notion-get-teams`** – Retrieve all **teamspaces** (formerly “teams”) in the workspace
-  - **Input:** *(none)*
-  - **Returns:** array of team objects
-
-- **`notion-get-self`** – Information about the bot itself and the workspace it’s linked to
-  - **Input:** *(none)*
-  - **Returns:** bot metadata + workspace metadata (ID, name, domain, etc.)
-  - **Prompt example:** “Which Notion workspace am I currently connected to?”
+For a complete list of available tools, their schemas, and specific usage examples, please refer to the **[official Notion MCP documentation](https://developers.notion.com/docs/mcp-supported-tools)**.
 
 ## Rate Limits
 Standard [API request limits](https://developers.notion.com/reference/request-limits) apply to your use of Notion MCP, totaled across all tool calls.
@@ -468,7 +387,9 @@ If you encounter rate limit errors, prompt your model to reduce the number of pa
 
 ## Troubleshooting
 
-### Error: `Failed to connect to MCP server 'ntn'`
+### Connection Errors
+
+#### `Failed to connect to MCP server 'ntn'`
 
 ![MCP Connection Error: Shows a red error message in the chat 'Failed to connect to MCP server 'ntn'.](/images/mcp-notion/notion-setup-step12.png)
 
@@ -480,27 +401,26 @@ If you encounter rate limit errors, prompt your model to reduce the number of pa
     4.  This will trigger the redirect to Notion's authorization page to complete the "Connect with Notion MCP" authorization flow again.
     5.  Once authorized successfully, the connection will work across all chats again, including for models with the tool enabled by default.
 
-### Error: `OAuth callback failed: mismatching_state`
-
+#### `OAuth callback failed: mismatching_state`
 ![OAuth Error Toast: Shows the red error notification 'OAuth callback failed: mismatching_state: CSRF Warning! State not equal in request and response'.](/images/mcp-notion/notion-setup-step13.png)
-
-If you receive this red error toast when registering the client or connecting via the tool toggle, it is likely due to a URL mismatch.
 
 *   **Cause:** You are likely accessing Open WebUI via `localhost` (e.g., `http://localhost:3000`), but your instance is configured with a public domain via the `WEBUI_URL` environment variable (e.g., `https://chat.mydomain.com`). The OAuth session state created on `localhost` is lost when the callback redirects to your public domain.
 *   **Fix:** Access your Open WebUI instance using the **exact URL** defined in `WEBUI_URL` (your public domain) and perform the setup again. **Do not use `localhost` for OAuth setups if a domain is configured.**
 
-### Error: `Object not found`
+### Usage Errors
+
+#### `Object not found`
 *   **Cause:** The Integration Token is valid, but the specific page has not been shared with the integration.
 *   **Fix:** In Notion, go to your Integration settings > **Access** tab and ensure the page is checked, or visit the page directly and check the **Connections** menu to ensure your integration is listed and selected.
 
-### Error: `Tool execution failed` (Local Method)
+#### `Tool execution failed` (Local Method)
 *   **Cause:** Open WebUI is unable to execute the local command (npx/docker) because it is missing from the container, or the configuration is incorrect.
 *   **Fix:** Native local execution is not supported. Ensure you are using **MCPO** (Method 2) to bridge these commands, rather than entering them directly into Open WebUI's config, or switch to **Method 1 (Streamable HTTP)** in the Configuration section above. This runs on Notion's servers and requires no local dependencies.
 
-### Error: `missing_property` when creating a page
+#### `missing_property` when creating a page
 *   **Cause:** The model is trying to create a page without specifying a **Parent ID**. Notion requires every page to exist inside another page or database.
 *   **Fix:** Instruct the model in your prompt: *"Search for my 'Notes' page first, get its ID, and create the new page inside there."*
 
-### Error: `RateLimitedError` (429)
+#### `RateLimitedError` (429)
 *   **Cause:** You have exceeded Notion's API limits (approx. 3 requests/second).
 *   **Fix:** Ask the model to perform actions sequentially rather than all at once (e.g., "Search for X, then wait, then search for Y").
