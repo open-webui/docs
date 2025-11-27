@@ -1055,6 +1055,12 @@ This variable replaces the deprecated `ENABLE_API_KEY` environment variable.
 
 :::
 
+:::info
+
+For API Key creation (and the API keys themselves) to work, you not only need to enable it globally, but also give specific user groups the permission for it 
+
+:::
+
 #### `ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS`
 
 - Type: `bool`
@@ -4547,11 +4553,32 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_FEATURES_FOLDERS`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables the visibility of the Folders feature (chat sidebar) to users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_NOTES`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables the visibility of the Notes feature to users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_FEATURES_API_KEYS`
 
 - Type: `bool`
 - Default: `False`
 - Description: Sets the permission for API key creation feature for users. When enabled, users will have the ability to create and manage API keys for programmatic access.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+For API Key creation (and the API keys themselves) to work, you not only need to give specific user groups the permission for it, but also enable it globally using `ENABLE_API_KEYS`
+
+:::
 
 ### Workspace Permissions
 
