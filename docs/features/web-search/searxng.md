@@ -131,13 +131,15 @@ rm searxng/settings.yml
 
 7. Bring up the container momentarily to generate a fresh settings.yml file:
 
-If the container name caddy, redis, searxng is already in use, change it to another name of your choice in the docker-compose.yaml file.
+If you have multiple containers running with the same name, such as caddy, redis, or searxng, you need to rename them in the docker-compose.yaml file to avoid conflicts.
 
 ```bash
 docker compose up -d ; sleep 10 ; docker compose down
 ```
 
 After the initial run, add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
+
+If Open WebUI is running in the same Docker network as Searxng, you may remove the `0.0.0.0` and only specify the port mapping. In this case, Open WebUI can access Searxng directly using the container name.
 
 <details>
 <summary>docker-compose.yaml</summary>
@@ -150,7 +152,7 @@ searxng:
     networks:
       - searxng
     ports:
-      - "0.0.0.0:9630:8080"
+      - "0.0.0.0:8080:8080" # use 8080:8080 if containers are in the same Docker network
     volumes:
       - ./searxng:/etc/searxng:rw
       - searxng-data:/var/cache/searxng:rw
@@ -324,7 +326,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
 
-- `http://localhost:8080/search?q=<query>` (using the host and exposed port, suitable for Docker-based setups)
+- `http://localhost:8080/search?q=<query>` (using the host and host port, suitable for Docker-based setups)
 - `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
 - `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
 - `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
