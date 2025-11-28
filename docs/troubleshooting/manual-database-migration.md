@@ -49,7 +49,37 @@ cd open_webui
 All subsequent Alembic commands must be run from this directory (`/app/backend/open_webui` inside the container or `backend/open_webui` in a local setup), where the `alembic.ini` file is located.
 :::
 
-### 2. Check the Current Database Revision
+### 2. Set Environment Variables (Docker Only)
+
+:::danger[Critical Step for Docker Users]
+When you open a shell in a Docker container with `docker exec`, the application's environment variables are **not** automatically loaded. You must set them manually before running any Alembic commands to avoid errors.
+:::
+
+You will need to export the following variables:
+
+1. `PYTHONPATH`: This tells Python where to find the application's modules.
+2. `DATABASE_URL`: This is the connection string for your database.
+3. `WEBUI_SECRET_KEY`: This is a required variable for the application's authentication system.
+
+You can find the values for `DATABASE_URL` and `WEBUI_SECRET_KEY` in your `docker-compose.yaml` file or the `docker run` command you used to start the container.
+
+Before proceeding, export the variables in your container shell:
+
+```bash
+export PYTHONPATH=.:../
+export DATABASE_URL="your-database-url-here"
+export WEBUI_SECRET_KEY="your-secret-key-here"
+```
+
+For example, for a PostgreSQL database, it might look like this:
+
+```bash
+export PYTHONPATH=.:../
+export DATABASE_URL="postgresql://user:password@host:port/database"
+export WEBUI_SECRET_KEY="t0p-s3cr3t"
+```
+
+### 3. Check the Current Database Revision
 
 To see the current revision of your database, run:
 
@@ -57,7 +87,7 @@ To see the current revision of your database, run:
 alembic current
 ```
 
-### 3. Apply All Pending Migrations (Upgrade)
+### 4. Apply All Pending Migrations (Upgrade)
 
 To upgrade your database to the latest version, which applies all pending migrations, run:
 
@@ -65,7 +95,7 @@ To upgrade your database to the latest version, which applies all pending migrat
 alembic upgrade head
 ```
 
-### 4. Upgrade to a Specific Revision
+### 5. Upgrade to a Specific Revision
 
 You can upgrade to a specific migration by providing its revision ID:
 
@@ -73,7 +103,7 @@ You can upgrade to a specific migration by providing its revision ID:
 alembic upgrade <revision_id>
 ```
 
-### 5. Downgrade to the Previous Revision
+### 6. Downgrade to the Previous Revision
 
 To revert the last migration, use:
 
@@ -81,7 +111,7 @@ To revert the last migration, use:
 alembic downgrade -1
 ```
 
-### 6. Downgrade to a Specific Revision
+### 7. Downgrade to a Specific Revision
 
 You can also downgrade to a specific revision:
 
@@ -89,7 +119,7 @@ You can also downgrade to a specific revision:
 alembic downgrade <revision_id>
 ```
 
-### 7. View Migration History
+### 8. View Migration History
 
 To see the history of all migrations, including their revision IDs, run:
 
