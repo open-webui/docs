@@ -1,211 +1,678 @@
 ---
 sidebar_position: 900
-title: Manual Alembic Database Migration Guide
+title: Manual Alembic Database Migration
+sidebar_label: Manual Migration
+description: Complete guide for manually running Alembic database migrations when Open WebUI's automatic migration fails or requires direct intervention.
+keywords: [alembic, migration, database, troubleshooting, sqlite, postgresql, docker]
 ---
 
-This guide provides step-by-step instructions for manually applying Alembic database migrations in Open WebUI. Migrations are typically run automatically on startup, but you may need to run them manually for maintenance, debugging, or deployment scenarios.
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-## Prerequisites
+## Overview
 
-- Ensure you have a Python environment with Open WebUI dependencies installed.
-- Your database connection must be configured via the `DATABASE_URL` environment variable.
-- You need access to the backend directory of your Open WebUI installation.
+Open WebUI automatically runs database migrations on startup. **Manual migration is rarely needed** and should only be performed in specific failure scenarios or maintenance situations.
 
-## Accessing the Container (for Docker installations)
+:::info When Manual Migration is Required
+You need manual migration only if:
 
-If you are running Open WebUI in a Docker container, you'll first need to get a shell into the container:
-
-```bash
-docker exec -it open-webui /bin/bash
-```
-
-:::note
-Replace `open-webui` with the name of your container if it's different.
+- Open WebUI logs show specific migration errors during startup
+- You're performing offline database maintenance
+- Automatic migration fails after a version upgrade
+- You're migrating between database types (SQLite ↔ PostgreSQL)
+- A developer has instructed you to run migrations manually
 :::
 
-## Manual Migration Commands
-
-This section provides instructions for running Alembic commands. The correct directory path depends on whether you are running Open WebUI from a local installation or within a Docker container.
-
-### 1. Navigate to the Correct Directory
-
-#### Local Installation
-
-If you are running Open WebUI from a local clone of the repository, navigate to the `backend/open_webui` directory from the repository root:
-
-```bash
-cd backend/open_webui
-```
-
-#### Docker Container
-
-After accessing the container with `docker exec`, you will be in the `/app/backend` directory. From there, navigate to the `open_webui` directory:
-
-```bash
-cd open_webui
-```
-
-:::info
-All subsequent Alembic commands must be run from this directory (`/app/backend/open_webui` inside the container or `backend/open_webui` in a local setup), where the `alembic.ini` file is located.
+:::danger Critical Warning
+Manual migration can corrupt your database if performed incorrectly. **Always create a verified backup before proceeding.**
 :::
 
-### 2. Set Environment Variables (Docker Only)
+## Prerequisites Checklist
 
-:::danger[Critical Step for Docker Users]
-When you open a shell in a Docker container with `docker exec`, the application's environment variables are **not** automatically loaded. You must set them manually before running any Alembic commands to avoid errors.
+Before starting, ensure you have:
+
+- [ ] **Root/admin access** to your Open WebUI installation
+- [ ] **Database location confirmed** (default: `/app/backend/data/webui.db` in Docker)
+- [ ] **Open WebUI completely stopped** (no running processes)
+- [ ] **Backup created and verified** (see below)
+- [ ] **Access to container or Python environment** where Open WebUI runs
+
+:::warning Stop All Processes First
+Database migrations cannot run while Open WebUI is active. You **must** stop all Open WebUI processes before attempting manual migration.
 :::
 
-You will need to export the following variables:
+## Step 1: Create and Verify Backup
 
-1. `PYTHONPATH`: This tells Python where to find the application's modules.
-2. `DATABASE_URL`: This is the connection string for your database.
-3. `WEBUI_SECRET_KEY`: This is a required variable for the application's authentication system.
+### Backup Your Database
 
-You can find the values for `DATABASE_URL` and `WEBUI_SECRET_KEY` in your `docker-compose.yaml` file or the `docker run` command you used to start the container.
+<Tabs groupId="database-type">
+  <TabItem value="sqlite" label="SQLite (Default)" default>
+    ```bash title="Terminal"
+    # Find your database location first
+    docker inspect open-webui | grep -A 5 Mounts
 
-Before proceeding, export the variables in your container shell:
+    # Create timestamped backup
+    cp /path/to/webui.db /path/to/webui.db.backup.$(date +%Y%m%d_%H%M%S)
+    ```
+  </TabItem>
+  <TabItem value="postgresql" label="PostgreSQL">
+    ```bash title="Terminal"
+    pg_dump -h localhost -U your_user -d open_webui_db > backup_$(date +%Y%m%d_%H%M%S).sql
+    ```
+  </TabItem>
+</Tabs>
 
-```bash
-export PYTHONPATH=.:../
-export DATABASE_URL="your-database-url-here"
-export WEBUI_SECRET_KEY="your-secret-key-here"
+### Verify Backup Integrity
+
+**Critical:** Test that your backup is readable before proceeding.
+
+<Tabs groupId="database-type">
+  <TabItem value="sqlite" label="SQLite" default>
+    ```bash title="Terminal - Verify Backup"
+    # Test backup can be opened
+    sqlite3 /path/to/webui.db.backup "SELECT count(*) FROM user;"
+
+    # Verify schema matches
+    sqlite3 /path/to/webui.db ".schema" > current-schema.sql
+    sqlite3 /path/to/webui.db.backup ".schema" > backup-schema.sql
+    diff current-schema.sql backup-schema.sql
+    ```
+  </TabItem>
+  <TabItem value="postgresql" label="PostgreSQL">
+    ```bash title="Terminal - Verify Backup"
+    # Verify backup file is not empty and contains SQL
+    head -n 20 backup_*.sql
+    grep -c "CREATE TABLE" backup_*.sql
+    ```
+  </TabItem>
+</Tabs>
+
+:::tip Backup Storage
+Store backups on a **different disk or volume** than your database to protect against disk failure.
+:::
+
+## Step 2: Diagnose Current State
+
+Before attempting any fixes, gather information about your database state.
+
+### Access Your Environment
+
+<Tabs groupId="install-type">
+  <TabItem value="docker" label="Docker" default>
+    ```bash title="Terminal"
+    # Stop Open WebUI first
+    docker stop open-webui
+
+    # Enter container for diagnostics
+    docker run --rm -it \
+      -v open-webui:/app/backend/data \
+      --entrypoint /bin/bash \
+      ghcr.io/open-webui/open-webui:main
+    ```
+    
+    :::note Default Directory
+    When you enter the container, you'll be in `/app`. The Alembic configuration is at `/app/backend/open_webui/alembic.ini`.
+    :::
+  </TabItem>
+  <TabItem value="local" label="Local Install">
+    ```bash title="Terminal"
+    # Navigate to Open WebUI installation
+    cd /path/to/open-webui/backend/open_webui
+
+    # Activate virtual environment if used
+    source ../../venv/bin/activate  # Linux/Mac
+    # venv\Scripts\activate  # Windows
+    ```
+  </TabItem>
+</Tabs>
+
+### Run Diagnostic Commands
+
+Navigate to the directory containing `alembic.ini`:
+
+```bash title="Terminal - Navigate to Alembic Directory"
+cd /app/backend/open_webui  # Docker
+# OR
+cd /path/to/open-webui/backend/open_webui  # Local
 ```
 
-For example, for a PostgreSQL database, it might look like this:
+Execute these read-only diagnostic commands:
 
-```bash
-export PYTHONPATH=.:../
-export DATABASE_URL="postgresql://user:password@host:port/database"
-export WEBUI_SECRET_KEY="t0p-s3cr3t"
-```
+```bash title="Terminal - Diagnostics (Safe - Read Only)"
+# Verify alembic.ini exists
+ls -la alembic.ini
 
-### 3. Check the Current Database Revision
+# Check current migration version
+alembic current -v
 
-To see the current revision of your database, run:
+# Check target (latest) version
+alembic heads
 
-```bash
-alembic current
-```
-
-### 4. Apply All Pending Migrations (Upgrade)
-
-To upgrade your database to the latest version, which applies all pending migrations, run:
-
-```bash
-alembic upgrade head
-```
-
-### 5. Upgrade to a Specific Revision
-
-You can upgrade to a specific migration by providing its revision ID:
-
-```bash
-alembic upgrade <revision_id>
-```
-
-### 6. Downgrade to the Previous Revision
-
-To revert the last migration, use:
-
-```bash
-alembic downgrade -1
-```
-
-### 7. Downgrade to a Specific Revision
-
-You can also downgrade to a specific revision:
-
-```bash
-alembic downgrade <revision_id>
-```
-
-### 8. View Migration History
-
-To see the history of all migrations, including their revision IDs, run:
-
-```bash
+# List all migration history
 alembic history
+
+# Check for branching (indicates issues)
+alembic branches
 ```
 
-:::tip
-The `alembic history` command is useful for finding the revision ID to use with the `upgrade` and `downgrade` commands.
+**Expected output:**
+
+```
+# alembic current should show something like:
+ae1027a6acf (head)
+
+# If you see multiple heads or branching, your migration history has issues
+```
+
+:::info Understanding Output
+
+- `alembic current` = what version your database thinks it's at
+- `alembic heads` = what version the code expects
+- If `current` is older than `heads`, you have pending migrations
+- If `current` equals `heads`, your database is up-to-date
 :::
 
-## Common Scenarios
+<details>
+<summary>Check Actual Database Tables</summary>
 
-### Fresh Database Setup
+Verify what's actually in your database:
 
-For a new database, run the following command to apply all migrations:
+<Tabs groupId="database-type">
+  <TabItem value="sqlite" label="SQLite" default>
+    ```bash title="Terminal"
+    sqlite3 /app/backend/data/webui.db ".tables"
+    sqlite3 /app/backend/data/webui.db "SELECT * FROM alembic_version;"
+    ```
+  </TabItem>
+  <TabItem value="postgresql" label="PostgreSQL">
+    ```bash title="Terminal"
+    psql -h localhost -U user -d dbname -c "\dt"
+    psql -h localhost -U user -d dbname -c "SELECT * FROM alembic_version;"
+    ```
+  </TabItem>
+</Tabs>
 
-```bash
+</details>
+
+## Step 3: Configure Environment
+
+Set required environment variables for manual Alembic execution.
+
+```bash title="Terminal - Set Environment Variables"
+# Required: Database URL
+# For Docker with SQLite (note the 4 slashes for absolute path)
+export DATABASE_URL="sqlite:////app/backend/data/webui.db"
+
+# For local install with SQLite (relative path from open_webui directory)
+export DATABASE_URL="sqlite:///../data/webui.db"
+
+# For PostgreSQL
+export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
+```
+
+:::warning Path Syntax for SQLite
+
+- `sqlite:////app/...` = 4 slashes total (absolute path)
+- `sqlite:///data/...` = 3 slashes total (relative path)
+- The extra slash after `sqlite:///` makes it absolute
+:::
+
+## Step 4: Apply Migrations
+
+### Standard Upgrade (Most Common)
+
+If diagnostics show you have pending migrations (`current` < `heads`), upgrade to latest:
+
+```bash title="Terminal - Upgrade to Latest"
+# Ensure you're in the correct directory
+cd /app/backend/open_webui
+
+# Run upgrade
 alembic upgrade head
 ```
 
-### Specific Migration Issues
+**Watch for these outputs:**
 
-If a migration fails, you can resolve it with the following steps:
+```bash
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+# highlight-next-line
+INFO  [alembic.runtime.migration] Running upgrade abc123 -> def456, add_new_column
+```
 
-1. Check the current revision: `alembic current`
-2. Identify the problematic revision from the error message.
-3. Downgrade to the previous revision: `alembic downgrade -1`
-4. Fix the underlying issue (e.g., a missing constraint).
-5. Run the upgrade again: `alembic upgrade head`
+:::note "Will assume non-transactional DDL"
+This is a **normal informational message** for SQLite, not an error. SQLite doesn't support rollback of schema changes, so migrations run without transaction protection.
 
-### Production Deployment
-
-When deploying to a production environment:
-
-:::danger[Backup Your Database]
-**Always back up your database before running migrations in a production environment.**
+If the process appears to hang after this message, wait 2-3 minutes - some migrations take time. If it's truly stuck, check for database locks (see troubleshooting).
 :::
 
-1. Run migrations during a maintenance window to avoid service disruptions.
-2. Verify the migration was successful with `alembic current`.
+### Upgrade to Specific Version
+
+If you need to apply migrations up to a specific point:
+
+```bash title="Terminal - Upgrade to Specific Version"
+# List available versions first
+alembic history
+
+# Upgrade to specific revision
+alembic upgrade ae1027a6acf
+```
+
+### Downgrade (Rollback)
+
+:::danger Data Loss Risk
+Downgrading can cause **permanent data loss** if the migration removed columns or tables. Only downgrade if you understand the consequences.
+:::
+
+```bash title="Terminal - Downgrade Migrations"
+# Downgrade one version
+alembic downgrade -1
+
+# Downgrade to specific version
+alembic downgrade <revision_id>
+
+# Nuclear option: Remove all migrations (rarely needed)
+alembic downgrade base
+```
+
+## Step 5: Verify Migration Success
+
+After running migrations, confirm everything is correct:
+
+```bash title="Terminal - Post-Migration Verification"
+# Verify current version matches expected
+alembic current
+
+# Should show (head) indicating you're at latest
+# Example: ae1027a6acf (head)
+
+# Confirm no pending migrations
+alembic upgrade head --sql | head -20
+# If output contains only comments or is empty, you're up to date
+```
+
+### Test Application Startup
+
+<Tabs groupId="install-type">
+  <TabItem value="docker" label="Docker" default>
+    ```bash title="Terminal"
+    # Exit the diagnostic container
+    exit
+
+    # Start Open WebUI normally
+    docker start open-webui
+    
+    # Watch logs for migration confirmation
+    docker logs -f open-webui
+    ```
+  </TabItem>
+  <TabItem value="local" label="Local Install">
+    ```bash title="Terminal"
+    # Start Open WebUI
+    python -m open_webui.main
+
+    # Watch for successful startup messages
+    ```
+  </TabItem>
+</Tabs>
+
+**Successful startup logs:**
+
+```
+INFO:     [db] Database initialization complete
+INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
+```
 
 ## Troubleshooting
 
-### `InvalidForeignKey` Error
+### "No config file 'alembic.ini' found"
 
-If you encounter an error similar to `sqlalchemy.exc.ProgrammingError: (psycopg2.errors.InvalidForeignKey) there is no unique constraint matching given keys for referenced table "user"`, it's likely that a primary key constraint is missing on the `user` table.
+**Cause:** You're in the wrong directory.
 
-To fix this, you need to connect to your PostgreSQL database and run the following SQL command:
+**Solution:**
 
-```sql
-ALTER TABLE public."user" ADD CONSTRAINT user_pk PRIMARY KEY (id);
+```bash title="Terminal"
+# Find alembic.ini location
+find /app -name "alembic.ini" 2>/dev/null  # Docker
+find . -name "alembic.ini"  # Local
+
+# Navigate to that directory
+cd /app/backend/open_webui  # Most common path
 ```
 
-After running this command, you can retry the `alembic upgrade head` command.
+### "Target database is not up to date"
 
-### Incorrect Autogenerated Migrations
+**Cause:** Your database version doesn't match expected schema.
 
-When creating a new migration, the `alembic revision --autogenerate` command can sometimes create an incorrect migration file that attempts to drop existing tables. This can happen if Alembic has trouble detecting the current state of your database schema.
+**Diagnosis:**
 
-If you encounter this issue, here are a few things to try:
+```bash title="Terminal - Diagnose Version Mismatch"
+# Check what database thinks its version is
+alembic current
 
-1. **Ensure Your Database is Up-to-Date:** Before generating a new migration, make sure your database is fully upgraded to the latest revision by running `alembic upgrade head`. An out-of-date database is a common cause of this problem.
-2. **Create a Manual Migration:** For simple changes, you can avoid `--autogenerate` altogether by creating a manual migration file. This gives you full control over the `upgrade()` and `downgrade()` functions.
-3. **Start Fresh:** If your database schema is in a state that is difficult to recover from, the simplest solution may be to start with a fresh installation.
+# Check what code expects
+alembic heads
 
-### Migrations in Multi-Server Deployments
+# Compare
+```
 
-:::warning[Update All Instances Simultaneously]
-If you are running Open WebUI in a load-balanced, multi-server environment, it is critical that you **update all instances of the application at the same time.**
+**Solution depends on diagnosis:**
 
-A rolling update, where servers are updated one by one, can cause service disruptions. If the first server to be updated applies a destructive migration (e.g., dropping a column), all other servers still running the old code will immediately encounter errors, as they will be trying to access a database schema that is no longer compatible.
+<Tabs>
+  <TabItem value="pending" label="Pending Migrations" default>
+    **Scenario:** `alembic current` shows older version than `alembic heads`
+
+    **Fix:** You simply need to apply pending migrations.
+    
+    ```bash title="Terminal"
+    alembic upgrade head
+    ```
+  </TabItem>
+  <TabItem value="mismatch" label="Schema Mismatch">
+    **Scenario:** `alembic current` shows correct version, but you still see errors
+
+    **Cause:** Someone manually modified the database schema without migrations, or a previous migration partially failed.
+    
+    **Fix:** Restore from backup - you have database corruption.
+    
+    ```bash title="Terminal"
+    # Stop everything
+    docker stop open-webui
+    
+    # Restore backup
+    cp /path/to/webui.db.backup /path/to/webui.db
+    
+    # Try migration again
+    alembic upgrade head
+    ```
+  </TabItem>
+  <TabItem value="fresh" label="Fresh Database">
+    **Scenario:** New database that needs initial schema
+
+    **Fix:** Run migrations from scratch.
+    
+    ```bash title="Terminal"
+    alembic upgrade head
+    ```
+  </TabItem>
+</Tabs>
+
+:::danger Never Use "alembic stamp" as a Fix
+You may see advice to run `alembic stamp head` to "fix" version mismatches. **This is dangerous.**
+
+`alembic stamp` tells Alembic "pretend this migration was applied" without actually running it. This creates permanent database corruption where Alembic thinks your schema is up-to-date when it isn't.
+
+**Only use `alembic stamp head` if:**
+
+- You manually created all tables using `create_all()` and need to mark them as migrated
+- You're a developer initializing a fresh database that matches current schema
+
+**Never use it to "fix" migration errors.**
 :::
 
-### Migration Path Issues
+### Process Hangs After "Will assume non-transactional DDL"
 
-If you encounter path resolution issues, ensure you are running the `alembic` commands from the correct directory (`open_webui` inside the Docker container, or `backend/open_webui` in a local setup) where the `alembic.ini` file is located.
+**Understanding the message:** This is **not an error**. It's informational. SQLite doesn't support transactional DDL, so Alembic is warning that migrations can't be rolled back automatically.
 
-### Database Connection
+**If genuinely stuck:**
 
-Verify that your `DATABASE_URL` environment variable is correctly set and that the database is accessible from where you are running the commands.
+<Tabs>
+  <TabItem value="wait" label="Wait First" default>
+    Some migrations (especially those adding indexes or modifying large tables) take several minutes.
 
-## Notes
+    **Action:** Wait 3-5 minutes before assuming it's stuck.
+  </TabItem>
+  <TabItem value="lock" label="Check Database Lock">
+    Another process might have locked the database.
+
+    ```bash title="Terminal - Check for Locks"
+    # Find processes using database file
+    fuser /app/backend/data/webui.db
+    
+    # Kill any orphaned processes
+    pkill -f "open-webui"
+    
+    # Verify nothing running
+    ps aux | grep open-webui
+    
+    # Try migration again
+    alembic upgrade head
+    ```
+  </TabItem>
+  <TabItem value="corrupt" label="Database Corruption">
+    If the database is corrupted, migration will hang.
+
+    ```bash title="Terminal - Check Integrity"
+    sqlite3 /app/backend/data/webui.db "PRAGMA integrity_check;"
+    ```
+    
+    If integrity check fails, restore from backup.
+  </TabItem>
+</Tabs>
+
+### Autogenerate Detects Removed Tables
+
+**Symptom:** You ran `alembic revision --autogenerate` and it wants to drop existing tables.
+
+:::warning Don't Run Autogenerate
+**Regular users should NEVER run `alembic revision --autogenerate`.** This command is for developers creating new migration files, not for applying existing migrations.
+
+The command you want is `alembic upgrade head` (no `revision`, no `--autogenerate`).
+:::
+
+**If you accidentally created a bad migration file:**
+
+```bash title="Terminal - Remove Bad Migration"
+# List migration files
+ls -la /app/backend/open_webui/migrations/versions/
+
+# Delete the incorrect auto-generated file (newest file)
+rm /app/backend/open_webui/migrations/versions/<newest_timestamp>_*.py
+
+# Restore to known good state
+git checkout /app/backend/open_webui/migrations/  # If using git
+```
+
+**Technical context:** The "autogenerate detects removed tables" issue occurs because Open WebUI's Alembic metadata configuration doesn't import all model definitions. This causes autogenerate to compare against incomplete metadata, thinking tables should be removed. This is a developer-level issue that doesn't affect users running `alembic upgrade`.
+
+### Peewee to Alembic Transition Issues
+
+**Background:** Older Open WebUI versions (pre-0.4.x) used Peewee migrations. Current versions use Alembic.
+
+**Symptoms:**
+
+- Both `migratehistory` and `alembic_version` tables exist
+- Errors about "migration already applied"
+
+**What happens automatically:**
+
+1. Open WebUI's `internal/db.py` runs old Peewee migrations first via `handle_peewee_migration()`
+2. Then `config.py` runs Alembic migrations via `run_migrations()`
+3. Both systems should work transparently
+
+**If automatic transition fails:**
+
+```bash title="Terminal - Manual Transition"
+# Check if old Peewee migrations exist
+sqlite3 /app/backend/data/webui.db "SELECT * FROM migratehistory;" 2>/dev/null
+
+# If Peewee migrations exist, ensure they completed
+# Then run Alembic migrations
+cd /app/backend/open_webui
+alembic upgrade head
+```
+
+:::tip
+If upgrading from very old Open WebUI versions (< 0.3.x), consider a fresh install with data export/import rather than attempting to migrate the database schema across multiple major version changes.
+:::
+
+## Advanced Operations
+
+### Generate SQL Without Applying
+
+For review or audit purposes, generate the SQL that would be executed:
+
+```bash title="Terminal - Generate Migration SQL"
+# Generate SQL for pending migrations
+alembic upgrade head --sql > /tmp/migration-plan.sql
+
+# Review what would be applied
+cat /tmp/migration-plan.sql
+```
+
+**Use cases:**
+
+- DBA review in enterprise environments
+- Understanding what changes will occur
+- Debugging migration issues
+- Applying migrations in restricted environments
+
+:::info When to Use This
+This is advanced functionality for DBAs or DevOps engineers. Regular users should just run `alembic upgrade head` directly.
+:::
+
+### Offline Migration (No Network)
+
+If your database server is offline or isolated:
+
+```bash title="Terminal - Offline Migration Workflow"
+# 1. Generate SQL on development machine
+alembic upgrade head --sql > upgrade-to-head.sql
+
+# 2. Transfer SQL file to production
+scp upgrade-to-head.sql production-server:/tmp/
+
+# 3. On production, apply SQL manually
+sqlite3 /app/backend/data/webui.db < /tmp/upgrade-to-head.sql
+
+# 4. Update alembic_version table manually
+sqlite3 /app/backend/data/webui.db \
+  "UPDATE alembic_version SET version_num='<target_revision>';"
+```
+
+:::danger Manual alembic_version Updates
+Only update `alembic_version` if you've **actually applied** the corresponding migrations. Lying to Alembic about migration state causes permanent corruption.
+:::
+
+## Recovery Procedures
+
+### Recovery from Failed Migration
+
+:::danger SQLite Has No Rollback
+SQLite migrations are **non-transactional**. If a migration fails halfway through, your database is in a partially-migrated state. The only safe recovery is restoring from backup.
+:::
+
+**Symptoms of partial migration:**
+
+- Some tables exist, others don't match expected schema
+- Foreign key violations
+- Missing columns that migration should have added
+- Application errors about missing database fields
+
+**Recovery steps:**
+
+```bash title="Terminal - Restore from Backup"
+# 1. Stop Open WebUI immediately
+docker stop open-webui
+
+# 2. Verify backup integrity
+sqlite3 /path/to/webui.db.backup "PRAGMA integrity_check;"
+
+# 3. Restore backup
+cp /path/to/webui.db.backup /path/to/webui.db
+
+# 4. Investigate root cause before retrying
+docker logs open-webui > migration-failure-logs.txt
+
+# 5. Get help with logs before attempting migration again
+```
+
+:::warning Do Not Use "stamp" to Fix Failed Migrations
+Never use `alembic stamp` to mark a partially-failed migration as complete. This leaves your database in a corrupt state.
+:::
+
+### Validate Database Integrity
+
+Before and after migrations, verify your database isn't corrupted:
+
+<Tabs groupId="database-type">
+  <TabItem value="sqlite" label="SQLite" default>
+    ```bash title="Terminal - SQLite Integrity Check"
+    sqlite3 /app/backend/data/webui.db "PRAGMA integrity_check;"
+
+    # Should output: ok
+    # If it outputs anything else, database is corrupted
+    ```
+  </TabItem>
+  <TabItem value="postgresql" label="PostgreSQL">
+    ```bash title="Terminal - PostgreSQL Integrity Check"
+    # Check for table corruption
+    psql -h localhost -U user -d dbname -c "SELECT * FROM pg_stat_database WHERE datname='open_webui_db';"
+
+    # Vacuum and analyze
+    psql -h localhost -U user -d dbname -c "VACUUM ANALYZE;"
+    ```
+  </TabItem>
+</Tabs>
+
+## Post-Migration Checklist
+
+After successful migration, verify:
+
+- [ ] `alembic current` shows `(head)` indicating latest version
+- [ ] Open WebUI starts without errors
+- [ ] Can log in successfully
+- [ ] Core features work (chat, model selection, etc.)
+- [ ] No error messages in logs
+- [ ] Data appears intact (users, chats, models)
+- [ ] Backup can be safely archived after 1 week of stability
+
+:::tip Keep Recent Backups
+Retain backups from before major migrations for at least 1-2 weeks. Issues sometimes appear days later during specific workflows.
+:::
+
+## Getting Help
+
+If migrations continue to fail after following this guide:
+
+**Gather diagnostic information:**
+
+```bash title="Terminal - Collect Diagnostic Data"
+# Version information
+docker logs open-webui 2>&1 | head -20 > diagnostics.txt
+
+# Migration state
+cd /app/backend/open_webui
+alembic current -v >> diagnostics.txt
+alembic history >> diagnostics.txt
+
+# Database info (SQLite)
+sqlite3 /app/backend/data/webui.db ".tables" >> diagnostics.txt
+sqlite3 /app/backend/data/webui.db "SELECT * FROM alembic_version;" >> diagnostics.txt
+
+# Full migration log
+alembic upgrade head 2>&1 >> diagnostics.txt
+```
+
+**Where to get help:**
+
+1. **Open WebUI GitHub Issues:** https://github.com/open-webui/open-webui/issues
+   - Search existing issues first
+   - Include your `diagnostics.txt` file
+   - Specify your Open WebUI version and installation method
+
+2. **Open WebUI Discord Community**
+   - Real-time support from community members
+   - Share error messages and diagnostics
+
+3. **Provide this information:**
+   - Open WebUI version
+   - Installation method (Docker/local)
+   - Database type (SQLite/PostgreSQL)
+   - Output of `alembic current` and `alembic history`
+   - Complete error messages
+   - What you were doing when it failed
 
 :::note
-The application automatically runs migrations on startup via the `run_migrations()` function in `config.py`. Manual migrations are useful for debugging, controlled deployments, or when automatic migration is disabled.
+Do not share your `webui.db` database file publicly - it contains user credentials and sensitive data. Only share the diagnostic text output.
 :::
-
-- Some migrations include data transformation logic that may take a significant amount of time to run on large datasets.
