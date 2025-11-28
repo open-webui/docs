@@ -156,6 +156,14 @@ If you encounter this issue, here are a few things to try:
 2. **Create a Manual Migration:** For simple changes, you can avoid `--autogenerate` altogether by creating a manual migration file. This gives you full control over the `upgrade()` and `downgrade()` functions.
 3. **Start Fresh:** If your database schema is in a state that is difficult to recover from, the simplest solution may be to start with a fresh installation.
 
+### Migrations in Multi-Server Deployments
+
+:::warning[Update All Instances Simultaneously]
+If you are running Open WebUI in a load-balanced, multi-server environment, it is critical that you **update all instances of the application at the same time.**
+
+A rolling update, where servers are updated one by one, can cause service disruptions. If the first server to be updated applies a destructive migration (e.g., dropping a column), all other servers still running the old code will immediately encounter errors, as they will be trying to access a database schema that is no longer compatible.
+:::
+
 ### Migration Path Issues
 
 If you encounter path resolution issues, ensure you are running the `alembic` commands from the correct directory (`open_webui` inside the Docker container, or `backend/open_webui` in a local setup) where the `alembic.ini` file is located.
