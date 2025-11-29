@@ -3,62 +3,155 @@ sidebar_position: 300
 title: "Updating Open WebUI"
 ---
 
-## Why isn't my Open WebUI updating?
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-To update your local Docker installation of Open WebUI to the latest version available, you can either use **Watchtower** or manually update the container. Follow either of the steps provided below to be guided through updating your existing Open WebUI image.
+## Overview
 
-### Manual Update
+Keeping Open WebUI updated ensures you have the latest features, security patches, and bug fixes. You can update manually or automate the process using container update tools.
 
-1. **Stop and remove the current container**:
+:::info Before Updating
+- **Backup your data** before major version updates
+- **Check release notes** at https://github.com/open-webui/open-webui/releases for breaking changes
+- **Clear browser cache** after updating to ensure the latest web interface loads
+:::
 
-   This will stop the running container and remove it, but it won't delete the data stored in the Docker volume. (Replace `open-webui` with your container's name throughout the updating process if it's different for you.)
+## Manual Update
 
-```bash
+Manual updates give you complete control and are recommended for production environments or when you need to review changes before applying them.
+
+### Step 1: Stop and Remove Current Container
+
+This stops the running container and removes it without deleting your data stored in the Docker volume.
+
+```bash title="Terminal"
+# Replace 'open-webui' with your container name if different
+# Use 'docker ps' to find your container name if unsure
 docker rm -f open-webui
 ```
 
-2. **Pull the latest Docker image**:
-
-   This will update the Docker image, but it won't update the running container or its data.
-
+:::tip Find Your Container Name
+If your container isn't named `open-webui`, find it with:
 ```bash
+docker ps -a | grep open-webui
+```
+Look in the "NAMES" column for your actual container name.
+:::
+
+### Step 2: Pull Latest Docker Image
+
+Download the newest Open WebUI image from the container registry.
+
+```bash title="Terminal"
 docker pull ghcr.io/open-webui/open-webui:main
 ```
 
-:::info
-
-**Remove any existing data in the Docker volume (NOT RECOMMENDED UNLESS ABSOLUTELY NECCESSARY!)**. Skip this step entirely if not needed and move on to the last step:
-
-   If you want to start with a clean slate, you can remove the existing data in the Docker volume. Be careful, as this will delete all your chat histories and other data.
-
-   The data is stored in a Docker volume named `open-webui`. You can remove it with the following command:
-
-```bash
-docker volume rm open-webui
+**Expected output:**
+```
+main: Pulling from open-webui/open-webui
+Digest: sha256:abc123...
+Status: Downloaded newer image for ghcr.io/open-webui/open-webui:main
 ```
 
+:::note About Data Persistence
+Your chat histories, settings, and uploaded files are stored in a Docker volume named `open-webui`. Pulling a new image does **not** affect this data. The volume persists independently of the container.
 :::
 
-3. **Start the container again with the updated image and existing volume attached**:
+### Step 3: Start Container with Updated Image
 
-   If you didn't remove the existing data, this will start the container with the updated image and the existing data. If you removed the existing data, this will start the container with the updated image and a new, empty volume. **For Nvidia GPU support, add `--gpus all` to the docker run command**
+Recreate the container using the new image while mounting your existing data volume.
 
-```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+<Tabs groupId="gpu-support">
+  <TabItem value="cpu" label="CPU Only" default>
+
+```bash title="Terminal - Standard Deployment"
+docker run -d \
+  -p 3000:8080 \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
 ```
 
-## Keeps being logged out after every update?
-If you find yourself getting logged out after every update, ensure that `WEBUI_SECRET_KEY` is set in your environment variables. Without this key being consistently defined, your authentication sessions may be invalidated after updates.
+  </TabItem>
+  <TabItem value="nvidia" label="NVIDIA GPU">
 
-To set `WEBUI_SECRET_KEY` persistently, include it when running your Docker container:
-
-```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui -e WEBUI_SECRET_KEY=your_secret_key ghcr.io/open-webui/open-webui:main
+```bash title="Terminal - With NVIDIA GPU Support"
+docker run -d \
+  -p 3000:8080 \
+  --gpus all \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
 ```
 
-Or, if using **docker-compose**, add it under the `environment` section:
+  </TabItem>
+</Tabs>
 
-```yml
+:::warning About WEBUI_SECRET_KEY
+If you're not setting `WEBUI_SECRET_KEY`, it will be auto-generated each time you recreate the container, **causing you to be logged out after every update**.
+
+See the [Persistent Login Sessions](#persistent-login-sessions) section below to fix this.
+:::
+
+### Verify Update Success
+
+Check that Open WebUI started successfully:
+
+```bash title="Terminal - Check Container Logs"
+docker logs open-webui
+
+# Watch logs in real-time
+docker logs -f open-webui
+```
+
+**Successful startup indicators:**
+```
+INFO:     [db] Database initialization complete
+INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
+```
+
+Then verify in your browser:
+1. Navigate to `http://localhost:3000` (or your configured port)
+2. Clear browser cache (Ctrl+Shift+Delete or Cmd+Shift+Delete)
+3. Hard refresh the page (Ctrl+F5 or Cmd+Shift+R)
+4. Log in and verify your data is intact
+
+## Persistent Login Sessions
+
+To avoid being logged out after every update, you must set a persistent `WEBUI_SECRET_KEY`.
+
+### Generate and Set Secret Key
+
+<Tabs groupId="setup-method">
+  <TabItem value="docker-run" label="Docker Run" default>
+
+```bash title="Terminal - Docker Run with Secret Key"
+docker run -d \
+  -p 3000:8080 \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  -e WEBUI_SECRET_KEY="your-secret-key-here" \
+  ghcr.io/open-webui/open-webui:main
+```
+
+:::tip Generate a Secure Key
+Generate a cryptographically secure key with:
+```bash
+openssl rand -hex 32
+```
+Or use Python:
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+:::
+
+  </TabItem>
+  <TabItem value="docker-compose" label="Docker Compose">
+
+```yaml title="docker-compose.yml"
 version: '3'
 services:
   open-webui:
@@ -68,40 +161,83 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - WEBUI_SECRET_KEY=your_secret_key
+      - WEBUI_SECRET_KEY=your-secret-key-here
+    restart: unless-stopped
+
+volumes:
+  open-webui:
 ```
 
-For more details on environment variable settings, check the [Open WebUI documentation on security variables](https://docs.openwebui.com/getting-started/env-configuration#security-variables).
+  </TabItem>
+</Tabs>
 
-## Automatically Updating Open WebUI with Watchtower
+:::danger Store Secret Key Securely
+- **Never commit** your secret key to version control
+- Use environment files (`.env`) or secret management tools
+- Keep the same key across updates to maintain sessions
+:::
 
-You can use [Watchtower](https://containrrr.dev/watchtower/) to automate the update process for Open WebUI. Here are three options:
+For complete environment variable documentation, see [Environment Configuration](https://docs.openwebui.com/getting-started/env-configuration#security-variables).
 
-### Option 1: One-time Update
+## Automated Update Tools
 
-You can run Watchtower as a one-time update to stop the current container, pull the latest image, and start a new container with the updated image and existing volume attached (**For Nvidia GPU support, add `--gpus all` to the docker run command**):
+Automated updates can save time but require careful consideration of the trade-offs.
 
-```bash
-docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
-```
+:::warning Important Considerations
+**Automated updates can break your deployment if:**
+- A new version has breaking changes you haven't reviewed
+- Custom configurations become incompatible
+- Database migrations fail during unattended updates
+- You have plugins or customizations that aren't forward-compatible
 
-### Option 2: Running Watchtower as a Separate Container
+**Best practices:**
+- Always review release notes before auto-updating production systems
+- Test updates in a staging environment first
+- Consider notification-only tools rather than automatic updates
+- Have a rollback plan and recent backups
+:::
 
-You can run Watchtower as a separate container that watches and updates your Open WebUI container:
+### Option 1: Watchtower (Community Fork)
 
-```bash
-docker run -d --name watchtower \
+:::info Watchtower Status
+The original `containrrr/watchtower` is **no longer maintained** and **does not work with Docker 29+**. The community has created maintained forks that resolve these issues.
+:::
+
+The original Watchtower project hasn't received updates in over two years and fails with Docker version 29.0.0 or newer due to API version incompatibility. Two maintained forks are now available: nickfedor/watchtower and Marrrrrrrrry/watchtower, both compatible with Docker 29+.
+
+**Recommended: nickfedor/watchtower fork**
+
+<Tabs>
+  <TabItem value="one-time" label="One-Time Update" default>
+
+Run Watchtower once to update all containers, then exit:
+
+```bash title="Terminal - One-Time Update"
+docker run --rm \
   --volume /var/run/docker.sock:/var/run/docker.sock \
-  containrrr/watchtower -i 300 open-webui
+  nickfedor/watchtower \
+  --run-once open-webui
 ```
 
-This will start Watchtower in detached mode, watching your Open WebUI container for updates every 5 minutes.
+  </TabItem>
+  <TabItem value="continuous" label="Continuous Monitoring">
 
-### Option 3: Integrating Watchtower with a `docker-compose.yml` File
+Run Watchtower as a persistent container that checks for updates every 6 hours:
 
-You can also integrate Watchtower with your `docker-compose.yml` file to automate updates for Open WebUI (**For Nvidia GPU support, add `--gpus all` to the docker run command**):
+```bash title="Terminal - Continuous Watchtower"
+docker run -d \
+  --name watchtower \
+  --restart unless-stopped \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  nickfedor/watchtower \
+  --interval 21600 \
+  open-webui
+```
 
-```yml
+  </TabItem>
+  <TabItem value="compose" label="Docker Compose">
+
+```yaml title="docker-compose.yml"
 version: '3'
 services:
   open-webui:
@@ -110,12 +246,20 @@ services:
       - "3000:8080"
     volumes:
       - open-webui:/app/backend/data
+    environment:
+      - WEBUI_SECRET_KEY=your-secret-key-here
+    restart: unless-stopped
 
   watchtower:
-    image: containrrr/watchtower
+    image: nickfedor/watchtower:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 300 open-webui
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_INCLUDE_STOPPED=false
+      - WATCHTOWER_SCHEDULE=0 0 2 * * *  # 2 AM daily
+    command: open-webui
+    restart: unless-stopped
     depends_on:
       - open-webui
 
@@ -123,29 +267,311 @@ volumes:
   open-webui:
 ```
 
-In this example, Watchtower is integrated with the `docker-compose.yml` file and watches the Open WebUI container for updates every 5 minutes.
+  </TabItem>
+</Tabs>
 
-:::info
+**Watchtower configuration options:**
 
-After updating, it's a good practice to clear your browser cache to ensure you are running the latest version of the web interface.
+| Environment Variable | Description | Default |
+|---------------------|-------------|---------|
+| `WATCHTOWER_CLEANUP` | Remove old images after update | `false` |
+| `WATCHTOWER_INCLUDE_STOPPED` | Update stopped containers too | `false` |
+| `WATCHTOWER_SCHEDULE` | Cron expression for update schedule | `0 0 0 * * *` (midnight) |
+| `WATCHTOWER_MONITOR_ONLY` | Only notify, don't update | `false` |
 
+:::tip Monitor-Only Mode
+To receive notifications without automatic updates:
+```bash
+docker run -d \
+  --name watchtower \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  -e WATCHTOWER_MONITOR_ONLY=true \
+  -e WATCHTOWER_NOTIFICATIONS=email \
+  -e WATCHTOWER_NOTIFICATION_EMAIL_TO=you@example.com \
+  nickfedor/watchtower
+```
 :::
 
-## Persistent Data in Docker Volumes
+**Alternative fork:** Marrrrrrrrry/watchtower is another actively maintained fork with updated dependencies and simplified functions.
 
-The data is stored in a Docker volume named `open-webui`. The path to the volume is not directly accessible, but you can inspect the volume with the following command:
+For complete Watchtower documentation, visit https://watchtower.nickfedor.com/
 
+### Option 2: What's Up Docker (WUD)
+
+What's Up Docker (WUD) is a notification-focused alternative that doesn't automatically update containers but instead provides a web UI to monitor updates and trigger them manually.
+
+**Why choose WUD:**
+- ✅ Web UI for visual monitoring
+- ✅ Click-button manual updates
+- ✅ Shows descriptive names and changelogs
+- ✅ Auto-prunes old images
+- ✅ Supports multiple Docker hosts
+- ✅ Extensive notification options
+- ❌ Requires manual intervention (not fully automated)
+
+**Quick start with WUD:**
+
+```yaml title="docker-compose.yml"
+version: '3'
+services:
+  wud:
+    image: fmartinou/whats-up-docker:latest
+    container_name: wud
+    ports:
+      - "3001:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Authentication (optional but recommended)
+      - WUD_AUTH_BASIC_USER=admin
+      - WUD_AUTH_BASIC_HASH=$$apr1$$... # Generate with htpasswd
+      
+      # Enable triggers for updates
+      - WUD_TRIGGER_DOCKERCOMPOSE_WUD_FILE=/docker-compose.yml
+      
+      # Notification examples
+      - WUD_WATCHER_LOCAL_SOCKET=/var/run/docker.sock
+    restart: unless-stopped
+```
+
+After starting WUD, access the web interface at `http://localhost:3001`. You'll see all containers and available updates with click-to-update buttons.
+
+:::tip Generate Password Hash
 ```bash
+htpasswd -nbB admin yourpassword
+```
+Copy the part after the colon, and replace each `$` with `$$` in docker-compose.
+:::
+
+For complete WUD documentation, visit https://getwud.github.io/wud/
+
+### Option 3: Diun (Docker Image Update Notifier)
+
+Diun is a lightweight CLI tool that only sends notifications about available updates without performing any updates. It's ideal if you want complete control and just need alerts.
+
+**Why choose Diun:**
+- ✅ Notification-only (safest approach)
+- ✅ No web UI overhead (lightweight)
+- ✅ Multiple notification providers (email, Slack, Discord, Telegram, etc.)
+- ✅ Fine-grained control over what to monitor
+- ❌ No built-in update mechanism (purely informational)
+
+```yaml title="docker-compose.yml"
+version: '3'
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/data
+    environment:
+      - TZ=America/New_York
+      - LOG_LEVEL=info
+      - DIUN_WATCH_WORKERS=10
+      - DIUN_WATCH_SCHEDULE=0 */6 * * *  # Every 6 hours
+      - DIUN_PROVIDERS_DOCKER=true
+      - DIUN_NOTIF_MAIL_HOST=smtp.gmail.com
+      - DIUN_NOTIF_MAIL_PORT=587
+      - DIUN_NOTIF_MAIL_USERNAME=your-email@gmail.com
+      - DIUN_NOTIF_MAIL_PASSWORD=your-app-password
+      - DIUN_NOTIF_MAIL_FROM=your-email@gmail.com
+      - DIUN_NOTIF_MAIL_TO=your-email@gmail.com
+    restart: unless-stopped
+```
+
+For complete Diun documentation, visit https://crazymax.dev/diun/
+
+### Comparison: Which Tool Should You Use?
+
+| Feature | Watchtower (Fork) | WUD | Diun |
+|---------|------------------|-----|------|
+| **Automatic Updates** | ✅ Yes | ⚠️ Manual via UI | ❌ No |
+| **Web Interface** | ❌ No | ✅ Yes | ❌ No |
+| **Notifications** | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Manual Control** | ⚠️ Limited | ✅ Full control | ✅ Full control |
+| **Resource Usage** | Low | Medium | Very Low |
+| **Docker 29+ Support** | ✅ Yes (forks) | ✅ Yes | ✅ Yes |
+| **Best For** | Set-and-forget homelabs | Visual monitoring + control | Notification-only workflows |
+
+:::tip Recommendation
+- **For homelabs/personal use:** nickfedor/watchtower (automated)
+- **For managed environments:** WUD (visual + manual control)
+- **For production/critical systems:** Diun (notifications only) + manual updates
+:::
+
+## Troubleshooting Updates
+
+### Container Won't Start After Update
+
+**Check logs for errors:**
+```bash title="Terminal"
+docker logs open-webui
+
+# Look for migration errors or startup failures
+```
+
+**Common causes:**
+- Database migration failed
+- Incompatible environment variables
+- Port already in use
+
+**Solution:** Restore previous version and investigate:
+```bash title="Terminal - Rollback to Previous Version"
+# Stop current container
+docker stop open-webui
+docker rm open-webui
+
+# Pull specific older version (check GitHub releases for version tags)
+docker pull ghcr.io/open-webui/open-webui:v0.4.0
+
+# Start with old image
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
+  --name open-webui ghcr.io/open-webui/open-webui:v0.4.0
+```
+
+### Data Loss or Corruption
+
+**If you suspect data issues:**
+
+```bash title="Terminal - Inspect Volume"
+# Find volume location
+docker volume inspect open-webui
+
+# Check database file exists
+docker run --rm -v open-webui:/data alpine ls -lah /data
+```
+
+**Recovery steps:**
+1. Stop Open WebUI: `docker stop open-webui`
+2. Backup volume: `docker run --rm -v open-webui:/data -v $(pwd):/backup alpine tar czf /backup/openwebui-backup.tar.gz /data`
+3. Restore from backup if needed
+4. Check [Manual Migration Guide](./manual-database-migration) for database issues
+
+### Watchtower Updates Too Frequently
+
+Configure update schedule with cron expressions:
+
+```bash title="Terminal - Custom Schedule"
+# Daily at 3 AM
+-e WATCHTOWER_SCHEDULE="0 0 3 * * *"
+
+# Weekly on Sundays at 2 AM
+-e WATCHTOWER_SCHEDULE="0 0 2 * * 0"
+
+# Every 12 hours
+-e WATCHTOWER_SCHEDULE="0 0 */12 * * *"
+```
+
+### "Logged Out After Update" Despite Setting Secret Key
+
+**Diagnosis:**
+```bash title="Terminal - Check Environment Variables"
+docker inspect open-webui | grep WEBUI_SECRET_KEY
+```
+
+If the key isn't showing, you didn't pass it correctly when recreating the container.
+
+**Fix:**
+```bash title="Terminal - Recreate with Correct Key"
+docker stop open-webui
+docker rm open-webui
+
+# Make sure to include -e WEBUI_SECRET_KEY
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
+  -e WEBUI_SECRET_KEY="your-persistent-key" \
+  --name open-webui ghcr.io/open-webui/open-webui:main
+```
+
+## Docker Volume Management
+
+### Locate Your Data
+
+The `open-webui` Docker volume contains all your data (chats, users, uploads, etc.).
+
+```bash title="Terminal - Inspect Volume"
 docker volume inspect open-webui
 ```
 
-This will show you the details of the volume, including the mountpoint, which is usually located in `/var/lib/docker/volumes/open-webui/_data`.
+**Common volume locations:**
+- Linux: `/var/lib/docker/volumes/open-webui/_data`
+- Windows (WSL2): `\\wsl$\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes\open-webui\_data`
+- macOS: `~/Library/Containers/com.docker.docker/Data/vms/0/data/docker/volumes/open-webui/_data`
 
-On Windows 10 + WSL 2, Docker volumes are located here (type in the Windows file explorer):
-- \\\wsl$\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes
+:::warning Direct Access Risk
+Avoid directly modifying files in the volume location. Always interact through the container or Docker commands to prevent corruption.
+:::
 
-For older versions of Docker (pre-Docker v26.1.4):
-- \\\wsl$\docker-desktop-data\data\docker\volumes
-- \\\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes
+### Backup Volume
 
-*(Windows answer credit to StackOverflow user sarye-haddadi; [link to original SO post](https://stackoverflow.com/questions/43181654/locating-data-volumes-in-docker-desktop-windows))*
+```bash title="Terminal - Backup Docker Volume"
+# Create timestamped backup
+docker run --rm \
+  -v open-webui:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/openwebui-$(date +%Y%m%d_%H%M%S).tar.gz /data
+```
+
+### Restore Volume
+
+```bash title="Terminal - Restore from Backup"
+# Stop container
+docker stop open-webui
+
+# Restore backup
+docker run --rm \
+  -v open-webui:/data \
+  -v $(pwd):/backup \
+  alpine sh -c "rm -rf /data/* && tar xzf /backup/openwebui-20241201_120000.tar.gz -C /"
+
+# Start container
+docker start open-webui
+```
+
+### Clean Up Old Images
+
+After updating, old images remain on disk. Remove them to free space:
+
+```bash title="Terminal - Remove Unused Images"
+# Remove dangling images (not tagged or used)
+docker image prune
+
+# Remove all unused images (careful!)
+docker image prune -a
+
+# List all open-webui images
+docker images | grep open-webui
+```
+
+Watchtower can do this automatically with:
+```bash
+-e WATCHTOWER_CLEANUP=true
+```
+
+## Post-Update Checklist
+
+After updating, verify everything works:
+
+- [ ] Open WebUI starts without errors (`docker logs open-webui`)
+- [ ] Can access web interface at `http://localhost:3000`
+- [ ] Can log in with existing credentials
+- [ ] Chat history is intact
+- [ ] Models are still configured correctly
+- [ ] Custom settings are preserved
+- [ ] No JavaScript console errors (F12 in browser)
+- [ ] Clear browser cache if interface looks broken
+
+:::tip Browser Cache Issues
+If the interface looks broken or old after updating:
+1. Hard refresh: Ctrl+F5 (Windows/Linux) or Cmd+Shift+R (Mac)
+2. Clear site data: Browser Settings > Privacy > Clear browsing data
+3. Try incognito/private window to verify it's a cache issue
+:::
+
+## Additional Resources
+
+- [Open WebUI GitHub Releases](https://github.com/open-webui/open-webui/releases) - Version history and changelogs
+- [Environment Configuration Guide](https://docs.openwebui.com/getting-started/env-configuration) - All environment variables
+- [Manual Database Migration](troubleshooting/manual-database-migration.md) - Fix database issues after updates
+- [Watchtower Documentation](https://watchtower.nickfedor.com/) - Advanced Watchtower configuration
+- [WUD Documentation](https://getwud.github.io/wud/) - What's Up Docker setup guide
