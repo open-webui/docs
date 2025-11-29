@@ -126,22 +126,61 @@ Before attempting any fixes, gather information about your database state.
   </TabItem>
 </Tabs>
 
-### Run Diagnostic Commands
+### Navigate to Alembic Directory and Set Environment
 
-Navigate to the directory containing `alembic.ini`:
+Navigate to the directory containing `alembic.ini` and configure required environment variables:
 
-```bash title="Terminal - Navigate to Alembic Directory"
+```bash title="Terminal - Navigate and Configure Environment"
+# Navigate to Alembic directory
 cd /app/backend/open_webui  # Docker
 # OR
 cd /path/to/open-webui/backend/open_webui  # Local
+
+# Verify alembic.ini exists
+ls -la alembic.ini
 ```
+
+### Set Required Environment Variables
+
+```bash title="Terminal - Set Environment Variables"
+# Required: Database URL
+# For Docker with SQLite (4 slashes for absolute path)
+export DATABASE_URL="sqlite:////app/backend/data/webui.db"
+
+# For local install with SQLite (relative path)
+export DATABASE_URL="sqlite:///../data/webui.db"
+
+# For PostgreSQL
+export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
+
+# Required: WEBUI_SECRET_KEY
+# Get from existing file
+export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
+
+# If .webui_secret_key doesn't exist, generate one
+# export WEBUI_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+# echo $WEBUI_SECRET_KEY > /app/backend/data/.webui_secret_key
+
+# Verify both are set
+echo "DATABASE_URL: $DATABASE_URL"
+echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
+```
+
+:::danger Both Variables Required
+Alembic commands will fail with `Required environment variable not found` if `WEBUI_SECRET_KEY` is missing. Open WebUI's code imports `env.py` which validates this variable exists before Alembic can even connect to the database.
+:::
+
+:::warning Path Syntax for SQLite
+
+- `sqlite:////app/...` = 4 slashes total (absolute path: `sqlite://` + `/` + `/app/...`)
+- `sqlite:///../data/...` = 3 slashes total (relative path)
+:::
+
+### Run Diagnostic Commands
 
 Execute these read-only diagnostic commands:
 
 ```bash title="Terminal - Diagnostics (Safe - Read Only)"
-# Verify alembic.ini exists
-ls -la alembic.ini
-
 # Check current migration version
 alembic current -v
 
@@ -194,30 +233,7 @@ Verify what's actually in your database:
 
 </details>
 
-## Step 3: Configure Environment
-
-Set required environment variables for manual Alembic execution.
-
-```bash title="Terminal - Set Environment Variables"
-# Required: Database URL
-# For Docker with SQLite (note the 4 slashes for absolute path)
-export DATABASE_URL="sqlite:////app/backend/data/webui.db"
-
-# For local install with SQLite (relative path from open_webui directory)
-export DATABASE_URL="sqlite:///../data/webui.db"
-
-# For PostgreSQL
-export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
-```
-
-:::warning Path Syntax for SQLite
-
-- `sqlite:////app/...` = 4 slashes total (absolute path)
-- `sqlite:///data/...` = 3 slashes total (relative path)
-- The extra slash after `sqlite:///` makes it absolute
-:::
-
-## Step 4: Apply Migrations
+## Step 3: Apply Migrations
 
 ### Standard Upgrade (Most Common)
 
@@ -275,7 +291,7 @@ alembic downgrade <revision_id>
 alembic downgrade base
 ```
 
-## Step 5: Verify Migration Success
+## Step 4: Verify Migration Success
 
 After running migrations, confirm everything is correct:
 
@@ -324,6 +340,31 @@ INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
 ```
 
 ## Troubleshooting
+
+### "Required environment variable not found"
+
+**Cause:** `WEBUI_SECRET_KEY` environment variable is missing.
+
+**Solution:**
+
+```bash title="Terminal - Fix Missing Secret Key"
+# Method 1: Use existing key from file
+export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
+
+# Method 2: If file doesn't exist, generate new key
+export WEBUI_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+echo $WEBUI_SECRET_KEY > /app/backend/data/.webui_secret_key
+
+# Verify it's set
+echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
+
+# Try alembic again
+alembic current -v
+```
+
+:::warning Why This Happens
+Open WebUI's `env.py` file imports models, which import `open_webui.env`, which validates that `WEBUI_SECRET_KEY` exists. Without it, Python crashes before Alembic can even connect to the database.
+:::
 
 ### "No config file 'alembic.ini' found"
 
