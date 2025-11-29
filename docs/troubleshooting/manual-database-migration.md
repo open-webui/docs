@@ -110,8 +110,12 @@ Before attempting any fixes, gather information about your database state.
       ghcr.io/open-webui/open-webui:main
     ```
     
-    :::note Default Directory
-    When you enter the container, you'll be in `/app`. The Alembic configuration is at `/app/backend/open_webui/alembic.ini`.
+    :::note Verify Your Location
+    Check where you are after entering the container:
+    ```bash
+    pwd
+    ```
+    The Alembic configuration is at `/app/backend/open_webui/alembic.ini`. Navigate there regardless of your starting directory.
     :::
   </TabItem>
   <TabItem value="local" label="Local Install">
@@ -131,24 +135,27 @@ Before attempting any fixes, gather information about your database state.
 Navigate to the directory containing `alembic.ini` and configure required environment variables:
 
 ```bash title="Terminal - Navigate and Configure Environment"
-# Navigate to Alembic directory
+# First, verify where you are
+pwd
+
+# Navigate to Alembic directory (adjust path if your pwd is different)
 cd /app/backend/open_webui  # Docker
 # OR
 cd /path/to/open-webui/backend/open_webui  # Local
 
-# Verify alembic.ini exists
+# Verify alembic.ini exists in current directory
 ls -la alembic.ini
 ```
 
 ### Set Required Environment Variables
 
-```bash title="Terminal - Set Environment Variables"
-# Required: Database URL
-# For Docker with SQLite (4 slashes for absolute path)
-export DATABASE_URL="sqlite:////app/backend/data/webui.db"
+<Tabs groupId="install-type">
+  <TabItem value="docker" label="Docker" default>
 
-# For local install with SQLite (relative path)
-export DATABASE_URL="sqlite:///../data/webui.db"
+```bash title="Terminal - Set Environment Variables (Docker)"
+# Required: Database URL
+# For SQLite (4 slashes for absolute path)
+export DATABASE_URL="sqlite:////app/backend/data/webui.db"
 
 # For PostgreSQL
 export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
@@ -165,6 +172,39 @@ export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
 echo "DATABASE_URL: $DATABASE_URL"
 echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
 ```
+
+  </TabItem>
+  <TabItem value="local" label="Local Install">
+
+```bash title="Terminal - Set Environment Variables (Local)"
+# Required: Database URL
+# For SQLite (relative path from backend/open_webui directory)
+export DATABASE_URL="sqlite:///../data/webui.db"
+
+# For absolute path
+export DATABASE_URL="sqlite:////full/path/to/webui.db"
+
+# For PostgreSQL
+export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
+
+# Required: WEBUI_SECRET_KEY
+# If using .env file, Alembic may not pick it up automatically - export manually
+export WEBUI_SECRET_KEY=$(cat ../data/.webui_secret_key)
+
+# Or if you have it in your environment already
+# export WEBUI_SECRET_KEY="your-existing-key"
+
+# Verify both are set
+echo "DATABASE_URL: $DATABASE_URL"
+echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
+```
+
+:::note Local Installation Environment
+Local installations often have `DATABASE_URL` in a `.env` file, but Alembic's `env.py` may not automatically load `.env` files. You must explicitly export these variables in your shell before running Alembic commands.
+:::
+
+  </TabItem>
+</Tabs>
 
 :::danger Both Variables Required
 Alembic commands will fail with `Required environment variable not found` if `WEBUI_SECRET_KEY` is missing. Open WebUI's code imports `env.py` which validates this variable exists before Alembic can even connect to the database.
@@ -190,6 +230,9 @@ alembic heads
 # List all migration history
 alembic history
 
+# Show pending migrations (what would be applied)
+alembic upgrade head --sql | head -30
+
 # Check for branching (indicates issues)
 alembic branches
 ```
@@ -207,6 +250,7 @@ ae1027a6acf (head)
 
 - `alembic current` = what version your database thinks it's at
 - `alembic heads` = what version the code expects
+- `alembic upgrade head --sql` = preview SQL that would be executed (doesn't apply changes)
 - If `current` is older than `heads`, you have pending migrations
 - If `current` equals `heads`, your database is up-to-date
 :::
@@ -259,7 +303,13 @@ INFO  [alembic.runtime.migration] Running upgrade abc123 -> def456, add_new_colu
 :::note "Will assume non-transactional DDL"
 This is a **normal informational message** for SQLite, not an error. SQLite doesn't support rollback of schema changes, so migrations run without transaction protection.
 
-If the process appears to hang after this message, wait 2-3 minutes - some migrations take time. If it's truly stuck, check for database locks (see troubleshooting).
+If the process appears to hang after this message, wait 2-3 minutes - some migrations take time, especially:
+
+- Migrations that add indexes to large tables (1M+ rows: 1-5 minutes)
+- Migrations with data transformations (100K+ rows: 30 seconds to several minutes)
+- Migrations that rebuild tables (SQLite doesn't support all ALTER operations)
+
+For very large databases (10M+ rows), consider running migrations during a maintenance window and monitoring progress with `sqlite3 /path/to/webui.db ".tables"` in another terminal.
 :::
 
 ### Upgrade to Specific Version
@@ -298,13 +348,20 @@ After running migrations, confirm everything is correct:
 ```bash title="Terminal - Post-Migration Verification"
 # Verify current version matches expected
 alembic current
-
 # Should show (head) indicating you're at latest
 # Example: ae1027a6acf (head)
 
 # Confirm no pending migrations
 alembic upgrade head --sql | head -20
 # If output contains only comments or is empty, you're up to date
+
+# Verify key tables exist (SQLite)
+sqlite3 /app/backend/data/webui.db ".tables" | grep -E "user|chat|model"
+# Should show user, chat, model tables among others
+
+# Test a simple query to ensure schema is intact
+sqlite3 /app/backend/data/webui.db "SELECT COUNT(*) FROM user;"
+# Should return a number, not an error
 ```
 
 ### Test Application Startup
@@ -320,6 +377,9 @@ alembic upgrade head --sql | head -20
     
     # Watch logs for migration confirmation
     docker logs -f open-webui
+    
+    # Look for successful startup, then test in browser
+    # Navigate to http://localhost:8080 and verify login page loads
     ```
   </TabItem>
   <TabItem value="local" label="Local Install">
@@ -328,6 +388,7 @@ alembic upgrade head --sql | head -20
     python -m open_webui.main
 
     # Watch for successful startup messages
+    # Test by navigating to http://localhost:8080
     ```
   </TabItem>
 </Tabs>
@@ -339,6 +400,13 @@ INFO:     [db] Database initialization complete
 INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
 ```
 
+**Smoke test after startup:**
+
+- Can access login page
+- Can log in with existing credentials
+- Can view chat history
+- No JavaScript console errors
+
 ## Troubleshooting
 
 ### "Required environment variable not found"
@@ -347,7 +415,10 @@ INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
 
 **Solution:**
 
-```bash title="Terminal - Fix Missing Secret Key"
+<Tabs groupId="install-type">
+  <TabItem value="docker" label="Docker" default>
+
+```bash title="Terminal - Fix Missing Secret Key (Docker)"
 # Method 1: Use existing key from file
 export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
 
@@ -362,6 +433,27 @@ echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
 alembic current -v
 ```
 
+  </TabItem>
+  <TabItem value="local" label="Local Install">
+
+```bash title="Terminal - Fix Missing Secret Key (Local)"
+# Method 1: Use existing key from file
+export WEBUI_SECRET_KEY=$(cat ../data/.webui_secret_key)
+
+# Method 2: Check if it's in your .env file
+grep WEBUI_SECRET_KEY .env
+# Then export it: export WEBUI_SECRET_KEY="value-from-env-file"
+
+# Verify it's set
+echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
+
+# Try alembic again
+alembic current -v
+```
+
+  </TabItem>
+</Tabs>
+
 :::warning Why This Happens
 Open WebUI's `env.py` file imports models, which import `open_webui.env`, which validates that `WEBUI_SECRET_KEY` exists. Without it, Python crashes before Alembic can even connect to the database.
 :::
@@ -373,12 +465,18 @@ Open WebUI's `env.py` file imports models, which import `open_webui.env`, which 
 **Solution:**
 
 ```bash title="Terminal"
+# Find your container name if not 'open-webui'
+docker ps
+
 # Find alembic.ini location
 find /app -name "alembic.ini" 2>/dev/null  # Docker
 find . -name "alembic.ini"  # Local
 
 # Navigate to that directory
 cd /app/backend/open_webui  # Most common path
+
+# Verify you're in the right place
+ls -la alembic.ini
 ```
 
 ### "Target database is not up to date"
@@ -443,12 +541,14 @@ You may see advice to run `alembic stamp head` to "fix" version mismatches. **Th
 
 `alembic stamp` tells Alembic "pretend this migration was applied" without actually running it. This creates permanent database corruption where Alembic thinks your schema is up-to-date when it isn't.
 
-**Only use `alembic stamp head` if:**
+**Only use `alembic stamp <revision>` if:**
 
 - You manually created all tables using `create_all()` and need to mark them as migrated
 - You're a developer initializing a fresh database that matches current schema
+- You imported a database backup from another system and need to mark it at the correct revision
+- You've manually applied migrations via raw SQL and need to update the version tracking
 
-**Never use it to "fix" migration errors.**
+**Never use it to "fix" migration errors or skip failed migrations.**
 :::
 
 ### Process Hangs After "Will assume non-transactional DDL"
@@ -547,7 +647,96 @@ alembic upgrade head
 If upgrading from very old Open WebUI versions (< 0.3.x), consider a fresh install with data export/import rather than attempting to migrate the database schema across multiple major version changes.
 :::
 
+### PostgreSQL Foreign Key Errors
+
+:::info PostgreSQL Only
+This troubleshooting applies only to PostgreSQL databases. SQLite handles foreign keys differently.
+:::
+
+**Symptom:** Errors like `psycopg2.errors.InvalidForeignKey: there is no unique constraint matching given keys for referenced table "user"`
+
+**Cause:** PostgreSQL requires explicit primary key constraints that were missing in older schema versions.
+
+**Solution for PostgreSQL:**
+
+```sql title="PostgreSQL Fix"
+-- Connect to your PostgreSQL database
+psql -h localhost -U your_user -d open_webui_db
+
+-- Add missing primary key constraint (PostgreSQL syntax)
+ALTER TABLE public."user" ADD CONSTRAINT user_pk PRIMARY KEY (id);
+
+-- Verify constraint was added
+\d+ public."user"
+```
+
+**Note:** The `public.` schema prefix and quoted `"user"` identifier are PostgreSQL-specific. This SQL will not work on SQLite or MySQL.
+
 ## Advanced Operations
+
+### Production and Multi-Server Deployments
+
+:::warning Rolling Updates Can Cause Failures
+In multi-server deployments, running different code versions simultaneously during rolling updates can cause errors if the new code expects schema changes that haven't been applied yet, or if old code is incompatible with new schema.
+:::
+
+**Recommended deployment strategies:**
+
+<Tabs>
+  <TabItem value="separate-job" label="Separate Migration Job" default>
+
+Run migrations as a one-time job before deploying new application code:
+
+```bash title="Kubernetes Job Example"
+# 1. Run migration job
+kubectl apply -f migration-job.yaml
+
+# 2. Wait for completion
+kubectl wait --for=condition=complete job/openwebui-migration
+
+# 3. Deploy new application version
+kubectl rollout restart deployment/openwebui
+```
+
+This ensures schema is updated before any new code runs.
+
+  </TabItem>
+  <TabItem value="maintenance" label="Maintenance Window">
+
+Take the application offline during migration:
+
+```bash title="Maintenance Workflow"
+# 1. Stop all application instances
+docker-compose down
+
+# 2. Run migrations
+docker run --rm -v open-webui:/app/backend/data \
+  ghcr.io/open-webui/open-webui:main \
+  bash -c "cd /app/backend/open_webui && alembic upgrade head"
+
+# 3. Start all instances with new code
+docker-compose up -d
+```
+
+Simplest approach but requires downtime.
+
+  </TabItem>
+  <TabItem value="blue-green" label="Blue-Green Deployment">
+
+Maintain two identical environments and switch traffic after migration:
+
+```bash title="Blue-Green Workflow"
+# 1. Green (new) environment gets migrated database
+# 2. Deploy new code to green environment
+# 3. Test green environment thoroughly
+# 4. Switch traffic from blue to green
+# 5. Keep blue as instant rollback option
+```
+
+Zero downtime but requires double infrastructure.
+
+  </TabItem>
+</Tabs>
 
 ### Generate SQL Without Applying
 
