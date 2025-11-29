@@ -94,7 +94,7 @@ From the main list view in the `Models` section, click the ellipsis (`...`) next
 - **Clone**: Create a copy of a model configuration, which will be appended with `-clone`.
 
 :::note
-You cannot clone a raw Base Model directly; you must create a custom model first before cloning it.
+A raw Base Model can be cloned as a custom Workspace model, but it will not clone the raw Base Model itself.
 :::
 
 - **Copy Link**: Copies a direct URL to the model settings.
