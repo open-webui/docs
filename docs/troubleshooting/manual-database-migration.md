@@ -161,12 +161,15 @@ export DATABASE_URL="sqlite:////app/backend/data/webui.db"
 export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
 
 # Required: WEBUI_SECRET_KEY
-# Get from existing file
-export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
+# Get from existing file in backend directory (NOT data directory)
+export WEBUI_SECRET_KEY=$(cat /app/backend/.webui_secret_key)
 
-# If .webui_secret_key doesn't exist, generate one
+# If that fails, try the data directory location
+# export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
+
+# If neither file exists, generate one
 # export WEBUI_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-# echo $WEBUI_SECRET_KEY > /app/backend/data/.webui_secret_key
+# echo $WEBUI_SECRET_KEY > /app/backend/.webui_secret_key
 
 # Verify both are set
 echo "DATABASE_URL: $DATABASE_URL"
@@ -304,7 +307,6 @@ INFO  [alembic.runtime.migration] Running upgrade abc123 -> def456, add_new_colu
 This is a **normal informational message** for SQLite, not an error. SQLite doesn't support rollback of schema changes, so migrations run without transaction protection.
 
 If the process appears to hang after this message, wait 2-3 minutes - some migrations take time, especially:
-
 - Migrations that add indexes to large tables (1M+ rows: 1-5 minutes)
 - Migrations with data transformations (100K+ rows: 30 seconds to several minutes)
 - Migrations that rebuild tables (SQLite doesn't support all ALTER operations)
@@ -401,7 +403,6 @@ INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
 ```
 
 **Smoke test after startup:**
-
 - Can access login page
 - Can log in with existing credentials
 - Can view chat history
@@ -419,12 +420,15 @@ INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
   <TabItem value="docker" label="Docker" default>
 
 ```bash title="Terminal - Fix Missing Secret Key (Docker)"
-# Method 1: Use existing key from file
-export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
+# Method 1: Check backend directory first (most common location)
+export WEBUI_SECRET_KEY=$(cat /app/backend/.webui_secret_key)
 
-# Method 2: If file doesn't exist, generate new key
-export WEBUI_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-echo $WEBUI_SECRET_KEY > /app/backend/data/.webui_secret_key
+# Method 2: If that fails, try data directory
+# export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
+
+# Method 3: If neither file exists, generate new key
+# export WEBUI_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+# echo $WEBUI_SECRET_KEY > /app/backend/.webui_secret_key
 
 # Verify it's set
 echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
@@ -616,6 +620,157 @@ git checkout /app/backend/open_webui/migrations/  # If using git
 
 **Technical context:** The "autogenerate detects removed tables" issue occurs because Open WebUI's Alembic metadata configuration doesn't import all model definitions. This causes autogenerate to compare against incomplete metadata, thinking tables should be removed. This is a developer-level issue that doesn't affect users running `alembic upgrade`.
 
+### PostgreSQL Foreign Key Errors
+
+:::info PostgreSQL Only
+This troubleshooting applies only to PostgreSQL databases. SQLite handles foreign keys differently.
+:::
+
+**Symptom:** Errors like `psycopg2.errors.InvalidForeignKey: there is no unique constraint matching given keys for referenced table "user"`
+
+**Cause:** PostgreSQL requires explicit primary key constraints that were missing in older schema versions.
+
+**Solution for PostgreSQL:**
+
+```sql title="PostgreSQL Fix"
+-- Connect to your PostgreSQL database
+psql -h localhost -U your_user -d open_webui_db
+
+-- Add missing primary key constraint (PostgreSQL syntax)
+ALTER TABLE public."user" ADD CONSTRAINT user_pk PRIMARY KEY (id);
+
+-- Verify constraint was added
+\d+ public."user"
+```
+
+**Note:** The `public.` schema prefix and quoted `"user"` identifier are PostgreSQL-specific. This SQL will not work on SQLite or MySQL.
+
+### Duplicate Column Errors
+
+:::danger Critical Issue
+Duplicate column errors indicate schema corruption, usually from failed migrations or manual database modifications. This requires careful manual intervention.
+:::
+
+**Symptom:** Migration fails with error like:
+
+```
+sqlite3.OperationalError: duplicate column name: message.reply_to_id
+```
+
+Or when starting Open WebUI:
+
+```
+UNIQUE constraint failed: alembic_version.version_num
+```
+
+**Cause:** 
+
+<ul>
+  <li>A previous migration partially completed, leaving duplicate columns</li>
+  <li>Database was manually modified</li>
+  <li>Migration was interrupted mid-execution</li>
+  <li>Upgrading directly across many versions (skipping intermediate migrations)</li>
+</ul>
+
+**Diagnosis:**
+
+```bash title="Terminal - Check for Duplicate Columns"
+# List all columns in the message table
+sqlite3 /app/backend/data/webui.db "PRAGMA table_info(message);"
+
+# Look for duplicate column names in the output
+# Example problematic output:
+# 10|reply_to_id|TEXT|0||0
+# 15|reply_to_id|TEXT|0||0  <- Duplicate!
+```
+
+**Solution - Manual Column Removal:**
+
+:::warning Data Loss Risk
+Removing columns can cause data loss. **Backup your database first** before proceeding.
+:::
+
+```bash title="Terminal - Remove Duplicate Column (SQLite)"
+# 1. Backup database first!
+cp /app/backend/data/webui.db /app/backend/data/webui.db.pre-fix
+
+# 2. Enter SQLite
+sqlite3 /app/backend/data/webui.db
+
+# 3. Check current table structure
+PRAGMA table_info(message);
+
+# 4. SQLite doesn't support DROP COLUMN directly - must recreate table
+# First, get the CREATE TABLE statement
+.schema message
+
+# 5. Create new table without duplicate column
+-- Copy the CREATE TABLE statement but remove duplicate column definition
+-- Example (adjust to your actual schema):
+CREATE TABLE message_new (
+    id TEXT PRIMARY KEY,
+    content TEXT,
+    role TEXT,
+    -- ... other columns ...
+    reply_to_id TEXT,  -- Only one instance
+    -- ... remaining columns ...
+    FOREIGN KEY (reply_to_id) REFERENCES message(id)
+);
+
+# 6. Copy data from old table to new table
+INSERT INTO message_new SELECT * FROM message;
+
+# 7. Drop old table
+DROP TABLE message;
+
+# 8. Rename new table
+ALTER TABLE message_new RENAME TO message;
+
+# 9. Exit SQLite
+.quit
+
+# 10. Verify fix worked
+sqlite3 /app/backend/data/webui.db "PRAGMA table_info(message);"
+
+# 11. Try migration again
+cd /app/backend/open_webui
+alembic upgrade head
+```
+
+**Alternative - Simpler approach if you know the duplicate column:**
+
+```bash title="Terminal - Quick Fix for Known Duplicate"
+# This only works if the column truly is completely duplicate
+# and SQLite's table rebuilding handles it correctly
+
+sqlite3 /app/backend/data/webui.db <<EOF
+-- Create temporary table with correct schema
+CREATE TABLE message_temp AS SELECT DISTINCT * FROM message;
+
+-- Drop original table
+DROP TABLE message;
+
+-- Recreate with proper schema (get from .schema message originally)
+-- Then copy data back
+EOF
+```
+
+:::danger When to Seek Help
+If you're not comfortable with SQL or aren't sure which column is the duplicate, **stop here and seek help** on the Open WebUI GitHub issues or Discord. Provide:
+- Output of `PRAGMA table_info(message);`
+- The full migration error message
+- Your Open WebUI version history (what version you upgraded from/to)
+:::
+
+**Prevention:**
+
+<ul>
+  <li>Never skip major versions when upgrading (don't jump from v0.1.x to v0.4.x)</li>
+  <li>Always backup before upgrading</li>
+  <li>Test upgrades on a copy of your database first</li>
+  <li>Review migration scripts for your version upgrade path</li>
+</ul>
+
 ### Peewee to Alembic Transition Issues
 
 **Background:** Older Open WebUI versions (pre-0.4.x) used Peewee migrations. Current versions use Alembic.
@@ -646,31 +801,6 @@ alembic upgrade head
 :::tip
 If upgrading from very old Open WebUI versions (< 0.3.x), consider a fresh install with data export/import rather than attempting to migrate the database schema across multiple major version changes.
 :::
-
-### PostgreSQL Foreign Key Errors
-
-:::info PostgreSQL Only
-This troubleshooting applies only to PostgreSQL databases. SQLite handles foreign keys differently.
-:::
-
-**Symptom:** Errors like `psycopg2.errors.InvalidForeignKey: there is no unique constraint matching given keys for referenced table "user"`
-
-**Cause:** PostgreSQL requires explicit primary key constraints that were missing in older schema versions.
-
-**Solution for PostgreSQL:**
-
-```sql title="PostgreSQL Fix"
--- Connect to your PostgreSQL database
-psql -h localhost -U your_user -d open_webui_db
-
--- Add missing primary key constraint (PostgreSQL syntax)
-ALTER TABLE public."user" ADD CONSTRAINT user_pk PRIMARY KEY (id);
-
--- Verify constraint was added
-\d+ public."user"
-```
-
-**Note:** The `public.` schema prefix and quoted `"user"` identifier are PostgreSQL-specific. This SQL will not work on SQLite or MySQL.
 
 ## Advanced Operations
 
