@@ -3104,8 +3104,8 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `str`
 - Default: `https://api.perplexity.ai/search`
-- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default. This enables flexibility in routing search requests to alternative providers or internal proxies.
-- Example: `my-litellm-server.com/search`
+- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default for the official Perplexity API. This enables flexibility in routing search requests to alternative providers or internal proxies. **Note: If using LiteLLM, append the specific provider name to the URL path.**
+- Example: `http://my-litellm-server.com/search/perplexity-search`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PERPLEXITY_MODEL`
