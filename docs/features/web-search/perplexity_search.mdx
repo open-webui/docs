@@ -25,8 +25,20 @@ Perplexity Search API is just a search engine, as opposed to the Perplexity inte
 4. Enter your Perplexity API key from [Perplexity API Key management](https://www.perplexity.ai/account/api/keys).
 5. Press save
 
-:::tip
+### Using LiteLLM for Search
 
-LiteLLM's `/search` endpoint uses the Perplexity Search API style - you can customize the API endpoint of Open WebUI's perplexity_search web search to point to your LiteLLM instance and use that for web searches!
+You can use a [LiteLLM](https://docs.litellm.ai/) proxy instance as your search provider instead of connecting directly to Perplexity. LiteLLM's `/search` endpoint is compatible with the Perplexity Search API style used by Open WebUI.
 
-:::
+To configure this:
+
+1. Follow the setup steps above, selecting `perplexity_search` as the engine.
+2. Under the **Perplexity Search API Base URL** field, replace the default URL with your LiteLLM endpoint.
+3. The URL must follow this specific format: `http://<your-litellm-url>/search/<your-search-provider-name>` - Ensurethe search provider name matches the provider name you configured in your LiteLLM setup.
+
+**Example:**
+
+If your LiteLLM instance is running on localhost and you want to use the `perplexity-search` provider defined in your LiteLLM config:
+
+```
+http://localhost:4000/search/perplexity-search
+```

@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.39](https://github.com/open-webui/open-webui/releases/tag/v0.6.39), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.41](https://github.com/open-webui/open-webui/releases/tag/v0.6.41), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -1052,6 +1052,12 @@ JSON format: { "tags": ["tag1", "tag2", "tag3"] }
 :::info
 
 This variable replaces the deprecated `ENABLE_API_KEY` environment variable.
+
+:::
+
+:::info
+
+For API Key creation (and the API keys themselves) to work, you not only need to enable it globally, but also give specific user groups the permission for it 
 
 :::
 
@@ -2202,7 +2208,7 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
   - `do_ocr` (bool): Enable OCR processing
   - `force_ocr` (bool): Force OCR even when text layer exists
   - `ocr_engine` (str): OCR engine to use (`tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`)
-  - `ocr_lang` (str): OCR language codes (e.g., `eng,fra,deu,spa`)
+  - `ocr_lang` (list[str]): OCR language codes (e.g., `["en", "de", "fr"]`)
   - `pdf_backend` (str): PDF processing backend
   - `table_mode` (str): Table extraction mode
   - `pipeline` (str): Processing pipeline to use
@@ -2217,8 +2223,10 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
 {
   "do_ocr": true,
   "ocr_engine": "tesseract",
-  "ocr_lang": "eng,fra,deu,spa",
+  "ocr_lang": ["eng", "fra", "deu", "spa"],
   "force_ocr": false,
+  "pdf_backend": "dlparse_v4",
+  "table_mode": "accurate",
   "do_picture_description": true,
   "picture_description_mode": "api",
   "vlm_pipeline_model_api": "openai://gpt-4o"
@@ -3098,8 +3106,8 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 - Type: `str`
 - Default: `https://api.perplexity.ai/search`
-- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default. This enables flexibility in routing search requests to alternative providers or internal proxies.
-- Example: `my-litellm-server.com/search`
+- Description: Configures the API endpoint for Perplexity Search. Allows using custom or self-hosted Perplexity-compatible API endpoints (such as LiteLLM's `/search` endpoint) instead of the hardcoded default for the official Perplexity API. This enables flexibility in routing search requests to alternative providers or internal proxies. **Note: If using LiteLLM, append the specific provider name to the URL path.**
+- Example: `http://my-litellm-server.com/search/perplexity-search`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PERPLEXITY_MODEL`
@@ -4251,7 +4259,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: `,`
-- Description: Allows custom role separators for for splitting the `OAUTH_*_ROLES` variables. Meant for OAuth roles that contain commas; useful for roles specified in LDAP syntax or other systems where commas are part of role names.
+- Description: Allows custom role separators for for splitting the `OAUTH_*_ROLES` variables. Meant for OAuth roles that contain commas; useful for roles specified in LDAP syntax or other systems where commas are part of role names. If the claim is a string and contains the separator, it will be also split by that separator.
 
 #### `OAUTH_GROUPS_SEPARATOR`
 
@@ -4547,11 +4555,39 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_FEATURES_FOLDERS`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables the visibility of the Folders feature (chat sidebar) to users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_NOTES`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables the visibility of the Notes feature to users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_CHANNELS`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables the ability for users to create their own group channels.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_FEATURES_API_KEYS`
 
 - Type: `bool`
 - Default: `False`
 - Description: Sets the permission for API key creation feature for users. When enabled, users will have the ability to create and manage API keys for programmatic access.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+For API Key creation (and the API keys themselves) to work, you not only need to give specific user groups the permission for it, but also enable it globally using `ENABLE_API_KEYS`
+
+:::
 
 ### Workspace Permissions
 
