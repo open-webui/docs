@@ -446,7 +446,7 @@ docker run --rm -v open-webui:/data alpine ls -lah /data
 1. Stop Open WebUI: `docker stop open-webui`
 2. Backup volume: `docker run --rm -v open-webui:/data -v $(pwd):/backup alpine tar czf /backup/openwebui-backup.tar.gz /data`
 3. Restore from backup if needed
-4. Check [Manual Migration Guide](./manual-database-migration) for database issues
+4. Check [Manual Migration Guide](../troubleshooting/manual-database-migration.md) for database issues
 
 ### Watchtower Updates Too Frequently
 
@@ -572,6 +572,6 @@ If the interface looks broken or old after updating:
 
 - [Open WebUI GitHub Releases](https://github.com/open-webui/open-webui/releases) - Version history and changelogs
 - [Environment Configuration Guide](https://docs.openwebui.com/getting-started/env-configuration) - All environment variables
-- [Manual Database Migration](troubleshooting/manual-database-migration.md) - Fix database issues after updates
+- [Manual Database Migration](../troubleshooting/manual-database-migration.md) - Fix database issues after updates
 - [Watchtower Documentation](https://watchtower.nickfedor.com/) - Advanced Watchtower configuration
 - [WUD Documentation](https://getwud.github.io/wud/) - What's Up Docker setup guide

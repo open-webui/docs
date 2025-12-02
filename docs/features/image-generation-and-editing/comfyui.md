@@ -104,7 +104,6 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
 
 ![Screenshot of an image being edited in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-edit-image-in-chat.png)
 
-
 ### Deeper Dive: Mapping ComfyUI Nodes to Open WebUI
 
 Understanding the node ID mapping is often the biggest hurdle in integrating ComfyUI with an external service like Open WebUI. Integrating ComfyUI via API requires mapping Open WebUI's generic controls (e.g., "Model," "Width," "Prompt") to specific node inputs within your static ComfyUI workflow JSON.
@@ -278,7 +277,7 @@ This section provides a supplementary guide on setting up the FLUX.1 models for 
 
 ## Configuring with SwarmUI
 
-SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `ComfyUI Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for [ComfyUI Image Generation](#comfyui-image-generation) outlined above.
+SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `ComfyUI Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for ComfyUI image generation outlined above.
 ![Install SwarmUI with LAN Access](https://github.com/user-attachments/assets/a6567e13-1ced-4743-8d8e-be526207f9f6)
 
 ### SwarmUI API URL
