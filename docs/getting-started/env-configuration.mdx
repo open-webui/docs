@@ -2208,7 +2208,7 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
   - `do_ocr` (bool): Enable OCR processing
   - `force_ocr` (bool): Force OCR even when text layer exists
   - `ocr_engine` (str): OCR engine to use (`tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`)
-  - `ocr_lang` (str): OCR language codes (e.g., `eng,fra,deu,spa`)
+  - `ocr_lang` (list[str]): OCR language codes (e.g., `["en", "de", "fr"]`)
   - `pdf_backend` (str): PDF processing backend
   - `table_mode` (str): Table extraction mode
   - `pipeline` (str): Processing pipeline to use
@@ -2223,8 +2223,10 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
 {
   "do_ocr": true,
   "ocr_engine": "tesseract",
-  "ocr_lang": "eng,fra,deu,spa",
+  "ocr_lang": ["eng", "fra", "deu", "spa"],
   "force_ocr": false,
+  "pdf_backend": "dlparse_v4",
+  "table_mode": "accurate",
   "do_picture_description": true,
   "picture_description_mode": "api",
   "vlm_pipeline_model_api": "openai://gpt-4o"
