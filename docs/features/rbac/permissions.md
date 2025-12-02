@@ -34,7 +34,7 @@ Chat permissions determine what actions users can perform within chat conversati
 
 Features permissions control access to specialized capabilities within Open WebUI:
 
-- **Web Search**: Toggle to allow users to perform web searches during chat sessions. (Environment variable: `ENABLE_RAG_WEB_SEARCH`)
+- **Web Search**: Toggle to allow users to perform web searches during chat sessions. (Environment variable: `ENABLE_WEB_SEARCH`)
 - **Image Generation**: Toggle to allow users to generate images. (Environment variable: `ENABLE_IMAGE_GENERATION`)
 - **Code Interpreter**: Toggle to allow users to use the code interpreter feature. (Environment variable: `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
 - **Direct Tool Servers**: Toggle to allow users to connect directly to tool servers. (Environment variable: `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`)
@@ -60,7 +60,7 @@ By default, Open WebUI applies the following permission settings:
 
 **Features Permissions**:
 
-- Web Search: Enabled (`ENABLE_RAG_WEB_SEARCH=True`)
+- Web Search: Enabled (`ENABLE_WEB_SEARCH=True`)
 - Image Generation: Enabled (`ENABLE_IMAGE_GENERATION=True`)
 - Code Interpreter: Enabled (`USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`)
 - Direct Tool Servers: Disabled (`USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS=False`)
