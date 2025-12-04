@@ -121,6 +121,10 @@ The following environment variables are used:
 1. `OAUTH_SCOPES` - Scopes to request. Defaults to `openid email profile`
 1. `OPENID_REDIRECT_URI` - The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
 
+#### Auth0
+
+1. `AUTH0_AUDIENCE`: If the OIDC provider is Auth0, this optional value can be set to the specific Auth0 `audience` the token should be issued for; doing so will ensure the access token is a JWT. If not specified the default behavior will be the issuance of an opaque Auth0 access token. [More info here](https://support.auth0.com/center/s/article/opaque-versus-jwt-access-token)
+
 :::warning
 
 **Common OIDC Mistakes:**
