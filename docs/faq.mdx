@@ -13,6 +13,10 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 For more details on enterprise solutions and branding customizations, [click here](https://docs.openwebui.com/enterprise).
 
+### **Q: Is my data being sent anywhere?**
+
+**A:** No, your data is never sent anywhere unless you explicitly choose to share it or you connect an external model provider. Everything inside Open WebUI runs and is stored locally on your machine or server, giving you full control over your data at all times. We encourage you not to simply take our word for it: our entire codebase is hosted publicly, so you can inspect exactly how everything works, and if you ever notice anything concerning, please report it to us on our repo immediately.
+
 ### **Q: Why am I asked to sign up? Where are my data being sent to?**
 
 **A:** We require you to sign up to become the admin user for enhanced security. This ensures that if the Open WebUI is ever exposed to external access, your data remains secure. It's important to note that everything is kept local. We do not collect your data. When you sign up, all information stays within your server and never leaves your device. Your privacy and security are our top priorities, ensuring that your data remains under your control at all times.
@@ -98,24 +102,7 @@ To do this, configure your **Ollama model params** to allow a larger context win
 
 ### **Q: Is MCP (Model Context Protocol) supported in Open WebUI?**
 
-**A:** [Yes, Open WebUI officially supports MCP Tool Servers—but exclusively through an **OpenAPI-compliant proxy**](/features/plugin/tools/openapi-servers/mcp) ([openapi-servers](https://github.com/open-webui/openapi-servers)) for optimal compatibility, security, and maintainability.
-
-To bridge MCP (and other backend protocols), we provide a purpose-built proxy implementation available at: 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo)
-
-This design choice is motivated by several core principles:
-
-- 📘 Standards-First: OpenAPI is the de facto standard for RESTful service definitions and contract-driven service interoperability. By aligning integrations through OpenAPI, we enable reproducible, schema-driven behavior across upgrades and deployments.
-- 🔒 Security Model Isolation: Integrating MCP through a proxy allows us to sandbox and isolate backend protocol behavior, reducing attack surface and enabling boundary-level auditing, authentication, and observability.
-- ⚙️ Protocol Abstraction: Supporting heterogeneous backends (e.g., MCP) through a unified OpenAPI schema enables Open WebUI to remain backend-agnostic while maintaining predictable runtime behavior.
-- ⛓️ Decoupled Deployment Topology: The proxy-based architecture allows tool servers (like MCP) to evolve independently from frontend presentation, facilitating highly modular production environments or distributed workloads.
-
-In summary: MCP is supported — as long as the MCP Tool Server is fronted by an OpenAPI-compatible proxy. This architectural decision is deliberate and ensures that Open WebUI remains scalable, secure, and maintainable.
-
-### **Q: How often is Open WebUI updated?** (Release Schedule)
-
-**A:** We aim to ship **major releases weekly**, with **bug fixes and minor updates delivered as needed**. However, this is not a rigid schedule—some weeks may see multiple releases, while others might have none at all.
-
-To stay informed, you can follow release notes and announcements on our [GitHub Releases page](https://github.com/open-webui/open-webui/releases).
+**A:** Yes, Open WebUI now includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
 
 ### **Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?**
 
@@ -123,7 +110,7 @@ The assumption that bundling the frontend with the backend is unscalable comes f
 
 ### **Q: Is Open WebUI scalable for large organizations or enterprise deployments?**
 
-**A:** Yes—**Open WebUI is architected for massive scalability and production readiness.** It’s already trusted in deployments supporting extremely high user counts—**think tens or even hundreds of thousands of seats**—used by universities, multinational enterprises, and major organizations worldwide.
+**A:** Yes, **Open WebUI is architected for massive scalability and production readiness.** It’s already trusted in deployments supporting extremely high user counts—**think tens or even hundreds of thousands of seats**—used by universities, multinational enterprises, and major organizations worldwide.
 
 Open WebUI’s stateless, container-first architecture means you’re never bottlenecked by a single server. Through horizontal scaling, flexible storage backends, externalized authentication and database support, and full container orchestration compatibility (for example, Kubernetes or Docker Swarm), you can build robust, high-availability clusters to meet even the most demanding enterprise requirements.
 
@@ -144,6 +131,12 @@ If you’re planning a high-availability, enterprise-grade deployment, we recomm
 *(This provides a strong technical overview and best practices for large-scale Open WebUI architecture.)*
 
 Open WebUI is designed from day one to not just handle, but thrive at scale—serving large organizations, universities, and enterprises worldwide.
+
+### **Q: How often is Open WebUI updated?** (Release Schedule)
+
+**A:** We aim to ship **major releases weekly**, with **bug fixes and minor updates delivered as needed**. However, this is not a rigid schedule—some weeks may see multiple releases, while others might have none at all.
+
+To stay informed, you can follow release notes and announcements on our [GitHub Releases page](https://github.com/open-webui/open-webui/releases).
 
 ### **Need Further Assistance?**
 
