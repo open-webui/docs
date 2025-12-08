@@ -183,10 +183,41 @@ REDIS_KEY_PREFIX="open-webui"
 
 The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Redis instance without key conflicts. In Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
 
+### Sentinel Failover Configuration
+
+:::danger Critical: Socket Timeout for Sentinel Deployments
+
+Redis Sentinel setups require explicit socket connection timeout configuration to ensure proper failover behavior. Without a timeout, the application can hang indefinitely when a Redis master node goes offline—potentially preventing even application restarts.
+
+**Symptoms of missing timeout configuration:**
+- Application becomes completely unresponsive during failover
+- Application hangs on startup if the first Sentinel host is unreachable  
+- Recovery takes minutes instead of seconds after master failover
+
+**Required configuration:**
+```bash
+REDIS_SOCKET_CONNECT_TIMEOUT=5
+```
+
+This sets a 5-second timeout for socket connection attempts to Redis/Sentinel nodes, allowing the application to fail over gracefully.
+
+:::
+
+:::warning
+
+**If using WEBSOCKET_REDIS_OPTIONS**
+
+When you explicitly set `WEBSOCKET_REDIS_OPTIONS`, `REDIS_SOCKET_CONNECT_TIMEOUT` does not automatically apply to websocket connections. You must include the timeout in both places:
+```bash
+REDIS_SOCKET_CONNECT_TIMEOUT=5
+WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
+```
+
+:::
+
 ### Complete Example Configuration
 
 Here's a complete example showing all Redis-related environment variables:
-
 ```bash
 # Required for multi-worker/multi-instance deployments
 REDIS_URL="redis://redis-valkey:6379/0"
@@ -196,9 +227,14 @@ ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
 WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
 
+# Recommended for Sentinel deployments (prevents failover hangs)
+REDIS_SOCKET_CONNECT_TIMEOUT=5
+
 # Optional
 REDIS_KEY_PREFIX="open-webui"
 ```
+
+For Redis Sentinel deployments specifically, ensure `REDIS_SOCKET_CONNECT_TIMEOUT` is set to prevent application hangs during master failover.
 
 ### Docker Run Example
 
