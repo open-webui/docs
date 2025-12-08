@@ -5118,6 +5118,35 @@ This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
 - Default: `open-webui`
 - Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
 
+#### `REDIS_SOCKET_CONNECT_TIMEOUT`
+
+- Type: `float` (seconds) or empty string for None
+- Default: None (no timeout, uses redis-py library default)
+- Description: Sets the socket connection timeout in seconds for Redis and Sentinel connections. This timeout applies to the initial TCP connection establishment. When set, it prevents indefinite blocking when attempting to connect to unreachable Redis nodes.
+
+:::danger
+
+**Critical for Redis Sentinel Deployments**
+
+Without a socket connection timeout, Redis Sentinel failover can cause the application to hang indefinitely when a master node goes offline. The application may become completely unresponsive and even fail to restart.
+
+For Sentinel deployments, it is **strongly recommended** to set this value (e.g., `REDIS_SOCKET_CONNECT_TIMEOUT=5`).
+
+:::
+
+:::warning
+
+**Interaction with WEBSOCKET_REDIS_OPTIONS**
+
+If you explicitly set `WEBSOCKET_REDIS_OPTIONS`, this variable will **not** apply to the AsyncRedisManager used for websocket communication. In that case, you must include `socket_connect_timeout` directly within `WEBSOCKET_REDIS_OPTIONS`:
+```bash
+WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
+```
+
+If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be applied to websocket connections automatically.
+
+:::
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
@@ -5201,13 +5230,21 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 #### `WEBSOCKET_REDIS_OPTIONS`
 
 - Type: `str`
-- Default: `{}`
-- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client. This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as a valid Python dictionary. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here] (https://redis.readthedocs.io/en/stable/connections.html) can be used.
+- Default: `{}` (empty, which allows `REDIS_SOCKET_CONNECT_TIMEOUT` to apply if set)
+- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client (AsyncRedisManager). This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as valid JSON. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here](https://redis.readthedocs.io/en/stable/connections.html) can be used.
 
 :::warning
 
-**AWS SSM and Docker compose cannot ingest raw JSON, as such you need top escape any double quotes like the following:**
+**AWS SSM and Docker compose cannot ingest raw JSON, as such you need to escape any double quotes like the following:**
 `{\"retry_on_timeout\": true, \"socket_connect_timeout\": 5, \"socket_timeout\": 5, \"max_connections\": 8}`
+
+:::
+
+:::info
+
+**Precedence with REDIS_SOCKET_CONNECT_TIMEOUT**
+
+When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is automatically applied to websocket connections if set. However, if you explicitly set `WEBSOCKET_REDIS_OPTIONS` to any value, `REDIS_SOCKET_CONNECT_TIMEOUT` will **not** be injected—you must include `socket_connect_timeout` manually within this JSON if needed.
 
 :::
 
