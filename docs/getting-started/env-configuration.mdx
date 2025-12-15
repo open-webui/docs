@@ -2882,6 +2882,14 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
 the search query. Example: `http://searxng.local/search?q=<query>`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `SEARXNG_LANGUAGE`
+
+- Type: `str`
+- Description: The search language when calling [SearXNG search API](https://docs.searxng.org/dev/search_api.html). Examples: `all`, `en`, `en-US`, `de`, `fr-BE` etc.
+For complete list, please refere to [sxng_locales.py](https://github.com/searxng/searxng/blob/master/searx/sxng_locales.py)
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+
 #### `GOOGLE_PSE_API_KEY`
 
 - Type: `str`
