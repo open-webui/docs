@@ -120,6 +120,7 @@ The following environment variables are used:
 1. `OAUTH_PROVIDER_NAME` - Name of the provider to show on the UI, defaults to SSO
 1. `OAUTH_SCOPES` - Scopes to request. Defaults to `openid email profile`
 1. `OPENID_REDIRECT_URI` - The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
+1. `OAUTH_AUDIENCE` - Optional `audience` value that will be passed to the oauth provider's authorization endpoint as an additional query parameter.
 
 :::warning
 

@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.41](https://github.com/open-webui/open-webui/releases/tag/v0.6.41), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.42](https://github.com/open-webui/open-webui/releases/tag/v0.6.42), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -2639,6 +2639,13 @@ Strictly return in JSON format:
 - Description: Specifies the key for document intelligence.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DOCUMENT_INTELLIGENCE_MODEL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the model for document intelligence.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Advanced Settings
 
 #### `BYPASS_EMBEDDING_AND_RETRIEVAL`
@@ -2885,10 +2892,17 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 #### `SEARXNG_LANGUAGE`
 
 - Type: `str`
-- Description: The search language when calling [SearXNG search API](https://docs.searxng.org/dev/search_api.html). Examples: `all`, `en`, `en-US`, `de`, `fr-BE` etc.
-For complete list, please refere to [sxng_locales.py](https://github.com/searxng/searxng/blob/master/searx/sxng_locales.py)
+- Default: `all`
+- Description: This variable is used in the request to searxng as the "search language" (arguement "language").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `SEARXNG_LANGUAGE`
+
+- Type: `str`
+- Default: `all`
+- Description: This variable is used in the request to searxng as the "search language" (arguement "language"). Examples: `all`, `en`, `en-US`, `de`, `fr-BE` etc.
+For complete list, please refere to [sxng_locales.py](https://github.com/searxng/searxng/blob/master/searx/sxng_locales.py)
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GOOGLE_PSE_API_KEY`
 
@@ -3220,6 +3234,21 @@ If value is `None`, timeout has [firecrawl's default value](https://docs.firecra
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the timeout for Playwright requests.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `WEB_LOADER_TIMEOUT`
+
+- Type: `float`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10–30 seconds depending on your network conditions.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
+
+:::
+
+### YouTube Loader
 
 ### YouTube Loader
 
@@ -4298,6 +4327,18 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Specifies the allowed domains for OAuth authentication. (e.g., "example1.com,example2.com").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `OAUTH_AUDIENCE`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies an audience parameter passed to the OAuth provider's authorization endpoint during login. Some providers (such as Auth0 and Ory) use this value to determine the type of access token returned—without it, providers typically return an opaque token, while with it, they return a JWT that can be decoded and validated. This parameter is not part of the official OAuth/OIDC spec for authorization endpoints but is widely supported by some providers.
+
+:::info
+
+This is useful when you need a JWT access token for downstream validation or when your OAuth provider requires an audience hint for proper token generation. For Auth0, this is typically your API identifier (e.g., `https://your-api.auth0.com/api/v2/`). For Ory, specify the resource server you want to access.
+
+:::
+
 ## LDAP
 
 #### `ENABLE_LDAP`
@@ -5142,6 +5183,35 @@ This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
 - Default: `open-webui`
 - Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
 
+#### `REDIS_SOCKET_CONNECT_TIMEOUT`
+
+- Type: `float` (seconds) or empty string for None
+- Default: None (no timeout, uses redis-py library default)
+- Description: Sets the socket connection timeout in seconds for Redis and Sentinel connections. This timeout applies to the initial TCP connection establishment. When set, it prevents indefinite blocking when attempting to connect to unreachable Redis nodes.
+
+:::danger
+
+**Critical for Redis Sentinel Deployments**
+
+Without a socket connection timeout, Redis Sentinel failover can cause the application to hang indefinitely when a master node goes offline. The application may become completely unresponsive and even fail to restart.
+
+For Sentinel deployments, it is **strongly recommended** to set this value (e.g., `REDIS_SOCKET_CONNECT_TIMEOUT=5`).
+
+:::
+
+:::warning
+
+**Interaction with WEBSOCKET_REDIS_OPTIONS**
+
+If you explicitly set `WEBSOCKET_REDIS_OPTIONS`, this variable will **not** apply to the AsyncRedisManager used for websocket communication. In that case, you must include `socket_connect_timeout` directly within `WEBSOCKET_REDIS_OPTIONS`:
+```bash
+WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
+```
+
+If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be applied to websocket connections automatically.
+
+:::
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
@@ -5225,13 +5295,21 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 #### `WEBSOCKET_REDIS_OPTIONS`
 
 - Type: `str`
-- Default: `{}`
-- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client. This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as a valid Python dictionary. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here] (https://redis.readthedocs.io/en/stable/connections.html) can be used.
+- Default: `{}` (empty, which allows `REDIS_SOCKET_CONNECT_TIMEOUT` to apply if set)
+- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client (AsyncRedisManager). This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as valid JSON. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here](https://redis.readthedocs.io/en/stable/connections.html) can be used.
 
 :::warning
 
-**AWS SSM and Docker compose cannot ingest raw JSON, as such you need top escape any double quotes like the following:**
+**AWS SSM and Docker compose cannot ingest raw JSON, as such you need to escape any double quotes like the following:**
 `{\"retry_on_timeout\": true, \"socket_connect_timeout\": 5, \"socket_timeout\": 5, \"max_connections\": 8}`
+
+:::
+
+:::info
+
+**Precedence with REDIS_SOCKET_CONNECT_TIMEOUT**
+
+When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is automatically applied to websocket connections if set. However, if you explicitly set `WEBSOCKET_REDIS_OPTIONS` to any value, `REDIS_SOCKET_CONNECT_TIMEOUT` will **not** be injected—you must include `socket_connect_timeout` manually within this JSON if needed.
 
 :::
 
