@@ -3208,10 +3208,10 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 #### `FIRECRAWL_TIMEOUT`
 
-- Type: `int`
-- Default: `2000`
+- Type: `str`
+- Default: `None`
 - Description: Sets the timeout in **milliseconds** used by firecrawl [Search](https://docs.firecrawl.dev/features/search). 
-Default is 2000ms (meaning 2 seconds). Please refere to [firecrawl Search API](https://docs.firecrawl.dev/api-reference/endpoint/search) for more details.
+If value is `None`, timeout has [firecrawl's default value](https://docs.firecrawl.dev/api-reference/endpoint/search#body-timeout).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PLAYWRIGHT_TIMEOUT`
