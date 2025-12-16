@@ -5210,8 +5210,8 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 #### `WEBSOCKET_MANAGER`
 
 - Type: `str`
-- Default: `redis`
-- Description: Specifies the websocket manager to use (in this case, Redis).
+- Default: `"" (empty string)`
+- Description: Specifies the websocket manager to use. Allowed values include: `redis`
 
 :::warning
 
