@@ -31,7 +31,8 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 
 | Variable                            | Default                         | Description                                         |
 |--------------------------------------|---------------------------------|-----------------------------------------------------|
-| `ENABLE_OTEL`                       | **true** in Compose             | Enable OpenTelemetry tracing                        |
+| `ENABLE_OTEL`                       | **true** in Compose             | Master switch to enable OpenTelemetry setup         |
+| `ENABLE_OTEL_TRACES`                | **true** in Compose             | Enable distributed tracing export                   |
 | `ENABLE_OTEL_METRICS`                | **true** in Compose             | Enable FastAPI HTTP metrics export                  |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`        | `http://grafana:4317` in Compose| OTLP gRPC/HTTP Collector endpoint URL               |
 | `OTEL_EXPORTER_OTLP_INSECURE`        | **true** in Compose             | Insecure (no TLS) connection for OTLP               |
@@ -48,6 +49,7 @@ Override defaults in your `.env` file or Compose file as needed.
   open-webui:
     environment:
       - ENABLE_OTEL=true
+      - ENABLE_OTEL_TRACES=true
       - ENABLE_OTEL_METRICS=true
       - OTEL_EXPORTER_OTLP_INSECURE=true # Use insecure connection for OTLP, you may want to remove this in production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana:4317
@@ -91,6 +93,7 @@ To use a different (external) OpenTelemetry Collector/Stack:
 docker run -d --name open-webui \
   -p 8088:8080 \
   -e ENABLE_OTEL=true \
+  -e ENABLE_OTEL_TRACES=true \
   -e ENABLE_OTEL_METRICS=true \
   -e OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317 \
   -e OTEL_EXPORTER_OTLP_INSECURE=true \
@@ -103,7 +106,7 @@ docker run -d --name open-webui \
 
 **Traces/metrics not appearing in Grafana?**
 
-- Double-check `ENABLE_OTEL` and `ENABLE_OTEL_METRICS` are both set to `true`
+- Double-check `ENABLE_OTEL`, `ENABLE_OTEL_TRACES`, and `ENABLE_OTEL_METRICS` are all set to `true`
 - Is the endpoint correct? (`OTEL_EXPORTER_OTLP_ENDPOINT`)
 - Inspect logs from Open WebUI (`docker logs open-webui`) for OTLP errors
 - Collector's OTLP port (`4317`) should be open and reachable. Try:

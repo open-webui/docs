@@ -117,8 +117,8 @@ To use Kokoro-FastAPI with Open WebUI, follow these steps:
 - - Text-to-Speech Engine: OpenAI
   - API Base URL: `http://localhost:8880/v1` # you may need to use `host.docker.internal` instead of `localhost`
   - API Key: `not-needed`
-  - TTS Model: `kokoro`
   - TTS Voice: `af_bella` # also accepts mapping of existing OAI voices for compatibility
+  - TTS Model: `kokoro`
 
 :::info
 
