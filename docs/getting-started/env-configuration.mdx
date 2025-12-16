@@ -3204,6 +3204,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Description: Sets the API key for Firecrawl API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `FIRECRAWL_TIMEOUT`
+
+- Type: `int`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the timeout in **milliseconds** used by firecrawl [Search](https://docs.firecrawl.dev/features/search). 
+If value is `None`, timeout has [firecrawl's default value](https://docs.firecrawl.dev/api-reference/endpoint/search#body-timeout).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `PLAYWRIGHT_TIMEOUT`
 
 - Type: `int`
