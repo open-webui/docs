@@ -613,6 +613,15 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Example: `sk-124781258123;sk-4389759834759834`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_SAFETY_IDENTIFIER`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, Open WebUI sends a `safety_identifier` to OpenAI-compatible servers. 
+The identifier is a hash derived from the user ID and `WEBUI_SECRET_KEY`, 
+providing a stable token for each user while preventing 
+the recipient from identifying the original user.
+
 ### Tasks
 
 #### `TASK_MODEL`
