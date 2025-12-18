@@ -18,6 +18,14 @@ For environments with limited storage or bandwidth, Open WebUI offers slim image
 docker pull ghcr.io/open-webui/open-webui:main-slim
 ```
 
+### Specific release version
+
+You can also pull a specific Open WebUI release version directly by using a versioned image tag. This is recommended for production environments to ensure stable and reproducible deployments.
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:v0.6.41
+```
+
 ## Step 2: Run the Container
 
 Run the container with default settings. This command includes a volume mapping to ensure persistent data storage.
