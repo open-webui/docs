@@ -57,6 +57,33 @@ Status: Downloaded newer image for ghcr.io/open-webui/open-webui:main
 Your chat histories, settings, and uploaded files are stored in a Docker volume named `open-webui`. Pulling a new image does **not** affect this data. The volume persists independently of the container.
 :::
 
+### (Optional) Using image tags in production
+
+Open WebUI provides multiple Docker image tags depending on how you want to manage updates.
+
+If you want to always run the latest version of Open WebUI, you can use the `:main`, `:cuda`, or `:ollama` image tags, depending on your setup.
+
+Examples (latest version tags):
+```
+ghcr.io/open-webui/open-webui:main
+ghcr.io/open-webui/open-webui:cuda
+ghcr.io/open-webui/open-webui:ollama
+```
+
+For `production environments` where stability and reproducibility are important, it is recommended to pin a specific release version instead of using these floating tags.
+
+Versioned images follow this format:
+```
+ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
+```
+
+Examples (pinned versions — replace with the release version you want to use):
+```
+ghcr.io/open-webui/open-webui:v0.6.41
+ghcr.io/open-webui/open-webui:v0.6.41-cuda
+ghcr.io/open-webui/open-webui:v0.6.41-ollama
+```
+
 ### Step 3: Start Container with Updated Image
 
 Recreate the container using the new image while mounting your existing data volume.
