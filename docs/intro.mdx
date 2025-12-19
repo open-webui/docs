@@ -89,6 +89,22 @@ Both commands facilitate a built-in, hassle-free installation of both Open WebUI
 
 After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
 
+### Using image tags in production
+
+If you want to always run the latest version of Open WebUI, you can use the `:main`, `:cuda`, or `:ollama` image tags, depending on your setup, as shown in the examples above.
+For `production environments` where stability and reproducibility are important, it is recommended to pin a specific release version instead of using these floating tags. Versioned images follow this format:
+
+```
+ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
+```
+
+Examples (pinned versions for illustration purposes only):
+```
+ghcr.io/open-webui/open-webui:v0.6.41
+ghcr.io/open-webui/open-webui:v0.6.41-ollama
+ghcr.io/open-webui/open-webui:v0.6.41-cuda
+```
+
 ### Using the Dev Branch 🌙
 
 :::warning
