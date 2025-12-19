@@ -85,35 +85,6 @@ Setting `GLOBAL_LOG_LEVEL` configures the root logger in Python, affecting all l
 
 **Impact:** Setting `GLOBAL_LOG_LEVEL` to `DEBUG` will produce the most verbose logs, including detailed information that is helpful for development and troubleshooting. For production environments, `INFO` or `WARNING` might be more appropriate to reduce log volume.
 
-### ⚙️ App/Backend Specific Logging Levels
-
-For more granular control, Open WebUI provides environment variables to set logging levels for specific backend components. Logging is an ongoing work-in-progress, but some level of control is made available using these environment variables. These variables allow you to fine-tune logging for different parts of the application.
-
-**Available Environment Variables:**
-
-| Environment Variable | Component/Module                                                    | Description                                                                                                |
-| -------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `AUDIO_LOG_LEVEL`    | Audio processing                                                    | Logging related to audio transcription (faster-whisper), text-to-speech (TTS), and audio handling. |
-| `COMFYUI_LOG_LEVEL`  | ComfyUI Integration                                                 | Logging for interactions with ComfyUI, if you are using this integration. |
-| `CONFIG_LOG_LEVEL`   | Configuration Management                                              | Logging related to loading and processing Open WebUI configuration files. |
-| `DB_LOG_LEVEL`       | Database Operations (Peewee)                                        | Logging for database interactions using the Peewee ORM (Object-Relational Mapper). |
-| `IMAGES_LOG_LEVEL`   | Image Generation (AUTOMATIC1111/Stable Diffusion)                   | Logging for image generation tasks, especially when using AUTOMATIC1111 Stable Diffusion integration. |
-| `MAIN_LOG_LEVEL`     | Main Application Execution (Root Logger)                             | Logging from the main application entry point and root logger. |
-| `MODELS_LOG_LEVEL`   | Model Management                                                    | Logging related to loading, managing, and interacting with language models (LLMs), including authentication. |
-| `OLLAMA_LOG_LEVEL`   | Ollama Backend Integration                                          | Logging for communication and interaction with the Ollama backend. |
-| `OPENAI_LOG_LEVEL`   | OpenAI API Integration                                              | Logging for interactions with the OpenAI API (e.g., for models like GPT). |
-| `RAG_LOG_LEVEL`      | Retrieval-Augmented Generation (RAG)                                | Logging for the RAG pipeline, including Chroma vector database and Sentence-Transformers. |
-| `WEBHOOK_LOG_LEVEL`  | Authentication Webhook                                                | Extended logging for authentication webhook functionality. |
-
-**How to Use:**
-
-You can set these environment variables in the same way as `GLOBAL_LOG_LEVEL` (Docker parameters, Docker Compose `environment` section). For example, to get more detailed logging for Ollama interactions, you could set:
-
-```yaml
-environment:
-  - OLLAMA_LOG_LEVEL=DEBUG
-```
-
 :::note
 
 **Important Note:** Unlike `GLOBAL_LOG_LEVEL`, these app-specific variables might not affect logging from *all* third-party modules. They primarily control logging within Open WebUI's codebase.
