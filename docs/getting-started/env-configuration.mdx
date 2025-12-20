@@ -1255,9 +1255,20 @@ Invalid regex patterns will cause password validation to fail, potentially preve
 - Type: `str`
 - Default: `t0p-s3cr3t`
 - Docker Default: Randomly generated on first start
-- Description: Overrides the randomly generated string used for JSON Web Token.
+- Description: Overrides the randomly generated string used for JSON Web Token and **encryption of sensitive data** (like OAuth tokens for MCP).
 
-:::warning
+:::danger Critical for Docker/Production
+
+You **MUST** set `WEBUI_SECRET_KEY` to a secure, persistent value.
+
+If you do NOT set this:
+1.  It will be randomly generated each time the container restarts/recreates.
+2.  **All OAuth sessions will become invalid.**
+3.  **MCP Tools will break** (Error: `Error decrypting tokens`) because they cannot decrypt the tokens stored with the previous key.
+4.  You will be logged out.
+
+**Do not leave this unset in production.**
+:::
 
 **Required for Multi-Worker and Multi-Node Deployments AND HIGHLY RECOMMENDED IN SINGLE-WORKER ENVIRONMENTS**
 

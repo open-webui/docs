@@ -27,6 +27,11 @@ This method connects directly to Notion's hosted MCP endpoint (`https://mcp.noti
 **Streamable HTTP** is preferred for its simplicity and enhanced security. It handles authentication via Notion's official OAuth flow, meaning you do not need to manually manage secrets or integration tokens.
 :::
 
+:::danger Critical for OAuth Persistence
+You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setup to a persistent value.
+If you do not, your Notion OAuth session will become invalid every time you restart the container, forcing you to re-authenticate repeatedly.
+:::
+
 ### 1. Configure Tool
 You can automatically prefill the connection settings by importing the JSON configuration below.
 

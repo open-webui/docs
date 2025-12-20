@@ -84,6 +84,14 @@ Everything you need to run Open WebUI, including your data, remains within your 
 
 **A:** If your Open WebUI isn't launching post-update or installation of new software, it's likely related to a direct installation approach, especially if you didn't use a virtual environment for your backend dependencies. Direct installations can be sensitive to changes in the system's environment, such as updates or new installations that alter existing dependencies. To avoid conflicts and ensure stability, we recommend using a virtual environment for managing the `requirements.txt` dependencies of your backend. This isolates your Open WebUI dependencies from other system packages, minimizing the risk of such issues.
 
+### Q: I updated/restarted and now I'm being logged out, or getting "Error decrypting tokens" for my tools?
+
+**A:** This happens because you haven't set a persistent `WEBUI_SECRET_KEY` in your environment variables.
+*   **Logouts:** Without this key, Open WebUI generates a random one every time it starts. This invalidates your previous session cookies (JWTs), forcing you to log in again.
+*   **Decryption Errors:** Essential secrets (like OAuth tokens for MCP tools or API keys) are encrypted using this key. If the key changes on restart, Open WebUI cannot decrypt them, leading to errors.
+
+**Fix:** Set `WEBUI_SECRET_KEY` to a constant, secure string in your Docker Compose or environment config.
+
 ### Q: I updated/restarted and now my login isn't working anymore, I had to create a new account and all my chats are gone.
 
 **A:** This issue typically arises when a Docker container is created without mounting a volume for `/app/backend/data` or if the designated Open WebUI volume (usually named `open-webui` in our examples) was unintentionally deleted. Docker volumes are crucial for persisting your data across container lifecycles. If you find yourself needing to create a new account after a restart, it's likely you've initiated a new container without attaching the existing volume where your data resides. Ensure that your Docker run command includes a volume mount pointing to the correct data location to prevent data loss.
