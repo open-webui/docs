@@ -2,7 +2,7 @@ import { marked } from "marked";
 
 export const TopBanner = ({
 	item,
-	bannerClassName = "h-18 ",
+	bannerClassName = "h-18",
 	label = true,
 	description = true,
 	mobile = true,
