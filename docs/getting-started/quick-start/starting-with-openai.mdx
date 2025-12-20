@@ -30,6 +30,9 @@ Other providers use different URLs — check your provider’s documentation.
 
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Step 2: Add the API Connection in Open WebUI
 
 Once Open WebUI is running:
@@ -37,15 +40,46 @@ Once Open WebUI is running:
 1. Go to the ⚙️ **Admin Settings**.
 2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
 3. Click ➕ **Add New Connection**.
-4. Fill in the following:
-   - API URL: https://api.openai.com/v1 (or the URL of your specific provider)
-   - API Key: Paste your key here
 
-5. Click Save ✅.
+<Tabs>
+  <TabItem value="standard" label="Standard / Compatible" default>
 
-This securely stores your credentials and sets up the connection.
+  Use this for **OpenAI**, **DeepSeek**, **OpenRouter**, **LocalAI**, **FastChat**, **Helicone**, **LiteLLM**, etc.
 
-Here’s what it looks like:
+  *   **Connection Type**: External
+  *   **URL**: `https://api.openai.com/v1` (or your provider's endpoint)
+  *   **API Key**: Your secret key (usually starts with `sk-...`)
+
+  </TabItem>
+  <TabItem value="azure" label="Azure OpenAI">
+
+  For Microsoft Azure OpenAI deployments.
+
+  1.  Find **Provider Type** and click the button labeled **OpenAI** to switch it to **Azure OpenAI**.
+  2.  **URL**: Your Azure Endpoint (e.g., `https://my-resource.openai.azure.com`).
+  3.  **API Version**: e.g., `2024-02-15-preview`.
+  4.  **API Key**: Your Azure API Key.
+  5.  **Model IDs (Deployments)**: You **must** add your specific Deployment Names here (e.g., `my-gpt4-deployment`).
+
+  </TabItem>
+</Tabs>
+
+### Advanced Configuration
+
+*   **Model IDs (Filter)**:
+    *   *Default (Empty)*: Auto-detects all available models from the provider.
+    *   *Set*: Acts as an **Allowlist**. Only the specific model IDs you enter here will be visible to users. Use this to hide older or expensive models.
+    
+    :::tip OpenRouter Recommendation
+    When using **OpenRouter**, we **highly recommend** using this allowlist (adding specific Model IDs). OpenRouter exposes thousands of models, which can clutter your model selector and slow down the admin panel if not filtered.
+    :::
+    
+*   **Prefix ID**:
+    *   If you connect multiple providers that have models with the same name (e.g., two providers both offering `llama3`), add a prefix here (e.g., `groq/`) to distinguish them. The model will appear as `groq/llama3`.
+
+4. Click **Save** ✅.
+
+This securely stores your credentials.
 
 ![OpenAI Connection Screen](/images/getting-started/quick-start/manage-openai.png)
 

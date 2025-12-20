@@ -91,7 +91,10 @@ If you want to interact directly with Ollama models—including for embedding ge
 #### 🔁 Generate Completion (Streaming)
 
 ```bash
-curl http://localhost:3000/ollama/api/generate -d '{
+curl http://localhost:3000/ollama/api/generate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
   "model": "llama3.2",
   "prompt": "Why is the sky blue?"
 }'
@@ -100,17 +103,25 @@ curl http://localhost:3000/ollama/api/generate -d '{
 #### 📦 List Available Models
 
 ```bash
-curl http://localhost:3000/ollama/api/tags
+curl http://localhost:3000/ollama/api/tags \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 #### 🧠 Generate Embeddings
 
 ```bash
-curl -X POST http://localhost:3000/ollama/api/embed -d '{
+curl -X POST http://localhost:3000/ollama/api/embed \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
   "model": "llama3.2",
-  "input": ["Open WebUI is great!", "Let's generate embeddings."]
+  "input": ["Open WebUI is great!", "Let'\''s generate embeddings."]
 }'
 ```
+
+:::info
+When using the Ollama Proxy endpoints, you **must** include the `Content-Type: application/json` header for POST requests, or the API may fail to parse the body. Authorization headers are also required if your instance is secured.
+:::
 
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
 

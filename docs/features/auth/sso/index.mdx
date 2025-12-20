@@ -17,11 +17,11 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 
 :::
 
-:::danger
+:::danger Only One OIDC Provider Supported
+Right now, you can only configure **one** OpenID Connect (OIDC) provider at a time via `OPENID_PROVIDER_URL`.
+You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 
-Right now, you can only configure one OAUTH provider at a time.
-You cannot have Microsoft **and** Google as providers simultaneously.
-
+*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/tips/dual-oauth-configuration) for more details.*
 :::
 
 ## OAuth Configuration Overview
@@ -131,6 +131,9 @@ The following environment variables are used:
 
 :::
 
+:::tip Community Workaround: Multi-Provider OAuth
+If you need to support both Microsoft and Google simultaneously, check out our **[Dual OAuth Configuration Tutorial](/tutorials/tips/dual-oauth-configuration)**. 
+:::
 ### OAuth Role Management
 
 Any OAuth provider that can be configured to return roles in the access token can be used to manage roles in Open WebUI.

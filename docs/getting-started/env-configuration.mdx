@@ -1255,9 +1255,20 @@ Invalid regex patterns will cause password validation to fail, potentially preve
 - Type: `str`
 - Default: `t0p-s3cr3t`
 - Docker Default: Randomly generated on first start
-- Description: Overrides the randomly generated string used for JSON Web Token.
+- Description: Overrides the randomly generated string used for JSON Web Token and **encryption of sensitive data** (like OAuth tokens for MCP).
 
-:::warning
+:::danger Critical for Docker/Production
+
+You **MUST** set `WEBUI_SECRET_KEY` to a secure, persistent value.
+
+If you do NOT set this:
+1.  It will be randomly generated each time the container restarts/recreates.
+2.  **All OAuth sessions will become invalid.**
+3.  **MCP Tools will break** (Error: `Error decrypting tokens`) because they cannot decrypt the tokens stored with the previous key.
+4.  You will be logged out.
+
+**Do not leave this unset in production.**
+:::
 
 **Required for Multi-Worker and Multi-Node Deployments AND HIGHLY RECOMMENDED IN SINGLE-WORKER ENVIRONMENTS**
 
@@ -2600,6 +2611,26 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Sets the timeout in seconds for external reranker API requests during RAG document retrieval. Leave empty to use default timeout behavior.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_EXTERNAL_RERANKER_URL`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the **full URL** for the external reranking API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+You **MUST** provide the full URL, including the endpoint path (e.g., `https://api.yourprovider.com/v1/rerank`). The system does **not** automatically append `/v1/rerank` or any other path to the base URL you provide.
+
+:::
+
+#### `RAG_EXTERNAL_RERANKER_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for the external reranking API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Query Generation
 
 #### `ENABLE_RETRIEVAL_QUERY_GENERATION`
@@ -3185,11 +3216,14 @@ If you use `perplexity`, this variable is not relevant to you.
 #### `WEB_LOADER_ENGINE`
 
 - Type: `str`
-- Default: `safe_web`
+- Default: `(empty)`
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
-  - `requests` - Uses the Requests module with enhanced error handling.
-  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+  - `safe_web` (default) - Uses internal fetching with enhanced error handling.
+  - `playwright` - Uses Playwright for rendering pages with JavaScript support.
+  - `firecrawl` - Uses Firecrawl service.
+  - `tavily` - Uses Tavily service.
+  - `external` - Uses an external web loader API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
@@ -3248,7 +3282,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 :::warning
 
-This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
+This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or left empty (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
 
 :::
 

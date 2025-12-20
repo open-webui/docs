@@ -26,10 +26,12 @@ For remote servers, use the appropriate hostname or IP address.
 1. Go to ⚙️ **Admin Settings**.
 2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
 3. Click ➕ **Add New Connection**.
-4. Fill in the following:
+4. Select the **Standard / Compatible** tab (if available).
+5. Fill in the following:
    - **API URL**: `http://localhost:8000/v1` (or your vLLM server URL)
-   - **API Key**: Leave empty (vLLM typically doesn't require an API key for local connections)
-5. Click **Save**.
+     *   **Docker Users**: Use `http://host.docker.internal:8000/v1` if Open WebUI is in a container.
+   - **API Key**: `none` (or leave empty if no key is configured)
+6. Click **Save**.
 
 ---
 

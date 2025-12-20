@@ -52,6 +52,9 @@ Follow these steps to configure an efficient task model:
    - **Hosted API Endpoint (For Maximum Speed)**
      - Connect to a hosted API service to handle task processing.
      - This can be very cheap. For example, OpenRouter offers Llama and Qwen models at less than **1.5 cents per million input tokens**.
+       :::tip OpenRouter Recommendation
+       When using **OpenRouter**, we highly recommend configuring the **Model IDs (Allowlist)** in the connection settings. Importing thousands of models can clutter your selector and degrade admin panel performance.
+       :::
 
    - **Disable Unnecessary Automation**
      - If certain automated features are not required, disable them to reduce extraneous background calls—especially features like autocomplete.

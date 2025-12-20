@@ -95,12 +95,12 @@ http://127.0.0.1:10000
 To control and query your locally running model directly from Open WebUI:
 
 1. Open Open WebUI in your browser
-2. Go to ⚙️ Admin Settings → Connections → OpenAI Connections
-3. Click ➕ Add Connection and enter:
-
-- URL: `http://127.0.0.1:10000/v1`
-  (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker)
-- API Key: `none` (leave blank)
+2. Go to ⚙️ **Admin Settings → Connections → OpenAI**.
+3. Click ➕ **Add Connection**.
+4. Set the following (under **Standard / Compatible** if tabs are visible):
+   - **URL**: `http://127.0.0.1:10000/v1`
+     (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker. **Note the `/v1` at the end!**)
+   - **API Key**: `none` (leave blank or type specific key if configured)
 
 💡 Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
 
