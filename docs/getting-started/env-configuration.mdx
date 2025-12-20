@@ -3216,11 +3216,14 @@ If you use `perplexity`, this variable is not relevant to you.
 #### `WEB_LOADER_ENGINE`
 
 - Type: `str`
-- Default: `safe_web`
+- Default: `(empty)`
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
-  - `requests` - Uses the Requests module with enhanced error handling.
-  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+  - `safe_web` (default) - Uses internal fetching with enhanced error handling.
+  - `playwright` - Uses Playwright for rendering pages with JavaScript support.
+  - `firecrawl` - Uses Firecrawl service.
+  - `tavily` - Uses Tavily service.
+  - `external` - Uses an external web loader API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
@@ -3279,7 +3282,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 :::warning
 
-This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
+This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or left empty (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
 
 :::
 
