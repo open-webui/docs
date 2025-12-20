@@ -5044,10 +5044,21 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 
 For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
 
+:::warning Additional Dependencies Required
+
+SQLCipher encryption requires additional dependencies that are **not included by default**. Before using this feature, you must install:
+
+- The **SQLCipher system library** (e.g., `libsqlcipher-dev` on Debian/Ubuntu, `sqlcipher` on macOS via Homebrew)
+- The **`sqlcipher3-wheels`** Python package (`pip install sqlcipher3-wheels`)
+
+For Docker users, this means building a custom image with these dependencies included.
+
+:::
+
 To enable encryption, you must configure two environment variables:
 
 1. Set `DATABASE_TYPE="sqlite+sqlcipher"`.
-1. Set `DATABASE_PASSWORD="your-secure-password"`.
+2. Set `DATABASE_PASSWORD="your-secure-password"`.
 
 When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
 
