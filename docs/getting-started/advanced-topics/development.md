@@ -140,6 +140,26 @@ VS Code's integrated terminal feature makes managing multiple terminals incredib
 
      *(Using Conda is optional but strongly recommended for managing Python dependencies and avoiding conflicts.)* If you choose not to use Conda, ensure you are using Python 3.11 or higher and proceed to the next step, but be aware of potential dependency conflicts.
 
+2.  **Alternative: Create and Activate a Python venv:**
+    
+    If you prefer using Python's built-in `venv` module instead of Conda, follow these steps:
+
+    -   **Create the virtual environment:**
+        ```bash
+        python3 -m venv venv
+        ```
+    -   **Activate the virtual environment:**
+        -   **Linux/macOS:**
+            ```bash
+            source venv/bin/activate
+            ```
+        -   **Windows:**
+            ```powershell
+            .\venv\Scripts\activate
+            ```
+    
+    Once activated, your terminal prompt should show `(venv)`. You can now proceed to install dependencies.
+
 1. **Install Backend Dependencies:**
      - In your *backend* terminal (and with the Conda environment activated if you are using Conda), run:
 
@@ -262,6 +282,15 @@ Hot reload (or hot module replacement - HMR) is a fantastic development feature 
 5. **Backend Restart Required (For Backend Changes):** Hot reload typically works best for frontend code changes (UI, styling, components). For significant backend code changes (especially changes to server logic, API endpoints, or dependencies), you might need to **manually restart the backend server** (by stopping `sh dev.sh` in your backend terminal and running it again). Hot reload for backend changes is often less reliable or not automatically configured in many backend development setups.
 6. **IDE/Editor Issues:** In rare cases, issues with your IDE or code editor might prevent file changes from being properly detected by the development servers. Try restarting your IDE or ensuring that files are being saved correctly.
 7. **Configuration Problems (Advanced):** If none of the above steps work, there might be a more complex configuration issue with the frontend or backend development server setup. Consult the project's documentation, configuration files (e.g., `vite.config.js` for frontend, backend server configuration files), or seek help from the Open WebUI community or maintainers.
+
+### 🖼️ Icons Not Loading? (CORS Issues)
+
+If you find that **icons or other static assets are failing to load**, it is often due to **Cross-Origin Resource Sharing (CORS)** restrictions. This happens when the frontend (running on one port, e.g., `5173`) tries to request resources from the backend (running on another port, e.g., `8080`) without explicit permission.
+
+**Solution:**
+You need to configure the `CORS_ALLOW_ORIGIN` environment variable in your backend.
+-   Check the [Environment Configuration](../getting-started/env-configuration.mdx#cors-settings) guide for details on how to set `CORS_ALLOW_ORIGIN` to allow requests from your frontend's URL (e.g., `http://localhost:5173`).
+-   In a development environment, you can often set this in your `backend/dev.sh` script or your `.env` file.
 
 ## Contributing to Open WebUI
 
