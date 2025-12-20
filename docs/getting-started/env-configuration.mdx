@@ -2600,6 +2600,26 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Sets the timeout in seconds for external reranker API requests during RAG document retrieval. Leave empty to use default timeout behavior.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_EXTERNAL_RERANKER_URL`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the **full URL** for the external reranking API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+You **MUST** provide the full URL, including the endpoint path (e.g., `https://api.yourprovider.com/v1/rerank`). The system does **not** automatically append `/v1/rerank` or any other path to the base URL you provide.
+
+:::
+
+#### `RAG_EXTERNAL_RERANKER_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for the external reranking API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Query Generation
 
 #### `ENABLE_RETRIEVAL_QUERY_GENERATION`
