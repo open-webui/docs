@@ -5,7 +5,7 @@ title: "Continue.dev VS Code Extension with Open WebUI"
 
 :::warning
 
-This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/docs/contributing.mdx).
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/contributing).
 
 :::
 
@@ -153,7 +153,7 @@ env:
 
 This is a crucial step: you need to direct the continue.dev extension requests to your Open WebUI instance.
 Either use an actual domain name if the instance is hosted somewhere (e.g., `https://example.com/api`) or your localhost setup (e.g., `http://localhost:3000/api`).
-You can find more information about the URLs in the [API Endpoints guide](/docs/getting-started/api-endpoints.md).
+You can find more information about the URLs in the [API Endpoints guide](/getting-started/api-endpoints).
 
 ```yaml
 apiBase: http://localhost:3000/api

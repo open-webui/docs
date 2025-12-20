@@ -75,7 +75,7 @@ Ensure you have:
 - **Quota Exceeded**: Check your Tavily plan at [Tavily Pricing](https://tavily.com/#pricing).
 - **Settings Not Saved**: Verify admin privileges and that `webui.db` is writable.
 
-For further help, visit the [Open WebUI Community](https://openwebui.com/community) or [Tavily Support](https://tavily.com/#contact).
+For further help, visit the [Open WebUI Community](https://openwebui.com/search) or [Tavily Support](https://tavily.com/#contact).
 
 ## Additional Resources
 
