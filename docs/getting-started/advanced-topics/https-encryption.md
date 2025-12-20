@@ -28,9 +28,9 @@ The best method depends on your infrastructure.
 ### 🏠 For Local/Docker Users
 If you are running Open WebUI with Docker, the standard approach is to use a **Reverse Proxy**. This sits in front of Open WebUI and handles the SSL encryption.
 
-*   **[Nginx](../../../tutorials/https/nginx.md)**: The industry standard. Highly configurable, great performance.
-*   **[Caddy](../../../tutorials/https/caddy.md)**: **Easiest option**. Automatically obtains and renews Let's Encrypt certificates with minimal config.
-*   **[HAProxy](../../../tutorials/https/haproxy.md)**: Robust choice for advanced load balancing needs.
+*   **[Nginx](../../tutorials/https/nginx.md)**: The industry standard. Highly configurable, great performance.
+*   **[Caddy](../../tutorials/https/caddy.md)**: **Easiest option**. Automatically obtains and renews Let's Encrypt certificates with minimal config.
+*   **[HAProxy](../../tutorials/https/haproxy.md)**: Robust choice for advanced load balancing needs.
 
 ### ☁️ For Cloud Deployments
 *   **Cloud Load Balancers**: (AWS ALB, Google Cloud Load Balancing) often handle SSL termination natively.
