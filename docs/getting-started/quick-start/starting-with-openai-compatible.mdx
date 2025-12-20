@@ -48,13 +48,14 @@ See [their docs](https://lemonade-server.ai/) for details.
 ## Step 2: Connect Your Server to Open WebUI
 
 1. Open Open WebUI in your browser.
-2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI Connections**.
+2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
 3. Click ➕ **Add Connection**.
-
-   - **URL**: Use your server’s API endpoint (for example, `http://localhost:11434/v1` for Ollama, or your own Llama.cpp server’s address).
-   - **API Key**: Leave blank unless required.
-
-4. Click Save.
+4. Select the **Standard / Compatible** tab (if available).
+5. Fill in the following:
+   - **API URL**: Use your server’s API endpoint.
+     *   **Examples**: `http://localhost:11434/v1` (Ollama), `http://localhost:10000/v1` (Llama.cpp).
+   - **API Key**: Leave blank unless the server requires one.
+6. Click **Save**.
 
 :::tip
 
