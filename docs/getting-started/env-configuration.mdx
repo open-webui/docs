@@ -225,6 +225,13 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Description: Toggles whether to show admin user details in the interface.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_PUBLIC_ACTIVE_USERS_COUNT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the active user count is visible to all users or restricted to administrators only. When set to `False`, only admin users can see how many users are currently active, reducing backend load and addressing privacy concerns in large deployments.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `ADMIN_EMAIL`
 
 - Type: `str`
