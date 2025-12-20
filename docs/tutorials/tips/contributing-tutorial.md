@@ -1,19 +1,21 @@
 ---
 sidebar_position: 2
-title: "🤝 Contributing Tutorials"
+title: "Contributing Tutorials"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
 # Contributing Tutorials
 
 We appreciate your interest in contributing tutorials to the Open WebUI documentation. Follow the steps below to set up your environment and submit your tutorial.
 
-## Steps
+## Contributing Steps
 
-1. **Fork the `openwebui/docs` GitHub Repository**
+1. **Fork the `open-webui/docs` GitHub Repository**
 
    - Navigate to the [Open WebUI Docs Repository](https://github.com/open-webui/docs) on GitHub.
    - Click the **Fork** button at the top-right corner to create a copy under your GitHub account.
@@ -96,15 +98,21 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
 
 Community-contributed tutorials must include the the following:
 
-```
+```txt
+
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
+
 ```
 
 ---
 
-:::tip How to Test Docusaurus Locally  
+:::tip
+
+How to Test Docusaurus Locally
 You can test your Docusaurus site locally with the following commands:
 
 ```bash
@@ -113,6 +121,7 @@ npm run build # Build the site for production
 ```
 
 This will help you catch any issues before deploying
+
 :::
 
 ---

@@ -1,0 +1,213 @@
+---
+sidebar_position: 2
+title: "LDAP Authentication"
+---
+
+# OpenLDAP Integration
+
+This guide provides a comprehensive walkthrough for setting up OpenLDAP authentication with Open WebUI. It covers creating a test OpenLDAP server using Docker, seeding it with sample users, configuring Open WebUI to connect to it, and troubleshooting common issues.
+
+## 1. Setting Up OpenLDAP with Docker
+
+The easiest way to get a test OpenLDAP server running is by using Docker. This `docker-compose.yml` file will create an OpenLDAP container and an optional phpLDAPadmin container for a web-based GUI.
+
+```yaml title="docker-compose.yml"
+version: "3.9"
+services:
+  ldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    environment:
+      LDAP_ORGANISATION: "Example Inc"
+      LDAP_DOMAIN: "example.org"
+      LDAP_ADMIN_PASSWORD: admin
+      LDAP_TLS: "false"
+    volumes:
+      - ./ldap/var:/var/lib/ldap
+      - ./ldap/etc:/etc/ldap/slapd.d
+    ports:
+      - "389:389"
+    networks: [ldapnet]
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "ldap"
+    ports:
+      - "6443:443"
+    networks: [ldapnet]
+
+networks:
+  ldapnet:
+    driver: bridge
+```
+
+- The `osixia/openldap` image automatically creates a basic organization structure with just `LDAP_DOMAIN` and `LDAP_ADMIN_PASSWORD`.
+- The `osixia/phpldapadmin` image provides a web interface for managing your LDAP directory, accessible at `https://localhost:6443`.
+
+Run `docker-compose up -d` to start the containers. Confirm that the LDAP server has started by checking the logs: `docker logs openldap`. You should see a "started slapd" message.
+
+## 2. Seeding a Sample User (LDIF)
+
+To test the login, you need to add a sample user to the LDAP directory. Create a file named `seed.ldif` with the following content:
+
+```ldif title="seed.ldif"
+dn: ou=users,dc=example,dc=org
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=jdoe,ou=users,dc=example,dc=org
+objectClass: inetOrgPerson
+cn: John Doe
+sn: Doe
+uid: jdoe
+mail: jdoe@example.org
+userPassword: {PLAIN}password123
+```
+
+**Note on Passwords:** The `userPassword` field is set to a plain text value for simplicity in this test environment. In production, you should always use a hashed password. You can generate a hashed password using `slappasswd` or `openssl passwd`. For example:
+
+```bash
+
+# Using slappasswd (inside the container)
+docker exec openldap slappasswd -s your_password
+
+# Using openssl
+openssl passwd -6 your_password
+```
+
+Copy the LDIF file into the container and use `ldapadd` to add the entry:
+
+```bash
+docker cp seed.ldif openldap:/seed.ldif
+docker exec openldap ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin -f /seed.ldif
+```
+
+A successful operation will show an "adding new entry" message.
+
+## 3. Verifying the LDAP Connection
+
+Before configuring Open WebUI, verify that the LDAP server is accessible and the user exists.
+
+```bash
+ldapsearch -x -H ldap://localhost:389 \
+  -D "cn=admin,dc=example,dc=org" -w admin \
+  -b "dc=example,dc=org" "(uid=jdoe)"
+```
+
+If the command returns the `jdoe` user entry, your LDAP server is ready.
+
+## 4. Configuring Open WebUI
+
+Now, configure your Open WebUI instance to use the LDAP server for authentication.
+
+### Environment Variables
+
+Set the following environment variables for your Open WebUI instance.
+
+:::info
+
+Open WebUI reads these environment variables only on the first startup. Subsequent changes must be made in the Admin settings panel of the UI unless you have `ENABLE_PERSISTENT_CONFIG=false`.
+
+:::
+
+```env
+
+# Enable LDAP
+ENABLE_LDAP="true"
+
+# --- Server Settings ---
+LDAP_SERVER_LABEL="OpenLDAP"
+LDAP_SERVER_HOST="localhost"  # Or the IP/hostname of your LDAP server
+LDAP_SERVER_PORT="389"        # Use 389 for plaintext/StartTLS, 636 for LDAPS
+LDAP_USE_TLS="false"          # Set to "true" for LDAPS or StartTLS
+LDAP_VALIDATE_CERT="false"    # Set to "true" in production with valid certs
+
+# --- Bind Credentials ---
+LDAP_APP_DN="cn=admin,dc=example,dc=org"
+LDAP_APP_PASSWORD="admin"
+
+# --- User Schema ---
+LDAP_SEARCH_BASE="dc=example,dc=org"
+LDAP_ATTRIBUTE_FOR_USERNAME="uid"
+LDAP_ATTRIBUTE_FOR_MAIL="mail"
+LDAP_SEARCH_FILTER="(uid=%(user)s)" # More secure and performant
+```
+
+### UI Configuration
+
+Alternatively, you can configure these settings directly in the UI:
+
+1. Log in as an administrator.
+2. Navigate to **Settings** > **General**.
+3. Enable **LDAP Authentication**.
+4. Fill in the fields corresponding to the environment variables above.
+5. Save the settings and restart Open WebUI.
+
+## 5. Logging In
+
+Open a new incognito browser window and navigate to your Open WebUI instance.
+
+-   **Login ID:** `jdoe`
+-   **Password:** `password123` (or the password you set)
+
+Upon successful login, a new user account with "User" role will be created automatically in Open WebUI. An administrator can later elevate the user's role if needed.
+
+## 6. Troubleshooting Common Errors
+
+Here are solutions to common errors encountered during LDAP integration.
+
+### `port must be an integer`
+
+```
+ERROR | open_webui.routers.auths:ldap_auth:447 - LDAP authentication error: port must be an integer - {}
+```
+
+**Cause:** The `LDAP_SERVER_PORT` environment variable is being passed as a string with quotes (e.g., `"389"`).
+
+**Solution:**
+-   Ensure the `LDAP_SERVER_PORT` value in your `.env` file or export command has no quotes: `LDAP_SERVER_PORT=389`.
+-   Remove the protocol (`http://`, `ldap://`) from `LDAP_SERVER_HOST`. It should just be the hostname or IP (e.g., `localhost`).
+
+### `[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred`
+
+```
+ERROR | LDAP authentication error: ("('socket ssl wrapping error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)',)",) - {}
+```
+
+**Cause:** This is a TLS handshake failure. The client (Open WebUI) is trying to initiate a TLS connection, but the server (OpenLDAP) is not configured for it or is expecting a different protocol.
+
+**Solution:**
+-   **If you don't intend to use TLS:** Set `LDAP_USE_TLS="false"` and connect to the standard plaintext port `389`.
+-   **If you intend to use LDAPS:** Ensure your LDAP server is configured for TLS and listening on port `636`. Set `LDAP_SERVER_PORT="636"` and `LDAP_USE_TLS="true"`.
+-   **If you intend to use StartTLS:** Your LDAP server must support the StartTLS extension. Connect on port `389` and set `LDAP_USE_TLS="true"`.
+
+### `err=49 text=` (Invalid Credentials)
+
+```
+openldap | ... conn=1001 op=0 RESULT tag=97 err=49 text=
+```
+
+**Cause:** The LDAP server rejected the bind attempt because the distinguished name (DN) or the password was incorrect. This happens during the second bind attempt, where Open WebUI tries to authenticate with the user's provided credentials.
+
+**Solution:**
+1. **Verify the Password:** Ensure you are using the correct plaintext password. The `userPassword` value in the LDIF file is what the server expects. If it's a hash, you must provide the original plaintext password.
+2. **Check the User DN:** The DN used for the bind (`uid=jdoe,ou=users,dc=example,dc=org`) must be correct.
+3. **Test with `ldapwhoami`:** Verify the credentials directly against the LDAP server to isolate the issue from Open WebUI.
+    ```bash
+    ldapwhoami -x -H ldap://localhost:389 \
+      -D "uid=jdoe,ou=users,dc=example,dc=org" -w "password123"
+    ```
+    If this command fails with `ldap_bind: Invalid credentials (49)`, the problem is with the credentials or the LDAP server's password configuration, not Open WebUI.
+4. **Reset the Password:** If you don't know the password, reset it using `ldapmodify` or `ldappasswd`. It's often easiest to use a `{PLAIN}` password for initial testing and then switch to a secure hash like `{SSHA}`.
+
+    **Example LDIF to change password:**
+    ```ldif title="change_password.ldif"
+    dn: uid=jdoe,ou=users,dc=example,dc=org
+    changetype: modify
+    replace: userPassword
+    userPassword: {PLAIN}newpassword
+    ```
+    Apply it with:
+    ```bash
+    docker exec openldap ldapmodify -x -D "cn=admin,dc=example,dc=org" -w admin -f /path/to/change_password.ldif

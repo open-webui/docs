@@ -1,9 +1,8 @@
 ### Self-Signed Certificate
 
-
 Using self-signed certificates is suitable for development or internal use where trust is not a critical concern.
 
-#### Steps
+#### Self-Signed Certificate Steps
 
 1. **Create Directories for Nginx Files:**
 
@@ -24,19 +23,56 @@ Using self-signed certificates is suitable for development or internal use where
         ssl_certificate_key /etc/nginx/ssl/nginx.key;
         ssl_protocols TLSv1.2 TLSv1.3;
 
-        location / {
+        location ~* ^/(auth|api|oauth|admin|signin|signup|signout|login|logout|sso)/ {
             proxy_pass http://host.docker.internal:3000;
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
-            # (Optional) Disable proxy buffering for better streaming response from models
             proxy_buffering off;
-
-            # (Optional) Increase max request size for large attachments and long audio messages
             client_max_body_size 20M;
             proxy_read_timeout 10m;
+
+            # Disable caching for auth endpoints
+            proxy_no_cache 1;
+            proxy_cache_bypass 1;
+            add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+            expires -1;
+        }
+
+        location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            proxy_pass http://host.docker.internal:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+
+            expires 7d;
+            add_header Cache-Control "public, immutable";
+        }
+
+        location / {
+            proxy_pass http://host.docker.internal:3000;
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_buffering off;
+
+            client_max_body_size 20M;
+            proxy_read_timeout 10m;
+
+            add_header Cache-Control "public, max-age=300, must-revalidate";
         }
     }
     ```

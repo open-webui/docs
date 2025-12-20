@@ -1,0 +1,194 @@
+---
+sidebar_position: 3
+title: "SCIM 2.0"
+---
+
+# SCIM 2.0 Support
+
+Open WebUI supports SCIM 2.0 (System for Cross-domain Identity Management) for automated user and group provisioning from identity providers like Okta, Azure AD, and Google Workspace.
+
+## Overview
+
+SCIM is an open standard that allows for the automation of user provisioning. When enabled, your identity provider can automatically:
+- Create users in Open WebUI when they're added to your organization
+- Update user information when changes are made
+- Deactivate users when they're removed from your organization
+- Manage group memberships
+
+## Configuration
+
+SCIM is configured entirely through environment variables. There is no UI configuration for SCIM settings.
+
+### Environment Variables
+
+Configure SCIM by setting these environment variables:
+
+- **`SCIM_ENABLED`**: Set to `true` to enable SCIM support (default: `false`)
+- **`SCIM_TOKEN`**: The bearer token for SCIM authentication (required when SCIM is enabled)
+
+:::warning
+
+Security Note
+The SCIM token should be a secure, randomly generated string. You can generate one using:
+```bash
+openssl rand -base64 32
+```
+Keep this token secure as it provides access to user management operations.
+
+:::
+
+### Example Configuration
+
+```bash
+
+# Enable SCIM
+export SCIM_ENABLED=true
+
+# Set a secure token (replace with your own generated token)
+export SCIM_TOKEN="your-secure-token-here"
+```
+
+## SCIM API Configuration
+
+When configuring your identity provider, use the following settings:
+
+- **SCIM Base URL**: `<your-openwebui-url>/api/v1/scim/v2/`
+- **Authentication**: Bearer Token
+- **Token**: `Bearer <your-scim-token>`
+
+### Example for Popular Identity Providers
+
+#### Okta
+1. In Okta, add the SCIM application
+2. Set the SCIM connector base URL to: `https://your-domain.com/api/v1/scim/v2/`
+3. Set authentication to "HTTP Header"
+4. Add Authorization header with value: `Bearer your-scim-token`
+
+## Supported SCIM Operations
+
+Open WebUI's SCIM implementation supports the following operations:
+
+### User Operations
+- **Create User** (`POST /Users`): Create a new user account
+- **Get User** (`GET /Users/{id}`): Retrieve user information
+- **Update User** (`PUT /Users/{id}`, `PATCH /Users/{id}`): Update user attributes
+- **Delete User** (`DELETE /Users/{id}`): Deactivate a user account
+- **List Users** (`GET /Users`): List all users with filtering support
+
+### Group Operations
+- **Create Group** (`POST /Groups`): Create a new group
+- **Get Group** (`GET /Groups/{id}`): Retrieve group information
+- **Update Group** (`PUT /Groups/{id}`, `PATCH /Groups/{id}`): Update group membership
+- **Delete Group** (`DELETE /Groups/{id}`): Remove a group
+- **List Groups** (`GET /Groups`): List all groups with filtering support
+
+### Supported Attributes
+
+#### User Attributes
+- `userName`: The user's email address (required, unique)
+- `name.givenName`: First name
+- `name.familyName`: Last name
+- `emails`: Email addresses
+- `active`: User status (active/inactive)
+- `externalId`: External identifier from the identity provider
+
+#### Group Attributes
+- `displayName`: Group name (required)
+- `members`: Array of user members
+- `externalId`: External identifier from the identity provider
+
+## Filtering Support
+
+The SCIM API supports filtering for both users and groups:
+
+```
+GET /api/v1/scim/v2/Users?filter=userName eq "user@example.com"
+GET /api/v1/scim/v2/Groups?filter=displayName eq "Engineering"
+```
+
+Supported filter operators:
+- `eq`: Equals
+- `ne`: Not equals
+- `co`: Contains
+- `sw`: Starts with
+- `ew`: Ends with
+- `pr`: Present (has value)
+- `gt`: Greater than
+- `ge`: Greater than or equal
+- `lt`: Less than
+- `le`: Less than or equal
+
+## Troubleshooting
+
+### Common Issues
+
+1. **401 Unauthorized Errors**
+   - Verify that `SCIM_ENABLED` is set to `true`
+   - Check that the bearer token in your identity provider matches `SCIM_TOKEN`
+   - Ensure the Authorization header format is: `Bearer <token>`
+
+2. **404 Not Found Errors**
+   - Verify the SCIM base URL ends with `/api/v1/scim/v2/`
+   - Check that the path includes the `/api/v1` prefix
+
+3. **User Creation Failures**
+   - Ensure the `userName` field contains a valid email address
+   - Check that the email is not already in use
+
+### Testing SCIM Endpoints
+
+You can test SCIM endpoints using curl:
+
+```bash
+
+# Test authentication and list users
+curl -H "Authorization: Bearer your-scim-token" \
+  https://your-domain.com/api/v1/scim/v2/Users
+
+# Get a specific user
+curl -H "Authorization: Bearer your-scim-token" \
+  https://your-domain.com/api/v1/scim/v2/Users/user-id
+
+# Create a test user
+curl -X POST \
+  -H "Authorization: Bearer your-scim-token" \
+  -H "Content-Type: application/scim+json" \
+  -d '{
+    "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+    "userName": "test@example.com",
+    "displayName": "Test User",
+    "name": {
+      "givenName": "Test",
+      "familyName": "User"
+    },
+    "emails": [{
+      "value": "test@example.com",
+      "primary": true
+    }],
+    "active": true
+  }' \
+  https://your-domain.com/api/v1/scim/v2/Users
+```
+
+## Security Considerations
+
+1. **Use HTTPS**: Always use HTTPS in production to protect the bearer token
+2. **Secure Token Storage**: Store the SCIM token securely and rotate it periodically
+3. **IP Allowlisting**: Consider restricting SCIM API access to your identity provider's IP addresses
+4. **Audit Logging**: SCIM operations are logged for security auditing
+
+## Limitations
+
+- Custom schema extensions are not currently supported
+- Bulk operations are not implemented
+- ETags for resource versioning are not supported
+
+## Integration with SSO
+
+SCIM works best when combined with SSO (Single Sign-On). A typical setup includes:
+1. SCIM for automated user provisioning
+2. OIDC for user authentication
+
+This ensures users are automatically created and can immediately authenticate using their corporate credentials.
+
+For SSO configuration, see the [SSO documentation](https://docs.openwebui.com/features/auth/).

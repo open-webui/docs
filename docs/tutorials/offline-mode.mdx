@@ -1,0 +1,164 @@
+---
+sidebar_position: 300
+title: "Offline Mode"
+---
+
+import { TopBanners } from "@site/src/components/TopBanners";
+
+<TopBanners />
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](../contributing.mdx).
+
+:::
+
+# Running Open WebUI in offline mode 🔌
+
+If you want to run Open WebUI in offline mode, you have to consider your installation approach and adjust your desired features accordingly. In this guide, we will go over the different ways of achieving a mostly similar setup to the online version.
+
+## What means offline mode?
+
+The offline mode of Open WebUI lets you run the application without the need for an active internet connection. This allows you to create an 'air-gapped' environment for your LLMs and tools (a fully 'air-gapped' environment requires isolating the instance from the internet).
+
+:::info
+
+**Disabled functionality when offline mode is enabled:**
+
+- Automatic version update checks (controlled by `ENABLE_VERSION_UPDATE_CHECK`)
+- Downloads of embedding models from Hugging Face Hub (controlled by `HF_HUB_OFFLINE`)
+  - If you did not download an embedding model prior to activating offline mode, RAG, web search and document analysis functionality will not work properly
+- Automatic model updates for embeddings, reranking, and Whisper models
+- Update notifications in the UI
+
+**Still functional:**
+
+- External LLM API connections (OpenAI, etc.)
+- OAuth authentication providers
+- Web search and RAG with external APIs
+
+:::
+
+## How to enable offline mode?
+
+Offline mode requires setting multiple environment variables to fully disconnect Open WebUI from external network dependencies. The primary variables are:
+
+**Required Environment Variables:**
+
+- `OFFLINE_MODE=true` - Disables version checks and prevents automatic model downloads
+- `HF_HUB_OFFLINE=1` - Tells Hugging Face Hub to operate in offline mode, preventing all automatic downloads
+
+**Optional but Recommended:**
+
+- `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of embedding models
+- `RAG_RERANKING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of reranking models  
+- `WHISPER_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of Whisper models
+
+Apply these environment variables depending on your deployment method.
+
+:::warning Critical: HF_HUB_OFFLINE Behavior
+
+When `HF_HUB_OFFLINE=1` is set:
+- **Downloads of models, sentence transformers, and other Hugging Face content will NOT WORK**
+- RAG will not work on a default installation if this is enabled without pre-downloading models
+- Only pre-downloaded models in the correct cache directories will be accessible
+
+This variable provides the strictest offline enforcement but requires careful preparation.
+
+:::
+
+:::tip
+
+Consider if you need to start the application offline from the beginning of your deployment. If your use case does not require immediate offline capability, follow **approach II** for an easier setup.
+
+:::
+
+## Approach I
+
+### I: Speech-To-Text
+
+The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/audio/speech-to-text/stt-config.md) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
+
+```python
+from faster_whisper import WhisperModel
+
+faster_whisper_kwargs = {
+    "model_size_or_path": "Systran/faster-whisper-large-v3",
+    "device": "cuda", # set this to download the cuda adjusted model
+    "compute_type": "int8",
+    "download_root": "/path/of/your/choice"
+}
+
+WhisperModel(**faster_whisper_kwargs)
+```
+
+The contents of the download directory must be copied to `/app/backend/data/cache/whisper/models/` within your Open WebUI deployment. It makes sense to directly declare your `whisper` model via the [environment variable](https://docs.openwebui.com/getting-started/env-configuration#whisper_model), like this: `WHISPER_MODEL=Systran/faster-whisper-large-v3`.
+
+### I: Text-To-Speech
+
+The default local transformer can already handle the text-to-speech function. If you prefer a different approach, follow one of the [guides](https://docs.openwebui.com/category/%EF%B8%8F-text-to-speech).
+
+### I: Embedding Model
+
+For various purposes, you will need an embedding model (e.g. [RAG](/features/rag)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+
+```python
+from huggingface_hub import snapshot_download
+
+snapshot_download(repo_id="sentence-transformers/all-MiniLM-L6-v2", cache_dir="/path/of/your/choice")
+```
+
+The contents of the download directory must be copied to `/app/backend/data/cache/embedding/models/` within your Open WebUI deployment. It makes sense to directly declare your embedding model via the [environment variable](https://docs.openwebui.com/getting-started/env-configuration#rag_embedding_model), like this: `RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2`.
+
+## Approach II
+
+### Running Open WebUI with internet connection during setup
+
+This is the easiest approach to achieving the offline setup with almost all features available in the online version. Apply only the features you want to use for your deployment.
+
+### II: Embedding Model
+
+In your Open WebUI installation, navigate to `Admin Settings` > `Settings` > `Documents` and select the embedding model you would like to use (e.g. [sentence-transformer/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)). After the selection, click the download button next to it.
+
+---
+
+After you have installed all your desired features, set the environment variable `OFFLINE_MODE=True` depending on your type of Open WebUI deployment.
+
+## Sidenote
+
+As previously mentioned, to achieve a fully offline experience with Open WebUI, you must disconnect your instance from the internet. The offline mode only prevents errors within Open WebUI when there is no internet connection.
+
+How you disconnect your instance is your choice. Here is an example via `docker-compose`:
+
+```yaml
+services:
+  # requires a reverse-proxy
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    environment:
+      # Core offline mode settings
+      - OFFLINE_MODE=true
+      - HF_HUB_OFFLINE=1
+      
+      # Disable automatic model updates
+      - RAG_EMBEDDING_MODEL_AUTO_UPDATE=false
+      - RAG_RERANKING_MODEL_AUTO_UPDATE=false
+      - WHISPER_MODEL_AUTO_UPDATE=false
+      
+      # Specify pre-downloaded models
+      - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - WHISPER_MODEL=Systran/faster-whisper-large-v3
+    volumes:
+      - ./open-webui-data:/app/backend/data
+      - ./models/sentence-transformers/all-MiniLM-L6-v2:/app/backend/data/cache/embedding/models/
+      - ./models/Systran/faster-whisper-large-v3:/app/backend/data/cache/whisper/models/
+    networks:
+      - open-webui-internal
+
+networks:
+  open-webui-internal:
+    name: open-webui-internal-network
+    driver: bridge
+    internal: true
+```

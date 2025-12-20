@@ -1,5 +1,5 @@
 ---
-sidebar_position: 400
+sidebar_position: 200
 title: "⭐ Features"
 ---
 
@@ -17,6 +17,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛡️ **Granular Permissions and User Groups**: By allowing administrators to create detailed user roles, user groups, and permissions across the workspace, we ensure a secure user environment for all users involved. This granularity not only enhances security, but also allows for customized user experiences, fostering a sense of ownership and responsibility amongst users.
 
+- 🔐 **SCIM 2.0 Provisioning**: Enterprise-grade user and group provisioning through SCIM 2.0 protocol, enabling seamless integration with identity providers like Okta, Azure AD, and Google Workspace for automated user lifecycle management.
+
 - 📱 **Responsive Design**: Enjoy a seamless experience across desktop PCs, laptops, and mobile devices.
 
 - 📱 **Progressive Web App for Mobile**: Enjoy a native progressive web application experience on your mobile device with offline access on `localhost` or a personal domain, and a smooth user interface. In order for our PWA to be installable on your device, it must be delivered in a secure context. This usually means that it must be served over HTTPS.
@@ -31,21 +33,33 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🧩 **Model Builder**: Easily create custom models from base Ollama models directly from Open WebUI. Create and add custom characters and agents, customize model elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
 
-- 📚 **Local and Remote RAG Integration**: Dive into the future of chat interactions and explore your documents with our cutting-edge Retrieval Augmented Generation (RAG) technology within your chats. Documents can be loaded into the `Documents` tab of the Workspace, after which they can be accessed using the pound key [`#`] before a query, or by starting the prompt with the pound key [`#`], followed by a URL for webpage content integration.
+- 📚 **Advanced RAG Integration with Multiple Vector Databases**: Dive into the future of chat interactions with cutting-edge Retrieval Augmented Generation (RAG) technology. Choose from 9 vector database options: ChromaDB (default), PostgreSQL with PGVector, Qdrant, Milvus, Elasticsearch, OpenSearch, Pinecone, S3Vector, and Oracle 23ai. Documents can be loaded into the `Documents` tab of the Workspace and accessed using the pound key [`#`] before a query, or by starting the prompt with [`#`] followed by a URL for webpage content integration.
 
-- 📄 **Document Extraction**: Extract text and data from various document formats including PDFs, Word documents, Excel spreadsheets, PowerPoint presentations, and more. Our advanced document processing capabilities enable seamless integration with your knowledge base, allowing for accurate retrieval and generation of information from complex documents while preserving their structure and formatting.
+- 📄 **Advanced Document Extraction with Multiple Engines**: Extract text and data from various document formats including PDFs, Word documents, Excel spreadsheets, PowerPoint presentations, and more using your choice of extraction engines: Apache Tika, Docling, Azure Document Intelligence, Mistral OCR, or external custom (self-built) content extraction engines/document loaders. Advanced document processing capabilities enable seamless integration with your knowledge base, preserving structure and formatting while supporting OCR for scanned documents and images.
 
-- 🔍 **Web Search for RAG**: You can perform web searches using a selection of various search providers and inject the results directly into your local Retrieval Augmented Generation (RAG) experience.
+- 🔍 **Web Search for RAG with 15+ Providers**: Perform web searches using 15+ providers including SearXNG, Google PSE, Brave Search, Kagi, Mojeek, Bocha, Tavily, Perplexity (AI models and Search API), serpstack, serper, Serply, DuckDuckGo, SearchAPI, SerpApi, Bing, Jina, Exa, Sougou, Azure AI Search, and Ollama Cloud, injecting results directly into your local Retrieval Augmented Generation (RAG) experience.
 
 - 🌐 **Web Browsing Capabilities**: Integrate websites seamlessly into your chat experience by using the `#` command followed by a URL. This feature enables the incorporation of web content directly into your conversations, thereby enhancing the richness and depth of your interactions.
 
-- 🎨 **Image Generation Integration**: Seamlessly incorporate image generation capabilities to enrich your chat experience with dynamic visual content.
+- 🎨 **Image Generation & Editing Integration**: Seamlessly create and edit images using multiple engines including OpenAI's DALL-E (generation and editing), Gemini (generation and editing), ComfyUI (local, generation and editing), and AUTOMATIC1111 (local, generation). Support for both text-to-image generation and prompt-based image editing workflows with dynamic visual content.
 
 - ⚙️ **Concurrent Model Utilization**: Effortlessly engage with multiple models simultaneously, harnessing their unique strengths for optimal responses. Leverage a diverse set of model modalities in parallel to enhance your experience.
 
 - 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions. Only authorized individuals can access your Ollama, while model creation and pulling rights are exclusively reserved for administrators.
 
 - 🌐🌍 **Multilingual Support**: Experience Open WebUI in your preferred language with our internationalization (`i18n`) support. We invite you to join us in expanding our supported languages! We're actively seeking contributors!
+
+- 💾 **Persistent Artifact Storage**: Built-in key-value storage API for artifacts, enabling features like journals, trackers, leaderboards, and collaborative tools with both personal and shared data scopes that persist across sessions.
+
+- ☁️ **Cloud Storage Integration**: Native support for cloud storage backends including Amazon S3 (with S3-compatible providers), Google Cloud Storage, and Microsoft Azure Blob Storage for scalable file storage and data management.
+
+- ☁️ **Enterprise Cloud Integration**: Seamlessly import documents from Google Drive and OneDrive/SharePoint directly through the file picker interface, enabling smooth workflows with enterprise cloud storage solutions.
+
+- 📊 **Production Observability with OpenTelemetry**: Built-in OpenTelemetry support for comprehensive monitoring with traces, metrics, and logs export to your existing observability stack (Prometheus, Grafana, Jaeger, etc.), enabling production-grade monitoring and debugging.
+
+- 🔒 **Encrypted Database Support**: Optional at-rest encryption for SQLite databases using SQLCipher, providing enhanced security for sensitive data in smaller deployments without requiring PostgreSQL infrastructure.
+
+- ⚖️ **Horizontal Scalability for Production**: Redis-backed session management and WebSocket support enabling multi-worker and multi-node deployments behind load balancers for high-availability production environments.
 
 - 🌟 **Continuous Updates**: We are committed to improving Open WebUI with regular updates, fixes, and new features.
 
@@ -222,7 +236,6 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 💻 Model Management
 
-
 - 🛠️ **Model Builder**: All models can be built and edited with a persistent model builder mode within the models edit page.
 
 - 📚 **Knowledge Support for Models**: The ability to attach tools, functions, and knowledge collections directly to models from a model's edit page, enhancing the information available to each model.
@@ -308,23 +321,23 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 🎙️ Audio, Voice, & Accessibility
 
-- 🗣️ **Voice Input Support**: Engage with your model through voice interactions; enjoy the convenience of talking to your model directly. Additionally, explore the option for sending voice input automatically after 3 seconds of silence for a streamlined experience.
+- 🗣️ **Voice Input Support with Multiple Providers**: Engage with your model through voice interactions using multiple Speech-to-Text providers: Local Whisper (default, with VAD filtering), OpenAI-compatible endpoints, Deepgram, and Azure Speech Services. Enjoy the convenience of talking to your model directly with automatic voice input after 3 seconds of silence for a streamlined experience.
   - Microphone access requires manually setting up a secure connection over HTTPS to work, or [manually whitelisting your URL at your own risk](https://docs.openwebui.com/troubleshooting/microphone-error).
 
 - 😊 **Emoji Call**: Toggle this feature on from the `Settings` > `Interface` menu, allowing LLMs to express emotions using emojis during voice calls for a more dynamic interaction.
-  - Microphone access requires a secure connection over HTTPS for this feature to work.
+  - Microphone access requires manually setting up a secure connection over HTTPS to work, or [manually whitelisting your URL at your own risk](https://docs.openwebui.com/troubleshooting/microphone-error).
 
 - 🎙️ **Hands-Free Voice Call Feature**: Initiate voice calls without needing to use your hands, making interactions more seamless.
-  - Microphone access is required using a secure connection over HTTPS for this feature to work.
+  - Microphone access requires manually setting up a secure connection over HTTPS to work, or [manually whitelisting your URL at your own risk](https://docs.openwebui.com/troubleshooting/microphone-error).
 
 - 📹 **Video Call Feature**: Enable video calls with supported vision models like LlaVA and GPT-4o, adding a visual dimension to your communications.
-  - Both Camera & Microphone access is required using a secure connection over HTTPS for this feature to work.
+  - Both Camera & Microphone access is required using a secure connection over HTTPS for this feature to work, or [manually whitelisting your URL at your own risk](https://docs.openwebui.com/troubleshooting/microphone-error).
 
 - 👆 **Tap to Interrupt**: Stop the AI’s speech during voice conversations with a simple tap on mobile devices, ensuring seamless control over the interaction.
 
 - 🎙️ **Voice Interrupt**: Stop the AI’s speech during voice conversations with your voice on mobile devices, ensuring seamless control over the interaction.
 
-- 🔊 **Configurable Text-to-Speech Endpoint**: Customize your Text-to-Speech experience with configurable OpenAI-compatible endpoints for reading aloud LLM responses.
+- 🔊 **Multiple Text-to-Speech Providers**: Customize your Text-to-Speech experience with multiple providers: OpenAI-compatible endpoints, Azure Speech Services, ElevenLabs (with EU residency support), local Transformers models, and browser-based WebAPI for reading aloud LLM responses.
 
 - 🔗 **Direct Call Mode Access**: Activate call mode directly from a URL, providing a convenient shortcut for mobile device users.
 
@@ -335,6 +348,10 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🎚️ **Customizable Audio Playback**: Allows users to adjust audio playback speed to their preferences in Call mode settings, enhancing accessibility and usability.
 
 - 🎵 **Broad Audio Compatibility**: Enjoy support for a wide range of audio file format transcriptions with RAG, including 'audio/x-m4a', to broaden compatibility with audio content within the platform.
+
+- 🎤 **Deepgram Speech-to-Text Integration**: Leverage Deepgram's advanced speech recognition capabilities for high-accuracy voice transcription, providing an additional STT option beyond local Whisper and OpenAI.
+
+- 🔊 **ElevenLabs Text-to-Speech Integration**: Access ElevenLabs' premium voice synthesis with support for EU residency API endpoints, offering high-quality and natural-sounding voice output for enhanced user experiences.
 
 - 🔊 **Audio Compression**: Experimental audio compression allows navigating around the 25MB limit for OpenAI's speech-to-text processing, expanding the possibilities for audio-based interactions.
 
@@ -368,6 +385,12 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🛢️ **Flexible Database Integration**: Seamlessly connect to custom databases, including SQLite, Postgres, and multiple vector databases like Milvus, using environment variables for flexible and scalable data management.
 
+- 🗄️ **Multiple Vector Database Support**: Choose from 9 vector database options for optimal RAG performance: ChromaDB (default), PostgreSQL with PGVector, Qdrant, Milvus, Elasticsearch, OpenSearch, Pinecone, S3Vector, and Oracle 23ai. Each option provides different scaling characteristics and performance profiles to match your deployment needs.
+
+- ☁️ **Enterprise Cloud Storage Backends**: Configure cloud storage backends including Amazon S3 (with S3-compatible providers like MinIO), Google Cloud Storage, and Microsoft Azure Blob Storage for scalable file storage, enabling stateless instances and distributed deployments.
+
+- 📂 **Cloud File Picker Integration**: Import documents directly from Google Drive and OneDrive/SharePoint through native file picker interfaces, streamlining workflows for users working with enterprise cloud storage solutions.
+
 - 🌐🗣️ **External Speech-to-Text Support**: The addition of external speech-to-text (`STT`) services provides enhanced flexibility, allowing users to choose their preferred provider for seamless interaction.
 
 - 🌐 **Remote ChromaDB Support**: Extend the capabilities of your database by connecting to remote ChromaDB servers.
@@ -376,9 +399,13 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🚀 **Advanced Load Balancing and Reliability**: Utilize enhanced load balancing capabilities, stateless instances with full Redis support, and automatic web socket re-connection to promote better performance, reliability, and scalability in WebUI, ensuring seamless and uninterrupted interactions across multiple instances.
 
-- ☁️ **Experimental S3 Support**: Enable stateless WebUI instances with S3 support for enhanced scalability and balancing heavy workloads.
+- ☁️ **Cloud Storage Backend Support**: Enable stateless Open WebUI instances with cloud storage backends (Amazon S3, Google Cloud Storage, Microsoft Azure Blob Storage) for enhanced scalability, high availability, and balancing heavy workloads across multiple instances.
 
 - 🛠️ **OAuth Management for User Groups**: Enhance control and scalability in collaborative environments with group-level management via OAuth integration.
+
+- 🔐 **SCIM 2.0 Automated Provisioning**: Enterprise-grade user and group provisioning through SCIM 2.0 protocol, enabling seamless integration with identity providers like Okta, Azure AD, and Google Workspace for automated user lifecycle management, reducing administrative overhead.
+
+- 📊 **OpenTelemetry Observability**: Export traces, metrics, and logs to your observability stack using OpenTelemetry protocol (OTLP), supporting both gRPC and HTTP exporters with configurable endpoints, authentication, and sampling strategies for comprehensive production monitoring.
 
 ---
 
@@ -412,7 +439,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔒 **Backend Reverse Proxy Support**: Bolster security through direct communication between Open WebUI's backend and Ollama. This key feature eliminates the need to expose Ollama over the local area network (LAN). Requests made to the `/ollama/api` route from Open WebUI are seamlessly redirected to Ollama from the backend, enhancing overall system security and providing an additional layer of protection.
 
-- 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/features/sso).
+- 🔒 **Authentication**: Please note that Open WebUI does not natively support federated authentication schemes such as SSO, OAuth, SAML, or OIDC. However, it can be configured to delegate authentication to an authenticating reverse proxy, effectively achieving a Single Sign-On (`SSO`) experience. This setup allows you to centralize user authentication and management, enhancing security and user convenience. By integrating Open WebUI with an authenticating reverse proxy, you can leverage existing authentication systems and streamline user access to Open WebUI. For more information on configuring this feature, please refer to the [Federated Authentication Support](https://docs.openwebui.com/features/auth).
 
 - 🔓 **Optional Authentication**: Enjoy the flexibility of disabling authentication by setting `WEBUI_AUTH` to `False`. This is an ideal solution for fresh installations without existing users or can be useful for demonstration purposes.
 
@@ -427,6 +454,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 - 🛠️ **Granular User Permissions**: Easily manage workspace permissions, including file uploads, deletions, edits, and temporary chats, as well as model, knowledge, prompt, and tool creation.
 
 - 🔑 **LDAP Authentication**: Enhance security and scalability with LDAP support for user management.
+
+- 🔐 **SCIM 2.0 Provisioning**: Automate user and group lifecycle management through SCIM 2.0 protocol integration with identity providers like Okta, Azure AD, and Google Workspace, reducing administrative overhead and ensuring synchronized user management across systems.
 
 - 🌐 **Customizable OpenAI Connections**: Enjoy smooth operation with custom OpenAI setups, including prefix ID support and explicit model ID support for APIs.
 

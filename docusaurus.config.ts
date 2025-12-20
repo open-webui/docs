@@ -77,32 +77,20 @@ const config: Config = {
 				srcDark: "images/logo-dark.png",
 			},
 			items: [
-				// {
-				// 	type: "docSidebar",
-				// 	position: "left",
-				// 	sidebarId: "pipelines",
-				// 	label: "Pipelines",
-				// },
-
-				// {
-				//   type: "docSidebar",
-				//   sidebarId: "blog",
-				//   position: "left",
-				//   label: "Blog",
-				// },
-
-				// {
-				//   href: "/blog",
-				//   label: "Blog",
-				//   position: "left",
-				// },
 				{
+					to: "blog",
+					label: "Blog",
+					position: "left",
+				},
+				{
+					label: "GitHub",
 					href: "https://github.com/open-webui/open-webui",
 					position: "right",
 					className: "header-github-link",
 					"aria-label": "GitHub repository",
 				},
 				{
+					label: "Discord",
 					href: "https://discord.com/invite/5rJgQTnV4s",
 					position: "right",
 					className: "header-discord-link",
@@ -128,6 +116,10 @@ const config: Config = {
 							label: "FAQ",
 							to: "faq",
 						},
+						{
+							label: "Help Improve The Docs",
+							to: "https://github.com/open-webui/docs",
+						},
 					],
 				},
 				{
@@ -140,6 +132,10 @@ const config: Config = {
 						{
 							label: "Discord",
 							href: "https://discord.gg/5rJgQTnV4s",
+						},
+						{
+							label: "Reddit",
+							href: "https://www.reddit.com/r/OpenWebUI/",
 						},
 						{
 							label: "𝕏",
@@ -158,6 +154,10 @@ const config: Config = {
 							label: "About",
 							to: "https://openwebui.com",
 						},
+						{
+							label: "Report a Vulnerability / Responsible Disclosure",
+							to: "https://github.com/open-webui/open-webui/security",
+						},
 					],
 				},
 			],
@@ -166,6 +166,7 @@ const config: Config = {
 		prism: {
 			theme: prismThemes.github,
 			darkTheme: prismThemes.dracula,
+			additionalLanguages: ["hcl", "docker"],
 		},
 	} satisfies Preset.ThemeConfig,
 	plugins: [require.resolve("docusaurus-lunr-search")],

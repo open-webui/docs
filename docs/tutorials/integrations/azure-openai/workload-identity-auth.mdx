@@ -1,0 +1,211 @@
+---
+title: "Workload Identity Authentication"
+---
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+
+## Overview
+
+This guide explains how to configure Open WebUI on Azure Kubernetes Service (AKS) with Workload Identity authentication for Azure OpenAI.
+
+Workload Identity allows your AKS pods to authenticate to Azure services using Azure Entra ID (formerly Azure AD) without storing credentials in your cluster. This provides a secure, managed identity solution for accessing Azure OpenAI.
+
+## Prerequisites
+
+### OpenWebUI
+
+- **Open WebUI**: Version 0.6.30 or later
+- **AKS Cluster Configuration**: your AKS cluster must have the following features enabled
+  - **OIDC Issuer**
+    - See [Microsoft Learn - Create an OpenID Connect provider on Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/use-oidc-issuer)
+    - AzureRM Terraform: [`azurerm_kubernetes_cluster.oidc_issuer_enabled`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster#oidc_issuer_enabled-1)
+  - **Workload Identity**
+    - See [Microsoft Learn - Use Microsoft Entra Workload ID with Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview?tabs=dotnet)
+    - AzureRM Terraform: [`azurerm_kubernetes_cluster.workload_identity_enabled`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster#workload_identity_enabled-1)
+
+## Terraform Configuration
+
+Below is a complete Terraform configuration for setting up Workload Identity authentication:
+
+### 1. Create a Kubernetes Namespace
+We need to create a Kubernetes namespace first so that we can programmatically assign this to
+our helm deployment but also to our user-assigned identity and federated identity credential 
+in the next steps. 
+
+```hcl
+resource "kubernetes_namespace" "this" {
+  metadata {
+    name = var.kubernetes_namespace
+  }
+}
+```
+
+### 2. Create a User Assigned Identity
+We first create a Azure Assigned Identity that your Open WebUI pods will use to
+authenticate to Azure services.
+
+```hcl
+resource "azurerm_user_assigned_identity" "uai" {
+  location            = var.location
+  name                = var.workload_identity_name
+  resource_group_name = var.resource_group_name
+}
+```
+
+### 3. Create Federated Identity Credential
+The Federated Identity Credentials establishes a trust relationship between your
+Kubernetes service account and the Azure User Assigned Identity, allowing pods
+to exchange Kubernetes tokens for Azure tokens.
+
+```hcl
+resource "azurerm_federated_identity_credential" "federated_identity" {
+  name                = "federated-identity"
+  resource_group_name = var.resource_group_name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = data.terraform_remote_state.aks.outputs.oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.uai.id
+  subject             = "system:serviceaccount:${kubernetes_namespace.this.metadata[0].name}:${var.kubernetes_service_account_name}"
+}
+```
+
+### 4. Assign RBAC Role for Azure OpenAI Access
+With the trust relationship established between Azure and our User Assigned Identity
+we can now assign this identity a role. In this case we assign it `Cognitive Services OpenAI User`
+but if you want to use other Azure features you could ofcourse add more role assignments in the future.
+
+:::note
+By default our User Assigned Identity has no access to anything and will need to
+be given Azure RBAC roles to allow it access to various Azure resources. 
+:::
+
+:::warning
+Make sure to replace `YOUR_COGNITIVE_ACCOUNT_ID` with the cognitive account id of your
+Azure OpenAI instance.
+:::
+
+```hcl
+resource "azurerm_role_assignment" "workload_identity_azure_openai" {
+  scope                = "YOUR_COGNITIVE_ACCOUNT_ID"
+  role_definition_name = "Cognitive Services OpenAI User"
+  principal_id         = azurerm_user_assigned_identity.uai.principal_id
+}
+```
+
+### 5. Deploy Open WebUI via Helm
+This deploys Open WebUI to your AKS cluster with the necessary service account annotations and pod labels to enable Workload Identity authentication.
+
+```hcl
+resource "helm_release" "openwebui" {
+  name       = "open-webui"
+  repository = "https://helm.openwebui.com/"
+  chart      = "open-webui"
+  version    = "7.2.0"
+  namespace  = kubernetes_namespace.this.metadata[0].name
+  atomic     = true
+
+  values = [
+    "${file("helm.values.yaml")}"
+  ]
+
+  set {
+    name  = "image.tag"
+    value = "v0.6.33"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = var.kubernetes_service_account_name
+  }
+
+  set {
+    name  = "serviceAccount.annotations.azure\\.workload\\.identity/client-id"
+    value = azurerm_user_assigned_identity.uai.client_id
+  }
+}
+```
+
+### 6. UI Configuration
+
+After deploying Open WebUI you can follow these steps to configure your Azure OpenAI connection:
+
+1. Navigate to **Admin Panel** &rarr; **Connections**
+2. Click **Add Connection**
+3. Select **Azure OpenAI** as the provider
+4. Choose **Entra ID** as the authentication type
+5. Configure your Azure OpenAI endpoint and deployment details
+6. Save the connection
+
+## Key Components Explained
+
+### Service Account Annotations
+
+The service account must have the following annotation to link it with the Azure User Assigned Identity:
+
+```yaml
+azure.workload.identity/client-id: <USER_ASSIGNED_IDENTITY_CLIENT_ID>
+```
+
+### Pod Labels
+
+Pods must include the following label to enable workload identity:
+
+```yaml
+azure.workload.identity/use: "true"
+```
+
+### Federated Identity Credential
+
+The federated identity credential creates a trust relationship between:
+- Your AKS cluster's OIDC issuer
+- The Kubernetes service account
+- The Azure User Assigned Identity
+
+The `subject` field follows the format:
+```
+system:serviceaccount:<namespace>:<service-account-name>
+```
+
+## Troubleshooting
+### Common Issues
+
+1. **Authentication Failures**
+   - Verify OIDC issuer is enabled on AKS cluster
+   - Check workload identity is enabled on AKS cluster
+   - Confirm federated identity credential subject matches namespace and service account name
+
+2. **Permission Errors**
+   - Ensure `Cognitive Services OpenAI User` role is assigned to the user-assigned identity
+   - Verify the scope of the role assignment includes your Azure OpenAI resource
+
+3. **Pod Identity Issues**
+   - Check pod has the label `azure.workload.identity/use: "true"`
+   - Verify service account has the correct `azure.workload.identity/client-id` annotation
+   - Confirm the service account name matches the federated credential configuration
+
+### Verification Commands
+
+Check service account annotations:
+```bash
+kubectl get serviceaccount <service-account-name> -n <namespace> -o yaml
+```
+
+View pod labels:
+```bash
+kubectl get pod <pod-name> -n <namespace> -o yaml
+```
+
+Check workload identity webhook:
+```bash
+kubectl get mutatingwebhookconfiguration azure-wi-webhook-controller-manager-mutating-webhook-configuration
+```
+
+## Additional Resources
+
+- [Azure Workload Identity Documentation](https://azure.github.io/azure-workload-identity/)
+- [AKS Workload Identity Overview](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview)
+- [Open WebUI Helm Chart](https://github.com/open-webui/helm-charts)

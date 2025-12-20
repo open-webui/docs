@@ -1,9 +1,110 @@
 ---
 sidebar_position: 0
-title: "🚧 Server Connectivity Issues"
+title: "Server Connectivity Issues"
 ---
 
-We're here to help you get everything set up and running smoothly. Below, you'll find step-by-step instructions tailored for different scenarios to solve common connection issues with Ollama and external servers like Hugging Face.
+We're here to help you get everything set up and running smoothly. Below, you'll find step-by-step instructions tailored for different scenarios to solve common connection issues.
+
+## 🔐 HTTPS, TLS, CORS & WebSocket Issues
+
+If you're experiencing connectivity problems with Open WebUI, especially when using reverse proxies or HTTPS, these issues often stem from improper CORS, TLS, WebSocket, or cookie configuration. Here's how to diagnose and fix them.
+
+### Common Symptoms
+
+You might be experiencing these issues if you see:
+- Empty responses like `"{}"` in the chat
+- Errors like `"Unexpected token 'd', "data: {"id"... is not valid JSON"`
+- WebSocket connection failures in browser console
+- WebSocket connection failures in CLI logs
+- Login problems or session issues
+- CORS errors in browser developer tools
+- Mixed content warnings when accessing over HTTPS
+
+### Required Configuration for HTTPS & Reverse Proxies
+
+**Critical Environment Variables**
+
+When running Open WebUI behind a reverse proxy with HTTPS, you must configure these settings:
+
+```bash
+# Set this to your actual domain BEFORE FIRST STARTUP (required for OAuth/SSO and proper operation)
+WEBUI_URL=https://your-open-webui-domain.com
+# If you already started Open WebUI, don't worry, you can set this config from the admin panel as well!
+
+# CORS configuration - CRITICAL for WebSocket functionality
+# Include ALL ways users might access your instance
+# Make sure to include all IPs, hostnames and domains users can and could access Open WebUI and how requests are going to your Open WebUI instance
+# e.g. localhost, 127.0.0.1, 0.0.0.0, <ip of your server/computer>, public domain - all in http and https with the correct ports
+CORS_ALLOW_ORIGIN="https://yourdomain.com;http://yourdomain.com;https://yourip;http://localhost:3000"
+
+# Cookie security settings for HTTPS
+# Disable if you do not use HTTPS
+WEBUI_SESSION_COOKIE_SECURE=true
+WEBUI_AUTH_COOKIE_SECURE=true
+
+# For OAuth/SSO, you will probably have to use 'lax' (strict can break OAuth callbacks)
+WEBUI_SESSION_COOKIE_SAME_SITE=lax
+WEBUI_AUTH_COOKIE_SAME_SITE=lax
+
+# WebSocket support (if using Redis)
+# If you experience websocket related issues, even after configuring all of the above, you can try turning OFF ENABLE_WEBSOCKET_SUPPORT
+# But this is not recommended for production and also not officially supported!
+# If you experience websocket issues, you should ideally provide websocket support through reverse proxies.
+ENABLE_WEBSOCKET_SUPPORT=true
+WEBSOCKET_MANAGER=redis
+WEBSOCKET_REDIS_URL=redis://redis:6379/1
+```
+
+**WEBUI_URL Configuration**
+
+The `WEBUI_URL` must be set correctly BEFORE using OAuth/SSO. Since it's a persistent config variable, you can only change it by:
+- Disabling persistent config temporarily with `ENABLE_PERSISTENT_CONFIG=false`
+- Changing it in Admin Panel > Settings > WebUI URL
+- Setting it correctly before first launch
+
+**CORS Configuration Details**
+
+The `CORS_ALLOW_ORIGIN` setting is crucial for WebSocket functionality. If you see errors in the logs like `"https://yourdomain.com is not an accepted origin"` or `"http://127.0.0.1:3000 is not an accepted origin"`, you need to add that URL to your CORS configuration. Use semicolons to separate multiple origins, and include every possible way users access your instance (domain, IP, localhost).
+
+### Reverse Proxy / SSL/TLS Configuration
+
+For reverse proxy and TLS setups, check our [tutorials here](/category/https).
+
+### WebSocket Troubleshooting
+
+WebSocket support is required for Open WebUI v0.5.0 and later. If WebSockets aren't working:
+
+1. **Check your reverse proxy configuration** - Ensure `Upgrade` and `Connection` headers are properly set
+2. **Verify CORS settings** - WebSocket connections respect CORS policies
+3. **Check browser console** - Look for WebSocket connection errors
+4. **Test direct connection** - Try connecting directly to Open WebUI without the proxy to isolate the issue
+
+For multi-instance deployments, configure Redis for WebSocket management:
+```bash
+ENABLE_WEBSOCKET_SUPPORT=true
+WEBSOCKET_MANAGER=redis
+WEBSOCKET_REDIS_URL=redis://redis:6379/1
+```
+
+### Testing Your Configuration
+
+To verify your setup is working:
+
+1. **Check HTTPS**: Visit your domain and ensure you see a valid certificate with no browser warnings
+2. **Test WebSockets**: Open browser developer tools, go to Network tab, filter by "WS", and verify WebSocket connections are established
+3. **Verify CORS**: Check browser console for any CORS-related errors
+4. **Test functionality**: Send a message and ensure streaming responses work properly
+
+### Quick Fixes Checklist
+
+- ✓ Set `WEBUI_URL` to your actual HTTPS domain before enabling OAuth
+- ✓ Configure `CORS_ALLOW_ORIGIN` with all possible access URLs
+- ✓ Enable `WEBUI_SESSION_COOKIE_SECURE=true` for HTTPS
+- ✓ Add WebSocket headers to your reverse proxy configuration
+- ✓ Use TLSv1.2 or TLSv1.3 in your SSL configuration
+- ✓ Set proper `X-Forwarded-Proto` headers in your reverse proxy
+- ✓ Ensure HTTP to HTTPS redirects are in place
+- ✓ Configure Let's Encrypt for automatic certificate renewal
 
 ## 🌟 Connection to Ollama Server
 

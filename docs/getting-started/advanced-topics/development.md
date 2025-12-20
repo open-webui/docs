@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: "🛠️ Local Development Guide"
+title: "Local Development Guide"
 ---
 
 # Ready to Contribute to Open WebUI? Let's Get Started! 🚀
@@ -14,7 +14,7 @@ Before you begin, ensure your system meets these minimum requirements:
 - **Operating System:** Linux (or WSL on Windows), Windows 11, or macOS. *(Recommended for best compatibility)*
 - **Python:** Version **3.11 or higher**. *(Required for backend services)*
 - **Node.js:** Version **22.10 or higher**. *(Required for frontend development)*
-- **IDE (Recommended):** We recommend using an IDE like [VSCode](https://code.visualstudio.com/) for code editing, debugging, and integrated terminal access. Feel free to use your favorite IDE if you have one!
+- **IDE (Recommended):** We recommend using an IDE like [VS Code](https://code.visualstudio.com/) for code editing, debugging, and integrated terminal access. Feel free to use your favorite IDE if you have one!
 - **[Optional] GitHub Desktop:** For easier management of the Git repository, especially if you are less familiar with command-line Git, consider installing [GitHub Desktop](https://desktop.github.com/).
 
 ## Setting Up Your Local Environment
@@ -49,7 +49,7 @@ Let's get the user interface (what you see in your browser) up and running first
 
      This command copies the `.env.example` file to a new file named `.env`. The `.env` file is where you'll configure environment variables for the frontend.
 
-   - **Customize `.env`**: Open the `.env` file in your code editor (like VSCode). This file contains configuration variables for the frontend, such as API endpoints and other settings. For local development, the default settings in `.env.example` are usually sufficient to start with. However, you can customize them if needed.
+   - **Customize `.env`**: Open the `.env` file in your code editor (like VS Code). This file contains configuration variables for the frontend, such as API endpoints and other settings. For local development, the default settings in `.env.example` are usually sufficient to start with. However, you can customize them if needed.
 
   **Important:** Do not commit sensitive information to `.env` if you are contributing back to the repository.
 
@@ -67,14 +67,14 @@ Let's get the user interface (what you see in your browser) up and running first
      npm install
      ```
 
-     This will install all frontend dependencies listed in `package.json`.  
+     This will install all frontend dependencies listed in `package.json`.
 
      *Note: Depending on your Open WebUI version, you might see compatibility warnings or errors. If so, just run:*
 
      ```bash
      npm install --force
      ```
-     
+
      *Some setups need this to get around version issues.*
 
 2. **Start the Frontend Development Server:**
@@ -86,7 +86,6 @@ Let's get the user interface (what you see in your browser) up and running first
      This command launches the frontend development server. If the steps were followed successfully, it will usually indicate the server is running and provide a local URL.
 
      🎉 **Access the Frontend:** Open your web browser and go to [http://localhost:5173](http://localhost:5173). You should see a message indicating that Open WebUI's frontend is running and is waiting for the backend to be available. Don't worry about that message yet! Let's set up the backend next. **Keep this terminal running** – it's serving your frontend!
-
 
 ### 2.5: Build the Frontend (Recommended)
 
@@ -102,22 +101,21 @@ npm run build
 - If the build completes successfully (without errors), you're ready! If there are errors, address them before proceeding.
 - You don't need to do anything more with `build` for local development, but building ensures your code will not break in production or during deployment.
 
-
 ### 3. Backend Setup (API and Server)
 
 We **require** you to use separate terminal instances for your frontend and backend processes. This keeps your workflows organized and makes it easier to manage each part of the application independently.
 
-**Using VSCode Integrated Terminals:**
+**Using VS Code Integrated Terminals:**
 
-VSCode's integrated terminal feature makes managing multiple terminals incredibly easy. Here's how to leverage it for frontend and backend separation:
+VS Code's integrated terminal feature makes managing multiple terminals incredibly easy. Here's how to leverage it for frontend and backend separation:
 
-1. **Frontend Terminal (You likely already have this):** If you followed the Frontend Setup steps, you probably already have a terminal open in VSCode at the project root (`open-webui` directory). This is where you'll run your frontend commands (`npm run dev`, etc.). Ensure you are in the `open-webui` directory for the next steps if you are not already.
+1. **Frontend Terminal (You likely already have this):** If you followed the Frontend Setup steps, you probably already have a terminal open in VS Code at the project root (`open-webui` directory). This is where you'll run your frontend commands (`npm run dev`, etc.). Ensure you are in the `open-webui` directory for the next steps if you are not already.
 
 2. **Backend Terminal (Open a New One):**
-   - In VSCode, go to **Terminal > New Terminal** (or use the shortcut `Ctrl+Shift+` on Windows/Linux or `Cmd+Shift+` on macOS). This will open a new integrated terminal panel.
+   - In VS Code, go to **Terminal > New Terminal** (or use the shortcut `Ctrl+Shift+` on Windows/Linux or `Cmd+Shift+` on macOS). This will open a new integrated terminal panel.
    - **Navigate to the `backend` directory:** In this *new* terminal, use the `cd backend` command to change the directory to the `backend` folder within your project. This ensures all backend-related commands are executed in the correct context.
 
-   Now you have **two separate terminal instances within VSCode**: one for the frontend (likely in the `open-webui` directory) and one specifically for the backend (inside the `backend` directory). You can easily switch between these terminals within VSCode to manage your frontend and backend processes independently. This setup is highly recommended for a cleaner and more efficient development workflow.
+   Now you have **two separate terminal instances within VS Code**: one for the frontend (likely in the `open-webui` directory) and one specifically for the backend (inside the `backend` directory). You can easily switch between these terminals within VS Code to manage your frontend and backend processes independently. This setup is highly recommended for a cleaner and more efficient development workflow.
 
 **Backend Setup Steps (in your *backend* terminal):**
 
@@ -137,7 +135,7 @@ VSCode's integrated terminal feature makes managing multiple terminals incredibl
 
      - `conda create --name open-webui python=3.11`: This command creates a new Conda environment named `open-webui` using Python version 3.11. If you chose a different Python 3.11.x version, that's fine.
      - `conda activate open-webui`: This command activates the newly created Conda environment. Once activated, your terminal prompt will usually change to indicate you are in the `open-webui` environment (e.g., it might show `(open-webui)` at the beginning of the line).
-  
+
     **Make sure you activate the environment in your backend terminal before proceeding.**
 
      *(Using Conda is optional but strongly recommended for managing Python dependencies and avoiding conflicts.)* If you choose not to use Conda, ensure you are using Python 3.11 or higher and proceed to the next step, but be aware of potential dependency conflicts.
@@ -163,6 +161,27 @@ VSCode's integrated terminal feature makes managing multiple terminals incredibl
      📄 **Explore the API Documentation:** Once the backend is running, you can access the automatically generated API documentation in your web browser at [http://localhost:8080/docs](http://localhost:8080/docs). This documentation is incredibly valuable for understanding the backend API endpoints, how to interact with the backend, and what data it expects and returns. Keep this documentation handy as you develop!
 
 🎉 **Congratulations!** If you have followed all the steps, you should now have both the frontend and backend development servers running locally. Go back to your browser tab where you accessed the frontend (usually [http://localhost:5173](http://localhost:5173)). **Refresh the page.** You should now see the full Open WebUI application running in your browser, connected to your local backend!
+
+## Testing From Another Device (Phone, Tablet, etc.)  
+
+Want to open your dev instance from your phone or another computer on the same Wi-Fi?  
+
+1. Find your dev-machine’s LAN IP, e.g. `192.168.1.42`.  
+2. **Frontend only (quick check):**  
+   - Keep the backend on `localhost`.  
+   - From your phone browse to `http://192.168.1.42:5173`.  
+3. **Full stack (frontend + backend):**  
+   - In `backend/dev.sh` **add your LAN address to the CORS list**, e.g.  
+
+     ```bash
+     export CORS_ALLOW_ORIGIN="http://localhost:5173;http://localhost:8080;http://192.168.1.42:5173"
+     ```
+
+   - Restart the backend (`sh dev.sh`).  
+   - From your phone browse to `http://192.168.1.42:5173`.  
+   - All API calls will now be allowed from that origin.  
+
+> **Security note:** The wildcard `"*"` works too, but do **not** ship that to production.  
 
 ## Troubleshooting Common Issues
 
@@ -234,7 +253,7 @@ Hot reload (or hot module replacement - HMR) is a fantastic development feature 
    - Alternatively, you can try clearing your browser cache or opening the frontend in a private/incognito browser window.
 4. **Dependency Issues (Frontend):** Outdated or corrupted frontend dependencies can sometimes interfere with hot reloading. Try refreshing your frontend dependencies:
    - In your *frontend* terminal, run:
-  
+
      ```bash
      rm -rf node_modules && npm install
      ```
@@ -260,7 +279,7 @@ We warmly welcome your contributions to Open WebUI! Your help is valuable in mak
    This helps ensure that your contribution aligns with the project's goals and avoids wasted effort on features that might not be merged.
 4. **Create a Separate Branch for Your Work:** **Never commit directly to the `dev` branch.** Always create a new branch for each feature or bug fix you are working on. This keeps your changes isolated and makes it easier to manage and submit pull requests.
    - To create a new branch (e.g., named `my-feature-branch`) based on the `dev` branch:
-  
+
      ```bash
      git checkout dev
      git pull origin dev # Ensure your local dev branch is up-to-date

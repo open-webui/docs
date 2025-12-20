@@ -1,0 +1,114 @@
+---
+sidebar_position: 1
+title: "Azure OpenAI with EntraID"
+---
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+# Azure OpenAI with EntraID
+
+This sections contains guides on how to integrate Open WebUI with Azure OpenAI using secure, keyless authentication via Azure Entra ID (formerly Azure AD). Instead of managing static API keys, you can leverage Azure's identity and access management for enhanced security.
+
+:::warning
+OpenWebUI needs to be on version 0.6.30 or higher for this to work!
+:::
+
+## Overview
+
+Open WebUI supports Azure OpenAI integration with **Entra ID authentication**, allowing you to authenticate without storing API keys. This provides several benefits:
+
+- **Enhanced Security**: No static API keys to manage or rotate
+- **Azure RBAC Integration**: Fine-grained access control using Azure role assignments
+- **Audit Trail**: All access is logged through Azure's audit system
+- **Automatic Token Management**: Azure handles token lifecycle automatically
+
+## Authentication Methods
+
+Open WebUI supports all authentication methods supported by [`DefaultAzureCredential`](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential?view=azure-python) for Azure OpenAI.
+
+:::warning
+By default `DefaultAzureCredential` tries all Azure Credentials, both development
+and production types. This might not be desirable if you know what authentication
+type you want to use since:
+- `DefaultAzureCredential` is called on **every** request and tries most authentication types until it finds one that works 
+- There is a performance overhead for some authentication types
+- If you don't have certain types of authentication configured but they are tried your logs might be polluted with erroneous errors.
+
+To fix this, **if you're on version 0.6.31 or greater** you can set the environment variable `AZURE_TOKEN_CREDENTIALS` to one of these specific values:
+- `EnvironmentCredential`
+- `WorkloadIdentityCredential`
+- `ManagedIdentityCredential`
+- `VisualStudioCodeCredential`
+- `AzureCliCredential`
+- `AzurePowershellCredential`
+- `AzureDeveloperCliCredential`
+- `InteractiveBrowserCredential`
+
+_This would result in it only ever choosing the selected credential type_
+
+Or, if you prefer the automatic selection behaviour but wish to narrow it between development vs production options you can use:
+- `prod` for `EnvironmentCredential`, `WorkloadIdentityCredential`, and `ManagedIdentityCredential`.
+- `dev` for `SharedTokenCacheCredential`, `AzureCliCredential`, `AzurePowershellCredential`, and `AzureDeveloperCliCredential`.
+:::
+
+### Azure CLI Authentication
+
+**Best for:** Local development
+
+Azure CLI authentication uses your local Azure credentials to authenticate with Azure OpenAI.
+This is the simplest method for getting started and works well for development environments.
+
+**Key Features:**
+- Simple setup with Azure CLI
+- Works on local machines and containers
+- Uses your personal Azure credentials
+- Requires Azure CLI to be installed
+
+[**→ Learn how to set up Azure CLI Authentication**](./azure-cli-auth.mdx)
+
+### 2. Workload Identity Authentication
+
+**Best for:** Azure Kubernetes Service (AKS) production deployments and multi-tenant environments
+
+Workload Identity provides a managed identity solution for AKS clusters, allowing pods to authenticate to Azure services without storing any credentials in the cluster.
+
+**Key Features:**
+- No credentials stored in cluster
+- Kubernetes-native authentication
+- Federated identity credentials
+- Production-ready security model
+- Infrastructure as Code via Terraform
+
+[**→ Learn how to set up Workload Identity Authentication**](./workload-identity-auth.mdx)
+
+## Prerequisites
+
+Regardless of which authentication method you choose, you'll need:
+
+- **Azure Subscription**: With access to Azure OpenAI resources
+- **Open WebUI**: Version 0.6.30 or later
+- **Azure RBAC Role**: `Cognitive Services OpenAI User` role assigned to your identity
+- **Azure OpenAI Resource**: A deployed Azure OpenAI instance
+
+## Quick Comparison
+
+|                        | Azure CLI Auth           | Workload Identity                                 |
+|------------------------|--------------------------|---------------------------------------------------|
+| **Environment**        | Local development        | Azure Kubernetes Service (AKS)                    |
+| **Setup Complexity**   | Simple                   | Moderate (requires Terraform or Azure experience) |
+| **Security Model**     | Azure CLI credentials    | Workload identity                                 |
+| **Best For**           | Development and testing  | Production deployments                            |
+| **Credential Storage** | Local `.azure` directory | None (federated tokens)                           |
+
+## Next Steps
+
+Choose the authentication method that best fits your deployment environment:
+
+- **For local development or Docker deployments**: Start with [Azure CLI Authentication](./azure-cli-auth.mdx)
+- **For production AKS deployments**: Use [Workload Identity Authentication](./workload-identity-auth.mdx)
+
+Both methods provide secure, keyless authentication to Azure OpenAI and can be configured through the Open WebUI admin interface once the infrastructure is set up.

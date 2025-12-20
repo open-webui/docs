@@ -1,16 +1,18 @@
 ---
 sidebar_position: 11
-title: "💠 SQLite Database Overview"
+title: "SQLite Database Overview"
 ---
 
 :::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-> [!WARNING]  
-> This documentation was created based on the current version (0.5.11) and is constantly being updated.
+> [!WARNING]
+> This documentation was created/updated based on version 0.6.30.
 
-# Open-WebUI Internal SQLite Database
+## Open-WebUI Internal SQLite Database
 
 For Open-WebUI, the SQLite database serves as the backbone for user management, chat history, file storage, and various other core functionalities. Understanding this structure is essential for anyone looking to contribute to or maintain the project effectively.
 
@@ -18,7 +20,7 @@ For Open-WebUI, the SQLite database serves as the backbone for user management, 
 
 You can find the SQLite database at `root` -> `data` -> `webui.db`
 
-```
+```txt
 📁 Root (/)
 ├── 📁 data
 │   ├── 📁 cache
@@ -70,10 +72,12 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 16      | message_reaction | Records user reactions (emojis/responses) to messages        |
 | 17      | migrate_history  | Tracks database schema version and migration records         |
 | 18      | model            | Manages AI model configurations and settings                 |
-| 19      | prompt           | Stores templates and configurations for AI prompts           |
-| 20      | tag              | Manages tags/labels for content categorization               |
-| 21      | tool             | Stores configurations for system tools and integrations      |
-| 22      | user             | Maintains user profiles and account information              |
+| 19      | note             | Stores user-created notes and annotations                    |
+| 20      | oauth_session    | Manages active OAuth sessions for users                      |
+| 21      | prompt           | Stores templates and configurations for AI prompts           |
+| 22      | tag              | Manages tags/labels for content categorization               |
+| 23      | tool             | Stores configurations for system tools and integrations      |
+| 24      | user             | Maintains user profiles and account information              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -175,7 +179,7 @@ Things to know about the auth table:
 | created_at      | BigInteger    | -               | Creation timestamp              |
 | updated_at      | BigInteger    | -               | Last update timestamp           |
 
-# File Table
+## File Table
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**       |
 | --------------- | ------------- | --------------- | --------------------- |
@@ -205,11 +209,12 @@ The `meta` field's expected structure:
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**                |
 | --------------- | ------------- | --------------- | ------------------------------ |
-| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)       |
+| id              | Text          | PK (composite)  | Unique identifier (UUID)       |
 | parent_id       | Text          | nullable        | Parent folder ID for hierarchy |
-| user_id         | Text          | -               | Owner of the folder            |
+| user_id         | Text          | PK (composite)  | Owner of the folder            |
 | name            | Text          | -               | Folder name                    |
 | items           | JSON          | nullable        | Folder contents                |
+| data            | JSON          | nullable        | Additional folder data         |
 | meta            | JSON          | nullable        | Folder metadata                |
 | is_expanded     | Boolean       | default=False   | UI expansion state             |
 | created_at      | BigInteger    | -               | Creation timestamp             |
@@ -217,9 +222,10 @@ The `meta` field's expected structure:
 
 Things to know about the folder table:
 
-- Folders can be nested (parent_id reference)
-- Root folders have null parent_id
-- Folder names must be unique within same parent
+- Primary key is composite (`id`, `user_id`)
+- Folders can be nested (`parent_id` reference)
+- Root folders have null `parent_id`
+- Folder names must be unique within the same parent
 
 ## Function Table
 
@@ -237,7 +243,7 @@ Things to know about the folder table:
 | created_at      | BigInteger    | -               | Creation timestamp        |
 | updated_at      | BigInteger    | -               | Last update timestamp     |
 
-Things to know about the folder table:
+Things to know about the function table:
 
 - `type` can only be: ["filter", "action"]
 
@@ -334,6 +340,31 @@ The `access_control` fields expected structure:
 | created_at      | BigInteger    | -               | Creation timestamp     |
 | updated_at      | BigInteger    | -               | Last update timestamp  |
 
+## Note Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**            |
+| --------------- | ------------- | --------------- | -------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier          |
+| user_id         | Text          | nullable        | Owner of the note          |
+| title           | Text          | nullable        | Note title                 |
+| data            | JSON          | nullable        | Note content and data      |
+| meta            | JSON          | nullable        | Note metadata              |
+| access_control  | JSON          | nullable        | Permission settings        |
+| created_at      | BigInteger    | nullable        | Creation timestamp         |
+| updated_at      | BigInteger    | nullable        | Last update timestamp      |
+
+## OAuth Session Table
+
+| **Column Name** | **Data Type** | **Constraints**      | **Description**                   |
+| --------------- | ------------- | -------------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY          | Unique session identifier         |
+| user_id         | Text          | FOREIGN KEY(user.id) | Associated user                   |
+| provider        | Text          | -                    | OAuth provider (e.g., 'google')   |
+| token           | Text          | -                    | OAuth session token               |
+| expires_at      | BigInteger    | -                    | Token expiration timestamp        |
+| created_at      | BigInteger    | -                    | Session creation timestamp        |
+| updated_at      | BigInteger    | -                    | Session last update timestamp     |
+
 ## Prompt Table
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**           |
@@ -375,22 +406,26 @@ Things to know about the tag table:
 
 ## User Table
 
-| **Column Name**   | **Data Type** | **Constraints**  | **Description**          |
-| ----------------- | ------------- | ---------------- | ------------------------ |
-| id                | String        | PRIMARY KEY      | Unique identifier        |
-| name              | String        | -                | User's name              |
-| email             | String        | -                | User's email             |
-| role              | String        | -                | User's role              |
-| profile_image_url | Text          | -                | Profile image path       |
-| last_active_at    | BigInteger    | -                | Last activity timestamp  |
-| updated_at        | BigInteger    | -                | Last update timestamp    |
-| created_at        | BigInteger    | -                | Creation timestamp       |
-| api_key           | String        | UNIQUE, nullable | API authentication key   |
-| settings          | JSON          | nullable         | User preferences         |
-| info              | JSON          | nullable         | Additional user info     |
-| oauth_sub         | Text          | UNIQUE           | OAuth subject identifier |
+| **Column Name**   | **Data Type** | **Constraints**  | **Description**            |
+| ----------------- | ------------- | ---------------- | -------------------------- |
+| id                | String        | PRIMARY KEY      | Unique identifier          |
+| username          | String(50)    | nullable         | User's unique username     |
+| name              | String        | -                | User's name                |
+| email             | String        | -                | User's email               |
+| role              | String        | -                | User's role                |
+| profile_image_url | Text          | -                | Profile image path         |
+| bio               | Text          | nullable         | User's biography           |
+| gender            | Text          | nullable         | User's gender              |
+| date_of_birth     | Date          | nullable         | User's date of birth       |
+| last_active_at    | BigInteger    | -                | Last activity timestamp    |
+| updated_at        | BigInteger    | -                | Last update timestamp      |
+| created_at        | BigInteger    | -                | Creation timestamp         |
+| api_key           | String        | UNIQUE, nullable | API authentication key     |
+| settings          | JSON          | nullable         | User preferences           |
+| info              | JSON          | nullable         | Additional user info       |
+| oauth_sub         | Text          | UNIQUE           | OAuth subject identifier   |
 
-# Entity Relationship Diagram
+## Entity Relationship Diagram
 
 To help visualize the relationship between the tables, refer to the below Entity Relationship Diagram (ERD) generated with Mermaid.
 
@@ -412,6 +447,8 @@ erDiagram
     user ||--o{ prompt : "creates"
     user ||--o{ tag : "creates"
     user ||--o{ tool : "manages"
+    user ||--o{ note : "owns"
+    user ||--|| oauth_session : "has"
 
     %% Content Relationships
     message ||--o{ message_reaction : "has"
@@ -422,10 +459,14 @@ erDiagram
 
     user {
         string id PK
+        string username
         string name
         string email
         string role
         text profile_image_url
+        text bio
+        text gender
+        date date_of_birth
         bigint last_active_at
         string api_key
         json settings
@@ -501,11 +542,12 @@ erDiagram
     }
 
     folder {
-        text id PK
+        text id PK "composite"
+        text user_id PK "composite"
         text parent_id FK
-        text user_id FK
         text name
         json items
+        json data
         json meta
         boolean is_expanded
     }
@@ -557,6 +599,23 @@ erDiagram
         json meta
         json access_control
         boolean is_active
+    }
+
+    note {
+        text id PK
+        text user_id FK
+        text title
+        json data
+        json meta
+        json access_control
+    }
+
+    oauth_session {
+        text id PK
+        text user_id FK
+        text provider
+        text token
+        bigint expires_at
     }
 
     prompt {

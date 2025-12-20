@@ -1,6 +1,6 @@
 ---
 sidebar_position: 400
-title: "🔗 API Endpoints"
+title: "API Endpoints"
 ---
 
 This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.
@@ -8,6 +8,20 @@ This guide provides essential information on how to interact with the API endpoi
 ## Authentication
 
 To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication.
+
+## Swagger Documentation Links
+
+:::important
+
+Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
+
+:::
+
+Access detailed API documentation for different services provided by Open WebUI:
+
+| Application | Documentation Path      |
+|-------------|-------------------------|
+| Main        | `/docs`                 |
 
 ## Notable API Endpoints
 
@@ -42,11 +56,12 @@ To ensure secure access to the API, authentication is required 🛡️. You can 
         ]
       }'
   ```
-  
+
 - **Python Example**:
+
   ```python
   import requests
-  
+
   def chat_with_model(token):
       url = 'http://localhost:3000/api/chat/completions'
       headers = {
@@ -119,7 +134,7 @@ To utilize external data in RAG responses, you first need to upload the files. T
 
   ```python
   import requests
-  
+
   def upload_file(token, file_path):
       url = 'http://localhost:3000/api/v1/files/'
       headers = {
@@ -233,7 +248,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
 
   ```python
   import requests
-  
+
   def chat_with_collection(token, model, query, collection_id):
       url = 'http://localhost:3000/api/chat/completions'
       headers = {
@@ -257,18 +272,5 @@ Open WebUI offers a myriad of benefits, making it an essential tool for develope
 
 - **Unified Interface**: Simplify your interactions with different LLMs through a single, integrated platform.
 - **Ease of Implementation**: Quick start integration with comprehensive documentation and community support.
-
-## Swagger Documentation Links
-
-:::important
-Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
-:::
-
-Access detailed API documentation for different services provided by Open WebUI:
-
-| Application | Documentation Path      |
-|-------------|-------------------------|
-| Main        | `/docs`                 |
-
 
 By following these guidelines, you can swiftly integrate and begin utilizing the Open WebUI API. Should you encounter any issues or have questions, feel free to reach out through our Discord Community or consult the FAQs. Happy coding! 🌟

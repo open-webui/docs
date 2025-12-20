@@ -1,0 +1,340 @@
+---
+sidebar_position: 999
+title: "Reserved Arguments"
+---
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+# 🪄 Special Arguments
+
+When developping your own `Tools`, `Functions` (`Filters`, `Pipes` or `Actions`), `Pipelines` etc, you can use special arguments explore the full spectrum of what Open-WebUI has to offer.
+
+This page aims to detail the type and structure of each special argument as well as provide an example.
+
+### `body`
+
+A `dict` usually destined to go almost directly to the model. Although it is not strictly a special argument, it is included here for easier reference and because it contains itself some special arguments.
+
+<details>
+<summary>Example</summary>
+
+```json
+
+{
+  "stream": true,
+  "model": "my-cool-model",
+  # lowercase string with - separated words: this is the ID of the model
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What is in this picture?"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdYAAAGcCAYAAABk2YF[REDACTED]"
+            # Images are passed as base64 encoded data
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "The image appears to be [REDACTED]"
+    },
+  ],
+  "features": {
+    "image_generation": false,
+    "code_interpreter": false,
+    "web_search": false
+  },
+  "stream_options": {
+    "include_usage": true
+  },
+  "metadata": "[The exact same dict as __metadata__]",
+  "files": "[The exact same list as __files__]"
+}
+
+```
+
+</details>
+
+### `__user__`
+
+A `dict` with user information.
+
+Note that if the `UserValves` class is defined, its instance has to be accessed via `__user__["valves"]`. Otherwise, the `valves` keyvalue is missing entirely from `__user__`.
+
+<details>
+<summary>Example</summary>
+
+```json
+{
+  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "email": "cheesy_dude@openwebui.com",
+  "name": "Patrick",
+  "role": "user",
+  # role can be either `user` or `admin`
+  "valves": "[the UserValve instance]"
+}
+```
+
+</details>
+
+### `__metadata__`
+
+A `dict` with wide ranging information about the chat, model, files, etc.
+
+<details>
+<summary>Example</summary>
+
+```json
+{
+  "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "chat_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "session_id": "xxxxxxxxxxxxxxxxxxxx",
+  "tool_ids": null,
+  # tool_ids is a list of str.
+  "tool_servers": [],
+  "files": "[Same as in body['files']]",
+  # If no files are given, the files key exists in __metadata__ and its value is []
+  "features": {
+    "image_generation": false,
+    "code_interpreter": false,
+    "web_search": false
+  },
+  "variables": {
+    "{{USER_NAME}}": "cheesy_username",
+    "{{USER_LOCATION}}": "Unknown",
+    "{{CURRENT_DATETIME}}": "2025-02-02 XX:XX:XX",
+    "{{CURRENT_DATE}}": "2025-02-02",
+    "{{CURRENT_TIME}}": "XX:XX:XX",
+    "{{CURRENT_WEEKDAY}}": "Monday",
+    "{{CURRENT_TIMEZONE}}": "Europe/Berlin",
+    "{{USER_LANGUAGE}}": "en-US"
+  },
+  "model": "[The exact same dict as __model__]",
+  "direct": false,
+  "function_calling": "native",
+  "type": "user_response",
+  "interface": "open-webui"
+}
+
+```
+
+</details>
+
+### `__model__`
+
+A `dict` with information about the model.
+
+<details>
+<summary>Example</summary>
+
+```json
+{
+  "id": "my-cool-model",
+  "name": "My Cool Model",
+  "object": "model",
+  "created": 1746000000,
+  "owned_by": "openai",
+  # either openai or ollama
+  "info": {
+      "id": "my-cool-model",
+      "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "base_model_id": "gpt-4o",
+      # this is the name of model that the model endpoint serves
+      "name": "My Cool Model",
+      "params": {
+      "system": "You are my best assistant. You answer [REDACTED]",
+      "function_calling": "native"
+      # custom options appear here, for example "Top K"
+      },
+      "meta": {
+      "profile_image_url": "/static/favicon.png",
+      "description": "Description of my-cool-model",
+      "capabilities": {
+          "vision": true,
+          "usage": true,
+          "citations": true
+      },
+      "position": 17,
+      "tags": [
+          {
+          "name": "for_friends"
+          },
+          {
+          "name": "vision_enabled"
+          }
+      ],
+      "suggestion_prompts": null
+      },
+      "access_control": {
+      "read": {
+          "group_ids": [],
+          "user_ids": []
+      },
+      "write": {
+          "group_ids": [],
+          "user_ids": []
+      }
+      },
+      "is_active": true,
+      "updated_at": 1740000000,
+      "created_at": 1740000000
+  },
+  "preset": true,
+  "actions": [],
+  "tags": [
+      {
+          "name": "for_friends"
+      },
+      {
+          "name": "vision_enabled"
+      }
+  ]
+}
+
+```
+
+</details>
+
+### `__messages__`
+
+A `list` of the previous messages.
+
+See the `body["messages"]` value above.
+
+### `__chat_id__`
+
+The `str` of the `chat_id`.
+
+See the `__metadata__["chat_id"]` value above.
+
+### `__session_id__`
+
+The `str` of the `session_id`.
+
+See the `__metadata__["session_id"]` value above.
+
+### `__message_id__`
+
+The `str` of the `message_id`.
+
+See the `__metadata__["message_id"]` value above.
+
+### `__event_emitter__`
+
+A `Callable` used to display event information to the user.
+
+### `__event_call__`
+
+A `Callable` used for `Actions`.
+
+### `__files__`
+
+A `list` of files sent via the chat. Note that images are not considered files and are sent directly to the model as part of the `body["messages"]` list.
+
+The actual binary of the file is not part of the arguments for performance reason, but the file remain nonetheless accessible by its path if needed. For example using `docker` the python syntax for the path could be:
+
+```python
+from pathlib import Path
+
+the_file = Path(f"/app/backend/data/uploads/{__files__[0]["files"]["id"]}_{__files__[0]["files"]["filename"]}")
+assert the_file.exists()
+```
+
+Note that the same files dict can also be accessed via `__metadata__["files"]` (and its value is `[]` if no files are sent) or via `body["files"]` (but the `files` key is missing entirely from `body` if no files are sent).
+
+<details>
+<summary>Example</summary>
+
+```json
+
+[
+  {
+    "type": "file",
+    "file": {
+      "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "filename": "Napoleon - Wikipedia.pdf",
+      "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "hash": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "data": {
+        "content": "Napoleon - Wikipedia\n\n\nNapoleon I\n\nThe Emperor Napoleon in His Study at the\nTuileries, 1812\n\nEmperor of the French\n\n1st reign 18 May 1804 – 6 April 1814\n\nSuccessor Louis XVIII[a]\n\n2nd reign 20 March 1815 – 22 June 1815\n\nSuccessor Louis XVIII[a]\n\nFirst Consul of the French Republic\n\nIn office\n13 December 1799 – 18 May 1804\n\nBorn Napoleone Buonaparte\n15 August 1769\nAjaccio, Corsica, Kingdom of\nFrance\n\nDied 5 May 1821 (aged 51)\nLongwood, Saint Helena\n\nBurial 15 December 1840\nLes Invalides, Paris\n\nNapoleon\nNapoleon Bonaparte[b] (born Napoleone\nBuonaparte;[1][c] 15 August 1769 – 5 May 1821), later\nknown [REDACTED]",
+        # The content value is the output of the document parser, the above example is with Tika as a document parser
+      },
+      "meta": {
+        "name": "Napoleon - Wikipedia.pdf",
+        "content_type": "application/pdf",
+        "size": 10486578,
+        # in bytes, here about 10Mb
+        "data": {},
+        "collection_name": "file-96xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        # always begins by 'file'
+      },
+      "created_at": 1740000000,
+      "updated_at": 1740000000
+    },
+    "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "url": "/api/v1/files/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "name": "Napoleon - Wikipedia.pdf",
+    "collection_name": "file-96xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    "status": "uploaded",
+    "size": 10486578,
+    "error": "",
+    "itemId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    # itemId is not the same as file["id"]
+  }
+]
+
+```
+
+</details>
+
+### `__request__`
+
+An instance of `fastapi.Request`. You can read more in the [migration page](/docs/features/plugin/migration/index.mdx) or in [fastapi's documentation](https://fastapi.tiangolo.com/reference/request/).
+
+### `__task__`
+
+A `str` for the type of task. Its value is just a shorthand for `__metadata__["task"]` if present, otherwise `None`.
+
+<details>
+<summary>Possible values</summary>
+
+```json
+
+[
+    "title_generation",
+    "tags_generation",
+    "emoji_generation",
+    "query_generation",
+    "image_prompt_generation",
+    "autocomplete_generation",
+    "function_calling",
+    "moa_response_generation"
+]
+```
+
+</details>
+
+### `__task_body__`
+
+A `dict` containing the `body` needed to accomplish a given `__task__`. Its value is just a shorthand for `__metadata__["task_body"]` if present, otherwise `None`.
+
+Its structure is the same as `body` above, with modifications like using the appropriate model and system message etc.
+
+### `__tools__`
+
+A `list` of `ToolUserModel` instances.
+
+For details the attributes of `ToolUserModel` instances, the code can be found in [tools.py](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/models/tools.py).
+

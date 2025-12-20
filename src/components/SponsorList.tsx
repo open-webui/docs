@@ -9,18 +9,18 @@ export const SponsorList = () => {
 		// 	description: "Does your interface have a backend yet? Try n8n",
 		// },
 
-		{
-			imgSrc: "/sponsors/logos/warp.png",
-			url: "https://warp.dev/open-webui",
-			name: "Warp",
-			description: "The intelligent terminal for developers",
-		},
-		{
-			imgSrc: "/sponsors/logos/tailscale.png",
-			url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
-			name: "Tailscale",
-			description: "Connect self-hosted AI to any device with Tailscale",
-		},
+		// {
+		// 	imgSrc: "/sponsors/logos/warp.png",
+		// 	url: "https://warp.dev/open-webui",
+		// 	name: "Warp",
+		// 	description: "The intelligent terminal for developers",
+		// },
+		// {
+		// 	imgSrc: "/sponsors/logos/tailscale.png",
+		// 	url: "https://tailscale.com/blog/self-host-a-local-ai-stack/?utm_source=OpenWebUI&utm_medium=paid-ad-placement&utm_campaign=OpenWebUI-Docs",
+		// 	name: "Tailscale",
+		// 	description: "Connect self-hosted AI to any device with Tailscale",
+		// },
 	];
 
 	const sponsors = [
@@ -38,30 +38,26 @@ export const SponsorList = () => {
 				<div className="font-semibold text-xl text-black dark:text-white ">Diamond</div>
 				<hr className="mt-1 mb-3 border-gray-200 dark:border-gray-700" />
 
-
 				<div className="flex flex-wrap items-start justify-start gap-5">
-					
-				</div>
-			</div>		
 
+				</div>
+			</div>
 
 			<div className="mb-4">
 				<div className="font-semibold text-xl text-black dark:text-white ">Sapphire</div>
 				<hr className="mt-1 mb-3 border-gray-200 dark:border-gray-700" />
 
-
 				<div className="flex flex-wrap items-start justify-start gap-5">
-					
+
 				</div>
-			</div>					
+			</div>
 
 			<div className="mb-4">
 				<div className="font-semibold text-xl text-black dark:text-white ">Topaz</div>
 				<hr className="mt-1 mb-3 border-gray-200 dark:border-gray-700" />
 
-
 				<div className="flex flex-wrap items-start justify-start gap-5">
-					
+
 				</div>
 			</div>		 */}
 

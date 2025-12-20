@@ -1,0 +1,61 @@
+---
+title: Model Context Protocol (MCP)
+sidebar_position: 1200
+---
+
+Open WebUI natively supports **MCP (Model Context Protocol)** starting in **v0.6.31**. This page shows how to enable it quickly, harden it for production, and troubleshoot common snags.
+
+:::info 
+Requires **Open WebUI v0.6.31+**.
+:::
+
+## 🚀 Quick start 
+
+1. Open **⚙️ Admin Settings → External Tools**.
+2. Click **+ (Add Server)**.
+3. Set **Type** to **MCP (Streamable HTTP)**.
+4. Enter your **Server URL** and **Auth** details (OAuth 2.1, if required).
+5. **Save**. If prompted, restart Open WebUI.
+
+You can now call tools exposed by your MCP server from Open WebUI.
+
+## 🧭 When to use MCP vs OpenAPI
+
+:::tip 
+For most deployments, **OpenAPI** remains the **preferred** integration path.
+:::
+
+Choose **OpenAPI** if you want:
+
+* **Enterprise readiness**: deep SSO, API gateways, audit, quotas, typed SDKs.
+* **Operational resilience**: standard HTTP verbs, idempotency, caching, rich error codes.
+* **Observability**: first-class tracing and policy integration.
+
+Choose **MCP (Streamable HTTP)** if you need:
+
+* A **common tool protocol** already used by your MCP servers/clients.
+* **Streamed** tool events over HTTP with emerging ecosystem support.
+
+> You don’t have to pick one: many teams expose OpenAPI internally and **wrap MCP** at the edge for specific clients.
+
+:::warning
+Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-user isolation, reconnects). Review your org’s auth, proxy, and rate-limiting policies before exposing MCP externally.
+:::
+
+## ❓ FAQ
+
+**Do you support stdio or SSE transports?**
+
+Native MCP support in Open WebUI is **Streamable HTTP only**. This design choice reflects our architecture: Open WebUI is a **web-based, multi-tenant environment**, not a local desktop process.
+
+Browsers operate within strict **sandboxed and event-driven HTTP constraints**, making long-lived stdio or SSE connections difficult to maintain securely across users and sessions.
+
+If you need to bridge those other MCP transports, check out [**mcpo**](https://github.com/open-webui/mcpo) — an open-source proxy that translates **stdio or SSE-based MCP servers into OpenAPI-compatible endpoints**. It effectively lets you run traditional MCP tools inside Open WebUI without modifying their transport layer.
+
+**Is MCP considered stable here?**
+
+Supported and improving. The broader ecosystem is still evolving; expect occasional breaking changes.
+
+**Can I mix OpenAPI and MCP tools?**
+
+Yes. Many deployments do both.
