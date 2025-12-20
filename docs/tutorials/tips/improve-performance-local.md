@@ -93,6 +93,7 @@ Many of these settings can also be configured directly in the **Admin Panel > Se
 Set a dedicated lightweight model for background tasks:
 
 ```bash
+# For Ollama models
 TASK_MODEL=llama3.2:3b
 
 # For OpenAI-compatible endpoints
