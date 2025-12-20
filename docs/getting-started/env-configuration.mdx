@@ -2138,6 +2138,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
   - `docling` - Use Docling engine
   - `document_intelligence` - Use Document Intelligence engine
   - `mistral_ocr` - Use Mistral OCR engine
+  - `mineru`
 - Description: Sets the content extraction engine to use for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2269,6 +2270,13 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 ```
 
 :::
+
+#### `MINERU_API_TIMEOUT`
+
+- Type: `str`
+- Default: `300`
+- Description: Sets the timeout in seconds for MinerU API requests during document processing.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Retrieval Augmented Generation (RAG)
 
