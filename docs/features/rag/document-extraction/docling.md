@@ -104,6 +104,44 @@ This command starts the Docling container and maps port 5001 from the container 
 
 - You can try uploading some files via the UI and it should return output in MD format or your desired format
 
+## Docling Parameters Reference
+ 
+When using Open WebUI with Docling version 2.0.0+, you can configure advanced processing options via the `DOCLING_PARAMS` JSON object in the **Admin Settings > Documents** or via the environment variable.
+ 
+### Common Parameters
+ 
+| Parameter | Type | Description | Allowed Values / Examples |
+| :--- | :--- | :--- | :--- |
+| `pdf_backend` | `string` | The PDF parsing engine to use. | `dlparse_v1`, `dlparse_v2`, `dlparse_v4`, `pypdfium2` |
+| `table_mode` | `string` | Quality/speed tradeoff for tables. | `fast`, `accurate` |
+| `ocr_engine` | `string` | The OCR library for scanned documents. | `tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr` |
+| `do_ocr` | `bool` | Whether to perform OCR. | `true`, `false` |
+| `force_ocr` | `bool` | Force OCR even on digital PDFs. | `true`, `false` |
+| `pipeline` | `string` | Processing pipeline complexity. | `standard`, `fast` |
+| `ocr_lang` | `list[string]` | Languages for OCR. | `["eng"]` (3-letter) for Tesseract; `["en"]` (2-letter) for EasyOCR |
+ 
+:::tip
+**Language Codes**: The format of `ocr_lang` depends on the engine:
+- **Tesseract / Tesserocr**: Uses 3-letter ISO 639-2 codes (e.g., `eng`, `deu`, `fra`, `spa`).
+- **EasyOCR / RapidOCR**: Typically use 2-letter ISO 639-1 codes (e.g., `en`, `de`, `fr`, `es`).
+:::
+
+:::tip
+**dlparse** vs **dbparse**: Note that the backend names use **`dlparse`** (Deep Learning Parse), not `dbparse`. For modern Docling (v2+), `dlparse_v4` is generally recommended for the best balance of features.
+:::
+ 
+### Example Configuration
+ 
+```json
+ {
+   "do_ocr": true,
+   "pdf_backend": "dlparse_v4",
+   "table_mode": "accurate",
+   "ocr_engine": "tesseract",
+   "ocr_lang": ["eng"]
+ }
+```
+ 
 ### Conclusion
 
 Integrating Docling with Open WebUI is a simple and effective way to enhance document processing and content extraction capabilities. By following the steps in this guide, you can set up Docling as the default extraction engine and verify it’s working smoothly in a Docker environment. Once configured, Docling enables powerful, format-agnostic document parsing to support more advanced AI features in Open WebUI.
