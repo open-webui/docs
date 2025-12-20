@@ -33,3 +33,7 @@ Once `uv` is installed, running Open WebUI is a breeze. Use the command below, e
   ```powershell
   $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
   ```
+
+:::tip Why set DATA_DIR?
+Setting `DATA_DIR` ensures your chats and settings are saved in a predictable location. If you don't set it, `uvx` might store it in a temporary folder that gets deleted when the process ends.
+:::
