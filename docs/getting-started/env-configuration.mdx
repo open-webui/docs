@@ -2593,6 +2593,13 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_EXTERNAL_RERANKER_TIMEOUT`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the timeout in seconds for external reranker API requests during RAG document retrieval. Leave empty to use default timeout behavior.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Query Generation
 
 #### `ENABLE_RETRIEVAL_QUERY_GENERATION`
