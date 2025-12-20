@@ -45,10 +45,14 @@ The best HTTPS solution depends on your existing infrastructure and technical ex
 - **Scalability and Performance:**  Consider the performance and scalability needs of your Open WebUI instance when choosing a solution, especially for high-traffic deployments.
 - **Cost:** Some solutions (like cloud load balancers or Cloudflare's paid plans) may have associated costs. Let's Encrypt and many reverse proxies are free and open-source.
 
-## 📚 Explore Deployment Tutorials for Step-by-Step Guides
+## 📚 Explore HTTPS Tutorials
 
-For detailed, practical instructions and community-contributed tutorials on setting up HTTPS encryption with various solutions, please visit the **[Deployment Tutorials](../../../tutorials/deployment/)** section.
+We have dedicated step-by-step guides for setting up reverse proxies with HTTPS:
 
-These tutorials often provide specific, step-by-step guides for different environments and HTTPS solutions, making the process easier to follow.
+*   **[Nginx](../../../tutorials/https/nginx.md)**: Industry-standard high-performance server.
+*   **[Caddy](../../../tutorials/https/caddy.md)**:  Easiest setup with automatic HTTPS.
+*   **[HAProxy](../../../tutorials/https/haproxy.md)**:  Robust load balancer and proxy.
+
+These tutorials provide specific configuration examples to get your secure Open WebUI instance running quickly.
 
 By implementing HTTPS, you significantly enhance the security and functionality of your Open WebUI instance, ensuring a safer and more feature-rich experience for yourself and your users.
