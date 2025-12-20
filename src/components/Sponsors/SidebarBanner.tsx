@@ -1,4 +1,4 @@
-import {marked} from 'marked';
+import { marked } from "marked";
 
 export const SidebarBanner = ({ item }) => {
 	return (
@@ -18,7 +18,7 @@ export const SidebarBanner = ({ item }) => {
 				</a>
 
 				<div className="mt-1 line-clamp-2 text-right text-xs font-medium text-gray-600 dark:text-gray-300">
-					<div dangerouslySetInnerHTML={{__html: marked(item.description)}} />
+					<div dangerouslySetInnerHTML={{ __html: marked(item.description) }} />
 				</div>
 			</div>
 		</div>
