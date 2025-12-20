@@ -106,13 +106,322 @@ class Filter:
 ```
 
 #### 🖼️ What’s happening?
-- **toggle = True** creates a switch UI in Open WebUI—users can manually enable or disable the filter in real time.
-- **icon** (with a Data URI) will show up as a little image next to the filter’s name. You can use any SVG as long as it’s Data URI encoded!
-- **The `inlet` function** uses the `__event_emitter__` special argument to broadcast feedback/status to the UI, such as a little toast/notification that reads "Toggled!"
+-   **toggle = True** creates a switch UI in Open WebUI—users can manually enable or disable the filter in real time.
+-   **icon** (with a Data URI) will show up as a little image next to the filter’s name. You can use any SVG as long as it’s Data URI encoded!
+-   **The `inlet` function** uses the `__event_emitter__` special argument to broadcast feedback/status to the UI, such as a little toast/notification that reads "Toggled!"
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
 
 You can use these mechanisms to make your filters dynamic, interactive, and visually unique within Open WebUI’s plugin ecosystem.
+
+---
+
+## ⚙️ Filter Administration & Configuration
+
+### 🌐 Global Filters vs. Model-Specific Filters
+
+Open WebUI provides a flexible multi-level filter system that allows you to control which filters are active, how they're enabled, and who can toggle them. Understanding this system is crucial for effective filter management.
+
+#### Filter Activation States
+
+Filters can exist in one of four states, controlled by two boolean flags in the database:
+
+| State | `is_active` | `is_global` | Effect |
+|-------|------------|------------|--------|
+| **Globally Enabled** | ✅ `True` | ✅ `True` | Applied to **ALL** models automatically, cannot be disabled per-model |
+| **Globally Disabled** | ❌ `False` | `True` | Not applied anywhere - even though the filter is globally enabled, the filter itself is disabled |
+| **Model-Specific** | ✅ `True` | ❌ `False` | Only applied to models where the admin explicitly enables it |
+| **Inactive** | ❌ `False` | `False` | Not applied anywhere, even if filter is enabled for a model by the admin - the filter itself is turned off |
+
+:::tip Global Filter Behavior
+When a filter is set as **Global** (`is_global=True`) and **Active** (`is_active=True`), it becomes **force-enabled** for all models:
+- It appears in every model's filter list as **checked and greyed out**
+- Admins **cannot** uncheck it in model settings
+- It runs on **every** chat completion request, regardless of model
+:::
+
+#### Admin Panel: Making a Filter Global
+
+**Location:** Admin Panel → Functions → Filter Management
+
+To make a filter global:
+1. Navigate to the Admin Panel
+2. Click on **Functions** in the sidebar
+3. Find your filter in the list
+4. Click the **three-dot menu (⋮)** next to the filter
+5. Click the **🌐 Globe icon** to toggle `is_global`
+6. Ensure the filter is also **Active** (green toggle switch)
+
+**API Endpoint:**
+```http
+POST /functions/id/{filter_id}/toggle/global
+```
+
+**Visual Indicators:**
+- 🟢 Green toggle = `is_active=True` (filter is active)
+- 🌐 Highlighted globe icon = `is_global=True` (applies to all models)
+
+---
+
+### 🎛️ The Two-Tier Filter System
+
+Open WebUI uses a sophisticated two-tier system for managing filters on a per-model basis. This can be confusing at first, but it's designed to support both **always-on filters** and **user-toggleable filters**.
+
+#### Tier 1: FiltersSelector (Which filters are available?)
+
+**Location:** Model Settings → Filters → "Filters" Section
+
+This controls which filters are **available** for a specific model.
+
+**Behavior:**
+- Shows **all** filters (both global and model-specific)
+- **Global filters** appear as checked and disabled (can't be unchecked)
+- **Regular filters** can be toggled on/off
+- Saves to: `model.meta.filterIds` in the database
+
+**Example:**
+```json
+{
+  "meta": {
+    "filterIds": ["filter-uuid-1", "filter-uuid-2"]
+  }
+}
+```
+
+#### Tier 2: DefaultFiltersSelector (Which toggleable filters start enabled?)
+
+**Location:** Model Settings → Filters → "Default Filters" Section
+
+This section **only appears** when at least one toggleable filter is selected (or is global).
+
+**Purpose:** Controls which toggleable filters are **enabled by default** for new chats.
+
+**What is a "Toggleable" Filter?**
+
+A filter becomes toggleable when its Python code includes:
+```python
+class Filter:
+    def __init__(self):
+        self.toggle = True  # This makes it toggleable!
+```
+
+**Behavior:**
+- Only shows filters with `toggle=True`
+- Only shows filters that are either:
+  - In `filterIds` (selected for this model), OR
+  - Have `is_global=true` (globally enabled)
+- Controls whether the filter is **ON** or **OFF** by default in the chat UI
+- Saves to: `model.meta.defaultFilterIds`
+
+**Example:**
+```json
+{
+  "meta": {
+    "filterIds": ["filter-uuid-1", "filter-uuid-2", "filter-uuid-3"],
+    "defaultFilterIds": ["filter-uuid-2"]
+  }
+}
+```
+
+**Interpretation:**
+- All three filters are available for this model
+- Only `filter-uuid-2` starts enabled by default
+- If `filter-uuid-1` and `filter-uuid-3` have `toggle=True`, users can enable them manually in the chat UI
+
+---
+
+### 🔄 Toggleable Filters vs. Always-On Filters
+
+Understanding the difference between these two types is key to using the filter system effectively.
+
+#### Always-On Filters (No `toggle` property)
+
+**Characteristics:**
+- Run automatically whenever the filter is active for a model
+- **No user control** in the chat interface
+- Do **not** appear in the "Default Filters" section
+- Do **not** show up in the chat integrations menu (⚙️ icon)
+
+**Use Cases:**
+- Content moderation (always filter inappropriate content)
+- PII scrubbing (always remove sensitive data)
+- System-level transformations (always apply certain formatting)
+- Security/compliance filters
+
+**Example:**
+```python
+class ContentModerationFilter:
+    def __init__(self):
+        # No toggle property - this is an always-on filter
+        pass
+    
+    def inlet(self, body: dict) -> dict:
+        # Always scrub PII before sending to model
+        last_message = body["messages"][-1]["content"]
+        body["messages"][-1]["content"] = self.scrub_pii(last_message)
+        return body
+```
+
+#### Toggleable Filters (`toggle=True`)
+
+**Characteristics:**
+- Appear as **switches in the chat UI** (in the integrations menu - ⚙️ icon)
+- Users can **enable/disable** them per chat session
+- **Do** appear in the "Default Filters" section
+- `defaultFilterIds` controls their initial state (ON or OFF)
+
+**Use Cases:**
+- Web search integration (user decides when to search)
+- Citation mode (user controls when to require sources)
+- Verbose output mode (user toggles detailed responses)
+- Translation filters (user enables when needed)
+- Code formatting (user chooses when to apply)
+- Thinking/reasoning toggle (user controls whether to show model reasoning)
+
+**Example:**
+```python
+class WebSearchFilter:
+    def __init__(self):
+        self.toggle = True  # User can turn on/off
+        self.icon = "data:image/svg+xml;base64,..."  # Shows in UI
+    
+    async def inlet(self, body: dict, __event_emitter__) -> dict:
+        # Only runs when user has enabled this filter
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Searching the web...", "done": False}
+        })
+        # ... perform web search ...
+        return body
+```
+
+**Where Toggleable Filters Appear:**
+
+1.  **Model Settings → Default Filters Section**
+    -   Configure which filters start enabled
+2.  **Chat UI → Integrations Menu (⚙️ icon)**
+    -   Users can toggle filters on/off per chat
+    -   Shows custom icons if provided
+    -   Realtime enable/disable
+
+---
+
+### 📊 Filter Execution Flow
+
+Here's the complete flow from admin configuration to filter execution:
+
+**1. ADMIN PANEL (Filter Creation & Global Settings)**
+- Admin Panel → Functions → Create New Function
+- Set type="filter"
+- Toggle is_active (enable/disable filter globally)
+- Toggle is_global (apply to all models)
+
+**2. MODEL CONFIGURATION (Per-Model Filter Selection)**
+- Model Settings → Filters Section
+- FiltersSelector: Select which filters for this model
+- DefaultFiltersSelector: Set default enabled state (only for toggleable filters)
+
+**3. CHAT UI (User Interaction - Toggleable Filters Only)**
+- Chat → Integrations Menu (⚙️) → Toggle Filters
+- Users can enable/disable toggleable filters
+- Always-on filters run automatically (no UI control)
+
+**4. REQUEST PROCESSING (Filter Compilation)**
+- Backend: get_sorted_filter_ids()
+- Fetch global filters (is_global=True, is_active=True)
+- Add model-specific filters from model.meta.filterIds
+- Filter by is_active status
+- For toggleable filters: Check user's enabled state
+- Sort by priority (from valves)
+
+**5. FILTER EXECUTION**
+- Execute inlet() filters (pre-request)
+- Send modified request to LLM
+- Execute stream() filters (during streaming)
+- Execute outlet() filters (post-response)
+
+---
+
+### 🎨 UI Indicators & Visual Feedback
+
+#### In the Admin Functions Panel
+
+| Indicator | Meaning |
+|-----------|---------|
+| 🟢 Green toggle | Filter is active (`is_active=True`) |
+| ⚪ Grey toggle | Filter is inactive (`is_active=False`) |
+| 🌐 Highlighted globe | Filter is global (`is_global=True`) |
+| 🌐 Unhighlighted globe | Filter is not global (`is_global=False`) |
+
+#### In Model Settings (FiltersSelector)
+
+| State | Checkbox | Description |
+|-------|----------|-------------|
+| Global Filter | ✅ Checked & Disabled (greyed) | "This filter is globally enabled" |
+| Selected Filter | ✅ Checked & Enabled | "This filter is selected for this model" |
+| Unselected Filter | ☐ Unchecked & Enabled | "Click to include this filter" |
+
+#### In Chat UI (Integrations Menu)
+
+| Element | Description |
+|---------|-------------|
+| Filter name | Shows the filter's display name |
+| Custom icon | SVG icon from `self.icon` (if provided) |
+| Toggle switch | Enable/disable the filter for this chat |
+| Status badge | Shows if filter is currently active |
+
+---
+
+### 💡 Best Practices for Filter Configuration
+
+#### 1. When to Use Global Filters
+
+✅ **Use global filters for:**
+- Security and compliance (PII scrubbing, content moderation)
+- System-wide formatting (standardize all outputs)
+- Logging and analytics (track all requests)
+- Organization-wide policies (enforce company guidelines)
+
+❌ **Don't use global filters for:**
+- Optional features (use toggleable filters instead)
+- Model-specific behavior (use model-specific filters)
+- User-preference features (let users control via toggles)
+
+#### 2. When to Use Toggleable Filters
+
+✅ **Make a filter toggleable (`toggle=True`) when:**
+- Users should control when it's active (web search, translation)
+- It's an optional enhancement (citation mode, verbose output)
+- It adds functionality users may not always want (code formatting)
+- It has a performance cost that should be optional
+
+❌ **Don't make a filter toggleable when:**
+- It's required for security/compliance (always-on is better)
+- Users shouldn't be able to disable it (use always-on)
+- It's a system-level transformation (global is better)
+
+#### 3. Organizing Filters for Your Organization
+
+**Recommended Structure:**
+
+```
+Global Always-On Filters:
+├─ PII Scrubber (security)
+├─ Content Moderator (compliance)
+└─ Request Logger (analytics)
+
+Model-Specific Always-On Filters:
+├─ Code Formatter (for coding models only)
+├─ Medical Terminology Corrector (for medical models)
+└─ Legal Citation Validator (for legal models)
+
+Toggleable Filters (User Choice):
+├─ Web Search Integration
+├─ Citation Mode
+├─ Translation Filter
+├─ Verbose Output Mode
+└─ Image Description Generator
+```
 
 ---
 
