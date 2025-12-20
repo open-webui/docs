@@ -2609,6 +2609,12 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Enables or disables retrieval query generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_QUERIES_CACHE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables request-scoped caching of LLM-generated search queries. When enabled, queries generated for web search are **cached** and automatically **reused** for file/knowledge base retrieval within the same request. This **eliminates duplicate LLM calls** when both web search and RAG are active, **reducing token usage and latency** while maintaining search quality. It is highly recommended to enable this especially in larger setups.
+
 #### `QUERY_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
@@ -5033,12 +5039,6 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 - Type: `float`
 - Default: `None`
 - Description: Sets the minimum time interval in seconds between user active status updates in the database. Helps reduce write operations for high-traffic instances. Set to `0.0` to update on every activity.
-
-#### `ENABLE_QUERIES_CACHE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables query result caching to improve database performance by storing and reusing frequently accessed data.
 
 ### Encrypted SQLite with SQLCipher
 
