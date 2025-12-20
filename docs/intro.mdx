@@ -130,15 +130,15 @@ docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --r
 To update Open WebUI container easily, follow these steps:
 
 #### Manual Update
-Use [Watchtower](https://containrrr.dev/watchtower) to update your Docker container manually:
+Use [Watchtower](https://github.com/nickfedor/watchtower) to update your Docker container manually:
 ```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
 ```
 
 #### Automatic Updates
 Keep your container updated automatically every 5 minutes:
 ```bash
-docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --interval 300 open-webui
+docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --interval 300 open-webui
 ```
 
 🔧 **Note**: Replace `open-webui` with your container name if it's different.
