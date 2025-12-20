@@ -16,7 +16,7 @@ export default function ContentWrapper(props: Props): JSX.Element {
 					</div>
 
 					<div className="mt-3 min-[996px]:hidden">
-						<TopBanners bannerClassName={"h-10"} label={false} mobile={false} />
+						<TopBanners bannerClassName="h-10" label={false} mobile={false} />
 					</div>
 				</div>
 			</div>
