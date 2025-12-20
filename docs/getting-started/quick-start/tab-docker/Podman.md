@@ -19,16 +19,32 @@ Podman is a daemonless container engine for developing, managing, and running OC
 
 ## Networking with Podman
 
-If networking issues arise, use slirp4netns to adjust the pod's network settings to allow the container to access your computer's ports.
+If networking issues arise (specifically on rootless Podman), you may need to adjust the network bridge settings.
 
-Ensure you have [slirp4netns installed](https://github.com/rootless-containers/slirp4netns?tab=readme-ov-file#install), remove the previous container if it exists using `podman rm`, and start a new container with
+:::warning Slirp4netns Deprecation
+Older Podman instructions often recommended `slirp4netns`. However, `slirp4netns` is being **deprecated** and will be removed in **Podman 6**. 
+
+The modern successor is **[pasta](https://passt.top/passt/about/)**, which is the default in Podman 5.0+.
+:::
+
+### Accessing the Host (Local Services)
+
+If you are running Ollama or other services directly on your host machine, use the special DNS name **`host.containers.internal`** to point to your computer.
+
+#### Modern Approach (Pasta - Default in Podman 5+)
+No special flags are usually needed to access the host via `host.containers.internal`.
+
+#### Legacy Approach (Slirp4netns)
+If you are on an older version of Podman and `pasta` is not available:
+1. Ensure you have [slirp4netns installed](https://github.com/rootless-containers/slirp4netns).
+2. Start the container with the following flag to allow host loopback:
 
 ```bash
-  podman run -d --network=slirp4netns:allow_host_loopback=true --name openwebui -p 3000:8080 -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main
+podman run -d --network=slirp4netns:allow_host_loopback=true --name openwebui -p 3000:8080 -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main
 ```
 
-If you are using Ollama from your computer (not running inside a container),
-
-Once inside open-webui, navigate to Settings > Admin Settings > Connections and create a new Ollama API connection to `http://10.0.2.2:[OLLAMA PORT]`. By default, the Ollama port is 11434.
+### Connection Configuration
+Once inside Open WebUI, navigate to **Settings > Admin Settings > Connections** and set your Ollama API connection to:
+`http://host.containers.internal:11434`
 
 Refer to the Podman [documentation](https://podman.io/) for advanced configurations.
