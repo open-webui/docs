@@ -2224,18 +2224,18 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
 - Description: Specifies all Docling processing parameters in JSON format. This is the primary configuration method for Docling processing options. All previously individual Docling settings are now configured through this single JSON object.
   
   **Supported Parameters:**
-  - `do_ocr` (bool): Enable OCR processing
-  - `force_ocr` (bool): Force OCR even when text layer exists
-  - `ocr_engine` (str): OCR engine to use (`tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`)
-  - `ocr_lang` (list[str]): OCR language codes (e.g., `["en", "de", "fr"]`)
-  - `pdf_backend` (str): PDF processing backend
-  - `table_mode` (str): Table extraction mode
-  - `pipeline` (str): Processing pipeline to use
-  - `do_picture_description` (bool): Enable image description generation
-  - `picture_description_mode` (str): Mode for picture descriptions
-  - `picture_description_local` (str): Local model for picture descriptions
-  - `picture_description_api` (str): API endpoint for picture descriptions
-  - `vlm_pipeline_model_api` (str): Vision-language model API configuration
+  - `do_ocr` (bool): Enable OCR processing.
+  - `force_ocr` (bool): Force OCR even when text layer exists.
+  - `ocr_engine` (str): OCR engine to use. Options: `tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`.
+  - `ocr_lang` (list[str]): OCR language codes. Note: Format depends on engine (e.g., `["eng", "fra"]` for Tesseract; `["en", "fr"]` for EasyOCR).
+  - `pdf_backend` (str): PDF processing backend. Options: `dlparse_v1`, `dlparse_v2`, `dlparse_v4`, `pypdfium2`.
+  - `table_mode` (str): Table extraction mode. Options: `fast`, `accurate`.
+  - `pipeline` (str): Processing pipeline to use. Options: `fast`, `standard`.
+  - `do_picture_description` (bool): Enable image description generation.
+  - `picture_description_mode` (str): Mode for picture descriptions. Options: `local`, `api`.
+  - `picture_description_local` (str): Local model configuration object for picture descriptions.
+  - `picture_description_api` (str): API endpoint configuration object for picture descriptions.
+  - `vlm_pipeline_model_api` (str): Vision-language model API configuration. (e.g., `openai://gpt-4o`).
 
 - Example:
 ```json
@@ -2251,6 +2251,10 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
   "vlm_pipeline_model_api": "openai://gpt-4o"
 }
 ```
+
+:::tip
+**dlparse** vs **dbparse**: Note that the backend names use **`dlparse`** (Deep Learning Parse), not `dbparse`. For modern Docling (v2+), `dlparse_v4` is generally recommended for the best balance of features.
+:::
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
