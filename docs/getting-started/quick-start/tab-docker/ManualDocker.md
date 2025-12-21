@@ -82,3 +82,23 @@ After the container is running, access Open WebUI at:
 [http://localhost:3000](http://localhost:3000)
 
 For detailed help on each Docker flag, see [Docker's documentation](https://docs.docker.com/engine/reference/commandline/run/).
+
+## Uninstall
+
+To uninstall Open WebUI running with Docker, follow these steps:
+
+1.  **Stop and Remove the Container:**
+    ```bash
+    docker rm -f open-webui
+    ```
+
+2.  **Remove the Image (Optional):**
+    ```bash
+    docker rmi ghcr.io/open-webui/open-webui:main
+    ```
+
+3.  **Remove the Volume (Optional, WARNING: Deletes all data):**
+    If you want to completely remove your data (chats, settings, etc.):
+    ```bash
+    docker volume rm open-webui
+    ```

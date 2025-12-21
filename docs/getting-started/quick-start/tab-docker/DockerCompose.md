@@ -74,8 +74,33 @@ deploy:
     reservations:
       devices:
         - driver: nvidia
-          count: all
+        - count: all
           capabilities: [gpu]
 ```
 
 This setup ensures that your application can leverage GPU resources when available.
+
+## Uninstall
+
+To uninstall Open WebUI running with Docker Compose, follow these steps:
+
+1.  **Stop and Remove the Services:**
+    Run this command in the directory containing your `docker-compose.yml` file:
+    ```bash
+    docker compose down
+    ```
+
+2.  **Remove the Volume (Optional, WARNING: Deletes all data):**
+    If you want to completely remove your data (chats, settings, etc.):
+    ```bash
+    docker compose down -v
+    ```
+    Or manually:
+    ```bash
+    docker volume rm <your_project_name>_open-webui
+    ```
+
+3.  **Remove the Image (Optional):**
+    ```bash
+    docker rmi ghcr.io/open-webui/open-webui:main
+    ```

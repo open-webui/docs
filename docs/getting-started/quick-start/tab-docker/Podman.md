@@ -48,3 +48,23 @@ Once inside Open WebUI, navigate to **Settings > Admin Settings > Connections** 
 `http://host.containers.internal:11434`
 
 Refer to the Podman [documentation](https://podman.io/) for advanced configurations.
+
+## Uninstall
+
+To uninstall Open WebUI running with Podman, follow these steps:
+
+1.  **Stop and Remove the Container:**
+    ```bash
+    podman rm -f openwebui
+    ```
+
+2.  **Remove the Image (Optional):**
+    ```bash
+    podman rmi ghcr.io/open-webui/open-webui:main
+    ```
+
+3.  **Remove the Volume (Optional, WARNING: Deletes all data):**
+    If you want to completely remove your data (chats, settings, etc.):
+    ```bash
+    podman volume rm open-webui
+    ```
