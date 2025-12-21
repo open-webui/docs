@@ -278,6 +278,7 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Default: `Open WebUI`
 - Description: Sets the main WebUI name. Appends `(Open WebUI)` if overridden.
 
+
 #### `PORT`
 
 - Type: `int`
@@ -555,6 +556,7 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Type: `str`
 - Default: `/chats,/chat,/folders`
 - Description: Comma-separated list of URL paths to exclude from audit logging. Paths are matched without leading slashes.RetryTo run code, enable code execution and file creation in Settings > Capabilities.Claude can make mistakes. Please double-check responses.
+
 
 ### Ollama
 
@@ -1280,7 +1282,10 @@ If you do NOT set this:
 4.  You will be logged out.
 
 **Do not leave this unset in production.**
+
 :::
+
+:::warning
 
 **Required for Multi-Worker and Multi-Node Deployments AND HIGHLY RECOMMENDED IN SINGLE-WORKER ENVIRONMENTS**
 
@@ -1403,6 +1408,7 @@ When configured, these custom schemes will be validated alongside `http` and `ht
 - Type: `bool`
 - Default: `False`
 - Description: Determines whether to allow custom models defined on the Hub in their own modeling files.
+
 
 #### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
 
