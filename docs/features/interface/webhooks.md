@@ -64,6 +64,19 @@ This webhook allows individual users to receive a notification when a model has 
 
 The notification is only sent if you are **not actively using the WebUI**. If you have the tab open and focused, the webhook will not be triggered, preventing unnecessary notifications.
 
+### Enabling/Disabling User Webhooks
+
+User webhooks are enabled by default. However, administrators can disable this feature for all users to prevent external requests or for security reasons.
+
+This can be done in two ways:
+
+1.  **Directly in the Admin Panel:**
+    - Go to **Admin Panel > Settings > General > Features**.
+    - Toggle the switch for **"User Webhooks"**.
+
+2.  **Using Environment Variables:**
+    - Set the environment variable `ENABLE_USER_WEBHOOKS` to `False` in your backend configuration. This will globally disable the feature and hide the setting from user profiles.
+
 ### Configuration
 
 1.  Click on your profile picture in the bottom-left corner to open the settings menu.

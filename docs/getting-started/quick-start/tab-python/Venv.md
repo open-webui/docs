@@ -43,3 +43,17 @@ If your terminal says the command doesn't exist:
 2. If you still get an error, try running it via Python directly: `python -m open_webui serve`
 3. If you want to store your data in a specific place, use: `DATA_DIR=./data open-webui serve`
 :::
+
+## Uninstall
+
+1.  **Delete the Virtual Environment:**
+    Simply remove the `venv` folder:
+    ```bash
+    rm -rf venv
+    ```
+
+2.  **Remove Data (WARNING: Deletes all data):**
+    Delete your data directory (usually `~/.open-webui` unless configured otherwise):
+    ```bash
+    rm -rf ~/.open-webui
+    ```

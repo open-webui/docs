@@ -49,3 +49,16 @@ If you run Open WebUI with multiple replicas/pods (`replicaCount > 1`) or `UVICO
 ## Access the WebUI
 
 Set up port forwarding or load balancing to access Open WebUI from outside the cluster.
+
+## Uninstall
+
+1.  **Uninstall the Helm Release:**
+    ```bash
+    helm uninstall openwebui
+    ```
+
+2.  **Remove Persistent Volume Claims (WARNING: Deletes all data):**
+    Helm does not automatically delete PVCs to prevent accidental data loss. You must delete them manually if you want to wipe everything.
+    ```bash
+    kubectl delete pvc -l app.kubernetes.io/instance=openwebui
+    ```
