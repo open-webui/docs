@@ -24,6 +24,10 @@ Notes utilizes a context-aware **Floating Toolbar** for formatting, rather than 
 * **Styling:** **Bold**, *Italic*, Underline, and ~~Strikethrough~~.
 * **Code:** Inline code formatting `</>`.
 
+### Drag-and-Drop List Reordering
+
+List items can be reordered by dragging. Visual drag handles appear when hovering over list items, making it easy to reorganize content.
+
 While this toolbar is native to the Notes workspace, it can also be enabled for standard Chats.
 
 :::info  To see this toolbar in your main chat input:
@@ -100,7 +104,7 @@ You can export your notes in standard formats:
 
 * **Plain text (.txt):** The raw text content.
 * **Plain text (.md):** Preserves Markdown structure (headers, code blocks, etc.).
-* **PDF document (.pdf):** A rendered document with visual formatting applied.
+* **PDF document (.pdf):** A rendered document with visual formatting applied. Dark mode styling is automatically detected and applied.
 
 ### Sharing
 
@@ -113,6 +117,47 @@ You can delete notes permanently from two locations:
 
 1. **From the Notes Dashboard:** Click the **More (`...`)** button on the individual note card in the list view and select **Delete**.
 2. **From the Editor:** While inside an open note, click the **More (`...`)** button in the top right corner of the screen and select **Delete**.
+
+
+### Quick Note Creation via URL
+
+Notes can be created directly by navigating to `/notes/new` with optional query parameters:
+
+* `/notes/new` — Opens a blank note
+* `/notes/new?title=My%20Title&content=Initial%20text` — Pre-populates title and content
+
+This enables bookmarks and shortcuts for fast note creation.
+
+### Creating Notes from Search
+
+You can also create notes directly from the global search bar:
+
+1. Open the search using the keyboard shortcut (`Cmd+K` / `Ctrl+K`) or by clicking the search icon.
+2. Type your initial note content.
+3. Select **"Create a new note"** from the actions list.
+4. This will immediately open a new note with your search text as the content.
+
+### Importing Notes
+
+You can import existing Markdown (`.md`) files into your Notes workspace:
+
+* **Drag and Drop:** Simply drag `.md` files directly onto the Notes list view to import them.
+
+### View Options
+
+The Notes dashboard offers different ways to organize your content:
+
+* **Filter:** Toggle between **Created by you** (your private/shared notes) and **Shared with you** (notes others have shared).
+* **Layout:** Switch between **List** and **Grid** views for visual preference.
+
+### Sharing Permissions
+
+Administrators can control sharing capabilities via environment variables or the Admin Panel:
+
+* **Internal Sharing:** `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Controls sharing with other users/groups on the server).
+* **Public Sharing:** `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING` (Controls generating public external links).
+
+These can also be configured in **Admin Panel > Settings > Users > Default Permissions**.
 
 ---
 

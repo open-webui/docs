@@ -2,12 +2,25 @@
 
 To update your local Docker installation to the latest version, you can either use **Watchtower** or manually update the container.
 
-### Option 1: Using Watchtower
+### Option 1: Using Watchtower (Recommended Fork)
 
-With [Watchtower](https://containrrr.dev/watchtower/), you can automate the update process:
+:::info Deprecation Notice
+The original `containrrr/watchtower` is **no longer maintained** and may fail with newer Docker versions. We recommend using the `nickfedor/watchtower` fork.
+:::
+
+:::warning Multi-Worker Environments
+If you run Open WebUI with `UVICORN_WORKERS > 1` (e.g., in a production environment), you **MUST** ensure the update migration runs on a single worker first to prevent database schema corruption.
+
+**Steps for proper update:**
+1. Update and start your container with `UVICORN_WORKERS=1`.
+2. Wait for the application to fully start and complete migrations.
+3. Stop and restart the container with your desired number of workers.
+:::
+
+With [Watchtower](https://github.com/nickfedor/watchtower), you can automate the update process:
 
 ```bash
-docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
 ```
 
 *(Replace `open-webui` with your container's name if it's different.)*

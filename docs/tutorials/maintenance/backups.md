@@ -403,7 +403,7 @@ In the interest of keeping this guide reasonably thorough these additional subje
 | Topic | Description |
 |---|---|
 | SQLite Built-in Backup | Consider using SQLite's `.backup` command for a consistent database backup solution. |
-| Encryption | Modify backup scripts to incorporate encryption at rest for enhanced security. |
+| Encryption | Modify backup scripts to incorporate encryption at rest. See [Database Encryption with SQLCipher](/tutorials/tips/sqlite-database#database-encryption-with-sqlcipher) for database-level encryption. |
 | Disaster Recovery and Testing | Develop a disaster recovery plan and regularly test the backup and restore process. |
 | Alternative Backup Tools | Explore other command-line backup tools like `borgbackup` or `restic` for advanced features. |
 | Email Notifications and Webhooks | Implement email notifications or webhooks to monitor backup success or failure. |

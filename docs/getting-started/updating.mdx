@@ -14,6 +14,8 @@ Keeping Open WebUI updated ensures you have the latest features, security patche
 - **Backup your data** before major version updates
 - **Check release notes** at https://github.com/open-webui/open-webui/releases for breaking changes
 - **Clear browser cache** after updating to ensure the latest web interface loads
+- **Running Multiple Workers?** If you use `UVICORN_WORKERS > 1`, you **MUST** run the updated container with `UVICORN_WORKERS=1` first to perform database migrations safely. Once started successfully, you can restart with multiple workers.
+:::
 :::
 
 ## Manual Update
@@ -56,6 +58,32 @@ Status: Downloaded newer image for ghcr.io/open-webui/open-webui:main
 :::note About Data Persistence
 Your chat histories, settings, and uploaded files are stored in a Docker volume named `open-webui`. Pulling a new image does **not** affect this data. The volume persists independently of the container.
 :::
+
+### (Optional) Using image tags in production
+
+Open WebUI provides multiple Docker image tags depending on how you want to manage updates.
+If you want to always run the latest version of Open WebUI, you can use the `:main`, `:cuda`, or `:ollama` image tags, depending on your setup.
+
+Examples (latest version tags):
+```
+ghcr.io/open-webui/open-webui:main
+ghcr.io/open-webui/open-webui:cuda
+ghcr.io/open-webui/open-webui:ollama
+```
+
+For `production environments` where stability and reproducibility are important, it is recommended to pin a specific release version instead of using these floating tags.
+
+Versioned images follow this format:
+```
+ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
+```
+
+Examples (pinned versions — replace with the release version you want to use):
+```
+ghcr.io/open-webui/open-webui:v0.6.52
+ghcr.io/open-webui/open-webui:v0.6.52-cuda
+ghcr.io/open-webui/open-webui:v0.6.52-ollama
+```
 
 ### Step 3: Start Container with Updated Image
 

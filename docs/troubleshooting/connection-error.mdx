@@ -160,14 +160,14 @@ docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host
 
 Running on MacOS with Podman? Here’s how to ensure connectivity:
 
-1. **Enable Host Loopback**:
-   Use `--network slirp4netns:allow_host_loopback=true` in your command.
+1. **Enable Host Access**:
+   Podman 5.0+ uses **pasta** by default, which simplifies host loopback. If you are on an older version, you may need `--network slirp4netns:allow_host_loopback=true`.
 
 2. **Set OLLAMA_BASE_URL**:
-   Ensure it points to `http://host.containers.internal:11434`.
+   Ensure it points to **`http://host.containers.internal:11434`**.
 
 **Example Podman Command**:
 ```bash
-podman run -d --network slirp4netns:allow_host_loopback=true -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+podman run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 

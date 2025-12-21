@@ -18,6 +18,14 @@ For environments with limited storage or bandwidth, Open WebUI offers slim image
 docker pull ghcr.io/open-webui/open-webui:main-slim
 ```
 
+### Specific release version
+
+You can also pull a specific Open WebUI release version directly by using a versioned image tag. This is recommended for production environments to ensure stable and reproducible deployments.
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:v0.6.42
+```
+
 ## Step 2: Run the Container
 
 Run the container with default settings. This command includes a volume mapping to ensure persistent data storage.
@@ -74,3 +82,23 @@ After the container is running, access Open WebUI at:
 [http://localhost:3000](http://localhost:3000)
 
 For detailed help on each Docker flag, see [Docker's documentation](https://docs.docker.com/engine/reference/commandline/run/).
+
+## Uninstall
+
+To uninstall Open WebUI running with Docker, follow these steps:
+
+1.  **Stop and Remove the Container:**
+    ```bash
+    docker rm -f open-webui
+    ```
+
+2.  **Remove the Image (Optional):**
+    ```bash
+    docker rmi ghcr.io/open-webui/open-webui:main
+    ```
+
+3.  **Remove the Volume (Optional, WARNING: Deletes all data):**
+    If you want to completely remove your data (chats, settings, etc.):
+    ```bash
+    docker volume rm open-webui
+    ```

@@ -9,6 +9,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
+:::tip
+
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+
+:::
+
 ## Overview
 
 Integrating Tavily with Open WebUI allows your language model to perform real-time web searches, providing up-to-date and relevant information. This tutorial guides you through configuring Tavily as a web search provider in Open WebUI.
@@ -75,7 +81,7 @@ Ensure you have:
 - **Quota Exceeded**: Check your Tavily plan at [Tavily Pricing](https://tavily.com/#pricing).
 - **Settings Not Saved**: Verify admin privileges and that `webui.db` is writable.
 
-For further help, visit the [Open WebUI Community](https://openwebui.com/community) or [Tavily Support](https://tavily.com/#contact).
+For further help, visit the [Open WebUI Community](https://openwebui.com/search) or [Tavily Support](https://tavily.com/#contact).
 
 ## Additional Resources
 

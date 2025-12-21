@@ -3,63 +3,65 @@ sidebar_position: 3
 title: "Roles"
 ---
 
-Open WebUI implements a structured role-based access control system with three primary user roles:
 
-| **Role**      | **Description**                                   | **Default Creation**             |
-|---------------|---------------------------------------------------|----------------------------------|
-| Administrator | System administrator with full control            | First user account               |
-| Regular User  | Standard user with limited permissions            | Subsequent approved users        |
-| Pending       | Unapproved user awaiting administrator activation | New registrations (configurable) |
+Open WebUI defines three primary **System Roles** that determine the fundamental access level of a user account. These roles are distinct from [Groups](./groups.md) and [Permissions](./permissions.md).
 
-### Role Assignment
+| Role | Keyword | Description |
+| :--- | :--- | :--- |
+| **Admin** | `admin` | **Superuser**. Full control over the system. |
+| **User** | `user` | **Standard User**. Subject to RBAC permissions. |
+| **Pending** | `pending` | **Restricted**. No access until approved. |
 
-- **First User:** The first account created on a new Open WebUI instance automatically receives Administrator
-  privileges.
-- **Subsequent Users:** New user registrations are assigned a default role based on the `DEFAULT_USER_ROLE`
-  configuration.
+## Role Details
 
-The default role for new registrations can be configured using the `DEFAULT_USER_ROLE` environment variable:
+### Administrator (`admin`)
+The Admin role is designed for system maintainers.
+*   **Full Access**: default access to all resources and settings.
+*   **Management**: Can manage users, groups, and global configurations.
+*   **Bypass**: Bypasses most permission checks by default.
 
-```.dotenv
-DEFAULT_USER_ROLE=pending  # Options: pending, user, admin
+:::warning Admin Limitations & Best Practices
+While Administrators generally have unrestricted access, certain system configurations can limit their capabilities for security and privacy:
+*   **Privacy Controls**: Environment variables like `ENABLE_ADMIN_CHAT_ACCESS=False` can prevent Admins from viewing user chats.
+*   **Strict Feature Checks**: Critical security features like **API Keys** (`features.api_keys`) require explicit permission, even for Admins.
+*   **Access Control Exceptions**: If `BYPASS_ADMIN_ACCESS_CONTROL` is disabled, Admins may require explicit permissions to access private model/knowledge resources.
+
+For a robust security posture, we recommend including Admins in your permission schema (via Groups) rather than relying solely on the role's implicit bypasses. This ensures consistent access if bypass limitations are ever enabled.
+:::
+
+### Standard User (`user`)
+This is the default functional role for team members.
+*   **Subject to Permissions**: Does not have implicit access. All capabilities must be granted via **Global Default Permissions** or **Group Memberships**.
+*   **Additive Rights**: As explained in the [Permissions](./permissions.md) section, their effective rights are the sum of all their grants.
+
+### Pending User (`pending`)
+The default state for new sign-ups (if configured) or deactivated users.
+*   **Zero Access**: Cannot perform any actions or see any content.
+*   **Approval Required**: Must be promoted to `user` or `admin` by an existing Administrator.
+
+:::note
+The `admin` role effectively has `check_permission() == True` for everything. Granular permissions (like disabling "Web Search") generally do **not** apply to admins.
+:::
+
+## Role Assignment
+
+### Initial Setup
+*   **First User:** The very first account created on a fresh installation is automatically assigned the **Admin** role.
+*   **Subsequent Users:** New sign-ups are assigned the **Default User Role**.
+
+### Configuration
+You can control the default role for new users via the `DEFAULT_USER_ROLE` environment variable:
+
+```bash
+DEFAULT_USER_ROLE=pending
+# Options: 'pending', 'user', 'admin'
 ```
+*   **pending (Recommended for public/shared instances):** New users cannot log in until an Admin explicitly activates them in the Admin Panel.
+*   **user:** New users get immediate access with default permissions.
+*   **admin:** (Use with caution) New users become full administrators.
 
-When set to "pending", new users must be manually approved by an administrator before gaining access to the system.
+## Changing Roles
+Administrators can change a user's role at any time via **Admin Panel > Users**.
+*   Promoting a user to `admin` grants them full control.
+*   Demoting an admin to `user` subjects them to the permission system again.
 
-## User Groups
-
-Groups allow administrators to
-
-- assign permissions to multiple users at once, simplifying access management
-- limit access to specific resources (Models, Tools, etc) by setting their access to "private" then opening access to
-specific groups
-- Group access to a resource can be set as "read" or "write"
-
-### Group Structure
-
-Each group in Open WebUI contains:
-
-- A unique identifier
-- Name and description
-- Owner/creator reference
-- List of member user IDs
-- Permission configuration
-- Additional metadata
-
-### Group Management
-
-Groups can be:
-
-- **Created manually** by administrators through the user interface
-- **Synced automatically** from OAuth providers when `ENABLE_OAUTH_GROUP_MANAGEMENT` is enabled
-- **Created automatically** from OAuth claims when both `ENABLE_OAUTH_GROUP_MANAGEMENT` and`ENABLE_OAUTH_GROUP_CREATION`
-  are enabled
-
-### OAuth Group Integration
-
-When OAuth group management is enabled, user group memberships are synchronized with groups received in OAuth claims:
-
-- Users are added to Open WebUI groups that match their OAuth claims
-- Users are removed from groups not present in their OAuth claims
-- With `ENABLE_OAUTH_GROUP_CREATION` enabled, groups from OAuth claims that don't exist in Open WebUI are automatically
-  created
