@@ -48,7 +48,21 @@ If you run Open WebUI with multiple replicas/pods (`replicaCount > 1`) or `UVICO
 
 ## Access the WebUI
 
-Set up port forwarding or load balancing to access Open WebUI from outside the cluster.
+You can access Open WebUI by port-forwarding or configuring an Ingress.
+
+### Ingress Configuration (Nginx)
+If you are using the **NGINX Ingress Controller**, you can enable session affinity (sticky sessions) to improve WebSocket stability. Add the following annotation to your Ingress resource:
+
+```yaml
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "open-webui-session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+```
+
+This ensures that a user's session remains connected to the same pod, reducing issues with WebSocket connections in multi-replica setups (though correct Redis configuration makes this less critical).
 
 ## Uninstall
 

@@ -5049,6 +5049,13 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 
 :::
 
+:::warning
+
+**Required for Multi-Replica Setups**
+For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), you **MUST** use an external database (PostgreSQL) instead of SQLite. SQLite does not support concurrent writes from multiple instances and will result in database corruption or data inconsistency.
+
+:::
+
 #### `DATABASE_TYPE`
 
 - Type: `str`

@@ -1,0 +1,150 @@
+---
+sidebar_position: 10
+title: "Multi-Replica / High Availability / Concurrency"
+---
+
+# Multi-Replica, High Availability & Concurrency Troubleshooting
+
+This guide addresses common issues encountered when deploying Open WebUI in **multi-replica** environments (e.g., Kubernetes, Docker Swarm) or when using **multiple workers** (`UVICORN_WORKERS > 1`) for increased concurrency.
+
+## Core Requirements Checklist
+
+Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
+
+1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/getting-started/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
+2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/getting-started/env-configuration#database_server)). SQLite is **NOT** supported for multiple instances.
+3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/getting-started/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/getting-started/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/getting-started/env-configuration#websocket_redis_url) are required.
+4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
+5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/getting-started/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
+
+---
+
+## Common Issues
+
+### 1. Login Loops / 401 Unauthorized Errors
+
+**Symptoms:**
+- You log in successfully, but the next click logs you out.
+- You see "Unauthorized" or "401" errors in the browser console immediately after login.
+- "Error decrypting tokens" appears in logs.
+
+**Cause:**
+Each replica is using a different `WEBUI_SECRET_KEY`. When Replica A issues a session token (JWT), Replica B rejects it because it cannot verify the signature with its own different key.
+
+**Solution:**
+Set the `WEBUI_SECRET_KEY` environment variable to the **same** strong, random string on all backend replicas.
+
+```yaml
+# Example in Kubernetes/Compose
+env:
+  - name: WEBUI_SECRET_KEY
+    value: "your-super-secure-static-key-here"
+```
+
+### 2. WebSocket 403 Errors / Connection Failures
+
+**Symptoms:**
+- Chat stops responding or hangs.
+- Browser console shows `WebSocket connection failed: 403 Forbidden` or `Connection closed`.
+- Logs show `engineio.server: https://your-domain.com is not an accepted origin`.
+
+**Cause:**
+- **CORS:** The load balancer or ingress origin does not match the allowed origins.
+- **Missing Redis:** WebSockets are defaulting to in-memory, so events on Replica A (e.g., LLM generation finish) are not broadcast to the user connected to Replica B.
+
+**Solution:**
+1.  **Configure CORS:** Ensure [`CORS_ALLOW_ORIGIN`](/getting-started/env-configuration#cors_allow_origin) includes your public domain *and* http/https variations.
+    
+    If you see logs like `engineio.base_server:_log_error_once:354 - https://yourdomain.com is not an accepted origin`, you must update this variable. It accepts a **semicolon-separated list** of allowed origins.
+    
+    **Example:**
+    ```bash
+    CORS_ALLOW_ORIGIN="https://chat.yourdomain.com;http://chat.yourdomain.com;https://yourhostname;http://localhost:3000"
+    ```
+    *Add all valid IPs, Domains, and Hostnames that users might use to access your Open WebUI.*
+2.  **Enable Redis for WebSockets:**
+    Ensure these variables are set on **all** replicas:
+    ```bash
+    ENABLE_WEBSOCKET_SUPPORT=True
+    WEBSOCKET_MANAGER=redis
+    WEBSOCKET_REDIS_URL=redis://your-redis-host:6379/0
+    ```
+
+### 3. "Model Not Found" or Configuration Mismatch
+
+**Symptoms:**
+- You enable a model or change a setting in the Admin UI, but other users (or you, after a refresh) don't see the change.
+- Chats fail with "Model not found" intermittently.
+
+**Cause:**
+- **Configuration Sync:** Replicas are not synced. Open WebUI uses Redis Pub/Sub to broadcast configuration changes (like toggling a model) to all other instances.
+- **Missing Redis:** If `REDIS_URL` is not set, configuration changes stay local to the instance where the change was made.
+
+**Solution:**
+Set `REDIS_URL` to point to your shared Redis instance. This enables the Pub/Sub mechanism for real-time config syncing.
+
+```bash
+REDIS_URL=redis://your-redis-host:6379/0
+```
+
+### 4. Database Corruption / "Locked" Errors
+
+**Symptoms:**
+- Logs show `database is locked` or severe SQL errors.
+- Data saved on one instance disappears on another.
+
+**Cause:**
+Using **SQLite** with multiple replicas. SQLite is a file-based database and does not support concurrent network writes from multiple containers.
+
+**Solution:**
+Migrate to **PostgreSQL**. Update your connection string:
+
+```bash
+DATABASE_URL=postgresql://user:password@postgres-host:5432/openwebui
+```
+
+### 5. Uploaded Files or RAG Knowledge Inaccessible
+
+**Symptoms:**
+- You upload a file (for RAG) on one instance, but the model cannot find it later.
+- Generated images appear as broken links.
+
+**Cause:**
+The `/app/backend/data` directory is not shared or is not consistent across replicas. If User A uploads a file to Replica 1, and the next request hits Replica 2, Replica 2 won't have the file physically on disk.
+
+**Solution:**
+- **Kubernetes:** Use a `PersistentVolumeClaim` with `ReadWriteMany` (RWX) access mode if your storage provider supports it (e.g., NFS, CephFS, AWS EFS).
+- **Docker Swarm/Compose:** Mount a shared volume (e.g., NFS mount) to `/app/backend/data` on all containers.
+
+---
+
+## Deployment Best Practices
+
+### Updates and Migrations
+
+:::danger Critical: Avoid Concurrent Migrations
+**Always scale down to 1 replica (and 1 worker) before upgrading Open WebUI versions.**
+:::
+
+Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, leading to race conditions or database schema corruption.
+
+**Safe Update Procedure:**
+1.  **Scale Down:** Set replicas to `1` (and ensure `UVICORN_WORKERS=1` if you customized it).
+2.  **Update Image:** Application restarts with the new version.
+3.  **Wait for Health Check:** Ensure the single instance starts up fully and completes DB migrations.
+4.  **Scale Up:** Increase replicas (or `UVICORN_WORKERS`) back to your desired count.
+
+### Session Affinity (Sticky Sessions)
+While Open WebUI is designed to be stateless with proper Redis configuration, enabling **Session Affinity** (Sticky Sessions) at your Load Balancer / Ingress level can improve performance and reduce occasional jitter in WebSocket connections.
+
+- **Nginx Ingress:** `nginx.ingress.kubernetes.io/affinity: "cookie"`
+- **AWS ALB:** Enable Target Group Stickiness.
+
+---
+
+## Related Documentation
+
+- [Environment Variable Configuration](/getting-started/env-configuration)
+- [Troubleshooting Connection Errors](/troubleshooting/connection-error)
+- [Logging Configuration](/getting-started/advanced-topics/logging)
+
