@@ -176,6 +176,8 @@ For local development, you can run the API and frontend separately:
 cd frontend && npm install && npm run dev
 ```
 
+> **Note:** If you encounter dependency issues, try running `npm install --force` instead of just `npm install`.
+
 Click the link provided from Vite to access the web UI.
 
 ### Build for Production
@@ -185,6 +187,8 @@ Build the frontend for production deployment:
 ```bash
 cd frontend && npm install && npm run build
 ```
+
+> **Note:** If the build fails due to dependency conflicts, try using `npm install --force`.
 
 You can then access it directly from your local file system at `/dist/index.html`.
 

@@ -277,6 +277,9 @@ Hot reload (or hot module replacement - HMR) is a fantastic development feature 
      ```bash
      rm -rf node_modules && npm install
      ```
+     
+     If `npm install` fails, try `npm install --force`.
+
 
      This command deletes the `node_modules` directory (where dependencies are stored) and then reinstalls them from scratch. This can resolve issues caused by corrupted or outdated packages.
 5. **Backend Restart Required (For Backend Changes):** Hot reload typically works best for frontend code changes (UI, styling, components). For significant backend code changes (especially changes to server logic, API endpoints, or dependencies), you might need to **manually restart the backend server** (by stopping `sh dev.sh` in your backend terminal and running it again). Hot reload for backend changes is often less reliable or not automatically configured in many backend development setups.
