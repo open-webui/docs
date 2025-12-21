@@ -85,7 +85,7 @@ Controls the features available to the user inside the chat interface.
 | **Text-to-Speech (TTS)**| Ability to use voice output. |
 | **Audio Call** | Ability to use the real-time audio call feature. |
 | **Multiple Models** | Ability to select multiple models for a simultaneous response. |
-| **Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). |
+| **Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
 | **Enforced Temporary** | *(Requires Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
 
 ### 4. Features Permissions

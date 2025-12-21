@@ -23,6 +23,10 @@ With proper document extraction, Open WebUI can help you:
 - Extract data in structured formats for further processing
 - Support multilingual content recognition
 
+:::note Privacy in Temporary Chats
+In **Temporary Chat** mode, document extraction is performed **exclusively in the browser** to prevent data from being stored or processed on the backend. This strict privacy measure means that some complex file formats (like certain DOCX files) that rely on backend parsers may not be processed correctly.
+:::
+
 ## Available Extraction Methods
 
 Open WebUI supports multiple document extraction engines to accommodate different needs and document types. Each extraction method has its own strengths and is suitable for different scenarios.
