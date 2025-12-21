@@ -9,6 +9,10 @@ Open WebUI natively supports **MCP (Model Context Protocol)** starting in **v0.6
 Requires **Open WebUI v0.6.31+**.
 :::
 
+:::danger Prerequisite: WEBUI_SECRET_KEY
+You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setup. Without it, **OAuth-connected MCP tools (like Notion)** will **break** every time you restart or recreate the container (Error: `Error decrypting tokens`), forcing you to re-authenticate everything.
+:::
+
 ## 🚀 Quick start 
 
 1. Open **⚙️ Admin Settings → External Tools**.

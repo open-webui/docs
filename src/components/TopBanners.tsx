@@ -9,19 +9,20 @@ export const TopBanners = ({
 }) => {
 	const items = [
 		{
-			imgSrc: '/sponsors/banners/openwebui-banner.png',
-			mobileImgSrc: '/sponsors/banners/openwebui-banner-mobile.png',
-			url: 'https://docs.openwebui.com/enterprise',
-			name: 'Open WebUI Inc.',
+			imgSrc: "/sponsors/banners/openwebui-banner.png",
+			mobileImgSrc: "/sponsors/banners/openwebui-banner-mobile.png",
+			url: "https://docs.openwebui.com/enterprise",
+			name: "Open WebUI Inc.",
 			description:
-				'Upgrade to a licensed plan for enhanced capabilities, including custom theming and branding, and dedicated support.'
+				"Upgrade to a licensed plan for enhanced capabilities, including custom theming and branding, and dedicated support.",
 		},
 		{
-			imgSrc: '/sponsors/banners/openwebui-banner.png',
-			mobileImgSrc: '/sponsors/banners/openwebui-banner-mobile.png',
-			url: 'https://careers.openwebui.com',
-			name: 'Open WebUI Inc.',
-			description: '**We are hiring!** Shape the way humanity engages with _intelligence_.'
+			imgSrc: "/sponsors/banners/openwebui-banner.png",
+			mobileImgSrc: "/sponsors/banners/openwebui-banner-mobile.png",
+			url: "https://careers.openwebui.com",
+			name: "Open WebUI Inc.",
+			description:
+				"**We are hiring!** Shape the way humanity engages with _intelligence_.",
 		},
 	];
 

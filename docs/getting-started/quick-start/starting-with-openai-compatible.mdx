@@ -48,13 +48,14 @@ See [their docs](https://lemonade-server.ai/) for details.
 ## Step 2: Connect Your Server to Open WebUI
 
 1. Open Open WebUI in your browser.
-2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI Connections**.
+2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
 3. Click ➕ **Add Connection**.
-
-   - **URL**: Use your server’s API endpoint (for example, `http://localhost:11434/v1` for Ollama, or your own Llama.cpp server’s address).
-   - **API Key**: Leave blank unless required.
-
-4. Click Save.
+4. Select the **Standard / Compatible** tab (if available).
+5. Fill in the following:
+   - **API URL**: Use your server’s API endpoint.
+     *   **Examples**: `http://localhost:11434/v1` (Ollama), `http://localhost:10000/v1` (Llama.cpp).
+   - **API Key**: Leave blank unless the server requires one.
+6. Click **Save**.
 
 :::tip
 
@@ -65,6 +66,25 @@ If running Open WebUI in Docker and your model server on your host machine, use 
 ##### **For Lemonade:**  When adding Lemonade, use `http://localhost:8000/api/v0` as the URL.
 
 ![Lemonade Connection](/images/getting-started/lemonade-connection.png)
+
+---
+
+## Required API Endpoints
+
+To ensure full compatibility with Open WebUI, your server should implement the following OpenAI-standard endpoints:
+
+| Endpoint | Method | Required? | Purpose |
+| :--- | :--- | :--- | :--- |
+| `/v1/models` | `GET` | **Yes** | Used for model discovery and selecting models in the UI. |
+| `/v1/chat/completions` | `POST` | **Yes** | The core endpoint for chat, supporting streaming and parameters like temperature. |
+| `/v1/embeddings` | `POST` | No | Required if you want to use this provider for RAG (Retrieval Augmented Generation). |
+| `/v1/audio/speech` | `POST` | No | Required for Text-to-Speech (TTS) functionality. |
+| `/v1/audio/transcriptions` | `POST` | No | Required for Speech-to-Text (STT/Whisper) functionality. |
+| `/v1/images/generations` | `POST` | No | Required for Image Generation (DALL-E) functionality. |
+
+### Supported Parameters
+
+Open WebUI passes standard OpenAI parameters such as `temperature`, `top_p`, `max_tokens` (or `max_completion_tokens`), `stop`, `seed`, and `logit_bias`. It also supports **Tool Use** (Function Calling) if your model and server support the `tools` and `tool_choice` parameters.
 
 ---
 

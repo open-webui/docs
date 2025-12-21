@@ -9,6 +9,35 @@ title: "Channels"
 Channels is currently a **Beta** feature. Functionality is subject to change, and it must be explicitly enabled by an Administrator before it appears in the interface.
 :::
 
+## Channel Types
+
+Open WebUI supports three types of channels:
+
+| Type | Description |
+|------|-------------|
+| **Standard** | Traditional topic-based channels with public or private visibility |
+| **Group** | Membership-based channels where users explicitly join as members |
+| **Direct Message** | Private one-on-one or multi-user conversations |
+
+### Group Channels
+
+Group channels are collaboration spaces where:
+- Users explicitly join as members rather than accessing through permissions
+- Support public or private visibility
+- Can automatically include members from specified user groups
+- Channel managers can add or remove members through the channel info modal
+
+### Direct Message Channels
+
+Direct Message (DM) channels enable private conversations:
+- One-on-one or multi-user private messaging
+- Automatic deduplication for existing conversations
+- Optional channel naming
+- Display participant avatars instead of channel icons
+- Can be hidden from sidebar while preserving message history
+- Automatically reappear when new messages arrive
+- Show online/offline status indicator for participants
+
 ## Enabling Channels
 
 By default, the Channels feature may be hidden. An **Admin** must enable it globally for the instance.
@@ -22,12 +51,19 @@ By default, the Channels feature may be hidden. An **Admin** must enable it glob
 
 ## Creating a Channel
 
+:::note
+Channel creation is restricted to administrators only by default.
+:::
+
 1. Locate the **Channels** header in the sidebar.
 2. Click the **(+) Plus** icon next to the "Channels" header.
-3. **Name:** Enter a channel name (e.g., `general`, `python-dev`). Spaces should get converted to hyphens.
-4. **Access Control:**
-   * **Public:** All registered users on your Open WebUI instance can see and join this channel.
-   * **Private/Group Access:** Only you or users with permission can access this channel.
+3. **Select Channel Type:** Choose Standard, Group, or Direct Message.
+4. **Name:** Enter a channel name (e.g., `general`, `python-dev`). Spaces are converted to hyphens.
+5. **Access Control:**
+   * **Public:** All registered users can see and join this channel.
+   * **Private/Group Access:** Only you or users with permission can access.
+   * For Group channels, select which user groups to auto-include.
+   * For DM channels, use the user selection interface to choose participants.
 
 ## Using Channels
 
@@ -79,22 +115,33 @@ If a user **does not** have access to view a linked channel (e.g., `#admin-only`
 
 Hover over any message in the timeline to access interaction options:
 
-* **Add Reaction:** Click the **Smiley Face** icon to add a visual emoji eaction to a message.
-* **Reply:** Quotes the message within the main channel stream, linking your response to the original message while keeping it visible to everyone in the main flow.
-* **Reply in Thread:** Starts a separate, nested conversation thread centered on that specific message. This allows for focused discussions without cluttering the main channel history.
-* **Edit:** Click the **Pencil** icon to modify the content of your message.
-* **Delete:** Click the **Trash** icon to remove the message from the channel.
+* **Add Reaction:** Click the **Smiley Face** icon to add an emoji reaction. Hovering over reactions shows the names of users who reacted (up to 3 names plus a count for additional reactors).
+* **Pin Message:** Pin important messages for easy reference. Pinned messages are highlighted and accessible via a dedicated modal in the navbar.
+* **Reply:** Quotes the message within the main channel stream.
+* **Reply in Thread:** Starts a separate, nested conversation thread.
+* **Edit:** Click the **Pencil** icon to modify your message.
+* **Delete:** Click the **Trash** icon to remove the message.
 
 :::note
 Currently, reactions are purely visual and do not influence model behavior.
 :::
 
+### File Attachments
+
+Channels support file sharing:
+
+* **Paste from clipboard:** Images and files can be pasted directly using Ctrl+V / Cmd+V
+* **Drag and drop:** Drag files directly into the message input
+* **Image processing:** AI models in channels can view and analyze shared images
+
 ### Collaboration
 
 If your Open WebUI instance supports multiple users:
 
-* **Real-time updates:** Messages appear instantly for all users currently viewing the channel.
-* **Shared Context:** When a teammate asks an AI a question, the AI's response becomes part of the context for the *next* user's query. This allows teams to iterate on AI outputs together.
+* **Real-time updates:** Messages appear instantly using optimistic UI rendering.
+* **Shared Context:** AI responses become part of the context for subsequent queries.
+* **Unread indicators:** Visual badges show unread message counts in the sidebar.
+* **User list:** Click to view all users with access to the channel.
 
 ## Managing Channels
 
@@ -106,8 +153,16 @@ To manage an existing channel:
 2. Click the **Gear (Edit)** icon.
 
 :::info
-Only the Channel Creator or an Admin can delete a channel.
+Channel creators can edit and delete their own group and DM channels without administrator privileges. Standard channels require admin access.
 :::
+
+### Permissions
+
+Channels support granular access control:
+
+* **Write access:** Required for posting, editing, and deleting messages
+* **Read-only access:** Users can view content but cannot contribute
+* **Feature toggle:** Administrators can control channel access via `USER_PERMISSIONS_FEATURES_CHANNELS` environment variable or group permissions in the admin panel
 
 ## Use Cases
 

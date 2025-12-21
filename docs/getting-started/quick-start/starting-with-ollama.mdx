@@ -25,6 +25,17 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 2. Navigate to **Connections > Ollama > Manage** (click the wrench icon).
    From here, you can download models, configure settings, and manage your connection to Ollama.
 
+### Connection Tips
+
+*   **Docker Users**: If Ollama is running on your host machine, use `http://host.docker.internal:11434` as the URL.
+*   **Load Balancing**: You can add **multiple** Ollama instances. Open WebUI will distribute requests between them using a **random selection** strategy, providing basic load balancing for concurrent users.
+    *   **Note**: To enable this, ensure the **Model IDs match exactly** across instances. If you use **Prefix IDs**, they must be identical (or empty) for the models to merge into a single entry.
+
+### Advanced Configuration
+
+*   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote/`) to distinguish them.
+*   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all.
+
 Here’s what the management screen looks like:
 
 ![Ollama Management Screen](/images/getting-started/quick-start/manage-ollama.png)

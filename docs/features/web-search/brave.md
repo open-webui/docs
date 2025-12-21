@@ -9,6 +9,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
+:::tip
+
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+
+:::
+
 ## Brave API
 
 ### Docker Compose Setup
@@ -23,5 +29,5 @@ services:
       RAG_WEB_SEARCH_ENGINE: "brave"
       BRAVE_SEARCH_API_KEY: "YOUR_API_KEY"
       RAG_WEB_SEARCH_RESULT_COUNT: 3
-      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 1
 ```

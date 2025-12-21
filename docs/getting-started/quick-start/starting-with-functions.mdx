@@ -22,11 +22,23 @@ Pipe Functions are “bring-your-own-model (or tool)” plugins:
 
 ## Step 1: Find a Pipe Function to Try
 
-Let’s integrate **Anthropic** with Open WebUI—even though Anthropic only supports its own native API (not OpenAI-compatible endpoints)!
+Functions are powerful tools, and the community has created thousands of them! You can browse, search, and import them directly from our community hub.
 
-1. Go to the [Anthropic Chat function page](https://openwebui.com/f/justinrahb/anthropic).
+:::info Community Account Required
+To search and import functions directly from **[Open WebUI Community](https://openwebui.com/search)**, you must be logged in with a registered community account.
+:::
 
-2. Click **Get**.
+1.  Go to **[Open WebUI Community Search](https://openwebui.com/search)**.
+2.  Explore the library! You can find functions for:
+    *   **New Providers**: Anthropic, Google Gemini, Groq.
+    *   **Tools**: Web Search, Calculator, Home Assistant control.
+    *   **Utilities**: Auto-tagging, content filtering, and more.
+3.  **Pro Tip**: Even if you don't find exactly what you need, you can use existing functions as **templates** to build your own!
+
+For this guide, let's try integrating **Anthropic** (Claude models):
+
+1.  Locate the [Anthropic Pipe](https://openwebui.com/f/justinrahb/anthropic) function.
+2.  Click **Get**.
 
 ![Anthropic Pipe Function Page](/images/getting-started/pipe-anthropic-function.png)
 
@@ -86,7 +98,14 @@ Some functions need credentials (like Anthropic’s API key):
 
 ### Next Steps & Learn More
 
-- [Pipe Functions Guide](https://docs.openwebui.com/features/plugin/functions/pipe)
-- [Browse community functions](https://openwebui.com/functions)
+Ready to build your own? Check out our detailed development guides:
+
+*   **[Functions Overview](../../features/plugin/functions/index.mdx)**: Learn the basics of the Functions system.
+*   **[Pipes Guide](../../features/plugin/functions/pipe.mdx)**: Create custom model providers and logic pipelines.
+*   **[Filters Guide](../../features/plugin/functions/filter.mdx)**: Intercept and modify messages (Input/Output guards).
+*   **[Actions Guide](../../features/plugin/functions/action.mdx)**: Add buttons/actions to messages.
+*   **[Tools Guide](../../features/plugin/tools/index.mdx)**: Build tools for LLMs to use (RAG, APIs).
+
+*   **[Community Registry](https://openwebui.com/search)**: Browse hundreds of community-made functions.
 
 🚀 With Pipe Functions, your Open WebUI is limited *only by your imagination*!

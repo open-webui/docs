@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.41](https://github.com/open-webui/open-webui/releases/tag/v0.6.41), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.42](https://github.com/open-webui/open-webui/releases/tag/v0.6.42), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -30,7 +30,9 @@ You can update the values of `PersistentConfig` environment variables directly f
 
 Please note that `PersistentConfig` environment variables are clearly marked as such in the documentation below, so you can be aware of how they will behave.
 
-To disable `PersistentConfig` and have Open WebUI treat all variables equally, you can set `ENABLE_PERSISTENT_CONFIG` to `False`.
+To disable this behavior and force Open WebUI to always use your environment variables (ignoring the database), set `ENABLE_PERSISTENT_CONFIG` to `False`.
+
+**CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved permanently**. They will persist only for the current session and will be **lost** when you restart the container, as the system will revert to the values defined in your environment variables.
 
 :::
 
@@ -206,6 +208,12 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 
 :::
 
+#### `ENABLE_CUSTOM_MODEL_FALLBACK`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether custom models should fall back to a default model if their assigned base model is missing. When set to `True`, if a custom model's base model is not found, the system will use the first model from the configured `DEFAULT_MODELS` list instead of returning an error.
+
 #### `MODELS_CACHE_TTL`
 
 - Type: `int`
@@ -223,6 +231,13 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Type: `bool`
 - Default: `True`
 - Description: Toggles whether to show admin user details in the interface.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_PUBLIC_ACTIVE_USERS_COUNT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the active user count is visible to all users or restricted to administrators only. When set to `False`, only admin users can see how many users are currently active, reducing backend load and addressing privacy concerns in large deployments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ADMIN_EMAIL`
@@ -246,7 +261,11 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 
 - Type: `bool`
 - Default: `True`
-- Description: If set to `False`, all `PersistentConfig` variables are treated as regular variables.
+- Description: Controls whether the system prioritizes configuration saved in the database over environment variables.
+  - **`True` (Default):** Values saved in the **database** (via the Admin UI) take precedence. If a value is set in the UI, the environment variable is ignored for that setting.
+  - **`False`:** **Environment variables** take precedence. The system will *not* load configuration from the database at startup if an environment variable is present (or it will use the default).
+    - **CRITICAL WARNING:** When set to `False`, you can still seemingly "change" settings in the Admin UI. These changes will apply to the **current running session** but **will be lost upon restart**. The system will revert to the values defined in your environment variables (or defaults) every time it boots up.
+    - **Use Case:** Set this to `False` if you want to strictly manage configuration via a `docker-compose.yaml` or `.env` file and prevent UI changes from persisting across restarts.
 
 #### `CUSTOM_NAME`
 
@@ -258,6 +277,7 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Type: `str`
 - Default: `Open WebUI`
 - Description: Sets the main WebUI name. Appends `(Open WebUI)` if overridden.
+
 
 #### `PORT`
 
@@ -536,6 +556,7 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Type: `str`
 - Default: `/chats,/chat,/folders`
 - Description: Comma-separated list of URL paths to exclude from audit logging. Paths are matched without leading slashes.RetryTo run code, enable code execution and file creation in Settings > Capabilities.Claude can make mistakes. Please double-check responses.
+
 
 ### Ollama
 
@@ -1248,7 +1269,21 @@ Invalid regex patterns will cause password validation to fail, potentially preve
 - Type: `str`
 - Default: `t0p-s3cr3t`
 - Docker Default: Randomly generated on first start
-- Description: Overrides the randomly generated string used for JSON Web Token.
+- Description: Overrides the randomly generated string used for JSON Web Token and **encryption of sensitive data** (like OAuth tokens for MCP).
+
+:::danger Critical for Docker/Production
+
+You **MUST** set `WEBUI_SECRET_KEY` to a secure, persistent value.
+
+If you do NOT set this:
+1.  It will be randomly generated each time the container restarts/recreates.
+2.  **All OAuth sessions will become invalid.**
+3.  **MCP Tools will break** (Error: `Error decrypting tokens`) because they cannot decrypt the tokens stored with the previous key.
+4.  You will be logged out.
+
+**Do not leave this unset in production.**
+
+:::
 
 :::warning
 
@@ -1373,6 +1408,7 @@ When configured, these custom schemes will be validated alongside `http` and `ht
 - Type: `bool`
 - Default: `False`
 - Description: Determines whether to allow custom models defined on the Hub in their own modeling files.
+
 
 #### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
 
@@ -2131,6 +2167,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
   - `docling` - Use Docling engine
   - `document_intelligence` - Use Document Intelligence engine
   - `mistral_ocr` - Use Mistral OCR engine
+  - `mineru`
 - Description: Sets the content extraction engine to use for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2205,18 +2242,18 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
 - Description: Specifies all Docling processing parameters in JSON format. This is the primary configuration method for Docling processing options. All previously individual Docling settings are now configured through this single JSON object.
   
   **Supported Parameters:**
-  - `do_ocr` (bool): Enable OCR processing
-  - `force_ocr` (bool): Force OCR even when text layer exists
-  - `ocr_engine` (str): OCR engine to use (`tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`)
-  - `ocr_lang` (list[str]): OCR language codes (e.g., `["en", "de", "fr"]`)
-  - `pdf_backend` (str): PDF processing backend
-  - `table_mode` (str): Table extraction mode
-  - `pipeline` (str): Processing pipeline to use
-  - `do_picture_description` (bool): Enable image description generation
-  - `picture_description_mode` (str): Mode for picture descriptions
-  - `picture_description_local` (str): Local model for picture descriptions
-  - `picture_description_api` (str): API endpoint for picture descriptions
-  - `vlm_pipeline_model_api` (str): Vision-language model API configuration
+  - `do_ocr` (bool): Enable OCR processing.
+  - `force_ocr` (bool): Force OCR even when text layer exists.
+  - `ocr_engine` (str): OCR engine to use. Options: `tesseract`, `easyocr`, `ocrmac`, `rapidocr`, `tesserocr`.
+  - `ocr_lang` (list[str]): OCR language codes. Note: Format depends on engine (e.g., `["eng", "fra"]` for Tesseract; `["en", "fr"]` for EasyOCR).
+  - `pdf_backend` (str): PDF processing backend. Options: `dlparse_v1`, `dlparse_v2`, `dlparse_v4`, `pypdfium2`.
+  - `table_mode` (str): Table extraction mode. Options: `fast`, `accurate`.
+  - `pipeline` (str): Processing pipeline to use. Options: `fast`, `standard`.
+  - `do_picture_description` (bool): Enable image description generation.
+  - `picture_description_mode` (str): Mode for picture descriptions. Options: `local`, `api`.
+  - `picture_description_local` (str): Local model configuration object for picture descriptions.
+  - `picture_description_api` (str): API endpoint configuration object for picture descriptions.
+  - `vlm_pipeline_model_api` (str): Vision-language model API configuration. (e.g., `openai://gpt-4o`).
 
 - Example:
 ```json
@@ -2232,6 +2269,10 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
   "vlm_pipeline_model_api": "openai://gpt-4o"
 }
 ```
+
+:::tip
+**dlparse** vs **dbparse**: Note that the backend names use **`dlparse`** (Deep Learning Parse), not `dbparse`. For modern Docling (v2+), `dlparse_v4` is generally recommended for the best balance of features.
+:::
 
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2262,6 +2303,13 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 ```
 
 :::
+
+#### `MINERU_API_TIMEOUT`
+
+- Type: `str`
+- Default: `300`
+- Description: Sets the timeout in seconds for MinerU API requests during document processing.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ## Retrieval Augmented Generation (RAG)
 
@@ -2578,6 +2626,33 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_EXTERNAL_RERANKER_TIMEOUT`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the timeout in seconds for external reranker API requests during RAG document retrieval. Leave empty to use default timeout behavior.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_EXTERNAL_RERANKER_URL`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the **full URL** for the external reranking API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+You **MUST** provide the full URL, including the endpoint path (e.g., `https://api.yourprovider.com/v1/rerank`). The system does **not** automatically append `/v1/rerank` or any other path to the base URL you provide.
+
+:::
+
+#### `RAG_EXTERNAL_RERANKER_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for the external reranking API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Query Generation
 
 #### `ENABLE_RETRIEVAL_QUERY_GENERATION`
@@ -2586,6 +2661,12 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Default: `True`
 - Description: Enables or disables retrieval query generation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_QUERIES_CACHE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables request-scoped caching of LLM-generated search queries. When enabled, queries generated for web search are **cached** and automatically **reused** for file/knowledge base retrieval within the same request. This **eliminates duplicate LLM calls** when both web search and RAG are active, **reducing token usage and latency** while maintaining search quality. It is highly recommended to enable this especially in larger setups.
 
 #### `QUERY_GENERATION_PROMPT_TEMPLATE`
 
@@ -2637,6 +2718,13 @@ Strictly return in JSON format:
 - Type: `str`
 - Default: `None`
 - Description: Specifies the key for document intelligence.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `DOCUMENT_INTELLIGENCE_MODEL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the model for document intelligence.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Advanced Settings
@@ -2827,6 +2915,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Description: Maximum number of search results to crawl.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `WEB_SEARCH_CONCURRENT_REQUESTS`
+
+- Type: `int`
+- Default: `0`
+- Description: Limits the number of concurrent search requests to the search engine provider. Set to `0` for unlimited concurrency (default). Set to `1` for sequential execution to prevent rate limiting errors (e.g., Brave Free Tier).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEB_LOADER_CONCURRENT_REQUESTS`
 
 - Type: `int`
@@ -2836,7 +2931,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 
 :::info
 
-This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". If you were using the old name, please update your configurations to use "WEB_LOADER_CONCURRENT_REQUESTS" as the old variable name is now deprecated and will not be recognized. This renaming clarifies its function, as it specifically controls the concurrency of the web *loader* component that fetches content from search results, not the initial search engine query itself.
+"WEB_LOADER_CONCURRENT_REQUESTS" was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". The variable "WEB_SEARCH_CONCURRENT_REQUESTS" has been repurposed to control the concurrency of the search engine requests (see above). To control the web *loader* concurrency (fetching content from results), you MUST use "WEB_LOADER_CONCURRENT_REQUESTS".
 
 :::
 
@@ -2880,6 +2975,13 @@ This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS".
 - Type: `str`
 - Description: The [SearXNG search API](https://docs.searxng.org/dev/search_api.html) URL supporting JSON output. `<query>` is replaced with
 the search query. Example: `http://searxng.local/search?q=<query>`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `SEARXNG_LANGUAGE`
+
+- Type: `str`
+- Default: `all`
+- Description: This variable is used in the request to searxng as the "search language" (arguement "language").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `GOOGLE_PSE_API_KEY`
@@ -3143,11 +3245,14 @@ If you use `perplexity`, this variable is not relevant to you.
 #### `WEB_LOADER_ENGINE`
 
 - Type: `str`
-- Default: `safe_web`
+- Default: `(empty)`
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
-  - `requests` - Uses the Requests module with enhanced error handling.
-  - `playwright` - Uses Playwright for more advanced web page rendering and interaction.
+  - `safe_web` (default) - Uses internal fetching with enhanced error handling.
+  - `playwright` - Uses Playwright for rendering pages with JavaScript support.
+  - `firecrawl` - Uses Firecrawl service.
+  - `tavily` - Uses Tavily service.
+  - `external` - Uses an external web loader API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::info
@@ -3196,6 +3301,21 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the timeout for Playwright requests.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `WEB_LOADER_TIMEOUT`
+
+- Type: `float`
+- Default: Empty string (' '), since `None` is set as default.
+- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10–30 seconds depending on your network conditions.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or left empty (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
+
+:::
+
+### YouTube Loader
 
 ### YouTube Loader
 
@@ -4274,6 +4394,18 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Description: Specifies the allowed domains for OAuth authentication. (e.g., "example1.com,example2.com").
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `OAUTH_AUDIENCE`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies an audience parameter passed to the OAuth provider's authorization endpoint during login. Some providers (such as Auth0 and Ory) use this value to determine the type of access token returned—without it, providers typically return an opaque token, while with it, they return a JWT that can be decoded and validated. This parameter is not part of the official OAuth/OIDC spec for authorization endpoints but is widely supported by some providers.
+
+:::info
+
+This is useful when you need a JWT access token for downstream validation or when your OAuth provider requires an audience hint for proper token generation. For Auth0, this is typically your API identifier (e.g., `https://your-api.auth0.com/api/v2/`). For Ory, specify the resource server you want to access.
+
+:::
+
 ## LDAP
 
 #### `ENABLE_LDAP`
@@ -4515,7 +4647,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to create temporary chats.
+- Description: Enables or disables user permission to create temporary chats. **Note:** Temporary chats disable backend document parsing for privacy.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
@@ -4917,6 +5049,13 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 
 :::
 
+:::warning
+
+**Required for Multi-Replica Setups**
+For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), you **MUST** use an external database (PostgreSQL) instead of SQLite. SQLite does not support concurrent writes from multiple instances and will result in database corruption or data inconsistency.
+
+:::
+
 #### `DATABASE_TYPE`
 
 - Type: `str`
@@ -4971,20 +5110,25 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 - Default: `None`
 - Description: Sets the minimum time interval in seconds between user active status updates in the database. Helps reduce write operations for high-traffic instances. Set to `0.0` to update on every activity.
 
-#### `ENABLE_QUERIES_CACHE`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables query result caching to improve database performance by storing and reusing frequently accessed data.
-
 ### Encrypted SQLite with SQLCipher
 
 For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
 
+:::warning Additional Dependencies Required
+
+SQLCipher encryption requires additional dependencies that are **not included by default**. Before using this feature, you must install:
+
+- The **SQLCipher system library** (e.g., `libsqlcipher-dev` on Debian/Ubuntu, `sqlcipher` on macOS via Homebrew)
+- The **`sqlcipher3-wheels`** Python package (`pip install sqlcipher3-wheels`)
+
+For Docker users, this means building a custom image with these dependencies included.
+
+:::
+
 To enable encryption, you must configure two environment variables:
 
 1. Set `DATABASE_TYPE="sqlite+sqlcipher"`.
-1. Set `DATABASE_PASSWORD="your-secure-password"`.
+2. Set `DATABASE_PASSWORD="your-secure-password"`.
 
 When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
 
@@ -5118,6 +5262,35 @@ This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
 - Default: `open-webui`
 - Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
 
+#### `REDIS_SOCKET_CONNECT_TIMEOUT`
+
+- Type: `float` (seconds) or empty string for None
+- Default: None (no timeout, uses redis-py library default)
+- Description: Sets the socket connection timeout in seconds for Redis and Sentinel connections. This timeout applies to the initial TCP connection establishment. When set, it prevents indefinite blocking when attempting to connect to unreachable Redis nodes.
+
+:::danger
+
+**Critical for Redis Sentinel Deployments**
+
+Without a socket connection timeout, Redis Sentinel failover can cause the application to hang indefinitely when a master node goes offline. The application may become completely unresponsive and even fail to restart.
+
+For Sentinel deployments, it is **strongly recommended** to set this value (e.g., `REDIS_SOCKET_CONNECT_TIMEOUT=5`).
+
+:::
+
+:::warning
+
+**Interaction with WEBSOCKET_REDIS_OPTIONS**
+
+If you explicitly set `WEBSOCKET_REDIS_OPTIONS`, this variable will **not** apply to the AsyncRedisManager used for websocket communication. In that case, you must include `socket_connect_timeout` directly within `WEBSOCKET_REDIS_OPTIONS`:
+```bash
+WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
+```
+
+If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be applied to websocket connections automatically.
+
+:::
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
@@ -5140,8 +5313,8 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 #### `WEBSOCKET_MANAGER`
 
 - Type: `str`
-- Default: `redis`
-- Description: Specifies the websocket manager to use (in this case, Redis).
+- Default: `"" (empty string)`
+- Description: Specifies the websocket manager to use. Allowed values include: `redis`
 
 :::warning
 
@@ -5201,13 +5374,21 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 #### `WEBSOCKET_REDIS_OPTIONS`
 
 - Type: `str`
-- Default: `{}`
-- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client. This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as a valid Python dictionary. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here] (https://redis.readthedocs.io/en/stable/connections.html) can be used.
+- Default: `{}` (empty, which allows `REDIS_SOCKET_CONNECT_TIMEOUT` to apply if set)
+- Description: A string representation of a dictionary containing additional Redis connection options for the websocket Redis client (AsyncRedisManager). This allows you to specify advanced connection parameters such as SSL settings, timeouts, or other Redis client configurations that are not covered by the standard `WEBSOCKET_REDIS_URL`. The string should be formatted as valid JSON. For example: `{"retry_on_timeout": true, "socket_connect_timeout": 5, "socket_timeout": 5, "max_connections": 8}`. All JSON encodable options listed [here](https://redis.readthedocs.io/en/stable/connections.html) can be used.
 
 :::warning
 
-**AWS SSM and Docker compose cannot ingest raw JSON, as such you need top escape any double quotes like the following:**
+**AWS SSM and Docker compose cannot ingest raw JSON, as such you need to escape any double quotes like the following:**
 `{\"retry_on_timeout\": true, \"socket_connect_timeout\": 5, \"socket_timeout\": 5, \"max_connections\": 8}`
+
+:::
+
+:::info
+
+**Precedence with REDIS_SOCKET_CONNECT_TIMEOUT**
+
+When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is automatically applied to websocket connections if set. However, if you explicitly set `WEBSOCKET_REDIS_OPTIONS` to any value, `REDIS_SOCKET_CONNECT_TIMEOUT` will **not** be injected—you must include `socket_connect_timeout` manually within this JSON if needed.
 
 :::
 
@@ -5286,6 +5467,16 @@ When deploying in orchestrated environments like Kubernetes or using Helm charts
 
 If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-worker setups are set accordingly.
 
+:::
+
+:::warning Database Migrations with Multiple Workers
+When `UVICORN_WORKERS > 1`, starting the application can trigger concurrent database migrations from multiple worker processes, potentially causing database schema corruption or inconsistent states.
+
+**Recommendation:**
+After pulling a new image or installing an update, **always run Open WebUI with a single worker (`UVICORN_WORKERS=1`) first**. This ensures the database migration completes successfully in a single process. Once the migration is finished and the application has started, you can then restart it with your desired number of workers.
+
+**For Kubernetes, Helm, Minikube, and other orchestrated setups:**
+Ensure that your deployment strategy allows for a single-replica or single-worker init container/job to handle migrations before scaling up to multiple replicas or workers. This is critical to prevent race conditions during schema updates.
 :::
 
 ### Cache Settings

@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation was created/updated based on version 0.6.30.
+> This documentation was created/updated based on version 0.6.42 and updated for recent migrations.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -56,28 +56,32 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | ------- | ---------------- | ------------------------------------------------------------ |
 | 01      | auth             | Stores user authentication credentials and login information |
 | 02      | channel          | Manages chat channels and their configurations               |
-| 03      | channel_member   | Tracks user membership and permissions within channels       |
-| 04      | chat             | Stores chat sessions and their metadata                      |
-| 05      | chatidtag        | Maps relationships between chats and their associated tags   |
-| 06      | config           | Maintains system-wide configuration settings                 |
-| 07      | document         | Stores documents and their metadata for knowledge management |
-| 08      | feedback         | Captures user feedback and ratings                           |
-| 09      | file             | Manages uploaded files and their metadata                    |
-| 10      | folder           | Organizes files and content into hierarchical structures     |
-| 11      | function         | Stores custom functions and their configurations             |
-| 12      | group            | Manages user groups and their permissions                    |
-| 13      | knowledge        | Stores knowledge base entries and related information        |
-| 14      | memory           | Maintains chat history and context memory                    |
-| 15      | message          | Stores individual chat messages and their content            |
-| 16      | message_reaction | Records user reactions (emojis/responses) to messages        |
-| 17      | migrate_history  | Tracks database schema version and migration records         |
-| 18      | model            | Manages AI model configurations and settings                 |
-| 19      | note             | Stores user-created notes and annotations                    |
-| 20      | oauth_session    | Manages active OAuth sessions for users                      |
-| 21      | prompt           | Stores templates and configurations for AI prompts           |
-| 22      | tag              | Manages tags/labels for content categorization               |
-| 23      | tool             | Stores configurations for system tools and integrations      |
-| 24      | user             | Maintains user profiles and account information              |
+| 03      | channel_file     | Links files to channels and messages                         |
+| 04      | channel_member   | Tracks user membership and permissions within channels       |
+| 05      | chat             | Stores chat sessions and their metadata                      |
+| 06      | chat_file        | Links files to chats and messages                            |
+| 07      | chatidtag        | Maps relationships between chats and their associated tags   |
+| 08      | config           | Maintains system-wide configuration settings                 |
+| 09      | document         | Stores documents and their metadata for knowledge management |
+| 10      | feedback         | Captures user feedback and ratings                           |
+| 11      | file             | Manages uploaded files and their metadata                    |
+| 12      | folder           | Organizes files and content into hierarchical structures     |
+| 13      | function         | Stores custom functions and their configurations             |
+| 14      | group            | Manages user groups and their permissions                    |
+| 15      | group_member     | Tracks user membership within groups                         |
+| 16      | knowledge        | Stores knowledge base entries and related information        |
+| 17      | knowledge_file   | Links files to knowledge bases                               |
+| 18      | memory           | Maintains chat history and context memory                    |
+| 19      | message          | Stores individual chat messages and their content            |
+| 20      | message_reaction | Records user reactions (emojis/responses) to messages        |
+| 21      | migrate_history  | Tracks database schema version and migration records         |
+| 22      | model            | Manages AI model configurations and settings                 |
+| 23      | note             | Stores user-created notes and annotations                    |
+| 24      | oauth_session    | Manages active OAuth sessions for users                      |
+| 25      | prompt           | Stores templates and configurations for AI prompts           |
+| 26      | tag              | Manages tags/labels for content categorization               |
+| 27      | tool             | Stores configurations for system tools and integrations      |
+| 28      | user             | Maintains user profiles and account information              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -129,6 +133,24 @@ Things to know about the auth table:
 | user_id         | TEXT          | NOT NULL        | Reference to the user                        |
 | created_at      | BIGINT        | -               | Timestamp when membership was created        |
 
+## Channel File Table
+
+| **Column Name** | **Data Type** | **Constraints**                    | **Description**                   |
+| --------------- | ------------- | ---------------------------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY                        | Unique identifier (UUID)          |
+| user_id         | Text          | NOT NULL                           | Owner of the relationship         |
+| channel_id      | Text          | FOREIGN KEY(channel.id), NOT NULL  | Reference to the channel          |
+| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL     | Reference to the file             |
+| message_id      | Text          | FOREIGN KEY(message.id), nullable  | Reference to associated message   |
+| created_at      | BigInteger    | NOT NULL                           | Creation timestamp                |
+| updated_at      | BigInteger    | NOT NULL                           | Last update timestamp             |
+
+Things to know about the channel_file table:
+
+- Unique constraint on (`channel_id`, `file_id`) to prevent duplicate entries
+- Foreign key relationships with CASCADE delete
+- Indexed on `channel_id`, `file_id`, and `user_id` for performance
+
 ## Chat Table
 
 | **Column Name** | **Data Type** | **Constraints**         | **Description**          |
@@ -144,6 +166,30 @@ Things to know about the auth table:
 | pinned          | Boolean       | default=False, nullable | Pin status               |
 | meta            | JSON          | server_default="{}"     | Metadata including tags  |
 | folder_id       | Text          | nullable                | Parent folder ID         |
+
+## Chat File Table
+
+| **Column Name** | **Data Type** | **Constraints**                  | **Description**                   |
+| --------------- | ------------- | -------------------------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY                      | Unique identifier (UUID)          |
+| user_id         | Text          | NOT NULL                         | User associated with the file     |
+| chat_id         | Text          | FOREIGN KEY(chat.id), NOT NULL   | Reference to the chat             |
+| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL   | Reference to the file             |
+| message_id      | Text          | nullable                         | Reference to associated message   |
+| created_at      | BigInteger    | NOT NULL                         | Creation timestamp                |
+| updated_at      | BigInteger    | NOT NULL                         | Last update timestamp             |
+
+Things to know about the chat_file table:
+
+- Unique constraint on (`chat_id`, `file_id`) to prevent duplicate entries
+- Foreign key relationships with CASCADE delete
+- Indexed on `chat_id`, `file_id`, `message_id`, and `user_id` for performance
+
+**Why this table was added:**
+
+- **Query Efficiency**: Before this, files were embedded in message objects. This table allows direct indexed lookups for finding all files in a chat without iterating through every message.
+- **Data Consistency**: Acts as a single source of truth for file associations. In multi-node deployments, all nodes query this table instead of relying on potentially inconsistent embedded data.
+- **Deduplication**: The database-level unique constraint prevents duplicate file associations, which is more reliable than application-level checks.
 
 ## Chat ID Tag Table
 
@@ -258,9 +304,25 @@ Things to know about the function table:
 | data            | JSON          | nullable            | Additional group data    |
 | meta            | JSON          | nullable            | Group metadata           |
 | permissions     | JSON          | nullable            | Permission configuration |
-| user_ids        | JSON          | nullable            | List of member user IDs  |
 | created_at      | BigInteger    | -                   | Creation timestamp       |
 | updated_at      | BigInteger    | -                   | Last update timestamp    |
+
+Note: The `user_ids` column has been migrated to the `group_member` table.
+
+## Group Member Table
+
+| **Column Name** | **Data Type** | **Constraints**                  | **Description**                   |
+| --------------- | ------------- | -------------------------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY, UNIQUE              | Unique identifier (UUID)          |
+| group_id        | Text          | FOREIGN KEY(group.id), NOT NULL  | Reference to the group            |
+| user_id         | Text          | FOREIGN KEY(user.id), NOT NULL   | Reference to the user             |
+| created_at      | BigInteger    | nullable                         | Creation timestamp                |
+| updated_at      | BigInteger    | nullable                         | Last update timestamp             |
+
+Things to know about the group_member table:
+
+- Unique constraint on (`group_id`, `user_id`) to prevent duplicate memberships
+- Foreign key relationships with CASCADE delete to group and user tables
 
 ## Knowledge Table
 
@@ -275,6 +337,23 @@ Things to know about the function table:
 | access_control  | JSON          | nullable            | Access control rules       |
 | created_at      | BigInteger    | -                   | Creation timestamp         |
 | updated_at      | BigInteger    | -                   | Last update timestamp      |
+
+## Knowledge File Table
+
+| **Column Name** | **Data Type** | **Constraints**                      | **Description**                   |
+| --------------- | ------------- | ------------------------------------ | --------------------------------- |
+| id              | Text          | PRIMARY KEY                          | Unique identifier (UUID)          |
+| user_id         | Text          | NOT NULL                             | Owner of the relationship         |
+| knowledge_id    | Text          | FOREIGN KEY(knowledge.id), NOT NULL  | Reference to the knowledge base   |
+| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL       | Reference to the file             |
+| created_at      | BigInteger    | NOT NULL                             | Creation timestamp                |
+| updated_at      | BigInteger    | NOT NULL                             | Last update timestamp             |
+
+Things to know about the knowledge_file table:
+
+- Unique constraint on (`knowledge_id`, `file_id`) to prevent duplicate entries
+- Foreign key relationships with CASCADE delete
+- Indexed on `knowledge_id`, `file_id`, and `user_id` for performance
 
 The `access_control` fields expected structure:
 
@@ -644,3 +723,57 @@ erDiagram
         json access_control
     }
 ```
+
+---
+
+## Database Encryption with SQLCipher
+
+For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
+
+### Prerequisites
+
+SQLCipher encryption requires additional dependencies that are **not included by default**. Before using this feature, you must install:
+
+- The **SQLCipher system library** (e.g., `libsqlcipher-dev` on Debian/Ubuntu, `sqlcipher` on macOS via Homebrew)
+- The **`sqlcipher3-wheels`** Python package (`pip install sqlcipher3-wheels`)
+
+For Docker users, this means building a custom image with these dependencies included.
+
+### Configuration
+
+To enable encryption, set the following environment variables:
+
+```bash
+# Required: Set the database type to use SQLCipher
+DATABASE_TYPE=sqlite+sqlcipher
+
+# Required: Set a secure password for database encryption
+DATABASE_PASSWORD=your-secure-password
+```
+
+When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
+
+### Important Notes
+
+:::danger
+
+- The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
+- The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
+- **Keep the password secure**, as it is needed to decrypt and access all application data.
+- **Losing the password means losing access to all data** in the encrypted database.
+
+:::
+
+### Related Database Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_TYPE` | `None` | Set to `sqlite+sqlcipher` for encrypted SQLite |
+| `DATABASE_PASSWORD` | - | Encryption password (required for SQLCipher) |
+| `DATABASE_ENABLE_SQLITE_WAL` | `False` | Enable Write-Ahead Logging for better performance |
+| `DATABASE_POOL_SIZE` | `None` | Database connection pool size |
+| `DATABASE_POOL_TIMEOUT` | `30` | Pool connection timeout in seconds |
+| `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |
+
+For more details, see the [Environment Variable Configuration](/getting-started/env-configuration) documentation.
+

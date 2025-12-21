@@ -39,22 +39,42 @@ The same principles apply in harsh terrestrial settings, including submarines, p
 
 ### Q: Why isn't my Open WebUI updating? I've re-pulled/restarted the container, and nothing changed.
 
-**A:** Updating Open WebUI requires more than just pulling the new Docker image. Here’s why your updates might not be showing and how to ensure they do:
+**A:** To update Open WebUI, you must first pull the latest image, then stop and remove the existing container, and finally start a new one. Simply pulling the image isn't enough because the running container is still based on the old version.
 
-1. **Updating the Docker Image**: The command `docker pull ghcr.io/open-webui/open-webui:main` updates the Docker image but not the running container or its data.
-2. **Persistent Data in Docker Volumes**: Docker volumes store data independently of container lifecycles, preserving your data (like chat histories) through updates.
-3. **Applying the Update**: Ensure your update takes effect by removing the existing container (which doesn't delete the volume) and creating a new one with the updated image and existing volume attached.
+**Follow these exact steps:**
 
-This process updates the app while keeping your data safe.
+1. **Pull the latest image:**
+   ```bash
+   docker pull ghcr.io/open-webui/open-webui:main
+   ```
+2. **Stop and Remove the current container:**
+   ```bash
+   docker stop open-webui
+   docker rm open-webui
+   ```
+3. **Start the new container with your data attached:**
+   ```bash
+   docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+   ```
+
+*(Note: If your container or volume has a different name, adjust the commands accordingly.)*
+
+For a deeper dive into update methods (including automated updates like Watchtower), check our full **[Updating Guide](/getting-started/updating)**.
 
 ### Q: Wait, why would I delete my container? Won't I lose my data?
 
-**A:** It's a common concern, but deleting a container doesn't mean you'll lose your data, provided you're using Docker volumes correctly. Here’s why:
+**A:** In Docker, containers are meant to be "disposable." Your data is safe **only if you have a Volume configured**. 
 
-- **Volumes Preserve Data**: Docker volumes are designed to persist data outside of container lifecycles. As long as your data is stored in a volume, it remains intact, regardless of what happens to the container.
-- **Safe Update Process**: When updating Open WebUI, removing the old container and creating a new one with the updated image does not affect the data stored in volumes. The key is not to explicitly delete the volume with commands like `docker volume rm`.
+:::danger Important: Data Persistence
+If you ran your container *without* the `-v open-webui:/app/backend/data` flag (or a similar volume mount in Docker Compose), your data is stored **inside** the container. In that specific case, deleting the container **will result in permanent data loss**. 
 
-By following the correct update steps—pulling the new image, removing the old container without deleting the volume, and creating a new container with the updated image and the existing volume—your application code is updated while your data remains unchanged and safe.
+Always ensure you follow our **[Quick Start Guide](/getting-started/quick-start)** correctly to set up persistent volumes from the beginning.
+:::
+
+When you use a Volume (typically named `open-webui` in our examples), your data stays safe even when the container is deleted. When you start a new container and mount that same volume, the new version of the app attaches to your old data automatically.
+
+**Default Data Path:** 
+On most Linux systems, your volume data is physically stored at: `/var/lib/docker/volumes/open-webui/_data`.
 
 ### Q: Should I use the distro-packaged Docker or the official Docker package?
 
@@ -83,6 +103,14 @@ Everything you need to run Open WebUI, including your data, remains within your 
 ### Q: I updated/restarted/installed some new software and now Open WebUI isn't working anymore!
 
 **A:** If your Open WebUI isn't launching post-update or installation of new software, it's likely related to a direct installation approach, especially if you didn't use a virtual environment for your backend dependencies. Direct installations can be sensitive to changes in the system's environment, such as updates or new installations that alter existing dependencies. To avoid conflicts and ensure stability, we recommend using a virtual environment for managing the `requirements.txt` dependencies of your backend. This isolates your Open WebUI dependencies from other system packages, minimizing the risk of such issues.
+
+### Q: I updated/restarted and now I'm being logged out, or getting "Error decrypting tokens" for my tools?
+
+**A:** This happens because you haven't set a persistent `WEBUI_SECRET_KEY` in your environment variables.
+*   **Logouts:** Without this key, Open WebUI generates a random one every time it starts. This invalidates your previous session cookies (JWTs), forcing you to log in again.
+*   **Decryption Errors:** Essential secrets (like OAuth tokens for MCP tools or API keys) are encrypted using this key. If the key changes on restart, Open WebUI cannot decrypt them, leading to errors.
+
+**Fix:** Set `WEBUI_SECRET_KEY` to a constant, secure string in your Docker Compose or environment config.
 
 ### Q: I updated/restarted and now my login isn't working anymore, I had to create a new account and all my chats are gone.
 

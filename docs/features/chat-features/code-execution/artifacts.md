@@ -100,3 +100,15 @@ Example Project: Develop a prototype for a new e-commerce website using HTML, CS
 - Benefits: Create interactive stories with scrolling effects, animations, and other interactive elements. Open WebUI's Artifacts enable you to refine the story and test different versions.
 
 Example Project: Build an interactive story about a company's history, using scrolling effects and animations to engage the reader. Use targeted updates to refine the story's narrative and Open WebUI's version selector to test different versions.
+
+## Troubleshooting
+
+### Artifacts Preview Not Working (Uncaught SecurityError)
+
+If you encounter an issue where the code preview in the chat interface does not appear and you see an error like `Artifacts.svelte:40 Uncaught SecurityError` in the browser console, this is commonly caused by cross-origin iframe restrictions in certain environment configurations.
+
+**Solution:**
+
+1. Go to **Settings > Interface**.
+2. Toggle on **Allow Iframe Sandbox Same-Origin Access**.
+3. Save your settings.

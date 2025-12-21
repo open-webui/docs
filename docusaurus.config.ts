@@ -20,7 +20,6 @@ const config: Config = {
 	projectName: "docs", // Usually your repo name.
 
 	onBrokenLinks: "throw",
-	onBrokenMarkdownLinks: "warn",
 
 	// Even if you don't use internationalization, you can use this field to set
 	// useful metadata like html lang. For example, if your site is Chinese, you
@@ -55,6 +54,7 @@ const config: Config = {
 				// blog: false,
 				blog: {
 					showReadingTime: true,
+					onUntruncatedBlogPosts: "ignore",
 					// Please change this to your repo.
 					// Remove this to remove the "edit this page" links.
 					// editUrl:
