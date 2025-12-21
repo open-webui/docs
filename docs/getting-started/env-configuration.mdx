@@ -30,7 +30,9 @@ You can update the values of `PersistentConfig` environment variables directly f
 
 Please note that `PersistentConfig` environment variables are clearly marked as such in the documentation below, so you can be aware of how they will behave.
 
-To disable `PersistentConfig` and have Open WebUI treat all variables equally, you can set `ENABLE_PERSISTENT_CONFIG` to `False`.
+To disable this behavior and force Open WebUI to always use your environment variables (ignoring the database), set `ENABLE_PERSISTENT_CONFIG` to `False`.
+
+**CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved permanently**. They will persist only for the current session and will be **lost** when you restart the container, as the system will revert to the values defined in your environment variables.
 
 :::
 
@@ -259,7 +261,11 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 
 - Type: `bool`
 - Default: `True`
-- Description: If set to `False`, all `PersistentConfig` variables are treated as regular variables.
+- Description: Controls whether the system prioritizes configuration saved in the database over environment variables.
+  - **`True` (Default):** Values saved in the **database** (via the Admin UI) take precedence. If a value is set in the UI, the environment variable is ignored for that setting.
+  - **`False`:** **Environment variables** take precedence. The system will *not* load configuration from the database at startup if an environment variable is present (or it will use the default).
+    - **CRITICAL WARNING:** When set to `False`, you can still seemingly "change" settings in the Admin UI. These changes will apply to the **current running session** but **will be lost upon restart**. The system will revert to the values defined in your environment variables (or defaults) every time it boots up.
+    - **Use Case:** Set this to `False` if you want to strictly manage configuration via a `docker-compose.yaml` or `.env` file and prevent UI changes from persisting across restarts.
 
 #### `CUSTOM_NAME`
 
