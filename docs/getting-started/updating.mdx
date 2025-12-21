@@ -14,6 +14,8 @@ Keeping Open WebUI updated ensures you have the latest features, security patche
 - **Backup your data** before major version updates
 - **Check release notes** at https://github.com/open-webui/open-webui/releases for breaking changes
 - **Clear browser cache** after updating to ensure the latest web interface loads
+- **Running Multiple Workers?** If you use `UVICORN_WORKERS > 1`, you **MUST** run the updated container with `UVICORN_WORKERS=1` first to perform database migrations safely. Once started successfully, you can restart with multiple workers.
+:::
 :::
 
 ## Manual Update

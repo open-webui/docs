@@ -5437,6 +5437,16 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 
 :::
 
+:::warning Database Migrations with Multiple Workers
+When `UVICORN_WORKERS > 1`, starting the application can trigger concurrent database migrations from multiple worker processes, potentially causing database schema corruption or inconsistent states.
+
+**Recommendation:**
+After pulling a new image or installing an update, **always run Open WebUI with a single worker (`UVICORN_WORKERS=1`) first**. This ensures the database migration completes successfully in a single process. Once the migration is finished and the application has started, you can then restart it with your desired number of workers.
+
+**For Kubernetes, Helm, Minikube, and other orchestrated setups:**
+Ensure that your deployment strategy allows for a single-replica or single-worker init container/job to handle migrations before scaling up to multiple replicas or workers. This is critical to prevent race conditions during schema updates.
+:::
+
 ### Cache Settings
 
 #### `CACHE_CONTROL`
