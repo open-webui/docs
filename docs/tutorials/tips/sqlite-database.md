@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation was created/updated based on version 0.6.41 and updated for recent migrations.
+> This documentation was created/updated based on version 0.6.42 and updated for recent migrations.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -59,28 +59,29 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 03      | channel_file     | Links files to channels and messages                         |
 | 04      | channel_member   | Tracks user membership and permissions within channels       |
 | 05      | chat             | Stores chat sessions and their metadata                      |
-| 06      | chatidtag        | Maps relationships between chats and their associated tags   |
-| 07      | config           | Maintains system-wide configuration settings                 |
-| 08      | document         | Stores documents and their metadata for knowledge management |
-| 09      | feedback         | Captures user feedback and ratings                           |
-| 10      | file             | Manages uploaded files and their metadata                    |
-| 11      | folder           | Organizes files and content into hierarchical structures     |
-| 12      | function         | Stores custom functions and their configurations             |
-| 13      | group            | Manages user groups and their permissions                    |
-| 14      | group_member     | Tracks user membership within groups                         |
-| 15      | knowledge        | Stores knowledge base entries and related information        |
-| 16      | knowledge_file   | Links files to knowledge bases                               |
-| 17      | memory           | Maintains chat history and context memory                    |
-| 18      | message          | Stores individual chat messages and their content            |
-| 19      | message_reaction | Records user reactions (emojis/responses) to messages        |
-| 20      | migrate_history  | Tracks database schema version and migration records         |
-| 21      | model            | Manages AI model configurations and settings                 |
-| 22      | note             | Stores user-created notes and annotations                    |
-| 23      | oauth_session    | Manages active OAuth sessions for users                      |
-| 24      | prompt           | Stores templates and configurations for AI prompts           |
-| 25      | tag              | Manages tags/labels for content categorization               |
-| 26      | tool             | Stores configurations for system tools and integrations      |
-| 27      | user             | Maintains user profiles and account information              |
+| 06      | chat_file        | Links files to chats and messages                            |
+| 07      | chatidtag        | Maps relationships between chats and their associated tags   |
+| 08      | config           | Maintains system-wide configuration settings                 |
+| 09      | document         | Stores documents and their metadata for knowledge management |
+| 10      | feedback         | Captures user feedback and ratings                           |
+| 11      | file             | Manages uploaded files and their metadata                    |
+| 12      | folder           | Organizes files and content into hierarchical structures     |
+| 13      | function         | Stores custom functions and their configurations             |
+| 14      | group            | Manages user groups and their permissions                    |
+| 15      | group_member     | Tracks user membership within groups                         |
+| 16      | knowledge        | Stores knowledge base entries and related information        |
+| 17      | knowledge_file   | Links files to knowledge bases                               |
+| 18      | memory           | Maintains chat history and context memory                    |
+| 19      | message          | Stores individual chat messages and their content            |
+| 20      | message_reaction | Records user reactions (emojis/responses) to messages        |
+| 21      | migrate_history  | Tracks database schema version and migration records         |
+| 22      | model            | Manages AI model configurations and settings                 |
+| 23      | note             | Stores user-created notes and annotations                    |
+| 24      | oauth_session    | Manages active OAuth sessions for users                      |
+| 25      | prompt           | Stores templates and configurations for AI prompts           |
+| 26      | tag              | Manages tags/labels for content categorization               |
+| 27      | tool             | Stores configurations for system tools and integrations      |
+| 28      | user             | Maintains user profiles and account information              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -165,6 +166,30 @@ Things to know about the channel_file table:
 | pinned          | Boolean       | default=False, nullable | Pin status               |
 | meta            | JSON          | server_default="{}"     | Metadata including tags  |
 | folder_id       | Text          | nullable                | Parent folder ID         |
+
+## Chat File Table
+
+| **Column Name** | **Data Type** | **Constraints**                  | **Description**                   |
+| --------------- | ------------- | -------------------------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY                      | Unique identifier (UUID)          |
+| user_id         | Text          | NOT NULL                         | User associated with the file     |
+| chat_id         | Text          | FOREIGN KEY(chat.id), NOT NULL   | Reference to the chat             |
+| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL   | Reference to the file             |
+| message_id      | Text          | nullable                         | Reference to associated message   |
+| created_at      | BigInteger    | NOT NULL                         | Creation timestamp                |
+| updated_at      | BigInteger    | NOT NULL                         | Last update timestamp             |
+
+Things to know about the chat_file table:
+
+- Unique constraint on (`chat_id`, `file_id`) to prevent duplicate entries
+- Foreign key relationships with CASCADE delete
+- Indexed on `chat_id`, `file_id`, `message_id`, and `user_id` for performance
+
+**Why this table was added:**
+
+- **Query Efficiency**: Before this, files were embedded in message objects. This table allows direct indexed lookups for finding all files in a chat without iterating through every message.
+- **Data Consistency**: Acts as a single source of truth for file associations. In multi-node deployments, all nodes query this table instead of relying on potentially inconsistent embedded data.
+- **Deduplication**: The database-level unique constraint prevents duplicate file associations, which is more reliable than application-level checks.
 
 ## Chat ID Tag Table
 
