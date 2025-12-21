@@ -9,6 +9,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
+:::tip
+
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+
+:::
+
 ## SerpApi API
 
 [SerpApi](https://serpapi.com/) Scrape Google and other search engines from our fast, easy, and complete API. Any existing or upcoming SERP engine that returns `organic_results` is supported. The default web search engine is `google`, but it can be changed to `bing`, `baidu`, `google_news`, `google_scholar`, `google_patents`, and others.
