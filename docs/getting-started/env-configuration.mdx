@@ -206,6 +206,12 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 
 :::
 
+#### `ENABLE_CUSTOM_MODEL_FALLBACK`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether custom models should fall back to a default model if their assigned base model is missing. When set to `True`, if a custom model's base model is not found, the system will use the first model from the configured `DEFAULT_MODELS` list instead of returning an error.
+
 #### `MODELS_CACHE_TTL`
 
 - Type: `int`
