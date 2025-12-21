@@ -118,12 +118,6 @@ You can delete notes permanently from two locations:
 1. **From the Notes Dashboard:** Click the **More (`...`)** button on the individual note card in the list view and select **Delete**.
 2. **From the Editor:** While inside an open note, click the **More (`...`)** button in the top right corner of the screen and select **Delete**.
 
-### Sharing Permissions
-
-Administrators can control whether users are allowed to share notes publicly:
-
-* **Environment Variable:** `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
-* **Admin Panel:** Settings > Users > Default Permissions
 
 ### Quick Note Creation via URL
 
@@ -133,6 +127,37 @@ Notes can be created directly by navigating to `/notes/new` with optional query 
 * `/notes/new?title=My%20Title&content=Initial%20text` — Pre-populates title and content
 
 This enables bookmarks and shortcuts for fast note creation.
+
+### Creating Notes from Search
+
+You can also create notes directly from the global search bar:
+
+1. Open the search using the keyboard shortcut (`Cmd+K` / `Ctrl+K`) or by clicking the search icon.
+2. Type your initial note content.
+3. Select **"Create a new note"** from the actions list.
+4. This will immediately open a new note with your search text as the content.
+
+### Importing Notes
+
+You can import existing Markdown (`.md`) files into your Notes workspace:
+
+* **Drag and Drop:** Simply drag `.md` files directly onto the Notes list view to import them.
+
+### View Options
+
+The Notes dashboard offers different ways to organize your content:
+
+* **Filter:** Toggle between **Created by you** (your private/shared notes) and **Shared with you** (notes others have shared).
+* **Layout:** Switch between **List** and **Grid** views for visual preference.
+
+### Sharing Permissions
+
+Administrators can control sharing capabilities via environment variables or the Admin Panel:
+
+* **Internal Sharing:** `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Controls sharing with other users/groups on the server).
+* **Public Sharing:** `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING` (Controls generating public external links).
+
+These can also be configured in **Admin Panel > Settings > Users > Default Permissions**.
 
 ---
 
