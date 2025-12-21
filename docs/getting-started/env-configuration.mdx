@@ -2897,6 +2897,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Description: Maximum number of search results to crawl.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `WEB_SEARCH_CONCURRENT_REQUESTS`
+
+- Type: `int`
+- Default: `0`
+- Description: Limits the number of concurrent search requests to the search engine provider. Set to `0` for unlimited concurrency (default). Set to `1` for sequential execution to prevent rate limiting errors (e.g., Brave Free Tier).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEB_LOADER_CONCURRENT_REQUESTS`
 
 - Type: `int`
@@ -2906,7 +2913,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 
 :::info
 
-This environment variable was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". If you were using the old name, please update your configurations to use "WEB_LOADER_CONCURRENT_REQUESTS" as the old variable name is now deprecated and will not be recognized. This renaming clarifies its function, as it specifically controls the concurrency of the web *loader* component that fetches content from search results, not the initial search engine query itself.
+"WEB_LOADER_CONCURRENT_REQUESTS" was previously named "WEB_SEARCH_CONCURRENT_REQUESTS". The variable "WEB_SEARCH_CONCURRENT_REQUESTS" has been repurposed to control the concurrency of the search engine requests (see above). To control the web *loader* concurrency (fetching content from results), you MUST use "WEB_LOADER_CONCURRENT_REQUESTS".
 
 :::
 

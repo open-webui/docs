@@ -9,6 +9,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
+:::tip
+
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+
+:::
+
 # Exa AI Web Search Integration
 
 This guide provides instructions on how to integrate [Exa AI](https://exa.ai/), a modern AI-powered search engine, with Open WebUI for web search capabilities.

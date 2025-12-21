@@ -9,6 +9,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
+:::tip
+
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+
+:::
+
 ## External Web Search API
 
 This option allows you to connect Open WebUI to your own self-hosted web search API endpoint. This is useful if you want to:
