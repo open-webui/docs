@@ -545,6 +545,18 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
 - Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses.
 
+#### `AUDIT_ENABLE_STDOUT`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, audit logs are included in the standard output (console) along with regular application logs. When disabled, audit logs are excluded from stdout and only sent to the audit log file (if file logging is enabled).
+
+#### `AUDIT_ENABLE_FILE`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled, audit logs are written to the audit log file specified by `AUDIT_LOGS_FILE_PATH`. When disabled, audit logs are not written to a file. Works in conjunction with `AUDIT_LOG_LEVEL` - file logging only occurs when `AUDIT_LOG_LEVEL` is not `NONE`.
+
 #### `MAX_BODY_LOG_SIZE`
 
 - Type: `int`
