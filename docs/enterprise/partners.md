@@ -22,6 +22,11 @@ To ensure alignment with our mission, please note the following criteria for par
 *   **Capacity:** Our program receives a high volume of requests. Being on the waitlist **does not guarantee a response**.
 *   **Communication:** Please **do not follow up** or send additional messages after applying.
 
+:::warning Policy on Contribution & Collaboration
+**We are not seeking, open to, or in need of any form of disguised collaboration or contribution pitches.**
+
+Any attempt to characterize engineering assistance, co-development, or roadmap input **as an alternative to our enterprise licensing program** will not receive a response. All organizational engagement with Open WebUI occurs **solely and exclusively** through enterprise licensing.
+:::
 ---
 
 ## Direct Client Deployments
@@ -31,7 +36,8 @@ If you have an **end-client** who is ready to move forward and is committed to p
 Please contact us directly with:
 1.  Your agency details.
 2.  The client's company name and official work email domain.
-3.  The expected number of end users (seats) to be deployed [2].
+3.  The expected number of end users (seats) to be deployed.
 
 
 [**Contact Sales for Immediate Client Deployment**](mailto:sales@openwebui.com)
+
