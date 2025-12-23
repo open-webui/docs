@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: "🤝 Partners & Agencies"
+title: "🌍 Partners & Agencies"
 ---
 
 # Partnership & Reseller Guidelines
@@ -40,4 +40,5 @@ Please contact us directly with:
 
 
 [**Contact Sales for Immediate Client Deployment**](mailto:sales@openwebui.com)
+
 
