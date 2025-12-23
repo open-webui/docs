@@ -73,8 +73,8 @@ The right architecture depends on your organization's specific requirements—us
 
 For organizations planning high-availability, enterprise-grade deployments, we recommend:
 
-1.  **Review the Getting Started Guide** for foundational deployment concepts.
-2.  **Consult the FAQ** for answers to common architecture questions.
+1.  **Review the [Getting Started Guide](../getting-started/index.md)** for foundational deployment concepts.
+2.  **Consult the [FAQ](../faq.mdx)** for answers to common questions.
 3.  **Contact our Enterprise team** for guidance on complex or large-scale deployments.
 
 [**Contact Sales to Discuss Architecture**](mailto:sales@openwebui.com)
@@ -95,4 +95,5 @@ For engineers looking for a technical implementation guide regarding high-availa
 *   **[🔧 Integration & Customization](./customization)** — Explore how to tailor Open WebUI to your workflows.
 
 *   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
+
 
