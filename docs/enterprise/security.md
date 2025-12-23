@@ -54,7 +54,7 @@ Seamless integration with your existing identity infrastructure eliminates frict
 
 ### Enterprise Identity Integration
 
-Open WebUI integrates with the identity systems your organization already uses [2]:
+Open WebUI integrates with the identity systems your organization already uses:
 
 *   **LDAP & Active Directory** — Connect directly to your existing directory services for user authentication and management.
 *   **Single Sign-On (SSO)** — Support for SAML and OIDC protocols, enabling users to access Open WebUI with their existing corporate credentials.
@@ -65,7 +65,7 @@ Open WebUI integrates with the identity systems your organization already uses [
 Beyond authentication, Open WebUI provides granular control over user permissions:
 
 *   **Role-Based Access Control (RBAC)** — Define roles that align with your organizational structure to limit administrative access.
-*   **Model-Level Permissions** — Control which users or groups can access specific AI models.
+*   **Model-Level Permissions** — Control which users or groups can access specific models.
 *   **Workspace Isolation** — Separate teams or departments to prevent unauthorized data access.
 
 ---
@@ -78,11 +78,11 @@ For regulated industries and security-conscious organizations, visibility into s
 
 *   **Infrastructure-Level Logging** — Containerized architecture allows standard output streams to be piped directly to your logging infrastructure (Splunk, Datadog, ELK).
 *   **Event Tracking** — Track API usage and system events to monitor for anomalies.
-*   **retention Controls** — Because you own the database, you control the data retention policies, ensuring data is purged or archived according to your compliance schedules.
+*   **Retention Controls** — Because you own the database, you control the data retention policies, ensuring data is purged or archived according to your compliance schedules.
 
 ### Data Residency
 
-For organizations with geographic data requirements—whether driven by GDPR, data sovereignty laws, or internal policy—Open WebUI's flexible deployment options ensure your data stays physically located where it is legally required to be.
+For organizations with geographic data requirements—whether driven by GDPR, data sovereignty laws, or internal policy—Open WebUI's deployment options ensure your data stays physically located where it is legally required to be.
 
 ---
 
@@ -121,4 +121,5 @@ Evaluating Open WebUI for enterprise deployment? Our team can assist with securi
 
 *   **[🏗️ High Availability](./architecture)** — Understand Open WebUI's scalable infrastructure design.
 *   **[🔧 Integration & Customization](./customization)** — Explore how to tailor Open WebUI to your workflows.
+
 *   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
