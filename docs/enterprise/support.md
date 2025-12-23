@@ -92,7 +92,7 @@ Even if you don't need enterprise support, consider becoming a sponsor to help f
 
 Open WebUI is free to use, but building, maintaining, and improving a platform of this scale takes real time, resources, and ongoing engineering work. Sponsorships help fund stability, security, new features, and long-term development—at a fraction of what it would cost to build and maintain an equivalent system in-house.
 
-[**💙 Sponsor Open WebUI**](https://github.com/sponsors/open-webui)
+[**💙 Sponsor Open WebUI**](https://github.com/sponsors/tjbck)
 
 ---
 
@@ -101,4 +101,5 @@ Open WebUI is free to use, but building, maintaining, and improving a platform o
 *   **[🏗️ High Availability](./architecture)** — Understand Open WebUI's scalable infrastructure design.
 *   **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
 *   **[🔧 Integration & Customization](./customization)** — Explore how to tailor Open WebUI to your workflows.
+
 *   **[👥 Customer Stories](./customers)** — See how other organizations have deployed Open WebUI.
