@@ -9,7 +9,7 @@ We carefully select our partners to maintain the highest standards and provide t
 
 ## For Agencies and Solutions Providers
 
-If you are a **consulting agency**, **AI services provider**, or **reseller**, please **do not** contact enterprise sales directly. As noted in our guidelines, direct sales inquiries from agencies may not receive a response [2].
+If you are a **consulting agency**, **AI services provider**, or **reseller**, please **do not** contact enterprise sales directly. As noted in our guidelines, direct sales inquiries from agencies may not receive a response.
 
 Instead, we ask that you **fill out our partnership interest form**:
 
@@ -18,9 +18,9 @@ Instead, we ask that you **fill out our partnership interest form**:
 ### Eligibility & Expectations
 To ensure alignment with our mission, please note the following criteria for partners:
 
-*   **Company Maturity:** We prioritize mature organizations. Generally, companies **less than 5 years old are not eligible** except in exceptional cases [2].
-*   **Capacity:** Our program receives a high volume of requests. Being on the waitlist **does not guarantee a response** [2].
-*   **Communication:** Please **do not follow up** or send additional messages after applying [2].
+*   **Company Maturity:** We prioritize mature organizations. Generally, companies **less than 5 years old are not eligible** except in exceptional cases.
+*   **Capacity:** Our program receives a high volume of requests. Being on the waitlist **does not guarantee a response**.
+*   **Communication:** Please **do not follow up** or send additional messages after applying.
 
 ---
 
@@ -32,5 +32,6 @@ Please contact us directly with:
 1.  Your agency details.
 2.  The client's company name and official work email domain.
 3.  The expected number of end users (seats) to be deployed [2].
+
 
 [**Contact Sales for Immediate Client Deployment**](mailto:sales@openwebui.com)
