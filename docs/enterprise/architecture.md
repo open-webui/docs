@@ -1,7 +1,6 @@
 ---
 sidebar_position: 1
 title: "🏗️ High Availability"
-description: "Enterprise architecture overview for Open WebUI: High availability, scalability, and performance optimization."
 ---
 
 # High Availability & Architecture
@@ -94,4 +93,5 @@ For engineers looking for a technical implementation guide regarding high-availa
 
 *   **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
 *   **[🔧 Integration & Customization](./customization)** — Explore how to tailor Open WebUI to your workflows.
+
 *   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
