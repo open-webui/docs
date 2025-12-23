@@ -81,8 +81,8 @@ For organizations planning high-availability, enterprise-grade deployments, we r
 
 ---
 
-:::info Community Resource: Technical Deep Dive
-For engineers looking for a technical implementation guide regarding high-availability patterns (Load Balancers, DB externalization), the community maintains excellent resources.
+:::info Community Resource: Best practices for large-scale Open WebUI architecture
+For engineers looking for a technical implementation guide regarding high-availability architecture, we recommend reviewing this excellent community resource:
 
 **[Read: The SRE's Guide to High Availability Open WebUI Deployment Architecture](https://taylorwilsdon.medium.com/the-sres-guide-to-high-availability-open-webui-deployment-architecture-2ee42654eced)**
 :::
@@ -95,3 +95,4 @@ For engineers looking for a technical implementation guide regarding high-availa
 *   **[🔧 Integration & Customization](./customization)** — Explore how to tailor Open WebUI to your workflows.
 
 *   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
+
