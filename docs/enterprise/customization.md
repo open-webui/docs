@@ -17,7 +17,7 @@ Open WebUI is built differently. From the interface your users see to the AI mod
 
 ### Connect Any Model to Any Workflow
 
-Your organization's AI needs are unique. Maybe you have fine-tuned models on proprietary data. Perhaps you are committed to specific providers for compliance reasons. Or you need different models for differents use cases across departments.
+Your organization's AI needs are unique. Maybe you have fine-tuned models on proprietary data. Perhaps you are committed to specific providers for compliance reasons. Or you need different models for different use cases across departments.
 
 Open WebUI supports flexible model integration:
 
@@ -126,3 +126,4 @@ Need capabilities that don't exist yet? Enterprise customers can work directly w
 *   **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
 
 *   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
+
