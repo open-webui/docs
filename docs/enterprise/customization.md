@@ -30,7 +30,7 @@ Open WebUI supports flexible model integration:
 
 Beyond basic connectivity, Open WebUI's enterprise offerings include guidance on optimizing model performance for your specific use cases:
 
-*   **Fine-Tuning Consultation** — Work with our team to optimize models for your domain vocabulary and use patterns [2].
+*   **Fine-Tuning Consultation** — Work with our team to optimize models for your domain vocabulary and use patterns.
 *   **Performance Benchmarking** — Understand how different models perform against your actual workflow requirements.
 *   **Cost Optimization** — Balance model capability against token costs for sustainable deployment at scale.
 
@@ -50,7 +50,7 @@ For organizations deploying AI tools to internal teams—or offering AI capabili
 | **User Experience** | Tailor the interface to emphasize the workflows most relevant to your teams. |
 
 :::info Enterprise License Required
-White-labeling and custom theming capabilities require an enterprise license. The standard open-source version must retain Open WebUI branding as specified in the design guidelines.
+White-labeling and custom theming capabilities require an enterprise license. The standard version must retain Open WebUI branding as specified in the design guidelines.
 
 [**Contact our Enterprise team to discuss licensing options.**](mailto:sales@openwebui.com)
 :::
@@ -124,4 +124,5 @@ Need capabilities that don't exist yet? Enterprise customers can work directly w
 
 *   **[🏗️ High Availability](./architecture)** — Understand Open WebUI's scalable infrastructure design.
 *   **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
+
 *   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
