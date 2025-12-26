@@ -45,13 +45,16 @@ To remove Open WebUI when running with `uvx`:
 1.  **Stop the Server:**
     Press `Ctrl+C` in the terminal where it's running.
 
-2.  **Available cleanup commands:**
+2. **Uninstall from UV:**
+    Enter `uv tool uninstall open-webui`
+
+3.  **Available cleanup commands:**
     The `uvx` command runs the application ephemerally or from cache. To remove cached components:
     ```bash
     uv cache clean
     ```
 
-3.  **Remove Data (WARNING: Deletes all data):**
+4.  **Remove Data (WARNING: Deletes all data):**
     Delete your data directory (default is `~/.open-webui` or the path set in `DATA_DIR`):
     ```bash
     rm -rf ~/.open-webui
