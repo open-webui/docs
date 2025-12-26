@@ -5049,12 +5049,20 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 
 :::
 
+#### `ENABLE_DB_MIGRATIONS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption.
+
 :::warning
 
 **Required for Multi-Replica Setups**
 For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), you **MUST** use an external database (PostgreSQL) instead of SQLite. SQLite does not support concurrent writes from multiple instances and will result in database corruption or data inconsistency.
 
 :::
+
+
 
 #### `DATABASE_TYPE`
 
@@ -5469,15 +5477,18 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 
 :::
 
-:::warning Database Migrations with Multiple Workers
-When `UVICORN_WORKERS > 1`, starting the application can trigger concurrent database migrations from multiple worker processes, potentially causing database schema corruption or inconsistent states.
+:::warning Database Migrations with Multiple Workers / Multi-Pod Deployments
+When `UVICORN_WORKERS > 1` or when running multiple replicas, starting the application can trigger concurrent database migrations from multiple processes, potentially causing database schema corruption or inconsistent states.
 
 **Recommendation:**
-After pulling a new image or installing an update, **always run Open WebUI with a single worker (`UVICORN_WORKERS=1`) first**. This ensures the database migration completes successfully in a single process. Once the migration is finished and the application has started, you can then restart it with your desired number of workers.
+To handle migrations safely in multi-process/multi-pod environments, you can:
+1.  **Designate a Master (Recommended):** Set `ENABLE_DB_MIGRATIONS=False` on all but one instance/worker. The instance with `ENABLE_DB_MIGRATIONS=True` (default) will handle the migration, while others will wait or skip it.
+2.  **Scale Down:** Temporarily scale down to a single instance/worker to let migrations finish before scaling back up.
 
-**For Kubernetes, Helm, Minikube, and other orchestrated setups:**
-Ensure that your deployment strategy allows for a single-replica or single-worker init container/job to handle migrations before scaling up to multiple replicas or workers. This is critical to prevent race conditions during schema updates.
+**For Kubernetes, Helm, and Orchestrated Setups:**
+It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a specific pod for migrations, or use an init container/job to handle migrations before scaling up the main application pods. This ensures schema updates are applied exactly once.
 :::
+
 
 ### Cache Settings
 
