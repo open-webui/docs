@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "🔧 Integration & Customization"
 ---
 
-# Integration & Customization
+## Integration & Customization
 
 ## Make Open WebUI Your Own
 
@@ -21,18 +21,18 @@ Your organization's AI needs are unique. Maybe you have fine-tuned models on pro
 
 Open WebUI supports flexible model integration:
 
-*   **Proprietary Models** — Connect models you have developed or fine-tuned specifically for your organization's domain.
-*   **Third-Party Providers** — Integrate commercial AI services that meet your compliance and performance requirements.
-*   **Local Models** — Run models entirely on-premise for maximum data control and reduced latency.
-*   **Multi-Model Environments** — Offer different models to different teams, or build multi-model agentic workflows based on specific needs.
+* **Proprietary Models** — Connect models you have developed or fine-tuned specifically for your organization's domain.
+* **Third-Party Providers** — Integrate commercial AI services that meet your compliance and performance requirements.
+* **Local Models** — Run models entirely on-premise for maximum data control and reduced latency.
+* **Multi-Model Environments** — Offer different models to different teams, or build multi-model agentic workflows based on specific needs.
 
 ### Model Optimization for Enterprise Workflows
 
 Beyond basic connectivity, Open WebUI's enterprise offerings include guidance on optimizing model performance for your specific use cases:
 
-*   **Fine-Tuning Consultation** — Work with our team to optimize models for your domain vocabulary and use patterns.
-*   **Performance Benchmarking** — Understand how different models perform against your actual workflow requirements.
-*   **Cost Optimization** — Balance model capability against token costs for sustainable deployment at scale.
+* **Fine-Tuning Consultation** — Work with our team to optimize models for your domain vocabulary and use patterns.
+* **Performance Benchmarking** — Understand how different models perform against your actual workflow requirements.
+* **Cost Optimization** — Balance model capability against token costs for sustainable deployment at scale.
 
 ---
 
@@ -78,10 +78,10 @@ Enterprise software ecosystems are complex. The last thing you need is another s
 
 Open WebUI's plugin and pipeline architecture allows you to add functionality without modifying core code:
 
-*   **Custom Workflows** — Build organization-specific AI workflows that reflect your actual business processes.
-*   **Data Connectors** — Create integrations that pull context from your internal knowledge bases.
-*   **Specialized Interfaces** — Develop custom UI components for specific departmental needs.
-*   **Automation Hooks** — Trigger actions in external systems based on AI interactions.
+* **Custom Workflows** — Build organization-specific AI workflows that reflect your actual business processes.
+* **Data Connectors** — Create integrations that pull context from your internal knowledge bases.
+* **Specialized Interfaces** — Develop custom UI components for specific departmental needs.
+* **Automation Hooks** — Trigger actions in external systems based on AI interactions.
 
 This approach protects your investment. **Core Open WebUI updates do not break your customizations**, and your customizations do not prevent you from receiving security patches and new features.
 
@@ -90,12 +90,15 @@ This approach protects your investment. **Core Open WebUI updates do not break y
 ## What This Means for Your Organization
 
 ### For Product Owners
+
 You are not forcing teams to adapt to the tool—the tool adapts to them. Customization options mean you can roll out AI capabilities that feel native to each department's workflow.
 
 ### For IT Teams
+
 Integration flexibility means Open WebUI slots into your existing architecture. You are not rebuilding identity management, recreating monitoring dashboards, or maintaining yet another authentication silo.
 
 ### For Brand & Communications Teams
+
 White-labeling ensures AI tools meet the same brand standards as every other internal platform. No awkward "third-party app" aesthetic undermining your carefully maintained internal experience.
 
 ---
@@ -106,9 +109,9 @@ The right level of customization depends on your organization's specific needs. 
 
 For organizations planning significant customization, we recommend:
 
-1.  **Inventory your requirements** — What must integrate? What should match your brand? What workflows need support?
-2.  **Review existing capabilities** — Many customizations are possible through configuration rather than development.
-3.  **Contact our Enterprise team** — For complex integrations or white-labeling, we can scope the effort together.
+1. **Inventory your requirements** — What must integrate? What should match your brand? What workflows need support?
+2. **Review existing capabilities** — Many customizations are possible through configuration rather than development.
+3. **Contact our Enterprise team** — For complex integrations or white-labeling, we can scope the effort together.
 
 [**Discuss Your Customization Needs**](mailto:sales@openwebui.com)
 
@@ -122,8 +125,7 @@ Need capabilities that don't exist yet? Enterprise customers can work directly w
 
 ## Next Steps
 
-*   **[🏗️ High Availability](./architecture)** — Understand Open WebUI's scalable infrastructure design.
-*   **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
+* **[🏗️ High Availability](./architecture)** — Understand Open WebUI's scalable infrastructure design.
+* **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
 
-*   **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
-
+* **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
