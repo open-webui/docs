@@ -50,10 +50,14 @@ For organizations deploying AI tools to internal teams—or offering AI capabili
 | **User Experience** | Tailor the interface to emphasize the workflows most relevant to your teams. |
 
 :::info Enterprise License Required
-White-labeling and custom theming capabilities require an enterprise license. The standard version must retain Open WebUI branding as specified in the design guidelines.
+White-labeling and custom theming capabilities require an enterprise license. The standard version must retain Open WebUI branding as specified in the licensing guidelines.
 
-[**Contact our Enterprise team to discuss licensing options.**](mailto:sales@openwebui.com)
+[**Contact our Enterprise team to discuss licensing options →**](mailto:sales@openwebui.com)
+
+To help us respond quickly, **please use your official work email address** and include your expected **end user count (seats)**. Personal email accounts (e.g., gmail.com, yahoo.com, icloud.com) are often flagged by our system and may not receive a response.
 :::
+
+---
 
 ### Why This Matters
 

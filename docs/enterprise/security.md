@@ -102,20 +102,20 @@ User management doesn't become another silo. Open WebUI works with your existing
 
 ---
 
-## Planning Your Secure Deployment
+## Discuss Your Security Requirements
 
-Security requirements vary significantly across industries. The right configuration depends on your specific threat model, compliance obligations, and operational needs.
+The right security posture depends on your organization's compliance obligations, data residency requirements, and risk tolerance.
 
-For organizations with complex security requirements, we recommend:
+For organizations with specific security or compliance needs, we recommend:
 
 1. **Review the [Getting Started Guide](../getting-started/index.md)** for foundational deployment concepts.
-2. **Assess your compliance requirements** and identify which frameworks apply to your deployment.
-3. **Contact our Enterprise team** for guidance on security-hardened configurations.
+2. **Consult the [FAQ](../faq.mdx)** for answers to common questions.
+3. **Contact our Enterprise team** for guidance on regulated or high-security deployments.
 
-[**Discuss Your Security Requirements**](mailto:sales@openwebui.com)
+[**Contact Sales to Discuss Security & Compliance**](mailto:sales@openwebui.com)
 
-:::info Security Questionnaires
-Evaluating Open WebUI for enterprise deployment? Our team can assist with security questionnaires and provide documentation to support your vendor assessment process.
+:::tip Use Your Work Email
+To help us respond quickly, **please use your official work email address** and include your **compliance requirements** (e.g., SOC 2, HIPAA, FedRAMP) and expected **end user count**. Personal email accounts (e.g., gmail.com, yahoo.com, icloud.com) are often flagged by our system and may not receive a response.
 :::
 
 ---

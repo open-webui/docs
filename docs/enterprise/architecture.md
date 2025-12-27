@@ -72,15 +72,19 @@ Horizontal scaling means you pay for capacity as you need it. No over-provisioni
 
 ## Planning Your Deployment
 
-The right architecture depends on your organization's specific requirements—user count, geographic distribution, uptime SLAs, and compliance needs all factor into the design.
+The right architecture depends on your organization's specific requirements. User count, geographic distribution, uptime SLAs, and compliance needs all factor into the design.
 
-For organizations planning high-availability, enterprise-grade deployments, we recommend:
+For organizations planning enterprise-grade deployments, we recommend:
 
 1. **Review the [Getting Started Guide](../getting-started/index.md)** for foundational deployment concepts.
 2. **Consult the [FAQ](../faq.mdx)** for answers to common questions.
 3. **Contact our Enterprise team** for guidance on complex or large-scale deployments.
 
 [**Contact Sales to Discuss Architecture**](mailto:sales@openwebui.com)
+
+:::tip Use Your Work Email
+To help us respond quickly, **please use your official work email address** and include your **deployment environment** (on-premise, cloud, hybrid) and expected **end user count**. Personal email accounts (e.g., gmail.com, yahoo.com, icloud.com) are often flagged by our system and may not receive a response.
+:::
 
 ---
 

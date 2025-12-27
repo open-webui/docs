@@ -76,18 +76,12 @@ Enterprise support de-risks your AI investment. You have a direct relationship w
 
 ## Find the Right Support Plan
 
-Every organization's needs are different. Whether you're exploring consulting hours, dedicated channels, or full enterprise SLAs, we'll help you find the right fit.
+Every organization's needs are different. Whether you're exploring consulting hours, or full enterprise SLAs, we'll help you find the right fit.
 
 [**Discuss Your Support Requirements →**](mailto:sales@openwebui.com)
 
----
-
-## Built for Open Access
-
-:::info
-Open WebUI is **free to use** and our source code is publicly available. You can deploy it today without an enterprise agreement.
-
-We believe in democratizing access to AI. The Enterprise offerings above provide **governance, white labeling, liability protection, and dedicated support** for organizations that require them—but the core platform remains free and accessible to our community.
+:::tip Use Your Work Email
+To help us respond quickly, **please use your official work email address** and include your **team size** and **support priorities** (e.g., onboarding, architecture review, SLAs). Personal email accounts (e.g., gmail.com, yahoo.com, icloud.com) are often flagged by our system and may not receive a response.
 :::
 
 ---

@@ -42,3 +42,7 @@ Please contact us directly with:
 3. The expected number of end users (seats) to be deployed.
 
 [**Contact Sales for Immediate Client Deployment**](mailto:sales@openwebui.com)
+
+:::tip Use Your Work Email
+To help us respond quickly, **please use your official work email address**. Personal email accounts (e.g., gmail.com, yahoo.com, icloud.com) are often flagged by our system and may not receive a response.
+:::
