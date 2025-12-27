@@ -1,0 +1,37 @@
+---
+sidebar_position: 1510
+title: "Direct Connections"
+---
+
+**Direct Connections** is a feature that allows users to connect their Open WebUI client directly to OpenAI-compatible API endpoints, bypassing the Open WebUI backend for inference requests.
+
+## Overview
+
+In a standard deployment, Open WebUI acts as a proxy: the browser sends the prompt to the Open WebUI backend, which then forwards it to the LLM provider (Ollama, OpenAI, etc.).
+
+With **Direct Connections**, the browser communicates directly with the API provider.
+
+## Benefits
+
+*   **Privacy & Control**: Users can use their own personal API keys without storing them on the Open WebUI server (keys are stored in the browser's local storage).
+*   **Reduced Latency**: Removes the "middleman" hop through the Open WebUI backend, potentially speeding up response times.
+*   **Server Load Reduction**: Offloads the network traffic and connection management from the Open WebUI server to the individual client browsers.
+
+## Prerequisites
+
+1.  **Admin Enablement**: The administrator must enable this feature globally.
+    *   **Admin Panel > Settings > Connections > Direct Connections**: Toggle **On**.
+    *   Alternatively, set the environment variable: `ENABLE_DIRECT_CONNECTIONS=true`.
+2.  **CORS Configuration**: Since the browser is making the request, the API provider must have **Cross-Origin Resource Sharing (CORS)** configured to allow requests from your Open WebUI domain.
+    *   *Note: Many strict providers (like official OpenAI) might block direct browser requests due to CORS policies. This feature is often best used with flexible providers or internal API gateways.*
+
+## User Configuration
+
+Once enabled by the admin, users can configure their own connections:
+
+1.  Go to **User Settings > Connections**.
+2.  Click **+ (Add Connection)**.
+3.  Enter the **Base URL** (e.g., `https://api.groq.com/openai/v1`) and your **API Key**.
+4.  Click **Save**.
+
+The models from this direct connection will now appear in your model list, often indistinguishable from backend-provided models, but requests will flow directly from your machine to the provider.
