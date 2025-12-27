@@ -1018,8 +1018,21 @@ Output:
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether users are shown the share to community button.
+- Description: Controls whether users can share content with the Open WebUI Community and access community resources. When enabled, this setting shows the following UI elements across the application:
+  - **Prompts Workspace**: "Made by Open WebUI Community" section with a link to discover community prompts, and a "Share" button in the prompt menu dropdown
+  - **Tools Workspace**: "Made by Open WebUI Community" section with a link to discover community tools, and a "Share" button in the tool menu dropdown
+  - **Models Workspace**: "Made by Open WebUI Community" section with a link to discover community model presets, and a "Share" button in the model menu dropdown
+  - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions
+  - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
+  - **Evaluation Feedbacks**: "Share to Open WebUI Community" button for contributing feedback history to the community leaderboard
+  - **Stats Sync Modal**: Enables syncing usage statistics with the community
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons and community resource discovery sections will be hidden from the UI. Users will still be able to export content locally, but the option to share directly to the Open WebUI Community will not be available.
+
+:::
 
 ### Tags Generation
 
