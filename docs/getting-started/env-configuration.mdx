@@ -158,6 +158,20 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables channel support.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_FOLDERS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the folders feature, allowing users to organize their chats into folders in the sidebar.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_NOTES`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the notes feature, allowing users to create and manage personal notes within Open WebUI.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEBHOOK_URL`
 
 - Type: `str`
@@ -175,6 +189,18 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `bool`
 - Default: `True`
 - Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
+
+#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables admin users to access all workspace content (models, knowledge bases, prompts, and tools) regardless of access control settings. When set to `False`, admins will only see workspace items they have been explicitly granted access to.
+
+:::warning **Deprecated**
+
+**This environment variable is deprecated and may be removed in a future release.** Use [`BYPASS_ADMIN_ACCESS_CONTROL`](#bypass_admin_access_control) instead, which provides the same functionality with a clearer name.
+
+:::
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
@@ -213,18 +239,6 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 - Type: `bool`
 - Default: `False`
 - Description: Controls whether custom models should fall back to a default model if their assigned base model is missing. When set to `True`, if a custom model's base model is not found, the system will use the first model from the configured `DEFAULT_MODELS` list instead of returning an error.
-
-#### `MODELS_CACHE_TTL`
-
-- Type: `int`
-- Default: `1`
-- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
-
-:::info
-
-This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
-
-:::
 
 #### `SHOW_ADMIN_DETAILS`
 
@@ -1128,6 +1142,57 @@ The value of `API_KEYS_ALLOWED_ENDPOINTS` should be a comma-separated list of en
 :::info
 
 This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment variable.
+
+:::
+
+### Model Caching
+
+#### `ENABLE_BASE_MODELS_CACHE`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+**How the cache works:**
+
+- **Initialization**: When enabled, base models are fetched and cached during application startup.
+- **Storage**: The cache is stored in application memory (`app.state.BASE_MODELS`).
+- **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
+- **Cache Refresh**: The cache is refreshed when:
+  - The application restarts
+  - The connection settings are saved in the **Admin Panel > Settings > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
+- **No TTL**: There is no automatic time-based expiration.
+
+
+Enable this setting in production environments where model lists are relatively stable. For development environments or when frequently adding/removing models from Ollama, you may prefer to leave it disabled for real-time model discovery.
+
+:::
+
+#### `MODELS_CACHE_TTL`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
+
+This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time.
+
+:::tip High-Traffic Recommendation
+
+In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
+
+:::
+
+:::info Two Caching Mechanisms
+
+Open WebUI has **two model caching mechanisms** that work independently:
+
+| Setting | Type | Default | Refresh Trigger |
+|---------|------|---------|-----------------|
+| `ENABLE_BASE_MODELS_CACHE` | In-memory | `False` | App restart OR Admin Save |
+| `MODELS_CACHE_TTL` | TTL-based | `1` second | Automatic after TTL expires |
+
+For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODELS_CACHE_TTL=300`.
 
 :::
 
