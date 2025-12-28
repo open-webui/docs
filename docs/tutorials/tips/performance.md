@@ -93,6 +93,17 @@ For multi-user setups, the choice of Vector DB matters.
 
 ---
 
+## 📈 Scaling Infrastructure (Multi-Tenancy & Kubernetes)
+
+If you are deploying for **enterprise scale** (hundreds of users), simple Docker Compose setups may not suffice. You will need to move to a clustered environment.
+
+*   **Kubernetes / Helm**: For deploying on K8s with multiple replicas, see the **[Multi-Replica & High Availability Guide](/troubleshooting/multi-replica)**.
+*   **Redis (Mandatory)**: When running multiple workers (`UVICORN_WORKERS > 1`) or multiple replicas, **Redis is required** to handle WebSocket connections and session syncing. See **[Redis Integration](/tutorials/integrations/redis)**.
+*   **Load Balancing**: Ensure your Ingress controller supports **Session Affinity** (Sticky Sessions) for best performance.
+*   **Reverse Proxy Caching**: Configure your reverse proxy (e.g., Nginx, Caddy, Cloudflare) to **cache static assets** (JS, CSS, Images). This significantly reduces load on the application server. See **[Nginx Config](/tutorials/https/nginx)** or **[Caddy Config](/tutorials/https/caddy)**.
+
+---
+
 ## ⚡ High-Concurrency & Network Optimization
 
 For setups with many simultaneous users, these settings are crucial to prevent bottlenecks.
@@ -182,7 +193,7 @@ If resource usage is critical, disable automated features that constantly trigge
 2.  **Task Model**: `gpt-5-nano` or `llama-3.1-8b-instant`.
 3.  **Caching**: `MODELS_CACHE_TTL=300`.
 4.  **Database**: `ENABLE_REALTIME_CHAT_SAVE=True` (Persistence is usually preferred over raw write speed here).
-5.  **Vector DB**: PGVector (recommended) or ChromaDB.
+5.  **Vector DB**: PGVector (recommended) or ChromaDB (either is fine unless dealing with massive data).
 
 ### Profile 3: High Scale / Enterprise
 *Target: Many concurrent users, Stability > Persistence.*
