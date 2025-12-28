@@ -3440,6 +3440,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Default: `${DATA_DIR}/cache/whisper/models`
 - Description: Specifies the directory to store Whisper model files.
 
+#### `WHISPER_COMPUTE_TYPE`
+
+- Type: `str`
+- Default: `int8` (CPU), `float16` (CUDA)
+- Description: Sets the compute type for Whisper model inference. Defaults to `int8` for CPU and `float16` for CUDA (with fallback to `int8/int8_float16`).
+
 #### `WHISPER_VAD_FILTER`
 
 - Type: `bool`
