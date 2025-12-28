@@ -25,3 +25,6 @@ The following is a summary of the environment variables for speech to text (STT)
 | `AUDIO_STT_MODEL` | Specifies the Speech-to-Text model for OpenAI-compatible endpoints |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Sets the OpenAI-compatible base URL for Speech-to-Text |
 | `AUDIO_STT_OPENAI_API_KEY` | Sets the OpenAI API key for Speech-to-Text |
+| `AUDIO_STT_AZURE_API_KEY` | Sets the Azure API key for Speech-to-Text |
+| `AUDIO_STT_AZURE_REGION` | Sets the Azure region for Speech-to-Text |
+| `AUDIO_STT_AZURE_LOCALES` | Sets the Azure locales for Speech-to-Text |
