@@ -177,7 +177,7 @@ If resource usage is critical, disable automated features that constantly trigge
 ## 🚀 Recommended Configuration Profiles
 
 ### Profile 1: Maximum Privacy (Weak Hardware/RPi)
-*Target: 100% Local, Raspberry Pi / <4GB RAM.*
+*Target: 100% Local, Raspberry Pi / &lt;4GB RAM.*
 
 1.  **Embeddings**: Default (SentenceTransformers) - *Runs on CPU, lightweight.*
 2.  **Audio**: `AUDIO_STT_ENGINE=webapi` - *Zero server load.*
