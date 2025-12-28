@@ -1091,7 +1091,11 @@ This variable replaces the deprecated `ENABLE_API_KEY` environment variable.
 
 :::info
 
-For API Key creation (and the API keys themselves) to work, you not only need to enable it globally, but also give specific user groups the permission for it 
+For API Key creation (and the API keys themselves) to work, you need **both**:
+1. Enable API keys globally using this setting (`ENABLE_API_KEYS`)
+2. Grant the "API Keys" permission to users via Default Permissions or User Groups
+
+**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
@@ -4730,7 +4734,11 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 :::info
 
-For API Key creation (and the API keys themselves) to work, you not only need to give specific user groups the permission for it, but also enable it globally using `ENABLE_API_KEYS`
+For API Key creation (and the API keys themselves) to work, you need **both**:
+1. Grant the "API Keys" permission to users via this setting or User Groups
+2. Enable API keys globally using `ENABLE_API_KEYS`
+
+**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
