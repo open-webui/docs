@@ -171,3 +171,11 @@ Running on MacOS with Podman? Here’s how to ensure connectivity:
 podman run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+
+## 🛠️ MCP Tool Connections
+
+If you are having trouble connecting to MCP tools (e.g. "Failed to connect to MCP server"):
+*   **Authentication**: Ensure you aren't using "Bearer" without a token.
+*   **Filters**: Try adding a comma to the Function Name Filter List.
+
+See the [MCP Feature Documentation](/features/mcp#troubleshooting) for detailed troubleshooting steps.
