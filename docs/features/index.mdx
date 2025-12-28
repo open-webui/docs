@@ -9,15 +9,15 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ## Key Features of Open WebUI ⭐
 
-- 🚀 **Effortless Setup**: Install seamlessly using Docker, Kubernetes, Podman, Helm Charts (`kubectl`, `kustomize`, `podman`, or `helm`) for a hassle-free experience with support for both `:ollama` image with bundled Ollama and `:cuda` with CUDA support.
+- 🚀 **Effortless Setup**: Install seamlessly using Docker, Kubernetes, Podman, Helm Charts (`kubectl`, `kustomize`, `podman`, or `helm`) for a hassle-free experience with support for both `:ollama` image with bundled Ollama and `:cuda` with CUDA support. [Learn more in our Quick Start Guide](/getting-started/quick-start).
 
 - 🛠️ **Guided Initial Setup**: Complete the setup process with clarity, including an explicit indication of creating an admin account during the first-time setup.
 
-- 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. The OpenAI API URL can be customized to integrate Open WebUI seamlessly with various third-party applications.
+- 🤝 **OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. The OpenAI API URL can be customized to integrate Open WebUI seamlessly with various third-party applications. [See Setup Guide](/getting-started/quick-start).
 
-- 🛡️ **Granular Permissions and User Groups**: By allowing administrators to create detailed user roles, user groups, and permissions across the workspace, we ensure a secure user environment for all users involved. This granularity not only enhances security, but also allows for customized user experiences, fostering a sense of ownership and responsibility amongst users.
+- 🛡️ **Granular Permissions and User Groups**: By allowing administrators to create detailed user roles, user groups, and permissions across the workspace, we ensure a secure user environment for all users involved. This granularity not only enhances security, but also allows for customized user experiences, fostering a sense of ownership and responsibility amongst users. [Learn more about RBAC](/features/rbac).
 
-- 🔐 **SCIM 2.0 Provisioning**: Enterprise-grade user and group provisioning through SCIM 2.0 protocol, enabling seamless integration with identity providers like Okta, Azure AD, and Google Workspace for automated user lifecycle management.
+- 🔐 **SCIM 2.0 Provisioning**: Enterprise-grade user and group provisioning through SCIM 2.0 protocol, enabling seamless integration with identity providers like Okta, Azure AD, and Google Workspace for automated user lifecycle management. [Read the SCIM Guide](/features/auth/scim).
 
 - 📱 **Responsive Design**: Enjoy a seamless experience across desktop PCs, laptops, and mobile devices.
 
@@ -29,37 +29,37 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
   :::
 
-- ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown, LaTex, and Rich Text capabilities for enriched interaction.
+- ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown, LaTex, and Rich Text capabilities for enriched interaction. [Explore Interface Features](/category/interface).
 
-- 🧩 **Model Builder**: Easily create custom models from base Ollama models directly from Open WebUI. Create and add custom characters and agents, customize model elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
+- 🧩 **Model Builder**: Easily create custom models from base Ollama models directly from Open WebUI. Create and add custom characters and agents, customize model elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration. [Learn more about Models](/features/workspace/models).
 
-- 📚 **Advanced RAG Integration with Multiple Vector Databases**: Dive into the future of chat interactions with cutting-edge Retrieval Augmented Generation (RAG) technology. Choose from 9 vector database options: ChromaDB (default), PostgreSQL with PGVector, Qdrant, Milvus, Elasticsearch, OpenSearch, Pinecone, S3Vector, and Oracle 23ai. Documents can be loaded into the `Documents` tab of the Workspace and accessed using the pound key [`#`] before a query, or by starting the prompt with [`#`] followed by a URL for webpage content integration.
+- 📚 **Advanced RAG Integration with Multiple Vector Databases**: Dive into the future of chat interactions with cutting-edge Retrieval Augmented Generation (RAG) technology. Choose from 9 vector database options: ChromaDB (default), PostgreSQL with PGVector, Qdrant, Milvus, Elasticsearch, OpenSearch, Pinecone, S3Vector, and Oracle 23ai. Documents can be loaded into the `Documents` tab of the Workspace and accessed using the pound key [`#`] before a query, or by starting the prompt with [`#`] followed by a URL for webpage content integration. [Learn more about RAG](/features/rag).
 
-- 📄 **Advanced Document Extraction with Multiple Engines**: Extract text and data from various document formats including PDFs, Word documents, Excel spreadsheets, PowerPoint presentations, and more using your choice of extraction engines: Apache Tika, Docling, Azure Document Intelligence, Mistral OCR, or external custom (self-built) content extraction engines/document loaders. Advanced document processing capabilities enable seamless integration with your knowledge base, preserving structure and formatting while supporting OCR for scanned documents and images.
+- 📄 **Advanced Document Extraction with Multiple Engines**: Extract text and data from various document formats including PDFs, Word documents, Excel spreadsheets, PowerPoint presentations, and more using your choice of extraction engines: Apache Tika, Docling, Azure Document Intelligence, Mistral OCR, or external custom (self-built) content extraction engines/document loaders. Advanced document processing capabilities enable seamless integration with your knowledge base, preserving structure and formatting while supporting OCR for scanned documents and images. [Read about Document Extraction](/features/rag/document-extraction).
 
-- 🔍 **Web Search for RAG with 15+ Providers**: Perform web searches using 15+ providers including SearXNG, Google PSE, Brave Search, Kagi, Mojeek, Bocha, Tavily, Perplexity (AI models and Search API), serpstack, serper, Serply, DuckDuckGo, SearchAPI, SerpApi, Bing, Jina, Exa, Sougou, Azure AI Search, and Ollama Cloud, injecting results directly into your local Retrieval Augmented Generation (RAG) experience.
+- 🔍 **Web Search for RAG with 15+ Providers**: Perform web searches using 15+ providers including SearXNG, Google PSE, Brave Search, Kagi, Mojeek, Bocha, Tavily, Perplexity (AI models and Search API), serpstack, serper, Serply, DuckDuckGo, SearchAPI, SerpApi, Bing, Jina, Exa, Sougou, Azure AI Search, and Ollama Cloud, injecting results directly into your local Retrieval Augmented Generation (RAG) experience. [Explore Web Search Providers](/category/web-search).
 
 - 🌐 **Web Browsing Capabilities**: Integrate websites seamlessly into your chat experience by using the `#` command followed by a URL. This feature enables the incorporation of web content directly into your conversations, thereby enhancing the richness and depth of your interactions.
 
-- 🎨 **Image Generation & Editing Integration**: Seamlessly create and edit images using multiple engines including OpenAI's DALL-E (generation and editing), Gemini (generation and editing), ComfyUI (local, generation and editing), and AUTOMATIC1111 (local, generation). Support for both text-to-image generation and prompt-based image editing workflows with dynamic visual content.
+- 🎨 **Image Generation & Editing Integration**: Seamlessly create and edit images using multiple engines including OpenAI's DALL-E (generation and editing), Gemini (generation and editing), ComfyUI (local, generation and editing), and AUTOMATIC1111 (local, generation). Support for both text-to-image generation and prompt-based image editing workflows with dynamic visual content. [Learn more about Image Gen](/category/create--edit-images).
 
 - ⚙️ **Concurrent Model Utilization**: Effortlessly engage with multiple models simultaneously, harnessing their unique strengths for optimal responses. Leverage a diverse set of model modalities in parallel to enhance your experience.
 
-- 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions. Only authorized individuals can access your Ollama, while model creation and pulling rights are exclusively reserved for administrators.
+- 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions. Only authorized individuals can access your Ollama, while model creation and pulling rights are exclusively reserved for administrators. [Learn more about RBAC](/features/rbac).
 
 - 🌐🌍 **Multilingual Support**: Experience Open WebUI in your preferred language with our internationalization (`i18n`) support. We invite you to join us in expanding our supported languages! We're actively seeking contributors!
 
-- 💾 **Persistent Artifact Storage**: Built-in key-value storage API for artifacts, enabling features like journals, trackers, leaderboards, and collaborative tools with both personal and shared data scopes that persist across sessions.
+- 💾 **Persistent Artifact Storage**: Built-in key-value storage API for artifacts, enabling features like journals, trackers, leaderboards, and collaborative tools with both personal and shared data scopes that persist across sessions. [Explore Chat Features](/features/chat-features).
 
-- ☁️ **Cloud Storage Integration**: Native support for cloud storage backends including Amazon S3 (with S3-compatible providers), Google Cloud Storage, and Microsoft Azure Blob Storage for scalable file storage and data management.
+- ☁️ **Cloud Storage Integration**: Native support for cloud storage backends including Amazon S3 (with S3-compatible providers), Google Cloud Storage, and Microsoft Azure Blob Storage for scalable file storage and data management. [See Storage Config](/getting-started/env-configuration#cloud-storage).
 
-- ☁️ **Enterprise Cloud Integration**: Seamlessly import documents from Google Drive and OneDrive/SharePoint directly through the file picker interface, enabling smooth workflows with enterprise cloud storage solutions.
+- ☁️ **Enterprise Cloud Integration**: Seamlessly import documents from Google Drive and OneDrive/SharePoint directly through the file picker interface, enabling smooth workflows with enterprise cloud storage solutions. [Learn more in Environment Config](/getting-started/env-configuration#onedrive) and check out the [SharePoint Guide](/tutorials/integrations/onedrive-sharepoint/).
 
-- 📊 **Production Observability with OpenTelemetry**: Built-in OpenTelemetry support for comprehensive monitoring with traces, metrics, and logs export to your existing observability stack (Prometheus, Grafana, Jaeger, etc.), enabling production-grade monitoring and debugging.
+- 📊 **Production Observability with OpenTelemetry**: Built-in OpenTelemetry support for comprehensive monitoring with traces, metrics, and logs export to your existing observability stack (Prometheus, Grafana, Jaeger, etc.), enabling production-grade monitoring and debugging. [See Observability Config](/getting-started/env-configuration/#opentelemetry-configuration).
 
-- 🔒 **Encrypted Database Support**: Optional at-rest encryption for SQLite databases using SQLCipher, providing enhanced security for sensitive data in smaller deployments without requiring PostgreSQL infrastructure.
+- 🔒 **Encrypted Database Support**: Optional at-rest encryption for SQLite databases using SQLCipher, providing enhanced security for sensitive data in smaller deployments without requiring PostgreSQL infrastructure. [See Database Encryption](/getting-started/env-configuration#encrypted-sqlite-with-sqlcipher).
 
-- ⚖️ **Horizontal Scalability for Production**: Redis-backed session management and WebSocket support enabling multi-worker and multi-node deployments behind load balancers for high-availability production environments.
+- ⚖️ **Horizontal Scalability for Production**: Redis-backed session management and WebSocket support enabling multi-worker and multi-node deployments behind load balancers for high-availability production environments. [See Advanced Topics](/getting-started/advanced-topics) and our [Multi-Replica Guide](/troubleshooting/multi-replica).
 
 - 🌟 **Continuous Updates**: We are committed to improving Open WebUI with regular updates, fixes, and new features.
 
@@ -69,9 +69,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 🔧 Pipelines Support
 
-- 🔧 **Pipelines Framework**: Seamlessly integrate and customize your Open WebUI experience with our modular plugin framework for enhanced customization and functionality (https://github.com/open-webui/pipelines). Our framework allows for the easy addition of custom logic and integration of Python libraries, from AI agents to home automation APIs.
+- 🔧 **Pipelines Framework**: Seamlessly integrate and customize your Open WebUI experience with our modular plugin framework for enhanced customization and functionality (https://github.com/open-webui/pipelines). Our framework allows for the easy addition of custom logic and integration of Python libraries, from AI agents to home automation APIs. Perfect for plugin and tool development, as well as creating custom functions and filters. [Learn more about Pipelines](/features/pipelines).
 
-- 📥 **Upload Pipeline**: Pipelines can be uploaded directly from the `Admin Panel` > `Settings` > `Pipelines` menu, streamlining the pipeline management process.
+- �️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions via a built-in code editor to seamlessly develop and integrate function code within the `Tools` and `Functions` workspace. [Learn more about Tools](/features/plugin/tools).
+
+- �📥 **Upload Pipeline**: Pipelines can be uploaded directly from the `Admin Panel` > `Settings` > `Pipelines` menu, streamlining the pipeline management process.
 
 #### The possibilities with our Pipelines framework knows no bounds and are practically limitless. Start with a few pre-built pipelines to help you get started!
 
@@ -108,7 +110,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🎨 **Splash Screen**: A simple loading splash screen for a smoother user experience.
 
-- 🌐 **Personalized Interface**: Choose between a freshly designed search landing page and the classic chat UI from Settings > Interface, allowing for a tailored experience.
+- 🌐 **Personalized Interface**: Choose between a freshly designed search landing page and the classic chat UI from Settings > Interface, allowing for a tailored experience. [Explore Interface Options](/category/interface).
 
 - 📦 **Pip Install Method**: Installation of Open WebUI can be accomplished via the command `pip install open-webui`, which streamlines the process and makes it more accessible to new users. For further information, please visit: https://pypi.org/project/open-webui/.
 
@@ -116,7 +118,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🖼️ **Custom Background Support**: Set a custom background from Settings > Interface to personalize your experience.
 
-- 📝 **Rich Banners with Markdown**: Create visually engaging announcements with markdown support in banners, enabling richer and more dynamic content.
+- 📝 **Rich Banners with Markdown**: Create visually engaging announcements with markdown support in banners, enabling richer and more dynamic content. [See Banners Documentation](/features/interface/banners).
 
 - 💻 **Code Syntax Highlighting**: Our syntax highlighting feature enhances code readability, providing a clear and concise view of your code.
 
@@ -162,9 +164,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔔 **Chat Completion Notifications**: Stay updated with instant in-UI notifications when a chat finishes in a non-active tab, ensuring you never miss a completed response.
 
-- 🌐 **Notification Webhook Integration**: Receive timely updates for long-running chats or external integration needs with configurable webhook notifications, even when your tab is closed.
+- 🌐 **Notification Webhook Integration**: Receive timely updates for long-running chats or external integration needs with configurable webhook notifications, even when your tab is closed. [Learn more about Webhooks](/features/interface/webhooks).
 
-- 📚 **Channels (Beta)**: Explore real-time collaboration between users and AIs with Discord/Slack-style chat rooms, build bots for channels, and unlock asynchronous communication for proactive multi-agent workflows.
+- 📚 **Channels (Beta)**: Explore real-time collaboration between users and AIs with Discord/Slack-style chat rooms, build bots for channels, and unlock asynchronous communication for proactive multi-agent workflows. [See Channels](/features/channels).
 
 - 🖊️ **Typing Indicators in Channels**: Enhance collaboration with real-time typing indicators in channels, keeping everyone engaged and informed.
 
@@ -293,7 +295,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - ⚔️ **Model Evaluation Arena**: Conduct blind A/B testing of models directly from the Admin Settings for a true side-by-side comparison, making it easier to find the best model for your needs.
 
-- 🎯 **Topic-Based Rankings**: Discover more accurate rankings with our experimental topic-based re-ranking system, which adjusts leaderboard standings based on tag similarity in feedback.
+- 🎯 **Topic-Based Rankings**: Discover more accurate rankings with our experimental topic-based re-ranking system, which adjusts leaderboard standings based on tag similarity in feedback. [Learn more about Evaluation](/features/evaluation).
 
 - 📂 **Unified and Collaborative Workspace** : Access and manage all your model files, prompts, documents, tools, and functions in one convenient location, while also enabling multiple users to collaborate and contribute to models, knowledge, prompts, or tools, streamlining your workflow and enhancing teamwork.
 
@@ -321,7 +323,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 ### 🎙️ Audio, Voice, & Accessibility
 
-- 🗣️ **Voice Input Support with Multiple Providers**: Engage with your model through voice interactions using multiple Speech-to-Text providers: Local Whisper (default, with VAD filtering), OpenAI-compatible endpoints, Deepgram, and Azure Speech Services. Enjoy the convenience of talking to your model directly with automatic voice input after 3 seconds of silence for a streamlined experience.
+- 🗣️ **Voice Input Support with Multiple Providers**: Engage with your model through voice interactions using multiple Speech-to-Text providers: Local Whisper (default, with VAD filtering), OpenAI-compatible endpoints, Deepgram, and Azure Speech Services. Enjoy the convenience of talking to your model directly with automatic voice input after 3 seconds of silence for a streamlined experience. [Explore Audio Features](/category/speech-to-text--text-to-speech).
   - Microphone access requires manually setting up a secure connection over HTTPS to work, or [manually whitelisting your URL at your own risk](https://docs.openwebui.com/troubleshooting/microphone-error).
 
 - 😊 **Emoji Call**: Toggle this feature on from the `Settings` > `Interface` menu, allowing LLMs to express emotions using emojis during voice calls for a more dynamic interaction.
@@ -362,14 +364,13 @@ import { TopBanners } from "@site/src/components/TopBanners";
 ### 🐍 Code Execution
 
 - 🚀 **Versatile, UI-Agnostic, OpenAI-Compatible Plugin Framework**: Seamlessly integrate and customize [Open WebUI Pipelines](https://github.com/open-webui/pipelines) for efficient data processing and model training, ensuring ultimate flexibility and scalability.
-
-- 🛠️ **Native Python Function Calling**: Access the power of Python directly within Open WebUI with native function calling. Easily integrate custom code to build unique features like custom RAG pipelines, web search tools, and even agent-like actions via a built-in code editor to seamlessly develop and integrate function code within the `Tools` and `Functions` workspace.
-
 - 🐍 **Python Code Execution**: Execute Python code locally in the browser via Pyodide with a range of libraries supported by Pyodide.
 
 - 🌊 **Mermaid Rendering**: Create visually appealing diagrams and flowcharts directly within Open WebUI using the [Mermaid Diagramming and charting tool](https://mermaid.js.org/intro/), which supports Mermaid syntax rendering.
 
 - 🔗 **Iframe Support**: Enables rendering HTML directly into your chat interface using functions and tools.
+
+
 
 ---
 
@@ -427,7 +428,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔒 **Prevent Chat Deletion**: Ability for admins to toggle a setting that prevents all users from deleting their chat messages, ensuring that all chat messages are retained for audit or compliance purposes.
 
-- 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with `Discord`, `Google Chat`, `Slack` and `Microsoft Teams`), providing real-time notifications and automation capabilities.
+- 🔗 **Webhook Integration**: Subscribe to new user sign-up events via webhook (compatible with `Discord`, `Google Chat`, `Slack` and `Microsoft Teams`), providing real-time notifications and automation capabilities. [See Webhook Guide](/features/interface/webhooks).
 
 - 📣 **Configurable Notification Banners**: Admins can create customizable banners with persistence in config.json, featuring options for content, background color (`info`, `warning`, `error`, or `success`), and dismissibility. Banners are accessible only to logged-in users, ensuring the confidentiality of sensitive information.
 
@@ -451,9 +452,9 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔐 **Group-Based Access Control**: Set granular access to models, knowledge, prompts, and tools based on user groups, allowing for more controlled and secure environments.
 
-- 🛠️ **Granular User Permissions**: Easily manage workspace permissions, including file uploads, deletions, edits, and temporary chats, as well as model, knowledge, prompt, and tool creation.
+- 🛠️ **Granular User Permissions**: Easily manage workspace permissions, including file uploads, deletions, edits, and temporary chats, as well as model, knowledge, prompt, and tool creation. [See User Permissions Config](/getting-started/env-configuration/#user-permissions).
 
-- 🔑 **LDAP Authentication**: Enhance security and scalability with LDAP support for user management.
+- 🔑 **LDAP Authentication**: Enhance security and scalability with LDAP support for user management. [Learn more about LDAP](/features/auth/ldap).
 
 - 🔐 **SCIM 2.0 Provisioning**: Automate user and group lifecycle management through SCIM 2.0 protocol integration with identity providers like Okta, Azure AD, and Google Workspace, reducing administrative overhead and ensuring synchronized user management across systems.
 

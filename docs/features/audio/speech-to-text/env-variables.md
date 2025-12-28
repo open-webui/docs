@@ -19,8 +19,12 @@ The following is a summary of the environment variables for speech to text (STT)
 |----------|-------------|
 | `WHISPER_MODEL` | Sets the Whisper model to use for local Speech-to-Text |
 | `WHISPER_MODEL_DIR` | Specifies the directory to store Whisper model files |
+| `WHISPER_COMPUTE_TYPE` | Sets the compute type for Whisper model inference (e.g., `int8`, `float16`) |
 | `WHISPER_LANGUAGE` | Specifies the ISO 639-1 (ISO 639-2 for Hawaiian and Cantonese) Speech-to-Text language to use for Whisper (language is predicted unless set) |
 | `AUDIO_STT_ENGINE` | Specifies the Speech-to-Text engine to use (empty for local Whisper, or `openai`) |
 | `AUDIO_STT_MODEL` | Specifies the Speech-to-Text model for OpenAI-compatible endpoints |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Sets the OpenAI-compatible base URL for Speech-to-Text |
 | `AUDIO_STT_OPENAI_API_KEY` | Sets the OpenAI API key for Speech-to-Text |
+| `AUDIO_STT_AZURE_API_KEY` | Sets the Azure API key for Speech-to-Text |
+| `AUDIO_STT_AZURE_REGION` | Sets the Azure region for Speech-to-Text |
+| `AUDIO_STT_AZURE_LOCALES` | Sets the Azure locales for Speech-to-Text |

@@ -5,6 +5,16 @@ title: "OpenTelemetry"
 
 Open WebUI supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with modern observability stacks such as **Grafana LGTM (Loki, Grafana, Tempo, Mimir)**, as well as **Jaeger**, **Tempo**, and **Prometheus** to monitor requests, database/Redis queries, response times, and more in real-time.
 
+:::warning Additional Dependencies
+
+If you are running Open WebUI from source or via `pip` (outside of the official Docker images), OpenTelemetry dependencies **may not be installed by default**. You may need to install them manually:
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
+```
+
+:::
+
 ## 🚀 Quick Start with Docker Compose
 
 The fastest way to get started with observability is with the pre-configured Docker Compose:

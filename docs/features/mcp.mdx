@@ -46,6 +46,37 @@ Choose **MCP (Streamable HTTP)** if you need:
 Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-user isolation, reconnects). Review your org’s auth, proxy, and rate-limiting policies before exposing MCP externally.
 :::
 
+## ⚙️ Configuration Best Practices
+
+### Authentication Modes
+
+*   **None**: Use this for **local MCP servers** or internal networks where no token is required.
+    *   **⚠️ Important**: Default to "None" unless your server strictly requires a token. Selecting "Bearer" without providing a key sends an empty Authorization header (`Authorization: Bearer`), which causes many servers to reject the connection immediately.
+*   **Bearer**: Use this **only** if your MCP server requires a specific API token. You **must** populate the "Key" field.
+*   **OAuth 2.1**: For secured, enterprise deployments requiring Identity Provider flows.
+
+### Connection URLs
+
+If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
+*   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/sse`) instead of `localhost`.
+
+### Function Name Filter List
+
+This field restricts which tools are exposed to the LLM.
+*   **Default**: Leave empty to expose all tools (in most cases).
+*   **Workaround**: If you encounter connection errors with an empty list, try adding a single comma (`,`) to this field. This forces the system to treat it as a valid (but empty) filter, potentially bypassing some parsing issues.
+
+## Troubleshooting
+
+### "Failed to connect to MCP server"
+
+**Symptom**: 
+The chat shows "Failed to connect to MCP server" when using a tool, even if the **Verify Connection** button in settings says "Connected".
+
+**Solutions**:
+1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
+2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
+
 ## ❓ FAQ
 
 **Do you support stdio or SSE transports?**

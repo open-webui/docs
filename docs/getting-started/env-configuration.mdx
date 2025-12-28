@@ -3440,6 +3440,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Default: `${DATA_DIR}/cache/whisper/models`
 - Description: Specifies the directory to store Whisper model files.
 
+#### `WHISPER_COMPUTE_TYPE`
+
+- Type: `str`
+- Default: `int8` (CPU), `float16` (CUDA)
+- Description: Sets the compute type for Whisper model inference. Defaults to `int8` for CPU and `float16` for CUDA (with fallback to `int8/int8_float16`).
+
 #### `WHISPER_VAD_FILTER`
 
 - Type: `bool`
@@ -4977,6 +4983,18 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
 
 ### OpenTelemetry Configuration
+
+:::warning Additional Dependencies May Be Required
+
+OpenTelemetry support requires additional Python dependencies that **may not be included by default** depending on your installation method (e.g., standard `pip install open-webui` versus Docker images).
+
+If you encounter `ImportError` or missing module errors related to OpenTelemetry, you may need to install them manually:
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
+```
+
+:::
 
 #### `ENABLE_OTEL`
 
