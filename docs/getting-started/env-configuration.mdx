@@ -1164,6 +1164,7 @@ This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment va
   - The connection settings are saved in the **Admin Panel > Settings > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
 - **No TTL**: There is no automatic time-based expiration.
 
+:::tip Performance Consideration
 
 Enable this setting in production environments where model lists are relatively stable. For development environments or when frequently adding/removing models from Ollama, you may prefer to leave it disabled for real-time model discovery.
 
