@@ -1,0 +1,229 @@
+---
+sidebar_position: 10
+title: "Optimization, Performance & RAM Usage"
+---
+
+# Optimization, Performance & RAM Usage
+
+This guide provides a comprehensive overview of strategies to optimize Open WebUI. Your ideal configuration depends heavily on your specific deployment goals. Consider which of these scenarios describes you best:
+
+1.  **Maximum Privacy on Weak Hardware (e.g., Raspberry Pi)**:
+    *   *Goal*: keep everything local; minimize resource usage.
+    *   *Trade-off*: You must use lightweight local models (SentenceTransformers) and disable heavy features to prevent crashes.
+
+2.  **Maximum Quality for Single User (e.g., Desktop)**:
+    *   *Goal*: Best possible experience with high speed and quality.
+    *   *Strategy*: Leverage external APIs (OpenAI/Anthropic) for embeddings and task models to offload compute from your local machine.
+
+3.  **High Scale for Many Users (e.g., Enterprise/Production)**:
+    *   *Goal*: Stability and concurrency.
+    *   *Strategy*: Requires dedicated Vector DBs (Milvus/Qdrant), increased thread pools, caching to handle load, and **PostgreSQL** instead of SQLite.
+
+---
+
+## ⚡ Performance Tuning (Speed & Responsiveness)
+
+If Open WebUI feels slow or unresponsive, especially during chat generation or high concurrency, specialized optimizations can significantly improve the user experience.
+
+### 1. Dedicated Task Models
+
+By default, Open WebUI automates background tasks like title generation, tagging, and autocomplete. These run in the background and can slow down your main chat model if they share the same resources.
+
+**Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid using large reasoning models (like o1, r1, or Claude) as they are too slow and expensive for simple background tasks.
+
+**Configuration:**
+There are two separate settings in **Admin Panel > Settings > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
+*   **Task Model (External)**: Used when you are chatting with an external model (e.g., OpenAI).
+*   **Task Model (Local)**: Used when you are chatting with a locally hosted model (e.g., Ollama).
+
+**Best Options (2025):**
+*   **External/Cloud**: `gpt-5-nano`, `gemini-2.5-flash-lite`, `llama-3.1-8b-instant` (OpenAI/Google/Groq/OpenRouter).
+*   **Local**: `qwen3:1b`, `gemma3:1b`, `llama3.2:3b`.
+
+### 2. Caching & Latency Optimization
+
+Configure these settings to reduce latency and external API usage.
+
+#### Model Caching
+Drastically reduces startup time and API calls to external providers.
+
+- **Admin Panel**: `Settings > Connections > Cache Base Model List`
+- **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
+  *   *Note*: Caches the list of models in memory. Only refreshes on App Restart or when clicking **Save** in Connections settings.
+
+- **Env Var**: `MODELS_CACHE_TTL=300`
+  *   *Note*: Sets a 5-minute cache for external API responses.
+
+#### Search Query Caching
+Reuses the LLM-generated Web-Search search queries for RAG search within the same chat turn. This prevents redundant LLM calls when multiple retrieval features act on the same user prompt.
+
+- **Env Var**: `ENABLE_QUERIES_CACHE=True`
+
+I.e. the LLM generates "US News 2025" as a Web Search query, if this setting is enabled, the same search query will be reused for RAG instead of generating new queries for RAG, saving on inference cost and API calls, thus improving performance.
+
+---
+
+## 📦 Database Optimization
+
+For high-scale deployments, your database configuration is the single most critical factor for stability.
+
+### PostgreSQL (Mandatory for Scale)
+For any multi-user or high-concurrency setup, **PostgreSQL is mandatory**. SQLite (the default) is not designed for high concurrency and will become a bottleneck (database locking errors).
+
+-   **Variable**: `DATABASE_URL`
+-   **Example**: `postgres://user:password@localhost:5432/webui`
+
+### Chat Saving Strategy
+By default, Open WebUI saves chats in **real-time**. This ensures no data loss but creates massive database write pressure because *every single chunk* of text received from the LLM triggers a database update.
+
+-   **Env Var**: `ENABLE_REALTIME_CHAT_SAVE=False`
+-   **Effect**: Chats are saved only when the generation is complete (or periodically).
+-   **Recommendation**: **Highly Recommended** for any high-user setup to reduce DB load substantially.
+
+### Vector Database (RAG)
+For multi-user setups, the choice of Vector DB matters.
+
+-   **ChromaDB**: **NOT RECOMMENDED** for multi-user environments due to performance limitations and locking issues.
+-   **Recommendations**:
+    *   **Milvus** or **Qdrant**: Best for improved scale and performance.
+    *   **PGVector**: Excellent choice if you are already using PostgreSQL.
+-   **Multitenancy**: If using Milvus or Qdrant, enabling multitenancy offers better resource sharing.
+    *   `ENABLE_MILVUS_MULTITENANCY_MODE=True`
+    *   `ENABLE_QDRANT_MULTITENANCY_MODE=True`
+
+---
+
+## 📈 Scaling Infrastructure (Multi-Tenancy & Kubernetes)
+
+If you are deploying for **enterprise scale** (hundreds of users), simple Docker Compose setups may not suffice. You will need to move to a clustered environment.
+
+*   **Kubernetes / Helm**: For deploying on K8s with multiple replicas, see the **[Multi-Replica & High Availability Guide](/troubleshooting/multi-replica)**.
+*   **Redis (Mandatory)**: When running multiple workers (`UVICORN_WORKERS > 1`) or multiple replicas, **Redis is required** to handle WebSocket connections and session syncing. See **[Redis Integration](/tutorials/integrations/redis)**.
+*   **Load Balancing**: Ensure your Ingress controller supports **Session Affinity** (Sticky Sessions) for best performance.
+*   **Reverse Proxy Caching**: Configure your reverse proxy (e.g., Nginx, Caddy, Cloudflare) to **cache static assets** (JS, CSS, Images). This significantly reduces load on the application server. See **[Nginx Config](/tutorials/https/nginx)** or **[Caddy Config](/tutorials/https/caddy)**.
+
+---
+
+## ⚡ High-Concurrency & Network Optimization
+
+For setups with many simultaneous users, these settings are crucial to prevent bottlenecks.
+
+#### Batch Streaming Tokens
+By default, Open WebUI streams *every single token* arriving from the LLM. High-frequency streaming increases network IO and CPU usage on the server. If real-time saving is enabled, it also destroys database performance (you can disable it with `ENABLE_REALTIME_CHAT_SAVE=False`).
+
+Increasing the chunk size buffers these updates, sending them to the client in larger groups. The only downside is a slightly choppier UI experience when streaming the response, but it can make a big difference in performance.
+
+- **Env Var**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7`
+  *   *Recommendation*: Set to **5-10** for high-concurrency instances.
+
+#### Thread Pool Size
+Defines the number of worker threads available for handling requests.
+*   **Default**: 40
+*   **High-Traffic Recommendation**: **2000+**
+*   **Warning**: **NEVER decrease this value.** Even on low-spec hardware, an idle thread pool does not consume significant resources. Setting this too low (e.g., 10) **WILL cause application freezes** and request timeouts.
+
+- **Env Var**: `THREAD_POOL_SIZE=2000`
+
+---
+
+## 📉 Resource Efficiency (Reducing RAM)
+
+If deploying on memory-constrained devices (Raspberry Pi, small VPS), use these strategies to prevent the application from crashing due to OOM (Out of Memory) errors.
+
+### 1. Offload Auxiliary Models (Local Deployments Only)
+
+Open WebUI loads local ML models for features like RAG and STT. **This section is only relevant if you are running models LOCALLY.**
+
+#### RAG Embeddings
+-   **Low-Spec Recommendation**:
+    *   **Option A (Easiest)**: Keep the default **SentenceTransformers** (all-MiniLM-L6-v2). It is lightweight, runs on CPU, and is significantly more efficient than running a full Ollama instance on the same Raspberry Pi.
+    *   **Option B (Best Performance)**: Use an **External API** (OpenAI/Cloud).
+
+-   **Configuration**:
+    *   **Admin Panel**: `Settings > Documents > Embedding Model Engine`
+    *   **Env Var**: `RAG_EMBEDDING_ENGINE=openai` (to offload completely)
+
+#### Speech-to-Text (STT)
+Local Whisper models are heavy (~500MB+ RAM).
+
+-   **Recommendation**: Use **WebAPI** (Browser-based). It uses the user's device capabilities, costing 0 server RAM.
+-   **Configuration**:
+    *   **Admin Panel**: `Settings > Audio > STT Engine`
+    *   **Env Var**: `AUDIO_STT_ENGINE=webapi`
+
+### 2. Disable Unused Features
+
+Prevent the application from loading **local** models you don't use.
+
+-   **Image Generation**: `ENABLE_IMAGE_GENERATION=False` (Admin: `Settings > Images`)
+-   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Tools`)
+
+### 3. Disable Background Tasks
+
+If resource usage is critical, disable automated features that constantly trigger model inference.
+
+**Recommendation order (Highest Impact first):**
+
+1.  **Autocomplete**: `ENABLE_AUTOCOMPLETE_GENERATION=False` (**High Impact**: Triggers on every keystroke!)
+    *   Admin: `Settings > Interface > Autocomplete`
+2.  **Follow-up Questions**: `ENABLE_FOLLOW_UP_GENERATION=False`
+    *   Admin: `Settings > Interface > Follow-up`
+3.  **Title Generation**: `ENABLE_TITLE_GENERATION=False`
+    *   Admin: `Settings > Interface > Chat Title`
+4.  **Tag Generation**: `ENABLE_TAGS_GENERATION=False`
+
+---
+
+## 🚀 Recommended Configuration Profiles
+
+### Profile 1: Maximum Privacy (Weak Hardware/RPi)
+*Target: 100% Local, Raspberry Pi / &lt;4GB RAM.*
+
+1.  **Embeddings**: Default (SentenceTransformers) - *Runs on CPU, lightweight.*
+2.  **Audio**: `AUDIO_STT_ENGINE=webapi` - *Zero server load.*
+3.  **Task Model**: Disable or use tiny model (`llama3.2:1b`).
+4.  **Scaling**: Keep default `THREAD_POOL_SIZE` (40).
+5.  **Disable**: Image Gen, Code Interpreter, Autocomplete, Follow-ups.
+6.  **Database**: SQLite is fine.
+
+### Profile 2: Single User Enthusiast
+*Target: Max Quality & Speed, Local + External APIs.*
+
+1.  **Embeddings**: `RAG_EMBEDDING_ENGINE=openai` (or `ollama` with `nomic-embed-text` on a fast server).
+2.  **Task Model**: `gpt-5-nano` or `llama-3.1-8b-instant`.
+3.  **Caching**: `MODELS_CACHE_TTL=300`.
+4.  **Database**: `ENABLE_REALTIME_CHAT_SAVE=True` (Persistence is usually preferred over raw write speed here).
+5.  **Vector DB**: PGVector (recommended) or ChromaDB (either is fine unless dealing with massive data).
+
+### Profile 3: High Scale / Enterprise
+*Target: Many concurrent users, Stability > Persistence.*
+
+1.  **Database**: **PostgreSQL** (Mandatory).
+2.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
+3.  **Streaming**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7` (Reduce CPU/Net/DB writes).
+4.  **Chat Saving**: `ENABLE_REALTIME_CHAT_SAVE=False`.
+5.  **Vector DB**: **Milvus**, **Qdrant**, or **PGVector**. **Avoid ChromaDB.**
+6.  **Task Model**: External/Hosted (Offload compute).
+7.  **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
+
+---
+
+## 🔗 Environment Variable References
+
+For detailed information on all available variables, see the [Environment Configuration](/getting-started/env-configuration) guide.
+
+| Variable | Description & Link |
+| :--- | :--- |
+| `TASK_MODEL` | [Task Model (Local)](/getting-started/env-configuration#task_model) |
+| `TASK_MODEL_EXTERNAL` | [Task Model (External)](/getting-started/env-configuration#task_model_external) |
+| `ENABLE_BASE_MODELS_CACHE` | [Cache Model List](/getting-started/env-configuration#enable_base_models_cache) |
+| `MODELS_CACHE_TTL` | [Model Cache TTL](/getting-started/env-configuration#models_cache_ttl) |
+| `ENABLE_QUERIES_CACHE` | [Queries Cache](/getting-started/env-configuration#enable_queries_cache) |
+| `DATABASE_URL` | [Database URL](/getting-started/env-configuration#database_url) |
+| `ENABLE_REALTIME_CHAT_SAVE` | [Realtime Chat Save](/getting-started/env-configuration#enable_realtime_chat_save) |
+| `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/getting-started/env-configuration#chat_response_stream_delta_chunk_size) |
+| `THREAD_POOL_SIZE` | [Thread Pool Size](/getting-started/env-configuration#thread_pool_size) |
+| `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/getting-started/env-configuration#rag_embedding_engine) |
+| `AUDIO_STT_ENGINE` | [STT Engine](/getting-started/env-configuration#audio_stt_engine) |
+| `ENABLE_IMAGE_GENERATION` | [Image Generation](/getting-started/env-configuration#enable_image_generation) |
+| `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/getting-started/env-configuration#enable_autocomplete_generation) |
