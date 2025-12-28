@@ -4978,6 +4978,18 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 ### OpenTelemetry Configuration
 
+:::warning Additional Dependencies May Be Required
+
+OpenTelemetry support requires additional Python dependencies that **may not be included by default** depending on your installation method (e.g., standard `pip install open-webui` versus Docker images).
+
+If you encounter `ImportError` or missing module errors related to OpenTelemetry, you may need to install them manually:
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
+```
+
+:::
+
 #### `ENABLE_OTEL`
 
 - Type: `bool`
