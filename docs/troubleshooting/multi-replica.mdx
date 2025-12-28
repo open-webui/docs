@@ -12,7 +12,7 @@ This guide addresses common issues encountered when deploying Open WebUI in **mu
 Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
 
 1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/getting-started/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
-2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/getting-started/env-configuration#database_server)). SQLite is **NOT** supported for multiple instances.
+2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/getting-started/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
 3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/getting-started/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/getting-started/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/getting-started/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
 5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/getting-started/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
