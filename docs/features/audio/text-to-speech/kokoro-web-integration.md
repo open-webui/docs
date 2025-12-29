@@ -89,4 +89,27 @@ Visit the [**Kokoro Web Demo**](https://voice-generator.pages.dev) to preview al
 
 For additional options, voice customization guides, and advanced settings, visit the [GitHub repository](https://github.com/eduardolat/kokoro-web).
 
+## Troubleshooting
+
+### Connection Issues
+
+If Open WebUI can't reach Kokoro Web:
+
+- **Docker Desktop (Windows/Mac):** Use `http://host.docker.internal:3000/api/v1`
+- **Docker Compose (same network):** Use `http://kokoro-web:3000/api/v1`
+- **Linux Docker:** Use your host machine's IP address
+
+### Voice Not Working
+
+1. Verify the secret API key matches in both the Kokoro Web config and Open WebUI settings
+2. Test the API directly:
+   ```bash
+   curl -X POST http://localhost:3000/api/v1/audio/speech \
+     -H "Authorization: Bearer your-api-key" \
+     -H "Content-Type: application/json" \
+     -d '{"input": "Hello world", "voice": "af_heart"}'
+   ```
+
+For more troubleshooting tips, see the [Audio Troubleshooting Guide](/troubleshooting/audio).
+
 **Enjoy natural AI voices in your OpenWebUI conversations!**

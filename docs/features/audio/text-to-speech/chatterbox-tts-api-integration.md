@@ -234,3 +234,31 @@ For more information on `chatterbox-tts-api`, you can visit the [GitHub repo](ht
 
 - 📖 **Documentation**: See [API Documentation](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/API_README.md) and [Docker Guide](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/DOCKER_README.md)
 - 💬 **Discord**: [Join the Discord for this project](http://chatterboxtts.com/discord)
+
+## Troubleshooting
+
+### Memory Requirements
+
+Chatterbox has higher memory requirements than other TTS solutions:
+- **Minimum:** 4GB RAM
+- **Recommended:** 8GB+ RAM
+- **GPU:** NVIDIA CUDA or Apple M-series (MPS) recommended
+
+If you experience memory issues, consider using a lighter alternative like [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](/features/audio/text-to-speech/Kokoro-FastAPI-integration).
+
+### Docker Networking
+
+If Open WebUI can't connect to Chatterbox:
+
+- **Docker Desktop:** Use `http://host.docker.internal:4123/v1` 
+- **Docker Compose:** Use `http://chatterbox-tts-api:4123/v1`
+- **Linux:** Use your host machine's IP address
+
+### First-Time Startup
+
+The first TTS request takes significantly longer as the model loads. Check logs with:
+```bash
+docker logs chatterbox-tts-api -f
+```
+
+For more troubleshooting tips, see the [Audio Troubleshooting Guide](/troubleshooting/audio).

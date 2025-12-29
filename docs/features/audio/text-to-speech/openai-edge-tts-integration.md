@@ -261,3 +261,66 @@ For direct support, you can visit the [Voice AI & TTS Discord](https://tts.travi
 ## 🎙️ Voice Samples
 
 [Play voice samples and see all available Edge TTS voices](https://tts.travisvn.com/)
+
+## Troubleshooting
+
+### Connection Issues
+
+#### "localhost" Not Working from Docker
+
+If Open WebUI runs in Docker and can't reach the TTS service at `localhost:5050`:
+
+**Solutions:**
+- Use `host.docker.internal:5050` instead of `localhost:5050` (Docker Desktop on Windows/Mac)
+- On Linux, use the host's IP address, or add `--network host` to your Docker run command
+- If both services are in Docker Compose, use the container name: `http://openai-edge-tts:5050/v1`
+
+**Example Docker Compose for both services on the same network:**
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - AUDIO_TTS_ENGINE=openai
+      - AUDIO_TTS_OPENAI_API_BASE_URL=http://openai-edge-tts:5050/v1
+      - AUDIO_TTS_OPENAI_API_KEY=your_api_key_here
+    networks:
+      - webui-network
+
+  openai-edge-tts:
+    image: travisvn/openai-edge-tts:latest
+    ports:
+      - "5050:5050"
+    environment:
+      - API_KEY=your_api_key_here
+    networks:
+      - webui-network
+
+networks:
+  webui-network:
+    driver: bridge
+```
+
+#### Testing the TTS Service
+
+Verify the TTS service is working independently:
+
+```bash
+curl -X POST http://localhost:5050/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_api_key_here" \
+  -d '{"input": "Test message", "voice": "alloy"}' \
+  --output test.mp3
+```
+
+If this works but Open WebUI still can't connect, the issue is network-related between containers.
+
+### No Audio Output in Open WebUI
+
+1. Check that the API Base URL ends with `/v1`
+2. Verify the API key matches between both services (or remove the requirement)
+3. Check Open WebUI container logs: `docker logs open-webui`
+4. Check openai-edge-tts logs: `docker logs openai-edge-tts` (or your container name)
+
+For more troubleshooting tips, see the [Audio Troubleshooting Guide](/troubleshooting/audio).
