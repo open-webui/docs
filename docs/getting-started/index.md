@@ -62,7 +62,16 @@ Already deployed? Stay current with the latest features and security patches.
 
 ---
 
-## 📋 Reference
+## 💡 Explore What's Possible
+
+Already up and running? Ready to go deeper?
+
+- **[Upload documents and use RAG →](\features\rag\index.md)** Ground responses in your data
+- **[Enable web search →](\features\web-search\_category_.json)** Let models access current information _(SearXNG Recommended)_
+- **[Generate images →](\features\image-generation-and-editing\_category_.json)** Connect to AUTOMATIC1111, ComfyUI, or DALL-E _(ComfyUI Recommended)_
+- **[Explore all features →](/features)** Voice, tools, pipelines, and more
+
+---
 
 Looking for something specific?
 
