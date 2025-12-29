@@ -24,156 +24,233 @@ import PythonUpdating from './tab-python/PythonUpdating.md';
 
 <TopBanners />
 
-:::info
+# Quick Start
 
-**Important Note on User Roles and Privacy:**
+Let's get you running. Pick your deployment method—all paths lead to localhost.
 
-- **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
-- **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
-- **Privacy and Data Security:** **All your data**, including login details, is **locally stored** on your device. Open WebUI ensures **strict confidentiality** and **no external requests** for enhanced privacy and security.
-  - **All models are private by default.** Models must be explicitly shared via groups or by being made public. If a model is assigned to a group, only members of that group can see it. If a model is made public, anyone on the instance can see it.
+---
+
+## Choose Your Path
+
+| Method | Best for | Time to deploy |
+|--------|----------|----------------|
+| **Docker** | Most users. Clean, isolated, officially supported. | ~5 minutes |
+| **Python** | Low-resource environments, development, or no Docker available. | ~10 minutes |
+| **Kubernetes** | Production scale, orchestration, enterprise deployments. | 30+ minutes |
+| **Third-party** | One-click installers like Pinokio. Community-supported. | Varies |
+
+---
+
+## Before You Begin
+
+:::info Admin & User Roles
+
+The first account created on Open WebUI gets **Administrator privileges**—this controls user management, system settings, and permissions for your entire instance.
+
+Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access. Plan your admin account before sharing access.
 
 :::
 
-Choose your preferred installation method below:
+:::tip Your Data Stays Yours
 
-- **Docker:** **Officially supported and recommended for most users**
-- **Python:** Suitable for low-resource environments or those wanting a manual setup
-- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration
+**All your data**—including login details, conversations, and documents—is **stored locally** on your infrastructure. Open WebUI makes no external requests. No telemetry. No phoning home.
+
+**Models are private by default.** Models must be explicitly shared via groups or made public. If assigned to a group, only members see it. If made public, anyone on your instance can access it.
+
+:::
+
+---
+
+## Installation
 
 <Tabs>
-  <TabItem value="docker" label="Docker">
-    <Tabs>
-      <TabItem value="docker" label="Docker">
-        <div className='mt-5'>
-          <ManualDocker />
-          <DockerUpdating />
-        </div>
-      </TabItem>
+  <TabItem value="docker" label="Docker" default>
 
-      <TabItem value="compose" label="Docker Compose">
-        <div className='mt-5'>
-          <DockerCompose />
-        </div>
-      </TabItem>
+**The recommended path.** Docker keeps Open WebUI isolated and portable. Works on Linux, macOS, and Windows.
 
-      <TabItem value="extension" label="Extension">
-        <div className='mt-5'>
-          <Extension />
-        </div>
-      </TabItem>
-
-      <TabItem value="podman" label="Podman">
-        <div className='mt-5'>
-          <Podman />
-        </div>
-      </TabItem>
-
-      <TabItem value="podman-quadlet" label="Quadlets">
-        <div className='mt-5'>
-          <PodmanQuadlet />
-        </div>
-      </TabItem>
-
-    <TabItem value="podman-kube-play" label="Kube Play">
-      <div className='mt-5'>
-        <PodmanKubePlay />
-      </div>
-    </TabItem>
-
-      <TabItem value="swarm" label="Swarm">
-        <div className='mt-5'>
-          <DockerSwarm />
-        </div>
-      </TabItem>
-      <TabItem value="wsl" label="WSL">
-        <div className='mt-5'>
-          <WSL />
-        </div>
-      </TabItem>
-    </Tabs>
-
-  </TabItem>
-  <TabItem value="python" label="Python">
-    <Tabs>
-      <TabItem value="uv" label="uv">
-        <div className='mt-5'>
-          <Uv />
-        </div>
-        <PythonUpdating />
-      </TabItem>
-
-      <TabItem value="conda" label="Conda">
-        <div className='mt-5'>
-          <Conda />
-        </div>
-        <PythonUpdating />
-      </TabItem>
-
-      <TabItem value="venv" label="Venv">
-        <div className='mt-5'>
-          <Venv />
-        </div>
-        <PythonUpdating />
-
-      </TabItem>
-
-      <TabItem value="development" label="Development">
-        <div className='mt-5'>
-          <h3>Development Setup</h3>
-          <p>
-            For developers who want to contribute, check the Development Guide in <a href="/getting-started/advanced-topics">Advanced Topics</a>.
-          </p>
-        </div>
-      </TabItem>
-
-    </Tabs>
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+    <div className='mt-5'>
+      <ManualDocker />
+      <DockerUpdating />
+    </div>
   </TabItem>
 
-  <TabItem value="kubernetes" label="Kubernetes">
-    <Tabs>
-      <TabItem value="helm" label="Helm">
-        <Helm />
-      </TabItem>
-    </Tabs>
+  <TabItem value="compose" label="Compose">
+    <div className='mt-5'>
+      <DockerCompose />
+    </div>
   </TabItem>
 
-  <TabItem value="third-party" label="Third Party">
-    <Tabs>
-      <TabItem value="pinokio-computer" label="Pinokio.computer">
-        ### Pinokio.computer Installation
+  <TabItem value="extension" label="Desktop">
+    <div className='mt-5'>
+      <Extension />
+    </div>
+  </TabItem>
 
-        For installation via Pinokio.computer, please visit their website:
+  <TabItem value="podman" label="Podman">
+    <div className='mt-5'>
+      <Podman />
+    </div>
+  </TabItem>
 
-        [https://pinokio.computer/](https://pinokio.computer/)
+  <TabItem value="podman-quadlet" label="Quadlet">
+    <div className='mt-5'>
+      <PodmanQuadlet />
+    </div>
+  </TabItem>
 
-        Support for this installation method is provided through their website.
-      </TabItem>
-    </Tabs>
+  <TabItem value="podman-kube" label="KubePlay">
+    <div className='mt-5'>
+      <PodmanKubePlay />
+    </div>
+  </TabItem>
 
-    ### Additional Third-Party Integrations
+  <TabItem value="swarm" label="Swarm">
+    <div className='mt-5'>
+      <DockerSwarm />
+    </div>
+  </TabItem>
 
-    *(Add information about third-party integrations as they become available.)*
+  <TabItem value="wsl" label="WSL">
+    <div className='mt-5'>
+      <WSL />
+    </div>
   </TabItem>
 </Tabs>
 
-## Next Steps
+  </TabItem>
 
-After installing, visit:
+  <TabItem value="python" label="Python">
 
-- [http://localhost:3000](http://localhost:3000) to access Open WebUI.
-- or [http://localhost:8080/](http://localhost:8080/) when using a Python deployment.
+**No Docker? No problem.** Run Open WebUI directly as a Python application. Good for development, debugging, or constrained environments.
 
-You are now ready to start using Open WebUI!
+**Prerequisites:** Python 3.11+
 
-## Using Open WebUI with Ollama
-If you're using Open WebUI with Ollama, be sure to check out our [Starting with Ollama Guide](/getting-started/quick-start/starting-with-ollama) to learn how to manage your Ollama instances with Open WebUI.
+<Tabs>
+  <TabItem value="uv" label="uv (Recommended)" default>
+    <div className='mt-5'>
+      <Uv />
+      <PythonUpdating />
+    </div>
+  </TabItem>
 
-## Join the Community
+  <TabItem value="venv" label="pip + venv">
+    <div className='mt-5'>
+      <Venv />
+      <PythonUpdating />
+    </div>
+  </TabItem>
 
-Need help? Have questions? Join our community:
+  <TabItem value="conda" label="Conda">
+    <div className='mt-5'>
+      <Conda />
+      <PythonUpdating />
+    </div>
+  </TabItem>
 
-- [Open WebUI Discord](https://discord.gg/5rJgQTnV4s)
-- [GitHub Issues](https://github.com/open-webui/open-webui/issues)
+  <TabItem value="development" label="Development">
+    <div className='mt-5'>
+      <h3>Development Setup</h3>
+      <p>
+        Want to contribute? Check the <a href="/getting-started/advanced-topics">Development Guide in Advanced Topics</a> for build instructions, hot-reloading, and contribution guidelines.
+      </p>
+    </div>
+  </TabItem>
+</Tabs>
 
-Stay updated with the latest features, troubleshooting tips, and announcements!
+  </TabItem>
+
+  <TabItem value="kubernetes" label="Kubernetes">
+
+**Built for scale.** Deploy Open WebUI on Kubernetes with Helm for production-grade orchestration, high availability, and enterprise requirements.
+
+**Prerequisites:** Kubernetes cluster, Helm 3.x, `kubectl` configured
+
+<div className='mt-5'>
+  <Helm />
+</div>
+
+  </TabItem>
+
+  <TabItem value="third-party" label="Third-Party">
+
+**Community-supported options.** These installers are maintained by third parties—support is provided through their respective channels.
+
+<Tabs>
+  <TabItem value="pinokio" label="Pinokio" default>
+
+### Pinokio.computer
+
+One-click installation via Pinokio:
+
+[https://pinokio.computer/](https://pinokio.computer/)
+
+For support, visit their website or community channels.
+
+  </TabItem>
+</Tabs>
+
+*Additional third-party integrations will be listed here as they become available.*
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Installation Complete 🎉
+
+You're in. Open WebUI is running at:
+
+- **Docker:** [http://localhost:3000](http://localhost:3000)
+- **Python:** [http://localhost:8080](http://localhost:8080)
+
+Now let's make it _yours_...
+
+---
+
+## Connect Your Models
+
+Open WebUI needs something to talk to. Choose your path:
+
+| I want to... | Go here |
+|--------------|---------|
+| Run local models with **Ollama** | [Ollama Setup →](getting-started\quick-start\starting-with-ollama.mdx) |
+| Connect to **OpenAI** | [OpenAI Setup →](\getting-started\quick-start\starting-with-openai.mdx) |
+| Connect almost anything via OpenAI-Compatible API | [OpenAI-Compatible APIs →](\getting-started\quick-start\starting-with-openai-compatible.mdx) |
+| Connect to **Claude, Gemini**, or other providers via **Functions** | [Functions →](\getting-started\quick-start\starting-with-functions.mdx) |
+
+_See sidebar for additional connectivity options._
+
+---
+
+## Complete Your Setup
+
+A few more steps to get the most out of Open WebUI:
+
+| Task | Why it matters |
+|------|----------------|
+| **Set up remote access** | Access Open WebUI from any device, anywhere—securely. We recommend [Tailscale](https://tailscale.com/). |
+| **[Install the PWA on other devices](\features\index.mdx#key-features-of-open-webui-)** | Native app experience on mobile and desktop. Requires HTTPS. |
+| **[Add users and set permissions](\features\rbac\index.mdx)** | Ready to share? Set up your team. |
+
+---
+
+## Explore What's Possible
+
+You're running. You're connected. Ready to go deeper?
+
+- **[Upload documents and use RAG →](\features\rag\index.md)** Ground responses in your data
+- **[Enable web search →](\features\web-search\searxng.md)** Let models access current information _(SearXNG Recommended)_
+- **[Generate images →](\features\image-generation-and-editing\_category_.json)** Connect to AUTOMATIC1111, ComfyUI, or DALL-E _(ComfyUI Recommended)_
+- **[Explore all features →](/features)** Voice, tools, pipelines, and more
+
+---
+
+## Need Help?
+
+Stuck? It happens. We've got you.
+
+- **[Troubleshooting →](/troubleshooting)** How and where to get support
+- **[Discord →](https://discord.gg/5rJgQTnV4s)** Ask the community or our trusty support bot for advice
+- **[GitHub Issues →](https://github.com/open-webui/open-webui/issues)** Report bugs
