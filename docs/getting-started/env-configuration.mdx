@@ -3522,6 +3522,20 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Description: Specifies the locales to use for Azure Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `AUDIO_STT_AZURE_BASE_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies a custom Azure base URL for Speech-to-Text. Use this if you have a custom Azure endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_AZURE_MAX_SPEAKERS`
+
+- Type: `int`
+- Default: `3`
+- Description: Sets the maximum number of speakers for Azure Speech-to-Text diarization.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Speech-to-Text (Deepgram)
 
 #### `DEEPGRAM_API_KEY`
@@ -3529,6 +3543,38 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Type: `str`
 - Default: `None`
 - Description: Specifies the Deepgram API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Speech-to-Text (Mistral)
+
+#### `AUDIO_STT_MISTRAL_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the Mistral API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_MISTRAL_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.mistral.ai/v1`
+- Description: Specifies the Mistral API base URL to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, uses the chat completions endpoint for Mistral Speech-to-Text instead of the dedicated transcription endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Speech-to-Text (General)
+
+#### `AUDIO_STT_SUPPORTED_CONTENT_TYPES`
+
+- Type: `str`
+- Default: `None`
+- Description: Comma-separated list of supported audio MIME types for Speech-to-Text (e.g., `audio/wav,audio/mpeg,video/*`). Leave empty to use defaults.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Text-to-Speech
@@ -3583,7 +3629,15 @@ Note: If none of the specified languages are available and `en` was not in your 
 #### `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT`
 
 - Type: `str`
+- Default: `audio-24khz-160kbitrate-mono-mp3`
 - Description: Sets the output format for Azure Text to Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_AZURE_SPEECH_BASE_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies a custom Azure Speech base URL for Text-to-Speech. Use this if you have a custom Azure endpoint.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Voice Mode
@@ -3608,6 +3662,14 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Type: `str`
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for text-to-speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_OPENAI_PARAMS`
+
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Additional parameters for OpenAI-compatible TTS API in JSON format. Allows customization of API-specific settings.
+- Example: `{"speed": 1.0}`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Elevenlabs Text-to-Speech

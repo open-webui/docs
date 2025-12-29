@@ -1,0 +1,430 @@
+---
+sidebar_position: 3
+title: "Audio Troubleshooting"
+---
+
+import { TopBanners } from "@site/src/components/TopBanners";
+
+<TopBanners />
+
+# Audio Troubleshooting Guide
+
+This page covers common issues with Speech-to-Text (STT) and Text-to-Speech (TTS) functionality in Open WebUI, along with their solutions.
+
+## Where to Find Audio Settings
+
+### Admin Settings (Server-Wide)
+
+Admins can configure server-wide audio defaults:
+
+1. Click your **profile icon** (bottom-left corner)
+2. Select **Admin Panel**
+3. Click **Settings** in the top navigation
+4. Select the **Audio** tab
+
+Here you can configure:
+- **Speech-to-Text Engine** — Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
+- **Whisper Model** — Select model size for local STT (tiny, base, small, medium, large)
+- **Text-to-Speech Engine** — Choose between OpenAI-compatible, ElevenLabs, Azure, or local Transformers
+- **TTS Voice** — Select the default voice
+- **API Keys and Base URLs** — Configure external service connections
+
+### User Settings (Per-User)
+
+Individual users can customize their audio experience:
+
+1. Click your **profile icon** (bottom-left corner)
+2. Select **Settings**
+3. Click the **Audio** tab
+
+User-level options include:
+- **STT Engine Override** — Use "Web API" for browser-based speech recognition
+- **STT Language** — Set preferred language for transcription
+- **TTS Engine** — Choose "Browser Kokoro" for local in-browser TTS
+- **TTS Voice** — Select from available voices
+- **Auto-playback** — Automatically play AI responses
+- **Playback Speed** — Adjust audio speed
+- **Conversation Mode** — Enable hands-free voice interaction
+
+:::tip
+User settings override admin defaults. If you're having issues, check both locations to ensure settings aren't conflicting.
+:::
+
+## Quick Setup Guide
+
+### Fastest Setup: OpenAI (Paid)
+
+If you have an OpenAI API key, this is the simplest setup:
+
+**In Admin Panel → Settings → Audio:**
+- **STT Engine:** `OpenAI` | **Model:** `whisper-1`
+- **TTS Engine:** `OpenAI` | **Model:** `tts-1` | **Voice:** `alloy`
+- Enter your OpenAI API key in both sections
+
+Or via environment variables:
+```yaml
+environment:
+  - AUDIO_STT_ENGINE=openai
+  - AUDIO_STT_OPENAI_API_KEY=sk-...
+  - AUDIO_TTS_ENGINE=openai
+  - AUDIO_TTS_OPENAI_API_KEY=sk-...
+  - AUDIO_TTS_MODEL=tts-1
+  - AUDIO_TTS_VOICE=alloy
+```
+
+→ See full guides: [Speech-to-Text](/category/speech-to-text) | [Text-to-Speech](/category/text-to-speech)
+
+### Free Setup: Local Whisper + Edge TTS
+
+For a completely free setup:
+
+**STT:** Leave engine empty (uses built-in Whisper)
+```yaml
+environment:
+  - WHISPER_MODEL=base  # Options: tiny, base, small, medium, large
+```
+
+**TTS:** Use OpenAI Edge TTS (free Microsoft voices)
+```yaml
+services:
+  openai-edge-tts:
+    image: travisvn/openai-edge-tts:latest
+    ports:
+      - "5050:5050"
+
+  open-webui:
+    environment:
+      - AUDIO_TTS_ENGINE=openai
+      - AUDIO_TTS_OPENAI_API_BASE_URL=http://openai-edge-tts:5050/v1
+      - AUDIO_TTS_OPENAI_API_KEY=not-needed
+```
+
+→ See full guide: [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration)
+
+### Browser-Only Setup (No Config Needed)
+
+For basic functionality without any server-side setup:
+
+**In User Settings → Audio:**
+- **STT Engine:** `Web API` (uses browser's built-in speech recognition)
+- **TTS Engine:** `Web API` (uses browser's built-in text-to-speech)
+
+:::note
+Browser-based audio has limited accuracy and voice options compared to server-side solutions.
+:::
+
+## Microphone Access Issues
+
+### Understanding Secure Contexts 🔒
+
+For security reasons, accessing the microphone is restricted to pages served over HTTPS or locally from `localhost`. This requirement is meant to safeguard your data by ensuring it is transmitted over secure channels.
+
+### Common Permission Issues 🚫
+
+Browsers like Chrome, Brave, Microsoft Edge, Opera, and Vivaldi, as well as Firefox, restrict microphone access on non-HTTPS URLs. This typically becomes an issue when accessing a site from another device within the same network (e.g., using a mobile phone to access a desktop server).
+
+### Solutions for Non-HTTPS Connections
+
+1. **Set Up HTTPS (Recommended):**
+   - Configure your server to support HTTPS. This not only resolves permission issues but also enhances the security of your data transmissions.
+   - You can use a reverse proxy like Nginx or Caddy with Let's Encrypt certificates.
+
+2. **Temporary Browser Flags (Use with caution):**
+   - These settings force your browser to treat certain insecure URLs as secure. This is useful for development purposes but poses significant security risks.
+
+   **Chromium-based Browsers (e.g., Chrome, Brave):**
+   - Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
+   - Enter your non-HTTPS address (e.g., `http://192.168.1.35:3000`)
+   - Restart the browser to apply the changes
+
+   **Firefox-based Browsers:**
+   - Open `about:config`
+   - Search and modify (or create) the string value `dom.securecontext.allowlist`
+   - Add your IP addresses separated by commas (e.g., `http://127.0.0.1:8080`)
+
+:::warning
+While browser flags offer a quick fix, they bypass important security checks which can expose your device and data to vulnerabilities. Always prioritize proper security measures, especially when planning for a production environment.
+:::
+
+### Microphone Not Working
+
+If the microphone icon doesn't respond even on HTTPS:
+
+1. **Check browser permissions:** Ensure your browser has microphone access for the site
+2. **Check system permissions:** On Windows/Mac, ensure the browser has microphone access in system settings
+3. **Check browser compatibility:** Some browsers have limited STT support
+4. **Try a different browser:** Chrome typically has the best support for web audio APIs
+
+---
+
+## Text-to-Speech (TTS) Issues
+
+### TTS Loading Forever / Not Working
+
+If clicking the play button on chat responses causes endless loading, try the following solutions:
+
+#### 1. Hugging Face Dataset Library Conflict (Local Transformers TTS)
+
+**Symptoms:**
+- TTS keeps loading forever
+- Container logs show: `RuntimeError: Dataset scripts are no longer supported, but found cmu-arctic-xvectors.py`
+
+**Cause:** This occurs when using local Transformers TTS (`AUDIO_TTS_ENGINE=transformers`). The `datasets` library is pulled in as an indirect dependency of the `transformers` package and isn't pinned to a specific version in Open WebUI's requirements. Newer versions of `datasets` removed support for dataset loading scripts, causing this error when loading speaker embeddings.
+
+**Solutions:**
+
+**Temporary fix** (re-applies after container restart):
+```bash
+docker exec open-webui bash -lc "pip install datasets==3.6.0" && docker restart open-webui
+```
+
+**Permanent fix using environment variable:**
+Add this to your `docker-compose.yml`:
+```yaml
+environment:
+  - EXTRA_PIP_PACKAGES=datasets==3.6.0
+```
+
+**Verify the installed version:**
+```bash
+docker exec open-webui bash -lc "pip show datasets"
+```
+
+:::tip
+Consider using an external TTS service like [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro](/features/audio/text-to-speech/Kokoro-FastAPI-integration) instead of local Transformers TTS to avoid these dependency conflicts.
+:::
+
+#### 2. Using External TTS Instead of Local
+
+If you continue to have issues with local TTS, configuring an external TTS service is often more reliable. See the example Docker Compose configuration below that uses `openai-edge-tts`:
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - AUDIO_TTS_ENGINE=openai
+      - AUDIO_TTS_OPENAI_API_KEY=your-api-key-here
+      - AUDIO_TTS_OPENAI_API_BASE_URL=http://openai-edge-tts:5050/v1
+    depends_on:
+      - openai-edge-tts
+    # ... other configuration
+
+  openai-edge-tts:
+    image: travisvn/openai-edge-tts:latest
+    ports:
+      - "5050:5050"
+    environment:
+      - API_KEY=your-api-key-here
+    restart: unless-stopped
+```
+
+### TTS Voice Not Found / No Audio Output
+
+**Checklist:**
+1. Verify the TTS engine is correctly configured in **Admin Panel → Settings → Audio**
+2. Check that the voice name matches an available voice for your chosen engine
+3. For external TTS services, verify the API Base URL is accessible from the Open WebUI container
+4. Check container logs for any error messages
+
+### Docker Networking Issues with TTS
+
+If Open WebUI can't reach your TTS service:
+
+**Problem:** Using `localhost` in the API Base URL doesn't work from within Docker.
+
+**Solutions:**
+- Use `host.docker.internal` instead of `localhost` (works on Docker Desktop for Windows/Mac)
+- Use the container name if both services are on the same Docker network (e.g., `http://openai-edge-tts:5050/v1`)
+- Use the host machine's IP address
+
+---
+
+## Speech-to-Text (STT) Issues
+
+### Whisper STT Not Working / Compute Type Error
+
+**Symptoms:**
+- Error message: `Requested int8 compute type, but the target device or backend do not support efficient int8 computation`
+- STT fails to process audio
+
+**Cause:** This typically occurs when using the `:cuda` Docker image with an older NVIDIA GPU that doesn't support the required compute operations (e.g., Maxwell architecture GPUs like Tesla M60).
+
+**Solutions:**
+
+#### Switch to the Standard Image
+
+Older GPUs (Maxwell architecture, ~2014-2016) may not be supported by modern ML libraries with CUDA acceleration. Switch to the standard Docker image instead:
+
+```bash
+# Instead of:
+# ghcr.io/open-webui/open-webui:cuda
+
+# Use:
+ghcr.io/open-webui/open-webui:main
+```
+
+:::info
+The CUDA image primarily accelerates RAG embedding/reranking models and Whisper STT. For smaller models like Whisper, CPU mode often provides comparable performance without the compatibility issues.
+:::
+
+#### Adjust Whisper Compute Type
+
+If you want to keep GPU acceleration, try changing the compute type:
+
+```yaml
+environment:
+  - WHISPER_COMPUTE_TYPE=float16  # Recommended for GPU
+```
+
+**Available compute types (from faster-whisper):**
+
+| Compute Type | Best For | Notes |
+|--------------|----------|-------|
+| `int8` | **CPU (default)** | Fastest, but doesn't work on older GPUs |
+| `float16` | **CUDA/GPU (recommended)** | Best balance of speed and compatibility for GPUs |
+| `int8_float16` | GPU with hybrid precision | Uses int8 for weights, float16 for computation |
+| `float32` | Maximum compatibility | Slowest, but works on all hardware |
+
+:::info Default Behavior
+- **CPU mode:** Defaults to `int8` for best performance
+- **CUDA mode:** The `:cuda` image may default to `int8`, which can cause errors on older GPUs. Set `float16` explicitly for GPUs.
+:::
+
+### STT Not Recognizing Speech Correctly
+
+**Tips for better recognition:**
+
+1. **Set the correct language:**
+   ```yaml
+   environment:
+     - WHISPER_LANGUAGE=en  # Use ISO 639-1 language code
+   ```
+
+2. **Try a larger Whisper model** for better accuracy (at the cost of speed):
+   ```yaml
+   environment:
+     - WHISPER_MODEL=medium  # Options: tiny, base, small, medium, large
+   ```
+
+3. **Check microphone permissions** in your browser (see above)
+
+4. **Use the Web API engine** as an alternative:
+   - Go to user settings (not admin panel)
+   - Under STT Settings, try switching Speech-to-Text Engine to "Web API"
+   - This uses the browser's built-in speech recognition
+
+---
+
+## ElevenLabs Integration
+
+ElevenLabs is natively supported in Open WebUI. To configure:
+
+1. Go to **Admin Panel → Settings → Audio**
+2. Select **ElevenLabs** as the TTS engine
+3. Enter your ElevenLabs API key
+4. Select the voice and model
+5. Save settings
+
+**Using environment variables:**
+
+```yaml
+environment:
+  - AUDIO_TTS_ENGINE=elevenlabs
+  - AUDIO_TTS_API_KEY=sk_...  # Your ElevenLabs API key
+  - AUDIO_TTS_VOICE=EXAVITQu4vr4xnSDxMaL  # Voice ID from ElevenLabs dashboard
+  - AUDIO_TTS_MODEL=eleven_multilingual_v2
+```
+
+:::note
+You can find your Voice ID in the ElevenLabs dashboard under the voice settings. Common model options are `eleven_multilingual_v2` or `eleven_monolingual_v1`.
+:::
+
+---
+
+## General Debugging Tips
+
+### Check Container Logs
+
+```bash
+# View Open WebUI logs
+docker logs open-webui -f
+
+# View logs for external TTS service (if applicable)
+docker logs openai-edge-tts -f
+```
+
+### Check Browser Console
+
+1. Open browser developer tools (F12 or right-click → Inspect)
+2. Go to the Console tab
+3. Look for error messages when attempting to use audio features
+
+### Verify Service Health
+
+For external TTS services, test directly:
+
+```bash
+# Test OpenAI Edge TTS
+curl -X POST http://localhost:5050/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_api_key_here" \
+  -d '{"input": "Hello, this is a test.", "voice": "alloy"}' \
+  --output test.mp3
+```
+
+### Network Connectivity
+
+Verify the Open WebUI container can reach external services:
+
+```bash
+# Enter the container
+docker exec -it open-webui bash
+
+# Test connectivity (if curl is available)
+curl http://your-tts-service:port/health
+```
+
+---
+
+## Quick Reference: Environment Variables
+
+### TTS Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `elevenlabs`, `azure`, `transformers` |
+| `AUDIO_TTS_MODEL` | TTS model to use (default: `tts-1`) |
+| `AUDIO_TTS_VOICE` | Default voice for TTS (default: `alloy`) |
+| `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS |
+| `AUDIO_TTS_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible TTS |
+| `AUDIO_TTS_OPENAI_API_KEY` | API key for OpenAI-compatible TTS |
+
+### STT Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `WHISPER_MODEL` | Whisper model: `tiny`, `base`, `small`, `medium`, `large` (default: `base`) |
+| `WHISPER_COMPUTE_TYPE` | Compute type: `int8`, `float16`, `int8_float16`, `float32` (default: `int8`) |
+| `WHISPER_LANGUAGE` | ISO 639-1 language code (empty = auto-detect) |
+| `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `azure`, `deepgram` |
+| `AUDIO_STT_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible STT |
+| `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |
+| `DEEPGRAM_API_KEY` | Deepgram API key |
+
+For a complete list of audio environment variables, see [Environment Variable Configuration](/getting-started/env-configuration#audio).
+
+---
+
+## Still Having Issues?
+
+If you've tried the above solutions and still experience problems:
+
+1. **Search existing issues** on GitHub for similar problems
+2. **Check the discussions** for community solutions
+3. **Create a new issue** with:
+   - Open WebUI version
+   - Docker image being used
+   - Complete error logs
+   - Very detailed steps to reproduce
+   - Your environment details (OS, GPU if applicable)
