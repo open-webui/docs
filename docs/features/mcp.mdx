@@ -23,6 +23,15 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 You can now call tools exposed by your MCP server from Open WebUI.
 
+:::warning Common Mistake: Wrong Connection Type
+If you are adding an MCP server, make sure **Type** is set to **MCP (Streamable HTTP)**, not **OpenAPI**.
+
+Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI connection will cause the UI to crash or display an infinite loading screen. If you encounter this:
+
+1. Disable the problematic tool connection via Admin Settings
+2. Re-add it with the correct **Type** set to **MCP**
+:::
+
 ## 🧭 When to use MCP vs OpenAPI
 
 :::tip 
@@ -76,6 +85,20 @@ The chat shows "Failed to connect to MCP server" when using a tool, even if the 
 **Solutions**:
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
+
+### Infinite loading screen after adding External Tool
+
+**Symptom**: 
+After adding an External Tool connection, the frontend gets stuck on a loading spinner. The browser console shows an error like `Cannot convert undefined or null to object at Object.entries`.
+
+**Cause**: 
+You likely configured an **MCP server** using the **OpenAPI** connection type, or entered MCP-style JSON (containing `mcpServers`) into an OpenAPI connection.
+
+**Solution**:
+1.  Open **Admin Settings → External Tools** (the sidebar still loads)
+2.  **Disable** or **delete** the problematic tool connection
+3.  Refresh the page (Ctrl+F5)
+4.  Re-add the connection with the correct **Type** set to **MCP (Streamable HTTP)**
 
 ## ❓ FAQ
 
