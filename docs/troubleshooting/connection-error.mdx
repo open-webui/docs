@@ -179,3 +179,36 @@ If you are having trouble connecting to MCP tools (e.g. "Failed to connect to MC
 *   **Filters**: Try adding a comma to the Function Name Filter List.
 
 See the [MCP Feature Documentation](/features/mcp#troubleshooting) for detailed troubleshooting steps.
+
+## 🔐 SSL/TLS Errors with Web Search (Proxy Issues)
+
+If you're seeing SSL errors like `UNEXPECTED_EOF_WHILE_READING` or `Max retries exceeded` when using web search providers (Bocha, Tavily, etc.):
+
+### Common Symptoms
+
+- `SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING]'))`
+- `Max retries exceeded with url: /v1/web-search`
+- Web search works in standalone Python scripts but fails in Open WebUI
+
+### Cause: HTTP Proxy Configured for HTTPS Traffic
+
+This typically happens when you have an **HTTP proxy** configured for **HTTPS traffic**. The HTTP proxy cannot properly handle TLS connections, causing SSL handshake failures.
+
+Check your environment for these variables:
+- `HTTP_PROXY` / `http_proxy`
+- `HTTPS_PROXY` / `https_proxy`
+
+If your `https_proxy` points to `http://...` (HTTP) instead of `https://...` (HTTPS), SSL handshakes will fail because the proxy terminates the connection unexpectedly.
+
+### Solutions
+
+1. **Fix proxy configuration**: Use an HTTPS-capable proxy for HTTPS traffic, or configure your HTTP proxy to properly support CONNECT tunneling for SSL
+2. **Bypass proxy for specific hosts**: Set `NO_PROXY` environment variable:
+   ```bash
+   NO_PROXY=api.bochaai.com,api.tavily.com,api.search.brave.com
+   ```
+3. **Disable proxy if not needed**: Unset the proxy environment variables entirely
+
+### Why Standalone Scripts Work
+
+When you run a Python script directly, it may not inherit the same proxy environment variables that your Open WebUI service is using. The service typically inherits environment variables from systemd, Docker, or your shell profile, which may have different proxy settings.
