@@ -2528,10 +2528,24 @@ Provide a clear and direct response to the user's query, including inline citati
 - Options:
   - `character`
   - `token`
-  - `markdown_header`
 - Default: `character`
-- Description: Sets the text splitter for RAG models.
+- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter (Tiktoken-based).
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables markdown header text splitting as a preprocessing step before character or token splitting. When enabled, documents are first split by markdown headers (h1-h6), then the resulting chunks are further processed by the configured text splitter (`RAG_TEXT_SPLITTER`). This helps preserve document structure and context across chunks.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+**Migration from `markdown_header` TEXT_SPLITTER**
+
+The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown header splitting is now a preprocessing step controlled by `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`. If you were using `RAG_TEXT_SPLITTER=markdown_header`, switch to `character` or `token` and ensure `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER` is enabled (it is enabled by default).
+
+:::
 
 #### `TIKTOKEN_CACHE_DIR`
 
