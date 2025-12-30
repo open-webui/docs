@@ -131,7 +131,11 @@ LDAP_APP_PASSWORD="admin"
 LDAP_SEARCH_BASE="dc=example,dc=org"
 LDAP_ATTRIBUTE_FOR_USERNAME="uid"
 LDAP_ATTRIBUTE_FOR_MAIL="mail"
-LDAP_SEARCH_FILTER="(uid=%(user)s)" # More secure and performant
+# LDAP_SEARCH_FILTER is optional and used for additional filtering conditions.
+# The username filter is automatically added by Open WebUI, so do NOT include 
+# user placeholder syntax like %(user)s or %s - these are not supported.
+# Leave empty for simple setups, or add group membership filters, e.g.:
+# LDAP_SEARCH_FILTER="(memberOf=cn=allowed-users,ou=groups,dc=example,dc=org)"
 ```
 
 ### UI Configuration
