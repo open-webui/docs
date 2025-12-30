@@ -71,7 +71,9 @@ Once Open WebUI is running:
     *   *Set*: Acts as an **Allowlist**. Only the specific model IDs you enter here will be visible to users. Use this to hide older or expensive models.
     
     :::tip OpenRouter Recommendation
-    When using **OpenRouter**, we **highly recommend** using this allowlist (adding specific Model IDs). OpenRouter exposes thousands of models, which can clutter your model selector and slow down the admin panel if not filtered.
+    When using **OpenRouter**, we **highly recommend**:
+    1.  **Use an allowlist** (add specific Model IDs). OpenRouter exposes thousands of models, which can clutter your model selector and slow down the admin panel if not filtered.
+    2.  **Enable Model Caching** (`Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`). Without caching, page loads can take 10-15+ seconds on first visit due to querying a large number of models. See the [Performance Guide](/tutorials/tips/performance) for more details.
     :::
     
 *   **Prefix ID**:

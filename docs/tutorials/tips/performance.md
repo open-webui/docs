@@ -47,6 +47,10 @@ Configure these settings to reduce latency and external API usage.
 #### Model Caching
 Drastically reduces startup time and API calls to external providers.
 
+:::warning Important for OpenRouter and Multi-Model Providers
+If you are using **OpenRouter** or any provider with hundreds/thousands of models, enabling model caching is **highly recommended**. Without caching, initial page loads can take **10-15+ seconds** as the application queries all available models. Enabling the cache reduces this to near-instant.
+:::
+
 - **Admin Panel**: `Settings > Connections > Cache Base Model List`
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
   *   *Note*: Caches the list of models in memory. Only refreshes on App Restart or when clicking **Save** in Connections settings.
