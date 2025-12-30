@@ -4626,13 +4626,13 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 - Type: `str`
 - Default: `None`
-- Description: Sets a single filter to use for LDAP search. Alternative to `LDAP_SEARCH_FILTERS`.
+- Description: Sets additional filter conditions for LDAP user search. This filter is **appended** to the automatically-generated username filter. Open WebUI automatically constructs the username portion of the filter using `LDAP_ATTRIBUTE_FOR_USERNAME`, so you should **not** include user placeholders like `%(user)s` or `%s` — these are not supported. Use this for additional conditions such as group membership restrictions (e.g., `(memberOf=cn=allowed-users,ou=groups,dc=example,dc=com)`). Alternative to `LDAP_SEARCH_FILTERS`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_SEARCH_FILTERS`
 
 - Type: `str`
-- Description: Sets the filter to use for LDAP search.
+- Description: Sets additional filter conditions for LDAP user search. This is an alias for `LDAP_SEARCH_FILTER`. The filter is appended to the automatically-generated username filter — do **not** include user placeholders like `%(user)s` or `%s`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_USE_TLS`
