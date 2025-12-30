@@ -3085,6 +3085,12 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: Sets the API key for the Brave Search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+:::info
+
+Brave's free tier enforces a rate limit of 1 request per second. Open WebUI automatically retries requests that receive HTTP 429 rate limit errors after a 1-second delay. For free tier users, set `WEB_SEARCH_CONCURRENT_REQUESTS` to `1` to ensure sequential request processing. See the [Brave web search documentation](/features/web-search/brave) for more details.
+
+:::
+
 #### `KAGI_SEARCH_API_KEY`
 
 - Type: `str`
