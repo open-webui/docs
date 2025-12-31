@@ -83,6 +83,19 @@ Once Open WebUI is running:
 
 This securely stores your credentials.
 
+:::tip Connection Timeout Configuration
+
+If your API provider is slow to respond or you're experiencing timeout issues, you can adjust the model list fetch timeout:
+
+```bash
+# Increase timeout for slow networks (default is 10 seconds)
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15
+```
+
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
+
+:::
+
 ![OpenAI Connection Screen](/images/getting-started/quick-start/manage-openai.png)
 
 ---

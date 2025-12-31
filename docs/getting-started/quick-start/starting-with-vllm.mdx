@@ -38,3 +38,16 @@ For remote servers, use the appropriate hostname or IP address.
 ## Step 3: Start Using Models
 
 Select any model that's available on your vLLM server from the Model Selector and start chatting.
+
+:::tip Connection Timeout Configuration
+
+If your vLLM server is slow to respond (especially during model loading), you can adjust the timeout:
+
+```bash
+# Increase timeout for slower model initialization (default is 10 seconds)
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
+```
+
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
+
+:::

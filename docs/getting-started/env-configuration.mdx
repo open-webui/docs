@@ -469,11 +469,29 @@ allowing the client to wait indefinitely.
 
 - Type: `int`
 - Default: `10`
-- Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+- Description: Sets the timeout in seconds for fetching the model list from Ollama and OpenAI endpoints. This affects how long Open WebUI waits for each configured endpoint when loading available models.
 
-:::note
+:::note When to Adjust This Value
 
-The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped, depending on your network conditions.
+**Lower the timeout** (e.g., `3`) if:
+- You have multiple endpoints configured and want faster failover when one is unreachable
+- You prefer the UI to load quickly even if some slow endpoints are skipped
+
+**Increase the timeout** (e.g., `30`) if:
+- Your model servers are slow to respond (e.g., cold starts, large model loading)
+- You're connecting over high-latency networks
+- You're using providers like OpenRouter that may have variable response times
+
+:::
+
+:::warning Database Persistence
+
+Connection URLs configured via the Admin Settings UI are **persisted in the database** and take precedence over environment variables. If you save an unreachable URL and the UI becomes unresponsive, you may need to use one of these recovery options:
+
+- `RESET_CONFIG_ON_START=true` - Resets database config to environment variable values on next startup
+- `ENABLE_PERSISTENT_CONFIG=false` - Always use environment variables (UI changes won't persist)
+
+See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for detailed recovery steps.
 
 :::
 

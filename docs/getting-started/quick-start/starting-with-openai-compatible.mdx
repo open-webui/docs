@@ -57,6 +57,19 @@ See [their docs](https://lemonade-server.ai/) for details.
    - **API Key**: Leave blank unless the server requires one.
 6. Click **Save**.
 
+:::tip Connection Timeout Configuration
+
+If your local server is slow to start or you're connecting over a high-latency network, you can adjust the model list fetch timeout:
+
+```bash
+# Adjust timeout for slower connections (default is 10 seconds)
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=5
+```
+
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
+
+:::
+
 :::tip
 
 If running Open WebUI in Docker and your model server on your host machine, use `http://host.docker.internal:<your-port>/v1`.

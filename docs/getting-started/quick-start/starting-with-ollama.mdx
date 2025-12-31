@@ -36,6 +36,19 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 *   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote/`) to distinguish them.
 *   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all.
 
+:::tip Connection Timeout Configuration
+
+When using multiple Ollama instances (especially across networks), connection delays can occur if an endpoint is unreachable. You can adjust the timeout using:
+
+```bash
+# Lower the timeout (default is 10 seconds) for faster failover
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=3
+```
+
+If you've saved an unreachable URL and can't access Settings to fix it, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
+
+:::
+
 Here’s what the management screen looks like:
 
 ![Ollama Management Screen](/images/getting-started/quick-start/manage-ollama.png)

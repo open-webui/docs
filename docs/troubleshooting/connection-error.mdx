@@ -141,6 +141,81 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 🔗 After running the above, your WebUI should be available at `http://localhost:8080`.
 
+## ⏱️ Model List Loading Issues (Slow UI / Unreachable Endpoints)
+
+If your Open WebUI takes a long time to load models, or the model selector spins indefinitely, it may be due to an unreachable or slow API endpoint configured in your connections.
+
+### Common Symptoms
+
+- Model selector shows a loading spinner for extended periods
+- `500 Internal Server Error` on `/api/models` endpoint
+- UI becomes unresponsive when opening Settings
+- Docker/server logs show: `Connection error: Cannot connect to host...`
+
+### Cause: Unreachable Endpoints
+
+When you configure multiple Ollama or OpenAI base URLs (for load balancing or redundancy), Open WebUI attempts to fetch models from **all** configured endpoints. If any endpoint is unreachable, the system waits for the full connection timeout before returning results.
+
+By default, Open WebUI waits **10 seconds** per unreachable endpoint when fetching the model list. With multiple bad endpoints, this delay compounds.
+
+### Solution 1: Adjust the Timeout
+
+Lower the timeout for model list fetching using the `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` environment variable:
+
+```bash
+# Set a shorter timeout (in seconds) for faster failure on unreachable endpoints
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=3
+```
+
+This reduces how long Open WebUI waits for each endpoint before giving up and continuing.
+
+### Solution 2: Fix or Remove Unreachable Endpoints
+
+1. Go to **Admin Settings → Connections**
+2. Review your Ollama and OpenAI base URLs
+3. Remove or correct any unreachable IP addresses or hostnames
+4. Save the configuration
+
+### Solution 3: Recover from Database-Persisted Bad Configuration
+
+If you saved an unreachable URL and now can't access the Settings UI to fix it, the bad configuration is persisted in the database and takes precedence over environment variables. Use one of these recovery methods:
+
+**Option A: Reset configuration on startup**
+```bash
+# Forces environment variables to override database values on next startup
+RESET_CONFIG_ON_START=true
+```
+
+**Option B: Always use environment variables**
+```bash
+# Prevents database values from taking precedence (changes in UI won't persist across restarts)
+ENABLE_PERSISTENT_CONFIG=false
+```
+
+**Option C: Manual database cleanup (advanced)**
+
+If using SQLite, stop the container and run:
+```bash
+sqlite3 webui.db "DELETE FROM config WHERE id LIKE '%urls%';"
+```
+
+:::warning
+
+Manual database manipulation should be a last resort. Always back up your database first.
+
+:::
+
+### Related Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` | `10` | Timeout (seconds) for fetching model lists |
+| `AIOHTTP_CLIENT_TIMEOUT` | `300` | General API request timeout |
+| `RESET_CONFIG_ON_START` | `false` | Reset database config to env var values on startup |
+| `ENABLE_PERSISTENT_CONFIG` | `true` | Whether database config takes precedence over env vars |
+
+See the [Environment Configuration](/getting-started/env-configuration#aiohttp_client_timeout_model_list) documentation for more details.
+
 ## 🔒 SSL Connection Issue with Hugging Face
 
 Encountered an SSL error? It could be an issue with the Hugging Face server. Here's what to do:

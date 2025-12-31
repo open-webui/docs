@@ -104,6 +104,19 @@ To control and query your locally running model directly from Open WebUI:
 
 💡 Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
 
+:::tip Connection Timeout Configuration
+
+If your Llama.cpp server is slow to initialize or you see timeout errors, you can increase the model list fetch timeout:
+
+```bash
+# Increase timeout for slower model loading (default is 10 seconds)
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
+```
+
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
+
+:::
+
 ![Llama.cpp Connection in Open WebUI](/images/tutorials/deepseek/connection.png)
 
 ---
