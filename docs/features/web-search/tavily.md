@@ -15,6 +15,12 @@ For a comprehensive list of all environment variables related to Web Search (inc
 
 :::
 
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
+
+:::
+
 ## Overview
 
 Integrating Tavily with Open WebUI allows your language model to perform real-time web searches, providing up-to-date and relevant information. This tutorial guides you through configuring Tavily as a web search provider in Open WebUI.

@@ -15,6 +15,12 @@ For a comprehensive list of all environment variables related to Web Search (inc
 
 :::
 
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
+
+:::
+
 # Exa AI Web Search Integration
 
 This guide provides instructions on how to integrate [Exa AI](https://exa.ai/), a modern AI-powered search engine, with Open WebUI for web search capabilities.
