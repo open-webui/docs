@@ -1,0 +1,114 @@
+---
+sidebar_position: 4
+title: "Troubleshooting Web Search"
+---
+
+Web Search in Open WebUI allows language models to access real-time information from the internet. When things don't work as expected, this guide will help you diagnose and fix common issues.
+
+## Common Web Search Issues and How to Fix Them 🛠️
+
+### 1. Web Search Fails Behind HTTP Proxy 🌐🔒
+
+If you're running Open WebUI behind an HTTP proxy, you might notice that web search queries succeed (e.g., SearXNG returns results), but the subsequent content fetching fails with errors like:
+
+- `[Errno -3] Temporary failure in name resolution`
+- `Connection timeout to host`
+- `The content provided is empty`
+
+This happens because the web content fetcher doesn't use your `http_proxy`/`https_proxy` environment variables by default.
+
+✅ **Solution:**
+
+1. Navigate to: **Admin Panel > Settings > Web Search**
+2. Enable **Trust Proxy Environment**
+3. Save changes
+
+Alternatively, set the environment variable [`WEB_SEARCH_TRUST_ENV`](../getting-started/env-configuration#web_search_trust_env):
+
+```bash
+WEB_SEARCH_TRUST_ENV=True
+```
+
+:::info
+
+This is a **PersistentConfig** variable, meaning it can be set via environment variable on startup OR configured through the Admin Panel UI. Once set in the UI, the database value takes precedence over the environment variable.
+
+This setting tells Open WebUI's web content loader to respect the proxy settings from your environment variables (`http_proxy`, `https_proxy`). Without this, even if your search engine works through the proxy, fetching content from the returned URLs will fail.
+
+:::
+
+---
+
+### 2. 403 Forbidden Errors from SearXNG
+
+If you're using SearXNG and seeing `403 Client Error: Forbidden` in your logs, the JSON format is not enabled.
+
+✅ **Solution:**
+
+Edit your SearXNG `settings.yml` and add `json` to the formats list:
+
+```yaml
+search:
+  formats:
+    - html
+    - json
+```
+
+Restart SearXNG after making this change.
+
+---
+
+### 3. Empty Content or Poor Results
+
+If web search returns empty content or poor quality results, the issue is often related to context window size or content extraction.
+
+✅ **Solutions:**
+
+- **Increase context length**: Web pages often contain 4,000-8,000+ tokens. If your model has a 2048-token limit, you're missing most of the content. Increase to 16384+ tokens in **Admin Panel > Models > Settings > Advanced Parameters** (anything below will be subpar for web content).
+
+- **Check result count**: Adjust `WEB_SEARCH_RESULT_COUNT` to control how many results are fetched.
+
+- **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use `playwright` for JavaScript-heavy sites or `firecrawl`/`tavily` for better extraction.
+
+For more details on context window issues, see the [RAG Troubleshooting Guide](./rag).
+
+---
+
+### 4. Connection Timeouts
+
+If web searches are timing out:
+
+✅ **Solutions:**
+
+- **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (required for Brave free tier).
+
+- **Adjust loader concurrency**: Lower `WEB_LOADER_CONCURRENT_REQUESTS` if fetching many pages simultaneously.
+
+- **Check network connectivity**: Ensure Open WebUI can reach both the search engine and the result URLs.
+
+---
+
+## Environment Variables Reference
+
+For a comprehensive list of all web search environment variables, see the [Environment Configuration documentation](../getting-started/env-configuration#web-search).
+
+Key variables:
+
+| Variable | Description |
+|----------|-------------|
+| `WEB_SEARCH_TRUST_ENV` | Enable proxy support for content fetching |
+| `WEB_SEARCH_RESULT_COUNT` | Number of search results to fetch |
+| `WEB_SEARCH_CONCURRENT_REQUESTS` | Concurrent requests to search engine |
+| `WEB_LOADER_CONCURRENT_REQUESTS` | Concurrent page fetches |
+| `WEB_LOADER_ENGINE` | Content extraction engine |
+
+---
+
+## Still Having Issues?
+
+If you're still experiencing problems:
+
+1. Check the Open WebUI logs for detailed error messages
+2. Verify your search engine configuration is correct
+3. Test connectivity from the Open WebUI container to your search engine
+4. Review all [Web Search environment variables](../getting-started/env-configuration#web-search) for additional configuration options

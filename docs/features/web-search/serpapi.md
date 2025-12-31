@@ -15,6 +15,12 @@ For a comprehensive list of all environment variables related to Web Search (inc
 
 :::
 
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
+
+:::
+
 ## SerpApi API
 
 [SerpApi](https://serpapi.com/) Scrape Google and other search engines from our fast, easy, and complete API. Any existing or upcoming SERP engine that returns `organic_results` is supported. The default web search engine is `google`, but it can be changed to `bing`, `baidu`, `google_news`, `google_scholar`, `google_patents`, and others.

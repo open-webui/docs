@@ -15,6 +15,12 @@ For a comprehensive list of all environment variables related to Web Search (inc
 
 :::
 
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
+
+:::
+
 # Jina Web Search Integration
 
 This guide provides instructions on how to integrate [Jina AI](https://jina.ai/), a powerful AI-driven search foundation, with Open WebUI. The integration uses Jina's `DeepSearch` API to provide web search capabilities.

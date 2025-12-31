@@ -345,6 +345,12 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 
 ![SearXNG GUI Configuration](/images/tutorial_searxng_config.png)
 
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems, including proxy configuration, connection timeouts, and empty content issues.
+
+:::
+
 ## 5. Using Web Search in a Chat
 
 To access Web Search, Click the Integrations button next to the + icon.
