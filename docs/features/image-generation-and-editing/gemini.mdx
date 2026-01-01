@@ -11,15 +11,15 @@ Open WebUI also supports image generation through the **Google AI Studio API** a
 
 ### Initial Setup
 
-1. Obtain an [API key](https://aistudio.google.com/api-keys) from Google AI Studio.
-2. You may need to create a project and enable the `Generative Language API` in addition to adding billing information.
+1. Obtain an [API key](https://aistudio.google.com/api-keys) from Google AI Studio - alternatively an API Key from Google Cloud and activate the `Generative Language API` for the project.
+2. You most likely need to create a project and enable the `Generative Language API` in addition to adding billing information, because the image generation API is not available for free.
 
 :::warning
 If you are utilizing a free API key, it is vital to have a payment method on file. The absence of a valid payment method is a frequent cause of errors during the setup process.
 :::
 
 :::tip
-Alternatively, if you are using Vertex AI, you can create an API key in Google Cloud instead of a service account. This key will function correctly, provided it is assigned the appropriate permissions.
+Alternatively, if you are using Vertex AI, you can create an API key in Google Cloud instead of a service account. This key will function correctly, provided it is assigned the appropriate permissions. And given the Generative Language API is enabled for the project.
 :::
 
 ### Configuring Open WebUI
@@ -55,7 +55,7 @@ import TabItem from '@theme/TabItem';
 - **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
 - **Gemini API Key**: Enter your API Key
 
-  </TabItem>
+</TabItem>
   <TabItem value="gemini-2.5-flash" label="Gemini 2.5 Flash (aka Nano Banana)">
 
 **Create Image**
@@ -74,7 +74,7 @@ import TabItem from '@theme/TabItem';
 - **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
 - **Gemini API Key**: Enter your API Key
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 ![Screenshot of the Open WebUI Images settings page with Gemini selected and the API key, model, and image size fields highlighted.](/images/image-generation-and-editing/gemini-settings.png)
