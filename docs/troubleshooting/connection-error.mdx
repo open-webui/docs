@@ -231,6 +231,35 @@ Encountered an SSL error? It could be an issue with the Hugging Face server. Her
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+## 🔐 SSL Certificate Issues with Internal Tools
+
+If you are using external tools like Tika, Ollama (for embeddings), or an external reranker with self-signed certificates, you might encounter SSL verification errors.
+
+### Common Symptoms
+
+- Logs show `[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate`
+- Tika document ingestion fails
+- Embedding generation fails with SSL errors
+- Reranking fails with SSL errors
+
+### Solution
+
+You can disable SSL verification for these internal tool connections using the following environment variables:
+
+1.  **For synchronous requests (Tika, External Reranker):**
+    ```bash
+    REQUESTS_VERIFY=false
+    ```
+
+2.  **For asynchronous requests (Ollama Embeddings):**
+    ```bash
+    AIOHTTP_CLIENT_SESSION_SSL=false
+    ```
+
+:::warning
+Disabling SSL verification reduces security. Only do this if you trust the network and the services you are connecting to (e.g., functioning within a secure internal network).
+:::
+
 ## 🍏 Podman on MacOS
 
 Running on MacOS with Podman? Here’s how to ensure connectivity:
@@ -255,17 +284,32 @@ If you are having trouble connecting to MCP tools (e.g. "Failed to connect to MC
 
 See the [MCP Feature Documentation](/features/mcp#troubleshooting) for detailed troubleshooting steps.
 
-## 🔐 SSL/TLS Errors with Web Search (Proxy Issues)
+## 🔐 SSL/TLS Errors with Web Search
+
+If you are encountering SSL errors while using the Web Search feature, they usually fall into two categories: Proxy configuration issues or Certificate verification issues.
+
+### Certificate Verification Issues
+
+If you are seeing SSL verification errors when Open WebUI tries to fetch content from websites (Web Loader):
+
+- **Symptom**: `[SSL: CERTIFICATE_VERIFY_FAILED]` when loading search results.
+- **Solution**: You can disable SSL verification for the Web Loader (scraper) specifically.
+  ```bash
+  ENABLE_WEB_LOADER_SSL_VERIFICATION=false
+  ```
+  > **Note**: This setting applies to the *fetching* of web pages. If you are having SSL issues with the Search Engine itself (e.g., local SearXNG) or subsequent steps (Embedding/Reranking), see the sections below.
+
+### Proxy Configuration Issues
 
 If you're seeing SSL errors like `UNEXPECTED_EOF_WHILE_READING` or `Max retries exceeded` when using web search providers (Bocha, Tavily, etc.):
 
-### Common Symptoms
+#### Common Symptoms
 
 - `SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING]'))`
 - `Max retries exceeded with url: /v1/web-search`
 - Web search works in standalone Python scripts but fails in Open WebUI
 
-### Cause: HTTP Proxy Configured for HTTPS Traffic
+#### Cause: HTTP Proxy Configured for HTTPS Traffic
 
 This typically happens when you have an **HTTP proxy** configured for **HTTPS traffic**. The HTTP proxy cannot properly handle TLS connections, causing SSL handshake failures.
 
@@ -275,7 +319,7 @@ Check your environment for these variables:
 
 If your `https_proxy` points to `http://...` (HTTP) instead of `https://...` (HTTPS), SSL handshakes will fail because the proxy terminates the connection unexpectedly.
 
-### Solutions
+#### Solutions
 
 1. **Fix proxy configuration**: Use an HTTPS-capable proxy for HTTPS traffic, or configure your HTTP proxy to properly support CONNECT tunneling for SSL
 2. **Bypass proxy for specific hosts**: Set `NO_PROXY` environment variable:
@@ -284,6 +328,6 @@ If your `https_proxy` points to `http://...` (HTTP) instead of `https://...` (HT
    ```
 3. **Disable proxy if not needed**: Unset the proxy environment variables entirely
 
-### Why Standalone Scripts Work
+#### Why Standalone Scripts Work
 
 When you run a Python script directly, it may not inherit the same proxy environment variables that your Open WebUI service is using. The service typically inherits environment variables from systemd, Docker, or your shell profile, which may have different proxy settings.

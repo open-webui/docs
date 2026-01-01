@@ -165,6 +165,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables the folders feature, allowing users to organize their chats into folders in the sidebar.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `FOLDER_MAX_FILE_COUNT`
+
+- Type: `int`
+- Default: `100`
+- Description: Sets the maximum number of files processing allowed per folder.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**.
+
 #### `ENABLE_NOTES`
 
 - Type: `bool`
@@ -504,7 +511,7 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs.
+- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings).
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
 
@@ -517,6 +524,12 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 - Type: `bool`
 - Default: `True`
 - Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
+
+#### `REQUESTS_VERIFY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls SSL/TLS verification for synchronous `requests` (e.g., Tika, External Reranker). Set to `False` to bypass certificate verification for self-signed certificates.
 
 ### Directories
 
@@ -550,6 +563,18 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 - Type: `str`
 - Default: `INFO`
 - Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+
+#### `ENABLE_AUDIT_STDOUT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether audit logs are output to stdout (console). Useful for containerized environments where logs are collected from stdout.
+
+#### `ENABLE_AUDIT_LOGS_FILE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether audit logs are written to a file. When enabled, logs are written to the location specified by `AUDIT_LOGS_FILE_PATH`.
 
 #### `AUDIT_LOGS_FILE_PATH`
 
@@ -2741,6 +2766,12 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_SIGMOID_ACTIVATION_FUNCTION`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled (default), applies sigmoid normalization to local CrossEncoder reranking scores to ensure they fall within the 0-1 range. This allows the relevance threshold setting to work correctly with models like MS MARCO that output raw logits.
+
 #### `RAG_EXTERNAL_RERANKER_TIMEOUT`
 
 - Type: `str`
@@ -3184,6 +3215,13 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Description: Sets the API key for Jina.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `JINA_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://s.jina.ai/`
+- Description: Sets the Base URL for Jina Search API. Useful for specifying custom or regional endpoints (e.g., `https://eu-s-beta.jina.ai/`).
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > Web Search > Jina API Base URL**.
+
 #### `BING_SEARCH_V7_ENDPOINT`
 
 - Type: `str`
@@ -3415,6 +3453,13 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Default: `None`
 - Description: Sets the API key for Firecrawl API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FIRECRAWL_TIMEOUT`
+
+- Type: `int`
+- Default: `None`
+- Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > Web Search > Firecrawl Timeout**.
 
 #### `PLAYWRIGHT_TIMEOUT`
 
