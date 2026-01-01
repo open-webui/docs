@@ -31,12 +31,34 @@ Alternatively, if you are using Vertex AI, you can create an API key in Google C
 5. Enter the model you wish to use from these [available models](https://ai.google.dev/gemini-api/docs/imagen#model-versions).
 6. Set the image size to one of the available [image sizes](https://ai.google.dev/gemini-api/docs/image-generation#aspect_ratios).
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ### Example Minimal Setup
 
-One minimalistic working setup for Gemini can look like this:
+<Tabs>
+  <TabItem value="gemini-3-pro" label="Gemini 3.0 Pro (aka Nano Banana Pro)" default>
 
-#### Create Image
+**Create Image**
+- **Create Image Model**: `gemini-3-pro-image-preview`
+- **Image Size**: `2816x1536`
+- **Image Prompt Generation**: on
+- **Image Generation Engine**: `Gemini`
+- **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
+- **Gemini API Key**: Enter your API Key
+- **Gemini Endpoint Method**: `generateContent`
 
+**Edit Image**
+- **Image Edit Engine**: `Gemini`
+- **Model**: `gemini-3-pro-image-preview`
+- **Image Size**: (can be left empty)
+- **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
+- **Gemini API Key**: Enter your API Key
+
+  </TabItem>
+  <TabItem value="gemini-2.5-flash" label="Gemini 2.5 Flash (aka Nano Banana)">
+
+**Create Image**
 - **Create Image Model**: `gemini-2.5-flash-image`
 - **Image Size**: `2816x1536`
 - **Image Prompt Generation**: on
@@ -45,13 +67,15 @@ One minimalistic working setup for Gemini can look like this:
 - **Gemini API Key**: Enter your API Key
 - **Gemini Endpoint Method**: `generateContent`
 
-#### Edit Image
-
+**Edit Image**
 - **Image Edit Engine**: `Gemini`
 - **Model**: `gemini-2.5-flash-image`
 - **Image Size**: (can be left empty)
 - **Gemini Base URL**: `https://generativelanguage.googleapis.com/v1beta`
 - **Gemini API Key**: Enter your API Key
+
+  </TabItem>
+</Tabs>
 
 ![Screenshot of the Open WebUI Images settings page with Gemini selected and the API key, model, and image size fields highlighted.](/images/image-generation-and-editing/gemini-settings.png)
 
@@ -69,12 +93,12 @@ Imagen model endpoint example:
 
 Gemini model endpoint example:
 
-- `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`.
+- `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent`.
 - [Documentation for Gemini models](https://ai.google.dev/gemini-api/docs/image-generation)
 
-Trying to call a Gemini model, such as gemini-2.5-flash-image aka *Nano Banana* would result in an error due to the difference in supported endpoints for Image Generation.
+Trying to call a Gemini model, such as `gemini-3-pro-image-preview` would result in an error due to the difference in supported endpoints for Image Generation.
 
-`400: [ERROR: models/gemini-2.5-flash-image is not found for API version v1beta, or is not supported for predict. Call ListModels to see the list of available models and their supported methods.]`
+`400: [ERROR: models/gemini-3-pro-image-preview is not found for API version v1beta, or is not supported for predict. Call ListModels to see the list of available models and their supported methods.]`
 
 :::
 
