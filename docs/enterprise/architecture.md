@@ -7,9 +7,9 @@ title: "🏗️ High Availability"
 
 ## Built for Mission-Critical Reliability
 
-When AI becomes central to your organization's operations, downtime isn't just inconvenient—it's costly. Open WebUI is architected from the ground up to support enterprise-scale deployments where reliability isn't optional.
+When AI becomes central to your organization's operations, downtime isn't just inconvenient, it's costly. Open WebUI is architected from the ground up to support enterprise-scale deployments where reliability isn't optional.
 
-Whether you're supporting a pilot team of 15 or a global workforce of 10,000+, Open WebUI's architecture scales with you—without requiring a complete rebuild as your needs grow.
+Whether you're supporting a pilot team of 15 or a global workforce of 10,000+, Open WebUI's architecture scales with you, without requiring a complete rebuild as your needs grow.
 
 ---
 
@@ -38,13 +38,13 @@ For organizations with demanding uptime requirements, Open WebUI supports produc
 | **Persistent Storage** | Flexible storage backends to meet your data residency and performance requirements. |
 | **Observability** | Integration with modern logging and metrics tools for proactive monitoring. |
 
-When properly configured, Open WebUI can achieve **99.99% uptime**—the reliability standard expected for mission-critical enterprise systems.
+When properly configured, Open WebUI can achieve **99.99% uptime**, the reliability standard expected for mission-critical enterprise systems.
 
 ---
 
 ## Scalability in Practice
 
-Open WebUI isn't theoretically scalable—it's **proven at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
+Open WebUI isn't theoretically scalable, it's **proven at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
 
 * 🎓 **Universities** managing institution-wide AI access.
 * 🏢 **Multinational Enterprises** deploying across regions and business units.
@@ -98,6 +98,6 @@ For engineers looking for a technical implementation guide regarding high-availa
 
 ## Next Steps
 
-* **[🛡️ Security & Governance](./security)** — Learn how Open WebUI integrates with enterprise identity systems.
-* **[🔧 Integration & Customization](./customization)** — Explore how to tailor Open WebUI to your workflows.
-* **[🤝 Support & SLAs](./support)** — Review enterprise support options and service guarantees.
+* **[🛡️ Security & Governance](./security)** ,  Learn how Open WebUI integrates with enterprise identity systems.
+* **[🔧 Integration & Customization](./customization)** ,  Explore how to tailor Open WebUI to your workflows.
+* **[🤝 Support & SLAs](./support)** ,  Review enterprise support options and service guarantees.
