@@ -59,3 +59,13 @@ This means that even if your connection is fast enough to send multiple sequenti
 :::tip
 If you are on Brave's paid tier with higher rate limits, you can increase `RAG_WEB_SEARCH_CONCURRENT_REQUESTS` for faster parallel searches.
 :::
+
+:::info Understanding Concurrency & Rate Limits
+
+The `RAG_WEB_SEARCH_CONCURRENT_REQUESTS` setting controls concurrency **per individual search request**, not globally across the entire application.
+
+- **When this is NOT an issue**: For single-user instances or low-traffic setups where users rarely hit "Enter" at the exact same second, setting concurrency to `1` is usually sufficient to stay within the Free Tier limits (1 req/sec).
+- **When this IS an issue**: If multiple users trigger web searches at the exact same moment (e.g., 3 users searching in the same second), Open WebUI will process these requests in parallel. Each user's request creates its own connection pool, meaning 3 requests will be sent to the API simultaneously, triggering a rate limit error on the Free Tier.
+
+**Note:** If you are running an environment with multiple concurrent users actively using web search, it is highly recommended to upgrade to a paid API tier. The Free Tier is not designed to support the throughput of a multi-user deployment.
+:::
