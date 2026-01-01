@@ -1,13 +1,11 @@
 ---
 sidebar_position: 6
-title: "🌍 Partners & Agencies"
+title: "Partners & Agencies"
 ---
-
-## Partnership & Reseller Guidelines
 
 We carefully select our partners to maintain the highest standards and provide the best experience to our community.
 
-## For Agencies and Solutions Providers
+### For Agencies and Solutions Providers
 
 If you are a **consulting agency**, **AI services provider**, or **reseller**, please **do not** contact enterprise sales directly. As noted in our guidelines, direct sales inquiries from agencies may not receive a response.
 
@@ -15,7 +13,7 @@ Instead, we ask that you **fill out our partnership interest form**:
 
 🔗 **[Apply to Partner Network](https://forms.gle/SemdgxjFXpHmdCby6)**
 
-### Eligibility & Expectations
+#### Eligibility & Expectations
 
 To ensure alignment with our mission, please note the following criteria for partners:
 
@@ -29,9 +27,7 @@ To ensure alignment with our mission, please note the following criteria for par
 Any attempt to characterize engineering assistance, co-development, or roadmap input **as an alternative to our enterprise licensing program** will not receive a response. All organizational engagement with Open WebUI occurs **solely and exclusively** through enterprise licensing.
 :::
 
----
-
-## Direct Client Deployments
+### Direct Client Deployments
 
 If you have an **end-client** who is ready to move forward and is committed to purchasing an **Enterprise License** immediately, you may facilitate the introduction.
 

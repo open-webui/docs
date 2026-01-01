@@ -1,21 +1,17 @@
 ---
-sidebar_position: 2
-title: "🛡️ Security & Governance"
+sidebar_position: 3
+title: "Security"
 ---
 
-## Security & Governance
-
-## Enterprise-Grade Security Without Compromise
+### Enterprise-Grade Security Without Compromise
 
 For enterprise organizations, AI adoption isn't just a technology decision, it's a security decision. Every model query, every document uploaded, and every workflow automated represents data that needs protection.
 
 Open WebUI is built with security as a foundational principle. Whether you are navigating strict regulatory requirements or simply committed to protecting your organization's intellectual property, Open WebUI provides the controls necessary to deploy AI confidently.
 
----
+### Security Architecture
 
-## Security Architecture
-
-### Your Data, Your Infrastructure
+#### Your Data, Your Infrastructure
 
 Unlike SaaS AI platforms where your data traverses third-party servers, Open WebUI gives you **complete control over your data pipeline**:
 
@@ -28,9 +24,7 @@ Unlike SaaS AI platforms where your data traverses third-party servers, Open Web
 
 For organizations handling sensitive data, whether proprietary research, customer information, or classified materials, this architecture ensures your AI capabilities never compromise your security posture.
 
----
-
-## Compliance Frameworks
+### Compliance Frameworks
 
 Open WebUI is designed to support organizations operating under rigorous compliance requirements. The platform's architecture and controls align with major compliance frameworks, including:
 
@@ -46,13 +40,11 @@ Open WebUI provides the **technical controls and architecture** to support these
 [**Contact Enterprise Sales for Compliance Guidance**](mailto:sales@openwebui.com)
 :::
 
----
-
-## Identity & Access Management
+### Identity & Access Management
 
 Seamless integration with your existing identity infrastructure eliminates friction while maintaining security boundaries.
 
-### Enterprise Identity Integration
+#### Enterprise Identity Integration
 
 Open WebUI integrates with the identity systems your organization already uses:
 
@@ -60,7 +52,7 @@ Open WebUI integrates with the identity systems your organization already uses:
 * **Single Sign-On (SSO)** ,  Support for SAML and OIDC protocols, enabling users to access Open WebUI with their existing corporate credentials.
 * **Multi-Factor Authentication (MFA)** ,  Layer additional security on top of primary authentication.
 
-### Access Control & Permissions
+#### Access Control & Permissions
 
 Beyond authentication, Open WebUI provides granular control over user permissions:
 
@@ -68,11 +60,9 @@ Beyond authentication, Open WebUI provides granular control over user permission
 * **Model-Level Permissions** ,  Control which users or groups can access specific models.
 * **Workspace Isolation** ,  Separate teams or departments to prevent unauthorized data access.
 
----
+### Data Governance
 
-## Data Governance
-
-### Audit & Accountability
+#### Audit & Accountability
 
 For regulated industries and security-conscious organizations, visibility into system usage is not optional. Open WebUI supports standard enterprise logging patterns:
 
@@ -80,49 +70,25 @@ For regulated industries and security-conscious organizations, visibility into s
 * **Event Tracking** ,  Track API usage and system events to monitor for anomalies.
 * **Retention Controls** ,  Because you own the database, you control the data retention policies, ensuring data is purged or archived according to your compliance schedules.
 
-### Data Residency
+#### Data Residency
 
 For organizations with geographic data requirements, whether driven by GDPR, data sovereignty laws, or internal policy, Open WebUI's deployment options ensure your data stays physically located where it is legally required to be.
 
----
 
-## What This Means for Your Organization
+### What This Means for Your Organization
 
-### For Security Teams
+#### For Security Teams
 
 You are not introducing a "black box" into your environment. Open WebUI's architecture gives you visibility and control, integrating with your existing security tooling rather than creating blind spots.
 
-### For Compliance Officers
+#### For Compliance Officers
 
 The technical controls exist to support your compliance posture. Whether you are preparing for an audit or responding to a security questionnaire, Open WebUI's architecture provides defensible answers.
 
-### For IT Leadership
+#### For IT Leadership
 
 User management doesn't become another silo. Open WebUI works with your existing identity infrastructure, reducing administrative overhead and ensuring consistent access policies across your tooling.
 
----
+--- 
 
-## Discuss Your Security Requirements
-
-The right security posture depends on your organization's compliance obligations, data residency requirements, and risk tolerance.
-
-For organizations with specific security or compliance needs, we recommend:
-
-1. **Review the [Getting Started Guide](../getting-started/index.md)** for foundational deployment concepts.
-2. **Consult the [FAQ](../faq.mdx)** for answers to common questions.
-3. **Contact our Enterprise team** for guidance on regulated or high-security deployments.
-
-[**Contact Sales to Discuss Security & Compliance**](mailto:sales@openwebui.com)
-
-:::tip Use Your Work Email
-To help us respond quickly, **please use your official work email address** and include your **compliance requirements** (e.g., SOC 2, HIPAA, FedRAMP) and expected **end user count**. Personal email accounts (e.g., gmail.com, yahoo.com, icloud.com) are often flagged by our system and may not receive a response.
-:::
-
----
-
-## Next Steps
-
-* **[🏗️ High Availability](./architecture)** ,  Understand Open WebUI's scalable infrastructure design.
-* **[🔧 Integration & Customization](./customization)** ,  Explore how to tailor Open WebUI to your workflows.
-
-* **[🤝 Support & SLAs](./support)** ,  Review enterprise support options and service guarantees.
+[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
