@@ -764,6 +764,19 @@ When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open
 
 :::
 
+:::warning Migrating Existing Data to SQLCipher
+
+**Open WebUI does not support automatic migration from an unencrypted SQLite database to an encrypted SQLCipher database.** If you enable SQLCipher on an existing installation, the application will fail to read your existing unencrypted data.
+
+To use SQLCipher with existing data, you must either:
+
+1. **Start fresh** - Enable SQLCipher on a new installation and have users export/re-import their chats manually
+2. **Manual database migration** - Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
+3. **Use filesystem-level encryption** - Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
+4. **Switch to PostgreSQL** - For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
+
+:::
+
 ### Related Database Environment Variables
 
 | Variable | Default | Description |
