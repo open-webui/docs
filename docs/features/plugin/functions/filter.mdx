@@ -342,6 +342,188 @@ Here's the complete flow from admin configuration to filter execution:
 
 ---
 
+### ⚡ Filter Priority & Execution Order
+
+When multiple filters are active, they execute in a specific order determined by their **priority** value. Understanding this is crucial when building filter chains where one filter depends on another's changes.
+
+#### Setting Filter Priority
+
+Priority is configured via the `Valves` class using a `priority` field:
+
+```python
+class Filter:
+    class Valves(BaseModel):
+        priority: int = Field(
+            default=0,
+            description="Filter execution order. Lower values run first."
+        )
+    
+    def __init__(self):
+        self.valves = self.Valves()
+    
+    def inlet(self, body: dict) -> dict:
+        # This filter's execution order depends on its priority value
+        return body
+```
+
+#### Priority Ordering Rules
+
+| Priority Value | Execution Order |
+|---------------|-----------------|
+| `0` (default) | Runs first |
+| `1` | Runs after priority 0 |
+| `2` | Runs after priority 1 |
+
+:::tip Lower Priority = Earlier Execution
+Filters are sorted in **ascending** order by priority. A filter with `priority=0` runs **before** a filter with `priority=1`, which runs before `priority=2`, and so forth.
+:::
+
+#### Example: Model Router + Context Manager Chain
+
+A common use case is having one filter route messages to different models, followed by another filter that adjusts context based on the selected model.
+
+:::note Example Only
+The following examples are simplified to illustrate the concept. They show incomplete filter implementations—you would need to add the actual routing logic and helper methods for a working filter.
+:::
+
+**Filter 1: Model Router (priority=0)**
+```python
+class Filter:
+    class Valves(BaseModel):
+        priority: int = 0  # Runs first
+    
+    async def inlet(self, body: dict, __event_emitter__) -> dict:
+        # Example: Route complex tasks to a more capable model
+        # You would implement is_complex_task() with your own logic
+        if self.is_complex_task(body):
+            body["model"] = "claude-3-opus"
+        else:
+            body["model"] = "gemini-1.5-flash"
+        return body
+```
+
+**Filter 2: Context Manager (priority=1)**
+```python
+class Filter:
+    class Valves(BaseModel):
+        priority: int = 1  # Runs after model router
+    
+    async def inlet(self, body: dict, __event_emitter__) -> dict:
+        # Example: Trim messages based on the selected model's context window
+        # You would implement get_context_limit() and trim_to_fit() with your own logic
+        model_id = body.get("model")
+        max_tokens = self.get_context_limit(model_id)
+        body["messages"] = self.trim_to_fit(body["messages"], max_tokens)
+        return body
+```
+
+---
+
+### 🔗 Data Passing Between Filters
+
+When multiple filters are active, each filter in the chain receives the **modified data from the previous filter**. The returned value from one filter becomes the input to the next filter in the priority order.
+
+```
+User Input
+    ↓
+Model Router Filter (priority=0) → changes body["model"] to "claude"
+    ↓
+Context Manager Filter (priority=1) → receives body with model="claude" ✓
+    ↓
+Logging Filter (priority=2) → receives body with all previous changes ✓
+    ↓
+LLM Request (sends final modified body to OpenAI/Ollama API)
+```
+
+:::warning Important: Always Return the Body
+If your filter modifies the `body`, you **must** return it. The returned value is passed to the next filter. If you return `None`, subsequent filters will fail.
+
+```python
+async def inlet(self, body: dict, __event_emitter__) -> dict:
+    body["messages"].append({"role": "system", "content": "Hello"})
+    return body  # Don't forget this!
+```
+:::
+
+---
+
+### 🔀 Model Routing in Filters
+
+Filters can dynamically route messages to different models by modifying `body["model"]` in the `inlet` function. To ensure the UI also displays the correct model in real-time, you need to emit a `chat:model` event using the event emitter.
+
+#### Model Routing Example
+
+:::note Example Only
+This is a simplified example to demonstrate the model routing concept. The `requires_deep_reasoning()` method shown here is just placeholder logic—you would implement your own routing criteria based on your specific use case.
+:::
+
+```python
+from pydantic import BaseModel, Field
+from typing import Optional
+
+class Filter:
+    class Valves(BaseModel):
+        priority: int = Field(default=0, description="Filter priority")
+        simple_model: str = Field(
+            default="gemini-1.5-flash",
+            description="Model for simple queries"
+        )
+        complex_model: str = Field(
+            default="claude-3-opus",
+            description="Model for complex queries"
+        )
+    
+    def __init__(self):
+        self.valves = self.Valves()
+    
+    async def inlet(
+        self, body: dict, __event_emitter__, __user__: Optional[dict] = None
+    ) -> dict:
+        user_message = body["messages"][-1]["content"]
+        
+        # Route based on task complexity (implement your own logic)
+        if self.requires_deep_reasoning(user_message):
+            new_model = self.valves.complex_model
+        else:
+            new_model = self.valves.simple_model
+        
+        # Only emit event if model actually changed
+        if body.get("model") != new_model:
+            body["model"] = new_model
+            # Update UI to show the new model
+            await __event_emitter__(
+                {
+                    "type": "chat:model",
+                    "data": {"model": new_model},
+                }
+            )
+        
+        return body
+    
+    def requires_deep_reasoning(self, text: str) -> bool:
+        # Example logic - replace with your own criteria
+        complex_indicators = ["analyze", "debug", "explain why", "step by step"]
+        return any(indicator in text.lower() for indicator in complex_indicators)
+```
+
+**Key points:**
+- Filter functions should generally be `async` to ensure compatibility with future Open WebUI versions as the backend progressively moves toward fully async execution. Synchronous filters may block execution in future releases.
+- Include `__event_emitter__` in the function signature to emit events
+- Emit `chat:model` event with the new model ID to update the UI in real-time
+- The model change is automatically persisted to the database
+
+:::note UI Dropdown Behavior
+The model selector dropdown at the top of the chat is **not** automatically updated when a filter changes the model. This is intentional—the filter may make different routing decisions for each message, so changing the dropdown wouldn't make sense.
+
+If you want to also update the dropdown, you could potentially use JavaScript injection via the event emitter to simulate a click and change the model selection. However, this is generally not recommended for routing filters that may switch models on every message.
+
+**Tip:** You can use the [toggleable filter feature](#-toggleable-filters-vs-always-on-filters) to allow users to enable or disable model routing for a specific filter. This gives users control over when routing is active.
+
+For a complete list of all available event types you can emit, see the [Events documentation](/features/plugin/development/events).
+:::
+
+---
+
 ### 🎨 UI Indicators & Visual Feedback
 
 #### In the Admin Functions Panel

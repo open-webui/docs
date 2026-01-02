@@ -90,6 +90,7 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `chat:message:delta`,<br/>`message`          | Append content to the current message                | `{content: "text to append"}`                                                                        |
 | `chat:message`,<br/>`replace`                | Replace current message content completely           | `{content: "replacement text"}`                                                                      |
 | `chat:message:files`,<br/>`files`            | Set or overwrite message files (for uploads, output) | `{files: [...]}`                                                                                     |
+| `chat:model`                                 | Update the model displayed for a message (used by routing filters) | `{model: "model-id"}`                                                                    |
 | `chat:title`                                 | Set (or update) the chat conversation title          | Topic string OR `{title: ...}`                                                                       |
 | `chat:tags`                                  | Update the set of tags for a chat                    | Tag array or object                                                                                  |
 | `source`,<br/>`citation`                     | Add a source/citation, or code execution result      | For code: See [below.](/features/plugin/development/events#source-or-citation-and-code-execution) |
@@ -183,6 +184,27 @@ await __event_emitter__(
     }
 )
 ```
+
+---
+
+### `chat:model`
+
+**Update the model displayed for a message (used by routing filters):**
+
+When a filter routes a message to a different model, emit this event to update the UI so it displays the correct model name for the response.
+
+```python
+await __event_emitter__(
+    {
+        "type": "chat:model",
+        "data": {
+            "model": "claude-3-opus"
+        },
+    }
+)
+```
+
+This is typically used in filter `inlet` functions when dynamically routing to different models based on message content or other criteria. See the [Model Routing in Filters](/features/plugin/functions/filter#-model-routing-in-filters) documentation for a complete example.
 
 ---
 
