@@ -130,6 +130,65 @@ Defines the number of worker threads available for handling requests.
 
 ---
 
+## ☁️ Cloud Infrastructure Latency
+
+When deploying Open WebUI in cloud Kubernetes environments (AKS, EKS, GKE), you may notice significant performance degradation compared to local Kubernetes (Rancher Desktop, kind, Minikube) or bare-metal deployments—even with identical resource allocations. This is almost always caused by **latency** in the underlying infrastructure.
+
+### Network Latency (Database & Services)
+
+The most common cause of cloud performance issues is **network latency between Open WebUI and its database**.
+
+Many cloud deployments place the database on a separate node, availability zone, or even a managed database service. While this is architecturally sound, it introduces latency to *every single database query*. Open WebUI makes multiple database calls per request, so even 10-20ms of network latency per query can compound into multi-second response times under concurrent load.
+
+**Symptoms:**
+- Health check endpoints show high response times instead of being near-instant.
+- Simple API calls or normal chat completions become sluggish under concurrent load, even when CPU and Memory usage appear low.
+- Significant performance gap between local development/testing and cloud production environments.
+
+**Diagnosis:**
+- Check network latency between your Open WebUI pod and your database. From within the pod:
+  ```bash
+  # For PostgreSQL
+  psql -h <db-host> -U <user> -c "SELECT 1" -d <database>
+  
+  # Or use ping/nc to check raw latency
+  nc -zv <db-host> 5432
+  ```
+- If network latency to your database exceeds **5ms**, it is not recommended for high-performance deployments and will likely be your primary bottleneck.
+
+**Solutions:**
+1. **Co-locate services:** Deploy Open WebUI and PostgreSQL in the same availability zone, or even on the same node pool if possible, to minimize network hops.
+2. **Managed DB Consideration:** Note that "one-click" managed database solutions in the cloud, while scalable, often introduce significant network latency compared to a self-hosted DB on the same node. This tradeoff must be carefully considered.
+3. **Enable caching:** Use `ENABLE_BASE_MODELS_CACHE=True` and other caching options to reduce the frequency of database queries.
+4. **Reduce database writes:** Set `ENABLE_REALTIME_CHAT_SAVE=False` to batch database updates and reduce IOPS pressure.
+
+### Disk I/O Latency (SQLite & Storage)
+
+If you're using **SQLite** (the default) in a cloud environment, you may be trading network latency for **disk latency**.
+
+Cloud storage (Azure Disks, AWS EBS, GCP Persistent Disks) often has significantly higher latency and lower IOPS than local NVMe/SSD storage—especially on lower-tier storage classes. SQLite is particularly sensitive to disk performance because it performs synchronous writes.
+
+**Symptoms:**
+- Performance is acceptable with a single user but degrades rapidly as concurrency increases.
+- High "I/O Wait" on the server despite low CPU usage.
+
+**Solutions:**
+1. **Use high-performance storage classes:**
+   - Ensure you are using SSD-backed storage classes (e.g., `Premium_LRS` on Azure, `gp3` on AWS, `pd-ssd` on GCP).
+2. **Use PostgreSQL instead:** For any medium to large production deployment, **Postgres is mandatory**. SQLite is generally not recommended at scale in cloud environments due to the inherent latency of network-attached storage.
+
+### Other Cloud-Specific Considerations
+
+| Factor | Impact | Mitigation |
+|--------|--------|------------|
+| **Burstable VMs** (e.g., Azure B-series, AWS T-series) | CPU throttling under sustained load, even at low reported usage | Use standard/compute-optimized node pools |
+| **DNS Resolution** | CoreDNS overhead on every external request | Ensure CoreDNS is properly scaled; consider node-local DNS cache |
+| **Service Mesh Sidecars** | Istio/Linkerd proxies add latency to every request | Check for unexpected sidecar containers in your pods |
+| **Network Policies** | CNI processing overhead | Audit and simplify network policies if possible |
+| **Cross-Zone Traffic** | Latency + egress costs when services span zones | Pin services to the same availability zone |
+
+---
+
 ## 📉 Resource Efficiency (Reducing RAM)
 
 If deploying on memory-constrained devices (Raspberry Pi, small VPS), use these strategies to prevent the application from crashing due to OOM (Out of Memory) errors.
