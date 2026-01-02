@@ -22,6 +22,21 @@ You can also edit the LLM's response and enter your image generation prompt as t
 
 :::
 
+:::info
+**Legacy "Generate Image" Button:**
+As of Open WebUI v0.6.44, the native "Generate Image" button (which allowed generating an image directly from a message's content) was removed. If you wish to restore this functionality, you can use the community-built **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)**.
+:::
+
+## Restoring the "Generate Image" Button
+
+If you prefer the workflow where you can click a button on any message to generate an image from its content, you can easily restore it:
+
+1. Visit the **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)** on the Open WebUI Community site.
+2. Click **Get** to import it into your local instance (or copy the code and paste it into your local instance).
+3. Once imported, go to **Workspace** > **Functions** and ensure the **Generate Image** action is enabled.
+
+This action adds a "Generate Image" icon to the message action bar, allowing you to generate images directly from LLM responses - which is helpful if you want the assistant to first iterate on the image prompt and generate it once you are satisfied.
+
 
 :::info
 **Requirement:** To use **Image Editing** or **Image+Image Generation**, you must have an **Image Generation Model** configured in the Admin Settings that supports these features (e.g., OpenAI DALL-E, or a ComfyUI/Automatic1111 model with appropriate inpainting/img2img capabilities).
