@@ -154,7 +154,7 @@ Many cloud deployments place the database on a separate node, availability zone,
   # Or use ping/nc to check raw latency
   nc -zv <db-host> 5432
   ```
-- If network latency to your database exceeds **5ms**, it is not recommended for high-performance deployments and will likely be your primary bottleneck.
+- **Ideal Latency Target:** You should aim for **1-2ms or lower** for database queries. If network latency to your database exceeds **5ms**, it is highly not recommended for production deployments and will likely be your primary performance bottleneck.
 
 **Solutions:**
 1. **Co-locate services:** Deploy Open WebUI and PostgreSQL in the same availability zone, or even on the same node pool if possible, to minimize network hops.
@@ -166,16 +166,22 @@ Many cloud deployments place the database on a separate node, availability zone,
 
 If you're using **SQLite** (the default) in a cloud environment, you may be trading network latency for **disk latency**.
 
-Cloud storage (Azure Disks, AWS EBS, GCP Persistent Disks) often has significantly higher latency and lower IOPS than local NVMe/SSD storage—especially on lower-tier storage classes. SQLite is particularly sensitive to disk performance because it performs synchronous writes.
+Cloud storage (Azure Disks, AWS EBS, GCP Persistent Disks) often has significantly higher latency and lower IOPS than local NVMe/SSD storage—especially on lower-tier storage classes. 
+
+:::warning Warning: Performance Risk with Network File Systems
+Using Network-attached File Systems like **NFS, SMB, or Azure Files** for your database storage (especially for SQLite) **may** introduce severe latency into the file locking and synchronous write operations that SQLite relies on.
+:::
+
+SQLite is particularly sensitive to disk performance because it performs synchronous writes. Moving from local SSDs to a network share can increase latency by 10x or more per operation.
 
 **Symptoms:**
 - Performance is acceptable with a single user but degrades rapidly as concurrency increases.
 - High "I/O Wait" on the server despite low CPU usage.
 
 **Solutions:**
-1. **Use high-performance storage classes:**
-   - Ensure you are using SSD-backed storage classes (e.g., `Premium_LRS` on Azure, `gp3` on AWS, `pd-ssd` on GCP).
-2. **Use PostgreSQL instead:** For any medium to large production deployment, **Postgres is mandatory**. SQLite is generally not recommended at scale in cloud environments due to the inherent latency of network-attached storage.
+1. **Use high-performance Block Storage:**
+   - Ensure you are using SSD-backed **Block Storage** classes (e.g., `Premium_LRS` on Azure Disks, `gp3` on AWS EBS, `pd-ssd` on GCP). Avoid "File" based storage classes (like `azurefile-csi`) for database workloads.
+2. **Use PostgreSQL instead:** For any medium to large production deployment, **Postgres is mandatory**. SQLite is generally not recommended at scale in cloud environments due to the inherent latency of network-attached storage and the compounding effect of file locking over the network.
 
 ### Other Cloud-Specific Considerations
 
