@@ -95,6 +95,15 @@ For multi-user setups, the choice of Vector DB matters.
     *   `ENABLE_MILVUS_MULTITENANCY_MODE=True`
     *   `ENABLE_QDRANT_MULTITENANCY_MODE=True`
 
+### Optimizing Document Chunking
+
+The way your documents are chunked directly impacts both storage efficiency and retrieval quality.
+
+- **Use Markdown Header Splitting**: This preserves the semantic structure of your documents.
+- **Set a Chunk Min Size Target**: When using the markdown header splitter, tiny chunks (e.g., just a single sub-header) can be created. These are inefficient to store and poor for retrieval.
+  - **Env Var**: `CHUNK_MIN_SIZE_TARGET=1000` (Example value)
+  - **Benefit**: Intelligently merges small chunks with neighbors, significantly reducing the total vector count and improving RAG performance.
+
 ---
 
 ## 📈 Scaling Infrastructure (Multi-Tenancy & Kubernetes)

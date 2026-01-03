@@ -2565,6 +2565,13 @@ Provide a clear and direct response to the user's query, including inline citati
 - Description: Specifies how much overlap there should be between chunks.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `CHUNK_MIN_SIZE_TARGET`
+
+- Type: `int`
+- Default: `0`
+- Description: Chunks smaller than this threshold will be intelligently merged with neighboring chunks when possible. This helps prevent tiny, low-quality fragments that can hurt retrieval performance and waste embedding resources. This feature only works when `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER` is enabled. Set to `0` to disable merging. For more information on the benefits and configuration, see the [RAG guide](/features/rag#chunking-configuration).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_TEXT_SPLITTER`
 
 - Type: `str`
