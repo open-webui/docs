@@ -39,6 +39,33 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 Customize the RAG template from the `Admin Panel` > `Settings` > `Documents` menu.
 
+## Markdown Header Splitting
+
+When enabled, documents are first split by markdown headers (H1-H6). This preserves document structure and ensures that sections under the same header are kept together when possible. The resulting chunks are then further processed by the standard character or token splitter.
+
+:::tip
+
+Use the **Chunk Min Size Target** setting (found in **Admin Panel > Settings > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
+
+:::
+
+## Chunking Configuration
+
+Open WebUI allows you to fine-tune how documents are split into chunks for embedding. This is crucial for optimal retrieval performance.
+
+- **Chunk Size**: Sets the maximum number of characters (or tokens) per chunk.
+- **Chunk Overlap**: Specifies how much content is shared between adjacent chunks to maintain context.
+- **Chunk Min Size Target**: Although [Markdown Header Splitting](#markdown-header-splitting) is excellent for preserving structure, it can often create tiny, fragmented chunks (e.g., a standalone sub-header, a table of contents entry, a single-sentence paragraph, or a short list item) that lack enough semantic context for high-quality embedding. You can counteract this by setting the **Chunk Min Size Target** to intelligently merge these small pieces with their neighbors.
+
+### Why use a Chunk Min Size Target?
+
+Intelligently merging small sections after markdown splitting provides several key advantages:
+
+- **Improves RAG Quality**: Eliminates tiny, meaningless fragments, ensuring better semantic coherence in each retrieve chunk.
+- **Reduces Vector Database Size**: Fewer chunks mean fewer vectors to store, reducing storage costs and memory usage.
+- **Speeds Up Retrieval & Embedding**: A smaller index is faster to search, and fewer chunks require fewer embedding API calls (or less local compute). This significantly accelerates document processing when uploading files to chats or knowledge bases, as there is less data to vectorize.
+- **Efficiency & Impact**: Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size of 2000) can reduce chunk counts by over 90% while **improving accuracy**, increasing embedding speed, and enhancing overall retrieval quality by maintaining semantic context.
+
 ## RAG Embedding Support
 
 Change the RAG embedding model directly in the `Admin Panel` > `Settings` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.

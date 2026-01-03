@@ -155,6 +155,18 @@ By separating these limits, administrators can better manage resource usage acro
 
 ---
 
+### 7. Fragmented or Tiny Chunks 🧩
+
+When using the **Markdown Header Splitter**, documents can sometimes be split into very small fragments (e.g., just a table of contents entry or a short sub-header). These tiny chunks often lack enough semantic context for the embedding model to represent them accurately, leading to poor RAG results and unnecessary overhead.
+
+✅ Solution:
+
+- Go to **Admin Settings > Documents**.
+- Increase the **Chunk Min Size Target**.
+- Setting this to a value like `1000` (or ~50-60% of your `CHUNK_SIZE`) will force the system to merge small fragments with neighboring chunks when possible, resulting in better semantic coherence and fewer total chunks.
+
+---
+
 
 | Problem | Fix |
 |--------|------|
@@ -163,6 +175,7 @@ By separating these limits, administrators can better manage resource usage acro
 | ⏱ Limited by 2048 token cap | Increase model context length (Admin Panel > Models > Settings > Advanced Parameters for Ollama) or use large-context LLM |
 | 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
 | ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`) but note that Knowledge Base limits are separate |
+| 🧩 Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
 | Still confused? | Test with GPT-4o and compare outputs |
 
 ---
