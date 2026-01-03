@@ -7,6 +7,10 @@ title: "Development"
 
 Toolkits are defined in a single Python file, with a top level docstring with metadata and a `Tools` class.
 
+:::warning Use Async Functions for Future Compatibility
+Tool methods should generally be defined as `async` to ensure compatibility with future Open WebUI versions. The backend is progressively moving toward fully async execution, and synchronous functions may block execution or cause issues in future releases.
+:::
+
 ### Example Top-Level Docstring
 
 ```python
