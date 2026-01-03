@@ -378,45 +378,6 @@ class Filter:
 Filters are sorted in **ascending** order by priority. A filter with `priority=0` runs **before** a filter with `priority=1`, which runs before `priority=2`, and so forth.
 :::
 
-#### Example: Model Router + Context Manager Chain
-
-A common use case is having one filter route messages to different models, followed by another filter that adjusts context based on the selected model.
-
-:::note Example Only
-The following examples are simplified to illustrate the concept. They show incomplete filter implementations—you would need to add the actual routing logic and helper methods for a working filter.
-:::
-
-**Filter 1: Model Router (priority=0)**
-```python
-class Filter:
-    class Valves(BaseModel):
-        priority: int = 0  # Runs first
-    
-    async def inlet(self, body: dict, __event_emitter__) -> dict:
-        # Example: Route complex tasks to a more capable model
-        # You would implement is_complex_task() with your own logic
-        if self.is_complex_task(body):
-            body["model"] = "claude-3-opus"
-        else:
-            body["model"] = "gemini-1.5-flash"
-        return body
-```
-
-**Filter 2: Context Manager (priority=1)**
-```python
-class Filter:
-    class Valves(BaseModel):
-        priority: int = 1  # Runs after model router
-    
-    async def inlet(self, body: dict, __event_emitter__) -> dict:
-        # Example: Trim messages based on the selected model's context window
-        # You would implement get_context_limit() and trim_to_fit() with your own logic
-        model_id = body.get("model")
-        max_tokens = self.get_context_limit(model_id)
-        body["messages"] = self.trim_to_fit(body["messages"], max_tokens)
-        return body
-```
-
 ---
 
 ### 🔗 Data Passing Between Filters
