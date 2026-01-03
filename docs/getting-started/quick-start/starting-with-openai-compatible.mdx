@@ -7,24 +7,29 @@ title: "Starting with OpenAI-Compatible Servers"
 
 ## Overview
 
-Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server that implements the OpenAI-compatible API**, running locally or remotely. This is perfect if you want to run different language models, or if you already have a favorite backend or ecosystem. This guide will show you how to:
-
-- Set up an OpenAI-compatible server (with a few popular options)
-- Connect it to Open WebUI
-- Start chatting right away
-
-## Step 1: Choose an OpenAI-Compatible Server
-
-There are many servers and tools that expose an OpenAI-compatible API. Here are some of the most popular:
-
-- [Llama.cpp](https://github.com/ggml-org/llama.cpp): Extremely efficient, runs on CPU and GPU
-- [Ollama](https://ollama.com/): Super user-friendly and cross-platform
-- [LM Studio](https://lmstudio.ai/): Rich desktop app for Windows/Mac/Linux
-- [Lemonade](https://lemonade-server.ai/): Fast ONNX-based backend with NPU/iGPU acceleration
-
-Pick whichever suits your workflow!
+Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server that implements the OpenAI-compatible API**, running locally or remotely. This is perfect if you want to run different language models, or if you already have a favorite backend or ecosystem.
 
 ---
+
+## Protocol-Oriented Design
+
+Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider (like Anthropic, Gemini, or Mistral), Open WebUI supports the **OpenAI Chat Completions Protocol**. 
+
+Any provider that offers an OpenAI-compatible endpoint can be used with Open WebUI. This approach ensure maximum compatibility with minimal configuration bloat. 
+
+### Popular Compatible Servers and Providers
+
+There are many servers and tools that expose an OpenAI-compatible API. Pick whichever suits your workflow:
+
+- **Local Runners**: [Llama.cpp](https://github.com/ggml-org/llama.cpp), [Ollama](https://ollama.com/), [LM Studio](https://lmstudio.ai/), [LocalAI](https://localai.io/), [Docker Model Runner](https://docs.docker.com/ai/model-runner/), [Lemonade](https://lemonade-server.ai/).
+- **Cloud Providers**: [Groq](https://groq.com/), [Mistral AI](https://mistral.ai/), [Perplexity](https://www.perplexity.ai/), [OpenRouter](https://openrouter.ai/), [LiteLLM](https://docs.litellm.ai/).
+- **Google Gemini**: Google also provides an OpenAI-compatible endpoint for Gemini models.
+  - **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/openai/`
+  - **Key**: Use your Gemini API key from [Google AI Studio](https://aistudio.google.com/).
+
+---
+
+## Step 1: Connect Your Server to Open WebUI
 
 #### 🍋 Get Started with Lemonade
 

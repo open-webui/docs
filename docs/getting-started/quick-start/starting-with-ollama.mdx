@@ -9,6 +9,16 @@ Open WebUI makes it easy to connect and manage your **Ollama** instance. This gu
 
 ---
 
+## Protocol-Oriented Design
+
+Open WebUI is designed to be **Protocol-Oriented**. This means that when we refer to "Ollama", we are specifically referring to the **Ollama API Protocol** (typically running on port `11434`).
+
+While some tools may offer basic compatibility, this connection type is optimized for the unique features of the Ollama service, such as native model management and pulling directly through the Admin UI. 
+
+If your backend is primarily based on the OpenAI standard (like LocalAI or Docker Model Runner), we recommend using the [OpenAI-Compatible Server Guide](/getting-started/quick-start/starting-with-openai-compatible) for the best experience.
+
+---
+
 ## Step 1: Setting Up the Ollama Connection
 
 Once Open WebUI is installed and running, it will automatically attempt to connect to your Ollama instance. If everything goes smoothly, you’ll be ready to manage and use models right away.
