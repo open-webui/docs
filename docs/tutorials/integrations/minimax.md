@@ -23,8 +23,11 @@ MiniMax offers a "Coding Plan" subscription which is significantly more cost-eff
 2.  Choose a plan that fits your needs (e.g., the **Starter** plan for $10/month).
 3.  Complete the subscription process.
 
-> [!NOTE]
-> The **Starter** plan provides 100 "prompts" every 5 hours. One prompt is roughly equivalent to 15 requests, offering substantial value compared to token-based billing.
+:::info
+
+The **Starter** plan provides 100 "prompts" every 5 hours. One prompt is roughly equivalent to 15 requests, offering substantial value compared to token-based billing.
+
+:::
 
 Source: [MiniMax Coding Plan Official Documentation](https://platform.minimax.io/docs/coding-plan/intro)
 
@@ -38,8 +41,11 @@ Once subscribed, you need your specialized API Key.
 
 ![MiniMax Platform API Usage](/images/tutorials/minimax/minimax-platform-api-usage.png)
 
-> [!IMPORTANT]
-> This API Key is exclusive to the Coding Plan and is not interchangeable with standard pay-as-you-go API Keys.
+:::info
+
+This API Key is exclusive to the Coding Plan and is not interchangeable with standard pay-as-you-go API Keys.
+
+:::
 
 ## Step 3: Configure Connection in Open WebUI
 
