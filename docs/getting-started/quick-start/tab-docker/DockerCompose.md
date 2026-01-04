@@ -74,7 +74,7 @@ deploy:
     reservations:
       devices:
         - driver: nvidia
-        - count: all
+          count: all
           capabilities: [gpu]
 ```
 
