@@ -19,6 +19,7 @@ You can use:
 
 - OpenAI directly (https://platform.openai.com/account/api-keys)
 - Azure OpenAI
+- MiniMax (https://platform.minimax.io/)
 - Any OpenAI-compatible service (e.g., LocalAI, FastChat, Helicone, LiteLLM, OpenRouter etc.)
 
 👉 Once you have the key, copy it and keep it handy.
@@ -44,7 +45,7 @@ Once Open WebUI is running:
 <Tabs>
   <TabItem value="standard" label="Standard / Compatible" default>
 
-  Use this for **OpenAI**, **DeepSeek**, **OpenRouter**, **LocalAI**, **FastChat**, **Helicone**, **LiteLLM**, etc.
+  Use this for **OpenAI**, **DeepSeek**, **MiniMax**, **OpenRouter**, **LocalAI**, **FastChat**, **Helicone**, **LiteLLM**, etc.
 
   *   **Connection Type**: External
   *   **URL**: `https://api.openai.com/v1` (or your provider's endpoint)
@@ -74,6 +75,10 @@ Once Open WebUI is running:
     When using **OpenRouter**, we **highly recommend**:
     1.  **Use an allowlist** (add specific Model IDs). OpenRouter exposes thousands of models, which can clutter your model selector and slow down the admin panel if not filtered.
     2.  **Enable Model Caching** (`Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`). Without caching, page loads can take 10-15+ seconds on first visit due to querying a large number of models. See the [Performance Guide](/tutorials/tips/performance) for more details.
+    :::
+
+    :::caution MiniMax Whitelisting
+    Some providers, like **MiniMax**, do not expose their models via a `/models` endpoint. For these providers, you **must** manually add the Model ID (e.g., `MiniMax-M2.1`) to the **Model IDs (Filter)** list for them to appear in the UI.
     :::
     
 *   **Prefix ID**:
