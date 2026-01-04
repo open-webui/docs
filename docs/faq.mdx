@@ -128,6 +128,22 @@ Everything you need to run Open WebUI, including your data, remains within your 
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+### Q: Why are my reasoning model's thinking blocks showing as raw text instead of being hidden?
+
+**A:** If you're using a reasoning/thinking model (like **DeepSeek-R1**, **Qwen3**, or similar) and the `<think>...</think>` content is displaying as raw text instead of being properly parsed and hidden, you need to configure Ollama with the correct **reasoning parser**.
+
+Start Ollama with the `--reasoning-parser` flag:
+
+```bash
+ollama serve --reasoning-parser deepseek_r1
+```
+
+This enables proper parsing of thinking blocks so they display in a collapsible section rather than as raw text in the response. The `deepseek_r1` parser works for most reasoning models.
+
+**Note:** This issue is most common with **non-streaming** requests (`stream: false`). Streaming mode typically handles reasoning blocks better by default.
+
+For detailed troubleshooting steps, see our [Reasoning Models Troubleshooting Guide](/troubleshooting/reasoning-models).
+
 ### Q: RAG with Open WebUI is very bad or not working at all. Why?
 
 **A:** If you're using **Ollama**, be aware that Ollama sets the context length to **2048 tokens by default**. This means that none of the retrieved data might be used because it doesn't fit within the available context window.
