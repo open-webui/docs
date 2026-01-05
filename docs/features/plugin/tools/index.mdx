@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 title: "Tools"
 ---
 
@@ -26,8 +26,12 @@ Users often encounter the term "Tools" in different contexts. Here is how to dis
 ### 1. Native Features (Built-in)
 These are deeply integrated into Open WebUI and generally don't require external scripts.
 - **Web Search**: Integrated via engines like SearXNG, Google, or Tavily.
+- **URL Fetching**: Extract text content directly from websites using `#` or native tools.
 - **Image Generation**: Integrated with DALL-E, ComfyUI, or Automatic1111.
+- **Memory**: The ability for models to remember facts about you across chats.
 - **RAG (Knowledge)**: The ability to query uploaded documents (`#`).
+
+In [**Native Mode**](#-built-in-system-tools-native-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
 These are **Python scripts** that run directly within the Open WebUI environment.
@@ -79,32 +83,66 @@ You can also let your LLM auto-select the right Tools using the [**AutoTool Filt
 
 ---
 
-## 🧠 Choosing How Tools Are Used: Default vs Native
+## Tool Calling Modes: Default vs. Native
 
-Once Tools are enabled, Open WebUI gives you two different ways to let your LLM interact with them. You can switch this via the chat settings:
+Open WebUI offers two distinct ways for models to interact with tools. Choosing the right mode depends on your model's capabilities and your performance requirements.
+
+### 🟡 Default Mode (Prompt-based)
+In Default Mode, Open WebUI manages tool selection by injecting a specific prompt template that guides the model to output a tool request. 
+- **Compatibility**: Works with **practically any model**, including older or smaller local models that lack native function-calling support.
+- **Flexibility**: Highly customizable via prompt templates.
+- **Caveat**: Can be slower (requires extra tokens) and less reliable for complex, multi-step tool chaining.
+
+### 🟢 Native Mode (System Function Calling)
+Native Mode leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for high-performance agentic workflows.
+
+#### Why use Native Mode?
+- **Speed & Efficiency**: Lower latency as it avoids bulky prompt-based tool selection.
+- **Reliability**: Higher accuracy in following tool schemas.
+- **Multi-step Chaining**: Essential for **Agentic Research** and **Interleaved Thinking** where a model needs to call multiple tools in succession.
+
+#### How to Enable Native Mode
+Native Mode can be enabled at two levels:
+
+1.  **Global/Administrator Level (Recommended)**:
+    *   Navigate to **Admin Panel > Settings > Models**.
+    *   Scroll to **Model Specific Settings** for your target model.
+    *   Under **Advanced Parameters**, find the **Function Calling** dropdown and select `Native`.
+2.  **Per-Chat Basis**:
+    *   Inside a chat, click the ⚙️ **Chat Controls** icon.
+    *   Go to **Advanced Params** and set **Function Calling** to `Native`.
 
 ![Chat Controls](/images/features/plugin/tools/chat-controls.png)
 
-1. Open a chat with your model.
-2. Click ⚙️ **Chat Controls > Advanced Params**.
-3. Look for the **Function Calling** setting and switch between:
 
-### 🟡 Default Mode (Prompt-based)
-Here, your LLM doesn’t need to natively support function calling. We guide the model using a smart tool-selection prompt template to select and use a Tool.
-- ✅ Works with **practically any model** (including smaller local models).
-- 💡 **Admin Note**: You can also toggle the default mode for each specific model in the **Admin Panel > Settings > Models > Advanced Parameters**.
 
-- ❗ Not as reliable as Native Mode when chaining multiple complex tools.
+#### Model Requirements & Caveats
+- **Recommended Models**: High-tier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, and **MiniMax M2.1** excel in Native Mode.
+- **Local Model Warning**: While large local models (e.g., Qwen 3 32B) support native tool calling, **small local models (<= 8B parameters)** often struggle with Native Mode. They may produce malformed JSON or fail to follow the strict state management required for sequential calls. For these models, **Default Mode** is usually more reliable.
 
-### 🟢 Native Mode (Built-in Function Calling)
-If your model supports native function calling (like GPT-4o, Gemini, Claude, or GPT-5), use this for a faster, more accurate experience where the LLM decides exactly when and how to call tools.
-- ✅ Fast, accurate, and can chain multiple tools in one response.
-- ❗ Requires a model that explicitly supports tool-calling schemas.
+| Feature | Default Mode | Native Mode |
+|:---|:---|:---|
+| **Latency** | Medium/High | Low |
+| **Model Compatibility** | Universal | Requires Tool-Calling Support |
+| **Logic** | Prompt-based (Open WebUI) | Model-native (API/Ollama) |
+| **Complex Chaining** | ⚠️ Limited | ✅ Excellent |
 
-| Mode     | Who it’s for                     | Pros                                    | Cons                                 |
-|----------|----------------------------------|-----------------------------------------|--------------------------------------|
-| **Default** | Practically any model (basic/local) | Broad compatibility, safer, flexible    | May be less accurate or slower       |
-| **Native**  | GPT-4o, Gemini, Claude, GPT-5, etc. | Fast, smart, excellent tool chaining    | Needs proper function call support   |
+### 🛠️ Built-in System Tools (Native Mode)
+
+When **Native Mode** is enabled, Open WebUI automatically injects powerful system tools based on the features toggled for the chat. This unlocks "Agentic" behaviors where models (like GPT-5, Claude 4.5, or MiniMax M2.1) can perform multi-step research or manage user memory dynamically.
+
+| Tool | Purpose | Requirements |
+|------|---------|--------------|
+| `web_search` | Performs a search using the **Search Engine** provider configured in **Admin Panel > Settings > Web Search**. | `ENABLE_WEB_SEARCH` must be enabled. |
+| `fetch_url` | Visits a specific URL and extracts the main text content using the **Web Loader Engine** configured in **Admin Panel > Settings > Web Search**. | Part of the Web Search feature. |
+| `generate_image` | Generates a new image based on a prompt using the **Image Generation Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_GENERATION` must be enabled. |
+| `edit_image` | Edits an existing image based on a prompt and image URL using the **Image Editing Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_EDIT` must be enabled. |
+| `memory_query` | Searches the user's personal memory for relevant information managed in **Settings > Personalization > Memory**. | Memory feature enabled in Model/Chat settings. |
+| `memory_add` | Stores a new piece of information in the user's personalization memory. | Memory feature enabled in Model/Chat settings. |
+
+**Why use these?** It allows for **Deep Research** (searching multiple times), **Dynamic Personalization** (saving facts automatically), and **Improved Context Selection** (the model decides when to search).
+
+---
 
 ---
 

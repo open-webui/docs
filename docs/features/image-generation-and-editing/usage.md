@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 1
 title: "Usage"
 ---
 
@@ -12,6 +12,19 @@ Before you can use image generation, you must ensure that the **Image Generation
 3. Click `Send`.
 
 ![Image Generation Tutorial](/images/tutorial_image_generation_2.png)
+
+## Native Tool-Based Generation (Agentic)
+
+If your model is configured with **Native Function Calling** (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), it can invoke image generation directly as a tool.
+
+### How it works:
+- **Requirement**: The **Image Generation** feature must be toggled **ON** for the chat or model. This grants the model "permission" to use the tool.
+- **Natural Language**: You can simply ask the model: *"Generate an image of a cybernetic forest."*
+- **Action**: If **Native Mode** is active and the feature is enabled, the model will invoke the `generate_image` tool.
+- **Display**: The generated image is displayed directly in the chat interface.
+- **Editing**: This also supports **Image Editing** (inpainting) via the `edit_image` tool (e.g., *"Make the sky in this image red"*).
+
+This approach allows the model to "reason" about the prompt before generating, or even generate multiple images as part of a complex request.
 
 
 
