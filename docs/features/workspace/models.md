@@ -22,7 +22,7 @@ Both actions lead to the same Model Builder interface, where you can configure t
 
 ### Core Configuration
 
-- **Avatar Photo**: Upload a custom image to represent your model in the chat interface.
+- **Avatar Photo**: Upload a custom image to represent your model in the chat interface. **Animated formats** (GIF and WebP) are supported and their animations will be preserved during the upload process.
 - **Model Name & ID**: The display name and unique identifier for your custom preset (e.g., "Python Tutor" or "Meeting Summarizer").
 - **Base Model**: The actual model beneath the hood that powers the agent. You can choose *any* model connected to Open WebUI. You can create a custom preset for `gpt-4o` just as easily as `llama3`.
   - **Fallback Behavior**: If the configured Base Model is unavailable and the `ENABLE_CUSTOM_MODEL_FALLBACK` environment variable is set to `True`, the system will automatically fall back to the first configured default model (set in Admin Panel > Settings > Models > Default Models). This ensures mission-critical custom models remain functional even if their specific base model is removed or temporarily unavailable.
