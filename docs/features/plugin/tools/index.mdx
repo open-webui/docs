@@ -142,6 +142,19 @@ When **Native Mode** is enabled, Open WebUI automatically injects powerful syste
 
 **Why use these?** It allows for **Deep Research** (searching multiple times), **Dynamic Personalization** (saving facts automatically), and **Improved Context Selection** (the model decides when to search).
 
+### Interleaved Thinking 🧠
+
+When using **Native Mode**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
+
+This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
+1.  **Reason**: Analyze the user's intent and identify information gaps.
+2.  **Act**: Call a tool (e.g., `web_search` and `fetch_url`).
+3.  **Think**: Read the tool's output and update its internal understanding.
+4.  **Iterate**: If the answer isn't clear, call another tool (e.g., `fetch_url` to read a specific page) or refine the search.
+5.  **Finalize**: Only after completing this "Deep Research" cycle does the model provide a final, grounded answer.
+
+This behavior is what transforms a standard chatbot into an **Agentic AI** capable of solving complex, multi-step problems autonomously.
+
 ---
 
 ---
