@@ -3131,6 +3131,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Description: Bypasses the web search embedding and retrieval process.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `BYPASS_WEB_SEARCH_WEB_LOADER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Bypasses the web loader when performing web search. When enabled, only snippets from the search engine are used, and the full page content is not fetched.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `SEARXNG_QUERY_URL`
 
 - Type: `str`
