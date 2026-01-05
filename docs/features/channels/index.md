@@ -164,6 +164,23 @@ Channels support granular access control:
 * **Read-only access:** Users can view content but cannot contribute
 * **Feature toggle:** Administrators can control channel access via `USER_PERMISSIONS_FEATURES_CHANNELS` environment variable or group permissions in the admin panel
 
+---
+
+## Native Channel Awareness (Agentic)
+
+When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), models can navigate and search through your organization's channels autonomously.
+
+### Available Channel Tools:
+- **`search_channels`**: The model can find channels by name or description to identify where relevant discussions might be happening.
+- **`search_channel_messages`**: The model can search for specific keywords or topics across all channels it has access to.
+- **`view_channel_message`**: The model can read specific individual messages and their metadata.
+- **`view_channel_thread`**: The model can retrieve an entire conversation thread to understand the full context of a discussion.
+
+### Why use native tool calling for Channels?
+This removes the need for human users to manually bridge information between private chats and public channels. You can ask an AI: *"Check the #dev-team channel and summarize the latest updates on the deployment issue,"* or *"What was decided in the #marketing-strategy thread about the logo?"*
+
+The model will use its "Agentic" loop to find the channel, search for relevant messages, read the full thread, and provide you with a synthesized answer—all without you leaving your current chat.
+
 ## Use Cases
 
 ### 1. Team Development (`#dev-team`)

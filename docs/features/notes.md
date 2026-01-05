@@ -161,6 +161,21 @@ These can also be configured in **Admin Panel > Settings > Users > Default Permi
 
 ---
 
+## Native Note Management (Agentic)
+
+If you are using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), the AI can interact with your Notes workspace autonomously using built-in system tools.
+
+### Available Note Tools:
+- **`search_notes`**: The model can search your entire library of notes by title and content.
+- **`view_note`**: After finding a note, the model can "read" its full markdown content.
+- **`write_note`**: The model can proactively create new notes for you (e.g., "I'll save this summary as a new note for you").
+- **`replace_note_content`**: The model can update existing notes (e.g., adding a new item to a todo list note).
+
+### Why use native tool calling for Notes?
+This transforms Notes from a static reference into a dynamic **Long-Term Memory** and **Task Management** system. Instead of manually copying and pasting, you can simply tell the model: *"Search my 'Project X' notes and find the database schema,"* or *"Add a new task to my 'Weekly Todo' note to review the PR."*
+
+---
+
 ## Use Cases
 
 While Open WebUI has dedicated **Prompts** (for slash commands) and **Documents** (for RAG), **Notes** serves a unique middle ground for iterative work and precise control.
@@ -200,8 +215,8 @@ Because attaching a Note injects the full text into the chat:
 
 * If you have a very large note (e.g., 10,000 words) and attach it to a model with a small context window (e.g., 8k tokens), the model may run out of memory or "forget" the beginning of your conversation.
 
-### Read-Only Context
+### Write Support (Native Mode)
 
-When you attach a Note to a standard chat, it is **read-only** for the AI.
+By default, when you manually attach a Note to a chat, it is **read-only**. However, in **Native Mode**, if the model has permission to use the `replace_note_content` tool, it can **actively modify** your notes.
 
-* The AI in the main chat cannot automatically update the text inside your Note file. If the AI suggests changes to your project, you must manually copy those changes back into the Note editor.
+* **Security Note**: This means a model could potentially overwrite content in your notes if instructed (or if it decides it's necessary for the task). Always review changes and utilize the **Undo/Redo** arrows in the Note editor if an AI makes an unwanted modification.

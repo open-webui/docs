@@ -153,17 +153,37 @@ When **Native Mode** is enabled, Open WebUI automatically injects built-in syste
 
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
-| `web_search` | Performs a search using the **Search Engine** provider configured in **Admin Panel > Settings > Web Search**. | `ENABLE_WEB_SEARCH` must be enabled. |
-| `fetch_url` | Visits a specific URL and extracts the main text content using the **Web Loader Engine** configured in **Admin Panel > Settings > Web Search**. | Part of the Web Search feature. |
-| `generate_image` | Generates a new image based on a prompt using the **Image Generation Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_GENERATION` must be enabled. |
-| `edit_image` | Edits an existing image based on a prompt and image URL using the **Image Editing Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_EDIT` must be enabled. |
-| `memory_query` | Searches the user's personal memory for relevant information managed in **Settings > Personalization > Memory**. | Memory feature enabled in Model/Chat settings. |
-| `memory_add` | Stores a new piece of information in the user's personalization memory. | Memory feature enabled in Model/Chat settings. |
+| **Search & Web** | | |
+| `web_search` | Performs a search using the configured Search Engine. | `ENABLE_WEB_SEARCH` enabled. |
+| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
+| **Image Gen** | | |
+| `generate_image` | Generates a new image based on a prompt. | `ENABLE_IMAGE_GENERATION` enabled. |
+| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
+| **Memory** | | |
+| `memory_query` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
+| `memory_add` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
+| **Notes** | | |
+| `search_notes` | Search the user's notes by title and content. | `ENABLE_NOTES` enabled. |
+| `view_note` | Get the full markdown content of a specific note. | `ENABLE_NOTES` enabled. |
+| `write_note` | Create a new private note for the user. | `ENABLE_NOTES` enabled. |
+| `replace_note_content` | Update an existing note's content or title. | `ENABLE_NOTES` enabled. |
+| **Chat History** | | |
+| `search_chats` | Search across the user's previous conversation history. | Always available. |
+| `view_chat` | Retrieve the full message history of a specific previous chat. | Always available. |
+| **Channels** | | |
+| `search_channels` | Find public or accessible channels by name/description. | `ENABLE_CHANNELS` enabled. |
+| `search_channel_messages` | Search for specific messages inside accessible channels. | `ENABLE_CHANNELS` enabled. |
+| `view_channel_message` | View a specific message or its details in a channel. | `ENABLE_CHANNELS` enabled. |
+| `view_channel_thread` | View a full message thread/replies in a channel. | `ENABLE_CHANNELS` enabled. |
+| **Time Tools** | | |
+| `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. | Always available. |
+| `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). | Always available. |
 
 #### Why Use Built-in Tools?
 - **Agentic Research**: Models can invoke `web_search` multiple times to refine results, then use `fetch_url` to read specific deep-dive articles.
+- **Contextual Awareness**: Models can search your previous chat history or notes to find specific details without manual copy-pasting.
 - **Dynamic Personalization**: Models can proactively store important facts about the user using `memory_add` during the conversation.
-- **Improved Context**: Instead of forcing a search before every prompt, the model decides *when* a search is actually necessary.
+- **Improved Context Selection**: Instead of forcing a search before every prompt, the model decides *when* a search or retrieval is actually necessary.
 
 
 #### Complete Event Type Compatibility Matrix
