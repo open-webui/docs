@@ -2896,6 +2896,12 @@ Strictly return in JSON format:
 - Description: Specifies whether to use the full context for RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_SYSTEM_CONTEXT`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, injects RAG context into the **system message** instead of the user message. This is highly recommended for optimizing performance when using models that support **KV prefix caching** or **Prompt Caching**. This includes local engines (like Ollama, llama.cpp, or vLLM) and cloud providers / Model-as-a-Service providers (like OpenAI and Vertex AI). By placing the context in the system message, it remains at a stable position at the start of the conversation, allowing the cache to persist across multiple turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
+
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
 - Type: `bool`
