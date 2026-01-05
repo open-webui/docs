@@ -3,17 +3,17 @@ sidebar_position: 1
 title: "Tools"
 ---
 
-# ⚙️ What are Tools?
+# What are Tools?
 
-Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things — like search the web, scrape data, generate images, talk back using AI voices, and more.
+⚙️ Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things — like search the web, scrape data, generate images, talk back using AI voices, and more.
 
 Because there are several ways to integrate "Tools" in Open WebUI, it's important to understand which type you are using.
 
 ---
 
-## 🧩 Tooling Taxonomy: Which "Tool" are you using?
+## Tooling Taxonomy: Which "Tool" are you using?
 
-Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
+🧩 Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
 
 | Type | Location in UI | Best For... | Source |
 | :--- | :--- | :--- | :--- |
@@ -40,8 +40,9 @@ These are **Python scripts** that run directly within the Open WebUI environment
 - **Safety**: Always review code before importing, as these run on your server.
 - **⚠️ Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
 
-### 3. MCP (Model Context Protocol) 🔌
-MCP is an open standard that allows LLMs to interact with external data and tools.
+### 3. MCP (Model Context Protocol)
+
+🔌 MCP is an open standard that allows LLMs to interact with external data and tools.
 - **Native HTTP MCP**: Open WebUI can connect directly to any MCP server that exposes an HTTP/SSE endpoint.
 - **MCPO (Proxy)**: Most community MCP servers use `stdio` (local command line). To use these in Open WebUI, you use the [**MCPO Proxy**](../../plugin/tools/openapi-servers/mcp.mdx) to bridge the connection.
 
@@ -50,9 +51,9 @@ Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification. 
 
 ---
 
-## 📦 How to Install & Manage Workspace Tools
+## How to Install & Manage Workspace Tools
 
-Workspace Tools are the most common way to extend your instance with community features.
+📦 Workspace Tools are the most common way to extend your instance with community features.
 
 1. Go to [Community Tool Library](https://openwebui.com/search)
 2. Choose a Tool, then click the **Get** button.
@@ -65,9 +66,9 @@ Never import a Tool you don’t recognize or trust. These are Python scripts and
 
 ---
 
-## 🔧 How to Use Tools in Chat
+## How to Use Tools in Chat
 
-Once installed or connected, here’s how to enable them for your conversations:
+🔧 Once installed or connected, here’s how to enable them for your conversations:
 
 ### Option 1: Enable on-the-fly (Specific Chat)
 While chatting, click the **➕ (plus)** icon in the input area. You’ll see a list of available Tools — you can enable them specifically for that session.
@@ -127,9 +128,9 @@ Native Mode can be enabled at two levels:
 | **Logic** | Prompt-based (Open WebUI) | Model-native (API/Ollama) |
 | **Complex Chaining** | ⚠️ Limited | ✅ Excellent |
 
-### 🛠️ Built-in System Tools (Native Mode)
+### Built-in System Tools (Native Mode)
 
-When **Native Mode** is enabled, Open WebUI automatically injects powerful system tools based on the features toggled for the chat. This unlocks "Agentic" behaviors where models (like GPT-5, Claude 4.5, or MiniMax M2.1) can perform multi-step research or manage user memory dynamically.
+🛠️ When **Native Mode** is enabled, Open WebUI automatically injects powerful system tools based on the features toggled for the chat. This unlocks "Agentic" behaviors where models (like GPT-5, Claude 4.5, or MiniMax M2.1) can perform multi-step research or manage user memory dynamically.
 
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
@@ -142,9 +143,9 @@ When **Native Mode** is enabled, Open WebUI automatically injects powerful syste
 
 **Why use these?** It allows for **Deep Research** (searching multiple times), **Dynamic Personalization** (saving facts automatically), and **Improved Context Selection** (the model decides when to search).
 
-### Interleaved Thinking 🧠
+### Interleaved Thinking {#interleaved-thinking}
 
-When using **Native Mode**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
+🧠 When using **Native Mode**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
 
 This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
 1.  **Reason**: Analyze the user's intent and identify information gaps.
