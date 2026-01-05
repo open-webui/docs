@@ -1,19 +1,19 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 title: "Tools"
 ---
 
-# ⚙️ What are Tools?
+# What are Tools?
 
-Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things — like search the web, scrape data, generate images, talk back using AI voices, and more.
+⚙️ Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things — like search the web, scrape data, generate images, talk back using AI voices, and more.
 
 Because there are several ways to integrate "Tools" in Open WebUI, it's important to understand which type you are using.
 
 ---
 
-## 🧩 Tooling Taxonomy: Which "Tool" are you using?
+## Tooling Taxonomy: Which "Tool" are you using?
 
-Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
+🧩 Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
 
 | Type | Location in UI | Best For... | Source |
 | :--- | :--- | :--- | :--- |
@@ -26,8 +26,12 @@ Users often encounter the term "Tools" in different contexts. Here is how to dis
 ### 1. Native Features (Built-in)
 These are deeply integrated into Open WebUI and generally don't require external scripts.
 - **Web Search**: Integrated via engines like SearXNG, Google, or Tavily.
+- **URL Fetching**: Extract text content directly from websites using `#` or native tools.
 - **Image Generation**: Integrated with DALL-E, ComfyUI, or Automatic1111.
+- **Memory**: The ability for models to remember facts about you across chats.
 - **RAG (Knowledge)**: The ability to query uploaded documents (`#`).
+
+In [**Native Mode**](#built-in-system-tools-native-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
 These are **Python scripts** that run directly within the Open WebUI environment.
@@ -36,8 +40,9 @@ These are **Python scripts** that run directly within the Open WebUI environment
 - **Safety**: Always review code before importing, as these run on your server.
 - **⚠️ Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
 
-### 3. MCP (Model Context Protocol) 🔌
-MCP is an open standard that allows LLMs to interact with external data and tools.
+### 3. MCP (Model Context Protocol)
+
+🔌 MCP is an open standard that allows LLMs to interact with external data and tools.
 - **Native HTTP MCP**: Open WebUI can connect directly to any MCP server that exposes an HTTP/SSE endpoint.
 - **MCPO (Proxy)**: Most community MCP servers use `stdio` (local command line). To use these in Open WebUI, you use the [**MCPO Proxy**](../../plugin/tools/openapi-servers/mcp.mdx) to bridge the connection.
 
@@ -46,9 +51,9 @@ Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification. 
 
 ---
 
-## 📦 How to Install & Manage Workspace Tools
+## How to Install & Manage Workspace Tools
 
-Workspace Tools are the most common way to extend your instance with community features.
+📦 Workspace Tools are the most common way to extend your instance with community features.
 
 1. Go to [Community Tool Library](https://openwebui.com/search)
 2. Choose a Tool, then click the **Get** button.
@@ -61,9 +66,9 @@ Never import a Tool you don’t recognize or trust. These are Python scripts and
 
 ---
 
-## 🔧 How to Use Tools in Chat
+## How to Use Tools in Chat
 
-Once installed or connected, here’s how to enable them for your conversations:
+🔧 Once installed or connected, here’s how to enable them for your conversations:
 
 ### Option 1: Enable on-the-fly (Specific Chat)
 While chatting, click the **➕ (plus)** icon in the input area. You’ll see a list of available Tools — you can enable them specifically for that session.
@@ -79,32 +84,79 @@ You can also let your LLM auto-select the right Tools using the [**AutoTool Filt
 
 ---
 
-## 🧠 Choosing How Tools Are Used: Default vs Native
+## Tool Calling Modes: Default vs. Native
 
-Once Tools are enabled, Open WebUI gives you two different ways to let your LLM interact with them. You can switch this via the chat settings:
+Open WebUI offers two distinct ways for models to interact with tools. Choosing the right mode depends on your model's capabilities and your performance requirements.
+
+### 🟡 Default Mode (Prompt-based)
+In Default Mode, Open WebUI manages tool selection by injecting a specific prompt template that guides the model to output a tool request. 
+- **Compatibility**: Works with **practically any model**, including older or smaller local models that lack native function-calling support.
+- **Flexibility**: Highly customizable via prompt templates.
+- **Caveat**: Can be slower (requires extra tokens) and less reliable for complex, multi-step tool chaining.
+
+### 🟢 Native Mode (System Function Calling)
+Native Mode leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for high-performance agentic workflows.
+
+#### Why use Native Mode?
+- **Speed & Efficiency**: Lower latency as it avoids bulky prompt-based tool selection.
+- **Reliability**: Higher accuracy in following tool schemas.
+- **Multi-step Chaining**: Essential for **Agentic Research** and **Interleaved Thinking** where a model needs to call multiple tools in succession.
+
+#### How to Enable Native Mode
+Native Mode can be enabled at two levels:
+
+1.  **Global/Administrator Level (Recommended)**:
+    *   Navigate to **Admin Panel > Settings > Models**.
+    *   Scroll to **Model Specific Settings** for your target model.
+    *   Under **Advanced Parameters**, find the **Function Calling** dropdown and select `Native`.
+2.  **Per-Chat Basis**:
+    *   Inside a chat, click the ⚙️ **Chat Controls** icon.
+    *   Go to **Advanced Params** and set **Function Calling** to `Native`.
 
 ![Chat Controls](/images/features/plugin/tools/chat-controls.png)
 
-1. Open a chat with your model.
-2. Click ⚙️ **Chat Controls > Advanced Params**.
-3. Look for the **Function Calling** setting and switch between:
 
-### 🟡 Default Mode (Prompt-based)
-Here, your LLM doesn’t need to natively support function calling. We guide the model using a smart tool-selection prompt template to select and use a Tool.
-- ✅ Works with **practically any model** (including smaller local models).
-- 💡 **Admin Note**: You can also toggle the default mode for each specific model in the **Admin Panel > Settings > Models > Advanced Parameters**.
 
-- ❗ Not as reliable as Native Mode when chaining multiple complex tools.
+#### Model Requirements & Caveats
+- **Recommended Models**: High-tier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, and **MiniMax M2.1** excel in Native Mode.
+- **Local Model Warning**: While large local models (e.g., Qwen 3 32B) support native tool calling, **small local models** often struggle with Native Mode. They may produce malformed JSON or fail to follow the strict state management required for sequential calls. For these models, **Default Mode** is usually more reliable.
 
-### 🟢 Native Mode (Built-in Function Calling)
-If your model supports native function calling (like GPT-4o, Gemini, Claude, or GPT-5), use this for a faster, more accurate experience where the LLM decides exactly when and how to call tools.
-- ✅ Fast, accurate, and can chain multiple tools in one response.
-- ❗ Requires a model that explicitly supports tool-calling schemas.
+| Feature | Default Mode | Native Mode |
+|:---|:---|:---|
+| **Latency** | Medium/High | Low |
+| **Model Compatibility** | Universal | Requires Tool-Calling Support |
+| **Logic** | Prompt-based (Open WebUI) | Model-native (API/Ollama) |
+| **Complex Chaining** | ⚠️ Limited | ✅ Excellent |
 
-| Mode     | Who it’s for                     | Pros                                    | Cons                                 |
-|----------|----------------------------------|-----------------------------------------|--------------------------------------|
-| **Default** | Practically any model (basic/local) | Broad compatibility, safer, flexible    | May be less accurate or slower       |
-| **Native**  | GPT-4o, Gemini, Claude, GPT-5, etc. | Fast, smart, excellent tool chaining    | Needs proper function call support   |
+### Built-in System Tools (Native Mode)
+
+🛠️ When **Native Mode** is enabled, Open WebUI automatically injects powerful system tools based on the features toggled for the chat. This unlocks "Agentic" behaviors where models (like GPT-5, Claude 4.5, or MiniMax M2.1) can perform multi-step research or manage user memory dynamically.
+
+| Tool | Purpose | Requirements |
+|------|---------|--------------|
+| `web_search` | Performs a search using the **Search Engine** provider configured in **Admin Panel > Settings > Web Search**. | `ENABLE_WEB_SEARCH` must be enabled. |
+| `fetch_url` | Visits a specific URL and extracts the main text content using the **Web Loader Engine** configured in **Admin Panel > Settings > Web Search**. | Part of the Web Search feature. |
+| `generate_image` | Generates a new image based on a prompt using the **Image Generation Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_GENERATION` must be enabled. |
+| `edit_image` | Edits an existing image based on a prompt and image URL using the **Image Editing Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_EDIT` must be enabled. |
+| `memory_query` | Searches the user's personal memory for relevant information managed in **Settings > Personalization > Memory**. | Memory feature enabled in Model/Chat settings. |
+| `memory_add` | Stores a new piece of information in the user's personalization memory. | Memory feature enabled in Model/Chat settings. |
+
+**Why use these?** It allows for **Deep Research** (searching multiple times), **Dynamic Personalization** (saving facts automatically), and **Improved Context Selection** (the model decides when to search).
+
+### Interleaved Thinking {#interleaved-thinking}
+
+🧠 When using **Native Mode**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
+
+This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
+1.  **Reason**: Analyze the user's intent and identify information gaps.
+2.  **Act**: Call a tool (e.g., `web_search` and `fetch_url`).
+3.  **Think**: Read the tool's output and update its internal understanding.
+4.  **Iterate**: If the answer isn't clear, call another tool (e.g., `fetch_url` to read a specific page) or refine the search.
+5.  **Finalize**: Only after completing this "Deep Research" cycle does the model provide a final, grounded answer.
+
+This behavior is what transforms a standard chatbot into an **Agentic AI** capable of solving complex, multi-step problems autonomously.
+
+---
 
 ---
 

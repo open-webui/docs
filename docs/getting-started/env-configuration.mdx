@@ -3116,6 +3116,14 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `yacy`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DDGS_BACKEND`
+
+- Type: `str`
+- Default: `auto`
+- Options: `auto` (Random), `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `wikipedia`, `yahoo`, `yandex`.
+- Description: Specifies the backend to be used by the DDGS engine.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > Web Search > DDGS Backend** when DDGS is selected as the search engine.
+
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
 - Type: `bool`

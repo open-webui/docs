@@ -37,11 +37,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 📄 **Advanced Document Extraction with Multiple Engines**: Extract text and data from various document formats including PDFs, Word documents, Excel spreadsheets, PowerPoint presentations, and more using your choice of extraction engines: Apache Tika, Docling, Azure Document Intelligence, Mistral OCR, or external custom (self-built) content extraction engines/document loaders. Advanced document processing capabilities enable seamless integration with your knowledge base, preserving structure and formatting while supporting OCR for scanned documents and images. [Read about Document Extraction](/features/rag/document-extraction).
 
-- 🔍 **Web Search for RAG with 15+ Providers**: Perform web searches using 15+ providers including SearXNG, Google PSE, Brave Search, Kagi, Mojeek, Bocha, Tavily, Perplexity (AI models and Search API), serpstack, serper, Serply, DuckDuckGo, SearchAPI, SerpApi, Bing, Jina, Exa, Sougou, Azure AI Search, and Ollama Cloud, injecting results directly into your local Retrieval Augmented Generation (RAG) experience. [Explore Web Search Providers](/category/web-search).
+- 🔍 **Web Search for RAG & Agentic Research**: Perform web searches using 15+ providers including SearXNG, Google PSE, Brave Search, Kagi, Mojeek, Bocha, Tavily, Perplexity, and more. When using **Native Function Calling**, models can perform multiple searches sequentially and use the `fetch_url` tool to read full page content for deep research. [Learn about Agentic Search](/features/web-search/agentic-search).
 
-- 🌐 **Web Browsing Capabilities**: Integrate websites seamlessly into your chat experience by using the `#` command followed by a URL. This feature enables the incorporation of web content directly into your conversations, thereby enhancing the richness and depth of your interactions.
+- 🌐 **Web Browsing & URL Fetching**: Integrate websites by using the `#` command or allow the model to independently visit links using the `fetch_url` tool in Native Mode, extracting full text content for precise analysis.
 
-- 🎨 **Image Generation & Editing Integration**: Seamlessly create and edit images using multiple engines including OpenAI's DALL-E, Gemini, ComfyUI, and AUTOMATIC1111. Open WebUI now supports **Image Compositing** and **Image Editing** (inpainting/editing), allowing you to transform existing images and refine your creations with ease. [Learn more about Image Gen](/category/create--edit-images).
+- 🎨 **Image Generation & Editing Integration**: Seamlessly create and edit images using engines like DALL-E, Gemini, ComfyUI, and AUTOMATIC1111. Supports **Native Tool Calling**, allowing models to independently generate and refine images during a conversation. [Learn more about Image Gen](/category/create--edit-images).
 
 - ⚙️ **Concurrent Model Utilization**: Effortlessly engage with multiple models simultaneously, harnessing their unique strengths for optimal responses. Leverage a diverse set of model modalities in parallel to enhance your experience.
 
@@ -232,7 +232,7 @@ import { TopBanners } from "@site/src/components/TopBanners";
   - Please note that the `{{USER_LOCATION}}` prompt variable requires a secure connection over HTTPS. To utilize this particular prompt variable, please ensure that `{{USER_LOCATION}}` is toggled on from the `Settings` > `Interface` menu.
   - Please note that the `{{CLIPBOARD}}` prompt variables requires access to your device's clipboard.
 
-- 🧠 **Memory Feature**: Manually add information you want your LLMs to remember via the `Settings` > `Personalization` > `Memory` menu. Memories can be added, edited, and deleted.
+- 🧠 **Memory Feature & Tools (Experimental)**: Manage information you want your LLMs to remember via `Settings` > `Personalization` > `Memory`. Capable models can now use `memory_add` and `memory_query` tools to dynamically store and retrieve facts about you during chat sessions. [Learn more about Memory](/features/memory).
 
 ---
 

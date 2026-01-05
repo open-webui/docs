@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4000
+sidebar_position: 4
 title: "Mistral OCR"
 ---
 

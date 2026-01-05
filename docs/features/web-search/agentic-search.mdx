@@ -1,0 +1,57 @@
+---
+sidebar_position: 1
+title: "Agentic Search & URL Fetching"
+---
+
+# Agentic Web Search & URL Fetching 🌐
+
+Open WebUI's web search has evolved from simple result injection to a fully **agentic research system**. By enabling **Native Function Calling**, you allow the model to independently explore the web, verify facts, and follow links.
+
+## Native Mode vs. Traditional RAG
+
+| Feature | Traditional RAG (Default) | Agentic Search (Native Mode) |
+|---------|---------------------------|------------------------------|
+| **Search Decision** | Open WebUI decides based on prompt analysis. | The **Model** decides if it needs data. |
+| **Search Queries** | Usually a single query executed once. | Multiple queries can be run sequentially. |
+| **Link Following** | Snippets from top results are injected. | The model can use `fetch_url` to read full pages. |
+| **Reasoning** | Model process data *after* injection. | Model can search, read, check, and search again. |
+
+## How to Enable Agentic Behavior
+
+To unlock these features, your model must support native tool calling (e.g., GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, MiniMax M2.1). Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+
+1.  **Enable Web Search**: Ensure a search engine is configured in **Admin Panel > Settings > Web Search**.
+2.  **Enable Native Mode**:
+    *   Go to **Admin Panel > Settings > Models**.
+    *   Navigate to **Model Specific Settings** for your target model.
+    *   Under **Advanced Parameters**, set **Function Calling** to `Native`.
+3.  **Chat Features**: Ensure the **Web Search** feature is toggled **ON** for your chat session.
+
+## The `fetch_url` Tool 🔗
+
+One of the most powerful additions is the ability for the model to "visit" specific URLs. 
+
+Previously, a model could only see snippets from search results. Now, if it sees a promising link, it can invoke `fetch_url(url="...")` to extract the full text content of that page. 
+
+:::info
+**How it fetches:** The `fetch_url` tool uses the **Web Loader Engine** (e.g., Safe Web, Playwright, or Firecrawl) configured by the administrator in **Admin Panel > Settings > Web Search**. This ensures the model respects your custom proxy, filtering, and timeout settings.
+:::
+
+This allows for:
+- Summarizing specific news articles.
+- Technical documentation research.
+- Verifying details that aren't present in search snippets.
+
+## Deep Research & Interleaved Thinking 🧠
+
+Because the model can call `web_search` multiple times, it can perform "Deep Research" using **Interleaved Thinking**. This is a cycle where the model can:
+
+1.  **Think**: Analyze the user prompt.
+2.  **Search**: Run a broad `web_search` query.
+3.  **Think**: Evaluate the results and identify gaps or new directions.
+4.  **Refine**: Call `web_search` again with highly specific technical keywords.
+5.  **Think**: Synthesize findings.
+6.  **Fetch**: Use `fetch_url` to read a specific deep-dive source.
+7.  **Finalize**: Answer the user with grounded, verified information.
+
+This iterative loop of **Thought → Action → Thought** continues until the model has sufficient information to answer your request with maximum accuracy.

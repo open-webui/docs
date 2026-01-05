@@ -22,21 +22,22 @@ Groups can be managed in the **Admin Panel > Groups** section.
 ### Group Configuration
 When creating or editing a group, you can configure its visibility in the system:
 
-*   **Allow Group Sharing**: (Default: **On**)
-    *   **Enabled**: The group will appear in the "Access Control" dropdowns when users share Chat items, Models, or Knowledge lists. Use this for teams or project groups that need to collaborate on content.
-    *   **Disabled**: The group is **hidden** from sharing menus. This is designed for groups used solely for **RBAC Permission assignment** (e.g., granting "Image Generation" rights). Hiding these prevents the Sharing UI from becoming cluttered with technical/administrative groups.
+*   **Who can share to this group**: (Access Control setting)
+    *   **Anyone**: (Default) Any user on the platform can see this group in the "Access Control" menus for Sharing and share Chat items, Models, Prompts, or Knowledge Bases to it.
+    *   **Members**: Only users who are **already members** of this group will see it as an option in the "Access Control" menus for Sharing. This is the ideal setting for private team collaboration (e.g., a "Marketing" team), ensuring only teammates can share resources (Models, Prompts, Knowledge) with each other.
+    *   **No one**: The group is completely **hidden** from sharing menus for non-administrators. This is perfect for technical groups used exclusively for **RBAC Permission assignment** (e.g., a "High-Tier Users" group) where content sharing is not required.
 
 :::tip Strategy: Permission Groups vs. Sharing Groups
 To maintain a clean and manageable system, consider separating your groups into two distinct categories using a naming scheme:
 
 1.  **Permission Groups** (e.g., prefix `[Perms]`, `Role-`, or `P-`)
     *   **Purpose**: Exclusively for granting features (e.g., `[Perms] Image Gen`, `[Perms] Web Search`).
-    *   **Config**: Disable **Allow Group Sharing**.
+    *   **Config**: Set "Who can share" to **No one**.
     *   **Result**: Users get the features they need, but these technical groups don't clutter the "Share" menu.
 
 2.  **Sharing Groups** (e.g., prefix `Team-`, `Project-`, or normal names)
     *   **Purpose**: Exclusively for organizing people (e.g., `Marketing`, `Engineering`, `Team Alpha`) to share resources.
-    *   **Config**: Enable **Allow Group Sharing**.
+    *   **Config**: Set "Who can share" to **Members** or **Anyone**.
     *   **Best Practice**: **Disable all permissions** in these groups.
         *   Rely on *Global Default Permissions* (or separate *Permission Groups*) for feature rights.
         *   *Why?* This ensures painless **Permission Revocation**. If you decide to disable a feature (e.g., "Web Search") globally, it will instantly take effect for everyone. If your Sharing Groups had "Web Search" enabled, you would have to manually update every single group to remove the right, as the Group's `True` status would override the Global `False`. Keep functional groups clean to maintain Global control.

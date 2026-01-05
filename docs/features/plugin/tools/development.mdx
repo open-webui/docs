@@ -130,17 +130,41 @@ Before using event emitters, you must understand these critical limitations:
 - **Native Mode** (`function_calling = "native"`): **Limited event emitter support** - many event types don't work properly due to native function calling bypassing Open WebUI's custom tool processing pipeline
 
 **When to Use Each Mode:**
-- **Use Default Mode** when you need full event emitter functionality, complex tool interactions, or real-time UI updates
-- **Use Native Mode** when you need reduced latency and basic tool calling without complex UI interactions
+For a comprehensive guide on choosing a function calling mode, including model requirements and administrator setup, refer to the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+
+In general:
+- **Use Default Mode** when you need full event emitter functionality, complex tool interactions, or real-time UI updates.
+- **Use Native Mode** when you need reduced latency and system-level tools (Agentic Research, Memory) without complex custom emitter requirements.
 
 #### Function Calling Mode Configuration
 
 You can configure the function calling mode in two places:
 
-1. **Model Settings**: Go to Model page → Advanced Params → Function Calling (set to "Default" or "Native")
-2. **Per-request basis**: Set `params.function_calling = "native"` or `"default"` in your request
+1. **Administrator Level**: Go to **Admin Panel > Settings > Models > Model Specific Settings > Advanced Parameters > Function Calling** (set to "Default" or "Native").
+2. **Per-request basis**: Set `params.function_calling = "native"` or `"default"` in Chat Controls > Advanced Params.
 
 If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field).
+
+### Built-in System Tools (Native Mode)
+
+When **Native Mode** is enabled, Open WebUI automatically injects built-in system tools based on the features enabled for the chat. This enables powerful "Agentic" behaviors where capable models (like GPT-5, Claude 4.5, or MiniMax M2.1) can perform multi-step research or manage user memory dynamically.
+
+#### Available Built-in Tools
+
+| Tool | Purpose | Requirements |
+|------|---------|--------------|
+| `web_search` | Performs a search using the **Search Engine** provider configured in **Admin Panel > Settings > Web Search**. | `ENABLE_WEB_SEARCH` must be enabled. |
+| `fetch_url` | Visits a specific URL and extracts the main text content using the **Web Loader Engine** configured in **Admin Panel > Settings > Web Search**. | Part of the Web Search feature. |
+| `generate_image` | Generates a new image based on a prompt using the **Image Generation Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_GENERATION` must be enabled. |
+| `edit_image` | Edits an existing image based on a prompt and image URL using the **Image Editing Engine** configured in **Admin Panel > Settings > Images**. | `ENABLE_IMAGE_EDIT` must be enabled. |
+| `memory_query` | Searches the user's personal memory for relevant information managed in **Settings > Personalization > Memory**. | Memory feature enabled in Model/Chat settings. |
+| `memory_add` | Stores a new piece of information in the user's personalization memory. | Memory feature enabled in Model/Chat settings. |
+
+#### Why Use Built-in Tools?
+- **Agentic Research**: Models can invoke `web_search` multiple times to refine results, then use `fetch_url` to read specific deep-dive articles.
+- **Dynamic Personalization**: Models can proactively store important facts about the user using `memory_add` during the conversation.
+- **Improved Context**: Instead of forcing a search before every prompt, the model decides *when* a search is actually necessary.
+
 
 #### Complete Event Type Compatibility Matrix
 

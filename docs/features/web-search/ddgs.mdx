@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: "DDGS"
 ---
 
@@ -21,16 +21,31 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 :::
 
-## DDGS (Dux Distributed Global Search - previously DuckDuckGo)
+## DDGS (Dux Distributed Global Search)
+
+DDGS is a metasearch engine that allows you to search multiple providers through a single interface. 
 
 ### Setup
 
-:::note
+1.  Enable **Web Search** in the Admin Settings.
+2.  Select **DDGS** as the **Web Search Engine**.
+3.  Choose your desired **DDGS Backend** from the dropdown menu.
 
-DDGS (Dux Distributed Global Search) was previously DuckDuckGo.
-It is now a metasearch engine.
-This part of the docs needs an update.
+#### DDGS Backend Options
+- **Auto (Random)**: Randomly selects from available providers.
+- **Bing**
+- **Brave**
+- **DuckDuckGo**
+- **Google**
+- **Grokipedia**
+- **Mojeek**
+- **Wikipedia**
+- **Yahoo**
+- **Yandex**
 
-Know how to set it up? Submit a PR on [GitHub](https://github.com/open-webui/docs) to edit this page!
+#### Environment Variable
+You can also configure the backend using the `DDGS_BACKEND` environment variable.
 
-:::
+```bash
+DDGS_BACKEND="google"
+```
