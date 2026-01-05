@@ -62,8 +62,16 @@ If you are using **OpenRouter** or any provider with hundreds/thousands of model
 Reuses the LLM-generated Web-Search search queries for RAG search within the same chat turn. This prevents redundant LLM calls when multiple retrieval features act on the same user prompt.
 
 - **Env Var**: `ENABLE_QUERIES_CACHE=True`
+  *   *Note*: If enabled, the same search query will be reused for RAG instead of generating new queries for RAG, saving on inference cost and API calls, thus improving performance.
 
 I.e. the LLM generates "US News 2025" as a Web Search query, if this setting is enabled, the same search query will be reused for RAG instead of generating new queries for RAG, saving on inference cost and API calls, thus improving performance.
+
+#### KV Cache Optimization (RAG Performance)
+Drastically improves the speed of follow-up questions when chatting with large documents or knowledge bases.
+
+- **Env Var**: `RAG_SYSTEM_CONTEXT=True`
+- **Effect**: Injects RAG context into the **system message** instead of the user message.
+- **Why**: Many LLM engines (like Ollama, llama.cpp, vLLM) and cloud providers (OpenAI, Vertex AI) support **KV prefix caching** or **Prompt Caching**. System messages stay at the start of the conversation, while user messages shift position each turn. Moving RAG context to the system message ensures the cache remains valid, leading to **near-instant follow-up responses** instead of re-processing large contexts every turn.
 
 ---
 
@@ -305,3 +313,4 @@ For detailed information on all available variables, see the [Environment Config
 | `AUDIO_STT_ENGINE` | [STT Engine](/getting-started/env-configuration#audio_stt_engine) |
 | `ENABLE_IMAGE_GENERATION` | [Image Generation](/getting-started/env-configuration#enable_image_generation) |
 | `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/getting-started/env-configuration#enable_autocomplete_generation) |
+| `RAG_SYSTEM_CONTEXT` | [RAG System Context](/getting-started/env-configuration#rag_system_context) |

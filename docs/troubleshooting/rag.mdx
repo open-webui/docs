@@ -167,6 +167,18 @@ When using the **Markdown Header Splitter**, documents can sometimes be split in
 
 ---
 
+### 8. Slow Follow-up Responses (KV Cache Invalidation) 🐌
+
+If your initial response is fast but follow-up questions become increasingly slow, you are likely experiencing **KV Cache invalidation**.
+
+**The Problem**: By default, Open WebUI injects RAG context into the **user message**. As the chat progresses, new messages shift the position of this context, forcing models (like Ollama, llama.cpp, or vLLM) and cloud providers (like OpenAI or Vertex AI) to re-process the entire context for every turn.
+
+✅ Solution:
+- Set the environment variable `RAG_SYSTEM_CONTEXT=True`.
+- This injects the RAG context into the **system message**, which stays at a fixed position at the start of the conversation.
+- This allows providers to effectively use **KV prefix caching** or **Prompt Caching**, resulting in nearly instant follow-up responses even with large documents.
+
+---
 
 | Problem | Fix |
 |--------|------|
@@ -176,6 +188,7 @@ When using the **Markdown Header Splitter**, documents can sometimes be split in
 | 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
 | ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`) but note that Knowledge Base limits are separate |
 | 🧩 Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
+| 🐌 Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
 | Still confused? | Test with GPT-4o and compare outputs |
 
 ---

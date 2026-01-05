@@ -146,6 +146,23 @@ The RAG feature allows users to easily track the context of documents fed to LLM
 
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
+## KV Cache Optimization (Performance Tip) 🚀
+
+For professional and high-performance use cases—especially when dealing with long documents or frequent follow-up questions—you can significantly improve response times by enabling **KV Cache Optimization**.
+
+### The Problem: Cache Invalidation
+By default, Open WebUI injects retrieved RAG context into the **user message**. As the conversation progresses, follow-up messages shift the position of this context in the chat history. For many LLM engines—including local engines (like Ollama, llama.cpp, and vLLM) and cloud providers / Model-as-a-Service providers (like OpenAI and Vertex AI)—this shifting position invalidates the **KV (Key-Value) prefix cache** or **Prompt Cache**, forcing the model to re-process the entire context for every single response. This leads to increased latency and potentially higher costs as the conversation grows.
+
+### The Solution: `RAG_SYSTEM_CONTEXT`
+You can fix this behavior by enabling the `RAG_SYSTEM_CONTEXT` environment variable.
+
+- **How it works**: When `RAG_SYSTEM_CONTEXT=True`, Open WebUI injects the RAG context into the **system message** instead of the user message. 
+- **The Result**: Since the system message stays at the absolute beginning of the prompt and its position never changes, the provider can effectively cache the processed context. Follow-up questions then benefit from **instant responses** and **cost savings** because the "heavy lifting" (processing the large RAG context) is only done once.
+
+:::tip recommended configuration
+If you are using **Ollama**, **llama.cpp**, **OpenAI**, or **Vertex AI** and frequently "chat with your documents," set `RAG_SYSTEM_CONTEXT=True` in your environment to experience drastically faster follow-up responses!
+:::
+
 ## YouTube RAG Pipeline
 
 The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly. This innovative feature allows you to incorporate video content into your chats, further enriching your conversation experience.

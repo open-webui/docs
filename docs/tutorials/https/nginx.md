@@ -25,6 +25,17 @@ A very common and difficult-to-debug issue with WebSocket connections is a misco
 
 Failure to do so will cause WebSocket connections to fail, even if you have enabled "Websockets support" in Nginx Proxy Manager.
 
+### HTTP/2 and WebSockets
+
+If you enable **HTTP/2** on your Nginx server, ensure that your proxy configuration still uses **HTTP/1.1** for the connection to the Open WebUI backend. This is crucial as most WebUI features (like streaming and real-time updates) rely on WebSockets, which are more stable when handled via HTTP/1.1 `Upgrade` than over the newer RFC 8441 (WebSockets over H2) in many proxy environments.
+
+In your Nginx location block, always include:
+```nginx
+proxy_http_version 1.1;
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
+```
+
 :::
 
 Choose the method that best fits your deployment needs.
