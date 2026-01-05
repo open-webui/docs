@@ -77,7 +77,10 @@ WebSocket support is required for Open WebUI v0.5.0 and later. If WebSockets are
 1. **Check your reverse proxy configuration** - Ensure `Upgrade` and `Connection` headers are properly set
 2. **Verify CORS settings** - WebSocket connections respect CORS policies
 3. **Check browser console** - Look for WebSocket connection errors
-4. **Test direct connection** - Try connecting directly to Open WebUI without the proxy to isolate the issue
+4. **Test direct connection** - Try connecting directly to Open WebUI without the proxy to isolate the issue.
+5. **Check for HTTP/2 WebSocket Issues** - Some proxies (like HAProxy 3.x) enable HTTP/2 by default. If your proxy handles client connections via HTTP/2 but the backend/application doesn't support RFC 8441 (WebSockets over H2) properly, the instance may "freeze" or stop responding. 
+   - **Fix for HAProxy**: Add `option h2-workaround-bogus-websocket-clients` to your configuration or force the backend connection to use HTTP/1.1.
+   - **Fix for Nginx**: Ensure you are using `proxy_http_version 1.1;` in your location block (which is the default in many Open WebUI examples).
 
 For multi-instance deployments, configure Redis for WebSocket management:
 ```bash

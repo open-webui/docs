@@ -117,6 +117,20 @@ backend owui_chat
     http-request add-header X-CLIENT-IP %[src]
  http-request set-header X-Forwarded-Proto https if { ssl_fc }
     server chat <ip>:3000
+
+## WebSocket and HTTP/2 Compatibility
+
+Starting with recent versions (including HAProxy 3.x), HAProxy may enable HTTP/2 by default. While HTTP/2 supports WebSockets (RFC 8441), some clients or backend configurations may experience "freezes" or unresponsiveness when icons or data start loading via WebSockets over an H2 tunnel.
+
+If you experience these issues:
+1. **Force HTTP/1.1 for WebSockets**: Add `option h2-workaround-bogus-websocket-clients` to your `frontend` or `defaults` section. This prevents HAProxy from advertising RFC 8441 support to the client, forcing a fallback to the more stable HTTP/1.1 Upgrade mechanism.
+2. **Backend Version**: Ensure your backend connection is using HTTP/1.1 (the default for `mode http`).
+
+Example addition to your `defaults` or `frontend`:
+```shell
+defaults
+    # ... other settings
+    option h2-workaround-bogus-websocket-clients
 ```
 
 You will see that we have ACL records (routers) for both Open WebUI and Let's Encrypt. To use WebSocket with OWUI, you need to have an SSL configured, and the easiest way to do that is to use Let's Encrypt.
