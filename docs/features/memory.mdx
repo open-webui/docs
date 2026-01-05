@@ -23,15 +23,17 @@ Users can manually add, edit, or delete memories by navigating to:
 
 ### 2. Native Memory Tools (Agentic)
 
-When using a model with **Native Function Calling** enabled, the model can manage your memory autonomously using two built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+When using a model with **Native Function Calling** enabled, the model can manage your memory autonomously using three built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
 
--   **`memory_add`**: Allows the model to proactively save a new fact it learned about you during the conversation.
--   **`memory_query`**: Allows the model to search your memory bank for relevant context that might not have been initially injected.
+-   **`add_memory`**: Allows the model to proactively save a new fact it learned about you during the conversation.
+-   **`search_memories`**: Allows the model to search your memory bank for relevant context. Results include a unique `id` for each memory snippet.
+-   **`replace_memory_content`**: Allows the model to update or correct a specific existing memory using its `id`.
 
 ## Benefits of the New Memory System
 
--   **Proactive Learning**: Instead of you manually typing preferences, a model can say: *"I'll remember that you prefer dark mode for your UI projects"* and call `memory_add` behind the scenes.
--   **Contextual Retrieval**: If a conversation drifts into a topic mentioned months ago, the model can "search its brain" using `memory_query` to find those past details.
+-   **Proactive Learning**: Instead of you manually typing preferences, a model can say: *"I'll remember that you prefer dark mode for your UI projects"* and call `add_memory` behind the scenes.
+-   **Contextual Retrieval**: If a conversation drifts into a topic mentioned months ago, the model can "search its brain" using `search_memories` to find those past details.
+-   **Dynamic Correction**: If the model remembers something incorrectly, it can use `replace_memory_content` to fix the fact rather than creating a duplicate.
 -   **User Control**: Even though models can add memories, users retain full control. Every memory added by a model can be reviewed and deleted in the Personalization settings.
 
 ## Enabling Memory Tools
