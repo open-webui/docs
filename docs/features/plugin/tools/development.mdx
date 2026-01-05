@@ -160,8 +160,9 @@ When **Native Mode** is enabled, Open WebUI automatically injects built-in syste
 | `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled. |
 | `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
 | **Memory** | | |
-| `memory_query` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
-| `memory_add` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
+| `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
+| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
+| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled. |
 | **Notes** | | |
 | `search_notes` | Search the user's notes by title and content. | `ENABLE_NOTES` enabled. |
 | `view_note` | Get the full markdown content of a specific note. | `ENABLE_NOTES` enabled. |
@@ -182,7 +183,7 @@ When **Native Mode** is enabled, Open WebUI automatically injects built-in syste
 #### Why Use Built-in Tools?
 - **Agentic Research**: Models can invoke `web_search` multiple times to refine results, then use `fetch_url` to read specific deep-dive articles.
 - **Contextual Awareness**: Models can search your previous chat history or notes to find specific details without manual copy-pasting.
-- **Dynamic Personalization**: Models can proactively store important facts about the user using `memory_add` during the conversation.
+- **Dynamic Personalization**: Models can proactively store important facts about the user using `add_memory` during the conversation.
 - **Improved Context Selection**: Instead of forcing a search before every prompt, the model decides *when* a search or retrieval is actually necessary.
 
 
