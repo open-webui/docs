@@ -11,23 +11,28 @@ Open WebUI makes it easy to connect and use OpenAI and other OpenAI-compatible A
 
 ---
 
+## Important: Protocols, Not Providers
+
+Open WebUI is a **protocol-centric** platform. While we provide first-class support for OpenAI models, we do so exclusively through the **OpenAI Chat Completions API protocol**. 
+
+We do **not** support proprietary, non-standard APIs such as OpenAI’s new stateful **Responses API**. Instead, Open WebUI focuses on universal standards that are shared across dozens of providers. This approach keeps Open WebUI fast, stable, and truly open-sourced. 
+
+---
+
 ## Step 1: Get Your OpenAI API Key
 
 To use OpenAI models (such as GPT-4 or o3-mini), you need an API key from a supported provider.
 
 You can use:
 
-- OpenAI directly (https://platform.openai.com/account/api-keys)
-- Azure OpenAI
-- MiniMax (https://platform.minimax.io/)
-- Any OpenAI-compatible service (e.g., LocalAI, FastChat, Helicone, LiteLLM, OpenRouter etc.)
-
-👉 Once you have the key, copy it and keep it handy.
-
-For most OpenAI usage, the default API base URL is:
-https://api.openai.com/v1
-
-Other providers use different URLs — check your provider’s documentation.
+- **OpenAI** directly (https://platform.openai.com/account/api-keys)
+- **Azure OpenAI**
+- **Anthropic** (via their [OpenAI-compatible endpoint](https://platform.claude.com/docs/en/api/openai-sdk))
+- **Google Gemini** (via their [OpenAI-compatible endpoint](https://generativelanguage.googleapis.com/v1beta/openai/))
+- **DeepSeek** (https://platform.deepseek.com/)
+- **MiniMax** (https://platform.minimax.io/)
+- **Proxies & Aggregators**: OpenRouter, LiteLLM, Helicone.
+- **Local Servers**: Ollama, Llama.cpp, LM Studio, vLLM, LocalAI.
 
 ---
 

@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.42](https://github.com/open-webui/open-webui/releases/tag/v0.6.42), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.6.44](https://github.com/open-webui/open-webui/releases/tag/v0.6.44), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -5035,6 +5035,16 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 - Type: `str`
 - Default: `True`
 - Description: Enables or disables public sharing of notes.
+
+### Settings Permissions
+
+#### `USER_PERMISSIONS_SETTINGS_INTERFACE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user / group permissions for the interface settings section in the Settings Modal.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 
 ## Misc Environment Variables
 

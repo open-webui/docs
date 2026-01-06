@@ -245,16 +245,26 @@ If Open WebUI can't reach your TTS service:
 ### Whisper STT Not Working / Compute Type Error
 
 **Symptoms:**
-- Error message: `Requested int8 compute type, but the target device or backend do not support efficient int8 computation`
-- STT fails to process audio
+- Error message: `Error transcribing chunk: Requested int8 compute type, but the target device or backend do not support efficient int8 computation`
+- STT fails to process audio, often showing a persistent loading spinner or a red error toast.
 
-**Cause:** This typically occurs when using the `:cuda` Docker image with an older NVIDIA GPU that doesn't support the required compute operations (e.g., Maxwell architecture GPUs like Tesla M60).
+**Cause:** This typically occurs when using the `:cuda` Docker image with an NVIDIA GPU that doesn't support the required `int8` compute operations (common on older Maxwell or Pascal architecture GPUs). In version **v0.6.43**, a regression caused the compute type to be incorrectly defaulted or hardcoded to `int8` in some scenarios.
 
 **Solutions:**
 
-#### Switch to the Standard Image
+#### 1. Upgrade to the Latest Version (Recommended)
+The most reliable fix is to upgrade to the latest version of Open WebUI. Recent updates ensure that `WHISPER_COMPUTE_TYPE` is correctly respected and provides optimized defaults for CUDA environments.
 
-Older GPUs (Maxwell architecture, ~2014-2016) may not be supported by modern ML libraries with CUDA acceleration. Switch to the standard Docker image instead:
+#### 2. Manually Set Compute Type
+If you are on an affected version or still experiencing issues on GPU, explicitly set the compute type to `float16`:
+
+```yaml
+environment:
+  - WHISPER_COMPUTE_TYPE=float16
+```
+
+#### 3. Switch to the Standard Image
+If your GPU is very old or compatibility persists, switch to the standard (CPU-based) image. For smaller models like Whisper, CPU mode often provides comparable performance without compatibility issues:
 
 ```bash
 # Instead of:
@@ -407,6 +417,7 @@ curl http://your-tts-service:port/health
 | `WHISPER_MODEL` | Whisper model: `tiny`, `base`, `small`, `medium`, `large` (default: `base`) |
 | `WHISPER_COMPUTE_TYPE` | Compute type: `int8`, `float16`, `int8_float16`, `float32` (default: `int8`) |
 | `WHISPER_LANGUAGE` | ISO 639-1 language code (empty = auto-detect) |
+| `WHISPER_VAD_FILTER` | Enable Voice Activity Detection filter (default: `False`) |
 | `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `azure`, `deepgram` |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible STT |
 | `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |

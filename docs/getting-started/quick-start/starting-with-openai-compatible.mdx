@@ -13,19 +13,25 @@ Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server
 
 ## Protocol-Oriented Design
 
-Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider (like Anthropic, Gemini, or Mistral), Open WebUI supports the **OpenAI Chat Completions Protocol**. 
+Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider (which leads to inconsistent behavior and configuration bloat), Open WebUI focuses on the **OpenAI Chat Completions Protocol**. 
 
-Any provider that offers an OpenAI-compatible endpoint can be used with Open WebUI. This approach ensure maximum compatibility with minimal configuration bloat. 
+This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
+
+- **We Support Protocols**: Any provider that follows the OpenAI Chat Completions standard (like Groq, OpenRouter, or LiteLLM) is natively supported.
+- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs (such as OpenAI's stateful Responses API or Anthropic's native Messages API) to maintain a universal, maintainable codebase.
+
+If you are using a provider that requires a proprietary API, we recommend using a proxy tool like **LiteLLM** or **OpenRouter** to bridge them to the standard OpenAI protocol supported by Open WebUI.
 
 ### Popular Compatible Servers and Providers
 
 There are many servers and tools that expose an OpenAI-compatible API. Pick whichever suits your workflow:
 
-- **Local Runners**: [Llama.cpp](https://github.com/ggml-org/llama.cpp), [Ollama](https://ollama.com/), [LM Studio](https://lmstudio.ai/), [LocalAI](https://localai.io/), [Docker Model Runner](https://docs.docker.com/ai/model-runner/), [Lemonade](https://lemonade-server.ai/).
-- **Cloud Providers**: [Groq](https://groq.com/), [Mistral AI](https://mistral.ai/), [Perplexity](https://www.perplexity.ai/), [MiniMax](https://platform.minimax.io/), [OpenRouter](https://openrouter.ai/), [LiteLLM](https://docs.litellm.ai/).
-- **Google Gemini**: Google also provides an OpenAI-compatible endpoint for Gemini models.
-  - **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/openai/`
-  - **Key**: Use your Gemini API key from [Google AI Studio](https://aistudio.google.com/) or Vertex AI.
+- **Local Runners**: [Ollama](https://ollama.com/), [Llama.cpp](https://github.com/ggml-org/llama.cpp), [LM Studio](https://lmstudio.ai/), [vLLM](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html), [LocalAI](https://localai.io/), [Lemonade](https://lemonade-server.ai/), [Docker Model Runner](https://docs.docker.com/ai/model-runner/).
+- **Cloud Providers**: [Groq](https://groq.com/), [Mistral AI](https://mistral.ai/), [Perplexity](https://www.perplexity.ai/), [MiniMax](https://platform.minimax.io/), [DeepSeek](https://platform.deepseek.com/), [OpenRouter](https://openrouter.ai/), [LiteLLM](https://docs.litellm.ai/).
+- **Major Model Ecosystems**:
+  - **Google Gemini**: [OpenAI Endpoint](https://generativelanguage.googleapis.com/v1beta/openai/) (requires a Gemini API key).
+  - **Anthropic**: While they primarily use a proprietary API, they offer a [Chat Completions compatible endpoint](https://platform.claude.com/docs/en/api/openai-sdk) for easier integration.
+  - **Azure OpenAI**: Enterprise-grade OpenAI hosting via Microsoft Azure.
 
 ---
 

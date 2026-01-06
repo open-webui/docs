@@ -69,10 +69,11 @@ Once your recording has begun you can:
 
 #### "int8 compute type not supported" Error
 
-If you see an error like `Requested int8 compute type, but the target device or backend do not support efficient int8 computation`, this usually means your GPU doesn't support the requested compute operations.
+If you see an error like `Error transcribing chunk: Requested int8 compute type, but the target device or backend do not support efficient int8 computation`, this usually means your GPU doesn't support the requested `int8` compute operations.
 
 **Solutions:**
-- **Switch to the standard Docker image** instead of the `:cuda` image — older GPUs (Maxwell architecture, ~2014-2016) may not be supported
+- **Upgrade to the latest version** — persistent configuration for compute type has been improved in recent updates to resolve known issues with CUDA compatibility.
+- **Switch to the standard Docker image** instead of the `:cuda` image — older GPUs (Maxwell architecture, ~2014-2016) may not be supported by modern CUDA accelerated libraries.
 - **Change the compute type** using the `WHISPER_COMPUTE_TYPE` environment variable:
   ```yaml
   environment:
