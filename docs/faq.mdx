@@ -156,6 +156,14 @@ To do this, configure your **Ollama model params** to allow a larger context win
 
 **A:** Yes, Open WebUI now includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
 
+### Q: Why doesn't Open WebUI support [Specific Provider]'s latest API (e.g. OpenAI Responses API)?
+
+**A:** Open WebUI is built around **universal protocols**, not specific providers. Our core philosophy is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
+
+This protocol-centric design ensures that Open WebUI remains backend-agnostic and compatible with dozens of providers (like OpenRouter, LiteLLM, vLLM, and Groq) simultaneously. We avoid implementing proprietary, provider-specific APIs (such as OpenAI's stateful Responses API or Anthropic's Messages API) to prevent unsustainable architectural bloat and to maintain a truly open ecosystem. 
+
+If you need functionality exclusive to a proprietary API (like OpenAI's hidden reasoning traces), we recommend using a proxy like **LiteLLM** or **OpenRouter**, which translate those proprietary features into the standard Chat Completions protocol that Open WebUI supports.
+
 ### Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?
 
 The assumption that bundling the frontend with the backend is unscalable comes from a misunderstanding of how modern Single-Page Applications work. Open WebUI’s frontend is a static SPA, meaning it consists only of HTML, CSS, and JavaScript files with no runtime coupling to the backend. Because these files are static, lightweight, and require no separate server, including them in the same image has no impact on scalability. This approach simplifies deployment, ensures every replica serves the exact same assets, and eliminates unnecessary moving parts. If you prefer, you can still host the SPA on any CDN or static hosting service and point it to a remote backend, but packaging both together is the standard and most practical method for containerized SPAs.
