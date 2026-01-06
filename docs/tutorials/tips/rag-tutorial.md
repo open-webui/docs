@@ -47,8 +47,10 @@ Follow these steps to set up RAG with **Open WebUI Documentation**:
 
 4. **Create a Knowledge Base**:
    - Navigate to **Workspace** > **Knowledge** > **+ Create a Knowledge Base**.
-   - Name it: `Open WebUI Documentation`
-   - Purpose: **Assistance**
+   - What are you working on?: `Open WebUI Documentation`
+   - What are you trying to achieve?: **Assistance**
+   - Visibility: **Private**
+   - Groups: Select a group if needed.
 
    > Click **Create Knowledge**.
 
