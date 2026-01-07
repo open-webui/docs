@@ -11,6 +11,7 @@ title: "Image Generation"
     - Check the **Images** settings in the **Admin Panel** > **Settings** > **Images**. Ensure "Image Generation" is toggled **ON**.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
+    - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
 
 ### ComfyUI Issues
 
