@@ -21,9 +21,13 @@ The memory system stores snippets of information about you (e.g., "I prefer Pyth
 Users can manually add, edit, or delete memories by navigating to:
 **Settings > Personalization > Memory**
 
-### 2. Native Memory Tools (Agentic)
+### 2. Native Memory Tools (Agentic Mode)
 
-When using a model with **Native Function Calling** enabled, the model can manage your memory autonomously using three built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using three built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+
+:::tip Quality Models for Memory Management
+Autonomous memory management works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can intelligently decide what facts are worth saving and when to recall relevant memories. Small local models may struggle with appropriate memory selection.
+:::
 
 -   **`add_memory`**: Allows the model to proactively save a new fact it learned about you during the conversation.
 -   **`search_memories`**: Allows the model to search your memory bank for relevant context. Results include a unique `id` for each memory snippet.
@@ -39,10 +43,12 @@ When using a model with **Native Function Calling** enabled, the model can manag
 ## Enabling Memory Tools
 
 1.  **Global Toggle**: Ensure Memory is enabled in your user profile settings.
-2.  **Native Mode**: Enable **Native Function Calling** in the model's advanced parameters (**Admin Panel > Settings > Models > Model Specific Settings > Advanced Parameters**).
-3.  **Capable Models**: To unlock these features, your model must support native tool calling (e.g., GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, MiniMax M2.1) for the best experience.
+2.  **Native Mode (Agentic Mode)**: Enable **Native Function Calling** in the model's advanced parameters (**Admin Panel > Settings > Models > Model Specific Settings > Advanced Parameters**).
+3.  **Quality Models Required**: To unlock these features effectively, use frontier models with strong reasoning capabilities (e.g., GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, MiniMax M2.1) for the best experience. Small local models may not effectively manage memories autonomously.
 
-Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+:::info Central Tool Documentation
+For complete details on all built-in agentic tools (including memory, web search, and knowledge bases) and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
+:::
 
 ## Privacy & Security
 
