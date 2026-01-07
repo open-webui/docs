@@ -122,19 +122,19 @@ Event Emitters are used to add additional information to the chat interface. Sim
 Event Emitter behavior is **significantly different** depending on your function calling mode. The function calling mode is controlled by the `function_calling` parameter:
 
 - **Default Mode**: Uses traditional function calling approach with wider model compatibility
-- **Native Mode**: Leverages model's built-in tool-calling capabilities for reduced latency
+- **Native Mode (Agentic Mode)**: Leverages model's built-in tool-calling capabilities for reduced latency and autonomous behavior
 
 Before using event emitters, you must understand these critical limitations:
 
 - **Default Mode** (`function_calling = "default"`): Full event emitter support with all event types working as expected
-- **Native Mode** (`function_calling = "native"`): **Limited event emitter support** - many event types don't work properly due to native function calling bypassing Open WebUI's custom tool processing pipeline
+- **Native Mode (Agentic Mode)** (`function_calling = "native"`): **Limited event emitter support** - many event types don't work properly due to native function calling bypassing Open WebUI's custom tool processing pipeline
 
 **When to Use Each Mode:**
 For a comprehensive guide on choosing a function calling mode, including model requirements and administrator setup, refer to the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
 
 In general:
 - **Use Default Mode** when you need full event emitter functionality, complex tool interactions, or real-time UI updates.
-- **Use Native Mode** when you need reduced latency and system-level tools (Agentic Research, Memory) without complex custom emitter requirements.
+- **Use Native Mode (Agentic Mode)** when you have a quality model and need reduced latency, autonomous tool selection, and system-level tools (Agentic Research, Knowledge Base exploration, Memory) without complex custom emitter requirements.
 
 #### Function Calling Mode Configuration
 
@@ -145,17 +145,27 @@ You can configure the function calling mode in two places:
 
 If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field).
 
-### Built-in System Tools (Native Mode)
+### Built-in System Tools (Native/Agentic Mode)
 
-When **Native Mode** is enabled, Open WebUI automatically injects built-in system tools based on the features enabled for the chat. This enables powerful "Agentic" behaviors where capable models (like GPT-5, Claude 4.5, or MiniMax M2.1) can perform multi-step research or manage user memory dynamically.
+When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects built-in system tools based on the features enabled for the chat. This enables powerful agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.1) can perform multi-step research, explore knowledge bases autonomously, or manage user memory dynamically.
+
+:::warning Quality Models Required for Agentic Behavior
+Agentic tool calling requires **high-quality frontier models** to work reliably. Small local models often struggle with the complex reasoning, proper JSON formatting, and multi-step planning required for effective tool use. For production agentic workflows, use models like **GPT-5**, **Claude 4.5+**, **Gemini 3+**, or **MiniMax M2.1**. Small local models may work better with **Default Mode** instead.
+:::
 
 #### Available Built-in Tools
 
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
 | **Search & Web** | | |
-| `web_search` | Performs a search using the configured Search Engine. | `ENABLE_WEB_SEARCH` enabled. |
+| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
+| **Knowledge Base** | | |
+| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
+| `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
+| `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
+| `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
+| `query_knowledge_bases` | Search internal knowledge bases using semantic/vector search. Should be your first choice for finding information before searching the web. | Always available. |
 | **Image Gen** | | |
 | `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled. |
 | `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
@@ -181,10 +191,15 @@ When **Native Mode** is enabled, Open WebUI automatically injects built-in syste
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). | Always available. |
 
 #### Why Use Built-in Tools?
-- **Agentic Research**: Models can invoke `web_search` multiple times to refine results, then use `fetch_url` to read specific deep-dive articles.
+- **Agentic Research**: Models can invoke `search_web` multiple times to refine results, then use `fetch_url` to read specific deep-dive articles.
+- **Knowledge Base Search**: Models can use `query_knowledge_bases` to search internal documents semantically, or `list_knowledge_bases` and `view_knowledge_file` to browse and read specific files.
 - **Contextual Awareness**: Models can search your previous chat history or notes to find specific details without manual copy-pasting.
 - **Dynamic Personalization**: Models can proactively store important facts about the user using `add_memory` during the conversation.
 - **Improved Context Selection**: Instead of forcing a search before every prompt, the model decides *when* a search or retrieval is actually necessary.
+
+:::info Complete Tool Reference
+This table provides a quick reference for developers. For the complete user-facing guide on how to enable and use these tools, see the [**Tool Calling Modes Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+:::
 
 
 #### Complete Event Type Compatibility Matrix
