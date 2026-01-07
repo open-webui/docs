@@ -29,16 +29,36 @@ Some examples of what you might store in Knowledge:
 
 ### How to Use Knowledge in Chats
 
-Accessing stored Knowledge in your chats is easy! By simply referencing what’s saved (using '#' before the name), Open WebUI can pull in data or follow specific guidelines that you’ve set up in the Knowledge section.
+Accessing stored Knowledge in your chats is easy! By simply referencing what's saved (using '#' before the name), Open WebUI can pull in data or follow specific guidelines that you've set up in the Knowledge section.
 
 For example:
 
 - When discussing a project, Open WebUI can automatically recall your specified project details.
 - It can apply custom preferences to responses, like formality levels or preferred phrasing.
 
-To reference Knowledge in your chats, just ensure it’s saved in the Knowledge section, and Open WebUI will know when and where to bring in the relevant information!
+To reference Knowledge in your chats, just ensure it's saved in the Knowledge section, and Open WebUI will know when and where to bring in the relevant information!
 
 Admins can add knowledge to the workspace, which users can access and use; however, users do not have direct access to the workspace itself.
+
+### Native Mode (Agentic Mode) Knowledge Tools
+
+When using **Native Function Calling (Agentic Mode)**, quality models can interact with your Knowledge Bases autonomously using built-in tools:
+
+:::tip Quality Models for Knowledge Exploration
+Autonomous knowledge base exploration works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can intelligently search, browse, and synthesize information from multiple documents. Small local models may struggle with multi-step knowledge retrieval.
+:::
+
+- **`query_knowledge_bases`**: Search across knowledge bases using semantic/vector search. This should be the model's first choice for finding information before searching the web.
+- **`list_knowledge_bases`**: Browse available knowledge bases with file counts.
+- **`search_knowledge_bases`**: Find specific knowledge bases by name or description.
+- **`search_knowledge_files`**: Locate files within knowledge bases by filename.
+- **`view_knowledge_file`**: Read the full content of a specific file from a knowledge base.
+
+These tools enable models to autonomously explore and retrieve information from your knowledge bases, making conversations more contextually aware and grounded in your stored documents.
+
+:::info Central Tool Documentation
+For complete details on all built-in agentic tools and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
+:::
 
 ### Setting Up Your Knowledge Base
 
