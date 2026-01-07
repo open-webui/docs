@@ -207,6 +207,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables the notes feature, allowing users to create and manage personal notes within Open WebUI.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_MEMORIES`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the [memory feature](/features/memory), allowing models to store and retrieve long-term information about users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEBHOOK_URL`
 
 - Type: `str`
@@ -4960,6 +4967,13 @@ This is useful when you need a JWT access token for downstream validation or whe
 - Type: `str`
 - Default: `True`
 - Description: Enables or disables user permission to use code interpreter feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_MEMORIES`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to use the [memory feature](/features/memory).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
