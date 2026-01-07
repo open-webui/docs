@@ -57,7 +57,7 @@ Autonomous knowledge base exploration works best with frontier models (GPT-5, Cl
 These tools enable models to autonomously explore and retrieve information from your knowledge bases, making conversations more contextually aware and grounded in your stored documents.
 
 :::info Central Tool Documentation
-For complete details on all built-in agentic tools and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/plugin/tools#built-in-system-tools-native-mode).
+For complete details on all built-in agentic tools and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
 :::
 
 ### Setting Up Your Knowledge Base
