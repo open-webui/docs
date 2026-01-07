@@ -1,0 +1,49 @@
+---
+sidebar_position: 10
+title: "Reasoning & Thinking Models"
+---
+
+# Reasoning & Thinking Models
+
+Open WebUI provides first-class support for models that exhibit "thinking" or "reasoning" behaviors (such as DeepSeek R1, OpenAI o1, and others). These models often generate internal chains of thought before providing a final answer.
+
+## How Thinking Tags Work
+
+When a model generates reasoning content, it typically wraps that content in specific XML-like tags (e.g., `<think>...</think>` or `<thought>...</thought>`). 
+
+Open WebUI automatically:
+1.  **Detects** these tags in the model's output stream.
+2.  **Extracts** the content between the tags.
+3.  **Renders** the extracted content in a collapsible UI element labeled "Thought" or "Thinking".
+
+This keeps the main chat interface clean while still giving you access to the model's internal processing.
+
+## The `reasoning_tags` Parameter
+
+You can customize which tags Open WebUI should look for using the `reasoning_tags` parameter. This can be set on a **per-chat** or **per-model** basis.
+
+### Default Tags
+By default, Open WebUI looks for several common reasoning tag pairs:
+- `<think>`, `</think>`
+- `<thinking>`, `</thinking>`
+- `<reason>`, `</reason>`
+- `<reasoning>`, `</reasoning>`
+- `<thought>`, `</thought>`
+- `<|begin_of_thought|>`, `<|end_of_thought|>`
+
+### Customization
+If your model uses different tags, you can provide a list of tag pairs in the `reasoning_tags` parameter. Each pair is a tuple or list of the opening and closing tag.
+
+## Configuration & Behavior
+
+- **Stripping from Payload**: The `reasoning_tags` parameter itself is an Open WebUI-specific control and is **stripped** from the payload before being sent to the LLM backend (OpenAI, Ollama, etc.). This ensures compatibility with providers that do not recognize this parameter.
+- **Chat History**: Thinking tags are **not** stripped from the chat history. If previous messages in a conversation contain thinking blocks, they are sent back to the model as part of the context, allowing the model to "remember" its previous reasoning steps.
+- **UI Rendering**: Internally, reasoning blocks are processed and rendered using a specialized UI component. When saved or exported, they may be represented as HTML `<details type="reasoning">` tags.
+
+## Frequently Asked Questions
+
+### Why is the thinking block showing as raw text?
+If the model uses tags that are not in the default list and have not been configured in `reasoning_tags`, Open WebUI will treat them as regular text. You can fix this by adding the correct tags to the `reasoning_tags` parameter in the Model Settings or Chat Controls. For more advanced issues, see the **[Reasoning Models Troubleshooting Guide](/troubleshooting/reasoning-models)**.
+
+### Does the model see its own thinking?
+Generally, **no**. Because Open WebUI typically extracts the reasoning content into a separate field and removes the tags from the message's main `content` before it is saved or sent back as history, the model does not see its own previous reasoning in subsequent turns. This follows the design of reasoning models like OpenAI's `o1`, where the "chain of thought" is intended to be internal and ephemeral.

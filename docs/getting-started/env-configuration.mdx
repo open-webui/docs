@@ -36,6 +36,34 @@ To disable this behavior and force Open WebUI to always use your environment var
 
 :::
 
+### Troubleshooting Ignored Environment Variables 🛠️
+
+If you change an environment variable (like `ENABLE_SIGNUP=True`) but don't see the change reflected in the UI (e.g., the "Sign Up" button is still missing), it's likely because a value has already been persisted in the database from a previous run or a persistent Docker volume.
+
+#### Option 1: Using `ENABLE_PERSISTENT_CONFIG` (Temporary Fix)
+Set `ENABLE_PERSISTENT_CONFIG=False` in your environment. This forces Open WebUI to read your variables directly. Note that UI-based settings changes will not persist across restarts in this mode.
+
+#### Option 2: Update via Admin UI (Recommended)
+The simplest and safest way to change `PersistentConfig` settings is directly through the **Admin Panel** within Open WebUI. Even if an environment variable is set, changes made in the UI will take precedence and be saved to the database.
+
+#### Option 3: Manual Database Update (Last Resort / Lock-out Recovery)
+If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker:
+
+```bash
+docker exec -it open-webui sqlite3 /app/backend/data/webui.db "UPDATE config SET data = json_set(data, '$.ENABLE_SIGNUP', json('true'));"
+```
+*(Replace `ENABLE_SIGNUP` and `true` with the specific setting and value needed.)*
+
+#### Option 4: Resetting for a Fresh Install
+If you are performing a clean installation and want to ensure all environment variables are fresh:
+1. Stop the container.
+2. Remove the persistent volume: `docker volume rm open-webui`.
+3. Restart the container.
+
+:::danger
+**Warning:** Removing the volume will delete all user data, including chats and accounts.
+:::
+
 ## App/Backend
 
 The following environment variables are used by `backend/open_webui/config.py` to provide Open WebUI startup
@@ -177,6 +205,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables the notes feature, allowing users to create and manage personal notes within Open WebUI.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_MEMORIES`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the [memory feature](/features/memory), allowing models to store and retrieve long-term information about users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEBHOOK_URL`
@@ -4932,6 +4967,13 @@ This is useful when you need a JWT access token for downstream validation or whe
 - Type: `str`
 - Default: `True`
 - Description: Enables or disables user permission to use code interpreter feature.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_MEMORIES`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to use the [memory feature](/features/memory).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
