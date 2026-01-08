@@ -36,7 +36,7 @@ Direct Message (DM) channels enable private conversations:
 - Display participant avatars instead of channel icons
 - Can be hidden from sidebar while preserving message history
 - Automatically reappear when new messages arrive
-- Show online/offline status indicator for participants
+- Show online/offline status indicator for participants (Can be disabled via **Admin Panel > Settings > General > User Status**)
 
 ## Enabling Channels
 
