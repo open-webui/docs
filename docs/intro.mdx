@@ -10,13 +10,12 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 # Open WebUI
 
+## AI that answers to you.
 
-**Open WebUI is an [extensible](https://docs.openwebui.com/features/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It supports various LLM runners like **Ollama** and **OpenAI-compatible APIs**, with **built-in inference engine** for RAG, making it a **powerful AI deployment solution**.
+Open WebUI is an [extensible](https://docs.openwebui.com/features/plugin/), feature-rich, self-hosted AI platform that runs on your hardware, connects to your models, and keeps your data exactly where it belongs—with you.
 
+No cloud dependency. No forced telemetry. No vendor lock-in.
 [![Open WebUI Banner](/images/banner.png)](https://openwebui.com)
-
-Passionate about open-source AI? [Join our team →](https://careers.openwebui.com/)
-
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
@@ -28,6 +27,8 @@ Passionate about open-source AI? [Join our team →](https://careers.openwebui.c
 [![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
 [![Image Description](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/tjbck)
 
+Passionate about decentralizing AI? [Join our team →](https://careers.openwebui.com/)
+
 ![Open WebUI Demo](/images/demo.png)
 
 :::tip
@@ -37,10 +38,27 @@ Passionate about open-source AI? [Join our team →](https://careers.openwebui.c
 Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
 
 :::
+---
 
-<TopBanners />
+## What is Open WebUI?
+
+The operating system for AI—self-hosted, extensible, and entirely yours.
+
+Open WebUI is where you bring your AI stack together. Connect any model—local or cloud, open or proprietary—and interact with them through one interface you control. Chat, generate images, talk with voice, search the web, ground responses in your own documents. Add more capabilities when you need them. Remove what you don't.
+
+Run it on your laptop for personal use. Deploy it for your team with roles and permissions. Scale it across your organization. The platform adapts to how *you* work, not the other way around.
+
+Everything stays on your infrastructure. Your conversations, your documents, your data—none of it leaves unless you choose to connect to external services. We don't phone home. We don't know what you're building. That's the point.
+
+**Private by default. Connected by choice.**
+
+[Explore all features →](/features) · [Get started →](/getting-started)
+
+---
 
 ## Quick Start with Docker 🐳
+
+Pick your path. All commands are copy-paste ready.
 
 :::info
 
@@ -48,203 +66,167 @@ Get **enhanced capabilities**, including **custom theming and branding**, **Serv
 
 :::
 
-**If Ollama is on your computer**, use this command:
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="standalone" label="Open WebUI" default>
+
+**Use this if:** You already have Ollama running locally, or you're connecting exclusively through external APIs ( OpenRouter, OpenAI, Anthropic, Azure, etc.)
+
+<Tabs>
+  <TabItem value="gpu" label="With Nvidia GPU" default>
+
+Use this if you have an Nvidia GPU and want GPU-accelerated features in Open WebUI.
 
 ```bash
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+docker run -d -p 3000:8080 --gpus all \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:cuda
 ```
 
-**To run Open WebUI with Nvidia GPU support**, use this command:
+  </TabItem>
+  <TabItem value="cpu" label="CPU Only">
+
+No Nvidia GPU? This works on any machine.
 
 ```bash
-docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
 ```
 
-For environments with limited storage or bandwidth, Open WebUI offers slim image variants that exclude pre-bundled models. These images are significantly smaller but download required models on first use:
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+  <TabItem value="bundled" label="Open WebUI + Ollama">
+
+**Use this if:** You want everything in one container. Open WebUI will install and manage Ollama for you.
+
+<Tabs>
+  <TabItem value="gpu" label="With GPU" default>
+
+Use this if you have a GPU. Ollama will use it for faster model inference.
 
 ```bash
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main-slim
+docker run -d -p 3000:8080 --gpus all \
+  -v ollama:/root/.ollama \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:ollama
 ```
 
-### Open WebUI Bundled with Ollama
+  </TabItem>
+  <TabItem value="cpu" label="CPU Only">
 
-This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
-
-- **With GPU Support**:
-  Utilize GPU resources by running the following command:
-
-  ```bash
-  docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
-  ```
-
-- **For CPU Only**:
-  If you're not using a GPU, use this command instead:
-
-  ```bash
-  docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
-  ```
-
-Both commands facilitate a built-in, hassle-free installation of both Open WebUI and Ollama, ensuring that you can get everything up and running swiftly.
-
-After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
-
-### Using image tags in production
-
-If you want to always run the latest version of Open WebUI, you can use the `:main`, `:cuda`, or `:ollama` image tags, depending on your setup, as shown in the examples above.
-For `production environments` where stability and reproducibility are important, it is recommended to pin a specific release version instead of using these floating tags. Versioned images follow this format:
-
-```
-ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
-```
-
-Examples (pinned versions for illustration purposes only):
-```
-ghcr.io/open-webui/open-webui:v0.6.42
-ghcr.io/open-webui/open-webui:v0.6.42-ollama
-ghcr.io/open-webui/open-webui:v0.6.42-cuda
-```
-
-### Using the Dev Branch 🌙
-
-:::warning
-
-The `:dev` branch contains the latest unstable features and changes. Use it at your own risk as it may have bugs or incomplete features.
-
-:::
-
-If you want to try out the latest bleeding-edge features and are okay with occasional instability, you can use the `:dev` tag like this:
+No GPU? Ollama runs on CPU too—slower inference, but it works.
 
 ```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
+docker run -d -p 3000:8080 \
+  -v ollama:/root/.ollama \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:ollama
 ```
 
-For the slim variant of the dev branch:
+  </TabItem>
+</Tabs>
 
-```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev-slim
-```
+  </TabItem>
+</Tabs>
 
-### Updating Open WebUI
+Once it's running, open [localhost:3000](http://localhost:3000). That's it—you're in.
 
-To update Open WebUI container easily, follow these steps:
+**Need more options?** Kubernetes, Python install, air-gapped deployment, and more:  
 
-#### Manual Update
-Use [Watchtower](https://github.com/nickfedor/watchtower) to update your Docker container manually:
-```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
-```
+[See all installation methods →](/getting-started/quick-start)
 
-#### Automatic Updates
-Keep your container updated automatically every 5 minutes:
-```bash
-docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --interval 300 open-webui
-```
+---
 
-🔧 **Note**: Replace `open-webui` with your container name if it's different.
+## What You Can Do
 
-## Manual Installation
+### Connect Any Model
 
-:::info
+Ollama, OpenAI, Azure, Anthropic, local GGUF files, OpenAI-compatible APIs—bring whatever models you want. Mix local and remote models for different use cases. Compare models side by side. Switch between them mid-conversation.
 
-### Platform Compatibility
-Open WebUI works on macOS, Linux (x86_64 and ARM64, including Raspberry Pi and other ARM boards like NVIDIA DGX Spark), and Windows.
+[Connect your first model →](/getting-started/quick-start)
 
-:::
+### Ground Responses with _Your_ Context
 
-There are two main ways to install and run Open WebUI: using the `uv` runtime manager or Python's `pip`. While both methods are effective, **we strongly recommend using `uv`** as it simplifies environment management and minimizes potential conflicts.
+Upload documents. Build knowledge bases. RAG is built in—no external vector database required (though you can bring one if you want).
 
-### Installation with `uv` (Recommended)
+[Deep dive into RAG →](/features/rag)
 
-The `uv` runtime manager ensures seamless Python environment management for applications like Open WebUI. Follow these steps to get started:
+### Actually Own Your Data
 
-#### 1. Install `uv`
+Your conversations are stored locally. Your documents stay on your infrastructure. We don't phone home. We don't collect telemetry. We literally don't know what you're building. You own your data. You own your models. You own your conversations.
 
-Pick the appropriate installation command for your operating system:
+### Run Anywhere
 
-- **macOS/Linux**:
-  ```bash
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  ```
+Docker, Kubernetes, bare metal, your laptop, an air-gapped server in a basement. GPU acceleration when you have it, CPU-only when you don't.
 
-- **Windows**:
-  ```powershell
-  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-  ```
+[Explore installation methods →](/getting-started/quick-start)
 
-#### 2. Run Open WebUI
+---
 
-Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
+## Built For
 
-- **macOS/Linux**:
-  ```bash
-  DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
-  ```
+**Privacy-conscious users**  
+Your conversations and confidential data aren't training data for someone else's model.
 
-- **Windows**:
-  ```powershell
-  $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
-  ```
+**Teams that need control**  
+Role-based access, SSO integration, audit logs. Deploy on your infrastructure, under your compliance requirements.
 
-:::note
+**Developers who build**  
+Python functions, tool integrations, pipelines. Extend it. We made that easy on purpose.
 
-**For PostgreSQL Support:**
+**Anyone tired of asking permission**  
+Run the models you want. Keep the data you generate. No vendor lock-in. No cloud dependency. No forced telemetry.
 
-The default installation now uses a slimmed-down package. If you need **PostgreSQL support**, install with all optional dependencies:
+[Read the roadmap →](/roadmap)
 
-```bash
-pip install open-webui[all]
-```
+---
 
-:::
+## Free to Use. Built in Public.
 
-### Installation with `pip`
+Open WebUI is **free to use**—no trial, no paywall, no "contact sales to unlock." The full platform, yours to deploy today.
 
-For users installing Open WebUI with Python's package manager `pip`, **it is strongly recommended to use Python runtime managers like `uv` or `conda`**. These tools help manage Python environments effectively and avoid conflicts.
+Our source code is public. Our roadmap is informed by the community. We believe AI infrastructure is too important to be locked behind enterprise agreements—so the core platform stays free and accessible to everyone, forever.
 
-Python 3.11 is the development environment. Python 3.12 seems to work but has not been thoroughly tested. Python 3.13 is entirely untested and some dependencies do not work with Python 3.13 yet—**use at your own risk**.
+**119,000+** GitHub stars. Active Discord. Regular releases. What we build next is up to all of us.
 
-1. **Install Open WebUI**:
+[GitHub](https://github.com/open-webui/open-webui) · [Discord](https://discord.gg/5rJgQTnV4s) · [Contribute](/contributing) · [Sponsor the project](https://github.com/sponsors/tjbck)
 
-   Open your terminal and run the following command:
-   ```bash
-   pip install open-webui
-   ```
+---
 
-2. **Start Open WebUI**:
+## Enterprise Ready
 
-   Once installed, start the server using:
-   ```bash
-   open-webui serve
-   ```
+Open WebUI powers AI deployments at startups and Fortune 500s alike. When community support isn't enough, we're here.
 
-### Updating Open WebUI
+**What you get:**
+- **Architecture for scale** — Multi-node HA, 99.99% uptime targets, regional deployments
+- **Security & compliance** — SOC 2, HIPAA, GDPR, FedRAMP-ready. Air-gapped and on-prem options
+- **Your brand, your platform** — White-label the interface. Integrate proprietary models. Make it yours
+- **Support that answers** — SLAs, dedicated contacts, long-term support versions
 
-To update to the latest version, simply run:
+[Explore Enterprise →](/enterprise)
 
-```bash
-pip install --upgrade open-webui
-```
-
-This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
-
-## Other Installation Methods
-
-We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
-
-Continue with the full [getting started guide](/getting-started).
-
-### Desktop App
-
-We also have an **experimental** desktop app, which is actively a **work in progress (WIP)**. While it offers a convenient way to run Open WebUI natively on your system without Docker or manual setup, it is **not yet stable**.
-
-👉 For stability and production use, we strongly recommend installing via **Docker** or **Python (`uv` or `pip`)**.
+---
 
 ## Sponsors 🙌
 
 <SponsorList />
 
-We are incredibly grateful for the generous support of our sponsors. Their contributions help us to maintain and improve our project, ensuring we can continue to deliver quality work to our community. Thank you!
-
+Open WebUI exists because of the people and organizations who back it. Their contributions help us to maintain and improve our project, ensuring we can continue to deliver quality work to our community. Thank you!
 
 ## Acknowledgements 🙏
 
@@ -259,8 +241,6 @@ We are deeply grateful for the generous grant support provided by:
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>A16z Open Source AI Grant 2025</span>
   </a>
 
-
-
   <a href="https://builders.mozilla.org/" title="Mozilla Builders 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
     <div className="max-w-full h-auto">
       ![Mozilla](/sponsors/grants/mozilla.png)
@@ -268,13 +248,11 @@ We are deeply grateful for the generous grant support provided by:
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>Mozilla Builders 2024</span>
   </a>
 
-
   <a href="https://github.com/accelerator" title="GitHub Accelerator 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
     <div className="max-w-full h-auto">
       ![GitHub](/sponsors/grants/github.png)
     </div>
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>GitHub Accelerator 2024</span>
   </a>
-
 
 </div>
