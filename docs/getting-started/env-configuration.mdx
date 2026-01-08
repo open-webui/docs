@@ -196,9 +196,9 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 #### `FOLDER_MAX_FILE_COUNT`
 
 - Type: `int`
-- Default: `100`
+- Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
-- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
 #### `ENABLE_NOTES`
 
