@@ -296,6 +296,13 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 - Description: Controls whether the active user count is visible to all users or restricted to administrators only. When set to `False`, only admin users can see how many users are currently active, reducing backend load and addressing privacy concerns in large deployments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_USER_STATUS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be toggled in the **Admin Panel > Settings > General > User Status**.
+
 #### `ADMIN_EMAIL`
 
 - Type: `str`
