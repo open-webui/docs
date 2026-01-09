@@ -92,6 +92,26 @@ By default, Open WebUI saves chats in **real-time**. This ensures no data loss b
 -   **Effect**: Chats are saved only when the generation is complete (or periodically).
 -   **Recommendation**: **Highly Recommended** for any high-user setup to reduce DB load substantially.
 
+### Database Session Sharing
+
+Starting with v0.7.1, Open WebUI includes a database session sharing feature that can improve performance under high concurrency by reusing database sessions instead of creating new ones for each request.
+
+-   **Env Var**: `DATABASE_ENABLE_SESSION_SHARING`
+-   **Default**: `False`
+
+:::tip Recommendations by Database Type
+
+- **SQLite:** Keep this setting **disabled** (default). Enabling session sharing on SQLite with limited hardware resources may cause severe performance degradation or timeouts.
+- **PostgreSQL with adequate resources:** Consider **enabling** this setting for improved performance, especially in multi-user or high-concurrency deployments.
+
+:::
+
+:::warning Low-Spec Hardware
+
+If you upgraded to v0.7.0 and experienced slow admin page loads, API timeouts, or unresponsive UI, this was likely caused by database session sharing being enabled. Ensure `DATABASE_ENABLE_SESSION_SHARING=False` on low-spec hardware (Raspberry Pi, containers with limited CPU allocation like 250m or less).
+
+:::
+
 ### Vector Database (RAG)
 For multi-user setups, the choice of Vector DB matters.
 
@@ -314,3 +334,4 @@ For detailed information on all available variables, see the [Environment Config
 | `ENABLE_IMAGE_GENERATION` | [Image Generation](/getting-started/env-configuration#enable_image_generation) |
 | `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/getting-started/env-configuration#enable_autocomplete_generation) |
 | `RAG_SYSTEM_CONTEXT` | [RAG System Context](/getting-started/env-configuration#rag_system_context) |
+| `DATABASE_ENABLE_SESSION_SHARING` | [Database Session Sharing](/getting-started/env-configuration#database_enable_session_sharing) |
