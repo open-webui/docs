@@ -219,6 +219,24 @@ Manual database manipulation should be a last resort. Always back up your databa
 
 See the [Environment Configuration](/getting-started/env-configuration#aiohttp_client_timeout_model_list) documentation for more details.
 
+## 🐢 Slow Performance or Timeouts on Low-Spec Hardware
+
+If you're experiencing slow page loads, API timeouts, or unresponsive UI—especially on resource-constrained systems—this may be related to database session sharing.
+
+### Cause
+
+Database session sharing can overwhelm low-spec hardware (Raspberry Pi, containers with minimal CPU, etc.) or SQLite databases under concurrent load.
+
+### Solution
+
+Disable database session sharing:
+
+```bash
+DATABASE_ENABLE_SESSION_SHARING=false
+```
+
+For PostgreSQL on adequate hardware, enabling this setting may improve performance. See the [DATABASE_ENABLE_SESSION_SHARING](/getting-started/env-configuration#database_enable_session_sharing) documentation for details.
+
 ## 🔒 SSL Connection Issue with Hugging Face
 
 Encountered an SSL error? It could be an issue with the Hugging Face server. Here's what to do:

@@ -7,6 +7,24 @@ title: "Local Development Guide"
 
 Excited to dive into Open WebUI development? This comprehensive guide will walk you through setting up your **local development environment** quickly and easily. Whether you're a seasoned developer or just starting out, we'll get you ready to tweak the frontend, enhance the backend, and contribute to the future of Open WebUI! Let's get your development environment up and running in simple, detailed steps!
 
+:::tip Help Us Build Better Software!
+
+**Running the development setup is one of the most valuable ways to contribute.** You don't need to write code—just using and testing the latest changes helps us catch bugs before stable releases. We cannot deliver high-quality software without community testing.
+
+**Prefer Docker?** If setting up a local dev environment seems like too much, you can also test by running the [dev Docker image](/#using-the-dev-branch-) — it's the same code, just containerized.
+
+**Keep your setup updated regularly** — run `git pull origin dev` frequently to stay current with the latest changes.
+
+:::
+
+:::warning Do Not Share Data with Production
+
+**Never share your database or data directory between dev and production setups.** Dev builds may include database migrations that are not backward-compatible. If a dev migration runs on your production data and you later need to roll back, your production setup may break.
+
+Keep your development data completely separate from production.
+
+:::
+
 ## Prerequisites
 
 Before you begin, ensure your system meets these minimum requirements:

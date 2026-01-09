@@ -106,23 +106,45 @@ ghcr.io/open-webui/open-webui:v0.7.0-cuda
 
 ### Using the Dev Branch 🌙
 
-:::warning
+:::tip Help Us Build Better Software!
 
-The `:dev` branch contains the latest unstable features and changes. Use it at your own risk as it may have bugs or incomplete features.
+**We encourage users to run the development branch!** Testing dev builds is one of the most valuable ways to contribute to Open WebUI. By running the latest development version, you help us catch bugs early, validate new features, and ensure stable releases for everyone.
+
+**We cannot deliver high-quality software without community testing.** When issues are only discovered after a stable release, it creates a poor experience for everyone. Your feedback on the dev branch directly improves the next release.
 
 :::
 
-If you want to try out the latest bleeding-edge features and are okay with occasional instability, you can use the `:dev` tag like this:
+The `:dev` branch contains the latest features and changes before they reach a stable release. While it may occasionally have bugs or incomplete features, it's generally usable for day-to-day testing.
 
+**Standard dev image:**
 ```bash
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
 ```
 
-For the slim variant of the dev branch:
-
+**Slim variant (excludes bundled models):**
 ```bash
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev-slim
 ```
+
+**How to help:**
+- Run the dev image on a test instance (not your primary production setup)
+- **Keep it updated regularly** — the dev branch moves fast! Pull the latest image frequently or see [Updating Open WebUI](#updating-open-webui) below
+- Report issues on [GitHub](https://github.com/open-webui/open-webui/issues) with clear reproduction steps
+- Join our [Discord](https://discord.gg/5rJgQTnV4s) to discuss findings
+
+:::note Alternative: Local Development Setup
+
+If Docker doesn't work for your environment, you can also run the latest development code using the [Local Development Guide](/getting-started/advanced-topics/development). Conversely, if you prefer Docker over a local setup, the dev image is the easiest way to test.
+
+:::
+
+:::warning Do Not Share Data with Production
+
+**Never share your database or data volume between dev and production setups.** Dev builds may include database migrations that are not backward-compatible. If a dev migration runs on your production data and you later need to roll back, your production setup may break.
+
+Always use a separate data volume (e.g., `-v open-webui-dev:/app/backend/data`) for testing.
+
+:::
 
 ### Updating Open WebUI
 

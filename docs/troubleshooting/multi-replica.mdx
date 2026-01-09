@@ -16,6 +16,7 @@ Before troubleshooting specific errors, ensure your deployment meets these **abs
 3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/getting-started/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/getting-started/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/getting-started/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
 5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/getting-started/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
+6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/getting-started/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
 
 ---
 
@@ -127,6 +128,16 @@ This is typically caused by infrastructure latency (Network Latency to the datab
 
 **Solution:**
 Refer to the **[Cloud Infrastructure Latency](/tutorials/tips/performance#%EF%B8%8F-cloud-infrastructure-latency)** section in the Performance Guide for a detailed breakdown of diagnosis and mitigation strategies.
+
+### 7. Optimizing Database Performance
+
+For PostgreSQL deployments with adequate resources, enabling database session sharing can improve performance under high concurrency:
+
+```bash
+DATABASE_ENABLE_SESSION_SHARING=true
+```
+
+See [DATABASE_ENABLE_SESSION_SHARING](/getting-started/env-configuration#database_enable_session_sharing) for details.
 
 ---
 

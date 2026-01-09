@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.7.0](https://github.com/open-webui/open-webui/releases/tag/v0.7.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.7.1](https://github.com/open-webui/open-webui/releases/tag/v0.7.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -5480,6 +5480,27 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 - Type: `float`
 - Default: `None`
 - Description: Sets the minimum time interval in seconds between user active status updates in the database. Helps reduce write operations for high-traffic instances. Set to `0.0` to update on every activity.
+
+#### `DATABASE_ENABLE_SESSION_SHARING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls database session sharing behavior. When enabled (`True`), `get_db_context` reuses existing database sessions, which can improve performance and scalability in high-concurrency environments. When disabled (`False`), new sessions are always created.
+
+:::tip Recommendations by Database Type
+
+- **SQLite:** Keep this setting **disabled** (default `False`). Enabling session sharing on SQLite with limited hardware resources may cause performance issues.
+- **PostgreSQL:** Consider **enabling** this setting (`True`) for improved performance, especially in multi-user or high-concurrency deployments.
+
+This setting is very deployment-specific. Users are encouraged to experiment based on their hardware specs and database choice to find the optimal configuration.
+
+:::
+
+:::warning
+
+Enabling this on low-spec hardware (e.g., Raspberry Pi, containers with limited CPU allocation) may cause significant slowdowns or timeouts. If you experience slow admin page loads or API timeouts after upgrading, ensure this setting is disabled.
+
+:::
 
 ### Encrypted SQLite with SQLCipher
 
