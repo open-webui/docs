@@ -5,12 +5,13 @@ title: "Webhook Integrations"
 
 ## Overview
 
-Open WebUI offers two distinct webhook integrations to help you stay informed about events happening within your instance. These webhooks allow you to receive automated notifications in external services like Discord, Slack, or any other application that supports incoming webhooks.
+Open WebUI offers three distinct webhook integrations to help you stay informed about events happening within your instance and enable external integrations. These webhooks allow you to receive automated notifications in external services like Discord, Slack, or any other application that supports incoming webhooks, as well as post messages from external services into Open WebUI channels.
 
-There are two types of webhooks available:
+There are three types of webhooks available:
 
 1.  **Admin Webhook:** A system-wide webhook that notifies administrators about new user sign-ups.
 2.  **User Webhook:** A personal webhook that notifies individual users when a response to their chat is ready, especially useful for long-running tasks.
+3.  **Channel Webhooks:** Incoming webhooks that allow external services to post messages into specific channels.
 
 ## 1. Admin Webhook: New User Notifications
 
@@ -101,6 +102,134 @@ When a chat response is ready and you are inactive, Open WebUI will send a `POST
   }
 }
 ```
+
+## 3. Channel Webhooks: External Message Integration
+
+Channel Webhooks allow external services, automation tools, or scripts to post messages directly into Open WebUI channels. This enables seamless integration with monitoring systems, CI/CD pipelines, notification services, or any custom automation.
+
+### Use Cases
+
+- **System Monitoring:** Post alerts from monitoring tools (Prometheus, Grafana, Nagios) directly into team channels.
+- **CI/CD Integration:** Send build status notifications from GitHub Actions, GitLab CI, or Jenkins to development channels.
+- **Custom Automation:** Integrate with n8n, Zapier, or custom scripts to automate message posting.
+- **External Notifications:** Forward notifications from external services into your Open WebUI workspace.
+
+### How it Works
+
+Each channel can have multiple webhooks. Each webhook has:
+- A unique **webhook URL** that external services can POST to
+- A **display name** shown as the message author
+- An optional **profile image** to visually identify the webhook source
+- A **last used timestamp** to track webhook activity
+
+Messages posted via webhooks appear in the channel with the webhook's identity, making it clear they came from an external source rather than a user.
+
+### Managing Channel Webhooks
+
+Only **channel managers** and **administrators** can create and manage webhooks for a channel.
+
+#### Creating a Webhook
+
+1.  Navigate to the channel where you want to add a webhook.
+2.  Click the channel menu (⋮) and select **Edit Channel**.
+3.  In the channel settings modal, locate the **Webhooks** section.
+4.  Click **Manage** to open the Webhooks modal.
+5.  Click **New Webhook** to create a new webhook.
+6.  Configure the webhook:
+    - **Name:** The display name that will appear as the message author
+    - **Profile Image:** (Optional) Upload an image to represent this webhook
+7.  Click **Save** to create the webhook.
+8.  Copy the generated webhook URL using the **Copy URL** button.
+
+#### Webhook URL Format
+
+```
+{WEBUI_API_BASE_URL}/channels/webhooks/{webhook_id}/{token}
+```
+
+This URL is unique and contains an authentication token. Anyone with this URL can post messages to the channel, so treat it securely.
+
+#### Updating a Webhook
+
+1.  Open the **Webhooks** modal from the channel settings.
+2.  Click on the webhook you want to edit to expand it.
+3.  Modify the **Name** or **Profile Image** as needed.
+4.  Click **Save** to apply changes.
+
+The webhook URL remains the same when you update the name or image. Messages posted after the update will show the new name/image, but existing messages retain the webhook identity from when they were posted.
+
+#### Deleting a Webhook
+
+1.  Open the **Webhooks** modal from the channel settings.
+2.  Click on the webhook you want to delete to expand it.
+3.  Click the **Delete** (trash) icon.
+4.  Confirm the deletion.
+
+Once deleted, the webhook URL will stop working immediately. Messages previously posted by the webhook will remain in the channel but show "Deleted Webhook" as the author.
+
+### Posting Messages via Webhook
+
+To post a message from an external service, send a `POST` request to the webhook URL with a JSON payload.
+
+#### Request Format
+
+**Endpoint:** `POST {webhook_url}`
+**Headers:** `Content-Type: application/json`
+**Body:**
+
+```json
+{
+  "content": "Your message content here"
+}
+```
+
+#### Example: Using cURL
+
+```bash
+curl -X POST "https://your-instance.com/api/channels/webhooks/{webhook_id}/{token}" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Deployment to production completed successfully! 🚀"}'
+```
+
+#### Example: Using Python
+
+```python
+import requests
+
+webhook_url = "https://your-instance.com/api/channels/webhooks/{webhook_id}/{token}"
+message = {
+    "content": "Build #1234 failed: Unit tests did not pass."
+}
+
+response = requests.post(webhook_url, json=message)
+print(response.json())
+```
+
+#### Response Format
+
+On success, the webhook will return:
+
+```json
+{
+  "success": true,
+  "message_id": "abc-123-def-456"
+}
+```
+
+### Security Considerations
+
+-   **URL Protection:** Webhook URLs contain authentication tokens. Keep them secure and don't expose them in public repositories or logs.
+-   **Channel Access:** Anyone with the webhook URL can post to the channel. Only share the URL with trusted services.
+-   **Message Content:** Validate and sanitize message content on the sending side to prevent injection attacks.
+-   **Regeneration:** If a webhook URL is compromised, delete the webhook and create a new one.
+
+### Webhook Identity
+
+Messages posted via webhooks have a special identity system:
+- They appear with the webhook's **name** and **profile image**
+- The user role is marked as **"webhook"** to distinguish from regular users
+- If a webhook is deleted, its messages remain visible but show "Deleted Webhook" with the current webhook name no longer displayed
+- Each message stores the webhook ID in its metadata, allowing proper attribution even if the webhook is later modified or deleted
 
 ## Troubleshooting
 
