@@ -142,6 +142,62 @@ Change the RAG embedding model directly in the `Admin Panel` > `Settings` > `Doc
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats.
 
+## File Context vs Builtin Tools
+
+Open WebUI provides two separate capabilities that control how files are handled. Understanding the difference is important for configuring models correctly.
+
+### File Context Capability
+
+The **File Context** capability controls whether Open WebUI performs RAG (Retrieval-Augmented Generation) on attached files:
+
+| File Context | Behavior |
+|--------------|----------|
+| ✅ **Enabled** (default) | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
+| ❌ **Disabled** | File processing is **completely skipped**. No content extraction, no injection. The model receives no file content. |
+
+**When to disable File Context:**
+- **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
+- **Using Builtin Tools only**: If you prefer the model to retrieve file content on-demand via tools like `query_knowledge_bases` rather than having content pre-injected.
+- **Debugging/testing**: To isolate whether issues are related to RAG processing.
+
+:::warning File Context Disabled = No Pre-Injected Content
+When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through builtin tools (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
+:::
+
+:::info
+The File Context toggle only appears when **File Upload** is enabled for the model.
+:::
+
+### Builtin Tools Capability
+
+The **Builtin Tools** capability controls whether the model receives native function-calling tools for autonomous retrieval:
+
+| Builtin Tools | Behavior |
+|---------------|----------|
+| ✅ **Enabled** (default) | In Native Function Calling mode, the model receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats`, etc. |
+| ❌ **Disabled** | No builtin tools are injected. The model works only with pre-injected context. |
+
+**When to disable Builtin Tools:**
+- **Model doesn't support function calling**: Smaller or older models may not handle the `tools` parameter.
+- **Predictable behavior needed**: You want the model to work only with what's provided upfront.
+
+### Combining the Two Capabilities
+
+These capabilities work independently, giving you fine-grained control:
+
+| File Context | Builtin Tools | Result |
+|--------------|---------------|--------|
+| ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
+| ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
+| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content, but model can use tools to query knowledge bases or retrieve attached files on-demand |
+| ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
+
+:::tip Choosing the Right Configuration
+- **Most models**: Keep both enabled (defaults) for full functionality.
+- **Small/local models**: Disable Builtin Tools if they don't support function calling.
+- **On-demand retrieval only**: Disable File Context, enable Builtin Tools if you want the model to decide what to retrieve rather than pre-injecting everything.
+:::
+
 ## Enhanced RAG Pipeline
 
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.

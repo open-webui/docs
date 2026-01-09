@@ -185,6 +185,34 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 **Why use these?** It allows for **Deep Research** (searching the web multiple times, or querying knowledge bases), **Contextual Awareness** (looking up previous chats or notes), **Dynamic Personalization** (saving facts), and **Precise Automation** (generating content based on existing notes or documents).
 
+#### Disabling Builtin Tools (Per-Model)
+
+The **Builtin Tools** capability can be toggled on or off for each model in the **Workspace > Models** editor under **Capabilities**. When enabled (the default), all the system tools listed above are automatically injected when using Native Mode.
+
+**When to disable Builtin Tools:**
+
+| Scenario | Reason to Disable |
+|----------|-------------------|
+| **Model doesn't support function calling** | Smaller or older models may not handle the `tools` parameter correctly |
+| **Simpler/predictable behavior needed** | You want the model to work only with pre-injected context, no autonomous tool calls |
+| **Security/control concerns** | Prevents the model from actively querying knowledge bases, searching chats, accessing memories, etc. |
+| **Token efficiency** | Tool specifications consume tokens; disabling saves context window space |
+
+**What happens when Builtin Tools is disabled:**
+
+1. **No tool injection**: The model won't receive any of the built-in system tools, even in Native Mode.
+2. **RAG still works** (if File Context is enabled): Attached files are still processed via RAG and injected as context.
+3. **No autonomous retrieval**: The model cannot decide to search knowledge bases or fetch additional information—it works only with what's provided upfront.
+
+:::warning Builtin Tools vs File Context
+**Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG—that's controlled by the separate **File Context** capability.
+
+- **File Context** = Whether Open WebUI extracts and injects file content (RAG processing)
+- **Builtin Tools** = Whether the model gets tools to autonomously search/retrieve additional content
+
+See [File Context vs Builtin Tools](../../rag/index.md#file-context-vs-builtin-tools) for a detailed comparison.
+:::
+
 ### Interleaved Thinking {#interleaved-thinking}
 
 🧠 When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
