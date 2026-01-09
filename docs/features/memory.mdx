@@ -30,7 +30,7 @@ Autonomous memory management works best with frontier models (GPT-5, Claude 4.5+
 :::
 
 -   **`add_memory`**: Allows the model to proactively save a new fact it learned about you during the conversation.
--   **`search_memories`**: Allows the model to search your memory bank for relevant context. Results include a unique `id` for each memory snippet.
+-   **`search_memories`**: Allows the model to search your memory bank for relevant context. Results include a unique `id` for each memory snippet. The model can optionally specify how many memories to return (default is 5).
 -   **`replace_memory_content`**: Allows the model to update or correct a specific existing memory using its `id`.
 
 ## Benefits of the New Memory System
