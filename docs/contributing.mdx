@@ -15,6 +15,18 @@ Your interest in contributing to Open WebUI is greatly appreciated. This documen
 
 Looking to contribute? Great! Here's how you can help:
 
+### 🧪 Test the Development Branch
+
+**One of the most valuable ways to contribute is running the dev branch.** You don't need to write code—just use it and report issues!
+
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:dev
+```
+
+**Keep it updated regularly** — the dev branch moves fast! If Docker doesn't work for you, the [Local Development Guide](/getting-started/advanced-topics/development) is another great option.
+
+By testing dev builds, you help us catch bugs before stable releases. Report issues on [GitHub](https://github.com/open-webui/open-webui/issues) with clear reproduction steps. **We cannot deliver high-quality releases without community testing.**
+
 ### 🌟 Code Contribution Guidelines
 
 We welcome pull requests. Before submitting one, please:
