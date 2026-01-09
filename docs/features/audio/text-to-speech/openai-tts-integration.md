@@ -57,6 +57,34 @@ OpenAI provides 6 built-in voices:
 Try different voices to find the one that best suits your use case. You can preview voices in OpenAI's documentation.
 :::
 
+## Per-Model TTS Voice
+
+You can assign a specific TTS voice to individual models, allowing different AI personas to have distinct voices. This is configured in the Model Editor.
+
+### Setting a Model-Specific Voice
+
+1. Go to **Workspace > Models**
+2. Click the **Edit** (pencil) icon on the model you want to configure
+3. Scroll down to find the **TTS Voice** field
+4. Enter the voice name (e.g., `alloy`, `echo`, `shimmer`, `onyx`, `nova`, `fable`)
+5. Click **Save**
+
+### Voice Priority
+
+When playing TTS audio, Open WebUI uses the following priority:
+
+1. **Model-specific TTS voice** (if set in Model Editor)
+2. **User's personal voice setting** (if configured in user settings)
+3. **System default voice** (configured by admin)
+
+This allows admins to give each AI persona a consistent voice while still letting users override with their personal preference when no model-specific voice is set.
+
+### Use Cases
+
+- **Character personas**: Give a "British Butler" model the `fable` voice, while an "Energetic Assistant" uses `nova`
+- **Language learning**: Assign appropriate voices for different language tutors
+- **Accessibility**: Set clearer voices for models designed for accessibility use cases
+
 ## Environment Variables Setup
 
 If you prefer to configure via environment variables:
