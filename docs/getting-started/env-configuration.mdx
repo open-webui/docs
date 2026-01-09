@@ -105,6 +105,44 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Default: `False`
 - Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
 
+#### `WEBUI_ADMIN_EMAIL`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the email address for an admin account to be created automatically on first startup when no users exist. This enables headless/automated deployments without manual account creation. When combined with `WEBUI_ADMIN_PASSWORD`, the admin account is created during application startup, and `ENABLE_SIGNUP` is automatically disabled to prevent unauthorized account creation.
+
+:::info
+
+This variable is designed for automated/containerized deployments where manual admin account creation is impractical. The admin account is only created if:
+- No users exist in the database (fresh installation)
+- Both `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` are configured
+
+After the admin account is created, sign-up is automatically disabled for security. You can re-enable it later via the Admin Panel if needed.
+
+:::
+
+#### `WEBUI_ADMIN_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the password for the admin account to be created automatically on first startup when no users exist. Must be used in conjunction with `WEBUI_ADMIN_EMAIL`. The password is securely hashed before storage using the same mechanism as manual account creation.
+
+:::danger
+
+**Security Considerations**
+- Use a strong, unique password for production deployments
+- Consider using secrets management (Docker secrets, Kubernetes secrets, environment variable injection) rather than storing the password in plain text configuration files
+- After initial setup, change the admin password through the UI for enhanced security
+- Never commit this value to version control
+
+:::
+
+#### `WEBUI_ADMIN_NAME`
+
+- Type: `str`
+- Default: `Admin`
+- Description: Specifies the display name for the automatically created admin account. This is used when `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` are configured for headless admin creation.
+
 #### `ENABLE_LOGIN_FORM`
 
 - Type: `bool`
