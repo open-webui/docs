@@ -140,6 +140,54 @@ To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open
 
 To do this, configure your **Ollama model params** to allow a larger context window. You can check and modify this setting in your chat directly or from model editor page to enhance the RAG experience significantly.
 
+### Q: I asked the model what it is and it gave the wrong answer. Is Open WebUI routing to the wrong model?
+
+**A:** No—**LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-4?", the response is not a system diagnostic. It's simply the model generating text based on patterns in its training data.
+
+Models frequently:
+- Claim to be a different model (e.g., a Llama model claiming to be ChatGPT)
+- Give outdated information about themselves
+- Hallucinate version numbers or capabilities
+- Change their answer depending on how you phrase the question
+
+**To verify which model you're actually using:**
+1. Check the model selector in the Open WebUI interface
+2. Look at the **Admin Panel > Settings > Connections** to confirm your API endpoints
+3. Check your provider's dashboard/logs for the actual API calls being made
+
+Asking the model itself is **not** a valid way to diagnose routing issues. If you suspect a configuration problem, check your connection settings and API keys instead.
+
+### Q: But why can models on official chat interfaces (like ChatGPT or Claude.ai) correctly identify themselves?
+
+**A:** Because the provider **injects a system prompt** that explicitly tells the model what it is. When you use ChatGPT, OpenAI's interface includes a hidden system message like "You are ChatGPT, a large language model trained by OpenAI..." before your conversation begins.
+
+The model isn't "aware" of itself—it's simply been instructed to claim a specific identity. You can do the same thing in Open WebUI by adding a system prompt to your model configuration (e.g., "You are Llama 3.3 70B..."). The model will then confidently repeat whatever identity you've told it to claim.
+
+This is also why the same model accessed through different interfaces might give different answers about its identity—it depends entirely on what system prompt (if any) was provided.
+
+### Q: Why am I seeing multiple API requests when I only send one message? Why is my token usage higher than expected?
+
+**A:** Open WebUI uses **Task Models** to power background features that enhance your chat experience. When you send a single message, additional API calls may be made for:
+
+- **Title Generation**: Automatically generating a title for new chats
+- **Tag Generation**: Auto-tagging chats for organization
+- **Query Generation**: Creating optimized search queries for RAG (when you attach files or knowledge)
+- **Web Search Queries**: Generating search terms when web search is enabled
+- **Autocomplete Suggestions**: If enabled
+
+By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-4 or Claude), this can significantly increase your costs.
+
+**To reduce API costs:**
+1. Go to **Admin Panel > Settings > Interface** (for title/tag generation settings)
+2. Configure a **Task Model** under **Admin Panel > Settings > Models** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
+3. Disable features you don't need (auto-title, auto-tags, etc.)
+
+:::tip Cost-Saving Recommendation
+Set your Task Model to a fast, inexpensive model (or a local model via Ollama) while keeping your primary chat model as a more capable one. This gives you the best of both worlds: smart responses for your conversations, cheap/free processing for background tasks.
+:::
+
+For more optimization tips, see the **[Performance Tips Guide](tutorials/tips/performance)**.
+
 ### Q: Is MCP (Model Context Protocol) supported in Open WebUI?
 
 **A:** Yes, Open WebUI now includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.

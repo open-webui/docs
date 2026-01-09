@@ -80,10 +80,13 @@ You can transform a generic model into a specialized agent by toggling specific 
   - **Vision**: Toggle to enable image analysis capabilities (requires a vision-capable Base Model).
   - **Web Search**: Enable the model to access the configured search provider (e.g., Google, SearxNG) for real-time information.
   - **File Upload**: Allow users to upload files to this model.
+  - **File Context**: When enabled (default), attached files are processed via RAG and their content is injected into the conversation. When disabled, file content is **not** extracted or injected—the model receives no file content unless it retrieves it via builtin tools. Only visible when File Upload is enabled. See [File Context vs Builtin Tools](../rag/index.md#file-context-vs-builtin-tools) for details.
   - **Code Interpreter**: Enable Python code execution.
   - **Image Generation**: Enable image generation integration.
   - **Usage / Citations**: Toggle usage tracking or source citations.
   - **Status Updates**: Show visible progress steps in the chat UI (e.g., "Searching web...", "Reading file...") during generation. Useful for slower, complex tasks.
+  - **Builtin Tools**: When enabled (default), automatically injects system tools (timestamps, memory, chat history, knowledge base queries, notes, etc.) in [Native Function Calling mode](../plugin/tools/index.mdx#disabling-builtin-tools-per-model). Disable this if the model doesn't support function calling or you need to save context window tokens. Note: This is separate from **File Context**—see [File Context vs Builtin Tools](../rag/index.md#file-context-vs-builtin-tools) for the difference.
+- **TTS Voice**: Set a specific Text-to-Speech voice for this model. When users read responses aloud, this voice will be used instead of the global default. Useful for giving different personas distinct voices. Leave empty to use the user's settings or system default. See [Per-Model TTS Voice](../audio/text-to-speech/openai-tts-integration#per-model-tts-voice) for details.
 - **Default Features**: Force specific toggles (like Web Search) to be "On" immediately when a user starts a chat with this model.
 
 ## Model Management
