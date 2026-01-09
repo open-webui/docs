@@ -47,6 +47,7 @@ The `admin` role effectively has `check_permission() == True` for everything. Gr
 
 ### Initial Setup
 *   **First User:** The very first account created on a fresh installation is automatically assigned the **Admin** role.
+*   **Headless Admin Creation:** For automated/containerized deployments, you can create the admin account automatically using environment variables (see below).
 *   **Subsequent Users:** New sign-ups are assigned the **Default User Role**.
 
 ### Configuration
@@ -64,4 +65,98 @@ DEFAULT_USER_ROLE=pending
 Administrators can change a user's role at any time via **Admin Panel > Users**.
 *   Promoting a user to `admin` grants them full control.
 *   Demoting an admin to `user` subjects them to the permission system again.
+
+## Headless Admin Account Creation
+
+For **automated deployments** (Docker, Kubernetes, cloud platforms) where manual interaction is impractical, Open WebUI supports creating an admin account automatically on first startup using environment variables.
+
+### How It Works
+
+When the following environment variables are configured:
+- `WEBUI_ADMIN_EMAIL`: The admin account email address
+- `WEBUI_ADMIN_PASSWORD`: The admin account password
+- `WEBUI_ADMIN_NAME`: (Optional) The admin display name (defaults to "Admin")
+
+Open WebUI will automatically:
+1. Check if any users exist in the database on startup
+2. If the database is empty (fresh installation), create an admin account using the provided credentials
+3. Securely hash and store the password
+4. Automatically disable sign-up (`ENABLE_SIGNUP=False`) to prevent unauthorized account creation
+
+### Use Cases
+
+This feature is particularly useful for:
+- **CI/CD Pipelines**: Automatically provision Open WebUI instances with admin credentials from secrets management
+- **Docker/Kubernetes Deployments**: Eliminate the time gap between container startup and manual admin creation
+- **Automated Testing**: Create reproducible test environments with pre-configured admin accounts
+- **Headless Servers**: Deploy instances where accessing the UI to manually create an account is impractical
+
+### Example Configuration
+
+#### Docker Compose
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - WEBUI_ADMIN_EMAIL=admin@example.com
+      - WEBUI_ADMIN_PASSWORD=${ADMIN_PASSWORD}  # Use secrets management
+      - WEBUI_ADMIN_NAME=System Administrator
+    # ... other configuration
+```
+
+#### Kubernetes Secret
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openwebui-admin
+type: Opaque
+stringData:
+  admin-email: admin@example.com
+  admin-password: your-secure-password
+  admin-name: System Administrator
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: open-webui
+spec:
+  containers:
+  - name: open-webui
+    image: ghcr.io/open-webui/open-webui:main
+    env:
+    - name: WEBUI_ADMIN_EMAIL
+      valueFrom:
+        secretKeyRef:
+          name: openwebui-admin
+          key: admin-email
+    - name: WEBUI_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: openwebui-admin
+          key: admin-password
+    - name: WEBUI_ADMIN_NAME
+      valueFrom:
+        secretKeyRef:
+          name: openwebui-admin
+          key: admin-name
+```
+
+### Important Notes
+
+:::warning Security Considerations
+- **Use Secrets Management**: Never hardcode `WEBUI_ADMIN_PASSWORD` in Docker Compose files or Dockerfiles. Use Docker secrets, Kubernetes secrets, or environment variable injection.
+- **Strong Passwords**: Use a strong, unique password for production deployments.
+- **Change After Setup**: Consider changing the admin password through the UI after initial deployment for enhanced security.
+- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Admin Panel > Settings > General** if needed.
+:::
+
+:::info Behavior Details
+- **Only on Fresh Install**: The admin account is created **only** if no users exist in the database. If users already exist, these environment variables are ignored.
+- **Password Hashing**: The password is securely hashed using the same mechanism as manual account creation, ensuring security.
+- **One-Time Operation**: This is a one-time operation on first startup. Subsequent restarts with the same environment variables will not modify the existing admin account.
+:::
+
+For complete documentation on these environment variables, see the [Environment Configuration Guide](../../getting-started/env-configuration.mdx#webui_admin_email).
 

@@ -138,3 +138,42 @@ docker compose up --build
 **That's it!**
 
 For more information on building the Docker container, including changing ports, please refer to the [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) repository
+
+## Troubleshooting
+
+### NVIDIA GPU Not Detected
+
+If the GPU version isn't using your GPU:
+
+1. **Install NVIDIA Container Toolkit:**
+   ```bash
+   # Ubuntu/Debian
+   distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+   curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+   curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+   sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+   sudo systemctl restart docker
+   ```
+
+2. **Verify GPU access:**
+   ```bash
+   docker run --rm --gpus all nvidia/cuda:12.2.0-base nvidia-smi
+   ```
+
+### Connection Issues from Open WebUI
+
+If Open WebUI can't reach Kokoro:
+
+- Use `host.docker.internal:8880` instead of `localhost:8880` (Docker Desktop)
+- If both are in Docker Compose, use `http://kokoro-fastapi-gpu:8880/v1`
+- Verify the service is running: `curl http://localhost:8880/health`
+
+### CPU Version Performance
+
+The CPU version uses ONNX optimization and performs well for most use cases. If speed is a concern:
+
+- Consider upgrading to the GPU version
+- Ensure no other heavy processes are running on the CPU
+- The CPU version is recommended for systems without compatible NVIDIA GPUs
+
+For more troubleshooting tips, see the [Audio Troubleshooting Guide](/troubleshooting/audio).

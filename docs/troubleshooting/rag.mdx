@@ -133,9 +133,52 @@ If you're not sure whether the issue is with retrieval, token limits, or embeddi
 - GPT-4o handles larger inputs (128k tokens!)
 - Provides a great benchmark to evaluate your system's RAG reliability
 
+
 ---
 
-## Summary Checklist ✅
+### 6. Upload Limits and Restrictions 🛑
+
+Open WebUI implements various limits to ensure system stability and prevent abuse. It is important to understand how these limits apply to different upload methods:
+
+*   **Chat Uploads:** Subject to global file size and count limits.
+    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Admin Panel > Settings > Documents > General > Max Upload Size**.
+    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Admin Panel > Settings > Documents > General > Max Upload Count**.
+    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Admin Panel > Settings > Documents > General > Allowed File Extensions**.
+*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/getting-started/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
+*   **Knowledge Base Uploads:**
+    *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
+    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used in **Full Context Mode** (accessible in chat settings), which feeds the full document content to the model instead of using vector search retrieval.
+
+:::info
+By separating these limits, administrators can better manage resource usage across different features. For example, you might want to allow larger uploads in a curated Knowledge Base while restricting the number of files in ad-hoc Folder uploads.
+:::
+
+---
+
+### 7. Fragmented or Tiny Chunks 🧩
+
+When using the **Markdown Header Splitter**, documents can sometimes be split into very small fragments (e.g., just a table of contents entry or a short sub-header). These tiny chunks often lack enough semantic context for the embedding model to represent them accurately, leading to poor RAG results and unnecessary overhead.
+
+✅ Solution:
+
+- Go to **Admin Settings > Documents**.
+- Increase the **Chunk Min Size Target**.
+- Setting this to a value like `1000` (or ~50-60% of your `CHUNK_SIZE`) will force the system to merge small fragments with neighboring chunks when possible, resulting in better semantic coherence and fewer total chunks.
+
+---
+
+### 8. Slow Follow-up Responses (KV Cache Invalidation) 🐌
+
+If your initial response is fast but follow-up questions become increasingly slow, you are likely experiencing **KV Cache invalidation**.
+
+**The Problem**: By default, Open WebUI injects RAG context into the **user message**. As the chat progresses, new messages shift the position of this context, forcing models (like Ollama, llama.cpp, or vLLM) and cloud providers (like OpenAI or Vertex AI) to re-process the entire context for every turn.
+
+✅ Solution:
+- Set the environment variable `RAG_SYSTEM_CONTEXT=True`.
+- This injects the RAG context into the **system message**, which stays at a fixed position at the start of the conversation.
+- This allows providers to effectively use **KV prefix caching** or **Prompt Caching**, resulting in nearly instant follow-up responses even with large documents.
+
+---
 
 | Problem | Fix |
 |--------|------|
@@ -143,6 +186,9 @@ If you're not sure whether the issue is with retrieval, token limits, or embeddi
 | 🧹 Only part of content used | Enable Full Context Mode or Bypass Embedding |
 | ⏱ Limited by 2048 token cap | Increase model context length (Admin Panel > Models > Settings > Advanced Parameters for Ollama) or use large-context LLM |
 | 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
+| ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`) but note that Knowledge Base limits are separate |
+| 🧩 Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
+| 🐌 Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
 | Still confused? | Test with GPT-4o and compare outputs |
 
 ---

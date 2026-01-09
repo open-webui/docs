@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.6.42](https://github.com/open-webui/open-webui/releases/tag/v0.6.42), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.7.0](https://github.com/open-webui/open-webui/releases/tag/v0.7.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -34,6 +34,34 @@ To disable this behavior and force Open WebUI to always use your environment var
 
 **CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved permanently**. They will persist only for the current session and will be **lost** when you restart the container, as the system will revert to the values defined in your environment variables.
 
+:::
+
+### Troubleshooting Ignored Environment Variables 🛠️
+
+If you change an environment variable (like `ENABLE_SIGNUP=True`) but don't see the change reflected in the UI (e.g., the "Sign Up" button is still missing), it's likely because a value has already been persisted in the database from a previous run or a persistent Docker volume.
+
+#### Option 1: Using `ENABLE_PERSISTENT_CONFIG` (Temporary Fix)
+Set `ENABLE_PERSISTENT_CONFIG=False` in your environment. This forces Open WebUI to read your variables directly. Note that UI-based settings changes will not persist across restarts in this mode.
+
+#### Option 2: Update via Admin UI (Recommended)
+The simplest and safest way to change `PersistentConfig` settings is directly through the **Admin Panel** within Open WebUI. Even if an environment variable is set, changes made in the UI will take precedence and be saved to the database.
+
+#### Option 3: Manual Database Update (Last Resort / Lock-out Recovery)
+If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker:
+
+```bash
+docker exec -it open-webui sqlite3 /app/backend/data/webui.db "UPDATE config SET data = json_set(data, '$.ENABLE_SIGNUP', json('true'));"
+```
+*(Replace `ENABLE_SIGNUP` and `true` with the specific setting and value needed.)*
+
+#### Option 4: Resetting for a Fresh Install
+If you are performing a clean installation and want to ensure all environment variables are fresh:
+1. Stop the container.
+2. Remove the persistent volume: `docker volume rm open-webui`.
+3. Restart the container.
+
+:::danger
+**Warning:** Removing the volume will delete all user data, including chats and accounts.
 :::
 
 ## App/Backend
@@ -76,6 +104,44 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Type: `bool`
 - Default: `False`
 - Description: If set to True, a "Confirm Password" field is added to the sign-up page to help users avoid typos when creating their password.
+
+#### `WEBUI_ADMIN_EMAIL`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the email address for an admin account to be created automatically on first startup when no users exist. This enables headless/automated deployments without manual account creation. When combined with `WEBUI_ADMIN_PASSWORD`, the admin account is created during application startup, and `ENABLE_SIGNUP` is automatically disabled to prevent unauthorized account creation.
+
+:::info
+
+This variable is designed for automated/containerized deployments where manual admin account creation is impractical. The admin account is only created if:
+- No users exist in the database (fresh installation)
+- Both `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` are configured
+
+After the admin account is created, sign-up is automatically disabled for security. You can re-enable it later via the Admin Panel if needed.
+
+:::
+
+#### `WEBUI_ADMIN_PASSWORD`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the password for the admin account to be created automatically on first startup when no users exist. Must be used in conjunction with `WEBUI_ADMIN_EMAIL`. The password is securely hashed before storage using the same mechanism as manual account creation.
+
+:::danger
+
+**Security Considerations**
+- Use a strong, unique password for production deployments
+- Consider using secrets management (Docker secrets, Kubernetes secrets, environment variable injection) rather than storing the password in plain text configuration files
+- After initial setup, change the admin password through the UI for enhanced security
+- Never commit this value to version control
+
+:::
+
+#### `WEBUI_ADMIN_NAME`
+
+- Type: `str`
+- Default: `Admin`
+- Description: Specifies the display name for the automatically created admin account. This is used when `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` are configured for headless admin creation.
 
 #### `ENABLE_LOGIN_FORM`
 
@@ -158,6 +224,34 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables channel support.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_FOLDERS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the folders feature, allowing users to organize their chats into folders in the sidebar.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `FOLDER_MAX_FILE_COUNT`
+
+- Type: `int`
+- Default: `("") empty string`
+- Description: Sets the maximum number of files processing allowed per folder.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+
+#### `ENABLE_NOTES`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the notes feature, allowing users to create and manage personal notes within Open WebUI.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_MEMORIES`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the [memory feature](/features/memory), allowing models to store and retrieve long-term information about users.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEBHOOK_URL`
 
 - Type: `str`
@@ -175,6 +269,18 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `bool`
 - Default: `True`
 - Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
+
+#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables admin users to access all workspace content (models, knowledge bases, prompts, and tools) regardless of access control settings. When set to `False`, admins will only see workspace items they have been explicitly granted access to.
+
+:::warning **Deprecated**
+
+**This environment variable is deprecated and may be removed in a future release.** Use [`BYPASS_ADMIN_ACCESS_CONTROL`](#bypass_admin_access_control) instead, which provides the same functionality with a clearer name.
+
+:::
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
@@ -214,18 +320,6 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 - Default: `False`
 - Description: Controls whether custom models should fall back to a default model if their assigned base model is missing. When set to `True`, if a custom model's base model is not found, the system will use the first model from the configured `DEFAULT_MODELS` list instead of returning an error.
 
-#### `MODELS_CACHE_TTL`
-
-- Type: `int`
-- Default: `1`
-- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
-
-:::info
-
-This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time. In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
-
-:::
-
 #### `SHOW_ADMIN_DETAILS`
 
 - Type: `bool`
@@ -239,6 +333,13 @@ This caches the external model lists retrieved from configured OpenAI-compatible
 - Default: `True`
 - Description: Controls whether the active user count is visible to all users or restricted to administrators only. When set to `False`, only admin users can see how many users are currently active, reducing backend load and addressing privacy concerns in large deployments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_USER_STATUS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be toggled in the **Admin Panel > Settings > General > User Status**.
 
 #### `ADMIN_EMAIL`
 
@@ -455,11 +556,29 @@ allowing the client to wait indefinitely.
 
 - Type: `int`
 - Default: `10`
-- Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
+- Description: Sets the timeout in seconds for fetching the model list from Ollama and OpenAI endpoints. This affects how long Open WebUI waits for each configured endpoint when loading available models.
 
-:::note
+:::note When to Adjust This Value
 
-The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help ensure that all necessary connections are available when opening the web UI. This duration allows enough time for retrieving the model list even in cases of higher network latency. You can lower this value if quicker timeouts are preferred, but keep in mind that doing so may lead to some connections being dropped, depending on your network conditions.
+**Lower the timeout** (e.g., `3`) if:
+- You have multiple endpoints configured and want faster failover when one is unreachable
+- You prefer the UI to load quickly even if some slow endpoints are skipped
+
+**Increase the timeout** (e.g., `30`) if:
+- Your model servers are slow to respond (e.g., cold starts, large model loading)
+- You're connecting over high-latency networks
+- You're using providers like OpenRouter that may have variable response times
+
+:::
+
+:::warning Database Persistence
+
+Connection URLs configured via the Admin Settings UI are **persisted in the database** and take precedence over environment variables. If you save an unreachable URL and the UI becomes unresponsive, you may need to use one of these recovery options:
+
+- `RESET_CONFIG_ON_START=true` - Resets database config to environment variable values on next startup
+- `ENABLE_PERSISTENT_CONFIG=false` - Always use environment variables (UI changes won't persist)
+
+See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for detailed recovery steps.
 
 :::
 
@@ -472,7 +591,7 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs.
+- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings).
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
 
@@ -485,6 +604,12 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Type: `bool`
 - Default: `True`
 - Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
+
+#### `REQUESTS_VERIFY`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls SSL/TLS verification for synchronous `requests` (e.g., Tika, External Reranker). Set to `False` to bypass certificate verification for self-signed certificates.
 
 ### Directories
 
@@ -518,6 +643,18 @@ The AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST is set to 10 seconds by default to help en
 - Type: `str`
 - Default: `INFO`
 - Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+
+#### `ENABLE_AUDIT_STDOUT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether audit logs are output to stdout (console). Useful for containerized environments where logs are collected from stdout.
+
+#### `ENABLE_AUDIT_LOGS_FILE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether audit logs are written to a file. When enabled, logs are written to the location specified by `AUDIT_LOGS_FILE_PATH`.
 
 #### `AUDIT_LOGS_FILE_PATH`
 
@@ -1018,8 +1155,21 @@ Output:
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether users are shown the share to community button.
+- Description: Controls whether users can share content with the Open WebUI Community and access community resources. When enabled, this setting shows the following UI elements across the application:
+  - **Prompts Workspace**: "Made by Open WebUI Community" section with a link to discover community prompts, and a "Share" button in the prompt menu dropdown
+  - **Tools Workspace**: "Made by Open WebUI Community" section with a link to discover community tools, and a "Share" button in the tool menu dropdown
+  - **Models Workspace**: "Made by Open WebUI Community" section with a link to discover community model presets, and a "Share" button in the model menu dropdown
+  - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions
+  - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
+  - **Evaluation Feedbacks**: "Share to Open WebUI Community" button for contributing feedback history to the community leaderboard
+  - **Stats Sync Modal**: Enables syncing usage statistics with the community
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons and community resource discovery sections will be hidden from the UI. Users will still be able to export content locally, but the option to share directly to the Open WebUI Community will not be available.
+
+:::
 
 ### Tags Generation
 
@@ -1078,7 +1228,11 @@ This variable replaces the deprecated `ENABLE_API_KEY` environment variable.
 
 :::info
 
-For API Key creation (and the API keys themselves) to work, you not only need to enable it globally, but also give specific user groups the permission for it 
+For API Key creation (and the API keys themselves) to work, you need **both**:
+1. Enable API keys globally using this setting (`ENABLE_API_KEYS`)
+2. Grant the "API Keys" permission to users via Default Permissions or User Groups
+
+**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
@@ -1111,6 +1265,58 @@ The value of `API_KEYS_ALLOWED_ENDPOINTS` should be a comma-separated list of en
 :::info
 
 This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment variable.
+
+:::
+
+### Model Caching
+
+#### `ENABLE_BASE_MODELS_CACHE`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+**How the cache works:**
+
+- **Initialization**: When enabled, base models are fetched and cached during application startup.
+- **Storage**: The cache is stored in application memory (`app.state.BASE_MODELS`).
+- **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
+- **Cache Refresh**: The cache is refreshed when:
+  - The application restarts
+  - The connection settings are saved in the **Admin Panel > Settings > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
+- **No TTL**: There is no automatic time-based expiration.
+
+:::tip Performance Consideration
+
+Enable this setting in production environments where model lists are relatively stable. For development environments or when frequently adding/removing models from Ollama, you may prefer to leave it disabled for real-time model discovery.
+
+:::
+
+#### `MODELS_CACHE_TTL`
+
+- Type: `int`
+- Default: `1`
+- Description: Sets the cache time-to-live in seconds for model list responses from OpenAI and Ollama endpoints. This reduces API calls by caching the available models list for the specified duration. Set to empty string to disable caching entirely.
+
+This caches the external model lists retrieved from configured OpenAI-compatible and Ollama API endpoints (not Open WebUI's internal model configurations). Higher values improve performance by reducing redundant API requests to external providers but may delay visibility of newly added or removed models on those endpoints. A value of 0 disables caching and forces fresh API calls each time.
+
+:::tip High-Traffic Recommendation
+
+In high-traffic scenarios, increasing this value (e.g., to 300 seconds) can significantly reduce load on external API endpoints while still providing reasonably fresh model data.
+
+:::
+
+:::info Two Caching Mechanisms
+
+Open WebUI has **two model caching mechanisms** that work independently:
+
+| Setting | Type | Default | Refresh Trigger |
+|---------|------|---------|-----------------|
+| `ENABLE_BASE_MODELS_CACHE` | In-memory | `False` | App restart OR Admin Save |
+| `MODELS_CACHE_TTL` | TTL-based | `1` second | Automatic after TTL expires |
+
+For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODELS_CACHE_TTL=300`.
 
 :::
 
@@ -2439,16 +2645,37 @@ Provide a clear and direct response to the user's query, including inline citati
 - Description: Specifies how much overlap there should be between chunks.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `CHUNK_MIN_SIZE_TARGET`
+
+- Type: `int`
+- Default: `0`
+- Description: Chunks smaller than this threshold will be intelligently merged with neighboring chunks when possible. This helps prevent tiny, low-quality fragments that can hurt retrieval performance and waste embedding resources. This feature only works when `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER` is enabled. Set to `0` to disable merging. For more information on the benefits and configuration, see the [RAG guide](/features/rag#chunking-configuration).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_TEXT_SPLITTER`
 
 - Type: `str`
 - Options:
   - `character`
   - `token`
-  - `markdown_header`
 - Default: `character`
-- Description: Sets the text splitter for RAG models.
+- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter (Tiktoken-based).
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables markdown header text splitting as a preprocessing step before character or token splitting. When enabled, documents are first split by markdown headers (h1-h6), then the resulting chunks are further processed by the configured text splitter (`RAG_TEXT_SPLITTER`). This helps preserve document structure and context across chunks.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+**Migration from `markdown_header` TEXT_SPLITTER**
+
+The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown header splitting is now a preprocessing step controlled by `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`. If you were using `RAG_TEXT_SPLITTER=markdown_header`, switch to `character` or `token` and ensure `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER` is enabled (it is enabled by default).
+
+:::
 
 #### `TIKTOKEN_CACHE_DIR`
 
@@ -2626,6 +2853,12 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_SIGMOID_ACTIVATION_FUNCTION`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled (default), applies sigmoid normalization to local CrossEncoder reranking scores to ensure they fall within the 0-1 range. This allows the relevance threshold setting to work correctly with models like MS MARCO that output raw logits.
+
 #### `RAG_EXTERNAL_RERANKER_TIMEOUT`
 
 - Type: `str`
@@ -2742,6 +2975,12 @@ Strictly return in JSON format:
 - Default: `False`
 - Description: Specifies whether to use the full context for RAG.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_SYSTEM_CONTEXT`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, injects RAG context into the **system message** instead of the user message. This is highly recommended for optimizing performance when using models that support **KV prefix caching** or **Prompt Caching**. This includes local engines (like Ollama, llama.cpp, or vLLM) and cloud providers / Model-as-a-Service providers (like OpenAI and Vertex AI). By placing the context in the system message, it remains at a stable position at the start of the conversation, allowing the cache to persist across multiple turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
 
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
@@ -2963,11 +3202,26 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `yacy`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DDGS_BACKEND`
+
+- Type: `str`
+- Default: `auto`
+- Options: `auto` (Random), `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `wikipedia`, `yahoo`, `yandex`.
+- Description: Specifies the backend to be used by the DDGS engine.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > Web Search > DDGS Backend** when DDGS is selected as the search engine.
+
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
 - Type: `bool`
 - Default: `False`
 - Description: Bypasses the web search embedding and retrieval process.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `BYPASS_WEB_SEARCH_WEB_LOADER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Bypasses the web loader when performing web search. When enabled, only snippets from the search engine are used, and the full page content is not fetched.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `SEARXNG_QUERY_URL`
@@ -3001,6 +3255,12 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Description: Sets the API key for the Brave Search API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+Brave's free tier enforces a rate limit of 1 request per second. Open WebUI automatically retries requests that receive HTTP 429 rate limit errors after a 1-second delay. For free tier users, set `WEB_SEARCH_CONCURRENT_REQUESTS` to `1` to ensure sequential request processing. See the [Brave web search documentation](/features/web-search/brave) for more details.
+
+:::
 
 #### `KAGI_SEARCH_API_KEY`
 
@@ -3062,6 +3322,13 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Type: `str`
 - Description: Sets the API key for Jina.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `JINA_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://s.jina.ai/`
+- Description: Sets the Base URL for Jina Search API. Useful for specifying custom or regional endpoints (e.g., `https://eu-s-beta.jina.ai/`).
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > Web Search > Jina API Base URL**.
 
 #### `BING_SEARCH_V7_ENDPOINT`
 
@@ -3295,6 +3562,13 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Description: Sets the API key for Firecrawl API.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `FIRECRAWL_TIMEOUT`
+
+- Type: `int`
+- Default: `None`
+- Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > Web Search > Firecrawl Timeout**.
+
 #### `PLAYWRIGHT_TIMEOUT`
 
 - Type: `int`
@@ -3357,12 +3631,17 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Default: `${DATA_DIR}/cache/whisper/models`
 - Description: Specifies the directory to store Whisper model files.
 
+#### `WHISPER_COMPUTE_TYPE`
+
+- Type: `str`
+- Default: `int8` (CPU), `float16` (CUDA)
+- Description: Sets the compute type for Whisper model inference. Defaults to `int8` for CPU and `float16` for CUDA (with fallback to `int8/int8_float16`).
+
 #### `WHISPER_VAD_FILTER`
 
 - Type: `bool`
 - Default: `False`
 - Description: Specifies whether to apply a Voice Activity Detection (VAD) filter to Whisper Speech-to-Text.
-- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WHISPER_MODEL_AUTO_UPDATE`
 
@@ -3375,6 +3654,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Type: `str`
 - Default: `None`
 - Description: Specifies the ISO 639-1 language Whisper uses for STT (ISO 639-2 for Hawaiian and Cantonese). Whisper predicts the language by default.
+
+#### `WHISPER_MULTILINGUAL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Toggles whether to use the multilingual Whisper model. When set to `False`, the system will use the English-only model for better performance in English-centric tasks. When `True`, it supports multiple languages.
 
 ### Speech-to-Text (OpenAI)
 
@@ -3433,6 +3718,20 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Description: Specifies the locales to use for Azure Speech-to-Text.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `AUDIO_STT_AZURE_BASE_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies a custom Azure base URL for Speech-to-Text. Use this if you have a custom Azure endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_AZURE_MAX_SPEAKERS`
+
+- Type: `int`
+- Default: `3`
+- Description: Sets the maximum number of speakers for Azure Speech-to-Text diarization.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Speech-to-Text (Deepgram)
 
 #### `DEEPGRAM_API_KEY`
@@ -3440,6 +3739,38 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Type: `str`
 - Default: `None`
 - Description: Specifies the Deepgram API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Speech-to-Text (Mistral)
+
+#### `AUDIO_STT_MISTRAL_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the Mistral API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_MISTRAL_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.mistral.ai/v1`
+- Description: Specifies the Mistral API base URL to use for Speech-to-Text.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, uses the chat completions endpoint for Mistral Speech-to-Text instead of the dedicated transcription endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Speech-to-Text (General)
+
+#### `AUDIO_STT_SUPPORTED_CONTENT_TYPES`
+
+- Type: `str`
+- Default: `None`
+- Description: Comma-separated list of supported audio MIME types for Speech-to-Text (e.g., `audio/wav,audio/mpeg,video/*`). Leave empty to use defaults.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Text-to-Speech
@@ -3494,7 +3825,15 @@ Note: If none of the specified languages are available and `en` was not in your 
 #### `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT`
 
 - Type: `str`
+- Default: `audio-24khz-160kbitrate-mono-mp3`
 - Description: Sets the output format for Azure Text to Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_AZURE_SPEECH_BASE_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies a custom Azure Speech base URL for Text-to-Speech. Use this if you have a custom Azure endpoint.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Voice Mode
@@ -3519,6 +3858,14 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Type: `str`
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the API key to use for text-to-speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_OPENAI_PARAMS`
+
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Additional parameters for OpenAI-compatible TTS API in JSON format. Allows customization of API-specific settings.
+- Example: `{"speed": 1.0}`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Elevenlabs Text-to-Speech
@@ -3715,22 +4062,7 @@ Strictly return in JSON format:
 
 :::tip
 
-One minimalistic working setup for Gemini can look like this:
-
-- Create Image
-  - Model: `gemini-2.5-flash-image`
-  - Image Size: `2816x1536`
-  - Image Prompt Generation: on
-  - Image Generation Engine: `Gemini`
-  - Gemini Base URL: `https://generativelanguage.googleapis.com/v1beta`
-  - Gemini API Key: Enter your API Key
-  - Gemini Endpoint Method: `generateContent`
-- Edit Image
-  - Image Edit Engine: `Gemini`
-  - Model: `gemini-2.5-flash-image`
-  - Image Size: (can be left empty)
-  - Gemini Base URL: `https://generativelanguage.googleapis.com/v1beta`
-  - Gemini API Key: Enter your API Key
+For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/image-generation-and-editing/gemini).
 
 :::
 
@@ -4469,13 +4801,13 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 - Type: `str`
 - Default: `None`
-- Description: Sets a single filter to use for LDAP search. Alternative to `LDAP_SEARCH_FILTERS`.
+- Description: Sets additional filter conditions for LDAP user search. This filter is **appended** to the automatically-generated username filter. Open WebUI automatically constructs the username portion of the filter using `LDAP_ATTRIBUTE_FOR_USERNAME`, so you should **not** include user placeholders like `%(user)s` or `%s` — these are not supported. Use this for additional conditions such as group membership restrictions (e.g., `(memberOf=cn=allowed-users,ou=groups,dc=example,dc=com)`). Alternative to `LDAP_SEARCH_FILTERS`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_SEARCH_FILTERS`
 
 - Type: `str`
-- Description: Sets the filter to use for LDAP search.
+- Description: Sets additional filter conditions for LDAP user search. This is an alias for `LDAP_SEARCH_FILTER`. The filter is appended to the automatically-generated username filter — do **not** include user placeholders like `%(user)s` or `%s`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `LDAP_USE_TLS`
@@ -4687,6 +5019,13 @@ This is useful when you need a JWT access token for downstream validation or whe
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_FEATURES_MEMORIES`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to use the [memory feature](/features/memory).
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
 
 - Type: `str`
@@ -4717,7 +5056,11 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 :::info
 
-For API Key creation (and the API keys themselves) to work, you not only need to give specific user groups the permission for it, but also enable it globally using `ENABLE_API_KEYS`
+For API Key creation (and the API keys themselves) to work, you need **both**:
+1. Grant the "API Keys" permission to users via this setting or User Groups
+2. Enable API keys globally using `ENABLE_API_KEYS`
+
+**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
@@ -4784,6 +5127,16 @@ For API Key creation (and the API keys themselves) to work, you not only need to
 - Type: `str`
 - Default: `True`
 - Description: Enables or disables public sharing of notes.
+
+### Settings Permissions
+
+#### `USER_PERMISSIONS_SETTINGS_INTERFACE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user / group permissions for the interface settings section in the Settings Modal.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 
 ## Misc Environment Variables
 
@@ -4890,6 +5243,18 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
   - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
 
 ### OpenTelemetry Configuration
+
+:::warning Additional Dependencies May Be Required
+
+OpenTelemetry support requires additional Python dependencies that **may not be included by default** depending on your installation method (e.g., standard `pip install open-webui` versus Docker images).
+
+If you encounter `ImportError` or missing module errors related to OpenTelemetry, you may need to install them manually:
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
+```
+
+:::
 
 #### `ENABLE_OTEL`
 
@@ -5049,6 +5414,12 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 
 :::
 
+#### `ENABLE_DB_MIGRATIONS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption.
+
 :::warning
 
 **Required for Multi-Replica Setups**
@@ -5138,6 +5509,14 @@ When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open
 - The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
 
 Ensure the database password is kept secure, as it is needed to decrypt and access all application data.
+
+:::
+
+:::warning Migrating Existing Data to SQLCipher
+
+**Open WebUI does not support automatic migration from an unencrypted SQLite database to an encrypted SQLCipher database.** If you enable SQLCipher on an existing installation, the application will fail to read your existing unencrypted data.
+
+To use SQLCipher with existing data, you must either start fresh (with users exporting/re-importing chats), manually migrate the database using external SQLite/SQLCipher tools, use filesystem-level encryption (LUKS/BitLocker) instead, or switch to PostgreSQL.
 
 :::
 
@@ -5469,15 +5848,18 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 
 :::
 
-:::warning Database Migrations with Multiple Workers
-When `UVICORN_WORKERS > 1`, starting the application can trigger concurrent database migrations from multiple worker processes, potentially causing database schema corruption or inconsistent states.
+:::warning Database Migrations with Multiple Workers / Multi-Pod Deployments
+When `UVICORN_WORKERS > 1` or when running multiple replicas, starting the application can trigger concurrent database migrations from multiple processes, potentially causing database schema corruption or inconsistent states.
 
 **Recommendation:**
-After pulling a new image or installing an update, **always run Open WebUI with a single worker (`UVICORN_WORKERS=1`) first**. This ensures the database migration completes successfully in a single process. Once the migration is finished and the application has started, you can then restart it with your desired number of workers.
+To handle migrations safely in multi-process/multi-pod environments, you can:
+1.  **Designate a Master (Recommended):** Set `ENABLE_DB_MIGRATIONS=False` on all but one instance/worker. The instance with `ENABLE_DB_MIGRATIONS=True` (default) will handle the migration, while others will wait or skip it.
+2.  **Scale Down:** Temporarily scale down to a single instance/worker to let migrations finish before scaling back up.
 
-**For Kubernetes, Helm, Minikube, and other orchestrated setups:**
-Ensure that your deployment strategy allows for a single-replica or single-worker init container/job to handle migrations before scaling up to multiple replicas or workers. This is critical to prevent race conditions during schema updates.
+**For Kubernetes, Helm, and Orchestrated Setups:**
+It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a specific pod for migrations, or use an init container/job to handle migrations before scaling up the main application pods. This ensures schema updates are applied exactly once.
 :::
+
 
 ### Cache Settings
 

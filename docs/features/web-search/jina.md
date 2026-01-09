@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 title: "Jina"
 ---
 
@@ -12,6 +12,12 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::tip
 
 For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+
+:::
+
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
 
 :::
 
@@ -51,7 +57,8 @@ To enable the Jina web search integration, follow these steps in the Open WebUI 
 2. **Navigate to Web Search Settings:** Go to the **Admin Panel**, then click on **Settings** > **Web Search**.
 3. **Select Jina as the Search Engine:** In the "Web Search Engine" dropdown menu, select **Jina**.
 4. **Enter Your API Key:** Paste your Jina API key into the **Jina API Key** input field.
-5. **Save Changes:** Scroll down and click the **Save** button to apply the changes.
+5. **(Optional) Enter Jina API Base URL:** If you need to use a specific endpoint (e.g., for EU data processing), enter it in the **Jina API Base URL** field. Default is `https://s.jina.ai/`.
+6. **Save Changes:** Scroll down and click the **Save** button to apply the changes.
 
 ### 3. Environment Variable Configuration
 
@@ -60,6 +67,7 @@ For Docker-based deployments, you can configure the Jina integration using an en
 Set the following environment variable for your Open WebUI instance:
 
 - `JINA_API_KEY`: Your Jina API key.
+- `JINA_API_BASE_URL`: (Optional) Custom Jina API endpoint.
 
 **Example Docker `run` command:**
 

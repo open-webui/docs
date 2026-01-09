@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: "Filter Function"
 ---
 
@@ -339,6 +339,72 @@ Here's the complete flow from admin configuration to filter execution:
 - Send modified request to LLM
 - Execute stream() filters (during streaming)
 - Execute outlet() filters (post-response)
+
+---
+
+### ⚡ Filter Priority & Execution Order
+
+When multiple filters are active, they execute in a specific order determined by their **priority** value. Understanding this is crucial when building filter chains where one filter depends on another's changes.
+
+#### Setting Filter Priority
+
+Priority is configured via the `Valves` class using a `priority` field:
+
+```python
+class Filter:
+    class Valves(BaseModel):
+        priority: int = Field(
+            default=0,
+            description="Filter execution order. Lower values run first."
+        )
+    
+    def __init__(self):
+        self.valves = self.Valves()
+    
+    def inlet(self, body: dict) -> dict:
+        # This filter's execution order depends on its priority value
+        return body
+```
+
+#### Priority Ordering Rules
+
+| Priority Value | Execution Order |
+|---------------|-----------------|
+| `0` (default) | Runs first |
+| `1` | Runs after priority 0 |
+| `2` | Runs after priority 1 |
+
+:::tip Lower Priority = Earlier Execution
+Filters are sorted in **ascending** order by priority. A filter with `priority=0` runs **before** a filter with `priority=1`, which runs before `priority=2`, and so forth.
+:::
+
+---
+
+### 🔗 Data Passing Between Filters
+
+When multiple filters are active, each filter in the chain receives the **modified data from the previous filter**. The returned value from one filter becomes the input to the next filter in the priority order.
+
+```
+User Input
+    ↓
+Model Router Filter (priority=0) → changes parts of the body
+    ↓
+Context Manager Filter (priority=1) → receives modified body ✓
+    ↓
+Logging Filter (priority=2) → receives body with all previous changes ✓
+    ↓
+LLM Request (sends final modified body to OpenAI/Ollama API)
+```
+
+:::warning Important: Always Return the Body
+If your filter modifies the `body`, you **must** return it. The returned value is passed to the next filter. If you return `None`, subsequent filters will fail.
+
+```python
+async def inlet(self, body: dict, __event_emitter__) -> dict:
+    body["messages"].append({"role": "system", "content": "Hello"})
+    return body  # Don't forget this!
+```
+:::
 
 ---
 

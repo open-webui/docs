@@ -96,7 +96,8 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
 | `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
 | `input` <br/>(needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ...}`                                     |
-| `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |                                                                    |
+| `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |
+| `chat:message:favorite`                      | Update the favorite/pin status of a message          | `{"favorite": bool}`                                                                                 |
 
 **Other/Advanced types:**
 
@@ -265,6 +266,33 @@ await __event_emitter__(
     }
 )
 ```
+
+---
+
+### `chat:message:favorite`
+
+**Update the favorite/pin status of a message:**
+
+```python
+await __event_emitter__(
+    {
+        "type": "chat:message:favorite",
+        "data": {
+            "favorite": True  # or False to unpin
+        }
+    }
+)
+```
+
+**What this does exactly:**
+This event forces the Open WebUI frontend to update the "favorite" state of a message in its local cache. Without this emitter, if an **Action Function** modifies the `message.favorite` field in the database directly, the frontend (which maintains its own state) might overwrite your change during its next auto-save cycle. This emitter ensures the UI and database stay perfectly in sync.
+
+**Where it appears:**
+*   **Message Toolbar**: When set to `True`, the "Heart" icon beneath the message will fill in, indicating it is favorited.
+*   **Chat Overview**: Favorited messages (pins) are highlighted in the conversation overview, making it easier for users to locate key information later.
+
+#### Example: "Pin Message" Action
+For a practical implementation of this event in a real-world plugin, see the **[Pin Message Action on Open WebUI Community](https://openwebui.com/posts/pin_message_action_143594d1)**. This action demonstrates how to toggle the favorite status in the database and immediately sync the UI using the `chat:message:favorite` event.
 
 ---
 

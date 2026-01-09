@@ -77,7 +77,10 @@ WebSocket support is required for Open WebUI v0.5.0 and later. If WebSockets are
 1. **Check your reverse proxy configuration** - Ensure `Upgrade` and `Connection` headers are properly set
 2. **Verify CORS settings** - WebSocket connections respect CORS policies
 3. **Check browser console** - Look for WebSocket connection errors
-4. **Test direct connection** - Try connecting directly to Open WebUI without the proxy to isolate the issue
+4. **Test direct connection** - Try connecting directly to Open WebUI without the proxy to isolate the issue.
+5. **Check for HTTP/2 WebSocket Issues** - Some proxies (like HAProxy 3.x) enable HTTP/2 by default. If your proxy handles client connections via HTTP/2 but the backend/application doesn't support RFC 8441 (WebSockets over H2) properly, the instance may "freeze" or stop responding. 
+   - **Fix for HAProxy**: Add `option h2-workaround-bogus-websocket-clients` to your configuration or force the backend connection to use HTTP/1.1.
+   - **Fix for Nginx**: Ensure you are using `proxy_http_version 1.1;` in your location block (which is the default in many Open WebUI examples).
 
 For multi-instance deployments, configure Redis for WebSocket management:
 ```bash
@@ -141,6 +144,81 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 🔗 After running the above, your WebUI should be available at `http://localhost:8080`.
 
+## ⏱️ Model List Loading Issues (Slow UI / Unreachable Endpoints)
+
+If your Open WebUI takes a long time to load models, or the model selector spins indefinitely, it may be due to an unreachable or slow API endpoint configured in your connections.
+
+### Common Symptoms
+
+- Model selector shows a loading spinner for extended periods
+- `500 Internal Server Error` on `/api/models` endpoint
+- UI becomes unresponsive when opening Settings
+- Docker/server logs show: `Connection error: Cannot connect to host...`
+
+### Cause: Unreachable Endpoints
+
+When you configure multiple Ollama or OpenAI base URLs (for load balancing or redundancy), Open WebUI attempts to fetch models from **all** configured endpoints. If any endpoint is unreachable, the system waits for the full connection timeout before returning results.
+
+By default, Open WebUI waits **10 seconds** per unreachable endpoint when fetching the model list. With multiple bad endpoints, this delay compounds.
+
+### Solution 1: Adjust the Timeout
+
+Lower the timeout for model list fetching using the `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` environment variable:
+
+```bash
+# Set a shorter timeout (in seconds) for faster failure on unreachable endpoints
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=3
+```
+
+This reduces how long Open WebUI waits for each endpoint before giving up and continuing.
+
+### Solution 2: Fix or Remove Unreachable Endpoints
+
+1. Go to **Admin Settings → Connections**
+2. Review your Ollama and OpenAI base URLs
+3. Remove or correct any unreachable IP addresses or hostnames
+4. Save the configuration
+
+### Solution 3: Recover from Database-Persisted Bad Configuration
+
+If you saved an unreachable URL and now can't access the Settings UI to fix it, the bad configuration is persisted in the database and takes precedence over environment variables. Use one of these recovery methods:
+
+**Option A: Reset configuration on startup**
+```bash
+# Forces environment variables to override database values on next startup
+RESET_CONFIG_ON_START=true
+```
+
+**Option B: Always use environment variables**
+```bash
+# Prevents database values from taking precedence (changes in UI won't persist across restarts)
+ENABLE_PERSISTENT_CONFIG=false
+```
+
+**Option C: Manual database cleanup (advanced)**
+
+If using SQLite, stop the container and run:
+```bash
+sqlite3 webui.db "DELETE FROM config WHERE id LIKE '%urls%';"
+```
+
+:::warning
+
+Manual database manipulation should be a last resort. Always back up your database first.
+
+:::
+
+### Related Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` | `10` | Timeout (seconds) for fetching model lists |
+| `AIOHTTP_CLIENT_TIMEOUT` | `300` | General API request timeout |
+| `RESET_CONFIG_ON_START` | `false` | Reset database config to env var values on startup |
+| `ENABLE_PERSISTENT_CONFIG` | `true` | Whether database config takes precedence over env vars |
+
+See the [Environment Configuration](/getting-started/env-configuration#aiohttp_client_timeout_model_list) documentation for more details.
+
 ## 🔒 SSL Connection Issue with Hugging Face
 
 Encountered an SSL error? It could be an issue with the Hugging Face server. Here's what to do:
@@ -155,6 +233,35 @@ Encountered an SSL error? It could be an issue with the Hugging Face server. Her
 ```bash
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
+
+## 🔐 SSL Certificate Issues with Internal Tools
+
+If you are using external tools like Tika, Ollama (for embeddings), or an external reranker with self-signed certificates, you might encounter SSL verification errors.
+
+### Common Symptoms
+
+- Logs show `[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate`
+- Tika document ingestion fails
+- Embedding generation fails with SSL errors
+- Reranking fails with SSL errors
+
+### Solution
+
+You can disable SSL verification for these internal tool connections using the following environment variables:
+
+1.  **For synchronous requests (Tika, External Reranker):**
+    ```bash
+    REQUESTS_VERIFY=false
+    ```
+
+2.  **For asynchronous requests (Ollama Embeddings):**
+    ```bash
+    AIOHTTP_CLIENT_SESSION_SSL=false
+    ```
+
+:::warning
+Disabling SSL verification reduces security. Only do this if you trust the network and the services you are connecting to (e.g., functioning within a secure internal network).
+:::
 
 ## 🍏 Podman on MacOS
 
@@ -171,3 +278,59 @@ Running on MacOS with Podman? Here’s how to ensure connectivity:
 podman run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+
+## 🛠️ MCP Tool Connections
+
+If you are having trouble connecting to MCP tools (e.g. "Failed to connect to MCP server"):
+*   **Authentication**: Ensure you aren't using "Bearer" without a token.
+*   **Filters**: Try adding a comma to the Function Name Filter List.
+
+See the [MCP Feature Documentation](/features/mcp#troubleshooting) for detailed troubleshooting steps.
+
+## 🔐 SSL/TLS Errors with Web Search
+
+If you are encountering SSL errors while using the Web Search feature, they usually fall into two categories: Proxy configuration issues or Certificate verification issues.
+
+### Certificate Verification Issues
+
+If you are seeing SSL verification errors when Open WebUI tries to fetch content from websites (Web Loader):
+
+- **Symptom**: `[SSL: CERTIFICATE_VERIFY_FAILED]` when loading search results.
+- **Solution**: You can disable SSL verification for the Web Loader (scraper) specifically.
+  ```bash
+  ENABLE_WEB_LOADER_SSL_VERIFICATION=false
+  ```
+  > **Note**: This setting applies to the *fetching* of web pages. If you are having SSL issues with the Search Engine itself (e.g., local SearXNG) or subsequent steps (Embedding/Reranking), see the sections below.
+
+### Proxy Configuration Issues
+
+If you're seeing SSL errors like `UNEXPECTED_EOF_WHILE_READING` or `Max retries exceeded` when using web search providers (Bocha, Tavily, etc.):
+
+#### Common Symptoms
+
+- `SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING]'))`
+- `Max retries exceeded with url: /v1/web-search`
+- Web search works in standalone Python scripts but fails in Open WebUI
+
+#### Cause: HTTP Proxy Configured for HTTPS Traffic
+
+This typically happens when you have an **HTTP proxy** configured for **HTTPS traffic**. The HTTP proxy cannot properly handle TLS connections, causing SSL handshake failures.
+
+Check your environment for these variables:
+- `HTTP_PROXY` / `http_proxy`
+- `HTTPS_PROXY` / `https_proxy`
+
+If your `https_proxy` points to `http://...` (HTTP) instead of `https://...` (HTTPS), SSL handshakes will fail because the proxy terminates the connection unexpectedly.
+
+#### Solutions
+
+1. **Fix proxy configuration**: Use an HTTPS-capable proxy for HTTPS traffic, or configure your HTTP proxy to properly support CONNECT tunneling for SSL
+2. **Bypass proxy for specific hosts**: Set `NO_PROXY` environment variable:
+   ```bash
+   NO_PROXY=api.bochaai.com,api.tavily.com,api.search.brave.com
+   ```
+3. **Disable proxy if not needed**: Unset the proxy environment variables entirely
+
+#### Why Standalone Scripts Work
+
+When you run a Python script directly, it may not inherit the same proxy environment variables that your Open WebUI service is using. The service typically inherits environment variables from systemd, Docker, or your shell profile, which may have different proxy settings.

@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation was created/updated based on version 0.6.42 and updated for recent migrations.
+> This documentation was created/updated based on version 0.7.0 and updated for recent migrations.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -761,6 +761,19 @@ When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open
 - The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
 - **Keep the password secure**, as it is needed to decrypt and access all application data.
 - **Losing the password means losing access to all data** in the encrypted database.
+
+:::
+
+:::warning Migrating Existing Data to SQLCipher
+
+**Open WebUI does not support automatic migration from an unencrypted SQLite database to an encrypted SQLCipher database.** If you enable SQLCipher on an existing installation, the application will fail to read your existing unencrypted data.
+
+To use SQLCipher with existing data, you must either:
+
+1. **Start fresh** - Enable SQLCipher on a new installation and have users export/re-import their chats manually
+2. **Manual database migration** - Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
+3. **Use filesystem-level encryption** - Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
+4. **Switch to PostgreSQL** - For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
 
 :::
 

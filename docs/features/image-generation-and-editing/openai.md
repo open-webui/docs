@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: "OpenAI"
 ---
 
@@ -27,22 +27,30 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 
 ### Azure OpenAI
 
-Image generation with Azure OpenAI Dall-E or GPT-Image is supported with Open WebUI. Configure the Image Generation as follows:
+Image generation with Azure OpenAI (DALL·E or GPT-Image) is supported. Configure the Image Generation as follows:
 
 1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Open AI` (Azure OpenAI uses the same syntax as OpenAI).
 3. Change the API endpoint URL to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Set the instance and model id as you find it in the settings of the Azure AI Foundry.
-4. Configure the API version to the value you find in the settings of the Azure AI Fountry.
+4. Configure the API version to the value you find in the settings of the Azure AI Foundry.
 5. Enter your Azure OpenAI API key.
 
 ![Screenshot of the Open WebUI Images settings page with Open AI selected and the API endpoint URL, API version, and API key fields highlighted for Azure OpenAI configuration.](/images/image-generation-and-editing/azure-openai-settings.png)
 
-:::tip
+:::tip Azure GPT-Image-1.5 Configuration
+For Azure OpenAI **gpt-image-1.5**, use the following settings for successful generation:
+- **Model**: `gpt-image-1.5`
+- **Image Size**: `1024x1024`
+- **API Version**: `2025-04-01-preview`
+- **API Endpoint URL**: `https://<your-resource-name>.openai.azure.com/openai/deployments/<your-deployment-name>/` (ensure the trailing slash is included)
 
+If you encounter the error `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, double-check that your API Version is set to `2025-04-01-preview` or later.
+:::
+
+:::tip
 Alternative API endpoint URL tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` - you can find your endpoint name on https://ai.azure.com/resource/overview, and model name on https://ai.azure.com/resource/deployments.
 You can also copy Target URI from your deployment detailed page, but remember to delete strings after model name.
 For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the API endpoint URL in Open WebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
-
 :::
 
 ### LiteLLM Proxy with OpenAI Endpoints

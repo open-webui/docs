@@ -23,6 +23,15 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 You can now call tools exposed by your MCP server from Open WebUI.
 
+:::warning Common Mistake: Wrong Connection Type
+If you are adding an MCP server, make sure **Type** is set to **MCP (Streamable HTTP)**, not **OpenAPI**.
+
+Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI connection will cause the UI to crash or display an infinite loading screen. If you encounter this:
+
+1. Disable the problematic tool connection via Admin Settings
+2. Re-add it with the correct **Type** set to **MCP**
+:::
+
 ## 🧭 When to use MCP vs OpenAPI
 
 :::tip 
@@ -45,6 +54,51 @@ Choose **MCP (Streamable HTTP)** if you need:
 :::warning
 Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-user isolation, reconnects). Review your org’s auth, proxy, and rate-limiting policies before exposing MCP externally.
 :::
+
+## ⚙️ Configuration Best Practices
+
+### Authentication Modes
+
+*   **None**: Use this for **local MCP servers** or internal networks where no token is required.
+    *   **⚠️ Important**: Default to "None" unless your server strictly requires a token. Selecting "Bearer" without providing a key sends an empty Authorization header (`Authorization: Bearer`), which causes many servers to reject the connection immediately.
+*   **Bearer**: Use this **only** if your MCP server requires a specific API token. You **must** populate the "Key" field.
+*   **OAuth 2.1**: For secured, enterprise deployments requiring Identity Provider flows.
+
+### Connection URLs
+
+If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
+*   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/sse`) instead of `localhost`.
+
+### Function Name Filter List
+
+This field restricts which tools are exposed to the LLM.
+*   **Default**: Leave empty to expose all tools (in most cases).
+*   **Workaround**: If you encounter connection errors with an empty list, try adding a single comma (`,`) to this field. This forces the system to treat it as a valid (but empty) filter, potentially bypassing some parsing issues.
+
+## Troubleshooting
+
+### "Failed to connect to MCP server"
+
+**Symptom**: 
+The chat shows "Failed to connect to MCP server" when using a tool, even if the **Verify Connection** button in settings says "Connected".
+
+**Solutions**:
+1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
+2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
+
+### Infinite loading screen after adding External Tool
+
+**Symptom**: 
+After adding an External Tool connection, the frontend gets stuck on a loading spinner. The browser console shows an error like `Cannot convert undefined or null to object at Object.entries`.
+
+**Cause**: 
+You likely configured an **MCP server** using the **OpenAPI** connection type, or entered MCP-style JSON (containing `mcpServers`) into an OpenAPI connection.
+
+**Solution**:
+1.  Open **Admin Settings → External Tools** (the sidebar still loads)
+2.  **Disable** or **delete** the problematic tool connection
+3.  Refresh the page (Ctrl+F5)
+4.  Re-add the connection with the correct **Type** set to **MCP (Streamable HTTP)**
 
 ## ❓ FAQ
 

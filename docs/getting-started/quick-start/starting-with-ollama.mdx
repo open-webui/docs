@@ -9,6 +9,16 @@ Open WebUI makes it easy to connect and manage your **Ollama** instance. This gu
 
 ---
 
+## Protocol-Oriented Design
+
+Open WebUI is designed to be **Protocol-Oriented**. This means that when we refer to "Ollama", we are specifically referring to the **Ollama API Protocol** (typically running on port `11434`).
+
+While some tools may offer basic compatibility, this connection type is optimized for the unique features of the Ollama service, such as native model management and pulling directly through the Admin UI. 
+
+If your backend is primarily based on the OpenAI standard (like LocalAI or Docker Model Runner), we recommend using the [OpenAI-Compatible Server Guide](/getting-started/quick-start/starting-with-openai-compatible) for the best experience.
+
+---
+
 ## Step 1: Setting Up the Ollama Connection
 
 Once Open WebUI is installed and running, it will automatically attempt to connect to your Ollama instance. If everything goes smoothly, you’ll be ready to manage and use models right away.
@@ -36,6 +46,19 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 *   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote/`) to distinguish them.
 *   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all.
 
+:::tip Connection Timeout Configuration
+
+When using multiple Ollama instances (especially across networks), connection delays can occur if an endpoint is unreachable. You can adjust the timeout using:
+
+```bash
+# Lower the timeout (default is 10 seconds) for faster failover
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=3
+```
+
+If you've saved an unreachable URL and can't access Settings to fix it, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
+
+:::
+
 Here’s what the management screen looks like:
 
 ![Ollama Management Screen](/images/getting-started/quick-start/manage-ollama.png)
@@ -51,6 +74,26 @@ Here’s an example of how it works:
 ![Ollama Download Prompt](/images/getting-started/quick-start/selector-ollama.png)
 
 This method is perfect if you want to skip navigating through the Admin Settings menu and get right to using your models.
+
+---
+
+## Using Reasoning / Thinking Models
+
+If you're using reasoning models like **DeepSeek-R1** or **Qwen3** that output thinking/reasoning content in `<think>...</think>` tags, you'll need to configure Ollama with a **reasoning parser** for proper display.
+
+### Configure the Reasoning Parser
+
+Start Ollama with the `--reasoning-parser` flag:
+
+```bash
+ollama serve --reasoning-parser deepseek_r1
+```
+
+This ensures that thinking blocks are properly separated from the final answer and displayed in a collapsible section in Open WebUI.
+
+:::tip
+The `deepseek_r1` parser works for most reasoning models, including Qwen3. If you encounter issues, see our [Reasoning & Thinking Models Guide](/features/chat-features/reasoning-models) for alternative parsers and detailed troubleshooting steps.
+:::
 
 ---
 

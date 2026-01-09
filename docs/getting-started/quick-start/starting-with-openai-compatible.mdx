@@ -7,24 +7,35 @@ title: "Starting with OpenAI-Compatible Servers"
 
 ## Overview
 
-Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server that implements the OpenAI-compatible API**, running locally or remotely. This is perfect if you want to run different language models, or if you already have a favorite backend or ecosystem. This guide will show you how to:
-
-- Set up an OpenAI-compatible server (with a few popular options)
-- Connect it to Open WebUI
-- Start chatting right away
-
-## Step 1: Choose an OpenAI-Compatible Server
-
-There are many servers and tools that expose an OpenAI-compatible API. Here are some of the most popular:
-
-- [Llama.cpp](https://github.com/ggml-org/llama.cpp): Extremely efficient, runs on CPU and GPU
-- [Ollama](https://ollama.com/): Super user-friendly and cross-platform
-- [LM Studio](https://lmstudio.ai/): Rich desktop app for Windows/Mac/Linux
-- [Lemonade](https://lemonade-server.ai/): Fast ONNX-based backend with NPU/iGPU acceleration
-
-Pick whichever suits your workflow!
+Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server that implements the OpenAI-compatible API**, running locally or remotely. This is perfect if you want to run different language models, or if you already have a favorite backend or ecosystem.
 
 ---
+
+## Protocol-Oriented Design
+
+Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider (which leads to inconsistent behavior and configuration bloat), Open WebUI focuses on the **OpenAI Chat Completions Protocol**. 
+
+This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
+
+- **We Support Protocols**: Any provider that follows the OpenAI Chat Completions standard (like Groq, OpenRouter, or LiteLLM) is natively supported.
+- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs (such as OpenAI's stateful Responses API or Anthropic's native Messages API) to maintain a universal, maintainable codebase.
+
+If you are using a provider that requires a proprietary API, we recommend using a proxy tool like **LiteLLM** or **OpenRouter** to bridge them to the standard OpenAI protocol supported by Open WebUI.
+
+### Popular Compatible Servers and Providers
+
+There are many servers and tools that expose an OpenAI-compatible API. Pick whichever suits your workflow:
+
+- **Local Runners**: [Ollama](https://ollama.com/), [Llama.cpp](https://github.com/ggml-org/llama.cpp), [LM Studio](https://lmstudio.ai/), [vLLM](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html), [LocalAI](https://localai.io/), [Lemonade](https://lemonade-server.ai/), [Docker Model Runner](https://docs.docker.com/ai/model-runner/).
+- **Cloud Providers**: [Groq](https://groq.com/), [Mistral AI](https://mistral.ai/), [Perplexity](https://www.perplexity.ai/), [MiniMax](https://platform.minimax.io/), [DeepSeek](https://platform.deepseek.com/), [OpenRouter](https://openrouter.ai/), [LiteLLM](https://docs.litellm.ai/).
+- **Major Model Ecosystems**:
+  - **Google Gemini**: [OpenAI Endpoint](https://generativelanguage.googleapis.com/v1beta/openai/) (requires a Gemini API key).
+  - **Anthropic**: While they primarily use a proprietary API, they offer a [Chat Completions compatible endpoint](https://platform.claude.com/docs/en/api/openai-sdk) for easier integration.
+  - **Azure OpenAI**: Enterprise-grade OpenAI hosting via Microsoft Azure.
+
+---
+
+## Step 1: Connect Your Server to Open WebUI
 
 #### 🍋 Get Started with Lemonade
 
@@ -56,6 +67,19 @@ See [their docs](https://lemonade-server.ai/) for details.
      *   **Examples**: `http://localhost:11434/v1` (Ollama), `http://localhost:10000/v1` (Llama.cpp).
    - **API Key**: Leave blank unless the server requires one.
 6. Click **Save**.
+
+:::tip Connection Timeout Configuration
+
+If your local server is slow to start or you're connecting over a high-latency network, you can adjust the model list fetch timeout:
+
+```bash
+# Adjust timeout for slower connections (default is 10 seconds)
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=5
+```
+
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
+
+:::
 
 :::tip
 

@@ -190,6 +190,40 @@ If you encounter any problems integrating `openedai-speech` with Open WebUI, fol
 - If you're still experiencing issues, try restarting the `openedai-speech` service or the entire Docker environment.
 - If the problem persists, consult the `openedai-speech` GitHub repository or seek help on a relevant community forum.
 
+### GPU Memory Issues (XTTS)
+
+If XTTS fails to load or causes out-of-memory errors:
+- XTTS requires approximately 4GB of GPU VRAM
+- Consider using the minimal Piper-only image (`docker-compose.min.yml`) which runs on CPU
+- Reduce other GPU memory usage before starting the container
+
+### AMD GPU (ROCm) Notes
+
+When using AMD GPUs:
+1. Uncomment `USE_ROCM=1` in your `speech.env` file
+2. Use the `docker-compose.rocm.yml` file
+3. Ensure ROCm drivers are properly installed on the host
+
+### ARM64 / Apple Silicon
+
+- XTTS has CPU-only support on ARM64 and will be **very slow**
+- Use the Piper-only image (`docker-compose.min.yml`) for acceptable performance on ARM devices
+- Apple M-series chips work but benefit from the minimal image
+
+### Container Networking
+
+If using Docker networks:
+```yaml
+# Add to your Docker Compose
+networks:
+  webui-network:
+    driver: bridge
+```
+
+Then reference `http://openedai-speech:8000/v1` instead of `localhost`.
+
+For more troubleshooting tips, see the [Audio Troubleshooting Guide](/troubleshooting/audio).
+
 ## FAQ
 
 **How can I control the emotional range of the generated audio?**

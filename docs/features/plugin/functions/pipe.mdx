@@ -1,10 +1,14 @@
 ---
-sidebar_position: 1
+sidebar_position: 4
 title: "Pipe Function"
 ---
 
 # 🚰 Pipe Function: Create Custom "Agents/Models"
 Welcome to this guide on creating **Pipes** in Open WebUI! Think of Pipes as a way to **adding** a new model to Open WebUI. In this document, we'll break down what a Pipe is, how it works, and how you can create your own to add custom logic and processing to your Open WebUI models. We'll use clear metaphors and go through every detail to ensure you have a comprehensive understanding.
+
+:::warning Use Async Functions for Future Compatibility
+Pipe functions should generally be defined as `async` to ensure compatibility with future Open WebUI versions. The backend is progressively moving toward fully async execution, and synchronous functions may block execution or cause issues in future releases. When in doubt, make your `pipe` function async.
+:::
 
 ## Introduction to Pipes
 

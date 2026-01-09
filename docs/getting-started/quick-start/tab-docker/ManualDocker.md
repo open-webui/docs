@@ -23,7 +23,7 @@ docker pull ghcr.io/open-webui/open-webui:main-slim
 You can also pull a specific Open WebUI release version directly by using a versioned image tag. This is recommended for production environments to ensure stable and reproducible deployments.
 
 ```bash
-docker pull ghcr.io/open-webui/open-webui:v0.6.42
+docker pull ghcr.io/open-webui/open-webui:v0.7.0
 ```
 
 ## Step 2: Run the Container

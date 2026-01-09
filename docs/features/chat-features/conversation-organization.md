@@ -1,62 +1,129 @@
 ---
 sidebar_position: 4
-title: "Organizing Conversations"
+title: "Folders & Projects"
 ---
 
-Open WebUI provides powerful organization features that help users manage their conversations. You can easily categorize and tag conversations, making it easier to find and retrieve them later. The two primary ways to organize conversations are through **Folders** and **Tags**.
+# Folders & Projects
 
-## Folders: From Simple Organization to Powerful Projects
+Open WebUI provides powerful folder-based organization that turns simple chat containers into full-featured **project workspaces**. Folders allow you to not only group related conversations but also define specific contexts, system prompts, and knowledge bases that apply to all chats within them.
 
-Folders in Open WebUI have evolved from simple containers into powerful, project-like workspaces. They allow you to not only group related conversations but also to define specific contexts, instructions, and knowledge bases for those conversations.
+## Enabling Folders
 
-### Basic Folder Operations
+Folders are enabled by default. Administrators can control this feature via:
 
-At their core, folders still allow you to keep your chat list tidy:
+- **Admin Panel**: The folders feature is controlled globally alongside other features.
+- **Environment Variable**: [`ENABLE_FOLDERS`](/getting-started/env-configuration#enable_folders) - Set to `True` (default) to enable or `False` to disable.
 
-- **Creating a Folder**: You can create a new folder to store specific conversations. This is useful if you want to keep conversations of a similar topic or purpose together.
-- **Moving Conversations into Folders**: Existing conversations can be moved into folders by dragging and dropping them. This allows you to structure your workspace in a way that suits your workflow.
+## Core Features
 
-![Folder Demo](/images/folder-demo.gif)
+### Creating Folders
 
-### Starting a Chat within a Folder
+Create a new folder to organize your conversations:
 
-By simply clicking on a folder in the sidebar, you select the folder as your space to start a chat in. The main chat interface will then update to show that you selected that folder and any new chat you start will now automatically be created inside this folder, inheriting its unique settings.
+1. In the **sidebar**, click the **+ button** next to "Chats" or right-click in the chat list.
+2. Select **"New Folder"**.
+3. Enter a name for your folder.
+4. Click **Save**.
 
-### Editing Folder Settings: System Prompts & Knowledge
+### Moving Conversations into Folders
 
-You can give each folder a unique personality and context. By hovering over a folder, clicking the three-dot menu, and selecting **"Edit"**, you will open the folder's settings modal popup. Here, you can configure:
+Organize existing chats by moving them into folders:
 
-- **Folder Name**: Change the name of your folder to better reflect its purpose.
-- **System Prompt**: Optionally assign a dedicated System Prompt to the folder. This prompt is automatically prepended to every new conversation and message created within that folder, tailoring the AI's behavior for specific tasks. You can still use folders for organization without a system prompt.
-- **Attached Knowledge**: Link one or more knowledge bases to your folder. Any files attached here will automatically be included as context in all new chats within that project folder. This is also optional; you can still use folders for organization, without attaching extra knowledge bases.
+- **Drag and Drop**: Click and drag any conversation from the sidebar into a folder.
+- **Right-click Menu**: Right-click on a conversation and select "Move to Folder".
 
-### Example Use Case
+### Nested Folders
 
-:::tip
+Folders can be nested within other folders to create hierarchical organization:
 
-**Creating a 'Python Expert' Project**
-Imagine you are working on a Python project. You can create a folder called "Python Expert".
+- Drag a folder onto another folder to make it a subfolder.
+- Use the right-click menu to move folders between parent folders.
+- Folders can be expanded or collapsed to show/hide their contents.
 
-1. **Edit the folder** and set the System Prompt to something like: `You are an expert Python developer. You provide clean, efficient, and well-documented code. When asked for code, you prioritize clarity and adherence to PEP 8 standards.`
-2. **Attach Knowledge** by linking a knowledge base which contains a PDF of your project's technical specification, or a specific library's documentation.
-3. **Activate/Select the folder** by clicking on it.
-4. Now, any new chat you start will automatically have this expert persona, the context of your documents and is saved within the folder, ensuring you get highly relevant and specialized assistance for your project.
+### Starting a Chat in a Folder
+
+When you click on a folder in the sidebar, it becomes your **active workspace**:
+
+1. Click on any folder in the sidebar to select it.
+2. The chat interface will show that folder is active.
+3. Any new chat you start will automatically be created inside this folder.
+4. New chats will **inherit the folder's settings** (system prompt and knowledge).
+
+## Folder Settings (Project Configuration)
+
+Folders can be configured as full project workspaces with their own AI behavior and context. To edit folder settings:
+
+1. Hover over a folder in the sidebar.
+2. Click the **three-dot menu** (⋯).
+3. Select **"Edit"** to open the folder settings modal.
+
+### Folder Name
+
+Change the name of your folder to better reflect its purpose or project.
+
+### Folder Background Image
+
+Customize the visual appearance of your folder by uploading a background image. This helps visually distinguish different projects in your workspace.
+
+### System Prompt
+
+Assign a dedicated **System Prompt** to the folder that automatically applies to all conversations within it:
+
+- The system prompt is **prepended to every new conversation** created in the folder.
+- This tailors the AI's behavior for specific tasks or personas.
+- System prompts are optional—you can use folders purely for organization without one.
+
+:::info
+
+The System Prompt field is only visible if you have permission to set system prompts (controlled by admin settings).
 
 :::
 
-## Tagging Conversations
+### Attached Knowledge
 
-Tags provide an additional layer of organization by allowing you to label conversations with keywords or phrases.
+Link **knowledge bases and files** to your folder:
 
-- **Adding Tags to Conversations**: Tags can be applied to conversations based on their content or purpose. Tags are flexible and can be added or removed as needed.
-![Tag Demo](/images/tag-demo.gif)
-- **Using Tags for Searching**: Tags make it easy to locate specific conversations by using the search feature. You can filter conversations by tags to quickly find those related to specific topics.
+- All attached files and knowledge bases are automatically included as **context** for every chat in the folder.
+- This enables RAG (Retrieval Augmented Generation) for all folder conversations.
+- Knowledge is optional—folders work for organization without any attached files.
 
-### Example Use Case
+## Example Use Case
 
-:::tip
+:::tip **Creating a "Python Expert" Project**
 
-**Tagging by Topic**
-If you frequently discuss certain topics, such as "marketing" or "development," you can tag conversations with these terms. Later, when you search for a specific tag, all relevant conversations will be quickly accessible.
+Imagine you're working on a Python development project:
+
+1. **Create a folder** named "Python Expert".
+2. **Edit the folder** and set the System Prompt:
+   ```
+   You are an expert Python developer. You provide clean, efficient, and well-documented code. When asked for code, prioritize clarity and adherence to PEP 8 standards.
+   ```
+3. **Attach Knowledge** by linking your project's technical specification PDF or library documentation.
+4. **Click on the folder** to select it as your active workspace.
+5. **Start chatting** — every new conversation will have:
+   - The expert Python persona
+   - Access to your project documents
+   - Automatic organization in the folder
 
 :::
+
+## Tags (Complementary Organization)
+
+In addition to folders, **tags** provide a flexible labeling system for conversations:
+
+- **Adding Tags**: Apply keyword labels to conversations based on content or purpose.
+- **Searching by Tags**: Filter conversations by tags using the search feature.
+- **Flexible Organization**: Tags can be added or removed at any time and don't affect folder structure.
+
+:::tip **Tagging by Topic**
+
+If you frequently discuss topics like "marketing" or "development," tag conversations with these terms. When you search for a specific tag, all relevant conversations are quickly accessible regardless of which folder they're in.
+
+:::
+
+## Related Configuration
+
+| Setting | Description |
+|---------|-------------|
+| [`ENABLE_FOLDERS`](/getting-started/env-configuration#enable_folders) | Enable/disable the folders feature globally (Default: `True`) |
+| [`USER_PERMISSIONS_FEATURES_FOLDERS`](/getting-started/env-configuration#user_permissions_features_folders) | Control user-level access to the folders feature (Default: `True`) |

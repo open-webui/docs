@@ -12,7 +12,7 @@ This guide addresses common issues encountered when deploying Open WebUI in **mu
 Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
 
 1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/getting-started/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
-2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/getting-started/env-configuration#database_server)). SQLite is **NOT** supported for multiple instances.
+2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/getting-started/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
 3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/getting-started/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/getting-started/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/getting-started/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
 5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/getting-started/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
@@ -116,6 +116,18 @@ The `/app/backend/data` directory is not shared or is not consistent across repl
 - **Kubernetes:** Use a `PersistentVolumeClaim` with `ReadWriteMany` (RWX) access mode if your storage provider supports it (e.g., NFS, CephFS, AWS EFS).
 - **Docker Swarm/Compose:** Mount a shared volume (e.g., NFS mount) to `/app/backend/data` on all containers.
 
+### 6. Slow Performance in Cloud vs. Local Kubernetes
+
+**Symptoms:**
+- Open WebUI performs well locally but experiences significant degradation or timeouts when deployed to cloud providers (AKS, EKS, GKE).
+- Performance drops sharply under concurrent load despite adequate resource allocation.
+
+**Cause:**
+This is typically caused by infrastructure latency (Network Latency to the database or Disk I/O latency for SQLite) that is inherently higher in cloud environments compared to local NVMe/SSD storage and local networks.
+
+**Solution:**
+Refer to the **[Cloud Infrastructure Latency](/tutorials/tips/performance#%EF%B8%8F-cloud-infrastructure-latency)** section in the Performance Guide for a detailed breakdown of diagnosis and mitigation strategies.
+
 ---
 
 ## Deployment Best Practices
@@ -123,16 +135,27 @@ The `/app/backend/data` directory is not shared or is not consistent across repl
 ### Updates and Migrations
 
 :::danger Critical: Avoid Concurrent Migrations
-**Always scale down to 1 replica (and 1 worker) before upgrading Open WebUI versions.**
+**Always ensure only one process is running database migrations when upgrading Open WebUI versions.**
 :::
 
-Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, leading to race conditions or database schema corruption.
+Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, potentially leading to race conditions or database schema corruption.
 
 **Safe Update Procedure:**
-1.  **Scale Down:** Set replicas to `1` (and ensure `UVICORN_WORKERS=1` if you customized it).
-2.  **Update Image:** Application restarts with the new version.
-3.  **Wait for Health Check:** Ensure the single instance starts up fully and completes DB migrations.
-4.  **Scale Up:** Increase replicas (or `UVICORN_WORKERS`) back to your desired count.
+
+There are two ways to safely handle migrations in a multi-replica environment:
+
+#### Option 1: Designate a Master Migration Pod (Recommended)
+1.  Identify one pod/replica as the "master" for migrations.
+2.  Set `ENABLE_DB_MIGRATIONS=True` (default) on the master pod.
+3.  Set `ENABLE_DB_MIGRATIONS=False` on all other pods.
+4.  When updating, the master pod will handle the database schema update while other pods skip the migration step.
+
+#### Option 2: Scale Down During Update
+1.  **Scale Down:** Set replicas to `1` (and ensure `UVICORN_WORKERS=1`).
+2.  **Update Image:** Update the image or version.
+3.  **Wait for Health Check:** Wait for the single instance to start fully and complete migrations.
+4.  **Scale Up:** Increase replicas back to your desired count.
+
 
 ### Session Affinity (Sticky Sessions)
 While Open WebUI is designed to be stateless with proper Redis configuration, enabling **Session Affinity** (Sticky Sessions) at your Load Balancer / Ingress level can improve performance and reduce occasional jitter in WebSocket connections.
@@ -145,6 +168,7 @@ While Open WebUI is designed to be stateless with proper Redis configuration, en
 ## Related Documentation
 
 - [Environment Variable Configuration](/getting-started/env-configuration)
+- [Optimization, Performance & RAM Usage](/tutorials/tips/performance)
 - [Troubleshooting Connection Errors](/troubleshooting/connection-error)
 - [Logging Configuration](/getting-started/advanced-topics/logging)
 
