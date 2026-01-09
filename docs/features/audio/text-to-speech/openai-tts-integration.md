@@ -118,6 +118,20 @@ services:
 2. Send a message to any model
 3. Click the **speaker icon** on the AI response to hear it read aloud
 
+## Response Splitting
+
+When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Admin Panel > Settings > Audio** under **Response Splitting**.
+
+| Option | Description |
+|--------|-------------|
+| **Punctuation** (default) | Splits at sentence boundaries: periods (`.`), exclamation marks (`!`), question marks (`?`), and newlines. Best for natural pacing. |
+| **Paragraphs** | Splits only at paragraph breaks (double newlines). Results in longer audio chunks. |
+| **None** | Sends the entire response as one chunk. May cause delays before audio starts on long responses. |
+
+:::tip
+**Punctuation** mode is recommended for most use cases. It provides the best balance of streaming performance (audio starts quickly) and natural speech pacing.
+:::
+
 ## Troubleshooting
 
 ### No Audio Plays
