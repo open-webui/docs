@@ -27,6 +27,7 @@ Most of these settings can also be configured in the **Admin Panel → Settings 
 | `WHISPER_MODEL_DIR` | Directory to store Whisper model files | `{CACHE_DIR}/whisper/models` |
 | `WHISPER_COMPUTE_TYPE` | Compute type for inference (see note below) | `int8` |
 | `WHISPER_LANGUAGE` | ISO 639-1 language code (empty = auto-detect) | empty |
+| `WHISPER_MULTILINGUAL` | Use the multilingual Whisper model | `false` |
 | `WHISPER_MODEL_AUTO_UPDATE` | Auto-download model updates | `false` |
 | `WHISPER_VAD_FILTER` | Enable Voice Activity Detection filter | `false` |
 

@@ -93,6 +93,7 @@ For smaller models like Whisper, CPU mode often provides comparable performance 
 #### Poor Recognition Accuracy
 
 - **Set the language explicitly** using `WHISPER_LANGUAGE=en` (uses ISO 639-1 codes)
+- **Toggles multilingual support** — Use `WHISPER_MULTILINGUAL=true` if you need to support languages other than English. When disabled (default), only the English-only variant of the model is used for better performance in English tasks.
 - **Use a larger Whisper model** — options: `tiny`, `base`, `small`, `medium`, `large`
 - Larger models are more accurate but slower
 
