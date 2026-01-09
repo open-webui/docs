@@ -155,10 +155,11 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
 | **Knowledge Base** | | |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
+| `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. | Always available. |
 | `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
+| `query_knowledge_files` | Search internal knowledge base files using semantic/vector search. This should be your first choice for finding information before searching the web. | Always available. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
-| `query_knowledge_bases` | Search internal knowledge bases using semantic/vector search. Should be your first choice for finding information before searching the web. | Always available. |
 | **Image Gen** | | |
 | `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled. |
 | `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
@@ -227,7 +228,7 @@ Interleaved thinking requires models with strong reasoning capabilities. This fe
 
 This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
 1.  **Reason**: Analyze the user's intent and identify information gaps.
-2.  **Act**: Call a tool (e.g., `query_knowledge_bases` for internal docs or `search_web` and `fetch_url` for web research).
+2.  **Act**: Call a tool (e.g., `query_knowledge_files` for internal docs or `search_web` and `fetch_url` for web research).
 3.  **Think**: Read the tool's output and update its internal understanding.
 4.  **Iterate**: If the answer isn't clear, call another tool (e.g., `view_knowledge_file` to read a specific document or `fetch_url` to read a specific page) or refine the search.
 5.  **Finalize**: Only after completing this "Deep Research" cycle does the model provide a final, grounded answer.

@@ -37,7 +37,7 @@ You can also edit the LLM's response and enter your image generation prompt as t
 
 :::info
 **Legacy "Generate Image" Button:**
-As of Open WebUI v0.7, the native "Generate Image" button (which allowed generating an image directly from a message's content) was removed. If you wish to restore this functionality, you can use the community-built **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)**.
+As of Open WebUI v0.7.0, the native "Generate Image" button (which allowed generating an image directly from a message's content) was removed. If you wish to restore this functionality, you can use the community-built **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)**.
 :::
 
 ## Restoring the "Generate Image" Button
