@@ -332,6 +332,28 @@ docker run -d \
 
 For complete Watchtower documentation, visit https://watchtower.nickfedor.com/
 
+#### containrrr/watchtower (Not Maintained)
+
+You can use [Watchtower](https://containrrr.dev/watchtower/) to automate the update process for Open WebUI. Here are three options:
+
+##### One-time Update
+
+You can run Watchtower as a one-time update to stop the current container, pull the latest image, and start a new container with the updated image and existing volume attached (**For Nvidia GPU support, add `--gpus all` to the docker run command**):
+
+```bash
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once open-webui
+```
+
+##### Running Watchtower as a Separate Container
+
+You can run Watchtower as a separate container that watches and updates your Open WebUI container:
+
+```bash
+docker run -d --name watchtower \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  containrrr/watchtower -i 300 open-webui
+```
+
 ### Option 2: What's Up Docker (WUD)
 
 What's Up Docker (WUD) is a notification-focused alternative that doesn't automatically update containers but instead provides a web UI to monitor updates and trigger them manually.
