@@ -131,13 +131,30 @@ Refer to the **[Cloud Infrastructure Latency](/tutorials/tips/performance#%EF%B8
 
 ### 7. Optimizing Database Performance
 
-For PostgreSQL deployments with adequate resources, enabling database session sharing can improve performance under high concurrency:
+For PostgreSQL deployments with adequate resources, consider these optimizations:
+
+#### Database Session Sharing
+
+Enabling session sharing can improve performance under high concurrency:
 
 ```bash
 DATABASE_ENABLE_SESSION_SHARING=true
 ```
 
 See [DATABASE_ENABLE_SESSION_SHARING](/getting-started/env-configuration#database_enable_session_sharing) for details.
+
+#### Connection Pool Sizing
+
+If you experience `QueuePool limit reached` errors or connection timeouts under high concurrency, increase the pool size:
+
+```bash
+DATABASE_POOL_SIZE=15 (or higher)
+DATABASE_POOL_MAX_OVERFLOW=20 (or higher)
+```
+
+**Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keep the combined total under 50-80 per Open WebUI instance to leave room for other clients and maintenance operations.
+
+See [DATABASE_POOL_SIZE](/getting-started/env-configuration#database_pool_size) for details.
 
 ---
 
