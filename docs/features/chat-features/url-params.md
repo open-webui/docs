@@ -22,6 +22,7 @@ The following table lists the available URL parameters, their function, and exam
 | `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions. | `/?temporary-chat=true`          |
 | `code-interpreter`    | Enables the code interpreter feature if set to `true`. | `/?code-interpreter=true`        |
 | `image-generation`    | Enables the image generation feature if set to `true`. | `/?image-generation=true`        |
+| `hide`                | Hides parts of the UI, specified as a comma-separated list. Supported values: `nav`, `sidebar`. | `/?hide=nav,sidebar`             |
 
 ### 1. **Models and Model Selection**
 
@@ -95,6 +96,18 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?image-generation=true`
 - **Behavior**: Activates the image generation button to generate an image.
 
+### 11. **Hide UI Elements**
+
+- **Description**: The `hide` parameter allows you to hide parts of the UI to create a clean focused chat interface.
+- **How to Set**: Provide a comma-separated list of UI elements to hide. Supported values are:
+  - `nav` - Hides the navigation bar on the top
+  - `sidebar` - Hides the sidebar
+- **Example**:
+  - `/?hide=nav` - Hides only the navigation bar
+  - `/?hide=sidebar` - Hides only the sidebar
+  - `/?hide=nav,sidebar` - Hides both the navigation bar and sidebar
+- **Behavior**: The specified UI elements are hidden.
+
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
 <!-- markdownlint-disable-next-line MD033 -->
@@ -113,7 +126,7 @@ Suppose a user wants to initiate a quick chat session without saving the history
 These URL parameters can be combined to create highly customized chat sessions. For example:
 
 ```bash
-/?models=model1,model2&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
+/?models=model1,model2&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true&hide=nav,sidebar
 ```
 
 This URL will:
@@ -123,3 +136,4 @@ This URL will:
 - Display a call overlay.
 - Set an initial prompt of "Hello there."
 - Mark the chat as temporary, avoiding any history saving.
+- Hide the navigation bar and sidebar for a cleaner interface.
