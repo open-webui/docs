@@ -112,6 +112,15 @@ If you upgraded to v0.7.0 and experienced slow admin page loads, API timeouts, o
 
 :::
 
+### Connection Pool Sizing
+
+For high-concurrency PostgreSQL deployments, the default connection pool settings may be insufficient. If you experience `QueuePool limit reached` errors or connection timeouts, increase the pool size:
+
+-   **Env Var**: `DATABASE_POOL_SIZE=15` (default: uses SQLAlchemy defaults)
+-   **Env Var**: `DATABASE_POOL_MAX_OVERFLOW=20` (default: 0)
+
+**Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keep the combined total under 50-80 per Open WebUI instance to leave room for other clients and maintenance operations.
+
 ### Vector Database (RAG)
 For multi-user setups, the choice of Vector DB matters.
 
