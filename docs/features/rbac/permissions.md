@@ -4,12 +4,13 @@ title: "Permissions"
 ---
 
 
-The `Permissions` section of the `Workspace` within Open WebUI allows administrators to configure access controls and feature availability for users. This powerful system enables fine-grained control over what users can access and modify within the application.
+Open WebUI provides a flexible permissions system that allows administrators to configure access controls and feature availability for users. This enables fine-grained control over what users can access and modify within the application.
 
-Administrators can manage permissions in three primary ways:
-1.  **Global Default Permissions:** Set the baseline permissions for all user accounts via the Admin Panel.
-2.  **Group Permissions:** Create groups with specific permission overrides (e.g., a "Power Users" group with access to image generation).
-3.  **Role-Based Access:** The `Pending` role has no access, `Admin` has full access, and `User` is subject to the permission system.
+Administrators can manage permissions in two primary ways:
+1.  **Default Permissions:** Set the baseline permissions that apply to all users (including admins) via **Admin Panel > Users > Groups > Default Permissions**.
+2.  **Group Permissions:** Create groups with specific permission overrides via **Admin Panel > Users > Groups** (e.g., a "Power Users" group with access to image generation).
+
+Users with the `Pending` role have no access until approved, `Admin` users have full administrative access, and `User` accounts are subject to the permission system described below.
 
 :::info Permission Logic
 Permissions in Open WebUI are **additive**.
@@ -20,7 +21,7 @@ Permissions in Open WebUI are **additive**.
 
 :::tip Best Practice: Principle of Least Privilege
 Since permissions are **additive**, the recommended security strategy is to start with **Restriction**:
-1.  **minimize Global Default Permissions**: Configure the default permissions (Admin > Settings > Users) to include *only* what absolutely every user should have.
+1.  **minimize Global Default Permissions**: Configure the default permissions (**Admin Panel > Users > Groups > Default Permissions**) to include *only* what absolutely every user should have.
 2.  **Grant via Groups**: Create specific groups (e.g., "Creators", "Power Users") to explicitly **grant** advanced features like Image Generation or File Uploads.
 
 This approach ensures that new users don't accidentally get access to sensitive features, while allowing you to easily promote users by simply adding them to the relevant group.
@@ -28,7 +29,7 @@ This approach ensures that new users don't accidentally get access to sensitive 
 
 ## Permission Categories
 
-Permissions are organized into four main categories: **Workspace**, **Sharing**, **Chat**, and **Features**.
+Permissions are organized into five main categories: **Workspace**, **Sharing**, **Chat**, **Features**, and **Settings**.
 
 ### 1. Workspace Permissions
 Controls access to the "Workspace" section where users create and manage resources.
@@ -101,33 +102,43 @@ Controls access to broad platform capabilities.
 | **Image Generation** | Ability to use Image Generation tools. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
+| **Memories** | Access to the Memories feature for persistent user context. |
 
-:::warning API Keys Security & Admin Access
-The **API Keys** permission (`features.api_keys`) is treated with higher security and works differently than other features:
+### 5. Settings Permissions
+Controls access to user settings areas.
 
-1.  **Global Toggle Required**: 
-    The feature must be enabled globally in **Admin Settings > General > Enable API Keys**. If this is off, *no one* (not even groups with permission) can generate keys.
+| Permission | Description |
+| :--- | :--- |
+| **Interface Settings Access** | Ability to access and modify interface settings in user settings. |
 
-2.  **Permission Check Required**: 
-    In addition to the global toggle, the user must look for the permission `features.api_keys`.
+:::warning Permissions That Apply to Admins
 
-3.  **Admins Are Not Exempt**: 
-    Unlike most other permissions which Admins bypass, **Administrators require this permission** to generate API keys. They are subject to the same checks as regular users for this critical security feature.
+Certain permissions apply to **all users including administrators**. Currently, this includes:
 
-**Recommended "Least Privilege" Configuration**:
-*   **Step 1**: Disable `API Keys` in **Global Default Permissions** (so new users don't get it by default).
-*   **Step 2**: Create a specific Group (e.g., `🔐 API Users`) with `API Keys` enabled.
-*   **Step 3**: Manually add specific users—including yourself/Admins—to this group to grant access.
+- **API Keys** (`features.api_keys`) — Administrators must have this permission to generate API keys, just like regular users.
+
+**More permissions may be added to this category in future versions.** As Open WebUI evolves, additional security-sensitive features may require explicit permission grants even for admins.
+
+**API Keys Specifics:**
+1.  **Global Toggle Required**: The feature must be enabled globally in **Admin Settings > General > Enable API Keys**. If this is off, *no one* can generate keys.
+2.  **Permission Check Required**: The user must have the `features.api_keys` permission.
+3.  **Admins Are Not Exempt**: Administrators are subject to the same permission checks as regular users for this feature.
+
 :::
 
-## Managing Permissions
+:::tip Best Practice: Create an Admin Group
 
-Administrators can adjust these permissions through the **Admin Panel > Settings > Users > Permissions**.
+**To prepare for future permission changes, create a dedicated group for administrators:**
 
-*   **Default Permissions**: Changing settings here applies to all users immediately, unless they are granted the permission via a Group.
-*   **Group Permissions**: Go to **Admin Panel > Groups**, verify a group, and edit its permissions. Group permissions override the default (e.g., if "Image Generation" is disabled by default, a "Creative User" group can have it enabled).
+1.  **Create an "Administrators" group** via **Admin Panel > Users > Groups**
+2.  **Add all admin users** to this group
+3.  **Grant necessary permissions** to the group (e.g., API Keys, and any future admin-applicable permissions)
 
-### Environment Variables
+This approach ensures that when new permissions are added that apply to admins, you can easily grant them to all administrators via the group rather than modifying individual user settings. It also provides fine-grained control over which admins have access to which features.
+
+:::
+
+## Environment Variables
 
 While the UI is the recommended way to manage permissions, initial defaults can be set via environment variables. These are typically prefixed with `USER_PERMISSIONS_`.
 *   `ENABLE_IMAGE_GENERATION=True`
