@@ -104,17 +104,17 @@ You can specify different input types to build rich, user-friendly forms. Here i
 | :--- | :--- | :--- | :--- |
 | **text** | A standard single-line text input field, perfect for capturing short pieces of information like names, titles, or single-sentence summaries. This is the **default type if no other is specified**. | `placeholder`, `default`, `required` | `{{name \| text:placeholder="Enter name":required}}` |
 | **textarea**| A multi-line text area designed for capturing longer blocks of text, such as detailed descriptions, article content, or code snippets. | `placeholder`, `default`, `required` | `{{description \| textarea:required}}` |
-| **select** | A dropdown menu that presents a predefined list of choices. This is ideal for ensuring consistent input for things like status, priority, or categories. | `options` (JSON array), `default`, `required` | `{{priority \| select:options=["High","Medium","Low"]:required}}` |
-| **number** | An input field that is restricted to numerical values only. Useful for quantities, ratings, or any other numeric data. | `placeholder`, `default`, `required` | `{{count \| number:default=5}}` |
-| **checkbox**| A simple checkbox that represents a true or false (boolean) value. It's perfect for on/off toggles, like 'Include a conclusion?' or 'Mark as urgent?'. | `default` (boolean), `required` | `{{include_details \| checkbox}}` |
-| **date** | A calendar-based date picker that allows users to easily select a specific day, month, and year, ensuring a standardized date format. | `default` (YYYY-MM-DD), `required` | `{{start_date \| date:required}}` |
-| **datetime-local**| A specialized picker that allows users to select both a specific date and a specific time. Great for scheduling appointments or logging event timestamps. | `default`, `required` | `{{appointment \| datetime-local}}` |
+| **select** | A dropdown menu that presents a predefined list of choices. This is ideal for ensuring consistent input for things like status, priority, or categories. | `options` (JSON array), `placeholder`, `default`, `required` | `{{priority \| select:options=["High","Medium","Low"]:placeholder="Choose priority":required}}` |
+| **number** | An input field that is restricted to numerical values only. Useful for quantities, ratings, or any other numeric data. | `placeholder`, `min`, `max`, `step`, `default`, `required` | `{{count \| number:min=1:max=100:default=5}}` |
+| **checkbox**| A simple checkbox that represents a true or false (boolean) value. It's perfect for on/off toggles, like 'Include a conclusion?' or 'Mark as urgent?'. | `label`, `default` (boolean), `required` | `{{include_details \| checkbox:label="Include detailed analysis"}}` |
+| **date** | A calendar-based date picker that allows users to easily select a specific day, month, and year, ensuring a standardized date format. | `placeholder`, `default` (YYYY-MM-DD), `required` | `{{start_date \| date:required}}` |
+| **datetime-local**| A specialized picker that allows users to select both a specific date and a specific time. Great for scheduling appointments or logging event timestamps. | `placeholder`, `default`, `required` | `{{appointment \| datetime-local}}` |
 | **color** | A visual color picker that allows the user to select a color or input a standard hex code (e.g., #FF5733). Useful for design and branding prompts. | `default` (hex code), `required` | `{{brand_color \| color:default="#FFFFFF"}}` |
 | **email** | An input field specifically formatted and validated for email addresses, ensuring the user provides a correctly structured email. | `placeholder`, `default`, `required` | `{{recipient_email \| email:required}}` |
-| **month** | A picker that allows users to select a specific month and year, without needing to choose a day. Useful for billing cycles, reports, or timelines. **Note:** This input type is only natively supported in Chrome and Edge. In Firefox and Safari, it will display as a plain text input instead of a month picker. | `default`, `required` | `{{billing_month \| month}}` |
+| **month** | A picker that allows users to select a specific month and year, without needing to choose a day. Useful for billing cycles, reports, or timelines. **Note:** This input type is only natively supported in Chrome and Edge. In Firefox and Safari, it will display as a plain text input instead of a month picker. | `placeholder`, `default`, `required` | `{{billing_month \| month}}` |
 | **range** | A slider control that allows the user to select a numerical value from within a defined minimum and maximum range. Ideal for satisfaction scores or percentage adjustments. | `min`, `max`, `step`, `default`, `required` | `{{satisfaction \| range:min=1:max=10}}` |
 | **tel** | An input field designed for telephone numbers. It semantically indicates the expected input type for browsers and devices. | `placeholder`, `default`, `required` | `{{phone_number \| tel}}` |
-| **time** | A picker for selecting a time. Useful for scheduling meetings, logging events, or setting reminders without an associated date. | `default`, `required` | `{{meeting_time \| time}}` |
+| **time** | A picker for selecting a time. Useful for scheduling meetings, logging events, or setting reminders without an associated date. | `placeholder`, `default`, `required` | `{{meeting_time \| time}}` |
 | **url** | An input field for web addresses (URLs). It helps ensure that the user provides a link, which can be useful for prompts that analyze websites or reference online sources. | `placeholder`, `default`, `required` | `{{website \| url:required}}` |
 | **map** | **(Experimental)** An interactive map interface that lets users click to select geographic coordinates. This is a powerful tool for location-based prompts. | `default` (e.g., "51.5,-0.09"), `required` | `{{location \| map}}` |
 
@@ -134,7 +134,7 @@ Create a reusable prompt where the article content is required but additional pa
 
     {{focus_area | text:placeholder="Any specific aspect to focus on? (optional)"}}
 
-    {{include_quotes | checkbox}} Include key quotes from the article
+    {{include_quotes | checkbox:label="Include key quotes from the article"}}
     ```
 
     When you type `/summarize_article`, a modal will appear with a required text area for the article, and optional fields for customizing the summary style.
@@ -177,7 +177,7 @@ This prompt generates tailored content with required core information and option
     **Tone of Voice:** {{tone | select:options=["Professional","Casual","Humorous","Inspirational"]:default="Professional"}}
     **Call to Action:** {{cta | text:placeholder="e.g., 'Learn more', 'Sign up today'"}}
     **Character Limit:** {{char_limit | number:placeholder="Leave blank for platform default"}}
-    **Include Hashtags:** {{include_hashtags | checkbox:default=true}}
+    **Include Hashtags:** {{include_hashtags | checkbox:label="Add relevant hashtags":default=true}}
 
     Please create an engaging post optimized for the selected platform.
     ```
