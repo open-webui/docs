@@ -224,6 +224,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_read_timeout 10m;
             proxy_buffering off;
+            proxy_cache off;
             client_max_body_size 20M;
 
             proxy_no_cache 1;
@@ -257,6 +258,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_read_timeout 10m;
             proxy_buffering off;
+            proxy_cache off;
             client_max_body_size 20M;
 
             add_header Cache-Control "public, max-age=300, must-revalidate";

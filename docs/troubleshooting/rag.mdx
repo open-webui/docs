@@ -193,4 +193,124 @@ If your initial response is fast but follow-up questions become increasingly slo
 
 ---
 
+### 9. API File Upload: "The content provided is empty" Error
+
+When uploading files via the API and immediately adding them to a knowledge base, you may encounter:
+
+```
+400: The content provided is empty. Please ensure that there is text or data present before proceeding.
+```
+
+**The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously—the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
+
+✅ **Solution: Wait for Processing to Complete**
+
+Before adding a file to a knowledge base, poll the status endpoint until processing is complete:
+
+```python
+import requests
+import time
+
+def wait_for_processing(token, file_id, timeout=300):
+    url = f'http://localhost:3000/api/v1/files/{file_id}/process/status'
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        response = requests.get(url, headers=headers)
+        status = response.json().get('status')
+        
+        if status == 'completed':
+            return True
+        elif status == 'failed':
+            raise Exception(f"Processing failed: {response.json().get('error')}")
+        
+        time.sleep(2)  # Poll every 2 seconds
+    
+    raise TimeoutError("File processing timed out")
+```
+
+**Status Values:**
+| Status | Meaning |
+|--------|---------|
+| `pending` | Still processing |
+| `completed` | Ready to add to knowledge base |
+| `failed` | Processing failed (check error field) |
+
+:::tip
+For complete API workflow examples including proper status checking, see the [API Endpoints documentation](/getting-started/api-endpoints#checking-file-processing-status).
+:::
+
+---
+
+### 10. CUDA Out of Memory During Embedding 💥🎮
+
+When processing large files or many files in sequence, you may encounter CUDA OOM errors like:
+
+```
+CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB of which Z MiB is free.
+```
+
+**Common Causes:**
+- Embedding model competing with chat model for GPU memory
+- PyTorch memory fragmentation from repeated small allocations
+- Large documents creating memory spikes during embedding
+
+✅ **Solutions:**
+
+1. **Isolate Embedding to a Different GPU** (if available):
+   Set `CUDA_VISIBLE_DEVICES` to pin embedding to a specific GPU separate from your chat model.
+
+2. **Reduce Embedding Batch Size**:
+   Lower `RAG_EMBEDDING_BATCH_SIZE` (e.g., from 32 to 8 or 4) to reduce peak memory usage.
+
+3. **Enable Expandable Segments**:
+   Set the environment variable to reduce fragmentation:
+   ```
+   PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+   ```
+
+4. **Restart Between Large Ingestion Jobs**:
+   If memory fragmentation builds up, restart the Open WebUI container to clear CUDA contexts.
+
+5. **Use Smaller Embedding Models**:
+   Consider using lighter embedding models for bulk ingestion, then switch to higher-quality models for production queries.
+
+6. **Separate Ingestion from Chat**:
+   Don't run the chat model during large ingestion jobs. Load the chat model after embeddings finish.
+
+---
+
+### 11. PDF OCR Not Extracting Text from Images 📷❌
+
+If PDFs containing images with text are returning empty content:
+
+**The Problem**: The default "pypdf" content extractor may struggle with certain PDF formats, especially those containing primarily image-based content.
+
+✅ **Solutions:**
+
+1. **Use a Different Content Extraction Engine**:
+   - Navigate to **Admin Settings > Documents**
+   - Try **Apache Tika** or **Docling** for better OCR support
+
+2. **Enable PDF Image Extraction**:
+   - In **Admin Settings > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+
+3. **Update pypdf** (if using the default engine):
+   Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
+
+4. **Check for Corrupted PDFs**:
+   Verify the PDF opens correctly in a standard PDF viewer before uploading
+
+---
+
+| Problem | Fix |
+|--------|---------|
+| 📄 API returns "empty content" error | Wait for file processing to complete before adding to knowledge base |
+| 💥 CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
+| 📷 PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
+
+---
+
 By optimizing these areas—extraction, embedding, retrieval, and model context—you can dramatically improve how accurately your LLM works with your documents. Don't let a 2048-token window or weak retrieval pipeline hold back your AI's power 🎯.
+

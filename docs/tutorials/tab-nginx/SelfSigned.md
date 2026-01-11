@@ -36,6 +36,7 @@ Using self-signed certificates is suitable for development or internal use where
             proxy_set_header X-Forwarded-Proto $scheme;
 
             proxy_buffering off;
+            proxy_cache off;
             client_max_body_size 20M;
             proxy_read_timeout 10m;
 
@@ -68,6 +69,7 @@ Using self-signed certificates is suitable for development or internal use where
             proxy_set_header X-Forwarded-Proto $scheme;
 
             proxy_buffering off;
+            proxy_cache off;
 
             client_max_body_size 20M;
             proxy_read_timeout 10m;

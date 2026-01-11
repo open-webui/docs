@@ -38,6 +38,30 @@ proxy_set_header Connection "upgrade";
 
 :::
 
+:::danger Critical: Disable Proxy Buffering for SSE Streaming
+
+**This is the most common cause of garbled markdown and broken streaming responses.**
+
+When Nginx's `proxy_buffering` is enabled (the default!), it re-chunks SSE streams arbitrarily. This breaks markdown tokens across chunk boundaries—for example, `**bold**` becomes `**` + `bold` + `**`—causing corrupted output with visible `##`, `**`, or missing words.
+
+**You MUST include these directives in your Nginx location block:**
+
+```nginx
+# CRITICAL: Disable buffering for SSE streaming
+proxy_buffering off;
+proxy_cache off;
+```
+
+**Symptoms if you forget this:**
+- Raw markdown tokens visible (`##`, `**`, `###`)
+- Bold/heading markers appearing incorrectly
+- Words or sections randomly missing from responses
+- Streaming works perfectly when disabled, breaks when enabled
+
+**Bonus:** Disabling buffering also makes streaming responses **significantly faster**, as content flows directly to the client without Nginx's buffering delay.
+
+:::
+
 Choose the method that best fits your deployment needs.
 
 import Tabs from '@theme/Tabs';

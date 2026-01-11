@@ -134,6 +134,9 @@ The Retrieval Augmented Generation (RAG) feature allows you to enhance responses
 To utilize external data in RAG responses, you first need to upload the files. The content of the uploaded file is automatically extracted and stored in a vector database.
 
 - **Endpoint**: `POST /api/v1/files/`
+- **Query Parameters**:
+  - `process` (boolean, default: `true`): Whether to extract content and compute embeddings
+  - `process_in_background` (boolean, default: `true`): Whether to process asynchronously
 - **Curl Example**:
 
   ```bash
@@ -157,9 +160,107 @@ To utilize external data in RAG responses, you first need to upload the files. T
       return response.json()
   ```
 
+:::warning Async Processing and Race Conditions
+
+By default, file uploads are processed **asynchronously**. The upload endpoint returns immediately with a file ID, but content extraction and embedding computation continue in the background. 
+
+If you attempt to add the file to a knowledge base before processing completes, you will receive a `400` error:
+
+```
+The content provided is empty. Please ensure that there is text or data present before proceeding.
+```
+
+**You must wait for file processing to complete before adding files to knowledge bases.** See the [Checking File Processing Status](#checking-file-processing-status) section below.
+
+:::
+
+#### Checking File Processing Status
+
+Before adding a file to a knowledge base, verify that processing has completed using the status endpoint.
+
+- **Endpoint**: `GET /api/v1/files/{id}/process/status`
+- **Query Parameters**:
+  - `stream` (boolean, default: `false`): If `true`, returns a Server-Sent Events (SSE) stream
+
+**Status Values:**
+| Status | Description |
+|--------|-------------|
+| `pending` | File is still being processed |
+| `completed` | Processing finished successfully |
+| `failed` | Processing failed (check `error` field for details) |
+
+- **Python Example** (Polling):
+
+  ```python
+  import requests
+  import time
+
+  def wait_for_file_processing(token, file_id, timeout=300, poll_interval=2):
+      """
+      Wait for a file to finish processing.
+      
+      Returns:
+          dict: Final status with 'status' key ('completed' or 'failed')
+      
+      Raises:
+          TimeoutError: If processing doesn't complete within timeout
+      """
+      url = f'http://localhost:3000/api/v1/files/{file_id}/process/status'
+      headers = {'Authorization': f'Bearer {token}'}
+      
+      start_time = time.time()
+      while time.time() - start_time < timeout:
+          response = requests.get(url, headers=headers)
+          result = response.json()
+          status = result.get('status')
+          
+          if status == 'completed':
+              return result
+          elif status == 'failed':
+              raise Exception(f"File processing failed: {result.get('error')}")
+          
+          time.sleep(poll_interval)
+      
+      raise TimeoutError(f"File processing did not complete within {timeout} seconds")
+  ```
+
+- **Python Example** (SSE Streaming):
+
+  ```python
+  import requests
+  import json
+
+  def wait_for_file_processing_stream(token, file_id):
+      """
+      Wait for file processing using Server-Sent Events stream.
+      More efficient than polling for long-running operations.
+      """
+      url = f'http://localhost:3000/api/v1/files/{file_id}/process/status?stream=true'
+      headers = {'Authorization': f'Bearer {token}'}
+      
+      with requests.get(url, headers=headers, stream=True) as response:
+          for line in response.iter_lines():
+              if line:
+                  line = line.decode('utf-8')
+                  if line.startswith('data: '):
+                      data = json.loads(line[6:])
+                      status = data.get('status')
+                      
+                      if status == 'completed':
+                          return data
+                      elif status == 'failed':
+                          raise Exception(f"File processing failed: {data.get('error')}")
+      
+      raise Exception("Stream ended unexpectedly")
+  ```
+
 #### Adding Files to Knowledge Collections
 
 After uploading, you can group files into a knowledge collection or reference them individually in chats.
+
+:::important
+**Always wait for file processing to complete before adding files to a knowledge base.** Files that are still processing will have empty content, causing a `400` error. Use the status endpoint described above to verify the file status is `completed`.
+:::
 
 - **Endpoint**: `POST /api/v1/knowledge/{id}/file/add`
 - **Curl Example**:
@@ -186,6 +287,81 @@ After uploading, you can group files into a knowledge collection or reference th
       response = requests.post(url, headers=headers, json=data)
       return response.json()
   ```
+
+#### Complete Workflow Example
+
+Here's a complete example that uploads a file, waits for processing, and adds it to a knowledge base:
+
+```python
+import requests
+import time
+
+WEBUI_URL = 'http://localhost:3000'
+TOKEN = 'your-api-key-here'
+
+def upload_and_add_to_knowledge(file_path, knowledge_id, timeout=300):
+    """
+    Upload a file and add it to a knowledge base.
+    Properly waits for processing to complete before adding.
+    """
+    headers = {
+        'Authorization': f'Bearer {TOKEN}',
+        'Accept': 'application/json'
+    }
+    
+    # Step 1: Upload the file
+    with open(file_path, 'rb') as f:
+        response = requests.post(
+            f'{WEBUI_URL}/api/v1/files/',
+            headers=headers,
+            files={'file': f}
+        )
+    
+    if response.status_code != 200:
+        raise Exception(f"Upload failed: {response.text}")
+    
+    file_data = response.json()
+    file_id = file_data['id']
+    print(f"File uploaded with ID: {file_id}")
+    
+    # Step 2: Wait for processing to complete
+    print("Waiting for file processing...")
+    start_time = time.time()
+    
+    while time.time() - start_time < timeout:
+        status_response = requests.get(
+            f'{WEBUI_URL}/api/v1/files/{file_id}/process/status',
+            headers=headers
+        )
+        status_data = status_response.json()
+        status = status_data.get('status')
+        
+        if status == 'completed':
+            print("File processing completed!")
+            break
+        elif status == 'failed':
+            raise Exception(f"Processing failed: {status_data.get('error')}")
+        
+        time.sleep(2)  # Poll every 2 seconds
+    else:
+        raise TimeoutError("File processing timed out")
+    
+    # Step 3: Add to knowledge base
+    add_response = requests.post(
+        f'{WEBUI_URL}/api/v1/knowledge/{knowledge_id}/file/add',
+        headers={**headers, 'Content-Type': 'application/json'},
+        json={'file_id': file_id}
+    )
+    
+    if add_response.status_code != 200:
+        raise Exception(f"Failed to add to knowledge: {add_response.text}")
+    
+    print(f"File successfully added to knowledge base!")
+    return add_response.json()
+
+# Usage
+result = upload_and_add_to_knowledge('/path/to/document.pdf', 'your-knowledge-id')
+```
 
 #### Using Files and Collections in Chat Completions
 
