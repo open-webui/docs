@@ -14,6 +14,7 @@ If you're experiencing connectivity problems with Open WebUI, especially when us
 You might be experiencing these issues if you see:
 - Empty responses like `"{}"` in the chat
 - Errors like `"Unexpected token 'd', "data: {"id"... is not valid JSON"`
+- Garbled markdown (visible `##`, `**`, broken formatting) during streaming—see [Streaming Response Corruption](#-garbled-markdown--streaming-response-corruption)
 - WebSocket connection failures in browser console
 - WebSocket connection failures in CLI logs
 - Login problems or session issues
@@ -108,6 +109,57 @@ To verify your setup is working:
 - ✓ Set proper `X-Forwarded-Proto` headers in your reverse proxy
 - ✓ Ensure HTTP to HTTPS redirects are in place
 - ✓ Configure Let's Encrypt for automatic certificate renewal
+- ✓ Disable proxy buffering for SSE streaming (see below)
+
+## 📝 Garbled Markdown / Streaming Response Corruption
+
+If streaming responses show garbled markdown rendering (e.g., visible `##`, `**`, or broken formatting), but disabling streaming fixes the issue, this is typically caused by **nginx proxy buffering**.
+
+### Common Symptoms
+
+- Raw markdown tokens visible in responses (`##`, `**`, `###`)
+- Bold markers appearing incorrectly (`** Control:**` instead of `**Control:**`)
+- Words or sections randomly missing from responses
+- Formatting works correctly when streaming is disabled
+
+### Cause: Nginx Proxy Buffering
+
+When nginx's proxy buffering is enabled, it re-chunks the SSE (Server-Sent Events) stream arbitrarily. This breaks markdown tokens across chunk boundaries—for example, `**bold**` becomes separate chunks `**` + `bold` + `**`, causing the markdown parser to fail.
+
+### Solution: Disable Proxy Buffering
+
+Add these directives to your nginx location block for Open WebUI:
+
+```nginx
+location / {
+    proxy_pass http://your-open-webui-upstream;
+    
+    # CRITICAL: Disable buffering for SSE streaming
+    proxy_buffering off;
+    proxy_cache off;
+    
+    # WebSocket support
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    
+    # Standard proxy headers
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+:::tip
+Disabling proxy buffering also **significantly improves streaming speed**, as responses stream byte-by-byte directly to the client without nginx's buffering delay.
+:::
+
+### For Other Reverse Proxies
+
+- **HAProxy**: Ensure `option http-buffer-request` is not enabled for SSE endpoints
+- **Traefik**: Check compression/buffering middleware settings
+- **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
 
 ## 🌟 Connection to Ollama Server
 

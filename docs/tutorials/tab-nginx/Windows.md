@@ -113,6 +113,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
 
             proxy_buffering off;
+            proxy_cache off;
             client_max_body_size 20M;
             proxy_read_timeout 10m;
 
@@ -142,6 +143,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
 
             proxy_buffering off;
+            proxy_cache off;
             client_max_body_size 20M;
             proxy_read_timeout 10m;
 
