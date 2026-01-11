@@ -158,7 +158,7 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
 | **Search & Web** | | |
-| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled. |
+| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled + model `web_search` capability. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
 | **Knowledge Base** | | |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
@@ -167,8 +167,10 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
 | `query_knowledge_bases` | Search internal knowledge bases using semantic/vector search. Should be your first choice for finding information before searching the web. | Always available. |
 | **Image Gen** | | |
-| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled. |
-| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
+| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled + model `image_generation` capability. |
+| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled + model `image_generation` capability. |
+| **Code Interpreter** | | |
+| `execute_code` | Execute Python code in a sandboxed environment. Supports calculations, data analysis, and visualizations. Uses either Pyodide (browser-based) or Jupyter (server-side) depending on configuration. | `ENABLE_CODE_INTERPRETER` enabled + model `code_interpreter` capability. |
 | **Memory** | | |
 | `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
 | `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
@@ -199,6 +201,20 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 
 :::info Complete Tool Reference
 This table provides a quick reference for developers. For the complete user-facing guide on how to enable and use these tools, see the [**Tool Calling Modes Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+:::
+
+:::warning Model Capability vs. Chat Toggle in Native Mode
+In **Native Mode**, builtin tools are included based on the **model's capability settings**, not the chat-level toggles. If you:
+
+1. Use **Native Mode** function calling
+2. **Disable** a capability (e.g., `web_search`) on the model
+3. **Manually enable** the feature toggle in the chat (e.g., Web Search toggle)
+
+The builtin tool will **NOT** be passed to the model—the model cannot call `search_web()` as a function.
+
+**However**, features like Web Search that have RAG-style fallbacks will still work via context injection. The chat toggle triggers the traditional behavior (search results injected into context), just without giving the model autonomous control via tool calling.
+
+In **Default Mode** (non-native), the chat toggle fully controls the feature via RAG-style injection, independent of capability settings.
 :::
 
 
