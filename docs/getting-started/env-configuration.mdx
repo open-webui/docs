@@ -3678,11 +3678,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Options:
-  - Leave empty to use the built-in local Whisper engine for Speech-to-Text.
-  - `openai` - Uses OpenAI engine for Speech-to-Text.
-  - `deepgram`- Uses Deepgram engine for Speech-to-Text.
-  - `azure` Uses Azure engine for Speech-to-Text.
-- Description: Specifies the Speech-to-Text engine to use.
+  - `""` (empty string) - Uses the built-in local Whisper engine for Speech-to-Text. This runs Whisper on the backend server.
+  - `openai` - Uses an OpenAI-compatible API for Speech-to-Text.
+  - `deepgram` - Uses Deepgram engine for Speech-to-Text.
+  - `azure` - Uses Azure Cognitive Services for Speech-to-Text.
+  - `mistral` - Uses Mistral API for Speech-to-Text.
+- Description: Specifies the Speech-to-Text engine to use. When left as an empty string (the default), the backend runs a local Whisper instance. Note: The "Web API" option seen in User Settings is a frontend-only setting that uses the browser's built-in speech recognition and does not call this backend endpoint at all.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUDIO_STT_MODEL`
@@ -3796,12 +3797,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Options:
-  - Leave empty to use the built-in WebAPI engine for Text-to-Speech.
-  - `azure` - Uses Azure engine for Text-to-Speech.
-  - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech
-  - `openai` - Uses OpenAI engine for Text-to-Speech.
-  - `transformers` - Uses SentenceTransformers for Text-to-Speech.
-- Description: Specifies the Text-to-Speech engine to use.
+  - `""` (empty string) - **Disables backend TTS.** When empty, TTS requests do not reach the backend. All TTS is handled client-side using the browser's Web Speech API or the user-configurable "Browser Kokoro" option in User Settings.
+  - `openai` - Uses an OpenAI-compatible API for Text-to-Speech.
+  - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech.
+  - `azure` - Uses Azure Cognitive Services for Text-to-Speech.
+  - `transformers` - Uses a local SentenceTransformers-based model for Text-to-Speech (runs on the backend).
+- Description: Specifies the Text-to-Speech engine to use on the backend. When left as an empty string (the default), no backend TTS service is configured, and audio playback relies entirely on the user's browser capabilities or frontend options like "Browser Kokoro".
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUDIO_TTS_MODEL`
