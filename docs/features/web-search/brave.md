@@ -44,6 +44,7 @@ Brave's free tier API enforces a strict limit of **1 request per second**. If yo
 
 **Recommended configuration for free tier users:**
 
+- Set "Concurrent Requests" in Admin Panel > Settings > Web Search to `1`. Alternatively use environment variables:
 - Set `RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 1` to ensure requests are processed sequentially rather than in parallel.
 
 **Automatic retry behavior:**
