@@ -140,6 +140,33 @@ To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open
 
 To do this, configure your **Ollama model params** to allow a larger context window. You can check and modify this setting in your chat directly or from model editor page to enhance the RAG experience significantly.
 
+### Q: I'm getting "The content provided is empty" when uploading files via the API. Why?
+
+**A:** This is a **race condition**, not an actual empty file. When you upload a file through the API, the endpoint returns immediately with a file ID, but content extraction and embedding computation happen **asynchronously in the background**.
+
+If you immediately try to add the file to a knowledge base before processing completes, the system sees empty content and returns a `400` error.
+
+**Solution:** Poll the file status endpoint until processing is complete:
+
+```python
+import requests
+import time
+
+def wait_for_processing(token, file_id):
+    url = f'http://localhost:3000/api/v1/files/{file_id}/process/status'
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    while True:
+        status = requests.get(url, headers=headers).json().get('status')
+        if status == 'completed':
+            return True
+        elif status == 'failed':
+            raise Exception("Processing failed")
+        time.sleep(2)  # Wait before checking again
+```
+
+For complete workflow examples, see the **[API Endpoints documentation](/getting-started/api-endpoints#checking-file-processing-status)** and the **[RAG Troubleshooting guide](/troubleshooting/rag#9-api-file-upload-the-content-provided-is-empty-error-)**.
+
 ### Q: I asked the model what it is and it gave the wrong answer. Is Open WebUI routing to the wrong model?
 
 **A:** No—**LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-4?", the response is not a system diagnostic. It's simply the model generating text based on patterns in its training data.

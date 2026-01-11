@@ -76,6 +76,21 @@ To export a knowledge base, open the item menu (three dots) on any knowledge bas
 The export feature is restricted to admin users. Regular users will not see the Export option in the menu.
 :::
 
+### Programmatic Access via API
+
+Knowledge bases can also be managed programmatically through the Open WebUI API. This is useful for automated workflows, bulk imports, or integrating with external systems.
+
+Key API endpoints:
+- `POST /api/v1/files/` - Upload files
+- `GET /api/v1/files/{id}/process/status` - Check file processing status
+- `POST /api/v1/knowledge/{id}/file/add` - Add files to a knowledge base
+
+:::warning Important: Async File Processing
+When uploading files via API, processing happens asynchronously. You **must** wait for file processing to complete before adding files to a knowledge base, or you will receive an "empty content" error.
+
+For detailed examples and proper workflow handling, see the [API Endpoints documentation](/getting-started/api-endpoints#retrieval-augmented-generation-rag).
+:::
+
 ## Summary
 
 - The Knowledge section is like Open WebUI's "memory bank," where you can store data that you want it to remember and use.
