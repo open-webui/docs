@@ -79,6 +79,21 @@ Failure to do so will cause WebSocket connections to fail, even if you have enab
 
 :::
 
+:::danger Critical: Disable Proxy Buffering for Streaming
+
+**This is the most common cause of garbled markdown and broken streaming responses.**
+
+In Nginx Proxy Manager, go to your proxy host → **Advanced** tab → and add these directives to the **Custom Nginx Configuration** field:
+
+```nginx
+proxy_buffering off;
+proxy_cache off;
+```
+
+Without this, Nginx re-chunks SSE streams, breaking markdown formatting (visible `##`, `**`, missing words). This also makes streaming responses significantly faster.
+
+:::
+
 :::tip Caching Best Practice
 
 While Nginx Proxy Manager handles most configuration automatically, be aware that:
