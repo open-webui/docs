@@ -25,7 +25,7 @@ Admins can configure server-wide audio defaults:
 Here you can configure:
 - **Speech-to-Text Engine** — Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
 - **Whisper Model** — Select model size for local STT (tiny, base, small, medium, large)
-- **Text-to-Speech Engine** — Choose between OpenAI-compatible, ElevenLabs, Azure, or local Transformers
+- **Text-to-Speech Engine** — Choose between OpenAI-compatible, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
 - **TTS Voice** — Select the default voice
 - **API Keys and Base URLs** — Configure external service connections
 
@@ -78,7 +78,7 @@ environment:
 
 For a completely free setup:
 
-**STT:** Leave engine empty (uses built-in Whisper)
+**STT:** Leave engine empty (uses built-in Whisper running on the backend)
 ```yaml
 environment:
   - WHISPER_MODEL=base  # Options: tiny, base, small, medium, large
@@ -101,16 +101,16 @@ services:
 
 → See full guide: [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration)
 
-### Browser-Only Setup (No Config Needed)
+### Browser-Only Setup (No Backend Config Needed)
 
-For basic functionality without any server-side setup:
+For basic functionality without any server-side audio processing:
 
 **In User Settings → Audio:**
-- **STT Engine:** `Web API` (uses browser's built-in speech recognition)
-- **TTS Engine:** `Web API` (uses browser's built-in text-to-speech)
+- **STT Engine:** `Web API` (uses the browser's built-in speech recognition; **does not call the backend STT endpoint**)
+- **TTS Engine:** `Web API` or `Browser Kokoro` (uses browser's built-in text-to-speech or client-side Kokoro; **does not call the backend TTS endpoint**)
 
 :::note
-Browser-based audio has limited accuracy and voice options compared to server-side solutions.
+When the admin leaves `AUDIO_TTS_ENGINE` as an empty string (the default), no backend TTS service is available. All TTS is handled client-side. Similarly, if users select "Web API" for STT in their user settings, the backend's local Whisper is not used.
 :::
 
 ## Microphone Access Issues
@@ -403,7 +403,7 @@ curl http://your-tts-service:port/health
 
 | Variable | Description |
 |----------|-------------|
-| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `elevenlabs`, `azure`, `transformers` |
+| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS - uses browser), `openai`, `elevenlabs`, `azure`, `transformers` |
 | `AUDIO_TTS_MODEL` | TTS model to use (default: `tts-1`) |
 | `AUDIO_TTS_VOICE` | Default voice for TTS (default: `alloy`) |
 | `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS |
@@ -418,7 +418,7 @@ curl http://your-tts-service:port/health
 | `WHISPER_COMPUTE_TYPE` | Compute type: `int8`, `float16`, `int8_float16`, `float32` (default: `int8`) |
 | `WHISPER_LANGUAGE` | ISO 639-1 language code (empty = auto-detect) |
 | `WHISPER_VAD_FILTER` | Enable Voice Activity Detection filter (default: `False`) |
-| `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `azure`, `deepgram` |
+| `AUDIO_STT_ENGINE` | STT engine: `""` (empty, uses local Whisper), `openai`, `azure`, `deepgram`, `mistral` |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible STT |
 | `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |
 | `DEEPGRAM_API_KEY` | Deepgram API key |

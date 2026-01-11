@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 15
 title: "Optimization, Performance & RAM Usage"
 ---
 
@@ -86,11 +86,12 @@ For any multi-user or high-concurrency setup, **PostgreSQL is mandatory**. SQLit
 -   **Example**: `postgres://user:password@localhost:5432/webui`
 
 ### Chat Saving Strategy
-By default, Open WebUI saves chats in **real-time**. This ensures no data loss but creates massive database write pressure because *every single chunk* of text received from the LLM triggers a database update.
 
--   **Env Var**: `ENABLE_REALTIME_CHAT_SAVE=False`
+By default, Open WebUI saves chats **after generation is complete**. While saving in real-time (token by token) is possible, it creates massive database write pressure and is **strongly discouraged**.
+
+-   **Env Var**: `ENABLE_REALTIME_CHAT_SAVE=False` (Default)
 -   **Effect**: Chats are saved only when the generation is complete (or periodically).
--   **Recommendation**: **Highly Recommended** for any high-user setup to reduce DB load substantially.
+-   **Recommendation**: **DO NOT ENABLE `ENABLE_REALTIME_CHAT_SAVE` in production.** It is highly recommended to keep this `False` to prevent database connection exhaustion and severe performance degradation under concurrent load. See the [Environment Variable Configuration](/getting-started/env-configuration#enable_realtime_chat_save) for details.
 
 ### Database Session Sharing
 
@@ -159,7 +160,7 @@ If you are deploying for **enterprise scale** (hundreds of users), simple Docker
 For setups with many simultaneous users, these settings are crucial to prevent bottlenecks.
 
 #### Batch Streaming Tokens
-By default, Open WebUI streams *every single token* arriving from the LLM. High-frequency streaming increases network IO and CPU usage on the server. If real-time saving is enabled, it also destroys database performance (you can disable it with `ENABLE_REALTIME_CHAT_SAVE=False`).
+By default, Open WebUI streams *every single token* arriving from the LLM. High-frequency streaming increases network IO and CPU usage on the server. If real-time saving is enabled (which is strongly discouraged), it also destroys database performance.
 
 Increasing the chunk size buffers these updates, sending them to the client in larger groups. The only downside is a slightly choppier UI experience when streaming the response, but it can make a big difference in performance.
 
@@ -307,7 +308,7 @@ If resource usage is critical, disable automated features that constantly trigge
 1.  **Embeddings**: `RAG_EMBEDDING_ENGINE=openai` (or `ollama` with `nomic-embed-text` on a fast server).
 2.  **Task Model**: `gpt-5-nano` or `llama-3.1-8b-instant`.
 3.  **Caching**: `MODELS_CACHE_TTL=300`.
-4.  **Database**: `ENABLE_REALTIME_CHAT_SAVE=True` (Persistence is usually preferred over raw write speed here).
+4.  **Database**: `ENABLE_REALTIME_CHAT_SAVE=False` (Keeping this disabled is recommended even for single users to ensure maximum stability).
 5.  **Vector DB**: PGVector (recommended) or ChromaDB (either is fine unless dealing with massive data).
 
 ### Profile 3: High Scale / Enterprise
