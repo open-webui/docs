@@ -81,7 +81,7 @@ You can transform a generic model into a specialized agent by toggling specific 
   - **Web Search**: Enable the model to access the configured search provider (e.g., Google, SearxNG) for real-time information.
   - **File Upload**: Allow users to upload files to this model.
   - **File Context**: When enabled (default), attached files are processed via RAG and their content is injected into the conversation. When disabled, file content is **not** extracted or injected—the model receives no file content unless it retrieves it via builtin tools. Only visible when File Upload is enabled. See [File Context vs Builtin Tools](../rag/index.md#file-context-vs-builtin-tools) for details.
-  - **Code Interpreter**: Enable Python code execution.
+  - **Code Interpreter**: Enable Python code execution. See [Python Code Execution](../chat-features/code-execution/python.md) for details.
   - **Image Generation**: Enable image generation integration.
   - **Usage / Citations**: Toggle usage tracking or source citations.
   - **Status Updates**: Show visible progress steps in the chat UI (e.g., "Searching web...", "Reading file...") during generation. Useful for slower, complex tasks.
