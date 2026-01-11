@@ -215,9 +215,15 @@ See the `body["messages"]` value above.
 
 ### `__chat_id__`
 
-The `str` of the `chat_id`.
+The `str` of the `chat_id`, representing the unique identifier of the current chat/conversation.
 
-See the `__metadata__["chat_id"]` value above.
+This parameter is reliably passed for all function invocations that originate from a chat context, including:
+- Regular user messages
+- Internal task calls (title generation, query generation, tag generation, etc.)
+
+This allows stateful functions/pipes/manifolds to maintain per-chat state without fragmentation.
+
+See also `__metadata__["chat_id"]` for accessing the same value via the metadata dict.
 
 ### `__session_id__`
 
