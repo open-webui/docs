@@ -47,6 +47,17 @@ Using self-signed certificates is suitable for development or internal use where
             expires -1;
         }
 
+        # Profile and model images - cached for performance
+        location ~ ^/api/v1/(users/[^/]+/profile/image|models/model/profile/image)$ {
+            proxy_pass http://host.docker.internal:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+
+            # Cache images for 1 day
+            expires 1d;
+            add_header Cache-Control "public, max-age=86400";
+        }
+
         location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
             proxy_pass http://host.docker.internal:3000;
             proxy_http_version 1.1;
