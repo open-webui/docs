@@ -234,6 +234,20 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             expires -1;
         }
 
+        # Profile and model images - cached for performance
+        location ~ ^/api/v1/(users/[^/]+/profile/image|models/model/profile/image)$ {
+            proxy_pass http://open-webui:8080;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # Cache images for 1 day
+            expires 1d;
+            add_header Cache-Control "public, max-age=86400";
+        }
+
         location ~* \.(css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
             proxy_pass http://open-webui:8080;
             proxy_http_version 1.1;
