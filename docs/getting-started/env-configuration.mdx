@@ -5615,12 +5615,6 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `False`
 - Description: Enables or disables SQLite WAL (Write-Ahead Logging) mode. When enabled, SQLite transactions can be managed more efficiently, allowing multiple readers and one writer concurrently, which can improve database performance, especially under high concurrency. **This setting only applies to SQLite databases.**
 
-#### `DATABASE_DEDUPLICATE_INTERVAL`
-
-- Type: `float`
-- Default: `0.0`
-- Description: Sets a time interval in seconds during which certain database write operations (e.g., updating a user's `last_active_at` timestamp) will be deduplicated. If a write operation is attempted within this interval for the same entity, it will be skipped. A value of `0.0` disables deduplication. Enabling this can reduce write conflicts and improve performance, but may result in less real-time accuracy for the affected fields.
-
 ### Redis
 
 - Type: `str`
