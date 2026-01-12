@@ -88,7 +88,150 @@ import Windows from '../tab-nginx/Windows.md';
   </TabItem>
 </Tabs>
 
+
+## Caching Configuration
+
+Proper caching significantly improves Open WebUI performance by reducing backend load and speeding up page loads. This section provides guidance for advanced users who want to implement server-side and client-side caching.
+
+### Cache Zones
+
+Define cache zones in your nginx `http` block to store cached responses:
+
+```nginx
+# General cache for pages and assets
+proxy_cache_path /var/cache/nginx/openwebui levels=1:2 
+    keys_zone=OPENWEBUI_CACHE:10m max_size=1g inactive=60m use_temp_path=off;
+
+# Dedicated cache for images (profile pictures, model avatars)
+proxy_cache_path /var/cache/nginx/openwebui_images levels=1:2 
+    keys_zone=OPENWEBUI_IMAGES:10m max_size=2g inactive=7d use_temp_path=off;
+```
+
+:::note Create Cache Directories
+
+You must create these directories and set proper ownership before nginx can use them:
+
+```bash
+sudo mkdir -p /var/cache/nginx/openwebui /var/cache/nginx/openwebui_images
+sudo chown -R www-data:www-data /var/cache/nginx
+```
+
+Replace `www-data` with your nginx user (check with `ps aux | grep nginx`). Common alternatives: `nginx`, `nobody`.
+
+:::
+
+### What to Cache
+
+| Content Type | Cache Duration | Notes |
+|--------------|----------------|-------|
+| Static assets (CSS, JS, fonts) | 7-30 days | Use `immutable` for versioned assets |
+| Profile/model images | 1 day | Balance freshness vs performance |
+| Static files (/static/) | 7 days | Favicons, default avatars |
+| HTML pages | 5 minutes | Short cache with revalidation |
+| Uploaded file content | 1 day | User uploads, generated images |
+
+### What to Never Cache
+
+:::danger Critical: Never Cache Authentication
+
+These paths must **never** be cached to prevent security issues and broken logins:
+
+- `/api/v1/auths/` - Authentication endpoints
+- `/oauth/` - OAuth/SSO callbacks
+- `/api/` (general) - Dynamic API responses
+- `/ws/` - WebSocket connections
+
+Always include these directives for auth endpoints:
+
+```nginx
+proxy_no_cache 1;
+proxy_cache_bypass 1;
+add_header Cache-Control "no-store, no-cache, must-revalidate";
+```
+
+:::
+
+### Example: Image Caching
+
+Profile images and model avatars benefit greatly from caching:
+
+```nginx
+# User and model profile images
+location ~ ^/api/v1/(users/[^/]+/profile/image|models/model/profile/image)$ {
+    proxy_pass http://your_backend;
+    
+    proxy_cache OPENWEBUI_IMAGES;
+    proxy_cache_valid 200 302 1d;
+    proxy_cache_valid 404 1m;
+    proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+    proxy_cache_lock on;
+    proxy_cache_key "$request_uri$is_args$args";
+    
+    # Force caching even without backend cache headers
+    proxy_ignore_headers Cache-Control Expires Set-Cookie;
+    proxy_hide_header Set-Cookie;
+    
+    # Client-side caching
+    add_header Cache-Control "public, max-age=86400, stale-while-revalidate=604800" always;
+    add_header X-Cache-Status $upstream_cache_status always;
+    
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+### Example: Static Asset Caching
+
+```nginx
+location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|otf|eot)$ {
+    proxy_pass http://your_backend;
+    
+    proxy_cache OPENWEBUI_CACHE;
+    proxy_cache_valid 200 302 60m;
+    proxy_cache_valid 404 1m;
+    proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+    proxy_cache_lock on;
+    
+    add_header Cache-Control "public, max-age=2592000";  # 30 days
+    add_header X-Cache-Status $upstream_cache_status;
+    
+    etag on;
+    if_modified_since exact;
+}
+```
+
+### Cache Debugging
+
+Add the `X-Cache-Status` header to verify caching is working:
+
+```nginx
+add_header X-Cache-Status $upstream_cache_status always;
+```
+
+Check the header in browser DevTools:
+- `HIT` - Served from cache
+- `MISS` - Fetched from backend, now cached
+- `EXPIRED` - Cache expired, refreshed
+- `BYPASS` - Cache intentionally skipped
+
+### Trade-offs
+
+:::warning Cache Invalidation
+
+When images are cached aggressively, users may not see immediate updates after changing their profile picture. Consider:
+
+- **Shorter cache times** (e.g., 1 hour) if users frequently update images
+- **Longer cache times** (e.g., 1 day) for better performance in stable deployments
+- Cache can be manually cleared with: `rm -rf /var/cache/nginx/openwebui_images/*`
+
+:::
+
+---
+
 ## Next Steps
+
 
 After setting up HTTPS, access Open WebUI securely at:
 
