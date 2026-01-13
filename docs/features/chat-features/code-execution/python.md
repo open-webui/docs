@@ -187,6 +187,32 @@ plt.close()
 
 The image will be automatically uploaded and displayed inline in your chat.
 
+## Browser Compatibility
+
+### Microsoft Edge: Pyodide Crashes
+
+If Pyodide-based code execution causes Microsoft Edge to crash with a `STATUS_ACCESS_VIOLATION` error, this is caused by Edge's enhanced security mode.
+
+**Symptom:** The browser tab or entire browser crashes when attempting to run Python code, with no useful error message.
+
+**Cause:** Edge's "Enhance your security on the web" setting (found at `edge://settings/privacy/security`) enables stricter security mitigations that are incompatible with WebAssembly-based runtimes like Pyodide.
+
+**Solutions:**
+
+1. **Disable enhanced security in Edge:**
+   - Go to `edge://settings/privacy/security`
+   - Turn off **"Enhance your security on the web"**
+
+2. **Use a different browser:**
+   - Chrome and Firefox do not have this issue
+
+3. **Use Jupyter backend:**
+   - Switch `CODE_INTERPRETER_ENGINE` to `jupyter` to avoid browser-based execution entirely
+
+:::note
+This is a known compatibility issue between Edge's enhanced security mode and WebAssembly. The same crash occurs on the official [Pyodide console](https://pyodide.org/en/stable/console.html) when this setting is enabled.
+:::
+
 ## Tips for Better Results
 
 - **Mention the environment**: Tell the LLM it's running in a "Pyodide environment" or "code interpreter" for better code generation
