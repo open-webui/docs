@@ -158,8 +158,8 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
 | **Search & Web** | | |
-| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled + model `web_search` capability. |
-| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
+| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled + model `web_search` capability + Web Search toggle ON in chat. |
+| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Same requirements as `search_web`. |
 | **Knowledge Base** | | |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
 | `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
@@ -167,14 +167,14 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
 | `query_knowledge_bases` | Search internal knowledge bases using semantic/vector search. Should be your first choice for finding information before searching the web. | Always available. |
 | **Image Gen** | | |
-| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled + model `image_generation` capability. |
-| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled + model `image_generation` capability. |
+| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled + model `image_generation` capability + Image Generation toggle ON in chat. |
+| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled + model `image_generation` capability + Image Generation toggle ON in chat. |
 | **Code Interpreter** | | |
-| `execute_code` | Execute Python code in a sandboxed environment. Supports calculations, data analysis, and visualizations. Uses either Pyodide (browser-based) or Jupyter (server-side) depending on configuration. | `ENABLE_CODE_INTERPRETER` enabled + model `code_interpreter` capability. |
+| `execute_code` | Execute Python code in a sandboxed environment. Supports calculations, data analysis, and visualizations. Uses either Pyodide (browser-based) or Jupyter (server-side) depending on configuration. | `ENABLE_CODE_INTERPRETER` enabled + model `code_interpreter` capability + Code Interpreter toggle ON in chat. |
 | **Memory** | | |
-| `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
-| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
-| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled. |
+| `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled globally and for the user. |
+| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled globally and for the user. |
+| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled globally and for the user. |
 | **Notes** | | |
 | `search_notes` | Search the user's notes by title and content. | `ENABLE_NOTES` enabled. |
 | `view_note` | Get the full markdown content of a specific note. | `ENABLE_NOTES` enabled. |
@@ -203,18 +203,35 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 This table provides a quick reference for developers. For the complete user-facing guide on how to enable and use these tools, see the [**Tool Calling Modes Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
 :::
 
-:::warning Model Capability vs. Chat Toggle in Native Mode
-In **Native Mode**, builtin tools are included based on the **model's capability settings**, not the chat-level toggles. If you:
+:::tip Chat Toggle + Model Capability Control in Native Mode
+In **Native Mode**, builtin tools are only injected when **all four conditions are met**:
 
-1. Use **Native Mode** function calling
-2. **Disable** a capability (e.g., `web_search`) on the model
-3. **Manually enable** the feature toggle in the chat (e.g., Web Search toggle)
+1. **Feature enabled globally** (e.g., Web Search enabled at **Admin Panel > Settings > Web Search**)
+2. **Builtin Tools** capability ON for the model (in **Admin Panel > Settings > Models > Capabilities**)
+3. **Feature-specific capability** ON for the model (e.g., `web_search` capability in **Admin Panel > Settings > Models > Capabilities**)
+4. **Chat toggle** enabled (e.g., Web Search toggle ON in the chat interface)
 
-The builtin tool will **NOT** be passed to the model—the model cannot call `search_web()` as a function.
+This gives you fine-grained control:
+- **Admins** can disable features globally or per-model via capabilities
+- **Users** can enable/disable tools per-chat via the toggles in the chat interface
+- **Filters** (inlet functions) can programmatically control tool availability by modifying the `body["features"]` dict before the request is processed. For example, an inlet filter could set `body["features"]["web_search"] = False` to disable web search tools for specific conditions. See the [Filter Development Guide](/features/plugin/functions/filter#inlet-function-input-pre-processing) and the [Reserved Arguments Reference](/features/plugin/development/reserved-args#body) for details on the `features` dict structure.
 
-**However**, features like Web Search that have RAG-style fallbacks will still work via context injection. The chat toggle triggers the traditional behavior (search results injected into context), just without giving the model autonomous control via tool calling.
+**Example:** If Web Search is enabled globally, Builtin Tools is ON, `web_search` capability is ON, but the Web Search toggle is OFF in a specific chat, the model will NOT have access to `search_web()` for that conversation.
+:::
 
-In **Default Mode** (non-native), the chat toggle fully controls the feature via RAG-style injection, independent of capability settings.
+:::info Enabling Features by Default
+Tired of manually enabling features for every chat? You can configure defaults:
+
+**Admin-level (per-model):**
+Go to **Admin Panel > Settings > Models**, select a model, and scroll to the **Default Features** section. Toggle on **Web Search**, **Image Generation**, and/or **Code Interpreter**. When users start a new chat with this model, these features will be pre-enabled.
+
+**User-level:**
+Go to **Settings > Interface** and find the **Web Search** setting. Click to toggle it to **Always**. This ensures Web Search is enabled for all your chats regardless of model defaults.
+
+**Benefits:**
+- Reduces friction for users who always want certain tools available
+- Ensures consistent behavior across chats without manual toggling
+- Allows admins to set organization-wide defaults per model
 :::
 
 

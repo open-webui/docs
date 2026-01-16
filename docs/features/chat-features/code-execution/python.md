@@ -58,9 +58,15 @@ When using **Native function calling mode** with a capable model (e.g., GPT-5, C
 - **Same image handling**: Base64 image URLs in output are replaced with file URLs; model embeds via markdown
 
 **Requirements:**
-1. `ENABLE_CODE_INTERPRETER` must be enabled globally
-2. Model must have `code_interpreter` capability enabled
-3. Model must use **Native** function calling mode (set in model's advanced params)
+1. Code Interpreter enabled globally at **Admin Panel > Settings > Code Execution**
+2. **Builtin Tools** capability ON for the model (in **Admin Panel > Settings > Models > Capabilities**)
+3. Model must have `code_interpreter` capability enabled (in **Admin Panel > Settings > Models > Capabilities**)
+4. Model must use **Native** function calling mode (set in model's advanced params)
+5. **Code Interpreter toggle** must be ON in the chat interface
+
+:::tip Enabling Code Interpreter by Default
+Go to **Admin Panel > Settings > Models**, select a model, and scroll to **Default Features**. Toggle on **Code Interpreter** so it's pre-enabled for new chats with this model.
+:::
 
 For more details on builtin tools and native mode, see the [Tool Development Guide](/features/plugin/tools/development#built-in-system-tools-nativeagentic-mode).
 

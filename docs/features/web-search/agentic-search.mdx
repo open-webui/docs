@@ -35,12 +35,18 @@ To unlock these features, your model must support native tool calling and have s
     *   In the same model settings, under **Advanced Parameters**, set **Function Calling** to `Native`.
 4.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
 
-:::tip Model Capability vs. Chat Toggle
-In **Native Mode**, the `search_web` and `fetch_url` tools are automatically included based on the model's `web_search` capability setting. The chat toggle is not required.
+:::tip Four-Layer Tool Control
+In **Native Mode**, the `search_web` and `fetch_url` tools require **all four conditions** to be met:
+1. **Feature enabled globally**: Web Search enabled at **Admin Panel > Settings > Web Search**
+2. **Builtin Tools** capability ON for the model (in **Admin Panel > Settings > Models > Capabilities**)
+3. **Model capability**: `web_search` capability ON (in **Admin Panel > Settings > Models > Capabilities**)
+4. **Chat toggle**: Web Search toggle ON in the chat interface
 
-In **Default Mode** (non-native), the chat toggle still controls whether web search is performed via RAG-style injection.
+This gives both admins and users fine-grained control. Inlet filters can also programmatically control tool availability by modifying `body["features"]`—see the [Filter Development Guide](/features/plugin/functions/filter) for details.
 
-**Important**: If you disable the `web_search` capability on a model but use Native Mode, the tools won't be available even if you manually toggle Web Search on in the chat.
+**Enabling Web Search by Default:**
+- **Admins:** Go to **Admin Panel > Settings > Models**, select a model, and scroll to **Default Features**. Toggle on **Web Search** so it's pre-enabled for all new chats with this model.
+- **Users:** Go to **Settings > Interface** and set **Web Search** to **Always**.
 :::
 
 ## How Native Tools Handle Data (Agentic Mode)

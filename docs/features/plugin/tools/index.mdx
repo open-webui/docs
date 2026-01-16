@@ -151,8 +151,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
 | **Search & Web** | | |
-| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled. |
-| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
+| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled + model `web_search` capability + Web Search toggle ON in chat. |
+| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Same requirements as `search_web`. |
 | **Knowledge Base** | | |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
 | `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. | Always available. |
@@ -161,12 +161,12 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
 | **Image Gen** | | |
-| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled. |
-| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
+| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled + model `image_generation` capability + Image Generation toggle ON in chat. |
+| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled + model `image_generation` capability + Image Generation toggle ON in chat. |
 | **Memory** | | |
-| `search_memories` | Searches the user's personal memory/personalization bank. Supports an optional `count` parameter to specify how many memories to return (default: 5). | Memory feature enabled. |
-| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
-| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled. |
+| `search_memories` | Searches the user's personal memory/personalization bank. Supports an optional `count` parameter to specify how many memories to return (default: 5). | Memory feature enabled globally and for the user. |
+| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled globally and for the user. |
+| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled globally and for the user. |
 | **Notes** | | |
 | `search_notes` | Search the user's notes by title and content. | `ENABLE_NOTES` enabled. |
 | `view_note` | Get the full markdown content of a specific note. | `ENABLE_NOTES` enabled. |
@@ -186,6 +186,19 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 :::info Automatic Timezone Detection
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
+:::
+
+:::tip Four-Layer Tool Control
+Feature-specific tools (Web Search, Image Generation, Code Interpreter) require **all four conditions** to be met:
+
+1. **Feature enabled globally** (e.g., **Admin Panel > Settings > Web Search / Code Execution / Images**)
+2. **Builtin Tools** capability ON for the model
+3. **Feature-specific capability** ON for the model (e.g., `web_search`)
+4. **Chat toggle** enabled for the feature
+
+**Enabling Features by Default:**
+- **Admins:** Go to **Admin Panel > Settings > Models**, select a model, and scroll to **Default Features**. Toggle on the desired features so they're pre-enabled for new chats.
+- **Users:** Go to **Settings > Interface** and set **Web Search** to **Always**.
 :::
 
 **Why use these?** It allows for **Deep Research** (searching the web multiple times, or querying knowledge bases), **Contextual Awareness** (looking up previous chats or notes), **Dynamic Personalization** (saving facts), and **Precise Automation** (generating content based on existing notes or documents).
