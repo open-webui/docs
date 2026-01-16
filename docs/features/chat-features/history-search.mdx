@@ -34,8 +34,8 @@ You can search through your conversations using the global search bar in the sid
 When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), models can search through your chat history autonomously.
 
 ### Available History Tools:
-- **`search_chats`**: The model can search all your previous conversations for a specific topic or fact.
-- **`view_chat`**: After finding a relevant chat ID, the model can retrieve and "read" the full message history of that session.
+- **`search_chats`**: Simple text search across chat titles and message content. Returns matching chat IDs and snippets.
+- **`view_chat`**: Reads and returns the full message history of a specific chat by ID.
 
 ### Why use native tool calling for Search?
 This allows the model to leverage its own previous work. You can ask: *"What was the feedback I got on my last email draft?"* or *"Find the Python script I wrote about image processing two weeks ago."*
