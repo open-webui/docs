@@ -145,76 +145,8 @@ You can configure the function calling mode in two places:
 
 If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field).
 
-### Built-in System Tools (Native/Agentic Mode)
-
-When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects built-in system tools based on the features enabled for the chat. This enables powerful agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.1) can perform multi-step research, explore knowledge bases autonomously, or manage user memory dynamically.
-
-:::warning Quality Models Required for Agentic Behavior
-Agentic tool calling requires **high-quality frontier models** to work reliably. Small local models often struggle with the complex reasoning, proper JSON formatting, and multi-step planning required for effective tool use. For production agentic workflows, use models like **GPT-5**, **Claude 4.5+**, **Gemini 3+**, or **MiniMax M2.1**. Small local models may work better with **Default Mode** instead.
-:::
-
-#### Available Built-in Tools
-
-| Tool | Purpose | Requirements |
-|------|---------|--------------|
-| **Search & Web** | | |
-| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled + model `web_search` capability. |
-| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
-| **Knowledge Base** | | |
-| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
-| `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
-| `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
-| `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
-| `query_knowledge_bases` | Search knowledge bases using semantic/vector search (default: 5 results). **Note:** Does not use hybrid search or reranking. | Always available. |
-| **Image Gen** | | |
-| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled + model `image_generation` capability. |
-| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled + model `image_generation` capability. |
-| **Code Interpreter** | | |
-| `execute_code` | Execute Python code in a sandboxed environment. Supports calculations, data analysis, and visualizations. Uses either Pyodide (browser-based) or Jupyter (server-side) depending on configuration. | `ENABLE_CODE_INTERPRETER` enabled + model `code_interpreter` capability. |
-| **Memory** | | |
-| `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
-| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
-| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled. |
-| **Notes** | | |
-| `search_notes` | Search the user's notes by title and content. | `ENABLE_NOTES` enabled. |
-| `view_note` | Get the full markdown content of a specific note. | `ENABLE_NOTES` enabled. |
-| `write_note` | Create a new private note for the user. | `ENABLE_NOTES` enabled. |
-| `replace_note_content` | Update an existing note's content or title. | `ENABLE_NOTES` enabled. |
-| **Chat History** | | |
-| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. | Always available. |
-| `view_chat` | Reads and returns the full message history of a specific chat by ID. | Always available. |
-| **Channels** | | |
-| `search_channels` | Find public or accessible channels by name/description. | `ENABLE_CHANNELS` enabled. |
-| `search_channel_messages` | Search for specific messages inside accessible channels. | `ENABLE_CHANNELS` enabled. |
-| `view_channel_message` | View a specific message or its details in a channel. | `ENABLE_CHANNELS` enabled. |
-| `view_channel_thread` | View a full message thread/replies in a channel. | `ENABLE_CHANNELS` enabled. |
-| **Time Tools** | | |
-| `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. | Always available. |
-| `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). | Always available. |
-
-#### Why Use Built-in Tools?
-- **Agentic Research**: Models can invoke `search_web` multiple times to refine results, then use `fetch_url` to read specific deep-dive articles.
-- **Knowledge Base Search**: Models can use `query_knowledge_bases` to search internal documents semantically, or `list_knowledge_bases` and `view_knowledge_file` to browse and read specific files.
-- **Contextual Awareness**: Models can search your previous chat history or notes to find specific details without manual copy-pasting.
-- **Dynamic Personalization**: Models can proactively store important facts about the user using `add_memory` during the conversation.
-- **Improved Context Selection**: Instead of forcing a search before every prompt, the model decides *when* a search or retrieval is actually necessary.
-
-:::info Complete Tool Reference
-This table provides a quick reference for developers. For the complete user-facing guide on how to enable and use these tools, see the [**Tool Calling Modes Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
-:::
-
-:::warning Model Capability vs. Chat Toggle in Native Mode
-In **Native Mode**, builtin tools are included based on the **model's capability settings**, not the chat-level toggles. If you:
-
-1. Use **Native Mode** function calling
-2. **Disable** a capability (e.g., `web_search`) on the model
-3. **Manually enable** the feature toggle in the chat (e.g., Web Search toggle)
-
-The builtin tool will **NOT** be passed to the model—the model cannot call `search_web()` as a function.
-
-**However**, features like Web Search that have RAG-style fallbacks will still work via context injection. The chat toggle triggers the traditional behavior (search results injected into context), just without giving the model autonomous control via tool calling.
-
-In **Default Mode** (non-native), the chat toggle fully controls the feature via RAG-style injection, independent of capability settings.
+:::info Native Mode & Built-in Tools
+When writing custom tools, be aware that Open WebUI also provides **built-in system tools** when Native Mode is enabled. For details on built-in tools, function calling modes, and model requirements, see the [**Tool Calling Modes Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
 :::
 
 
