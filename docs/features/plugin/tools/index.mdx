@@ -173,8 +173,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `write_note` | Create a new private note for the user. | `ENABLE_NOTES` enabled. |
 | `replace_note_content` | Update an existing note's content or title. | `ENABLE_NOTES` enabled. |
 | **Chat History** | | |
-| `search_chats` | Search across the user's previous conversation history. | Always available. |
-| `view_chat` | Retrieve the full message history of a specific previous chat. | Always available. |
+| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. | Always available. |
+| `view_chat` | Reads and returns the full message history of a specific chat by ID. | Always available. |
 | **Channels** | | |
 | `search_channels` | Find public or accessible channels by name/description. | `ENABLE_CHANNELS` enabled. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. | `ENABLE_CHANNELS` enabled. |
