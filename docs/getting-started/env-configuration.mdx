@@ -1285,7 +1285,7 @@ This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment va
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints.
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Admin Panel > Settings > Connections > "Cache Base Model List".
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 **How the cache works:**
@@ -5616,6 +5616,8 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Description: Enables or disables SQLite WAL (Write-Ahead Logging) mode. When enabled, SQLite transactions can be managed more efficiently, allowing multiple readers and one writer concurrently, which can improve database performance, especially under high concurrency. **This setting only applies to SQLite databases.**
 
 ### Redis
+
+#### `REDIS_URL`
 
 - Type: `str`
 - Description: Specifies the URL of the Redis instance or cluster host for storing application state.

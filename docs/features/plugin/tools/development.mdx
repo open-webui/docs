@@ -165,7 +165,7 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 | `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
-| `query_knowledge_bases` | Search internal knowledge bases using semantic/vector search. Should be your first choice for finding information before searching the web. | Always available. |
+| `query_knowledge_bases` | Search knowledge bases using semantic/vector search (default: 5 results). **Note:** Does not use hybrid search or reranking. | Always available. |
 | **Image Gen** | | |
 | `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled + model `image_generation` capability. |
 | `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled + model `image_generation` capability. |
@@ -181,8 +181,8 @@ Agentic tool calling requires **high-quality frontier models** to work reliably.
 | `write_note` | Create a new private note for the user. | `ENABLE_NOTES` enabled. |
 | `replace_note_content` | Update an existing note's content or title. | `ENABLE_NOTES` enabled. |
 | **Chat History** | | |
-| `search_chats` | Search across the user's previous conversation history. | Always available. |
-| `view_chat` | Retrieve the full message history of a specific previous chat. | Always available. |
+| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. | Always available. |
+| `view_chat` | Reads and returns the full message history of a specific chat by ID. | Always available. |
 | **Channels** | | |
 | `search_channels` | Find public or accessible channels by name/description. | `ENABLE_CHANNELS` enabled. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. | `ENABLE_CHANNELS` enabled. |

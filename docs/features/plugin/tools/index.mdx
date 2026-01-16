@@ -157,14 +157,14 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
 | `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. | Always available. |
 | `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
-| `query_knowledge_files` | Search internal knowledge base files using semantic/vector search. This should be your first choice for finding information before searching the web. | Always available. |
+| `query_knowledge_files` | Search knowledge base files using simple vector search. **Note:** Does not use hybrid search or reranking—for full RAG pipeline with reranking, use File Context instead by attaching files via `#` or assigning knowledge bases. | Always available. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
 | **Image Gen** | | |
-| `generate_image` | Generates a new image based on a prompt (supports `steps`). | `ENABLE_IMAGE_GENERATION` enabled. |
-| `edit_image` | Edits an existing image based on a prompt and URL. | `ENABLE_IMAGE_EDIT` enabled.|
+| `generate_image` | Generates a new image based on a prompt. | `ENABLE_IMAGE_GENERATION` enabled. |
+| `edit_image` | Edits existing images based on a prompt and image URLs. | `ENABLE_IMAGE_EDIT` enabled. |
 | **Memory** | | |
-| `search_memories` | Searches the user's personal memory/personalization bank. Supports an optional `count` parameter to specify how many memories to return (default: 5). | Memory feature enabled. |
+| `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
 | `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
 | `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled. |
 | **Notes** | | |
@@ -173,8 +173,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `write_note` | Create a new private note for the user. | `ENABLE_NOTES` enabled. |
 | `replace_note_content` | Update an existing note's content or title. | `ENABLE_NOTES` enabled. |
 | **Chat History** | | |
-| `search_chats` | Search across the user's previous conversation history. | Always available. |
-| `view_chat` | Retrieve the full message history of a specific previous chat. | Always available. |
+| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. | Always available. |
+| `view_chat` | Reads and returns the full message history of a specific chat by ID. | Always available. |
 | **Channels** | | |
 | `search_channels` | Find public or accessible channels by name/description. | `ENABLE_CHANNELS` enabled. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. | `ENABLE_CHANNELS` enabled. |
@@ -184,8 +184,47 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. | Always available. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). | Always available. |
 
+#### Tool Parameters Reference
+
+| Tool | Parameters |
+|------|------------|
+| `search_web` | `query` (required), `count` (default: 5) |
+| `fetch_url` | `url` (required) |
+| `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) |
+| `query_knowledge_bases` | `query` (required), `count` (default: 5) |
+| `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) |
+| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) |
+| `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) |
+| `view_knowledge_file` | `file_id` (required) |
+| `generate_image` | `prompt` (required) |
+| `edit_image` | `prompt` (required), `image_urls` (required) |
+| `search_memories` | `query` (required), `count` (default: 5) |
+| `add_memory` | `content` (required) |
+| `replace_memory_content` | `memory_id` (required), `content` (required) |
+| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp` (optional), `end_timestamp` (optional) |
+| `view_note` | `note_id` (required) |
+| `write_note` | `title` (required), `content` (required) |
+| `replace_note_content` | `note_id` (required), `content` (required), `title` (optional) |
+| `search_chats` | `query` (required), `count` (default: 5), `start_timestamp` (optional), `end_timestamp` (optional) |
+| `view_chat` | `chat_id` (required) |
+| `search_channels` | `query` (required), `count` (default: 5) |
+| `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp` (optional), `end_timestamp` (optional) |
+| `view_channel_message` | `message_id` (required) |
+| `view_channel_thread` | `parent_message_id` (required) |
+| `get_current_timestamp` | None |
+| `calculate_timestamp` | `days_ago` (default: 0), `weeks_ago` (default: 0), `months_ago` (default: 0), `years_ago` (default: 0) |
+
 :::info Automatic Timezone Detection
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
+:::
+
+:::tip Knowledge Base Tools vs RAG Pipeline
+The native `query_knowledge_files` tool uses **simple vector search** with a default of 5 results. It does **not** use:
+- Hybrid search (BM25 + vector)
+- Reranking (external reranker endpoint)
+- The "Top K Reranker" admin setting
+
+For the full RAG pipeline with hybrid search and reranking, use the **File Context** capability (attach files via `#` or knowledge base assignment) instead of relying on autonomous tool calls.
 :::
 
 **Why use these?** It allows for **Deep Research** (searching the web multiple times, or querying knowledge bases), **Contextual Awareness** (looking up previous chats or notes), **Dynamic Personalization** (saving facts), and **Precise Automation** (generating content based on existing notes or documents).
@@ -209,7 +248,7 @@ The **Builtin Tools** capability can be toggled on or off for each model in the 
 2. **RAG still works** (if File Context is enabled): Attached files are still processed via RAG and injected as context.
 3. **No autonomous retrieval**: The model cannot decide to search knowledge bases or fetch additional information—it works only with what's provided upfront.
 
-:::warning Builtin Tools vs File Context
+:::tip Builtin Tools vs File Context
 **Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG—that's controlled by the separate **File Context** capability.
 
 - **File Context** = Whether Open WebUI extracts and injects file content (RAG processing)

@@ -35,7 +35,7 @@ class Pipe:
     def __init__(self):
         self.valves = self.Valves()
 
-    def pipe(self, body: dict):
+    async def pipe(self, body: dict):
         # Logic goes here
         print(self.valves, body)  # This will print the configuration options and the input body
         return "Hello, World!"
@@ -73,7 +73,7 @@ def __init__(self):
 - **Purpose**: Processes the input data using your custom logic and returns the result.
 
 ```python
-def pipe(self, body: dict):
+async def pipe(self, body: dict):
     # Logic goes here
     print(self.valves, body)  # This will print the configuration options and the input body
     return "Hello, World!"
@@ -106,7 +106,7 @@ class Pipe:
             {"id": "model_id_3", "name": "model_3"},
         ]
 
-    def pipe(self, body: dict):
+    async def pipe(self, body: dict):
         # Logic goes here
         print(self.valves, body)  # Prints the configuration options and the input body
         model = body.get("model", "")
