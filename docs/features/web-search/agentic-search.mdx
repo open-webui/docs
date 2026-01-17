@@ -29,13 +29,19 @@ For comprehensive information about all built-in agentic tools (including web se
 
 To unlock these features, your model must support native tool calling and have strong reasoning capabilities (e.g., GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, MiniMax M2.1). Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
 
-1.  **Enable Web Search**: Ensure a search engine is configured in **Admin Panel > Settings > Web Search**.
-2.  **Enable Native Mode (Agentic Mode)**:
-    *   Go to **Admin Panel > Settings > Models**.
-    *   Navigate to **Model Specific Settings** for your target model.
-    *   Under **Advanced Parameters**, set **Function Calling** to `Native`.
-3.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
-4.  **Chat Features**: Ensure the **Web Search** feature is toggled **ON** for your chat session.
+1.  **Enable Web Search Globally**: Ensure a search engine is configured in **Admin Panel → Settings → Web Search**.
+2.  **Enable Model Capability**: In **Admin Panel → Settings → Models**, select your model and enable the **Web Search** capability.
+3.  **Enable Native Mode (Agentic Mode)**:
+    *   In the same model settings, under **Advanced Parameters**, set **Function Calling** to `Native`.
+4.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
+
+:::tip Model Capability vs. Chat Toggle
+In **Native Mode**, the `search_web` and `fetch_url` tools are automatically included based on the model's `web_search` capability setting. The chat toggle is not required.
+
+In **Default Mode** (non-native), the chat toggle still controls whether web search is performed via RAG-style injection.
+
+**Important**: If you disable the `web_search` capability on a model but use Native Mode, the tools won't be available even if you manually toggle Web Search on in the chat.
+:::
 
 ## How Native Tools Handle Data (Agentic Mode)
 🔗 It is important to understand that Native Mode (Agentic Mode) works fundamentally differently from the global "Web Search" toggle found in standard models.

@@ -148,41 +148,41 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 🛠️ When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools based on the features toggled for the chat. This unlocks truly agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.1) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
 
-| Tool | Purpose | Requirements |
-|------|---------|--------------|
-| **Search & Web** | | |
-| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. | `ENABLE_WEB_SEARCH` enabled. |
-| `fetch_url` | Visits a URL and extracts text content via the Web Loader. | Part of Web Search feature. |
-| **Knowledge Base** | | |
-| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. | Always available. |
-| `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. | Always available. |
-| `search_knowledge_bases` | Search knowledge bases by name and description. | Always available. |
-| `query_knowledge_files` | Search knowledge base files using simple vector search. **Note:** Does not use hybrid search or reranking—for full RAG pipeline with reranking, use File Context instead by attaching files via `#` or assigning knowledge bases. | Always available. |
-| `search_knowledge_files` | Search files across accessible knowledge bases by filename. | Always available. |
-| `view_knowledge_file` | Get the full content of a file from a knowledge base. | Always available. |
-| **Image Gen** | | |
-| `generate_image` | Generates a new image based on a prompt. | `ENABLE_IMAGE_GENERATION` enabled. |
-| `edit_image` | Edits existing images based on a prompt and image URLs. | `ENABLE_IMAGE_EDIT` enabled. |
-| **Memory** | | |
-| `search_memories` | Searches the user's personal memory/personalization bank. | Memory feature enabled. |
-| `add_memory` | Stores a new fact in the user's personalization memory. | Memory feature enabled. |
-| `replace_memory_content` | Updates an existing memory record by its unique ID. | Memory feature enabled. |
-| **Notes** | | |
-| `search_notes` | Search the user's notes by title and content. | `ENABLE_NOTES` enabled. |
-| `view_note` | Get the full markdown content of a specific note. | `ENABLE_NOTES` enabled. |
-| `write_note` | Create a new private note for the user. | `ENABLE_NOTES` enabled. |
-| `replace_note_content` | Update an existing note's content or title. | `ENABLE_NOTES` enabled. |
-| **Chat History** | | |
-| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. | Always available. |
-| `view_chat` | Reads and returns the full message history of a specific chat by ID. | Always available. |
-| **Channels** | | |
-| `search_channels` | Find public or accessible channels by name/description. | `ENABLE_CHANNELS` enabled. |
-| `search_channel_messages` | Search for specific messages inside accessible channels. | `ENABLE_CHANNELS` enabled. |
-| `view_channel_message` | View a specific message or its details in a channel. | `ENABLE_CHANNELS` enabled. |
-| `view_channel_thread` | View a full message thread/replies in a channel. | `ENABLE_CHANNELS` enabled. |
-| **Time Tools** | | |
-| `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. | Always available. |
-| `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). | Always available. |
+| Tool | Purpose |
+|------|---------|
+| **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled.* |
+| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
+| `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
+| **Knowledge Base** | *Always available.* |
+| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. |
+| `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. |
+| `search_knowledge_bases` | Search knowledge bases by name and description. |
+| `query_knowledge_files` | Search knowledge base files using simple vector search. **Note:** Does not use hybrid search or reranking—for full RAG pipeline with reranking, use File Context instead by attaching files via `#` or assigning knowledge bases. |
+| `search_knowledge_files` | Search files across accessible knowledge bases by filename. |
+| `view_knowledge_file` | Get the full content of a file from a knowledge base. |
+| **Image Gen** | *Requires image generation enabled (per-tool).* |
+| `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
+| `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
+| **Memory** | *Requires Memory feature enabled.* |
+| `search_memories` | Searches the user's personal memory/personalization bank. |
+| `add_memory` | Stores a new fact in the user's personalization memory. |
+| `replace_memory_content` | Updates an existing memory record by its unique ID. |
+| **Notes** | *Requires `ENABLE_NOTES` enabled.* |
+| `search_notes` | Search the user's notes by title and content. |
+| `view_note` | Get the full markdown content of a specific note. |
+| `write_note` | Create a new private note for the user. |
+| `replace_note_content` | Update an existing note's content or title. |
+| **Chat History** | *Always available.* |
+| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. |
+| `view_chat` | Reads and returns the full message history of a specific chat by ID. |
+| **Channels** | *Requires `ENABLE_CHANNELS` enabled.* |
+| `search_channels` | Find public or accessible channels by name/description. |
+| `search_channel_messages` | Search for specific messages inside accessible channels. |
+| `view_channel_message` | View a specific message or its details in a channel. |
+| `view_channel_thread` | View a full message thread/replies in a channel. |
+| **Time Tools** | *Always available.* |
+| `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
+| `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
 
 #### Tool Parameters Reference
 

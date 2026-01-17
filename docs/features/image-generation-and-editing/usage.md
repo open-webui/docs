@@ -18,9 +18,12 @@ Before you can use image generation, you must ensure that the **Image Generation
 If your model is configured with **Native Function Calling** (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), it can invoke image generation directly as a tool.
 
 ### How it works:
-- **Requirement**: The **Image Generation** feature must be toggled **ON** for the chat or model. This grants the model "permission" to use the tool.
+- **Requirements**: 
+  - **Image Generation** must be enabled globally in **Admin Panel → Settings → Images**
+  - The model must have the **Image Generation** capability enabled
+- **No Chat Toggle Needed**: With Native Mode, the `generate_image` tool is automatically included when the model has the `image_generation` capability. You don't need to manually toggle it on per chat.
 - **Natural Language**: You can simply ask the model: *"Generate an image of a cybernetic forest."*
-- **Action**: If **Native Mode** is active and the feature is enabled, the model will invoke the `generate_image` tool.
+- **Action**: If **Native Mode** is active and the model has the capability, it will invoke the `generate_image` tool.
 - **Display**: The generated image is displayed directly in the chat interface.
 - **Editing**: This also supports **Image Editing** (inpainting) via the `edit_image` tool (e.g., *"Make the sky in this image red"*).
 
