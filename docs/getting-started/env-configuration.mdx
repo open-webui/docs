@@ -5855,8 +5855,8 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 #### `WEBSOCKET_SERVER_ENGINEIO_LOGGING`
 
 - Type: `bool`
-- Default: `false`
-- Description: Controls logging for EngineIO server related to websocket operations.
+- Default: Falls back to `WEBSOCKET_SERVER_LOGGING` if not set, otherwise `false`
+- Description: Controls logging for Engine.IO server related to websocket operations. If not explicitly set, this inherits the value from `WEBSOCKET_SERVER_LOGGING`.
 
 :::warning
 
