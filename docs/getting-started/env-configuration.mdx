@@ -2262,11 +2262,25 @@ When using Pinecone as the vector store, the following environment variables are
 
 ### Weaviate
 
+:::info
+
+**Self-Hosted and Cloud Deployments**
+
+Open WebUI uses `connect_to_custom` for Weaviate connections, which supports both locally hosted and remote Weaviate instances. This is essential for self-hosted deployments where HTTP and gRPC endpoints may be on different ingresses or hostnames, which is common in container orchestration platforms like Kubernetes or Azure Container Apps.
+
+:::
+
 #### `WEAVIATE_HTTP_HOST`
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Specifies the hostname of the Weaviate server for HTTP connections.
+- Description: Specifies the hostname of the Weaviate server for HTTP connections. For self-hosted deployments, this is typically your Weaviate HTTP endpoint hostname.
+
+#### `WEAVIATE_GRPC_HOST`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the hostname of the Weaviate server for gRPC connections. This can be different from `WEAVIATE_HTTP_HOST` when HTTP and gRPC are served on separate ingresses, which is common in container orchestration environments.
 
 #### `WEAVIATE_HTTP_PORT`
 
@@ -2280,11 +2294,29 @@ When using Pinecone as the vector store, the following environment variables are
 - Default: `50051`
 - Description: Specifies the gRPC port for connecting to the Weaviate server.
 
+#### `WEAVIATE_HTTP_SECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables HTTPS for HTTP connections to the Weaviate server. Set to `true` when connecting to a Weaviate instance with TLS enabled on the HTTP endpoint.
+
+#### `WEAVIATE_GRPC_SECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables TLS for gRPC connections to the Weaviate server. Set to `true` when connecting to a Weaviate instance with TLS enabled on the gRPC endpoint.
+
 #### `WEAVIATE_API_KEY`
 
 - Type: `str`
 - Default: `None`
 - Description: Sets the API key for authenticating with Weaviate server.
+
+#### `WEAVIATE_SKIP_INIT_CHECKS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Skips Weaviate initialization checks when connecting. This can be useful in certain network configurations where the checks may fail but the connection itself works.
 
 ### Oracle 23ai Vector Search (oracle23ai)
 
