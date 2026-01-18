@@ -150,20 +150,20 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 | Tool | Purpose |
 |------|---------|
-| **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled.* |
-| `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
+| **Search & Web** |  |
+| `search_web` | *Requires `ENABLE_WEB_SEARCH` + model `web_search` capability + chat toggle ON.* – Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
 | **Knowledge Base** | *Always available.* |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. |
-| `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. |
+| `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Use this to discover relevant knowledge bases before querying their files. |
 | `search_knowledge_bases` | Search knowledge bases by name and description. |
 | `query_knowledge_files` | Search knowledge base files using simple vector search. **Note:** Does not use hybrid search or reranking—for full RAG pipeline with reranking, use File Context instead by attaching files via `#` or assigning knowledge bases. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. |
-| **Image Gen** | *Requires image generation enabled (per-tool).* |
+| **Image Gen** | *Requires image generation enabled + model `image_generation` capability + chat toggle ON (per-tool).* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
-| `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
-| **Memory** | *Requires Memory feature enabled.* |
+| `edit_image` | Edits an existing image based on a prompt and URL. Requires `ENABLE_IMAGE_EDIT`. |
+| **Memory** | *Requires Memory feature enabled globally and for the user.* |
 | `search_memories` | Searches the user's personal memory/personalization bank. |
 | `add_memory` | Stores a new fact in the user's personalization memory. |
 | `replace_memory_content` | Updates an existing memory record by its unique ID. |
@@ -174,7 +174,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `replace_note_content` | Update an existing note's content or title. |
 | **Chat History** | *Always available.* |
 | `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. |
-| `view_chat` | Reads and returns the full message history of a specific chat by ID. |
+| `view_chat` | Retrieve the full message history of a specific previous chat. |
 | **Channels** | *Requires `ENABLE_CHANNELS` enabled.* |
 | `search_channels` | Find public or accessible channels by name/description. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
@@ -216,6 +216,19 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 :::info Automatic Timezone Detection
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
+:::
+
+:::tip Four-Layer Tool Control
+Feature-specific tools (Web Search, Image Generation, Code Interpreter) require **all four conditions** to be met:
+
+1. **Feature enabled globally** (e.g., **Admin Panel > Settings > Web Search / Code Execution / Images**)
+2. **Builtin Tools** capability ON for the model
+3. **Feature-specific capability** ON for the model (e.g., `web_search`)
+4. **Chat toggle** enabled for the feature
+
+**Enabling Features by Default:**
+- **Admins:** Go to **Admin Panel > Settings > Models**, select a model, and scroll to **Default Features**. Toggle on the desired features so they're pre-enabled for new chats.
+- **Users:** Go to **Settings > Interface** and set **Web Search** to **Always**.
 :::
 
 :::tip Knowledge Base Tools vs RAG Pipeline
