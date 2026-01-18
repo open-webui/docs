@@ -78,7 +78,7 @@ const config: Config = {
 			},
 			items: [
 				{
-					to: "blog",
+					href: "https://openwebui.com/blog",
 					label: "Blog",
 					position: "left",
 				},
