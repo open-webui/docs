@@ -1481,6 +1481,19 @@ Invalid regex patterns will cause password validation to fail, potentially preve
 
 :::
 
+#### `PASSWORD_VALIDATION_HINT`
+
+- Type: `str`
+- Default: `""` (empty string)
+- Description: Custom hint message displayed to users when their password fails validation. This message appears in error dialogs during signup, password changes, and admin user creation when the password doesn't meet the requirements defined by `PASSWORD_VALIDATION_REGEX_PATTERN`. Use this to explain your specific password requirements in user-friendly terms.
+- Example: `Password must be at least 12 characters with uppercase, lowercase, number, and special character.`
+
+:::tip
+
+When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_VALIDATION_HINT` to explain the requirements in plain language. Without a hint, users will only see a generic "Invalid password" error with no guidance on what's required.
+
+:::
+
 #### `WEBUI_SECRET_KEY`
 
 - Type: `str`
