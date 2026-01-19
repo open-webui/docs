@@ -11,7 +11,7 @@ Knowledge part of Open WebUI is like a memory bank that makes your interactions 
 - It's like a memory system for Open WebUI that allows it to pull from saved data, making responses more personalized and contextually aware.
 - You can use Knowledge directly in your chats with Open WebUI to access the stored data whenever you need it.
 
-Setting up Knowledge is straightforward! Simply head to the Knowledge section inside work space and start adding details or data. You don't need coding expertise or technical setup; it's built into the core system!
+Setting up Knowledge is straightforward! Simply navigate to **Workspace → Knowledge** in the sidebar and start adding details or data. You don't need coding expertise or technical setup; it's built into the core system!
 
 ## What is the "Knowledge" Section?
 
@@ -62,7 +62,7 @@ For complete details on all built-in agentic tools and how to configure them, se
 
 ### Setting Up Your Knowledge Base
 
-1. **Navigate to the Knowledge Section**: This area is designed to be user-friendly and intuitive.
+1. **Navigate to the Knowledge Section**: Click **Workspace** in the sidebar, then select **Knowledge**. This area is designed to be user-friendly and intuitive.
 2. **Add Entries**: Input information you want Open WebUI to remember. It can be as specific or broad as you like.
 3. **Save and Apply**: Once saved, the Knowledge is accessible and ready to enhance your chat interactions.
 

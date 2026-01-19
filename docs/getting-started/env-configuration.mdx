@@ -3029,8 +3029,21 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables local web fetch for RAG.
+- Description: Controls whether RAG web fetch operations can access URLs that resolve to private/local network IP addresses.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to private IP addresses, including:
+
+- IPv4 private ranges (`10.x.x.x`, `172.16.x.x`-`172.31.x.x`, `192.168.x.x`, `127.x.x.x`)
+- IPv6 private ranges
+
+This is a **Server-Side Request Forgery (SSRF) protection**. Without this safeguard, a malicious user could provide URLs that appear external but resolve to internal addresses, potentially exposing internal services, cloud metadata endpoints, or other sensitive resources.
+
+:::warning
+
+Only enable this setting if you need to fetch content from internal network resources (e.g., an internal wiki or intranet) **and** you trust all users with access to your Open WebUI instance. Enabling this in a multi-tenant or public-facing deployment introduces significant security risk.
+
+:::
 
 ### Google Drive
 
