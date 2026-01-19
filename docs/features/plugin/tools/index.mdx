@@ -137,6 +137,32 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 - **Large Local Models**: Some large local models (e.g., Qwen 3 32B, Llama 3.3 70B) can work with Native Mode, but results vary significantly by model quality.
 - **Small Local Models Warning**: **Small local models** (under 30B parameters) often struggle with Native Mode. They may produce malformed JSON, fail to follow strict state management, or make poor tool selection decisions. For these models, **Default Mode** is usually more reliable.
 
+#### Known Model-Specific Issues
+
+:::caution DeepSeek V3.2 Function Calling Issues
+**DeepSeek V3.2** has known issues with native function calling that cause **reproducible failures**. Despite being a 600B+ parameter model, it often outputs malformed tool calls.
+
+**The Problem**: DeepSeek V3.2 was trained using a proprietary format called **DSML (DeepSeek Markup Language)** for tool calls. When using native function calling, the model sometimes outputs raw DSML/XML-like syntax instead of proper JSON:
+- `<functionInvoke name="fetch_url">` instead of valid JSON
+- `<function_calls>` / `</function_calls>` tags in content
+- Garbled hybrid text like `prominentfunction_cinvoke name="search_parameter`
+
+**Why it happens**: This is heavily **model-dependent behavior induced during DeepSeek's fine-tuning process**. DeepSeek chose to train their model on DSML rather than standard OpenAI-style JSON tool calls. While inference providers (VertexAI, OpenRouter, etc.) attempt to intercept DSML blocks and convert them to OpenAI-style JSON, this translation layer is unreliable under certain conditions (streaming, high temperature, high concurrency, multi-turn conversations). **The primary responsibility lies with DeepSeek** for using a non-standard format that requires fragile translation.
+
+**Known contributing factors**:
+- Higher temperature values correlate with more malformed output
+- Multi-round conversations (6-8+ turns) can cause the model to stop calling functions entirely
+- Complex multi-step workflows (15-30 tool calls) may cause "schema drift" where argument formats degrade
+
+**Workarounds**:
+- **Use Default Mode** (prompt-based) instead of Native Mode for DeepSeek — this is the recommended approach
+- Lower temperature when using tool calling
+- Limit multi-round tool calling sessions
+- Consider alternative models for agentic workflows
+
+**This is a DeepSeek model/API issue**, not an Open WebUI issue. Open WebUI correctly sends tools in standard OpenAI format — the malformed output originates from DeepSeek's non-standard internal format.
+:::
+
 | Feature | Default Mode | Native Mode |
 |:---|:---|:---|
 | **Latency** | Medium/High | Low |
