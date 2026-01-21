@@ -45,6 +45,10 @@ So even though adding mcpo might at first seem like "just one more layer"—in r
 
 ✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable—without changing a single line of tool server code.
 
+:::note
+**Limitation**: Since mcpo exposes MCP tools as OpenAPI endpoints, they inherit OpenAPI's limitations—specifically, they cannot use Open WebUI's [event system](/features/plugin/development/events) for real-time UI updates (status messages, notifications, user input prompts). These features are only available for native Python tools.
+:::
+
 ### ✅ Quickstart: Running the Proxy Locally
 
 Here's how simple it is to launch the MCP-to-OpenAPI proxy server using the lightweight, easy-to-use tool **mcpo** ([GitHub Repository](https://github.com/open-webui/mcpo)):
