@@ -88,7 +88,7 @@ Key API endpoints:
 :::warning Important: Async File Processing
 When uploading files via API, processing happens asynchronously. You **must** wait for file processing to complete before adding files to a knowledge base, or you will receive an "empty content" error.
 
-For detailed examples and proper workflow handling, see the [API Endpoints documentation](/getting-started/api-endpoints#retrieval-augmented-generation-rag).
+For detailed examples and proper workflow handling, see the [API Endpoints documentation](/getting-started/api-endpoints#-retrieval-augmented-generation-rag).
 :::
 
 ## Summary

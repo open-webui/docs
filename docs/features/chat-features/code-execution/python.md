@@ -62,7 +62,7 @@ When using **Native function calling mode** with a capable model (e.g., GPT-5, C
 2. Model must have `code_interpreter` capability enabled
 3. Model must use **Native** function calling mode (set in model's advanced params)
 
-For more details on builtin tools and native mode, see the [Tool Development Guide](/features/plugin/tools/development#built-in-system-tools-nativeagentic-mode).
+For more details on builtin tools and native mode, see the [Tool Development Guide](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
 
 ## Displaying Images Inline (matplotlib, etc.)
 
