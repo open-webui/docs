@@ -2753,6 +2753,16 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Description: Extracts images from PDFs using OCR when loading documents.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `PDF_LOADER_MODE`
+
+- Type: `str`
+- Options:
+  - `page` - Creates one document per page (default).
+  - `single` - Combines all pages into one document for better chunking across page boundaries.
+- Default: `page`
+- Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
