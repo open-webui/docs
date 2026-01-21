@@ -75,3 +75,30 @@ class Filter:
 ```
 
 </details>
+
+## Input Types
+
+Valves support special input types that change how fields are rendered in the UI. You can configure these using `json_schema_extra` with the `input` key in your Pydantic `Field` definitions.
+
+### Password Input (Masked Fields)
+
+For sensitive fields like passwords, API keys, or secrets, you can use the password input type to mask the value in the UI. This prevents the password from being visible on screen (protecting against shoulder surfing).
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class UserValves(BaseModel):
+        service_password: str = Field(
+            default="",
+            description="Your service password",
+            json_schema_extra={"input": {"type": "password"}}
+        )
+```
+
+When rendered, this field will appear as a masked input (dots instead of characters) with a toggle to reveal the value if needed, using Open WebUI's `SensitiveInput` component.
+
+:::tip
+Use password input types for any credential or secret that users configure in their Valves or UserValves. This is especially important for UserValves since they are configurable by end users directly from the chat interface.
+:::
+
