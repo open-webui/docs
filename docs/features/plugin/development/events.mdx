@@ -22,6 +22,20 @@ Think of Events like push notifications and modal dialogs that your plugin can t
 
 ---
 
+## 🏁 Availability
+
+:::important
+Events are **only available for native Python Tools and Functions** defined directly in Open WebUI.
+
+Events are **NOT supported** for:
+- **OpenAPI tool servers** (external REST APIs)
+- **MCP tool servers** (Model Context Protocol)
+
+These external tools communicate via HTTP request/response and cannot emit real-time UI events.
+:::
+
+---
+
 ## 🧰 Basic Usage
 
 ### Sending an Event
