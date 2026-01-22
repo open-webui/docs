@@ -38,6 +38,11 @@ Open WebUI supports two kinds of variables to make your prompts more dynamic and
   * `{{CURRENT_WEEKDAY}}`: Current day of the week
 * **User Information**:
   * `{{USER_NAME}}`: Current user's name
+  * `{{USER_EMAIL}}`: Current user's email address
+  * `{{USER_BIO}}`: Current user's bio. Configured in **Settings > Account > User Profile**. If not set, the variable remains unreplaced.
+  * `{{USER_GENDER}}`: Current user's gender. Configured in **Settings > Account > User Profile**. If not set, the variable remains unreplaced.
+  * `{{USER_BIRTH_DATE}}`: Current user's birth date. Configured in **Settings > Account > User Profile**. If not set, the variable remains unreplaced.
+  * `{{USER_AGE}}`: Current user's age, calculated from birth date. If birth date is not set, the variable remains unreplaced.
   * `{{USER_LANGUAGE}}`: User's selected language
   * `{{USER_LOCATION}}`: User's location (requires HTTPS and Settings > Interface toggle)
 
