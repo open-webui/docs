@@ -1550,45 +1550,130 @@ from typing import Optional, Callable, Awaitable
 
 ### Rich UI Element Embedding
 
-Both External and Built-In Tools now support rich UI element embedding, allowing tools to return HTML content and interactive iframes that display directly within chat conversations. This feature enables tools to provide sophisticated visual interfaces, interactive widgets, charts, dashboards, and other rich web content.
+Both External and Built-in Tools support rich UI element embedding, allowing tools to return HTML content and interactive iframes that display directly within chat conversations. This feature enables tools to provide sophisticated visual interfaces, interactive widgets, charts, dashboards, and other rich web content.
 
-When a tool returns an `HTMLResponse` with the appropriate headers, the content will be embedded as an interactive iframe in the chat interface rather than displayed as plain text.
+When a tool returns an `HTMLResponse` with the `Content-Disposition: inline` header, the content will be embedded as an interactive iframe in the chat interface rather than displayed as plain text.
 
-#### Basic Usage
+:::important Native vs External Tools Have Different Return Patterns
+The implementation differs based on whether you're writing a native/built-in tool or an external tool (OpenAPI/MCP):
 
-To embed HTML content, your tool should return an `HTMLResponse` with the `Content-Disposition: inline` header:
+- **Native/Built-in Tools**: Return an `HTMLResponse` object directly
+- **External Tools (OpenAPI/MCP)**: Return a tuple `(response, headers)`
+
+Both approaches require the `Content-Disposition: inline` header.
+:::
+
+#### Native/Built-in Tools
+
+For native tools, return an `HTMLResponse` object with the `Content-Disposition: inline` header:
 
 ```python
 from fastapi.responses import HTMLResponse
 
-def create_visualization_tool(self, data: str) -> HTMLResponse:
-    """
-    Creates an interactive data visualization that embeds in the chat.
+class Tools:
+    def __init__(self):
+        self.valves = self.Valves()
 
-    :param data: The data to visualize
-    """
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Data Visualization</title>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    </head>
-    <body>
-        <div id="chart" style="width:100%;height:400px;"></div>
-        <script>
-            // Your interactive chart code here
-            Plotly.newPlot('chart', [{
-                y: [1, 2, 3, 4],
-                type: 'scatter'
-            }]);
-        </script>
-    </body>
-    </html>
-    """
+    class Valves(BaseModel):
+        chart_theme: str = Field("plotly_dark", description="Chart color theme")
 
-    headers = {"Content-Disposition": "inline"}
-    return HTMLResponse(content=html_content, headers=headers)
+    async def create_visualization_tool(self, data: str) -> HTMLResponse:
+        """
+        Creates an interactive data visualization that embeds in the chat.
+
+        :param data: The data to visualize (comma-separated values)
+        """
+        values = [float(x.strip()) for x in data.split(",")]
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Data Visualization</title>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+            <style>
+                body {{ margin: 0; padding: 20px; font-family: system-ui, sans-serif; }}
+            </style>
+        </head>
+        <body>
+            <div id="chart" style="width:100%;height:500px;"></div>
+            <script>
+                const data = [{{
+                    y: {values},
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    marker: {{ color: '#636efa' }}
+                }}];
+
+                const layout = {{
+                    title: 'Data Visualization',
+                    theme: '{self.valves.chart_theme}',
+                    xaxis: {{ title: 'Index' }},
+                    yaxis: {{ title: 'Value' }},
+                    margin: {{ t: 50, l: 50, r: 50, b: 50 }}
+                }};
+
+                Plotly.newPlot('chart', data, layout);
+            </script>
+        </body>
+        </html>
+        """
+
+        return HTMLResponse(
+            content=html_content,
+            headers={"Content-Disposition": "inline"}
+        )
+```
+
+**Key requirements for native tools:**
+1. Import `HTMLResponse` from `fastapi.responses`
+2. Set return type annotation to `-> HTMLResponse`
+3. Use `HTMLResponse(content=..., headers={...})` constructor
+4. Include `"Content-Disposition": "inline"` in headers
+
+#### External Tools (OpenAPI/MCP)
+
+For external tools, return a tuple `(response, headers)`:
+
+```python
+class Tools:
+    def __init__(self):
+        self.valves = self.Valves()
+
+    class Valves(BaseModel):
+        api_endpoint: str = Field("https://api.example.com", description="API endpoint")
+
+    async def create_visualization_tool(self, data: str) -> str:
+        """
+        Creates an interactive data visualization that embeds in the chat.
+
+        :param data: The data to visualize
+        """
+        values = [float(x.strip()) for x in data.split(",")]
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Data Visualization</title>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        </head>
+        <body>
+            <div id="chart" style="width:100%;height:400px;"></div>
+            <script>
+                Plotly.newPlot('chart', [{{
+                    y: {values},
+                    type: 'scatter'
+                }}]);
+            </script>
+        </body>
+        </html>
+        """
+
+        headers = {
+            "Content-Disposition": "inline",
+            "Content-Type": "text/html"
+        }
+
+        return html_content, headers
 ```
 
 #### Advanced Features
@@ -1686,6 +1771,12 @@ app.get('/tools/dashboard', (req,res) => {
 
 More info about the header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Expose-Headers
 
+#### Limitations
+
+- Embedded HTML cannot access the parent page's DOM due to cross-origin restrictions
+- Communication between iframe and parent requires `postMessage` API
+- External resources (scripts, stylesheets) must be loaded via absolute URLs (CDN, etc.)
+- Some browser features may be restricted by the iframe sandbox configuration
 
 ## External packages
 
