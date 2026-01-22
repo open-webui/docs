@@ -156,6 +156,22 @@ DATABASE_POOL_MAX_OVERFLOW=20 (or higher)
 
 **Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keep the combined total under 50-80 per Open WebUI instance to leave room for other clients and maintenance operations.
 
+:::warning Pool Size Multiplies with Concurrency
+
+**Each Open WebUI process maintains its own independent connection pool.** This applies to multiple replicas (Kubernetes pods, Docker Swarm replicas) *and* multiple Uvicorn workers within each replica.
+
+The actual maximum number of database connections is:
+
+```
+Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Total processes
+```
+
+Where `Total processes = Number of replicas × UVICORN_WORKERS per replica`.
+
+For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, 3 replicas, and 2 workers each, you could open up to **210 connections** (35 × 6 processes).
+
+:::
+
 See [DATABASE_POOL_SIZE](/getting-started/env-configuration#database_pool_size) for details.
 
 ---

@@ -341,6 +341,12 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 - Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
 - Persistence: This environment variable is a `PersistentConfig` variable. It can be toggled in the **Admin Panel > Settings > General > User Status**.
 
+#### `ENABLE_EASTER_EGGS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables easter egg features in the UI, such as special themes (e.g., the "Her" theme option in the theme selector). Set to `False` to hide these optional novelty features from users.
+
 #### `ADMIN_EMAIL`
 
 - Type: `str`
@@ -5638,6 +5644,22 @@ To use SQLCipher with existing data, you must either start fresh (with users exp
 For deployments with many concurrent users, consider increasing both `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW`. A good starting point is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`.
 
 **Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database server's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keeping the combined total under 50-80 per Open WebUI instance is recommended to leave room for other clients and maintenance connections.
+
+:::
+
+:::warning Pool Size Multiplies with Concurrency
+
+**Each Open WebUI process maintains its own independent connection pool.** This applies whether you're running multiple Uvicorn workers (`UVICORN_WORKERS > 1`), multiple Kubernetes pods, Docker Swarm replicas, or any other multi-instance deployment.
+
+The actual maximum number of database connections is:
+
+```
+Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Number of processes/instances
+```
+
+For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, and 4 instances (whether workers, pods, or replicas), you could open up to **140 connections** (35 × 4).
+
+When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation—connection pools cannot be shared across separate processes or containers.
 
 :::
 
