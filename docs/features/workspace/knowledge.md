@@ -56,6 +56,10 @@ Autonomous knowledge base exploration works best with frontier models (GPT-5, Cl
 
 These tools enable models to autonomously explore and retrieve information from your knowledge bases, making conversations more contextually aware and grounded in your stored documents.
 
+:::note Per-Model Control
+The Knowledge Base tools require the **Knowledge Base** category to be enabled for the model in **Workspace > Models > Edit > Builtin Tools** (enabled by default). Administrators can disable this category per-model to prevent autonomous knowledge base access.
+:::
+
 :::info Central Tool Documentation
 For complete details on all built-in agentic tools and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
 :::
