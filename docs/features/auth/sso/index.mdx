@@ -39,6 +39,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server - used for OAuth 2.1 authentication for MCP servers. |
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. |
+| `ENABLE_OAUTH_TOKEN_EXCHANGE`         | `false`            | Enables the token exchange endpoint for external apps to exchange OAuth tokens for Open WebUI JWTs. |
 
 :::warning
 
@@ -68,6 +69,14 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
 For more information, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
+
+### OAuth Token Exchange for External Applications
+
+Open WebUI also supports **OAuth Token Exchange**, allowing external applications to authenticate with Open WebUI by exchanging an OAuth provider's access token for an Open WebUI JWT session token. This is useful for programmatic access from scripts, CLI tools, or services that already have OAuth tokens from your identity provider.
+
+**Example use case:** A CLI tool that has obtained an OAuth access token from your identity provider can exchange it for an Open WebUI token to make API calls to Open WebUI.
+
+To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/getting-started/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
 
 ### Google
 
