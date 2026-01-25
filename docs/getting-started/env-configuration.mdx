@@ -4461,6 +4461,46 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.**
 - Usage: For new and secure deployments, **it is recommended to set this to `False`** to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
 
+#### `ENABLE_OAUTH_TOKEN_EXCHANGE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the OAuth token exchange endpoint, allowing external applications to exchange an OAuth provider's access token for an Open WebUI JWT session token. This enables programmatic authentication for external tools and services that already have OAuth tokens from your identity provider.
+- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token.
+
+:::warning
+
+**Security Note**: This feature should only be enabled when you have external applications that need to authenticate with Open WebUI using OAuth tokens from your identity provider. Ensure proper access controls are in place for any external applications using this endpoint.
+
+:::
+
+**Request Example:**
+```bash
+curl -X POST "http://localhost:8080/api/v1/oauth/google/token/exchange" \
+  -H "Content-Type: application/json" \
+  -d '{"token": "ya29.a0AfH6SMB..."}'
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_at": 1735682400,
+  "id": 1,
+  "email": "user@example.com",
+  "name": "John Doe",
+  "role": "user",
+  "profile_image_url": "https://...",
+  "permissions": {...}
+}
+```
+
+**Requirements:**
+- The user must already exist in Open WebUI (they must have signed in via the web interface at least once)
+- The OAuth provider must be properly configured
+- The token exchange uses the same user lookup logic as regular OAuth login (by OAuth `sub` claim first, then by email if `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is enabled)
+
 #### `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`
 
 - Type: `str`
