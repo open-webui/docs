@@ -9,19 +9,23 @@ The `Prompts` section of the `Workspace` within Open WebUI enables users to crea
 
 The Prompts interface provides several key features for managing your custom prompts:
 
-* **Create**: Design new prompts with customizable titles, access levels, and content.
+* **Create**: Design new prompts with customizable names, tags, access levels, and content.
 * **Share**: Share prompts with other users based on configured access permissions.
 * **Access Control**: Set visibility and usage permissions for each prompt (refer to [Permissions](/features/rbac/permissions) for more details).
 * **Slash Commands**: Quickly access prompts using custom slash commands during chat sessions.
+* **Versioning & History**: Track every change with a full version history, allowing you to compare and revert to previous versions.
+* **Tags & Filtering**: Organize your prompts using tags and easily filter through your collection in the workspace.
 
 ### Creating and Editing Prompts
 
 When creating or editing a prompt, you can configure the following settings:
 
-* **Title**: Give your prompt a descriptive name for easy identification.
+* **Name**: Give your prompt a descriptive name for easy identification.
+* **Tags**: Categorize your prompts with tags to make them easier to find and filter in your workspace.
 * **Access**: Set the access level to control who can view and use the prompt.
-* **Command**: Define a slash command that will trigger the prompt (e.g., `/summarize`).
+* **Command**: Define a slash command that will trigger the prompt (e.g., `/summarize`). Commands are triggered in the chat by typing `/` followed by the command name.
 * **Prompt Content**: Write the actual prompt text that will be sent to the model.
+* **Commit Message**: When saving changes, you can provide an optional commit message to describe what was updated in this version.
 
 ### Prompt Variables
 
@@ -58,7 +62,19 @@ By leveraging custom input variables, you can move beyond static text and build 
 * The `{{USER_LOCATION}}` system variable requires:
   * A secure HTTPS connection
   * Enabling the feature in `Settings` > `Interface`
-* The `{{CLIPBOARD}}` system variable requires clipboard access permission from your device
+* The `{{CLIPBOARD}}` system variable requires clipboard access permission from your device.
+
+---
+
+#### Advanced Variable Modifiers
+
+Certain system variables like `{{prompt}}` and `{{MESSAGES}}` support optional modifiers to control their length and which part of the content is included. This is particularly useful for managing context window limits.
+
+* **Start Truncation**: `{{prompt:start:N}}` - Includes only the first **N** characters of the content.
+* **End Truncation**: `{{prompt:end:N}}` - Includes only the last **N** characters of the content.
+* **Middle Truncation**: `{{prompt:middletruncate:N}}` - Includes a total of **N** characters, taking half from the beginning and half from the end, with `...` in the middle.
+
+These modifiers also work with the `{{MESSAGES}}` variable (e.g., `{{MESSAGES:START:5}}` to include only the first 5 messages).
 
 ---
 
@@ -239,6 +255,26 @@ A flexible template for reviewing various types of content.
     Please provide detailed feedback and suggestions for improvement.
     ```
 
+### Prompt Versioning and History
+
+Open WebUI includes a robust versioning system for prompts, allowing you to track changes over time and revert to previous versions if needed.
+
+#### Version Tracking
+Every time you save changes to a prompt's content, name, command, or access control, a new version is automatically created. This ensures that your prompt's evolution is preserved.
+
+#### History Sidebar
+When editing an existing prompt, you will see a **History** sidebar (on desktop) that lists all previous versions in reverse chronological order. Each entry shows:
+* **Commit Message**: A brief description of the changes (if provided).
+* **Author**: The user who made the changes, including their profile picture.
+* **Timestamp**: When the change was made.
+* **Live Badge**: Indicates which version is currently active in the chat.
+
+#### Managing Versions
+* **Previewing**: Click on any version in the history sidebar to preview its content in the main editor.
+* **Setting as Production**: To make a previous version the active "Live" version, select it and click **Set as Production**.
+* **Deleting Versions**: You can delete individual history entries by clicking the menu icon next to the version. Note that you cannot delete the currently active production version.
+* **Copying ID**: Click the prompt ID or a specific version's short ID to copy it to your clipboard for reference.
+
 ### Access Control and Permissions
 
 Prompt management is controlled by the following permission settings:
@@ -261,8 +297,6 @@ Prompt management is controlled by the following permission settings:
 
 ### Migration Notes
 
-If you have existing prompts created before this update, they will continue to work as before. However, note that:
-
-* All existing variables are now treated as optional by default
-* If you want to maintain required behavior for critical fields, edit your prompts to add the `:required` flag to those variables
-* This change provides better user experience by allowing flexible usage of prompt templates
+* **Prompt History Migration**: Existing prompts created before the versioning update have been automatically migrated to the new system. Their current content has been preserved as the initial "Live" version in their history.
+* **ID-based URLs**: The URL structure for editing prompts has changed from using commands to using unique IDs. Existing bookmarks to prompt edit pages may need to be updated.
+* **Variable Requirement**: As of the v0.5.0 update, all variables are now treated as optional by default. To maintain required behavior for critical fields, edit your prompts to add the `:required` flag to those variables.
