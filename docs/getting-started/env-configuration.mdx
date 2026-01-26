@@ -3285,6 +3285,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
   - `azure_ai_search`
   - `yacy`
+  - `yandex` - Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DDGS_BACKEND`
@@ -3547,6 +3548,27 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Type: `str`
 - Default: Empty string (' ')
 - Description: Sets the API key for authenticating with the external web loader service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YANDEX_WEB_SEARCH_URL`
+
+- Type: `str`
+- Default: `https://searchapi.api.cloud.yandex.net/v2/web/search`
+- Description: Specifies the URL of the Yandex Web Search service API endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YANDEX_WEB_SEARCH_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for authenticating with the Yandex Web Search service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YANDEX_WEB_SEARCH_CONFIG`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Optional JSON configuration string for Yandex Web Search. Can be used to set parameters like `searchType` or `region` as per the Yandex API documentation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PERPLEXITY_API_KEY`
