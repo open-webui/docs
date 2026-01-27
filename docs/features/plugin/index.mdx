@@ -17,6 +17,28 @@ Getting started with Tools and Functions is easy because everything’s already 
 
 ## What are "Tools" and "Functions"?
 
+---
+
+:::danger ⚠️ Critical Security Warning
+
+**Tools, Functions, Pipes, Filters, and Pipelines execute arbitrary Python code on your server.** This is by design—it's what makes them powerful. However, this also means:
+
+1. **Only install from trusted sources.** Never import Tools or Functions from unknown or untrusted sources. Malicious code can compromise your entire system.
+
+2. **Review code before importing.** Before installing any community Tool or Function, review its source code. If you don't understand what it does, don't install it.
+
+3. **Protect your data directory.** The `data` directory (mounted at `/app/backend/data` in Docker) contains your database, configurations, and cached Tools/Functions. If an attacker gains write access to this directory, they can inject malicious code that will execute on your server.
+
+4. **Restrict Workspace access.** Only trusted administrators should have permission to create, import, or modify Tools and Functions. Regular users should **not** have Workspace access unless explicitly required.
+
+5. **Audit installed plugins regularly.** Periodically review the Tools and Functions installed in your instance via **Workspace → Tools** and **Admin Panel → Functions**.
+
+**What could go wrong?** A malicious Tool or Function could exfiltrate data, install malware, mine cryptocurrency, pivot to other systems on your network, or corrupt your instance.
+
+:::
+
+---
+
 Let's start by thinking of **Open WebUI** as a "base" software that can do many tasks related to using Large Language Models (LLMs). But sometimes, you need extra features or abilities that don't come *out of the box*—this is where **tools** and **functions** come into play.
 
 ### Tools
