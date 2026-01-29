@@ -116,6 +116,32 @@ A raw Base Model can be cloned as a custom Workspace model, but it will not clon
 To download new raw Base Models (like `Llama-3.2-3B-Instruct-GGUF:Q8_0` or `Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`), navigate to **Settings > Connections > Ollama**. Alternatively, type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector to pull directly from Hugging Face. This action will create a button within the model selector labeled "Pull [Model Name]" that will begin downloading the model from its source once clicked.
 :::
 
+## Global Model Management (Admin)
+
+Administrators have access to a centralized management interface via **Admin Panel > Settings > Models**. This page provides powerful tools for decluttering and organizing the model list, especially when connected to providers with hundreds of available models.
+
+### View Filtering
+
+The **Admin View Selector** allows you to filter the entire list of models by their operational status. This is located next to the search bar and includes the following views:
+
+- **All**: Shows every model available to the system.
+- **Enabled**: Displays only models that are currently active and selectable by users.
+- **Disabled**: Shows models that have been deactivated.
+- **Visible**: Shows models that are currently visible in the user model selector.
+- **Hidden**: Displays only the models that have been hidden (these appear with reduced opacity in the list).
+
+### Bulk Actions
+
+To streamline the management of large model collections, the Admin Panel includes **Bulk Actions** that apply to the models currently visible in your filtered view.
+
+1.  **Filter your view** (e.g., select "Disabled" or "Hidden").
+2.  **Open the Actions menu** (Ellipsis icon next to the search bar).
+3.  **Select an action**:
+    - **Enable All**: Activates all models in the current filtered list simultaneously.
+    - **Disable All**: Deactivates all models in the current filtered list.
+
+These tools are specifically designed to help administrators quickly manage external providers (like OpenAI or Anthropic) that expose a high volume of models, allowing for instant site-wide configuration changes.
+
 ## Model Switching in Chat
 
 Open WebUI allows for dynamic model switching and parallel inference within a chat session.
