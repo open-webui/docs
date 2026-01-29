@@ -5859,6 +5859,24 @@ If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be 
 
 :::
 
+#### `REDIS_SENTINEL_MAX_RETRY_COUNT`
+
+- Type: `int`
+- Default: `2`
+- Description: Sets the maximum number of retries for Redis operations when using Sentinel fail-over. This is a critical high-availability setting that allows the application time for master election and promotion. If your Sentinel `down-after-milliseconds` is high, you should tune this value accordingly to ensure the service survives the failover window without dropping connections.
+
+#### `REDIS_RECONNECT_DELAY`
+
+- Type: `float` (milliseconds)
+- Default: None
+- Description: Optional reconnect delay in milliseconds for Redis Sentinel retry logic, applied consistently across both synchronous and asynchronous Redis operations. This improves stability during Sentinel failover by preventing tight retry loops. When unset or invalid, retry behavior remains unchanged.
+
+#### `WEBSOCKET_REDIS_LOCK_TIMEOUT`
+
+- Type: `int`
+- Default: `60`
+- Description: Sets the timeout in seconds for Redis locks used by the websocket manager.
+
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
 - Type: `bool`
