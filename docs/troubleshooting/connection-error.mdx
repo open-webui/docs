@@ -304,6 +304,46 @@ Encountered an SSL error? It could be an issue with the Hugging Face server. Her
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+## 🔐 SSL Certificate Issues with an OpenAI API Compatible Endpoint
+
+If you're using an OpenAI API Compatible endpoint like Nutanix AI with a corporate certificate, you might encounter SSL verification errors.
+
+### Common Symptoms
+
+- Logs show `[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate`
+- In the UI, when attempting to validate the endpoint, you see a `Network Error` message.
+
+### Solution 
+
+You can configure Open Web UI to use your certificate via two environment variables:
+- `REQUESTS_CA_BUNDLE=/path/to/your-ca.crt`
+- `SSL_CERT_FILE=/path/to/your-ca.crt`
+
+The easiest solution is building a docker container with the following `dockerfile`:
+```
+FROM ghcr.io/open-webui/open-webui/open-webui:latest
+
+COPY your-ca.crt /usr/local/share/ca-certificates/ca.crt
+
+ENV REQUESTS_CA_BUNDLE=/usr/local/share/ca-certificates/ca.crt
+ENV SSL_CERT_FILE=/usr/local/share/ca-certificates/ca.crt
+```
+Ensure  `your-ca.crt` (aka your cert's file name is)  is in the same directory as the dockerfile.
+
+Build it and docker compose like normal (referencing the new image):
+```bash
+docker build -f dockerfile -t <your-registry>/<your-repo>/open-webui-ca:latest .
+```
+
+If using the Kubernetes helm chart, you may also need to pass in the environment variables via the `commonEnvVars` override
+```yaml
+commonEnvVars:
+  - name: SSL_CERT_FILE
+    value: "/usr/local/share/ca-certificates/ca.crt"
+  - name: REQUESTS_CA_BUNDLE
+    value: "/usr/local/share/ca-certificates/ca.crt"
+```
+
 ## 🔐 SSL Certificate Issues with Internal Tools
 
 If you are using external tools like Tika, Ollama (for embeddings), or an external reranker with self-signed certificates, you might encounter SSL verification errors.
