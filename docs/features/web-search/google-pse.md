@@ -5,6 +5,12 @@ title: "Google PSE"
 
 :::warning
 
+**New Google PSE projects are no longer supported.** Google has restricted the legacy JSON API to existing customers only. New users attempting to use Google PSE will receive a `403 Forbidden` error.
+
+:::
+
+:::warning
+
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 
 :::

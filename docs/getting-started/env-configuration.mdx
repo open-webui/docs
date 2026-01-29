@@ -270,23 +270,11 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `True`
 - Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
 
-#### `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables admin users to access all workspace content (models, knowledge bases, prompts, and tools) regardless of access control settings. When set to `False`, admins will only see workspace items they have been explicitly granted access to.
-
-:::warning **Deprecated**
-
-**This environment variable is deprecated and may be removed in a future release.** Use [`BYPASS_ADMIN_ACCESS_CONTROL`](#bypass_admin_access_control) instead, which provides the same functionality with a clearer name.
-
-:::
-
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`
 - Default: `True`
-- Description: When disabled, admin users are treated like regular users for workspace access (models, knowledge, prompts and tools) and only see items they have **explicit permission to access** through the existing access control system. This also applies to the visibility of models in the model selector - admins will be treated as regular users: base models and custom models they do not have **explicit permission to access**, will be hidden. If set to `True` (Default), admins have access to **all created items** in the workspace area and all models in the model selector, **regardless of access permissions**.
+- Description: When disabled, admin users are treated like regular users for workspace access (models, knowledge, prompts and tools) and only see items they have **explicit permission to access** through the existing access control system. This also applies to the visibility of models in the model selector - admins will be treated as regular users: base models and custom models they do not have **explicit permission to access**, will be hidden. If set to `True` (Default), admins have access to **all created items** in the workspace area and all models in the model selector, **regardless of access permissions**. This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS` you should switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
 #### `ENABLE_USER_WEBHOOKS`
 
