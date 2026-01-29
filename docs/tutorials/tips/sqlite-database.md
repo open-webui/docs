@@ -79,9 +79,10 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 23      | note             | Stores user-created notes and annotations                    |
 | 24      | oauth_session    | Manages active OAuth sessions for users                      |
 | 25      | prompt           | Stores templates and configurations for AI prompts           |
-| 26      | tag              | Manages tags/labels for content categorization               |
-| 27      | tool             | Stores configurations for system tools and integrations      |
-| 28      | user             | Maintains user profiles and account information              |
+| 26      | prompt_history   | Tracks version history and snapshots for prompts             |
+| 27      | tag              | Manages tags/labels for content categorization               |
+| 28      | tool             | Stores configurations for system tools and integrations      |
+| 29      | user             | Maintains user profiles and account information              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -446,14 +447,33 @@ The `access_control` fields expected structure:
 
 ## Prompt Table
 
-| **Column Name** | **Data Type** | **Constraints** | **Description**           |
-| --------------- | ------------- | --------------- | ------------------------- |
-| command         | String        | PRIMARY KEY     | Unique command identifier |
-| user_id         | String        | -               | Prompt owner              |
-| title           | Text          | -               | Prompt title              |
-| content         | Text          | -               | Prompt content/template   |
-| timestamp       | BigInteger    | -               | Last update timestamp     |
-| access_control  | JSON          | nullable        | Access permissions        |
+| **Column Name** | **Data Type** | **Constraints** | **Description**                     |
+| --------------- | ------------- | --------------- | ----------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)            |
+| command         | String        | UNIQUE, INDEX   | Unique command identifier           |
+| user_id         | String        | NOT NULL        | Owner of the prompt                 |
+| name            | Text          | NOT NULL        | Display name of the prompt          |
+| content         | Text          | NOT NULL        | Prompt content/template             |
+| data            | JSON          | nullable        | Additional prompt data              |
+| meta            | JSON          | nullable        | Prompt metadata                     |
+| access_control  | JSON          | nullable        | Permission settings                 |
+| is_active       | Boolean       | default=True    | Active status                       |
+| version_id      | Text          | nullable        | Current version identifier          |
+| tags            | JSON          | nullable        | Associated tags                     |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                  |
+| updated_at      | BigInteger    | NOT NULL        | Last update timestamp               |
+
+## Prompt History Table
+
+| **Column Name** | **Data Type** | **Constraints**                | **Description**                   |
+| --------------- | ------------- | ------------------------------ | --------------------------------- |
+| id              | Text          | PRIMARY KEY                    | Unique identifier (UUID)          |
+| prompt_id       | Text          | FOREIGN KEY(prompt.id), INDEX  | Reference to the prompt           |
+| parent_id       | Text          | nullable                       | Reference to the parent version   |
+| snapshot        | JSON          | NOT NULL                       | Snapshot of the prompt at version |
+| user_id         | Text          | NOT NULL                       | User who created the version      |
+| commit_message  | Text          | nullable                       | Version commit message            |
+| created_at      | BigInteger    | NOT NULL                       | Creation timestamp                |
 
 ## Tag Table
 
@@ -524,6 +544,8 @@ erDiagram
     user ||--o{ memory : "owns"
     user ||--o{ model : "manages"
     user ||--o{ prompt : "creates"
+    user ||--o{ prompt_history : "creates"
+    prompt ||--o{ prompt_history : "has"
     user ||--o{ tag : "creates"
     user ||--o{ tool : "manages"
     user ||--o{ note : "owns"
@@ -698,11 +720,26 @@ erDiagram
     }
 
     prompt {
-        string command PK
+        text id PK
+        string command
         string user_id FK
-        text title
+        text name
         text content
+        json data
+        json meta
         json access_control
+        boolean is_active
+        text version_id
+        json tags
+    }
+
+    prompt_history {
+        text id PK
+        text prompt_id FK
+        text parent_id FK
+        json snapshot
+        text user_id FK
+        text commit_message
     }
 
     tag {

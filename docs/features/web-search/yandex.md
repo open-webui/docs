@@ -3,6 +3,12 @@ sidebar_position: 14
 title: "Yandex"
 ---
 
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
 :::tip
 
 For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
@@ -40,4 +46,4 @@ services:
 
 *   **YANDEX_WEB_SEARCH_URL**: The endpoint for the Yandex Search API. Defaults to `https://searchapi.api.cloud.yandex.net/v2/web/search`.
 *   **YANDEX_WEB_SEARCH_API_KEY**: Your Yandex Cloud API Key.
-*   **YANDEX_WEB_SEARCH_CONFIG**: An optional JSON string to customize the search request (e.g., setting `searchType`, `region`, or other parameters supported by the Yandex Search API).
+*   **YANDEX_WEB_SEARCH_CONFIG**: An optional JSON string to customize the search request. This allows you to set any parameters supported by the Yandex Search API.

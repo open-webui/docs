@@ -215,6 +215,13 @@ WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
 
 :::
 
+#### Retry and Reconnect Logic
+
+To enhance resilience during Sentinel failover—the window when a new master is being elected and promoted—you can configure retry behavior to prevent the application from exhausting its reconnection attempts too quickly.
+
+- **`REDIS_SENTINEL_MAX_RETRY_COUNT`**: Sets the maximum number of retries for Redis operations when using Sentinel (Default: `2`).
+- **`REDIS_RECONNECT_DELAY`**: Adds an optional delay in **milliseconds** between retry attempts (e.g., `REDIS_RECONNECT_DELAY=500`). This prevents tight retry loops that may otherwise overwhelm the event loop or block the application before a new master is ready.
+
 ### Complete Example Configuration
 
 Here's a complete example showing all Redis-related environment variables:
@@ -229,6 +236,8 @@ WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
 
 # Recommended for Sentinel deployments (prevents failover hangs)
 REDIS_SOCKET_CONNECT_TIMEOUT=5
+REDIS_SENTINEL_MAX_RETRY_COUNT=5
+REDIS_RECONNECT_DELAY=1000
 
 # Optional
 REDIS_KEY_PREFIX="open-webui"
