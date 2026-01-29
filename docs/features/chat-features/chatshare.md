@@ -113,68 +113,39 @@ Once deleted, the shared link will no longer be valid, and users will not be abl
 
 ### Managing Shared Chats
 
-Open WebUI now includes a robust, centralized management system for all your shared conversations. This feature is available to **all users** and provides a convenient way to audit, update, and secure your shared content without having to navigate through your entire chat history.
-
-#### Why Use Shared Chat Management?
-
-- **Privacy Audit**: Quickly see every conversation you have ever made public via a share link.
-- **Link Retrieval**: Lost a link you shared previously? Find it here in seconds.
-- **Instant Revocation**: If you accidentally shared sensitive information, you can invalidate the link immediately from this central dashboard.
-- **Organization**: Clean up old shared links that are no longer relevant.
+Open WebUI provides a centralized dashboard to manage every chat conversation you have shared. This feature allows users to audit their shared content and quickly revoke access if needed.
 
 #### Accessing the Management Dashboard
 
 1. Click on your **profile name** or avatar in the bottom-left corner of the sidebar.
 2. Select **Settings** from the menu.
-3. In the Settings modal, navigate to the **Data** tab.
+3. Navigate to the **Data** tab.
 4. Locate the **Shared Chats** row and click the **Manage** button.
 
 #### Dashboard Features
 
-The **Shared Chats** modal provides a streamlined interface for managing your public content:
+The **Shared Chats** modal provides a unified interface for your public content:
 
-- **Powerful Search**: Find specific shared conversations by their title. This is especially useful for users with hundreds of previous chats.
-- **Dynamic Sorting**: Toggle the sort order by date (last updated) to see your most recent or oldest shares first.
-- **Copy Link**: Each entry has a dedicated **Clipboard icon** to instantly copy the share URL back to your clipboard.
-- **Instant Unshare**: Use the **Unshare icon** to delete the link. 
+- **Centralized List**: View all conversations that have an active share link.
+- **Search & Filter**: Quickly find specific shared chats by title. The search bar includes a **500ms debounce** to ensure smooth performance while typing.
+- **Advanced Sorting**: Organize your shared history by:
+  - **Updated At** (Default)
+  - **Created At**
+  - **Title**
+- **Copy Link**: Use the **Clipboard icon** next to any entry to instantly copy the share URL back to your clipboard.
+- **Revoke Access (Unshare)**: Use the **Unshare icon** (represented by a slashed link) to deactivate a share link.
     - :::warning
-      Once unshared, the URL will be immediately deactivated. Anyone attempting to use the old link will receive a "Not Found" error. This action is permanent, though you can always re-share the chat later to generate a *new* unique link.
+      Revoking access immediately invalidates the link. Anyone attempting to visit the URL will receive a "Not Found" error. This action is permanent, though you can generate a *new* unique link by sharing the chat again from the main interface.
       :::
-- **Pagination and Load More**: Efficiently browse through your entire history of shared content with smooth "Load More" scrolling.
-
-#### Availability
-
-This feature is available to **every user** on the platform. While Administrators can manage their own shared chats, they do not see other users' shared chats here to maintain privacy. For global administration of shared content, admins should refer to the **Admin Panel > Settings**.
-
-:::info
-**Unsharing is Local**: This dashboard manages links generated on your local Open WebUI instance. If you have shared a chat to the [Open WebUI Community](https://openwebui.com), you must manage those snapshots directly on the community platform (see [Deleting Shared Chats](#deleting-shared-chats)).
-:::
-
-### Security Considerations
-
-The Shared Chat Management dashboard is a critical security tool for any organization:
-
-- **Link Persistence**: Shared links are persistent by default. If a user shares a chat and leaves the organization, the link remains active unless the chat is deleted or unshared.
-- **Static Snapshots**: Remember that local share links are **static snapshots**. If you share a link and then continue the conversation, the shared link will *not* show the new messages unless you explicitly use "Update and Copy Link".
-- **Access Control**: Users must be logged into your specific Open WebUI instance to view a local share link. This provides a layer of security over internal shared chats.
-
-### Best Practices
-
-1. **Regular Audits**: We recommend checking your Manage Shared Chats dashboard once a month to ensure you aren't inadvertently leaking internal project details.
-2. **Descriptive Titles**: Give your chats clear titles. The management dashboard's search feature relies on the chat title, so "Project Alpha Design Review" is much easier to find later than "New Chat".
-3. **Explicit Unsharing**: If a shared link was only needed for a temporary review, unshare it as soon as the review is complete to minimize your data footprint.
-4. **Update vs New Link**: If you need to show someone the next step in a conversation, use the **Update** feature in the individual chat modal rather than generating a new link. This keeps your management dashboard clean and ensures the recipient always has the latest version on the same URL.
+- **Pagination**: Efficiently browse through your history using the "Load More" functionality at the bottom of the list.
 
 ### Shared Management FAQ
 
-**Q: Does unsharing a chat delete the conversation?**  
-**A:** No. Unsharing only deletes the public link. Your original conversation remains perfectly intact in your history.
+**Q: Does unsharing a chat delete the original conversation?**  
+**A:** No. Unsharing only deletes the public link. Your original chat history remains completely intact.
 
-**Q: Can I share a chat that has been archived?**  
-**A:** Yes. Archiving and Sharing are independent features. A chat can be both archived and shared.
+**Q: Can I manage chats I've shared on the community platform here?**  
+**A:** No. This dashboard manages links generated on your local instance. For community-shared content, see [Deleting Shared Chats](#deleting-shared-chats).
 
-**Q: If I delete a chat, what happens to the shared link?**  
+**Q: If I delete my original chat, what happens to the shared link?**  
 **A:** Deleting a chat also immediately invalidates and deletes any associated share links.
-
-**Q: Can I see who has viewed my shared link?**  
-**A:** Currently, Open WebUI does not track view counts or recipient identities for shared links to prioritize privacy and performance.
