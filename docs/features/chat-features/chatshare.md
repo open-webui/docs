@@ -119,7 +119,7 @@ Open WebUI provides a centralized dashboard to manage every chat conversation yo
 
 1. Click on your **profile name** or avatar in the bottom-left corner of the sidebar.
 2. Select **Settings** from the menu.
-3. Navigate to the **Data** tab.
+3. Navigate to the **Data Controls** tab.
 4. Locate the **Shared Chats** row and click the **Manage** button.
 
 #### Dashboard Features
@@ -130,7 +130,6 @@ The **Shared Chats** modal provides a unified interface for your public content:
 - **Search & Filter**: Quickly find specific shared chats by title. The search bar includes a **500ms debounce** to ensure smooth performance while typing.
 - **Advanced Sorting**: Organize your shared history by:
   - **Updated At** (Default)
-  - **Created At**
   - **Title**
 - **Copy Link**: Use the **Clipboard icon** next to any entry to instantly copy the share URL back to your clipboard.
 - **Revoke Access (Unshare)**: Use the **Unshare icon** (represented by a slashed link) to deactivate a share link.

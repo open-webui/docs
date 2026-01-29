@@ -13,7 +13,7 @@ The **Centralized File Manager** provides a unified interface to view, search, a
 
 1. Click on your **profile name** or avatar in the bottom-left corner.
 2. Select **Settings** from the menu.
-3. Navigate to the **Data** tab.
+3. Navigate to the **Data Controls** tab.
 4. Locate the **Manage Files** row and click the **Manage** button.
 
 ### Key Features
