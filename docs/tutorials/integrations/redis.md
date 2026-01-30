@@ -63,6 +63,70 @@ Without Redis in multi-worker or multi-instance scenarios, you will experience:
 - A Docker network for communication between Open WebUI and Redis
 - Basic understanding of Docker, Redis, and Open WebUI
 
+### Critical: Redis Server Configuration
+
+:::danger
+
+**Prevent "Max Number of Clients Reached" Errors**
+
+Before configuring Open WebUI to use Redis, you **must** ensure your Redis server itself is properly configured. A common misconfiguration causes connections to accumulate over time, eventually exhausting the connection limit and causing **complete authentication failure** (500 Internal Server Error for all users).
+
+**The Problem:**
+
+Open WebUI uses Redis for:
+- Token validation/revocation checking (every authenticated request)
+- WebSocket management (real-time updates)
+- Session storage (if `ENABLE_STAR_SESSIONS_MIDDLEWARE` is enabled)
+
+With default Redis settings on some distributions (`maxclients 1000`, `timeout 0`), connections are never closed. Over days or weeks, they accumulate silently until the limit is reached. Then, suddenly, no one can log in.
+
+**The Symptoms:**
+- Application works fine for days/weeks
+- Suddenly, all users get 500 Internal Server Error on login
+- Error in logs: `redis.exceptions.ConnectionError: max number of clients reached`
+- May temporarily "fix itself" as old connections eventually die, then fail again
+
+**The Solution:**
+
+Add these settings to your Redis configuration:
+
+```conf
+# Allow sufficient concurrent connections
+maxclients 10000
+
+# Close idle connections after 30 minutes (1800 seconds)
+# This does NOT affect session validity — only the TCP connection to Redis
+timeout 1800
+```
+
+**For Docker deployments**, add to your Redis command:
+
+```yml
+services:
+  redis:
+    image: docker.io/valkey/valkey:8.0.1-alpine
+    command: "valkey-server --save 30 1 --maxclients 10000 --timeout 1800"
+    # ... rest of config
+```
+
+**Why `timeout 1800` is safe:**
+
+The timeout only affects idle Redis TCP connections, not user sessions. When a connection times out:
+- The user's JWT token remains valid
+- Their session is not affected
+- The next request simply opens a new Redis connection (adds ~1-5ms, imperceptible)
+
+**Monitoring:**
+
+Check current connection count:
+```bash
+redis-cli INFO clients | grep connected_clients
+```
+
+With proper `timeout` configuration, this number should fluctuate naturally (rising during active hours, falling during quiet periods) rather than climbing indefinitely.
+
+:::
+
 ## Setting up Redis
 
 To set up Redis for websocket support, you will need to create a `docker-compose.yml` file with the following contents:
@@ -75,7 +139,7 @@ services:
     container_name: redis-valkey
     volumes:
       - redis-data:/data
-    command: "valkey-server --save 30 1"
+    command: "valkey-server --save 30 1 --maxclients 10000 --timeout 1800"
     healthcheck:
       test: "[ $$(valkey-cli ping) = 'PONG' ]"
       start_period: 5s
@@ -112,6 +176,8 @@ Notes
 The `ports` directive is not included in this configuration, as it is not necessary in most cases. The Redis service will still be accessible from within the Docker network by the Open WebUI service. However, if you need to access the Redis instance from outside the Docker network (e.g., for debugging or monitoring purposes), you can add the `ports` directive to expose the Redis port (e.g., `6379:6379`).
 
 The above configuration sets up a Redis container named `redis-valkey` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option saves the Redis database to disk every 30 minutes if at least 1 key has changed.
+
+**Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion. See the "Critical: Redis Server Configuration" section above for details.
 
 :::
 
@@ -451,6 +517,54 @@ REDIS_KEY_PREFIX="openwebui-dev"
 
 2. Monitor Redis memory: `docker exec -it redis-valkey valkey-cli info memory`
 3. Clear old keys if needed: `docker exec -it redis-valkey valkey-cli FLUSHDB`
+
+#### Issue: "max number of clients reached" after days/weeks of operation
+
+**Symptoms:**
+
+- Application worked fine for an extended period, then suddenly fails
+- All login attempts return 500 Internal Server Error
+- Error in logs: `redis.exceptions.ConnectionError: max number of clients reached`
+- May temporarily recover, then fail again
+
+**Cause:** Redis `maxclients` limit reached due to connection accumulation. This happens when:
+- `timeout` is set to `0` (connections never close)
+- `maxclients` is too low for your usage pattern
+
+**Solution:**
+
+1. Check current connection count:
+   ```bash
+   redis-cli INFO clients | grep connected_clients
+   ```
+
+2. Check current settings:
+   ```bash
+   redis-cli CONFIG GET maxclients
+   redis-cli CONFIG GET timeout
+   ```
+
+3. Fix the configuration:
+   ```bash
+   redis-cli CONFIG SET maxclients 10000
+   redis-cli CONFIG SET timeout 1800
+   ```
+
+4. Make permanent by adding to `redis.conf` or Docker command:
+   ```conf
+   maxclients 10000
+   timeout 1800
+   ```
+
+5. Restart Redis to clear accumulated connections:
+   ```bash
+   # For systemd
+   sudo systemctl restart redis
+   
+   # For Docker
+   docker restart redis-valkey
+
+**Prevention:** Always configure `timeout` to a reasonable value (e.g., 1800 seconds). The timeout only affects idle TCP connections, not user sessions — it's safe and recommended.
 
 ### Additional Resources
 
