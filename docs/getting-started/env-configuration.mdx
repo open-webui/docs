@@ -5789,6 +5789,46 @@ If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the 
 
 :::
 
+:::danger
+
+**Critical Redis Server Configuration — Prevent Connection Exhaustion**
+
+Open WebUI uses Redis for token validation, WebSocket management, and session storage. Each user action can create Redis connections. If your Redis server is misconfigured, connections will accumulate over time until the limit is reached, causing **500 Internal Server Errors** and preventing all users from logging in.
+
+**You must configure these settings in your `redis.conf` (not Open WebUI environment variables):**
+
+| Setting | Bad Default | Recommended | Why |
+|---------|-------------|-------------|-----|
+| `maxclients` | 1000 (some distros) | `10000` or higher | Low limits cause "max number of clients reached" errors |
+| `timeout` | 0 (never close) | `1800` (30 minutes) | Without timeout, idle connections accumulate forever |
+
+**Example `redis.conf` settings:**
+```conf
+maxclients 10000
+timeout 1800
+```
+
+**Symptoms of this misconfiguration:**
+- Works fine for days/weeks, then suddenly all logins fail with 500 errors
+- `redis.exceptions.ConnectionError: max number of clients reached` in logs
+- Problem appears to "fix itself" temporarily, then returns
+
+**Why this happens:**
+With `timeout 0`, every Redis connection stays open indefinitely. Over days or weeks, connections from token checks, WebSocket events, and session validations accumulate. Once `maxclients` is reached, no new connections can be made, and authentication fails completely.
+
+**To check your current connection count:**
+```bash
+redis-cli INFO clients | grep connected_clients
+```
+
+**To verify your settings:**
+```bash
+redis-cli CONFIG GET maxclients
+redis-cli CONFIG GET timeout
+```
+
+:::
+
 #### `REDIS_SENTINEL_HOSTS`
 
 - Type: `str`
