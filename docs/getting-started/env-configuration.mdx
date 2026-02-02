@@ -5230,39 +5230,127 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 - Description: Enables or disables user permission to access workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Sharing (Private)
+
+These settings control whether users can share workspace items with other users **privately** (non-public sharing).
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace knowledge.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace prompts.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables **private sharing** of notes.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Sharing (Public)
+
+These settings control whether users can share workspace items **publicly**.
+
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace models.
+- Description: Enables or disables **public sharing** of workspace models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace knowledge.
+- Description: Enables or disables **public sharing** of workspace knowledge.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace prompts.
+- Description: Enables or disables **public sharing** of workspace prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace tools.
+- Description: Enables or disables **public sharing** of workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables public sharing of notes.
+- Description: Enables or disables **public sharing** of notes.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Import / Export
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_IMPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to import workspace models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_EXPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to export workspace models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_IMPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to import workspace prompts.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_EXPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to export workspace prompts.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_IMPORT`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables user permission to import workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_EXPORT`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables user permission to export workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Settings Permissions
 
