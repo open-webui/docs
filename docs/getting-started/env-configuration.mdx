@@ -5804,11 +5804,17 @@ If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the 
 
 - Type: `bool`
 - Default: `False`
-- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined. This mode is compatible with AWS Elasticache Serverless and other Redis Cluster implementations.
 
 :::info
 
 This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
+
+:::
+
+:::tip OpenTelemetry Support
+
+Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When `ENABLE_OTEL` is enabled, Redis operations are properly traced regardless of whether you're using a single Redis instance or Redis Cluster mode.
 
 :::
 
