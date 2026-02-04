@@ -65,6 +65,21 @@ When native function calling is enabled, the model's access to knowledge bases d
 | **No KB attached** | Model can access **all** knowledge bases the user has access to (public KBs, user's own KBs) |
 | **KB attached to model** | Model is **limited** to only the attached knowledge base(s) |
 
+:::warning Knowledge is NOT Auto-Injected with Native Function Calling
+
+**Important behavioral difference:** When using Native Function Calling, attached knowledge is **not automatically injected** into the conversation. Instead, the model must actively call the knowledge tools to search and retrieve information.
+
+**If your model isn't using attached knowledge:**
+
+1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. For example:
+   > "When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering."
+
+2. **Or disable Native Function Calling** for that model to restore the automatic RAG injection behavior from earlier versions.
+
+3. **Or use "Full Context" mode** for the attached knowledge (click on the attachment and select "Use Entire Document") which bypasses RAG and always injects the full content.
+
+:::
+
 :::tip Restricting Knowledge Access
 If you want a model to focus on specific documents, attach those knowledge bases to the model in **Workspace > Models > Edit**. This prevents the model from searching other available knowledge bases.
 :::
