@@ -2907,6 +2907,14 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 ### Reranking
 
+#### `RAG_RERANKING_ENGINE`
+
+- Type: `str`
+- Options: `external`, or empty for local Sentence-Transformer CrossEncoder
+- Default: Empty string (local reranking)
+- Description: Specifies the reranking engine to use. Set to `external` to use an external reranker API (requires `RAG_EXTERNAL_RERANKER_URL`). Leave empty to use a local Sentence-Transformer CrossEncoder model.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
