@@ -4048,8 +4048,20 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `512x512`
-- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`).
+- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`). Set to `auto` to let the model determine the appropriate size (only supported by models matching `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^gpt-image`
+- Description: A regex pattern to match model names that support `IMAGE_SIZE = "auto"`. When a model matches this pattern, the `auto` size option becomes available, allowing the model to determine the appropriate output dimensions. By default, only models starting with `gpt-image` (e.g., `gpt-image-1`) are matched.
+
+#### `IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^gpt-image`
+- Description: A regex pattern to match model names that return image URLs directly instead of base64-encoded data. Models matching this pattern will not include `response_format: b64_json` in API requests. By default, only models starting with `gpt-image` are matched. For other models, Open WebUI requests base64 responses and handles the conversion internally.
 
 #### `IMAGE_STEPS`
 
