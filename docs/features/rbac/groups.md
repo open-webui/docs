@@ -69,6 +69,10 @@ You can restrict access to specific objects (like a proprietary Model or sensiti
 1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private** or **Restricted**.
 2.  **Grant Access**: Select the specific **Groups** (or individual users) that should have "Read" or "Write" access.
 
+:::tip Knowledge Scoping for Models
+Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#knowledge-scoping-with-native-function-calling) for details.
+:::
+
 ### Access Control Object
 At a deeper level, resources store an access control list (ACL) looking like this:
 

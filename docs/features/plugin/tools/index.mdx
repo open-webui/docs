@@ -210,35 +210,43 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
 
-#### Tool Parameters Reference
+#### Tool Reference
 
-| Tool | Parameters |
-|------|------------|
-| `search_web` | `query` (required), `count` (default: 5) |
-| `fetch_url` | `url` (required) |
-| `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) |
-| `query_knowledge_bases` | `query` (required), `count` (default: 5) |
-| `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) |
-| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) |
-| `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) |
-| `view_knowledge_file` | `file_id` (required) |
-| `generate_image` | `prompt` (required) |
-| `edit_image` | `prompt` (required), `image_urls` (required) |
-| `search_memories` | `query` (required), `count` (default: 5) |
-| `add_memory` | `content` (required) |
-| `replace_memory_content` | `memory_id` (required), `content` (required) |
-| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp` (optional), `end_timestamp` (optional) |
-| `view_note` | `note_id` (required) |
-| `write_note` | `title` (required), `content` (required) |
-| `replace_note_content` | `note_id` (required), `content` (required), `title` (optional) |
-| `search_chats` | `query` (required), `count` (default: 5), `start_timestamp` (optional), `end_timestamp` (optional) |
-| `view_chat` | `chat_id` (required) |
-| `search_channels` | `query` (required), `count` (default: 5) |
-| `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp` (optional), `end_timestamp` (optional) |
-| `view_channel_message` | `message_id` (required) |
-| `view_channel_thread` | `parent_message_id` (required) |
-| `get_current_timestamp` | None |
-| `calculate_timestamp` | `days_ago` (default: 0), `weeks_ago` (default: 0), `months_ago` (default: 0), `years_ago` (default: 0) |
+| Tool | Parameters | Output |
+|------|------------|--------|
+| **Search & Web** | | |
+| `search_web` | `query` (required), `count` (default: 5) | Array of `{title, link, snippet}` |
+| `fetch_url` | `url` (required) | Plain text content (max 50,000 chars) |
+| **Knowledge Base** | | |
+| `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
+| `query_knowledge_bases` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` by similarity |
+| `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
+| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of `{id, filename, content_snippet, knowledge_id}` |
+| `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
+| `view_knowledge_file` | `file_id` (required) | `{id, filename, content}` |
+| **Image Gen** | | |
+| `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
+| `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}` — auto-displayed |
+| **Memory** | | |
+| `search_memories` | `query` (required), `count` (default: 5) | Array of `{id, date, content}` |
+| `add_memory` | `content` (required) | `{status: "success", id}` |
+| `replace_memory_content` | `memory_id` (required), `content` (required) | `{status: "success", id, content}` |
+| **Notes** | | |
+| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
+| `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
+| `write_note` | `title` (required), `content` (required) | `{status: "success", id}` |
+| `replace_note_content` | `note_id` (required), `content` (required), `title` (optional) | `{status: "success", id, title}` |
+| **Chat History** | | |
+| `search_chats` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
+| `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
+| **Channels** | | |
+| `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` |
+| `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{id, channel_id, content, user_name, created_at}` |
+| `view_channel_message` | `message_id` (required) | `{id, content, user_name, created_at, reply_count}` |
+| `view_channel_thread` | `parent_message_id` (required) | Array of `{id, content, user_name, created_at}` |
+| **Time Tools** | | |
+| `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
+| `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
 
 :::info Automatic Timezone Detection
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
@@ -251,6 +259,17 @@ The native `query_knowledge_files` tool uses **simple vector search** with a def
 - The "Top K Reranker" admin setting
 
 For the full RAG pipeline with hybrid search and reranking, use the **File Context** capability (attach files via `#` or knowledge base assignment) instead of relying on autonomous tool calls.
+:::
+
+:::warning Knowledge is NOT Auto-Injected in Native Mode
+**Important:** When using Native Function Calling, attached knowledge is **not automatically injected** into the conversation. The model must actively call knowledge tools to search and retrieve information.
+
+**If your model isn't using attached knowledge:**
+1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering."*
+2. **Or disable Native Function Calling** for that model to restore automatic RAG injection.
+3. **Or use "Full Context" mode** for attached knowledge (click on the attachment and select "Use Entire Document") which always injects the full content.
+
+See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#knowledge-scoping-with-native-function-calling) for more details.
 :::
 
 **Why use these?** It allows for **Deep Research** (searching the web multiple times, or querying knowledge bases), **Contextual Awareness** (looking up previous chats or notes), **Dynamic Personalization** (saving facts), and **Precise Automation** (generating content based on existing notes or documents).

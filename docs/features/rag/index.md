@@ -168,6 +168,10 @@ The **File Context** capability controls whether Open WebUI performs RAG (Retrie
 When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through builtin tools (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
 :::
 
+:::tip Per-File Retrieval Mode
+Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
+:::
+
 :::info
 The File Context toggle only appears when **File Upload** is enabled for the model.
 :::

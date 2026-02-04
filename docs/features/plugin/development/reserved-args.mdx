@@ -132,6 +132,27 @@ A `dict` with wide ranging information about the chat, model, files, etc.
 
 </details>
 
+:::tip Detecting Request Source
+
+The `interface` field indicates where the request originated:
+- **`"open-webui"`** - Request came from the web interface
+- **Other/missing** - Request likely came from a direct API call
+
+For direct API calls, some fields like `chat_id`, `message_id`, and `session_id` may be absent or `null` if not explicitly provided by the API client. You can use this to distinguish between WebUI and API requests in your filters:
+
+```python
+def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+    if __metadata__ and __metadata__.get("interface") == "open-webui":
+        # Request from WebUI
+        pass
+    else:
+        # Direct API request
+        pass
+    return body
+```
+
+:::
+
 ### `__model__`
 
 A `dict` with information about the model.

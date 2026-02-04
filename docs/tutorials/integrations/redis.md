@@ -288,6 +288,41 @@ To enhance resilience during Sentinel failover—the window when a new master is
 - **`REDIS_SENTINEL_MAX_RETRY_COUNT`**: Sets the maximum number of retries for Redis operations when using Sentinel (Default: `2`).
 - **`REDIS_RECONNECT_DELAY`**: Adds an optional delay in **milliseconds** between retry attempts (e.g., `REDIS_RECONNECT_DELAY=500`). This prevents tight retry loops that may otherwise overwhelm the event loop or block the application before a new master is ready.
 
+### Redis Cluster Mode
+
+For deployments using Redis Cluster (including managed services like **AWS Elasticache Serverless**), enable cluster mode with the following configuration:
+
+```bash
+REDIS_URL="redis://your-cluster-endpoint:6379/0"
+REDIS_CLUSTER="true"
+```
+
+:::info
+
+**Key Configuration Notes**
+
+- `REDIS_CLUSTER` enables cluster-aware connection handling
+- The `REDIS_URL` should point to your cluster's configuration endpoint
+- This option has no effect if `REDIS_SENTINEL_HOSTS` is defined (Sentinel takes precedence)
+- When using cluster mode, the `REDIS_KEY_PREFIX` is automatically formatted as `{prefix}:` to ensure multi-key operations target the same hash slot
+
+:::
+
+#### AWS Elasticache Serverless
+
+For AWS Elasticache Serverless deployments, use the following configuration:
+
+```bash
+REDIS_URL="rediss://your-elasticache-endpoint.serverless.use1.cache.amazonaws.com:6379/0"
+REDIS_CLUSTER="true"
+```
+
+Note the `rediss://` scheme (with double 's') which enables TLS, required for Elasticache Serverless.
+
+#### OpenTelemetry Support
+
+Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When `ENABLE_OTEL` is enabled, Redis operations are properly traced regardless of whether you're using a single Redis instance, Redis Sentinel, or Redis Cluster mode.
+
 ### Complete Example Configuration
 
 Here's a complete example showing all Redis-related environment variables:
@@ -310,6 +345,25 @@ REDIS_KEY_PREFIX="open-webui"
 ```
 
 For Redis Sentinel deployments specifically, ensure `REDIS_SOCKET_CONNECT_TIMEOUT` is set to prevent application hangs during master failover.
+
+#### Redis Cluster Mode Example
+
+For Redis Cluster deployments (including AWS Elasticache Serverless):
+
+```bash
+# Required for Redis Cluster
+REDIS_URL="rediss://your-cluster-endpoint:6379/0"
+REDIS_CLUSTER="true"
+
+# Required for websocket support
+ENABLE_WEBSOCKET_SUPPORT="true"
+WEBSOCKET_MANAGER="redis"
+WEBSOCKET_REDIS_URL="rediss://your-cluster-endpoint:6379/0"
+WEBSOCKET_REDIS_CLUSTER="true"
+
+# Optional
+REDIS_KEY_PREFIX="open-webui"
+```
 
 ### Docker Run Example
 

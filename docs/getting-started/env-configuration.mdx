@@ -2907,6 +2907,14 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 ### Reranking
 
+#### `RAG_RERANKING_ENGINE`
+
+- Type: `str`
+- Options: `external`, or empty for local Sentence-Transformer CrossEncoder
+- Default: Empty string (local reranking)
+- Description: Specifies the reranking engine to use. Set to `external` to use an external reranker API (requires `RAG_EXTERNAL_RERANKER_URL`). Leave empty to use a local Sentence-Transformer CrossEncoder model.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
@@ -4048,8 +4056,20 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `512x512`
-- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`).
+- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`). Set to `auto` to let the model determine the appropriate size (only supported by models matching `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^gpt-image`
+- Description: A regex pattern to match model names that support `IMAGE_SIZE = "auto"`. When a model matches this pattern, the `auto` size option becomes available, allowing the model to determine the appropriate output dimensions. By default, only models starting with `gpt-image` (e.g., `gpt-image-1`) are matched.
+
+#### `IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^gpt-image`
+- Description: A regex pattern to match model names that return image URLs directly instead of base64-encoded data. Models matching this pattern will not include `response_format: b64_json` in API requests. By default, only models starting with `gpt-image` are matched. For other models, Open WebUI requests base64 responses and handles the conversion internally.
 
 #### `IMAGE_STEPS`
 
@@ -5932,11 +5952,17 @@ redis-cli CONFIG GET timeout
 
 - Type: `bool`
 - Default: `False`
-- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined. This mode is compatible with AWS Elasticache Serverless and other Redis Cluster implementations.
 
 :::info
 
 This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
+
+:::
+
+:::tip OpenTelemetry Support
+
+Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When `ENABLE_OTEL` is enabled, Redis operations are properly traced regardless of whether you're using a single Redis instance or Redis Cluster mode.
 
 :::
 
