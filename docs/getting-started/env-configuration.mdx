@@ -1358,6 +1358,41 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Role`
   - `X-OpenWebUI-Chat-Id`
 
+#### `FORWARD_USER_INFO_HEADER_NAME`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Name`
+- Description: Customizes the header name used to forward the user's display name. Change this if your infrastructure requires a specific header prefix.
+
+#### `FORWARD_USER_INFO_HEADER_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Id`
+- Description: Customizes the header name used to forward the user's ID.
+
+#### `FORWARD_USER_INFO_HEADER_EMAIL`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Email`
+- Description: Customizes the header name used to forward the user's email address.
+
+#### `FORWARD_USER_INFO_HEADER_ROLE`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Role`
+- Description: Customizes the header name used to forward the user's role.
+
+:::tip Custom Header Prefix
+Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
+
+```bash
+FORWARD_USER_INFO_HEADER_NAME=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Name
+FORWARD_USER_INFO_HEADER_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Id
+FORWARD_USER_INFO_HEADER_EMAIL=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Email
+FORWARD_USER_INFO_HEADER_ROLE=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Role
+```
+:::
+
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
 - Type: `bool`
