@@ -44,7 +44,22 @@ At the top right of the Analytics dashboard, you can filter all data by time per
 - **Last 90 days** - Quarterly trends
 - **All time** - Complete historical data
 
-All metrics on the page update automatically when you change the time period.
+Your selected time period is **automatically saved** and persists across browser sessions.
+
+### Group Filtering
+
+If you have [user groups](/features/rbac/groups) configured, the Analytics dashboard allows filtering by group:
+
+- Use the **group dropdown** next to the time period selector
+- Select a specific group to view analytics **only for users in that group**
+- Choose "All Users" to see instance-wide analytics
+
+This is useful for:
+- **Department-level reporting** - Track usage for specific teams
+- **Cost allocation** - Attribute token consumption to business units
+- **Pilot programs** - Monitor adoption within test groups
+
+All metrics on the page update automatically when you change the time period or group filter.
 
 ### Summary Statistics
 
@@ -90,12 +105,49 @@ A detailed breakdown of how each model is being used:
 - **Sortable columns** - Click column headers to sort by name or message count
 - **Model icons** - Visual identification with profile images
 - **Token tracking** - See which models consume the most resources
+- **Clickable rows** - Click any model to open the [Model Details Modal](#model-details-modal)
 
 **Use cases:**
 - Identify your most popular models
 - Calculate cost per model (by multiplying tokens by provider rates)
 - Decide which models to keep or remove
 - Plan infrastructure upgrades based on usage
+
+### Model Details Modal
+
+Clicking on any model row opens a detailed modal with two tabs:
+
+#### Overview Tab
+
+The Overview tab provides:
+
+- **Feedback Activity Chart** - Visual history of user feedback (thumbs up/down) over time
+  - Toggle between **30 days**, **1 year**, or **All time** views
+  - Weekly aggregation for longer time ranges
+- **Tags** - Most common chat tags associated with this model (top 10)
+
+This helps you understand:
+- How users perceive model quality over time
+- Which topics/use cases the model is handling
+- Trends in user satisfaction
+
+#### Chats Tab
+
+:::info Admin Chat Access Required
+The Chats tab is only visible when **Admin Chat Access** is enabled in your instance settings.
+:::
+
+The Chats tab shows conversations that used this model:
+
+- **User info** - Who started each chat
+- **Preview** - First message of each conversation
+- **Timestamp** - When the chat was last updated
+- **Click to open** - Navigate directly to the shared chat view
+
+This is useful for:
+- Understanding how users interact with specific models
+- Auditing model usage for quality assurance
+- Finding example conversations for training or documentation
 
 ### User Activity Table
 
@@ -248,6 +300,7 @@ The following indexes optimize analytics queries:
 
 For advanced users and integrations, Analytics provides REST API endpoints:
 
+**Dashboard Endpoints:**
 ```
 GET /api/v1/analytics/summary
 GET /api/v1/analytics/models
@@ -257,13 +310,25 @@ GET /api/v1/analytics/daily
 GET /api/v1/analytics/tokens
 ```
 
-All endpoints support `start_date` and `end_date` parameters (Unix timestamps) for time-range filtering.
+**Model Detail Endpoints:**
+```
+GET /api/v1/analytics/models/{model_id}/chats    # Get chats using this model
+GET /api/v1/analytics/models/{model_id}/overview # Get feedback history and tags
+```
+
+**Common Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `start_date` | int | Unix timestamp (epoch seconds) - start of range |
+| `end_date` | int | Unix timestamp (epoch seconds) - end of range |
+| `group_id` | string | Filter to a specific user group (optional) |
 
 :::tip API Access
 All Analytics endpoints require admin authentication. Include your admin bearer token:
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
-  https://your-instance.com/api/v1/analytics/summary
+  "https://your-instance.com/api/v1/analytics/summary?group_id=abc123"
 ```
 :::
 

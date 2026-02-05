@@ -1,0 +1,111 @@
+---
+sidebar_position: 10
+title: "Message Queue"
+---
+
+# Message Queue
+
+The **Message Queue** feature allows you to continue composing and sending messages while the AI is still generating a response. Instead of blocking your input until the current response completes, your messages are queued and automatically sent in sequence.
+
+---
+
+## How It Works
+
+When you send a message while the AI is generating a response:
+
+1. **Your message is queued** - It appears in a compact queue area just above the input box
+2. **You can continue working** - Add more messages, edit queued messages, or delete them
+3. **Automatic processing** - Once the current response finishes, all queued messages are combined and sent together
+
+This creates a seamless workflow where you can capture thoughts as they come without waiting for the AI to finish.
+
+---
+
+## Queue Management
+
+Each queued message shows three action buttons:
+
+| Action | Icon | Description |
+|--------|------|-------------|
+| **Send Now** | ↑ | Interrupts the current generation and sends this message immediately |
+| **Edit** | ✏️ | Removes the message from the queue and puts it back in the input field |
+| **Delete** | 🗑️ | Removes the message from the queue without sending |
+
+### Combining Messages
+
+When the AI finishes generating, all queued messages are **combined into a single prompt** (separated by blank lines) and sent together. This means:
+
+- Multiple quick thoughts become one coherent message
+- Context flows naturally between your queued inputs
+- The AI receives everything at once for better understanding
+
+---
+
+## Persistence
+
+The message queue is preserved when you navigate between chats within the same browser session:
+
+- **Leaving a chat** - Queue is saved to session storage
+- **Returning to the chat** - Queue is restored and processed
+- **Closing the browser** - Queue is cleared (session storage only)
+
+This means you can start a thought, switch to another chat to check something, and return to find your queued messages waiting.
+
+---
+
+## Settings
+
+You can disable the Message Queue feature if you prefer the traditional behavior:
+
+1. Go to **Settings** → **Interface**
+2. Find **Enable Message Queue** under the Chat section
+3. Toggle it off
+
+When disabled, sending a message while the AI is generating will:
+- **Interrupt** the current generation
+- **Send** your new message immediately
+
+:::tip Default Behavior
+Message Queue is **enabled by default**. The toggle allows you to choose between:
+- **Queue mode** (default) - Messages queue up until generation completes
+- **Interrupt mode** - New messages stop current generation immediately
+:::
+
+---
+
+## Use Cases
+
+### 1. Stream of Consciousness
+
+You're reading an AI response and have follow-up questions. Instead of waiting:
+- Queue your first follow-up
+- Queue a clarification
+- Queue another thought
+
+All are sent together when the AI finishes.
+
+### 2. Adding Context
+
+The AI is working on a complex response, but you remember additional context:
+- Queue the extra information
+- The AI receives it as part of the next message
+
+### 3. Multitasking
+
+You're in a long conversation and need to capture quick notes:
+- Queue messages as reminders
+- Edit or delete before they're sent
+- Use "Send Now" for urgent interruptions
+
+---
+
+## Summary
+
+| Feature | Behavior |
+|---------|----------|
+| **Enabled** | Messages queue during generation, sent together when complete |
+| **Disabled** | New messages interrupt current generation immediately |
+| **Persistence** | Queue survives navigation within session |
+| **Actions** | Send Now, Edit, Delete for each queued item |
+
+The Message Queue helps you maintain your flow of thought without the friction of waiting for AI responses to complete.
