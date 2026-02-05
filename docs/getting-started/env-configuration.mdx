@@ -1350,7 +1350,7 @@ If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change 
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, ID, email, role and chat-id) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user and session information as HTTP headers to OpenAI API, Ollama API, MCP servers, and Tool servers.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
@@ -1358,38 +1358,47 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Role`
   - `X-OpenWebUI-Chat-Id`
 
-#### `FORWARD_USER_INFO_HEADER_NAME`
+This enables per-user authorization, auditing, rate limiting, and request tracing on external services.
+
+#### `FORWARD_USER_INFO_HEADER_USER_NAME`
 
 - Type: `str`
 - Default: `X-OpenWebUI-User-Name`
 - Description: Customizes the header name used to forward the user's display name. Change this if your infrastructure requires a specific header prefix.
 
-#### `FORWARD_USER_INFO_HEADER_ID`
+#### `FORWARD_USER_INFO_HEADER_USER_ID`
 
 - Type: `str`
 - Default: `X-OpenWebUI-User-Id`
 - Description: Customizes the header name used to forward the user's ID.
 
-#### `FORWARD_USER_INFO_HEADER_EMAIL`
+#### `FORWARD_USER_INFO_HEADER_USER_EMAIL`
 
 - Type: `str`
 - Default: `X-OpenWebUI-User-Email`
 - Description: Customizes the header name used to forward the user's email address.
 
-#### `FORWARD_USER_INFO_HEADER_ROLE`
+#### `FORWARD_USER_INFO_HEADER_USER_ROLE`
 
 - Type: `str`
 - Default: `X-OpenWebUI-User-Role`
 - Description: Customizes the header name used to forward the user's role.
 
+#### `FORWARD_SESSION_INFO_HEADER_CHAT_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-Chat-Id`
+- Description: Customizes the header name used to forward the current chat/session ID.
+
 :::tip Custom Header Prefix
 Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
 
 ```bash
-FORWARD_USER_INFO_HEADER_NAME=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Name
-FORWARD_USER_INFO_HEADER_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Id
-FORWARD_USER_INFO_HEADER_EMAIL=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Email
-FORWARD_USER_INFO_HEADER_ROLE=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Role
+FORWARD_USER_INFO_HEADER_USER_NAME=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Name
+FORWARD_USER_INFO_HEADER_USER_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Id
+FORWARD_USER_INFO_HEADER_USER_EMAIL=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Email
+FORWARD_USER_INFO_HEADER_USER_ROLE=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Role
+FORWARD_SESSION_INFO_HEADER_CHAT_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Chat-Id
 ```
 :::
 
