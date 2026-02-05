@@ -144,9 +144,11 @@ large_client_header_buffers 4 32k;
 |---------|---------------------|
 | `gzip on` with `application/json` | 🔴 Buffers for compression |
 | `proxy_buffering on` | 🔴 Buffers entire response |
-| `tcp_nopush on` | 🔴 Waits for full packets |
+| `proxy_request_buffering on` | Should be turned off |
+| `tcp_nodelay on` | 🔴 **Most Critical:** Disables Nagle's algorithm to send packets immediately (prevents 200ms delays) |
 | `chunked_transfer_encoding on` | 🟡 Can break SSE |
 | `proxy_cache` enabled on `/api/` | 🟡 Adds overhead |
+| `X-Accel-Buffering "yes"` | This header should be set to "no" for extra safety |
 
 ### Full Example Configuration
 
