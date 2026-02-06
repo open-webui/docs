@@ -82,11 +82,15 @@ Start the model server using the llama-server binary. Navigate to your llama.cpp
 - --ctx-size: Token context length (can increase if RAM allows)
 - --n-gpu-layers: Layers offloaded to GPU for faster performance
 
-Once the server runs, it will expose a local OpenAI-compatible API on:
+Once the server runs, it will expose a local **OpenAI-compatible API** (Chat Completions) on:
 
 ```
 http://127.0.0.1:10000
 ```
+
+:::tip
+Open WebUI also supports the experimental [Open Responses](/getting-started/quick-start/starting-with-open-responses) specification for providers that implement it.
+:::
 
 ---
 

@@ -17,10 +17,12 @@ Open WebUI is built around **Standard Protocols**. Instead of building specific 
 
 This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
 
-- **We Support Protocols**: Any provider that follows the OpenAI Chat Completions standard (like Groq, OpenRouter, or LiteLLM) is natively supported.
-- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs (such as OpenAI's stateful Responses API or Anthropic's native Messages API) to maintain a universal, maintainable codebase.
+- **We Support Protocols**: Any provider that follows widely adopted API standards (like Groq, OpenRouter, OpenAI, Mistral, Perplexity and many more) is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
+- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a pipe or middleware proxy.
 
-If you are using a provider that requires a proprietary API, we recommend using a proxy tool like **LiteLLM** or **OpenRouter** to bridge them to the standard OpenAI protocol supported by Open WebUI.
+If you are using a provider that requires a proprietary API, we recommend using a **[pipe](/features/plugin/functions/pipe)** (browse [community pipes](https://openwebui.com/)) or a middleware proxy like LiteLLM or OpenRouter to bridge them to a supported protocol.
+
+For a detailed explanation of why we've made this architectural decision, see our **[FAQ: Why doesn't Open WebUI natively support proprietary APIs?](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**
 
 ### Popular Compatible Servers and Providers
 

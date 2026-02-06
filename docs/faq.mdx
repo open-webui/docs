@@ -225,15 +225,63 @@ For more optimization tips, see the **[Performance Tips Guide](troubleshooting/p
 
 ### Q: Is MCP (Model Context Protocol) supported in Open WebUI?
 
-**A:** Yes, Open WebUI now includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
+**A:** Yes, Open WebUI includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
 
-### Q: Why doesn't Open WebUI support [Specific Provider]'s latest API (e.g. OpenAI Responses API)?
+### Q: Why doesn't Open WebUI natively support [Provider X]'s proprietary API?
 
-**A:** Open WebUI is built around **universal protocols**, not specific providers. Our core philosophy is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
+**A:** Open WebUI is highly modular with a plugin system including tools, functions, and most notably **[pipes](/features/plugin/functions/pipe)**. These modular pipes allow you to add support for virtually any provider you want—you can build your own or choose from the many [community-built](https://openwebui.com/) and usually well-maintained ones already available.
 
-This protocol-centric design ensures that Open WebUI remains backend-agnostic and compatible with dozens of providers (like OpenRouter, LiteLLM, vLLM, and Groq) simultaneously. We avoid implementing proprietary, provider-specific APIs (such as OpenAI's stateful Responses API or Anthropic's Messages API) to prevent unsustainable architectural bloat and to maintain a truly open ecosystem. 
+That said, Open WebUI's core is built around **universal protocols**, not specific providers. Our stance is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
 
-If you need functionality exclusive to a proprietary API (like OpenAI's hidden reasoning traces), we recommend using a proxy like **LiteLLM** or **OpenRouter**, which translate those proprietary features into the standard Chat Completions protocol that Open WebUI supports.
+This protocol-centric design ensures that Open WebUI remains backend-agnostic and compatible with dozens of providers simultaneously. We avoid implementing proprietary, provider-specific APIs in the core to prevent unsustainable architectural bloat and to maintain a truly open ecosystem.
+
+:::note Experimental: Open Responses
+As new standards emerge that gain broad adoption, we may add experimental support. Connections can now optionally be configured to use **[Open Responses](https://www.openresponses.org/)**—an open specification for multi-provider interoperability with consistent streaming events and tool use patterns.
+:::
+
+We understand this request comes up frequently, especially for major providers. Here's why we've made this deliberate architectural decision:
+
+#### 1. The Cascading Demand Problem
+
+Supporting one proprietary API sets a precedent. Once that precedent exists, every other major provider becomes a reasonable request. What starts as "just one provider" quickly becomes many integrations, each with their own quirks, authentication schemes, and breaking changes.
+
+#### 2. Maintenance is the Real Burden
+
+Adding integration code is the easy part. **Maintaining it forever** is where the real cost lies:
+- Each provider updates their API independently—when a provider changes something, we must update and test immediately
+- Changes in one integration can break compatibility with others
+- Every integration requires ongoing testing across multiple scenarios
+- Bug reports flood in for each provider whenever they make changes
+
+Contributors are **volunteers with full-time jobs**. Asking them to maintain 10+ provider integrations indefinitely is not sustainable.
+
+#### 3. Technical Complexity
+
+Each provider has different approaches to:
+- Reasoning/thinking content format and structure
+- Authentication and request signing
+- Error handling and rate limiting
+
+This requires provider-specific logic throughout both the backend and frontend, significantly increasing the codebase complexity and tech debt.
+
+#### 4. Scale and Stability Requirements
+
+Open WebUI is used by major organizations worldwide. At this scale, stability is paramount—extensive testing and backwards compatibility guarantees become exponentially harder with each added provider.
+
+#### 5. Pipes are the Modular Solution
+
+The pipes architecture exists precisely to solve this problem. One-click install a community pipe and you get full provider API support. This is exactly the modularity that allows:
+- Community members to maintain provider-specific integrations
+- Users to choose only what they need
+- The core project to remain stable and maintainable
+
+:::tip The Recommended Path
+For providers that don't follow widely adopted API standards, use:
+- **[Open WebUI community](https://openwebui.com/)**: Community-maintained provider integrations (one-click install)
+- **Middleware proxies**: Tools like LiteLLM or OpenRouter can translate proprietary APIs to widely adopted API formats
+
+These solutions exist specifically to bridge the gap, and they're maintained by teams dedicated to that purpose.
+:::
 
 ### Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?
 
