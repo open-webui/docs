@@ -180,11 +180,11 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
 | **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on).* |
-| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. |
-| `query_knowledge_bases` | Search knowledge bases by semantic similarity to query. Finds KBs whose name/description match the meaning of your query. Use this to discover relevant knowledge bases before querying their files. |
-| `search_knowledge_bases` | Search knowledge bases by name and description. |
-| `query_knowledge_files` | Search knowledge base files using simple vector search. **Note:** Does not use hybrid search or reranking—for full RAG pipeline with reranking, use File Context instead by attaching files via `#` or assigning knowledge bases. |
-| `search_knowledge_files` | Search files across accessible knowledge bases by filename. |
+| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. **Use this first** to discover what knowledge is available. |
+| `query_knowledge_bases` | Search KB *names and descriptions* by semantic similarity. Use to find which KB is relevant when you don't know which one to query. |
+| `search_knowledge_bases` | Search knowledge bases by name/description (text match). |
+| `query_knowledge_files` | Search *file contents* inside KBs using vector search. **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
+| `search_knowledge_files` | Search files across accessible knowledge bases by filename (not content). |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. |
 | **Image Gen** | *Requires image generation enabled (per-tool).* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
@@ -250,6 +250,15 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 :::info Automatic Timezone Detection
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
+:::
+
+:::info Recommended KB Tool Workflow
+**When an attached KB is returning empty results:**
+1. First call `list_knowledge_bases` to confirm the model can see the attached KB
+2. Then use `query_knowledge_files` (without specifying `knowledge_ids` — it auto-scopes to attached KBs)
+3. If still empty, the files may not be embedded yet, or you may have **Full Context mode enabled** which bypasses the vector store
+
+**Do NOT use Full Context mode with knowledge tools** — Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
 :::
 
 :::tip Knowledge Base Tools vs RAG Pipeline
