@@ -24,15 +24,26 @@ Think of Events like push notifications and modal dialogs that your plugin can t
 
 ## 🏁 Availability
 
-:::important
-Events are **only available for native Python Tools and Functions** defined directly in Open WebUI.
+### Native Python Tools & Functions
 
-Events are **NOT supported** for:
-- **OpenAPI tool servers** (external REST APIs)
-- **MCP tool servers** (Model Context Protocol)
+Events are **fully available** for native Python Tools and Functions defined directly in Open WebUI using the `__event_emitter__` and `__event_call__` helpers.
 
-These external tools communicate via HTTP request/response and cannot emit real-time UI events.
-:::
+### External Tools (OpenAPI & MCP)
+
+External tools can emit events via a **dedicated REST endpoint**. Open WebUI passes the following headers to all external tool requests:
+
+| Header | Description |
+|--------|-------------|
+| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked |
+| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call |
+
+Your external tool can use these headers to emit events back to the UI via:
+
+```
+POST /api/v1/chats/{chat_id}/messages/{message_id}/event
+```
+
+See [External Tool Events](#-external-tool-events) below for details.
 
 ---
 
@@ -449,6 +460,117 @@ Absolutely: use `"chat:title"` or `"chat:tags"` accordingly.
 
 ### Q: Can I stream responses (partial tokens) to the user?
 Yes—emit `"chat:message:delta"` events in a loop, then finish with `"chat:message"`.
+
+---
+
+## 🌐 External Tool Events
+
+External tools (OpenAPI and MCP servers) can emit events to the Open WebUI UI via a REST endpoint. This enables features like status updates, notifications, and streaming content from tools running on external servers.
+
+### Headers Provided by Open WebUI
+
+When Open WebUI calls your external tool, it includes these headers:
+
+| Header | Description |
+|--------|-------------|
+| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked |
+| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call |
+
+### Event Endpoint
+
+**Endpoint:** `POST /api/v1/chats/{chat_id}/messages/{message_id}/event`
+
+**Authentication:** Requires a valid Open WebUI API key or session token.
+
+**Request Body:**
+
+```json
+{
+  "type": "status",
+  "data": {
+    "description": "Processing your request...",
+    "done": false
+  }
+}
+```
+
+### Supported Event Types
+
+External tools can emit the same event types as native tools:
+- `status` – Show progress/status updates
+- `notification` – Display toast notifications
+- `chat:message:delta` / `message` – Append content to the message
+- `chat:message` / `replace` – Replace message content
+- `files` / `chat:message:files` – Attach files
+- `source` / `citation` – Add citations
+
+:::note
+Interactive events (`input`, `confirmation`, `execute`) require `__event_call__` and are **not supported** for external tools as they need bidirectional WebSocket communication.
+:::
+
+### Example: Python External Tool
+
+```python
+import httpx
+
+def my_tool_handler(request):
+    # Extract headers from incoming request
+    chat_id = request.headers.get("X-Open-WebUI-Chat-Id")
+    message_id = request.headers.get("X-Open-WebUI-Message-Id")
+    api_key = "your-open-webui-api-key"
+    
+    # Emit a status event
+    httpx.post(
+        f"http://your-open-webui-host/api/v1/chats/{chat_id}/messages/{message_id}/event",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "type": "status",
+            "data": {"description": "Working on it...", "done": False}
+        }
+    )
+    
+    # ... do work ...
+    
+    # Emit completion status
+    httpx.post(
+        f"http://your-open-webui-host/api/v1/chats/{chat_id}/messages/{message_id}/event",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "type": "status",
+            "data": {"description": "Complete!", "done": True}
+        }
+    )
+    
+    return {"result": "success"}
+```
+
+### Example: JavaScript/Node.js External Tool
+
+```javascript
+async function myToolHandler(req) {
+  const chatId = req.headers['x-open-webui-chat-id'];
+  const messageId = req.headers['x-open-webui-message-id'];
+  const apiKey = 'your-open-webui-api-key';
+  
+  // Emit a notification
+  await fetch(
+    `http://your-open-webui-host/api/v1/chats/${chatId}/messages/${messageId}/event`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: 'notification',
+        data: { type: 'info', content: 'Tool is processing...' }
+      })
+    }
+  );
+  
+  return { result: 'success' };
+}
+```
 
 ---
 
