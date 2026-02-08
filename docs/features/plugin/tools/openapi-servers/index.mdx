@@ -29,10 +29,10 @@ By leveraging OpenAPI, we eliminate the need for a proprietary or unfamiliar com
 
 While OpenAPI tools are powerful for extending Open WebUI with external services, they have some constraints compared to native Python tools:
 
-- **No real-time UI events**: OpenAPI tools cannot emit status updates, notifications, or request user input via the [event system](/features/plugin/development/events). They communicate via standard HTTP request/response only.
+- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/plugin/development/events#-external-tool-events) via the REST endpoint. Open WebUI passes `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to enable this. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
 - **No streaming output**: Tool responses are returned as complete results, not streamed token-by-token.
 
-If you need real-time UI feedback (progress updates, confirmations, streaming), consider implementing your tool as a [native Python Tool](/features/plugin/tools/development) instead.
+If you need interactive UI feedback (confirmations, user input prompts), consider implementing your tool as a [native Python Tool](/features/plugin/tools/development) instead.
 
 ## 🚀 Quickstart
 

@@ -7,6 +7,26 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 <TopBanners />
 
+### Q: How can I get support or ask for help?
+
+**A:** Open WebUI is a community-driven, open-source project. Support is provided by **volunteers** who contribute their time and expertise for free — there is no dedicated support team, and no one is obligated to provide personalized or on-demand assistance.
+
+**To get the best help:**
+1. **Search first.** Check these docs, [Discord](https://discord.gg/5rJgQTnV4s), [Reddit](https://www.reddit.com/r/OpenWebUI/), [GitHub Discussions](https://github.com/open-webui/open-webui/discussions), and [Issues](https://github.com/open-webui/open-webui/issues) — your question may already be answered.
+2. **Try the Discord bot.** In our [Discord server](https://discord.gg/5rJgQTnV4s)'s **#questions** channel, we have an experimental bot that has access to all issues, all discussions, and the entire documentation. Simply ping the bot with your question in the same message, wait a few seconds, and it will answer you. As our documentation improves, so does the bot.
+3. **Provide details.** When asking for help, always include: your Open WebUI version, deployment method (Docker/pip), model provider and model name, relevant settings (screenshots of the Admin Panel section are ideal), and steps to reproduce the issue.
+4. **Be respectful.** Contributors are volunteers. Demanding, entitled, or hostile behavior is not tolerated and will result in immediate enforcement under our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)**.
+
+**Where to ask:**
+- 🤖 **Quick Answers**: [Discord #questions channel](https://discord.gg/5rJgQTnV4s) — try the bot first, it can answer most Open WebUI questions
+- 🐛 **Bugs**: [GitHub Issues](https://github.com/open-webui/open-webui/issues) — you **must** use the issue template and provide all requested information (Open WebUI version, browser, deployment method, expected vs. actual behavior, and logs). Most importantly, your report **must include clear steps to reproduce the issue along with all relevant settings** to replicate the situation. If we cannot reproduce it, we will not investigate it. Reports that skip the template or omit key details will be closed without investigation or converted to discussions. Our contributors are volunteers — incomplete reports waste their limited time.
+- 💬 **Questions & Help**: [Discord](https://discord.gg/5rJgQTnV4s) (most active community), [Reddit](https://www.reddit.com/r/OpenWebUI/), or [GitHub Discussions](https://github.com/open-webui/open-webui/discussions)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/open-webui/open-webui/discussions/new/choose)
+
+:::important
+All participants in the Open WebUI community are expected to follow our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)**, which operates under a **zero-tolerance policy**. Unacceptable behavior — including hostility, entitlement, or persistent negativity toward contributors — will result in immediate action without prior warning.
+:::
+
 ### Q: How do I customize the logo and branding?
 
 **A:** You can customize the theme, logo, and branding with our **[Enterprise License](https://docs.openwebui.com/enterprise)**, which unlocks exclusive enterprise features.
@@ -225,15 +245,64 @@ For more optimization tips, see the **[Performance Tips Guide](troubleshooting/p
 
 ### Q: Is MCP (Model Context Protocol) supported in Open WebUI?
 
-**A:** Yes, Open WebUI now includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
+**A:** Yes, Open WebUI includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
 
-### Q: Why doesn't Open WebUI support [Specific Provider]'s latest API (e.g. OpenAI Responses API)?
+### Q: Why doesn't Open WebUI natively support [Provider X]'s proprietary API?
 
-**A:** Open WebUI is built around **universal protocols**, not specific providers. Our core philosophy is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
+**A:** Open WebUI is highly modular with a plugin system including tools, functions, and most notably **[pipes](/features/plugin/functions/pipe)**. These modular pipes allow you to add support for virtually any provider you want—you can build your own or choose from the many [community-built](https://openwebui.com/) and usually well-maintained ones already available.
 
-This protocol-centric design ensures that Open WebUI remains backend-agnostic and compatible with dozens of providers (like OpenRouter, LiteLLM, vLLM, and Groq) simultaneously. We avoid implementing proprietary, provider-specific APIs (such as OpenAI's stateful Responses API or Anthropic's Messages API) to prevent unsustainable architectural bloat and to maintain a truly open ecosystem. 
+That said, Open WebUI's core is built around **universal protocols**, not specific providers. Our stance is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
 
-If you need functionality exclusive to a proprietary API (like OpenAI's hidden reasoning traces), we recommend using a proxy like **LiteLLM** or **OpenRouter**, which translate those proprietary features into the standard Chat Completions protocol that Open WebUI supports.
+This protocol-centric design ensures that Open WebUI remains backend-agnostic and compatible with dozens of providers simultaneously. We avoid implementing proprietary, provider-specific APIs in the core to prevent unsustainable architectural bloat and to maintain a truly open ecosystem.
+
+:::note Experimental: Open Responses
+As new standards emerge that gain broad adoption, we may add experimental support. Connections can now optionally be configured to use **[Open Responses](https://www.openresponses.org/)**—an open specification for multi-provider interoperability with consistent streaming events and tool use patterns.
+:::
+
+We understand this request comes up frequently, especially for major providers. Here's why we've made this deliberate architectural decision:
+
+#### 1. The Cascading Demand Problem
+
+Supporting one proprietary API sets a precedent. Once that precedent exists, every other major provider becomes a reasonable request. What starts as "just one provider" quickly becomes many integrations, each with their own quirks, authentication schemes, and breaking changes.
+
+#### 2. Maintenance is the Real Burden
+
+Adding integration code is the easy part. **Maintaining it forever** is where the real cost lies:
+- Each provider updates their API independently—when a provider changes something, we must update and test immediately
+- Changes in one integration can break compatibility with others
+- Every integration requires ongoing testing across multiple scenarios
+- Bug reports flood in for each provider whenever they make changes
+
+Contributors are **volunteers with full-time jobs**. Asking them to maintain 10+ provider integrations indefinitely is not sustainable.
+
+#### 3. Technical Complexity
+
+Each provider has different approaches to:
+- Reasoning/thinking content format and structure
+- Tool calling schemas and response formats
+- Authentication and request signing
+- Error handling and rate limiting
+
+This requires provider-specific logic throughout both the backend and frontend, significantly increasing the codebase complexity and tech debt.
+
+#### 4. Scale and Stability Requirements
+
+Open WebUI is used by major organizations worldwide. At this scale, stability is paramount—extensive testing and backwards compatibility guarantees become exponentially harder with each added provider.
+
+#### 5. Pipes are the Modular Solution
+
+The pipes architecture exists precisely to solve this problem. One-click install a community pipe and you get full provider API support. This is exactly the modularity that allows:
+- Community members to maintain provider-specific integrations
+- Users to choose only what they need
+- The core project to remain stable and maintainable
+
+:::tip The Recommended Path
+For providers that don't follow widely adopted API standards, use:
+- **[Open WebUI community](https://openwebui.com/)**: Community-maintained provider integrations (one-click install)
+- **Middleware proxies**: Tools like LiteLLM or OpenRouter can translate proprietary APIs to widely adopted API formats
+
+These solutions exist specifically to bridge the gap, and they're maintained by teams dedicated to that purpose.
+:::
 
 ### Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?
 
@@ -280,4 +349,4 @@ We review every report in good faith and handle all submissions discreetly. Prot
 
 ### Need Further Assistance?
 
-If you have any further questions or concerns, please reach out to our [GitHub Issues page](https://github.com/open-webui/open-webui/issues) or our [Discord channel](https://discord.gg/5rJgQTnV4s) for more help and information.
+If you have any further questions or concerns, please reach out on our [Discord server](https://discord.gg/5rJgQTnV4s), [Reddit community](https://www.reddit.com/r/OpenWebUI/), [GitHub Issues](https://github.com/open-webui/open-webui/issues), or [GitHub Discussions](https://github.com/open-webui/open-webui/discussions) for more help and information. Please remember that all community interactions are governed by our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)**.
