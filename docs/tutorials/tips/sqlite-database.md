@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation was created/updated based on version 0.7.0 and updated for recent migrations.
+> This documentation was created/updated based on version 0.8.0 and updated for recent migrations.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -54,35 +54,36 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 
 | **No.** | **Table Name**   | **Description**                                              |
 | ------- | ---------------- | ------------------------------------------------------------ |
-| 01      | auth             | Stores user authentication credentials and login information |
-| 02      | channel          | Manages chat channels and their configurations               |
-| 03      | channel_file     | Links files to channels and messages                         |
-| 04      | channel_member   | Tracks user membership and permissions within channels       |
-| 05      | chat             | Stores chat sessions and their metadata                      |
-| 06      | chat_file        | Links files to chats and messages                            |
-| 07      | chatidtag        | Maps relationships between chats and their associated tags   |
-| 08      | config           | Maintains system-wide configuration settings                 |
-| 09      | document         | Stores documents and their metadata for knowledge management |
-| 10      | feedback         | Captures user feedback and ratings                           |
-| 11      | file             | Manages uploaded files and their metadata                    |
-| 12      | folder           | Organizes files and content into hierarchical structures     |
-| 13      | function         | Stores custom functions and their configurations             |
-| 14      | group            | Manages user groups and their permissions                    |
-| 15      | group_member     | Tracks user membership within groups                         |
-| 16      | knowledge        | Stores knowledge base entries and related information        |
-| 17      | knowledge_file   | Links files to knowledge bases                               |
-| 18      | memory           | Maintains chat history and context memory                    |
-| 19      | message          | Stores individual chat messages and their content            |
-| 20      | message_reaction | Records user reactions (emojis/responses) to messages        |
-| 21      | migrate_history  | Tracks database schema version and migration records         |
-| 22      | model            | Manages AI model configurations and settings                 |
-| 23      | note             | Stores user-created notes and annotations                    |
-| 24      | oauth_session    | Manages active OAuth sessions for users                      |
-| 25      | prompt           | Stores templates and configurations for AI prompts           |
-| 26      | prompt_history   | Tracks version history and snapshots for prompts             |
-| 27      | tag              | Manages tags/labels for content categorization               |
-| 28      | tool             | Stores configurations for system tools and integrations      |
-| 29      | user             | Maintains user profiles and account information              |
+| 01      | access_grant     | Stores normalized access control grants for all resources    |
+| 02      | auth             | Stores user authentication credentials and login information |
+| 03      | channel          | Manages chat channels and their configurations               |
+| 04      | channel_file     | Links files to channels and messages                         |
+| 05      | channel_member   | Tracks user membership and permissions within channels       |
+| 06      | chat             | Stores chat sessions and their metadata                      |
+| 07      | chat_file        | Links files to chats and messages                            |
+| 08      | chatidtag        | Maps relationships between chats and their associated tags   |
+| 09      | config           | Maintains system-wide configuration settings                 |
+| 10      | document         | Stores documents and their metadata for knowledge management |
+| 11      | feedback         | Captures user feedback and ratings                           |
+| 12      | file             | Manages uploaded files and their metadata                    |
+| 13      | folder           | Organizes files and content into hierarchical structures     |
+| 14      | function         | Stores custom functions and their configurations             |
+| 15      | group            | Manages user groups and their permissions                    |
+| 16      | group_member     | Tracks user membership within groups                         |
+| 17      | knowledge        | Stores knowledge base entries and related information        |
+| 18      | knowledge_file   | Links files to knowledge bases                               |
+| 19      | memory           | Maintains chat history and context memory                    |
+| 20      | message          | Stores individual chat messages and their content            |
+| 21      | message_reaction | Records user reactions (emojis/responses) to messages        |
+| 22      | migrate_history  | Tracks database schema version and migration records         |
+| 23      | model            | Manages AI model configurations and settings                 |
+| 24      | note             | Stores user-created notes and annotations                    |
+| 25      | oauth_session    | Manages active OAuth sessions for users                      |
+| 26      | prompt           | Stores templates and configurations for AI prompts           |
+| 27      | prompt_history   | Tracks version history and snapshots for prompts             |
+| 28      | tag              | Manages tags/labels for content categorization               |
+| 29      | tool             | Stores configurations for system tools and integrations      |
+| 30      | user             | Maintains user profiles and account information              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -90,6 +91,26 @@ Note: there are two additional tables in Open-WebUI's SQLite database that are n
 - Migrate History table
 
 Now that we have all the tables, let's understand the structure of each table.
+
+## Access Grant Table
+
+| **Column Name** | **Data Type** | **Constraints**         | **Description**                                        |
+| --------------- | ------------- | ----------------------- | ------------------------------------------------------ |
+| id              | Integer       | PRIMARY KEY, AUTOINCREMENT | Unique identifier                                   |
+| resource_type   | Text          | NOT NULL                | Type of resource (e.g., `model`, `knowledge`, `tool`)  |
+| resource_id     | Text          | NOT NULL                | ID of the specific resource                            |
+| principal_type  | Text          | NOT NULL                | Type of grantee: `user` or `group`                     |
+| principal_id    | Text          | NOT NULL                | ID of the user or group (or `*` for public)            |
+| permission      | Text          | NOT NULL                | Permission level: `read` or `write`                    |
+| created_at      | BigInteger    | nullable                | Grant creation timestamp                               |
+
+Things to know about the access_grant table:
+
+- Unique constraint on (`resource_type`, `resource_id`, `principal_type`, `principal_id`, `permission`) to prevent duplicate grants
+- Indexed on (`resource_type`, `resource_id`) and (`principal_type`, `principal_id`) for efficient lookups
+- Replaces the former `access_control` JSON column that was previously embedded in each resource table
+- `principal_type` of `user` with `principal_id` of `*` represents public (open) access
+- Supports both group-level and individual user-level access grants
 
 ## Auth Table
 
@@ -116,7 +137,7 @@ Things to know about the auth table:
 | description     | Text          | nullable        | Channel description                 |
 | data            | JSON          | nullable        | Flexible data storage               |
 | meta            | JSON          | nullable        | Channel metadata                    |
-| access_control  | JSON          | nullable        | Permission settings                 |
+
 | created_at      | BigInteger    | -               | Creation timestamp (nanoseconds)    |
 | updated_at      | BigInteger    | -               | Last update timestamp (nanoseconds) |
 
@@ -237,7 +258,7 @@ Things to know about the chat_file table:
 | path            | Text          | nullable        | File system path      |
 | data            | JSON          | nullable        | File-related data     |
 | meta            | JSON          | nullable        | File metadata         |
-| access_control  | JSON          | nullable        | Permission settings   |
+
 | created_at      | BigInteger    | -               | Creation timestamp    |
 | updated_at      | BigInteger    | -               | Last update timestamp |
 
@@ -335,7 +356,7 @@ Things to know about the group_member table:
 | description     | Text          | -                   | Knowledge base description |
 | data            | JSON          | nullable            | Knowledge base content     |
 | meta            | JSON          | nullable            | Additional metadata        |
-| access_control  | JSON          | nullable            | Access control rules       |
+
 | created_at      | BigInteger    | -                   | Creation timestamp         |
 | updated_at      | BigInteger    | -                   | Last update timestamp      |
 
@@ -356,20 +377,7 @@ Things to know about the knowledge_file table:
 - Foreign key relationships with CASCADE delete
 - Indexed on `knowledge_id`, `file_id`, and `user_id` for performance
 
-The `access_control` fields expected structure:
-
-```python
-{
-  "read": {
-    "group_ids": ["group_id1", "group_id2"],
-    "user_ids": ["user_id1", "user_id2"]
-  },
-  "write": {
-    "group_ids": ["group_id1", "group_id2"],
-    "user_ids": ["user_id1", "user_id2"]
-  }
-}
-```
+Access control for resources (models, knowledge bases, tools, prompts, notes, files, channels) is managed through the `access_grant` table rather than embedded JSON. Each grant entry specifies a resource, a principal (user or group), and a permission level (read or write). See the [Access Grant Table](#access-grant-table) section above for details.
 
 ## Memory Table
 
@@ -415,7 +423,7 @@ The `access_control` fields expected structure:
 | name            | Text          | -               | Display name           |
 | params          | JSON          | -               | Model parameters       |
 | meta            | JSON          | -               | Model metadata         |
-| access_control  | JSON          | nullable        | Access permissions     |
+
 | is_active       | Boolean       | default=True    | Active status          |
 | created_at      | BigInteger    | -               | Creation timestamp     |
 | updated_at      | BigInteger    | -               | Last update timestamp  |
@@ -429,7 +437,7 @@ The `access_control` fields expected structure:
 | title           | Text          | nullable        | Note title                 |
 | data            | JSON          | nullable        | Note content and data      |
 | meta            | JSON          | nullable        | Note metadata              |
-| access_control  | JSON          | nullable        | Permission settings        |
+
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
 
@@ -456,7 +464,7 @@ The `access_control` fields expected structure:
 | content         | Text          | NOT NULL        | Prompt content/template             |
 | data            | JSON          | nullable        | Additional prompt data              |
 | meta            | JSON          | nullable        | Prompt metadata                     |
-| access_control  | JSON          | nullable        | Permission settings                 |
+
 | is_active       | Boolean       | default=True    | Active status                       |
 | version_id      | Text          | nullable        | Current version identifier          |
 | tags            | JSON          | nullable        | Associated tags                     |
@@ -499,7 +507,7 @@ Things to know about the tag table:
 | specs           | JSON          | -               | Tool specifications   |
 | meta            | JSON          | -               | Tool metadata         |
 | valves          | JSON          | -               | Tool control settings |
-| access_control  | JSON          | nullable        | Access permissions    |
+
 | created_at      | BigInteger    | -               | Creation timestamp    |
 | updated_at      | BigInteger    | -               | Last update timestamp |
 

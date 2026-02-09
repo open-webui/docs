@@ -30,7 +30,7 @@ Both actions lead to the same Model Builder interface, where you can configure t
 - **Tags**: Add tags to organize models in the selector dropdown.
 - **Visibility & Groups**:
   - **Private**: Restricts access to specific users or groups.
-  - **Groups Selector**: Use the dropdown to grant access to specific teams (e.g., "Admins", "Developers") without making the model public to everyone.
+  - **Access Control Selector**: Use the access control panel to grant access to specific groups (e.g., "Admins", "Developers") or individual users without making the model public to everyone. The redesigned interface makes it easy to add multiple groups and users at once.
 
 ### System Prompt & Dynamic Variables
 
