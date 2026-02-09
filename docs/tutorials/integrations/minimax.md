@@ -56,7 +56,7 @@ Now, link MiniMax to your Open WebUI instance.
 3.  Enter the following details:
     -   **API Base URL**: `https://api.minimax.io/v1`
     -   **API Key**: `YOUR_CODING_PLAN_API_KEY`
-4.  **Important**: MiniMax does not expose models via a `/models` endpoint, so you must whitelist the model manually.
+4.  **Important**: MiniMax does not expose models via a `/models` endpoint, so you must whitelist the model manually. The connection verify button would also return with an error of "OpenAI: Network Problem" error because of this. 
 5.  In the **Model Whitelist**, type `MiniMax-M2.1` and click the **+** icon.
 6.  Click **Verify Connection** (you should see a success alert).
 7.  Click **Save** on the connection popup, then scroll down and click **Save** on the main Connections page.
@@ -77,3 +77,4 @@ You are now ready to use MiniMax M2.1!
 ---
 
 Enjoy using one of the best and most affordable coding-focused models! 🚀
+
