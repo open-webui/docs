@@ -1357,8 +1357,9 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
   - `X-OpenWebUI-Chat-Id`
+  - `X-OpenWebUI-Message-Id`
 
-This enables per-user authorization, auditing, rate limiting, and request tracing on external services.
+This enables per-user authorization, auditing, rate limiting, and request tracing on external services. The chat and message ID headers are also required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
 
 #### `FORWARD_USER_INFO_HEADER_USER_NAME`
 
@@ -1390,6 +1391,12 @@ This enables per-user authorization, auditing, rate limiting, and request tracin
 - Default: `X-OpenWebUI-Chat-Id`
 - Description: Customizes the header name used to forward the current chat/session ID.
 
+#### `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-Message-Id`
+- Description: Customizes the header name used to forward the current message ID. This header is required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
+
 :::tip Custom Header Prefix
 Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
 
@@ -1399,6 +1406,7 @@ FORWARD_USER_INFO_HEADER_USER_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Id
 FORWARD_USER_INFO_HEADER_USER_EMAIL=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Email
 FORWARD_USER_INFO_HEADER_USER_ROLE=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Role
 FORWARD_SESSION_INFO_HEADER_CHAT_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Chat-Id
+FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Message-Id
 ```
 :::
 
