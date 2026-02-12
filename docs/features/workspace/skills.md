@@ -84,43 +84,34 @@ From the Skills workspace list, you can perform the following actions via the el
 
 Each skill has an **active/inactive toggle** visible on the list page. Inactive skills are excluded from manifests and cannot be loaded by the model, even if they are bound to one or mentioned in chat.
 
-## Code Execution Limitations
+## Code Execution Backends
 
-Skills themselves are plain-text instructions, but many useful skills involve asking the model to execute code via the [Code Interpreter](/features/workspace/code-interpreter). The available code execution backends each have trade-offs to be aware of:
+The backend you choose affects what your skills can do — from simple text transformations (Pyodide) to full OS-level shell access (Open Terminal). Each has different trade-offs in library support, isolation, persistence, and multi-user safety.
 
-### Pyodide (Default)
+See the [Code Execution overview](/features/chat-features/code-execution) for a detailed comparison of all available backends and guidance on choosing the right one for your deployment.
 
-Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with significant constraints:
+### Setting Up Open Terminal
 
-- **No persistent storage** — the filesystem resets between executions, so skills that need to save or accumulate files across messages will not work.
-- **Limited library support** — only a subset of Python packages are available. Libraries that rely on C extensions or system calls (e.g., `python-docx`, `ffmpeg`, `pandas` with native backends) may not be available or may fail at runtime.
-- **No shell access** — skills that require running shell commands, installing packages, or interacting with the OS cannot function.
+Open Terminal is a FastAPI application that automatically exposes an [OpenAPI specification](https://swagger.io/specification/). This means it works out of the box as an OpenAPI Tool Server — Open WebUI auto-discovers its endpoints and registers them as tools. No manual tool creation needed.
 
-> [!TIP]
-> Skills work best with Pyodide when they focus on **text transformation, analysis, and instruction-following** rather than file generation or system-level tasks.
+**1. Start an Open Terminal instance**
 
-### Jupyter
+Follow the [Open Terminal setup guide](/features/open-terminal#getting-started) to launch an instance using Docker or pip.
 
-Jupyter provides a full Python environment and can handle virtually any task — file creation, package installation, and complex library usage. However, it has serious drawbacks in shared deployments:
+**2. Connect to Open WebUI**
 
-- **Shared environment** — all users share the same Python runtime and filesystem. One user's installed packages, files, or running processes are visible to (and can interfere with) others.
-- **Not sandboxed by default** — without careful configuration, users can access system resources, read other users' data, or interfere with the host system.
-- **Not designed for multi-tenant use** — Jupyter was built for single-user workflows. Running it as a shared backend in a multi-user Open WebUI deployment introduces security and isolation concerns.
+Add your Open Terminal instance as a Tool Server by following the [OpenAPI Tool Server Integration Guide](/features/plugin/tools/openapi-servers/open-webui). You can connect it as:
 
-> [!WARNING]
-> If you are running a multi-user or organizational deployment, **Jupyter is not recommended** as the code execution backend. Open WebUI's Jupyter integration connects to a single shared Jupyter instance with no per-user isolation.
+- A **User Tool Server** (in **Settings → Tools**) — connects from your browser, ideal for personal or local instances
+- A **Global Tool Server** (in **Admin Settings → Tools**) — connects from the backend, available to all users
 
-### Choosing the Right Backend
+Once connected, the Open Terminal tools (execute, file upload, file download) appear automatically in the chat interface.
 
-| Consideration | Pyodide | Jupyter |
-| :--- | :--- | :--- |
-| **Safety in multi-user setups** | ✅ Sandboxed | ⚠️ Shared environment |
-| **Library availability** | ⚠️ Limited | ✅ Full Python ecosystem |
-| **Persistent storage** | ❌ No | ✅ Yes |
-| **File generation** | ❌ Very limited | ✅ Full support |
-| **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation |
+:::tip
+For the best experience, pair Open Terminal with a [Skill](/features/workspace/skills) that teaches the model how to use the tool effectively — for example, instructing it to always check exit codes, handle errors gracefully, and use streaming for long-running commands.
+:::
 
-For organizational deployments that need powerful code execution, per-user sandboxed Docker containers are the recommended long-term approach but are not yet available as a built-in feature.
+See the [Open Terminal documentation](/features/open-terminal) for the full API reference and detailed setup instructions.
 
 ## Access Control
 
