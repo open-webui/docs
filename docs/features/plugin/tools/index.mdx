@@ -98,7 +98,7 @@ In Default Mode, Open WebUI manages tool selection by injecting a specific promp
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for high-performance agentic workflows.
 
 :::warning Model Quality Matters
-**Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.1**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
+**Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.5**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
 :::
 
 #### Why use Native Mode (Agentic Mode)?
@@ -129,7 +129,7 @@ For reliable agentic tool calling, use high-tier frontier models:
 - **GPT-5** (OpenAI)
 - **Claude 4.5 Sonnet** (Anthropic)
 - **Gemini 3 Flash** (Google)
-- **MiniMax M2.1**
+- **MiniMax M2.5**
 
 These models excel at multi-step reasoning, proper JSON formatting, and autonomous tool selection.
 :::
@@ -172,7 +172,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 ### Built-in System Tools (Native/Agentic Mode)
 
-🛠️ When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.1) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
+🛠️ When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.5) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
 
 | Tool | Purpose |
 |------|---------|

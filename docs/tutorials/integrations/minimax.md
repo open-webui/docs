@@ -1,6 +1,6 @@
 ---
 sidebar_position: 32
-title: "Integrate with MiniMax M2.1"
+title: "Integrate with MiniMax M2.5"
 ---
 
 :::warning
@@ -11,9 +11,9 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ---
 
-# Integrating Open WebUI with MiniMax M2.1
+# Integrating Open WebUI with MiniMax M2.5
 
-MiniMax is a leading AI company providing high-performance coding-focused models. Their latest model, **MiniMax M2.1**, is specifically optimized for coding, reasoning, and multi-turn dialogue. This guide covers how to set up MiniMax via their cost-effective **Coding Plan** and integrate it into Open WebUI.
+MiniMax is a leading AI company providing high-performance coding-focused models. Their latest model, **MiniMax M2.5**, is specifically optimized for coding, reasoning, and multi-turn dialogue. This guide covers how to set up MiniMax via their cost-effective **Coding Plan** and integrate it into Open WebUI.
 
 ## Step 1: Subscribe to a MiniMax Coding Plan
 
@@ -57,7 +57,7 @@ Now, link MiniMax to your Open WebUI instance.
     -   **API Base URL**: `https://api.minimax.io/v1`
     -   **API Key**: `YOUR_CODING_PLAN_API_KEY`
 4.  **Important**: MiniMax does not expose models via a `/models` endpoint, so you must whitelist the model manually.
-5.  In the **Model Whitelist**, type `MiniMax-M2.1` and click the **+** icon.
+5.  In the **Model Whitelist**, type `MiniMax-M2.5` and click the **+** icon.
 6.  Click **Verify Connection** (you should see a success alert).
 7.  Click **Save** on the connection popup, then scroll down and click **Save** on the main Connections page.
 
@@ -66,10 +66,10 @@ Now, link MiniMax to your Open WebUI instance.
 
 ## Step 4: Start Chatting
 
-You are now ready to use MiniMax M2.1!
+You are now ready to use MiniMax M2.5!
 
 1.  Start a new chat.
-2.  Select **MiniMax-M2.1** from the model dropdown menu.
+2.  Select **MiniMax-M2.5** from the model dropdown menu.
 3.  Send a message. Reasoning and thinking work by default without any additional configuration.
 
 ![MiniMax Chat interface](/images/tutorials/minimax/minimax-chat.png)
