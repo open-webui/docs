@@ -84,6 +84,44 @@ From the Skills workspace list, you can perform the following actions via the el
 
 Each skill has an **active/inactive toggle** visible on the list page. Inactive skills are excluded from manifests and cannot be loaded by the model, even if they are bound to one or mentioned in chat.
 
+## Code Execution Limitations
+
+Skills themselves are plain-text instructions, but many useful skills involve asking the model to execute code via the [Code Interpreter](/features/workspace/code-interpreter). The available code execution backends each have trade-offs to be aware of:
+
+### Pyodide (Default)
+
+Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with significant constraints:
+
+- **No persistent storage** — the filesystem resets between executions, so skills that need to save or accumulate files across messages will not work.
+- **Limited library support** — only a subset of Python packages are available. Libraries that rely on C extensions or system calls (e.g., `python-docx`, `ffmpeg`, `pandas` with native backends) may not be available or may fail at runtime.
+- **No shell access** — skills that require running shell commands, installing packages, or interacting with the OS cannot function.
+
+> [!TIP]
+> Skills work best with Pyodide when they focus on **text transformation, analysis, and instruction-following** rather than file generation or system-level tasks.
+
+### Jupyter
+
+Jupyter provides a full Python environment and can handle virtually any task — file creation, package installation, and complex library usage. However, it has serious drawbacks in shared deployments:
+
+- **Shared environment** — all users share the same Python runtime and filesystem. One user's installed packages, files, or running processes are visible to (and can interfere with) others.
+- **Not sandboxed by default** — without careful configuration, users can access system resources, read other users' data, or interfere with the host system.
+- **Not designed for multi-tenant use** — Jupyter was built for single-user workflows. Running it as a shared backend in a multi-user Open WebUI deployment introduces security and isolation concerns.
+
+> [!WARNING]
+> If you are running a multi-user or organizational deployment, **Jupyter is not recommended** as the code execution backend. Open WebUI's Jupyter integration connects to a single shared Jupyter instance with no per-user isolation.
+
+### Choosing the Right Backend
+
+| Consideration | Pyodide | Jupyter |
+| :--- | :--- | :--- |
+| **Safety in multi-user setups** | ✅ Sandboxed | ⚠️ Shared environment |
+| **Library availability** | ⚠️ Limited | ✅ Full Python ecosystem |
+| **Persistent storage** | ❌ No | ✅ Yes |
+| **File generation** | ❌ Very limited | ✅ Full support |
+| **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation |
+
+For organizational deployments that need powerful code execution, per-user sandboxed Docker containers are the recommended long-term approach but are not yet available as a built-in feature.
+
 ## Access Control
 
 Skills use the same [Access Control](/features/rbac) system as other workspace resources:
