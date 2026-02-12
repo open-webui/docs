@@ -2877,6 +2877,18 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 :::
 
+#### `RAG_EMBEDDING_TIMEOUT`
+
+- Type: `int` (seconds)
+- Default: `None` (no timeout)
+- Description: Sets an optional timeout in seconds for embedding operations during document upload. When set, embedding requests that exceed this duration will be aborted with a timeout error. When unset (default), embedding operations run without a time limit. This setting is primarily relevant for deployments using the default **SentenceTransformers** embedding engine, where embeddings run locally and can take longer on slower hardware. External embedding engines (Ollama, OpenAI, Azure OpenAI) have their own timeout mechanisms and are generally not affected by this setting.
+
+:::info
+
+This variable was introduced alongside a fix for **uvicorn worker death during document uploads**. Previously, local embedding operations could block the worker thread long enough to trigger uvicorn's health check timeout (default: 5 seconds), causing the worker process to be killed. The underlying fix uses `run_coroutine_threadsafe` to keep the main event loop responsive to health checks regardless of this timeout setting. The timeout is purely a safety net for aborting abnormally long embedding operations — it does not affect worker health check behavior.
+
+:::
+
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
 
 - Type: `str`
