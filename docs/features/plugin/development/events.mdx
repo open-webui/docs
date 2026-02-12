@@ -30,7 +30,7 @@ Events are **fully available** for native Python Tools and Functions defined dir
 
 ### External Tools (OpenAPI & MCP)
 
-External tools can emit events via a **dedicated REST endpoint**. Open WebUI passes the following headers to all external tool requests:
+External tools can emit events via a **dedicated REST endpoint**. Open WebUI passes the following headers to all external tool requests when `ENABLE_FORWARD_USER_INFO_HEADERS=True` is set:
 
 | Header | Description |
 |--------|-------------|
@@ -467,14 +467,24 @@ Yes—emit `"chat:message:delta"` events in a loop, then finish with `"chat:mess
 
 External tools (OpenAPI and MCP servers) can emit events to the Open WebUI UI via a REST endpoint. This enables features like status updates, notifications, and streaming content from tools running on external servers.
 
+### Prerequisites
+
+To receive the chat and message ID headers, you must enable header forwarding by setting the following environment variable on your Open WebUI instance:
+
+```
+ENABLE_FORWARD_USER_INFO_HEADERS=True
+```
+
+Without this, Open WebUI will not include the identification headers in requests to external tools, and event emitting will not work.
+
 ### Headers Provided by Open WebUI
 
-When Open WebUI calls your external tool, it includes these headers:
+When Open WebUI calls your external tool (with header forwarding enabled), it includes these headers:
 
-| Header | Description |
-|--------|-------------|
-| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked |
-| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call |
+| Header | Description | Env Var Override |
+|--------|-------------|------------------|
+| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked | `FORWARD_SESSION_INFO_HEADER_CHAT_ID` |
+| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call | `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID` |
 
 ### Event Endpoint
 

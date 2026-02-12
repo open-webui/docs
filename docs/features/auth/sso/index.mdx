@@ -104,6 +104,39 @@ The following environment variables are required:
 1. `MICROSOFT_REDIRECT_URI` - The redirect URI configured in your Microsoft OAuth application. This must be set to `<open-webui>/oauth/microsoft/callback`.
 1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly.
 
+#### Token Refresh (`offline_access`)
+
+By default, Microsoft's identity platform only returns an `access_token`, which expires after approximately 1 hour. To enable automatic token refresh — preventing users from needing to re-authenticate — add the `offline_access` scope:
+
+```
+MICROSOFT_OAUTH_SCOPE=openid email profile offline_access
+```
+
+The `offline_access` scope instructs Microsoft to also return a **refresh token**, which Open WebUI's server-side session middleware uses to automatically obtain new access tokens before they expire.
+
+:::warning Symptoms of Missing `offline_access`
+
+Without `offline_access`, you may see repeated log warnings after users have been logged in for more than 1 hour:
+
+```
+WARNING | No refresh token available for session xxx
+WARNING | Token refresh failed for user xxx, deleting session
+```
+
+Basic chat functionality (which uses Open WebUI's JWT) is **not** affected, but the following features **will** fail:
+
+- MCP tool servers using `auth_type: "system_oauth"`
+- OneDrive / SharePoint file access
+- Automatic profile picture refresh from Microsoft
+
+:::
+
+:::tip
+
+No additional configuration is required in Microsoft Entra ID. The `offline_access` scope is [available by default](https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#openid-connect-scopes) for web applications with client secrets.
+
+:::
+
 ### Github
 
 To configure a Github OAuth Client, please refer to [Github's documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) on how to create a OAuth App or Github App for a **web application**.

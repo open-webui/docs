@@ -98,7 +98,7 @@ In Default Mode, Open WebUI manages tool selection by injecting a specific promp
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for high-performance agentic workflows.
 
 :::warning Model Quality Matters
-**Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.1**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
+**Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.5**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
 :::
 
 #### Why use Native Mode (Agentic Mode)?
@@ -129,7 +129,7 @@ For reliable agentic tool calling, use high-tier frontier models:
 - **GPT-5** (OpenAI)
 - **Claude 4.5 Sonnet** (Anthropic)
 - **Gemini 3 Flash** (Google)
-- **MiniMax M2.1**
+- **MiniMax M2.5**
 
 These models excel at multi-step reasoning, proper JSON formatting, and autonomous tool selection.
 :::
@@ -172,7 +172,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 ### Built-in System Tools (Native/Agentic Mode)
 
-🛠️ When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.1) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
+🛠️ When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.5) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
 
 | Tool | Purpose |
 |------|---------|
@@ -206,6 +206,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
 | `view_channel_message` | View a specific message or its details in a channel. |
 | `view_channel_thread` | View a full message thread/replies in a channel. |
+| **Skills** | *Requires per-model "Skills" category enabled (default: on).* |
+| `view_skill` | Load the full instructions of a skill from the available skills manifest. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
@@ -244,6 +246,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{id, channel_id, content, user_name, created_at}` |
 | `view_channel_message` | `message_id` (required) | `{id, content, user_name, created_at, reply_count}` |
 | `view_channel_thread` | `parent_message_id` (required) | Array of `{id, content, user_name, created_at}` |
+| **Skills** | | |
+| `view_skill` | `name` (required) | `{name, content}` |
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
@@ -314,6 +318,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
 | **Knowledge Base** | `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_knowledge_file` | Browse and query knowledge bases |
 | **Channels** | `search_channels`, `search_channel_messages`, `view_channel_message`, `view_channel_thread` | Search channels and channel messages |
+| **Skills** | `view_skill` | Load skill instructions on-demand from the manifest |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 

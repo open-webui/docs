@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.7.1](https://github.com/open-webui/open-webui/releases/tag/v0.7.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.8.0](https://github.com/open-webui/open-webui/releases/tag/v0.8.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -1357,8 +1357,9 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
   - `X-OpenWebUI-Chat-Id`
+  - `X-OpenWebUI-Message-Id`
 
-This enables per-user authorization, auditing, rate limiting, and request tracing on external services.
+This enables per-user authorization, auditing, rate limiting, and request tracing on external services. The chat and message ID headers are also required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
 
 #### `FORWARD_USER_INFO_HEADER_USER_NAME`
 
@@ -1390,6 +1391,12 @@ This enables per-user authorization, auditing, rate limiting, and request tracin
 - Default: `X-OpenWebUI-Chat-Id`
 - Description: Customizes the header name used to forward the current chat/session ID.
 
+#### `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-Message-Id`
+- Description: Customizes the header name used to forward the current message ID. This header is required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
+
 :::tip Custom Header Prefix
 Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
 
@@ -1399,6 +1406,7 @@ FORWARD_USER_INFO_HEADER_USER_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Id
 FORWARD_USER_INFO_HEADER_USER_EMAIL=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Email
 FORWARD_USER_INFO_HEADER_USER_ROLE=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Role
 FORWARD_SESSION_INFO_HEADER_CHAT_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Chat-Id
+FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Message-Id
 ```
 :::
 
@@ -2866,6 +2874,18 @@ Enabling this will potentially send thousands of requests per minute.
 If you are embedding locally, ensure that you can handle this amount of requests, otherwise turn this off to return to sequential embedding (slower but will always work).
 If you are embedding externally via API, ensure your rate limits are high enough to handle parallel embedding.
 (Usually, OpenAI can handle thousands of embedding requests per minute, even on the lowest API tier).
+
+:::
+
+#### `RAG_EMBEDDING_TIMEOUT`
+
+- Type: `int` (seconds)
+- Default: `None` (no timeout)
+- Description: Sets an optional timeout in seconds for embedding operations during document upload. When set, embedding requests that exceed this duration will be aborted with a timeout error. When unset (default), embedding operations run without a time limit. This setting is primarily relevant for deployments using the default **SentenceTransformers** embedding engine, where embeddings run locally and can take longer on slower hardware. External embedding engines (Ollama, OpenAI, Azure OpenAI) have their own timeout mechanisms and are generally not affected by this setting.
+
+:::info
+
+This variable was introduced alongside a fix for **uvicorn worker death during document uploads**. Previously, local embedding operations could block the worker thread long enough to trigger uvicorn's health check timeout (default: 5 seconds), causing the worker process to be killed. The underlying fix uses `run_coroutine_threadsafe` to keep the main event loop responsive to health checks regardless of this timeout setting. The timeout is purely a safety net for aborting abnormally long embedding operations — it does not affect worker health check behavior.
 
 :::
 
@@ -5294,6 +5314,13 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 - Description: Enables or disables user permission to access workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ACCESS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to access workspace skills.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Sharing (Private)
 
 These settings control whether users can share workspace items with other users **privately** (non-public sharing).
@@ -5324,6 +5351,13 @@ These settings control whether users can share workspace items with other users 
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace skills.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
@@ -5363,6 +5397,13 @@ These settings control whether users can share workspace items **publicly**.
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables **public sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **public sharing** of workspace skills.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
