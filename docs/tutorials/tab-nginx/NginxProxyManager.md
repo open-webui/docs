@@ -94,6 +94,20 @@ Without this, Nginx re-chunks SSE streams, breaking markdown formatting (visible
 
 :::
 
+:::tip Extended Timeouts for Long Completions
+
+Long LLM completions (30+ minutes for complex tasks) may exceed the default 60-second timeout. Add these directives in the **Advanced** tab → **Custom Nginx Configuration**:
+
+```nginx
+proxy_read_timeout 1800;
+proxy_send_timeout 1800;
+proxy_connect_timeout 1800;
+```
+
+This sets a 30-minute timeout. Adjust as needed for your use case.
+
+:::
+
 :::tip Caching Best Practice
 
 While Nginx Proxy Manager handles most configuration automatically, be aware that:

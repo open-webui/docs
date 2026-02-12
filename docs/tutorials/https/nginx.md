@@ -89,6 +89,154 @@ import Windows from '../tab-nginx/Windows.md';
 </Tabs>
 
 
+## Complete Optimized NGINX Configuration
+
+This section provides a production-ready NGINX configuration optimized for Open WebUI streaming, WebSocket connections, and high-concurrency deployments.
+
+### Upstream Configuration
+
+Define an upstream with keepalive connections to reduce connection setup overhead:
+
+```nginx
+upstream openwebui {
+    server 127.0.0.1:3000;
+    keepalive 128;              # Persistent connections
+    keepalive_timeout 1800s;    # 30 minutes
+    keepalive_requests 10000;
+}
+```
+
+### Timeout Configuration
+
+Long-running LLM completions require extended timeouts:
+
+```nginx
+location /api/ {
+    proxy_connect_timeout 1800;   # 30 minutes
+    proxy_send_timeout 1800;
+    proxy_read_timeout 1800;
+}
+
+# WebSocket connections need even longer timeouts
+location ~ ^/(ws/|socket\.io/) {
+    proxy_connect_timeout 86400;  # 24 hours
+    proxy_send_timeout 86400;
+    proxy_read_timeout 86400;
+}
+```
+
+### Header and Body Size Limits
+
+Prevent errors with large requests or OAuth tokens:
+
+```nginx
+# In http {} or server {} block
+client_max_body_size 100M;           # Large file uploads
+proxy_buffer_size 128k;              # Large headers (OAuth tokens)
+proxy_buffers 4 256k;
+proxy_busy_buffers_size 256k;
+large_client_header_buffers 4 32k;
+```
+
+### Common Streaming Mistakes
+
+| Setting | Impact on Streaming |
+|---------|---------------------|
+| `gzip on` with `application/json` | 🔴 Buffers for compression |
+| `proxy_buffering on` | 🔴 Buffers entire response |
+| `proxy_request_buffering on` | Should be turned off |
+| `tcp_nodelay on` | 🔴 **Most Critical:** Disables Nagle's algorithm to send packets immediately (prevents 200ms delays) |
+| `chunked_transfer_encoding on` | 🟡 Can break SSE |
+| `proxy_cache` enabled on `/api/` | 🟡 Adds overhead |
+| `X-Accel-Buffering "yes"` | This header should be set to "no" for extra safety |
+| `HTTP/2` | If you experience streaming issues, lag, streaming ending before the last chunk arrived on the frontend, then using HTTP 1.1 instead of HTTP/2 might also help |
+
+### Full Example Configuration
+
+```nginx
+upstream openwebui {
+    server 127.0.0.1:3000;
+    keepalive 128;
+    keepalive_timeout 1800s;
+    keepalive_requests 10000;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+
+    # SSL configuration...
+
+    # Compression - EXCLUDE streaming content types
+    gzip on;
+    gzip_types text/plain text/css application/javascript image/svg+xml;
+    # DO NOT include: application/json, text/event-stream
+
+    # API endpoints - streaming optimized
+    location /api/ {
+        proxy_pass http://openwebui;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # CRITICAL: Disable all buffering for streaming
+        gzip off;
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_cache off;
+        tcp_nodelay on;
+        add_header X-Accel-Buffering "no" always;
+        add_header Cache-Control "no-store" always;
+
+        # Extended timeouts for LLM completions
+        proxy_connect_timeout 1800;
+        proxy_send_timeout 1800;
+        proxy_read_timeout 1800;
+    }
+
+    # WebSocket endpoints
+    location ~ ^/(ws/|socket\.io/) {
+        proxy_pass http://openwebui;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        gzip off;
+        proxy_buffering off;
+        proxy_cache off;
+
+        # 24-hour timeout for persistent connections
+        proxy_connect_timeout 86400;
+        proxy_send_timeout 86400;
+        proxy_read_timeout 86400;
+    }
+
+    # Static assets - CAN buffer and cache
+    location /static/ {
+        proxy_pass http://openwebui;
+        proxy_buffering on;
+        proxy_cache_valid 200 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+    }
+
+    # Default location
+    location / {
+        proxy_pass http://openwebui;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+---
+
 ## Caching Configuration
 
 Proper caching significantly improves Open WebUI performance by reducing backend load and speeding up page loads. This section provides guidance for advanced users who want to implement server-side and client-side caching.

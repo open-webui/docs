@@ -110,3 +110,9 @@ Once deleted, the shared link will no longer be valid, and users will not be abl
 4. Click on the chat you wish to change permission access for.
 5. Scroll to the bottom of the chat and update its permission level.
 6. Click the **Update Chat** button.
+
+### Managing Shared Chats
+
+Open WebUI provides a centralized dashboard to manage every chat conversation you have shared. From there you can search through your shared history, re-copy links, or revoke access instantly.
+
+For details on the management dashboard, see [Shared Chats Management](/features/data-controls/shared-chats).

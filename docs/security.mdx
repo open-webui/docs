@@ -85,6 +85,50 @@ If your concern does not meet the vulnerability requirements outlined above, is 
 
 Examples of non-vulnerability, still security-related concerns include suggestions for better default configuration values, security hardening recommendations, deployment best practices guidance, unclear configuration instructions, need for additional security documentation, feature requests for optional security enhancements (2FA, audit logging, etc.), and general security questions about production deployment. Please use the adequate channel for your specific issue.
 
+## Tools, Functions, and Pipelines Security
+
+Open WebUI provides powerful extensibility through **Tools**, **Functions** (including Pipes, Filters, and Actions), and **Pipelines**. These features allow you to extend Open WebUI's capabilities with custom Python code. However, this power comes with security responsibilities.
+
+:::warning
+
+**Tools, Functions, and Pipelines execute arbitrary Python code on your server.** This is intentional—it's what makes them powerful. However, this means they have the same level of access as the Open WebUI backend process itself.
+
+:::
+
+### Security Implications
+
+When you install a Tool, Function, or Pipeline, you are granting it the ability to:
+
+- **Access the file system** — read or write any files the backend process can access
+- **Make network requests** — connect to external services, potentially exfiltrating data
+- **Execute system commands** — run shell commands via subprocess
+- **Access environment variables** — read API keys, secrets, and configuration
+- **Modify the database** — access or alter stored data
+- **Consume compute resources** — run CPU-intensive operations
+
+### Best Practices
+
+| Practice | Description |
+|----------|-------------|
+| **Only install from trusted sources** | Only use Tools/Functions from the official community library or sources you trust |
+| **Review code before installing** | Read and understand what a Tool/Function does before importing it |
+| **Restrict Workspace access** | Only grant Workspace permissions to trusted administrators |
+| **Audit installed plugins** | Regularly review installed Tools (Workspace → Tools) and Functions (Admin Panel → Functions) |
+| **Protect your data directory** | The `/app/backend/data` directory contains your database and cached plugins—protect it from unauthorized access |
+| **Monitor resource usage** | Watch for unexpected CPU spikes that could indicate cryptomining or other abuse |
+| **Use official Docker images** | Only pull from `ghcr.io/open-webui/open-webui`—unofficial images may be compromised |
+
+### What Is NOT a Vulnerability
+
+The following scenarios are **not** considered vulnerabilities because they require administrator action:
+
+- An admin installing a malicious Tool or Function
+- An admin granting Workspace access to an untrusted user
+- An admin importing code from an untrusted source
+- An attacker with write access to the data volume injecting malicious plugins
+
+These scenarios represent **admin negligence** or **environment compromise**, not vulnerabilities in Open WebUI itself. See [our Security Policy](https://github.com/open-webui/open-webui/security) for details.
+
 ## Product Security Process
 
 - Internal and periodic external reviews of our architecture and pipelines

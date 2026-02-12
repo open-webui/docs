@@ -309,6 +309,51 @@ If PDFs containing images with text are returning empty content:
 | 📄 API returns "empty content" error | Wait for file processing to complete before adding to knowledge base |
 | 💥 CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
 | 📷 PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
+| 💀 Worker dies during upload | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
+
+---
+
+### 12. Worker Dies During Document Upload (SentenceTransformers) 💀
+
+When uploading documents with the default SentenceTransformers embedding engine in a **multi-worker** deployment, you may see:
+
+```
+INFO:     Waiting for child process [12]
+INFO:     Child process [12] died
+```
+
+**The Problem**: When using **multiple uvicorn workers** (`--workers 2` or more), uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. Local SentenceTransformers embedding operations can take longer than this, and in older versions of Open WebUI, the embedding call blocked the event loop entirely — preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
+
+:::note
+
+This issue was **fixed** in Open WebUI. The embedding system now uses `run_coroutine_threadsafe` to keep the main event loop responsive during embedding operations, so workers will no longer be killed during uploads regardless of how long embeddings take.
+
+If you are running a version with this fix and still experiencing worker death, ensure your Open WebUI is up to date.
+
+:::
+
+**Who is affected:**
+- Only deployments using the **default SentenceTransformers** embedding engine (local embeddings).
+- Only when running **multiple uvicorn workers**. Single-worker deployments don't have health check timeouts.
+- External embedding engines (Ollama, OpenAI, Azure OpenAI) are **not affected** since their API calls don't block the event loop.
+
+✅ **Solutions (for older versions without the fix):**
+
+1. **Update Open WebUI** to a version that includes the `run_coroutine_threadsafe` fix.
+
+2. **Increase the health check timeout** as a workaround:
+   ```yaml
+   # docker-compose.yaml
+   command: ["bash", "start.sh", "--workers", "2", "--timeout-worker-healthcheck", "120"]
+   ```
+
+3. **Switch to an external embedding engine** to avoid local blocking entirely:
+   ```
+   RAG_EMBEDDING_ENGINE=ollama
+   RAG_EMBEDDING_MODEL=nomic-embed-text
+   ```
+
+4. **Optionally set a safety timeout** via [`RAG_EMBEDDING_TIMEOUT`](/getting-started/env-configuration#rag_embedding_timeout) to abort abnormally long embedding operations (does not affect health checks).
 
 ---
 

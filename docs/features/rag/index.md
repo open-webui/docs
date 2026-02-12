@@ -17,6 +17,10 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 Local documents must first be uploaded via the Documents section of the Workspace area to access them using the `#` symbol before a query. Click on the formatted URL in the that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval.
 
+:::tip Bulk File Management
+Need to clean up multiple uploaded documents or audit your storage? You can now use the centralized **[File Manager](/features/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
+:::
+
 You can also load documents into the workspace area with their access by starting a prompt with `#`, followed by a URL. This can help incorporate web content directly into your conversations.
 
 ## Web Search for RAG
@@ -162,6 +166,10 @@ The **File Context** capability controls whether Open WebUI performs RAG (Retrie
 
 :::warning File Context Disabled = No Pre-Injected Content
 When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through builtin tools (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
+:::
+
+:::tip Per-File Retrieval Mode
+Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
 :::
 
 :::info

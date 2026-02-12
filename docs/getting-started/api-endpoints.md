@@ -81,6 +81,81 @@ Access detailed API documentation for different services provided by Open WebUI:
       return response.json()
   ```
 
+### 🔧 Filter and Function Behavior with API Requests
+
+When using the API endpoints directly, filters (Functions) behave differently than when requests come from the web interface.
+
+:::info Authentication Note
+Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** for API authentication. This is intentional—the web interface uses JWT tokens internally for the same API endpoints. Both authentication methods provide equivalent API access.
+:::
+
+#### Filter Execution
+
+| Filter Function | WebUI Request | Direct API Request |
+|----------------|--------------|-------------------|
+| `inlet()` | ✅ Runs | ✅ Runs |
+| `stream()` | ✅ Runs | ✅ Runs |
+| `outlet()` | ✅ Runs | ❌ **Does NOT run** |
+
+The `inlet()` function always executes, making it ideal for:
+- **Rate limiting** - Track and limit requests per user
+- **Request logging** - Log all API usage for monitoring
+- **Input validation** - Reject invalid requests before they reach the model
+
+#### Triggering Outlet Processing
+
+The `outlet()` function only runs when the WebUI calls `/api/chat/completed` after a chat finishes. For direct API requests, you must call this endpoint yourself if you need outlet processing:
+
+- **Endpoint**: `POST /api/chat/completed`
+- **Description**: Triggers outlet filter processing for a completed chat
+
+- **Curl Example**:
+
+  ```bash
+  curl -X POST http://localhost:3000/api/chat/completed \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "llama3.1",
+        "messages": [
+          {"role": "user", "content": "Hello"},
+          {"role": "assistant", "content": "Hi! How can I help you today?"}
+        ],
+        "chat_id": "optional-uuid",
+        "session_id": "optional-session-id"
+      }'
+  ```
+
+- **Python Example**:
+
+  ```python
+  import requests
+
+  def complete_chat_with_outlet(token, model, messages, chat_id=None):
+      """
+      Call after receiving the full response from /api/chat/completions
+      to trigger outlet filter processing.
+      """
+      url = 'http://localhost:3000/api/chat/completed'
+      headers = {
+          'Authorization': f'Bearer {token}',
+          'Content-Type': 'application/json'
+      }
+      payload = {
+          'model': model,
+          'messages': messages  # Include the full conversation with assistant response
+      }
+      if chat_id:
+          payload['chat_id'] = chat_id
+      
+      response = requests.post(url, headers=headers, json=payload)
+      return response.json()
+  ```
+
+:::tip
+For more details on writing filters that work with API requests, see the [Filter Function documentation](/features/plugin/functions/filter#-filter-behavior-with-api-requests).
+:::
+
 ### 🦙 Ollama API Proxy Support
 
 If you want to interact directly with Ollama models—including for embedding generation or raw prompt streaming—Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.

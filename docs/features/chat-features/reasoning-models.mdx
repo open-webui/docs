@@ -347,7 +347,7 @@ Open WebUI serializes reasoning as text wrapped in tags (e.g., `<think>...</thin
 
 **Why Open WebUI Doesn't Support This Natively:**
 
-There is no standard way for storing reasoning content as part of the API payload across different providers. If Open WebUI implemented support for one provider's format (Anthropic), it would likely break existing deployments for many other inference providers. Given the wide variety of backends Open WebUI supports, we follow the OpenAI Completions API as the common standard.
+There is no standard way for storing reasoning content as part of the API payload across different providers. If Open WebUI implemented support for one provider's format, it would likely break existing deployments for many other inference providers. Given the wide variety of backends Open WebUI supports, we follow the OpenAI Completions API as the common standard. For more details on this architectural decision, see our **[FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**.
 
 **Workarounds:**
 

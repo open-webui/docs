@@ -1,0 +1,407 @@
+---
+sidebar_position: 1050
+title: "Analytics"
+---
+
+# Analytics
+
+The **Analytics** feature in Open WebUI provides administrators with comprehensive insights into usage patterns, token consumption, and model performance across their instance. This powerful tool helps you understand how your users are interacting with AI models and make data-driven decisions about resource allocation and model selection.
+
+:::info Admin-Only Feature
+Analytics is only accessible to users with **admin** role. Access it via **Admin Panel > Analytics**.
+:::
+
+## Overview
+
+The Analytics dashboard gives you a bird's-eye view of your Open WebUI instance's activity, including:
+
+- **Message volume** across different models and time periods
+- **Token usage** tracking for cost estimation and resource planning
+- **User activity** patterns to understand engagement
+- **Time-series data** showing trends over hours, days, or months
+
+All analytics data is derived from the message history stored in your instance's database. When the Analytics feature is enabled, Open WebUI automatically tracks and indexes messages to provide fast, queryable insights.
+
+---
+
+## Accessing Analytics
+
+1. Log in with an **admin** account
+2. Navigate to **Admin Panel** (click your profile icon → Admin Panel)
+3. Click on the **Analytics** tab in the admin navigation
+
+---
+
+## Dashboard Features
+
+### Time Period Selection
+
+At the top right of the Analytics dashboard, you can filter all data by time period:
+
+- **Last 24 hours** - Hourly granularity for real-time monitoring
+- **Last 7 days** - Daily overview of the past week
+- **Last 30 days** - Monthly snapshot
+- **Last 90 days** - Quarterly trends
+- **All time** - Complete historical data
+
+Your selected time period is **automatically saved** and persists across browser sessions.
+
+### Group Filtering
+
+If you have [user groups](/features/rbac/groups) configured, the Analytics dashboard allows filtering by group:
+
+- Use the **group dropdown** next to the time period selector
+- Select a specific group to view analytics **only for users in that group**
+- Choose "All Users" to see instance-wide analytics
+
+This is useful for:
+- **Department-level reporting** - Track usage for specific teams
+- **Cost allocation** - Attribute token consumption to business units
+- **Pilot programs** - Monitor adoption within test groups
+
+All metrics on the page update automatically when you change the time period or group filter.
+
+### Summary Statistics
+
+The dashboard header displays key metrics for the selected time period:
+
+- **Total Messages** - Number of assistant responses generated
+- **Total Tokens** - Sum of all input and output tokens processed
+- **Total Chats** - Number of unique conversations
+- **Total Users** - Number of users who sent messages
+
+:::note Message Counting
+Analytics counts **assistant responses** rather than user messages. This provides a more accurate measure of AI model usage and token consumption.
+:::
+
+### Message Timeline Chart
+
+The interactive timeline chart visualizes message volume over time, broken down by model. Key features:
+
+- **Hourly or Daily granularity** - Automatically adjusts based on selected time period
+- **Multi-model visualization** - Shows up to 8 models with distinct colors
+- **Hover tooltips** - Display exact counts and percentages for each model at any point in time
+- **Trend identification** - Quickly spot usage patterns, peak hours, and model adoption
+
+This chart helps you:
+- Identify busy periods for capacity planning
+- Track model adoption after deployment
+- Detect unusual activity spikes
+- Monitor the impact of changes or announcements
+
+### Model Usage Table
+
+A detailed breakdown of how each model is being used:
+
+| Column | Description |
+|--------|-------------|
+| **#** | Rank by message count |
+| **Model** | Model name with icon |
+| **Messages** | Total assistant responses generated |
+| **Tokens** | Total tokens (input + output) consumed |
+| **%** | Percentage share of total messages |
+
+**Features:**
+- **Sortable columns** - Click column headers to sort by name or message count
+- **Model icons** - Visual identification with profile images
+- **Token tracking** - See which models consume the most resources
+- **Clickable rows** - Click any model to open the [Model Details Modal](#model-details-modal)
+
+**Use cases:**
+- Identify your most popular models
+- Calculate cost per model (by multiplying tokens by provider rates)
+- Decide which models to keep or remove
+- Plan infrastructure upgrades based on usage
+
+### Model Details Modal
+
+Clicking on any model row opens a detailed modal with two tabs:
+
+#### Overview Tab
+
+The Overview tab provides:
+
+- **Feedback Activity Chart** - Visual history of user feedback (thumbs up/down) over time
+  - Toggle between **30 days**, **1 year**, or **All time** views
+  - Weekly aggregation for longer time ranges
+- **Tags** - Most common chat tags associated with this model (top 10)
+
+This helps you understand:
+- How users perceive model quality over time
+- Which topics/use cases the model is handling
+- Trends in user satisfaction
+
+#### Chats Tab
+
+:::info Admin Chat Access Required
+The Chats tab is only visible when **Admin Chat Access** is enabled in your instance settings.
+:::
+
+The Chats tab shows conversations that used this model:
+
+- **User info** - Who started each chat
+- **Preview** - First message of each conversation
+- **Timestamp** - When the chat was last updated
+- **Click to open** - Navigate directly to the shared chat view
+
+This is useful for:
+- Understanding how users interact with specific models
+- Auditing model usage for quality assurance
+- Finding example conversations for training or documentation
+
+### User Activity Table
+
+Track user engagement and token consumption per user:
+
+| Column | Description |
+|--------|-------------|
+| **#** | Rank by activity |
+| **User** | Username with profile picture |
+| **Messages** | Total messages sent by this user |
+| **Tokens** | Total tokens consumed by this user |
+
+**Features:**
+- **Sortable columns** - Organize by name or activity level
+- **User identification** - Profile pictures and display names
+- **Token attribution** - See resource consumption per user
+
+**Use cases:**
+- Monitor power users and their token consumption
+- Identify inactive or low-usage accounts
+- Plan user quotas or rate limits
+- Calculate per-user costs for billing purposes
+
+---
+
+## Token Usage Tracking
+
+### What Are Tokens?
+
+Tokens are the units that language models use to process text. Both the **input** (your prompt) and **output** (the model's response) consume tokens. Most AI providers charge based on token usage, making token tracking essential for cost management.
+
+### How Token Tracking Works
+
+Open WebUI automatically captures token usage from model responses and stores it with each message. The Analytics feature aggregates this data to show:
+
+- **Input tokens** - Tokens in user prompts and context
+- **Output tokens** - Tokens in model responses
+- **Total tokens** - Sum of input and output
+
+Token data is normalized across different model providers (OpenAI, Ollama, llama.cpp, etc.) to provide consistent metrics regardless of which backend you're using.
+
+### Token Usage Metrics
+
+The **Token Usage** section (accessible via the Tokens endpoint or dashboard) provides:
+
+- **Per-model token breakdown** - Input, output, and total tokens for each model
+- **Total token consumption** - Instance-wide token usage
+- **Message count correlation** - Tokens per message for efficiency analysis
+
+:::tip Cost Estimation
+To estimate costs, multiply the token counts by your provider's pricing:
+```
+Cost = (input_tokens × input_price) + (output_tokens × output_price)
+```
+
+Example for GPT-4:
+- Input: 1,000,000 tokens × $0.03/1K = $30
+- Output: 500,000 tokens × $0.06/1K = $30
+- **Total: $60**
+:::
+
+---
+
+## Use Cases
+
+### 1. Resource Planning
+
+**Scenario:** You're running Open WebUI for a team and need to plan infrastructure capacity.
+
+**How Analytics helps:**
+- View the **Message Timeline** to identify peak usage hours
+- Check **Model Usage** to see which models need more resources
+- Monitor **Token Usage** to estimate future costs
+- Track **User Activity** to plan for team growth
+
+### 2. Model Evaluation
+
+**Scenario:** You've deployed several models and want to know which ones your users prefer.
+
+**How Analytics helps:**
+- Compare **message counts** across models to see adoption rates
+- Check **token efficiency** (tokens per message) to identify verbose models
+- Monitor **trends** in the timeline chart after introducing new models
+- Combine with the [Evaluation feature](../evaluation/index.mdx) for quality insights
+
+### 3. Cost Management
+
+**Scenario:** You're using paid API providers and need to control costs.
+
+**How Analytics helps:**
+- Track **total token consumption** by model and user
+- Identify **high-usage users** for quota discussions
+- Compare **token costs** across different model providers
+- Set up regular reviews using time-period filters
+
+### 4. User Engagement
+
+**Scenario:** You want to understand how your team is using AI tools.
+
+**How Analytics helps:**
+- Monitor **active users** vs. registered accounts
+- Identify **power users** who might need support or training
+- Track **adoption trends** over time
+- Correlate usage with team initiatives or training sessions
+
+### 5. Compliance & Auditing
+
+**Scenario:** Your organization requires usage reporting for compliance.
+
+**How Analytics helps:**
+- Generate **activity reports** for specific time periods
+- Track **user attribution** for all AI interactions
+- Monitor **model usage** for approved vs. unapproved models
+- Export data via API for external reporting tools
+
+---
+
+## Technical Details
+
+### Data Storage
+
+Analytics data is stored in the `chat_message` table, which contains:
+
+- **Message content** - User and assistant messages
+- **Metadata** - Model ID, user ID, timestamps
+- **Token usage** - Input, output, and total tokens
+- **Relationships** - Links to parent messages and chats
+
+When you enable Analytics (via migration), Open WebUI:
+1. Creates the `chat_message` table with optimized indexes
+2. **Backfills existing messages** from your chat history
+3. **Dual-writes** new messages to both the chat JSON and the message table
+
+This dual-write approach ensures:
+- **Backward compatibility** - Existing features continue working
+- **Fast queries** - Analytics doesn't impact chat performance
+- **Data consistency** - All messages are captured
+
+### Database Indexes
+
+The following indexes optimize analytics queries:
+
+- `chat_id` - Fast lookup of all messages in a chat
+- `user_id` - Quick user activity reports
+- `model_id` - Efficient model usage queries
+- `created_at` - Time-range filtering
+- Composite indexes for common query patterns
+
+### API Endpoints
+
+For advanced users and integrations, Analytics provides REST API endpoints:
+
+**Dashboard Endpoints:**
+```
+GET /api/v1/analytics/summary
+GET /api/v1/analytics/models
+GET /api/v1/analytics/users
+GET /api/v1/analytics/messages
+GET /api/v1/analytics/daily
+GET /api/v1/analytics/tokens
+```
+
+**Model Detail Endpoints:**
+```
+GET /api/v1/analytics/models/{model_id}/chats    # Get chats using this model
+GET /api/v1/analytics/models/{model_id}/overview # Get feedback history and tags
+```
+
+**Common Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `start_date` | int | Unix timestamp (epoch seconds) - start of range |
+| `end_date` | int | Unix timestamp (epoch seconds) - end of range |
+| `group_id` | string | Filter to a specific user group (optional) |
+
+:::tip API Access
+All Analytics endpoints require admin authentication. Include your admin bearer token:
+```bash
+curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  "https://your-instance.com/api/v1/analytics/summary?group_id=abc123"
+```
+:::
+
+---
+
+## Privacy & Data Considerations
+
+### What Gets Tracked?
+
+Analytics tracks:
+- ✅ Message timestamps and counts
+- ✅ Token usage per message
+- ✅ Model IDs and user IDs
+- ✅ Chat IDs and message relationships
+
+Analytics **does not** track:
+- ❌ Message content display in the dashboard (only metadata)
+- ❌ External sharing or exports
+- ❌ Individual message content outside the database
+
+### Data Retention
+
+Analytics data follows your instance's chat retention policy. When you delete:
+- **A chat** - All associated messages are removed from analytics
+- **A user** - All their messages are disassociated
+- **Message history** - Analytics data is also cleared
+
+---
+
+## Frequently Asked Questions
+
+### Why are message counts different from what I expected?
+
+Analytics counts **assistant responses**, not user messages. If a chat has 10 user messages and 10 assistant responses, the count is 10. This provides a more accurate measure of AI usage and token consumption.
+
+### How accurate is token tracking?
+
+Token accuracy depends on your model provider:
+- **OpenAI/Anthropic** - Exact counts from API responses
+- **Ollama** - Accurate for models with token reporting
+- **llama.cpp** - Reports tokens when available
+- **Custom providers** - Depends on implementation
+
+Missing token data appears as 0 in analytics.
+
+### Can I export analytics data?
+
+Yes, via the API endpoints. Use tools like `curl`, Python scripts, or BI tools to fetch and export data:
+
+```bash
+curl -H "Authorization: Bearer TOKEN" \
+  "https://instance.com/api/v1/analytics/summary?start_date=1704067200&end_date=1706745600" \
+  > analytics_export.json
+```
+
+---
+
+## Summary
+
+Open WebUI's Analytics feature transforms your instance into a data-driven platform by providing:
+
+- 📊 **Real-time insights** into model and user activity
+- 💰 **Token tracking** for cost management and optimization  
+- 📈 **Trend analysis** to understand usage patterns over time
+- 👥 **User engagement** metrics for community building
+- 🔒 **Privacy-focused** design keeping all data on your instance
+
+Whether you're managing a personal instance or a large organizational deployment, Analytics gives you the visibility needed to optimize performance, control costs, and better serve your users.
+
+---
+
+## Related Features
+
+- [**Evaluation**](../evaluation/index.mdx) - Measure model quality through user feedback
+- [**RBAC**](../rbac/index.mdx) - Control access to models and features per user
+- [**Data Controls**](../data-controls/index.mdx) - Manage chat history and exports

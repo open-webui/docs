@@ -64,25 +64,23 @@ When editing a group, you can toggle specific permissions.
 
 ## Resource Access (RBAC)
 
-You can restrict access to specific objects (like a proprietary Model or sensitive Knowledge Base) using Groups.
+You can restrict access to specific objects (like a proprietary Model or sensitive Knowledge Base) using Groups or individual user grants.
 
 1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private** or **Restricted**.
-2.  **Grant Access**: Select the specific **Groups** (or individual users) that should have "Read" or "Write" access.
+2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once.
 
-### Access Control Object
-At a deeper level, resources store an access control list (ACL) looking like this:
+:::tip Knowledge Scoping for Models
+Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#knowledge-scoping-with-native-function-calling) for details.
+:::
 
-```json
-{
-  "read": {
-    "group_ids": ["marketing-team-id", "admins-id"],
-    "user_ids": []
-  },
-  "write": {
-    "group_ids": ["admins-id"],
-    "user_ids": ["editor-user-id"]
-  }
-}
-```
+### Access Grant System
+At a deeper level, resource access is managed through normalized **access grants** stored in the database. Each grant specifies:
+
+*   **Resource**: The type and ID of the resource (e.g., a specific model or knowledge base).
+*   **Principal**: Who receives access — either a **group** or an **individual user**.
+*   **Permission**: The level of access — `read` or `write`.
+
+For example, granting the "Marketing" group read access and a specific editor user write access to a model would create two separate grant entries. Public access is represented by a user grant with a wildcard (`*`) principal.
+
 *   **Read**: Users can view and use the resource.
 *   **Write**: Users can update or delete the resource.

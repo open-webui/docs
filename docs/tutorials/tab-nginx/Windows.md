@@ -156,7 +156,11 @@ http {
             proxy_buffering off;
             proxy_cache off;
             client_max_body_size 20M;
-            proxy_read_timeout 10m;
+            
+            # Extended timeout for long LLM completions (30 minutes)
+            proxy_read_timeout 1800;
+            proxy_send_timeout 1800;
+            proxy_connect_timeout 1800;
 
             add_header Cache-Control "public, max-age=300, must-revalidate";
         }

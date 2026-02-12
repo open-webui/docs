@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.7.1](https://github.com/open-webui/open-webui/releases/tag/v0.7.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.8.0](https://github.com/open-webui/open-webui/releases/tag/v0.8.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -328,6 +328,12 @@ If you are running larger instances, you WILL NEED to set this to a higher value
 - Default: `True`
 - Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
 - Persistence: This environment variable is a `PersistentConfig` variable. It can be toggled in the **Admin Panel > Settings > General > User Status**.
+
+#### `ENABLE_EASTER_EGGS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables easter egg features in the UI, such as special themes (e.g., the "Her" theme option in the theme selector). Set to `False` to hide these optional novelty features from users.
 
 #### `ADMIN_EMAIL`
 
@@ -1344,13 +1350,65 @@ If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change 
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user information (name, ID, email, role and chat-id) as X-headers to OpenAI API and Ollama API.
+- Description: Forwards user and session information as HTTP headers to OpenAI API, Ollama API, MCP servers, and Tool servers.
 If enabled, the following headers are forwarded:
   - `X-OpenWebUI-User-Name`
   - `X-OpenWebUI-User-Id`
   - `X-OpenWebUI-User-Email`
   - `X-OpenWebUI-User-Role`
   - `X-OpenWebUI-Chat-Id`
+  - `X-OpenWebUI-Message-Id`
+
+This enables per-user authorization, auditing, rate limiting, and request tracing on external services. The chat and message ID headers are also required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
+
+#### `FORWARD_USER_INFO_HEADER_USER_NAME`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Name`
+- Description: Customizes the header name used to forward the user's display name. Change this if your infrastructure requires a specific header prefix.
+
+#### `FORWARD_USER_INFO_HEADER_USER_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Id`
+- Description: Customizes the header name used to forward the user's ID.
+
+#### `FORWARD_USER_INFO_HEADER_USER_EMAIL`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Email`
+- Description: Customizes the header name used to forward the user's email address.
+
+#### `FORWARD_USER_INFO_HEADER_USER_ROLE`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Role`
+- Description: Customizes the header name used to forward the user's role.
+
+#### `FORWARD_SESSION_INFO_HEADER_CHAT_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-Chat-Id`
+- Description: Customizes the header name used to forward the current chat/session ID.
+
+#### `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID`
+
+- Type: `str`
+- Default: `X-OpenWebUI-Message-Id`
+- Description: Customizes the header name used to forward the current message ID. This header is required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
+
+:::tip Custom Header Prefix
+Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
+
+```bash
+FORWARD_USER_INFO_HEADER_USER_NAME=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Name
+FORWARD_USER_INFO_HEADER_USER_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Id
+FORWARD_USER_INFO_HEADER_USER_EMAIL=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Email
+FORWARD_USER_INFO_HEADER_USER_ROLE=X-Amzn-Bedrock-AgentCore-Runtime-Custom-User-Role
+FORWARD_SESSION_INFO_HEADER_CHAT_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Chat-Id
+FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-Message-Id
+```
+:::
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
@@ -1466,6 +1524,19 @@ When defining a custom regex pattern, ensure it:
 - Is thoroughly tested before deployment to avoid locking users out
 
 Invalid regex patterns will cause password validation to fail, potentially preventing user registration and password changes.
+
+:::
+
+#### `PASSWORD_VALIDATION_HINT`
+
+- Type: `str`
+- Default: `""` (empty string)
+- Description: Custom hint message displayed to users when their password fails validation. This message appears in error dialogs during signup, password changes, and admin user creation when the password doesn't meet the requirements defined by `PASSWORD_VALIDATION_REGEX_PATTERN`. Use this to explain your specific password requirements in user-friendly terms.
+- Example: `Password must be at least 12 characters with uppercase, lowercase, number, and special character.`
+
+:::tip
+
+When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_VALIDATION_HINT` to explain the requirements in plain language. Without a hint, users will only see a generic "Invalid password" error with no guidance on what's required.
 
 :::
 
@@ -2250,11 +2321,25 @@ When using Pinecone as the vector store, the following environment variables are
 
 ### Weaviate
 
+:::info
+
+**Self-Hosted and Cloud Deployments**
+
+Open WebUI uses `connect_to_custom` for Weaviate connections, which supports both locally hosted and remote Weaviate instances. This is essential for self-hosted deployments where HTTP and gRPC endpoints may be on different ingresses or hostnames, which is common in container orchestration platforms like Kubernetes or Azure Container Apps.
+
+:::
+
 #### `WEAVIATE_HTTP_HOST`
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Specifies the hostname of the Weaviate server for HTTP connections.
+- Description: Specifies the hostname of the Weaviate server for HTTP connections. For self-hosted deployments, this is typically your Weaviate HTTP endpoint hostname.
+
+#### `WEAVIATE_GRPC_HOST`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Specifies the hostname of the Weaviate server for gRPC connections. This can be different from `WEAVIATE_HTTP_HOST` when HTTP and gRPC are served on separate ingresses, which is common in container orchestration environments.
 
 #### `WEAVIATE_HTTP_PORT`
 
@@ -2268,11 +2353,29 @@ When using Pinecone as the vector store, the following environment variables are
 - Default: `50051`
 - Description: Specifies the gRPC port for connecting to the Weaviate server.
 
+#### `WEAVIATE_HTTP_SECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables HTTPS for HTTP connections to the Weaviate server. Set to `true` when connecting to a Weaviate instance with TLS enabled on the HTTP endpoint.
+
+#### `WEAVIATE_GRPC_SECURE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables TLS for gRPC connections to the Weaviate server. Set to `true` when connecting to a Weaviate instance with TLS enabled on the gRPC endpoint.
+
 #### `WEAVIATE_API_KEY`
 
 - Type: `str`
 - Default: `None`
 - Description: Sets the API key for authenticating with Weaviate server.
+
+#### `WEAVIATE_SKIP_INIT_CHECKS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Skips Weaviate initialization checks when connecting. This can be useful in certain network configurations where the checks may fail but the connection itself works.
 
 ### Oracle 23ai Vector Search (oracle23ai)
 
@@ -2696,6 +2799,16 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Description: Extracts images from PDFs using OCR when loading documents.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `PDF_LOADER_MODE`
+
+- Type: `str`
+- Options:
+  - `page` - Creates one document per page (default).
+  - `single` - Combines all pages into one document for better chunking across page boundaries.
+- Default: `page`
+- Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
@@ -2761,6 +2874,18 @@ Enabling this will potentially send thousands of requests per minute.
 If you are embedding locally, ensure that you can handle this amount of requests, otherwise turn this off to return to sequential embedding (slower but will always work).
 If you are embedding externally via API, ensure your rate limits are high enough to handle parallel embedding.
 (Usually, OpenAI can handle thousands of embedding requests per minute, even on the lowest API tier).
+
+:::
+
+#### `RAG_EMBEDDING_TIMEOUT`
+
+- Type: `int` (seconds)
+- Default: `None` (no timeout)
+- Description: Sets an optional timeout in seconds for embedding operations during document upload. When set, embedding requests that exceed this duration will be aborted with a timeout error. When unset (default), embedding operations run without a time limit. This setting is primarily relevant for deployments using the default **SentenceTransformers** embedding engine, where embeddings run locally and can take longer on slower hardware. External embedding engines (Ollama, OpenAI, Azure OpenAI) have their own timeout mechanisms and are generally not affected by this setting.
+
+:::info
+
+This variable was introduced alongside a fix for **uvicorn worker death during document uploads**. Previously, local embedding operations could block the worker thread long enough to trigger uvicorn's health check timeout (default: 5 seconds), causing the worker process to be killed. The underlying fix uses `run_coroutine_threadsafe` to keep the main event loop responsive to health checks regardless of this timeout setting. The timeout is purely a safety net for aborting abnormally long embedding operations — it does not affect worker health check behavior.
 
 :::
 
@@ -2845,6 +2970,14 @@ If you are embedding externally via API, ensure your rate limits are high enough
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Reranking
+
+#### `RAG_RERANKING_ENGINE`
+
+- Type: `str`
+- Options: `external`, or empty for local Sentence-Transformer CrossEncoder
+- Default: Empty string (local reranking)
+- Description: Specifies the reranking engine to use. Set to `external` to use an external reranker API (requires `RAG_EXTERNAL_RERANKER_URL`). Leave empty to use a local Sentence-Transformer CrossEncoder model.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_RERANKING_MODEL`
 
@@ -3212,6 +3345,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
   - `azure_ai_search`
   - `yacy`
+  - `yandex` - Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DDGS_BACKEND`
@@ -3474,6 +3608,27 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Type: `str`
 - Default: Empty string (' ')
 - Description: Sets the API key for authenticating with the external web loader service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YANDEX_WEB_SEARCH_URL`
+
+- Type: `str`
+- Default: `https://searchapi.api.cloud.yandex.net/v2/web/search`
+- Description: Specifies the URL of the Yandex Web Search service API endpoint.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YANDEX_WEB_SEARCH_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for authenticating with the Yandex Web Search service.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `YANDEX_WEB_SEARCH_CONFIG`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Optional JSON configuration string for Yandex Web Search. Can be used to set parameters like `searchType` or `region` as per the Yandex API documentation.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `PERPLEXITY_API_KEY`
@@ -3965,8 +4120,20 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `512x512`
-- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`).
+- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`). Set to `auto` to let the model determine the appropriate size (only supported by models matching `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^gpt-image`
+- Description: A regex pattern to match model names that support `IMAGE_SIZE = "auto"`. When a model matches this pattern, the `auto` size option becomes available, allowing the model to determine the appropriate output dimensions. By default, only models starting with `gpt-image` (e.g., `gpt-image-1`) are matched.
+
+#### `IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN`
+
+- Type: `str`
+- Default: `^gpt-image`
+- Description: A regex pattern to match model names that return image URLs directly instead of base64-encoded data. Models matching this pattern will not include `response_format: b64_json` in API requests. By default, only models starting with `gpt-image` are matched. For other models, Open WebUI requests base64 responses and handles the conversion internally.
 
 #### `IMAGE_STEPS`
 
@@ -4387,6 +4554,46 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Default: `True`
 - Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.**
 - Usage: For new and secure deployments, **it is recommended to set this to `False`** to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
+
+#### `ENABLE_OAUTH_TOKEN_EXCHANGE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the OAuth token exchange endpoint, allowing external applications to exchange an OAuth provider's access token for an Open WebUI JWT session token. This enables programmatic authentication for external tools and services that already have OAuth tokens from your identity provider.
+- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token.
+
+:::warning
+
+**Security Note**: This feature should only be enabled when you have external applications that need to authenticate with Open WebUI using OAuth tokens from your identity provider. Ensure proper access controls are in place for any external applications using this endpoint.
+
+:::
+
+**Request Example:**
+```bash
+curl -X POST "http://localhost:8080/api/v1/oauth/google/token/exchange" \
+  -H "Content-Type: application/json" \
+  -d '{"token": "ya29.a0AfH6SMB..."}'
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_at": 1735682400,
+  "id": 1,
+  "email": "user@example.com",
+  "name": "John Doe",
+  "role": "user",
+  "profile_image_url": "https://...",
+  "permissions": {...}
+}
+```
+
+**Requirements:**
+- The user must already exist in Open WebUI (they must have signed in via the web interface at least once)
+- The OAuth provider must be properly configured
+- The token exchange uses the same user lookup logic as regular OAuth login (by OAuth `sub` claim first, then by email if `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is enabled)
 
 #### `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`
 
@@ -5107,39 +5314,148 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 - Description: Enables or disables user permission to access workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ACCESS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to access workspace skills.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Sharing (Private)
+
+These settings control whether users can share workspace items with other users **privately** (non-public sharing).
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace knowledge.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace prompts.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace skills.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables **private sharing** of notes.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Sharing (Public)
+
+These settings control whether users can share workspace items **publicly**.
+
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace models.
+- Description: Enables or disables **public sharing** of workspace models.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace knowledge.
+- Description: Enables or disables **public sharing** of workspace knowledge.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace prompts.
+- Description: Enables or disables **public sharing** of workspace prompts.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `False`
-- Description: Enables or disables public sharing of workspace tools.
+- Description: Enables or disables **public sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **public sharing** of workspace skills.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables public sharing of notes.
+- Description: Enables or disables **public sharing** of notes.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Import / Export
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_IMPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to import workspace models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_EXPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to export workspace models.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_IMPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to import workspace prompts.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_PROMPTS_EXPORT`
+
+- Type: `str`
+- Default: `True`
+- Description: Enables or disables user permission to export workspace prompts.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_IMPORT`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables user permission to import workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_TOOLS_EXPORT`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables user permission to export workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Settings Permissions
 
@@ -5574,6 +5890,22 @@ For deployments with many concurrent users, consider increasing both `DATABASE_P
 
 :::
 
+:::warning Pool Size Multiplies with Concurrency
+
+**Each Open WebUI process maintains its own independent connection pool.** This applies whether you're running multiple Uvicorn workers (`UVICORN_WORKERS > 1`), multiple Kubernetes pods, Docker Swarm replicas, or any other multi-instance deployment.
+
+The actual maximum number of database connections is:
+
+```
+Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Number of processes/instances
+```
+
+For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, and 4 instances (whether workers, pods, or replicas), you could open up to **140 connections** (35 × 4).
+
+When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation—connection pools cannot be shared across separate processes or containers.
+
+:::
+
 #### `DATABASE_POOL_MAX_OVERFLOW`
 
 - Type: `int`
@@ -5650,6 +5982,46 @@ If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the 
 
 :::
 
+:::danger
+
+**Critical Redis Server Configuration — Prevent Connection Exhaustion**
+
+Open WebUI uses Redis for token validation, WebSocket management, and session storage. Each user action can create Redis connections. If your Redis server is misconfigured, connections will accumulate over time until the limit is reached, causing **500 Internal Server Errors** and preventing all users from logging in.
+
+**You must configure these settings in your `redis.conf` (not Open WebUI environment variables):**
+
+| Setting | Bad Default | Recommended | Why |
+|---------|-------------|-------------|-----|
+| `maxclients` | 1000 (some distros) | `10000` or higher | Low limits cause "max number of clients reached" errors |
+| `timeout` | 0 (never close) | `1800` (30 minutes) | Without timeout, idle connections accumulate forever |
+
+**Example `redis.conf` settings:**
+```conf
+maxclients 10000
+timeout 1800
+```
+
+**Symptoms of this misconfiguration:**
+- Works fine for days/weeks, then suddenly all logins fail with 500 errors
+- `redis.exceptions.ConnectionError: max number of clients reached` in logs
+- Problem appears to "fix itself" temporarily, then returns
+
+**Why this happens:**
+With `timeout 0`, every Redis connection stays open indefinitely. Over days or weeks, connections from token checks, WebSocket events, and session validations accumulate. Once `maxclients` is reached, no new connections can be made, and authentication fails completely.
+
+**To check your current connection count:**
+```bash
+redis-cli INFO clients | grep connected_clients
+```
+
+**To verify your settings:**
+```bash
+redis-cli CONFIG GET maxclients
+redis-cli CONFIG GET timeout
+```
+
+:::
+
 #### `REDIS_SENTINEL_HOSTS`
 
 - Type: `str`
@@ -5665,11 +6037,17 @@ If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the 
 
 - Type: `bool`
 - Default: `False`
-- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined.
+- Description: Connect to a Redis Cluster instead of a single instance or using Redis Sentinels. If `True`, `REDIS_URL` must also be defined. This mode is compatible with AWS Elasticache Serverless and other Redis Cluster implementations.
 
 :::info
 
 This option has no effect if `REDIS_SENTINEL_HOSTS` is defined.
+
+:::
+
+:::tip OpenTelemetry Support
+
+Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When `ENABLE_OTEL` is enabled, Redis operations are properly traced regardless of whether you're using a single Redis instance or Redis Cluster mode.
 
 :::
 
@@ -5707,6 +6085,24 @@ WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
 If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be applied to websocket connections automatically.
 
 :::
+
+#### `REDIS_SENTINEL_MAX_RETRY_COUNT`
+
+- Type: `int`
+- Default: `2`
+- Description: Sets the maximum number of retries for Redis operations when using Sentinel fail-over. This is a critical high-availability setting that allows the application time for master election and promotion. If your Sentinel `down-after-milliseconds` is high, you should tune this value accordingly to ensure the service survives the failover window without dropping connections.
+
+#### `REDIS_RECONNECT_DELAY`
+
+- Type: `float` (milliseconds)
+- Default: None
+- Description: Optional reconnect delay in milliseconds for Redis Sentinel retry logic, applied consistently across both synchronous and asynchronous Redis operations. This improves stability during Sentinel failover by preventing tight retry loops. When unset or invalid, retry behavior remains unchanged.
+
+#### `WEBSOCKET_REDIS_LOCK_TIMEOUT`
+
+- Type: `int`
+- Default: `60`
+- Description: Sets the timeout in seconds for Redis locks used by the websocket manager.
 
 #### `ENABLE_WEBSOCKET_SUPPORT`
 
@@ -5824,8 +6220,8 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 #### `WEBSOCKET_SERVER_ENGINEIO_LOGGING`
 
 - Type: `bool`
-- Default: `false`
-- Description: Controls logging for EngineIO server related to websocket operations.
+- Default: Falls back to `WEBSOCKET_SERVER_LOGGING` if not set, otherwise `false`
+- Description: Controls logging for Engine.IO server related to websocket operations. If not explicitly set, this inherits the value from `WEBSOCKET_SERVER_LOGGING`.
 
 :::warning
 

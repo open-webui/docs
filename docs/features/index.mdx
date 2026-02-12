@@ -19,6 +19,10 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔐 **SCIM 2.0 Provisioning**: Enterprise-grade user and group provisioning through SCIM 2.0 protocol, enabling seamless integration with identity providers like Okta, Azure AD, and Google Workspace for automated user lifecycle management. [Read the SCIM Guide](/features/auth/scim).
 
+- 📂 **Centralized File Management**: A unified dashboard to search, view, and manage all your uploaded documents in one place. Includes automated cleanup of Knowledge Base associations and vector embeddings when deleting files. [Learn about File Management](/features/data-controls/files).
+
+- 💬 **Shared Chat Management**: A centralized interface to audit every conversation you've ever shared. Easily search through your shared history, re-copy links, or revoke (unshare) access instantly from a single location. [Learn about Shared Chats](/features/data-controls/shared-chats).
+
 - 📱 **Responsive Design**: Enjoy a seamless experience across desktop PCs, laptops, and mobile devices.
 
 - 📱 **Progressive Web App for Mobile**: Enjoy a native progressive web application experience on your mobile device with offline access on `localhost` or a personal domain, and a smooth user interface. In order for our PWA to be installable on your device, it must be delivered in a secure context. This usually means that it must be served over HTTPS.
@@ -164,6 +168,8 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🔔 **Chat Completion Notifications**: Stay updated with instant in-UI notifications when a chat finishes in a non-active tab, ensuring you never miss a completed response.
 
+- 📝 **Message Queue**: Continue composing messages while the AI is generating a response. Your messages are queued and automatically sent together when the current response completes. Edit, delete, or send queued messages immediately. [Learn about Message Queue](/features/chat-features/message-queue).
+
 - 🌐 **Notification Webhook Integration**: Receive timely updates for long-running chats or external integration needs with configurable webhook notifications, even when your tab is closed. [Learn more about Webhooks](/features/interface/webhooks).
 
 - 📚 **Channels (Beta)**: Explore real-time collaboration between users and AIs with Discord/Slack-style chat rooms, build bots for channels, and unlock asynchronous communication for proactive multi-agent workflows. [See Channels](/features/channels).
@@ -276,13 +282,13 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 🍻 **TavernAI Character Card Integration**: Experience enhanced visual storytelling with TavernAI Character Card Integration in our model builder. Users can seamlessly incorporate TavernAI character card PNGs directly into their model files, creating a more immersive and engaging user experience.
 
-- 🎲 **Model Playground (Beta)**: Try out models with the model playground area (`beta`), which enables users to test and explore model capabilities and parameters with ease in a sandbox environment before deployment in a live chat environment.
+- 🎲 **Model Playground (Beta)**: Try out models with the model playground area (`beta`), which enables users to test and explore model capabilities and parameters with ease in a sandbox environment before deployment in a live chat environment. Export your playground conversations in JSON format (compatible with Open WebUI chat import) or as plain text for easy sharing and documentation.
 
 ---
 
 ### 👥 Collaboration
 
-- 🗨️ **Local Chat Sharing**: Generate and share chat links between users in an efficient and seamless manner, thereby enhancing collaboration and communication.
+- 🗨️ **Local Chat Sharing**: Generate and share chat links between users in an efficient and seamless manner. Includes a **centralized management interface** in Settings to view, copy links, or unshare conversations at any time. [Learn more about Chat Sharing](/features/chat-features/chatshare).
 
 - 👍👎 **RLHF Annotation**: Enhance the impact of your messages by rating them with either a thumbs up or thumbs down AMD provide a rating for the response on a scale of 1-10, followed by the option to provide textual feedback, facilitating the creation of datasets for Reinforcement Learning from Human Feedback (`RLHF`). Utilize your messages to train or fine-tune models, all while ensuring the confidentiality of locally saved data.
 
@@ -422,7 +428,11 @@ import { TopBanners } from "@site/src/components/TopBanners";
 
 - 👥 **Active Users Indicator**: Monitor the number of active users and which models are being utilized by whom to assist in gauging when performance may be impacted due to a high number of users.
 
+- 📊 **Analytics Dashboard**: Comprehensive usage insights for administrators including message volume, token consumption, user activity, and model performance metrics with interactive time-series charts and detailed breakdowns. Track costs, identify trends, and make data-driven decisions about resource allocation. [Learn more about Analytics](/features/analytics).
+
 - 🔒 **Default Sign-Up Role**: Specify the default role for new sign-ups to `pending`, `user`, or `admin`, providing flexibility in managing user permissions and access levels for new users.
+
+- 🤖 **Bulk Model Management & Filtering**: Administrators can effortlessly manage large model collections from external providers with tools to bulk enable/disable models and filter the admin list by status (Enabled, Disabled, Hidden, etc.) to maintain a clean workspace. [Learn about Admin Models](/features/workspace/models#global-model-management-admin).
 
 - 🔒 **Prevent New Sign-Ups**: Enable the option to disable new user sign-ups, restricting access to the platform and maintaining a fixed number of users.
 

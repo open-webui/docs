@@ -30,7 +30,7 @@ Both actions lead to the same Model Builder interface, where you can configure t
 - **Tags**: Add tags to organize models in the selector dropdown.
 - **Visibility & Groups**:
   - **Private**: Restricts access to specific users or groups.
-  - **Groups Selector**: Use the dropdown to grant access to specific teams (e.g., "Admins", "Developers") without making the model public to everyone.
+  - **Access Control Selector**: Use the access control panel to grant access to specific groups (e.g., "Admins", "Developers") or individual users without making the model public to everyone. The redesigned interface makes it easy to add multiple groups and users at once.
 
 ### System Prompt & Dynamic Variables
 
@@ -72,8 +72,9 @@ Clicking **Show** on **Advanced Params** allows you to fine-tune the inference g
 
 You can transform a generic model into a specialized agent by toggling specific capabilities and binding resources.
 
-- **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files.
+- **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files. Click on attached items to toggle between **Focused Retrieval** (RAG chunks) and **Using Entire Document** (full content injection). See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
 - **Tools**: Force specific tools to be enabled by default (e.g., always enable the **Calculator** tool for a "Math Bot").
+- **Skills**: Bind [Skills](/features/workspace/skills) to this model so their manifests are always injected. The model can load full skill instructions on-demand via the `view_skill` builtin tool.
 - **Filters**: Attach specific Pipelines/Filters (e.g., a Profanity Filter or PII Redaction script) to run exclusively on this model.
 - **Actions**: Attach actionable scripts like `Add to Memories` or `Button` triggers.
 - **Capabilities**: Granularly control what the model is allowed to do:
@@ -81,11 +82,11 @@ You can transform a generic model into a specialized agent by toggling specific 
   - **Web Search**: Enable the model to access the configured search provider (e.g., Google, SearxNG) for real-time information.
   - **File Upload**: Allow users to upload files to this model.
   - **File Context**: When enabled (default), attached files are processed via RAG and their content is injected into the conversation. When disabled, file content is **not** extracted or injected—the model receives no file content unless it retrieves it via builtin tools. Only visible when File Upload is enabled. See [File Context vs Builtin Tools](../rag/index.md#file-context-vs-builtin-tools) for details.
-  - **Code Interpreter**: Enable Python code execution.
+  - **Code Interpreter**: Enable Python code execution. See [Python Code Execution](../chat-features/code-execution/python.md) for details.
   - **Image Generation**: Enable image generation integration.
   - **Usage / Citations**: Toggle usage tracking or source citations.
   - **Status Updates**: Show visible progress steps in the chat UI (e.g., "Searching web...", "Reading file...") during generation. Useful for slower, complex tasks.
-  - **Builtin Tools**: When enabled (default), automatically injects system tools (timestamps, memory, chat history, knowledge base queries, notes, etc.) in [Native Function Calling mode](../plugin/tools/index.mdx#disabling-builtin-tools-per-model). Disable this if the model doesn't support function calling or you need to save context window tokens. Note: This is separate from **File Context**—see [File Context vs Builtin Tools](../rag/index.md#file-context-vs-builtin-tools) for the difference.
+  - **Builtin Tools**: When enabled (default), automatically injects system tools (timestamps, memory, chat history, knowledge base queries, notes, etc.) in [Native Function Calling mode](../plugin/tools/index.mdx#disabling-builtin-tools-per-model). When enabled, you can further control which **tool categories** are available (Time, Memory, Chats, Notes, Knowledge, Channels) via checkboxes in the Model Editor. Disable the main toggle if the model doesn't support function calling or you need to save context window tokens. Note: This is separate from **File Context**—see [File Context vs Builtin Tools](../rag/index.md#file-context-vs-builtin-tools) for the difference.
 - **TTS Voice**: Set a specific Text-to-Speech voice for this model. When users read responses aloud, this voice will be used instead of the global default. Useful for giving different personas distinct voices. Leave empty to use the user's settings or system default. See [Per-Model TTS Voice](../audio/text-to-speech/openai-tts-integration#per-model-tts-voice) for details.
 - **Default Features**: Force specific toggles (like Web Search) to be "On" immediately when a user starts a chat with this model.
 
@@ -115,6 +116,32 @@ A raw Base Model can be cloned as a custom Workspace model, but it will not clon
 :::info Downloading Raw Models
 To download new raw Base Models (like `Llama-3.2-3B-Instruct-GGUF:Q8_0` or `Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`), navigate to **Settings > Connections > Ollama**. Alternatively, type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector to pull directly from Hugging Face. This action will create a button within the model selector labeled "Pull [Model Name]" that will begin downloading the model from its source once clicked.
 :::
+
+## Global Model Management (Admin)
+
+Administrators have access to a centralized management interface via **Admin Panel > Settings > Models**. This page provides powerful tools for decluttering and organizing the model list, especially when connected to providers with hundreds of available models.
+
+### View Filtering
+
+The **Admin View Selector** allows you to filter the entire list of models by their operational status. This is located next to the search bar and includes the following views:
+
+- **All**: Shows every model available to the system.
+- **Enabled**: Displays only models that are currently active and selectable by users.
+- **Disabled**: Shows models that have been deactivated.
+- **Visible**: Shows models that are currently visible in the user model selector.
+- **Hidden**: Displays only the models that have been hidden (these appear with reduced opacity in the list).
+
+### Bulk Actions
+
+To streamline the management of large model collections, the Admin Panel includes **Bulk Actions** that apply to the models currently visible in your filtered view.
+
+1.  **Filter your view** (e.g., select "Disabled" or "Hidden").
+2.  **Open the Actions menu** (Ellipsis icon next to the search bar).
+3.  **Select an action**:
+    - **Enable All**: Activates all models in the current filtered list simultaneously.
+    - **Disable All**: Deactivates all models in the current filtered list.
+
+These tools are specifically designed to help administrators quickly manage external providers (like OpenAI or Anthropic) that expose a high volume of models, allowing for instant site-wide configuration changes.
 
 ## Model Switching in Chat
 

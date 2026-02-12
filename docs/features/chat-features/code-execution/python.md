@@ -50,6 +50,20 @@ These settings can be configured at **Admin Panel → Settings → Code Executio
 
 For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/jupyter) tutorial.
 
+### Native Function Calling (Native Mode)
+
+When using **Native function calling mode** with a capable model (e.g., GPT-5, Claude 4.5, MiniMax M2.5), the code interpreter is available as a builtin tool called `execute_code`. This provides a more integrated experience:
+
+- **No XML tags required**: The model calls `execute_code(code)` directly
+- **Same image handling**: Base64 image URLs in output are replaced with file URLs; model embeds via markdown
+
+**Requirements:**
+1. `ENABLE_CODE_INTERPRETER` must be enabled globally
+2. Model must have `code_interpreter` capability enabled
+3. Model must use **Native** function calling mode (set in model's advanced params)
+
+For more details on builtin tools and native mode, see the [Tool Development Guide](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
+
 ## Displaying Images Inline (matplotlib, etc.)
 
 When using matplotlib or other visualization libraries, images can be displayed directly in the chat. For this to work correctly, the code must output the image as a **base64 data URL**.
@@ -92,9 +106,7 @@ If you see raw base64 text appearing in chat responses, the model is incorrectly
 
 ### Example Prompt
 
-> Create a bar chart showing quarterly sales: Q1: 150, Q2: 230, Q3: 180, Q4: 310. 
-> Use matplotlib, save the figure to a BytesIO buffer, encode it as base64, and print the data URL. 
-> After the code runs, use the resulting file URL from the output to display the image in your response.
+> Create a bar chart showing quarterly sales: Q1: 150, Q2: 230, Q3: 180, Q4: 310.
 
 **Expected model behavior:**
 1. Model writes Python code using the base64 pattern above
@@ -174,6 +186,32 @@ plt.close()
 ```
 
 The image will be automatically uploaded and displayed inline in your chat.
+
+## Browser Compatibility
+
+### Microsoft Edge: Pyodide Crashes
+
+If Pyodide-based code execution causes Microsoft Edge to crash with a `STATUS_ACCESS_VIOLATION` error, this is caused by Edge's enhanced security mode.
+
+**Symptom:** The browser tab or entire browser crashes when attempting to run Python code, with no useful error message.
+
+**Cause:** Edge's "Enhance your security on the web" setting (found at `edge://settings/privacy/security`) enables stricter security mitigations that are incompatible with WebAssembly-based runtimes like Pyodide.
+
+**Solutions:**
+
+1. **Disable enhanced security in Edge:**
+   - Go to `edge://settings/privacy/security`
+   - Turn off **"Enhance your security on the web"**
+
+2. **Use a different browser:**
+   - Chrome and Firefox do not have this issue
+
+3. **Use Jupyter backend:**
+   - Switch `CODE_INTERPRETER_ENGINE` to `jupyter` to avoid browser-based execution entirely
+
+:::note
+This is a known compatibility issue between Edge's enhanced security mode and WebAssembly. The same crash occurs on the official [Pyodide console](https://pyodide.org/en/stable/console.html) when this setting is enabled.
+:::
 
 ## Tips for Better Results
 

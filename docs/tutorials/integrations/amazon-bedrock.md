@@ -73,6 +73,23 @@ docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS
 
 You should now be able to access the BAG's swagger page at: http://localhost:8000/docs
 
+:::warning Troubleshooting: Container Exits Immediately
+
+If the Bedrock Gateway container starts and immediately exits (especially on Windows), check the logs with `docker logs <container_id>`. If you see Python/Uvicorn errors, this is likely a **Python 3.13 compatibility issue** with the BAG's Dockerfile.
+
+**Workaround:** Edit the `Dockerfile` before building and change the Python version from 3.13 to 3.12:
+
+```dockerfile
+# Change this line:
+FROM python:3.13-slim
+# To:
+FROM python:3.12-slim
+```
+
+Then rebuild with `docker build . -f Dockerfile -t bedrock-gateway`.
+
+:::
+
 ![Bedrock Access Gateway Swagger](/images/tutorials/amazon-bedrock/amazon-bedrock-proxy-api.png)
 
 ## Step 3: Add Connection in Open-WebUI

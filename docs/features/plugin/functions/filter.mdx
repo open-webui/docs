@@ -243,10 +243,15 @@ Understanding the difference between these two types is key to using the filter 
 - Do **not** show up in the chat integrations menu (⚙️ icon)
 
 **Use Cases:**
-- Content moderation (always filter inappropriate content)
-- PII scrubbing (always remove sensitive data)
-- System-level transformations (always apply certain formatting)
-- Security/compliance filters
+- **Content moderation** - Filter profanity, hate speech, or inappropriate content
+- **PII scrubbing** - Automatically redact emails, phone numbers, SSNs, credit card numbers
+- **Prompt injection detection** - Block attempts to manipulate the system prompt
+- **Input/output logging** - Track all conversations for audit or analytics
+- **Cost tracking** - Estimate and log token usage for billing
+- **Rate limiting** - Enforce request limits per user or globally
+- **Language enforcement** - Ensure responses are in a specific language
+- **Company policy enforcement** - Inject legal disclaimers or compliance notices
+- **Model routing** - Redirect requests to different models based on content
 
 **Example:**
 ```python
@@ -271,12 +276,16 @@ class ContentModerationFilter:
 - `defaultFilterIds` controls their initial state (ON or OFF)
 
 **Use Cases:**
-- Web search integration (user decides when to search)
-- Citation mode (user controls when to require sources)
-- Verbose output mode (user toggles detailed responses)
-- Translation filters (user enables when needed)
-- Code formatting (user chooses when to apply)
-- Thinking/reasoning toggle (user controls whether to show model reasoning)
+- **Web search integration** - User decides when to search the web for context
+- **Citation mode** - User controls when to require sources in responses
+- **Verbose/detailed mode** - User toggles between concise and detailed responses
+- **Translation filters** - User enables translation to/from specific languages
+- **Code formatting** - User chooses when to apply syntax highlighting or linting
+- **Thinking/reasoning toggle** - Show or hide model's chain-of-thought reasoning
+- **Markdown rendering** - Toggle between raw text and formatted output
+- **Anonymization mode** - User enables when discussing sensitive topics
+- **Expert mode** - Inject domain-specific context (legal, medical, technical)
+- **Creative writing mode** - Adjust temperature and style for creative tasks
 
 **Example:**
 ```python
@@ -339,6 +348,149 @@ Here's the complete flow from admin configuration to filter execution:
 - Send modified request to LLM
 - Execute stream() filters (during streaming)
 - Execute outlet() filters (post-response)
+
+---
+
+### 📡 Filter Behavior with API Requests
+
+When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters behave differently than when the request comes from the web interface. Understanding these differences is crucial for building effective filters.
+
+#### Key Behavioral Differences
+
+| Function | WebUI Request | Direct API Request |
+|----------|--------------|-------------------|
+| `inlet()` | ✅ Always called | ✅ Always called |
+| `stream()` | ✅ Called during streaming | ✅ Called during streaming |
+| `outlet()` | ✅ Called after response | ❌ **NOT called** by default |
+| `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Runs but no UI to display |
+
+:::warning Outlet Not Called for API Requests
+The `outlet()` function is **only triggered for WebUI chat requests**, not for direct API calls to `/api/chat/completions`. This is because `outlet()` is invoked by the WebUI's `/api/chat/completed` endpoint after the chat is finished.
+
+If you need `outlet()` processing for API requests, your API client must call `/api/chat/completed` after receiving the full response.
+:::
+
+#### Triggering Outlet for API Requests
+
+To invoke `outlet()` filters for API requests, your client must make a second request to `/api/chat/completed` after receiving the complete response:
+
+```bash
+# After receiving the full response from /api/chat/completions, call:
+curl -X POST http://localhost:3000/api/chat/completed \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3.1",
+    "messages": [
+      {"role": "user", "content": "Hello"},
+      {"role": "assistant", "content": "Hi there! How can I help you?"}
+    ],
+    "chat_id": "optional-chat-id",
+    "session_id": "optional-session-id"
+  }'
+```
+
+:::tip
+Include the full conversation in `messages`, including the assistant's response. The `chat_id` and `session_id` are optional but recommended for proper logging and state tracking.
+:::
+
+#### Detecting API vs WebUI Requests
+
+You can detect whether a request originates from the WebUI or a direct API call by checking the `__metadata__` argument:
+
+```python
+def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+    # Check if request is from WebUI
+    interface = __metadata__.get("interface") if __metadata__ else None
+    
+    if interface == "open-webui":
+        print("Request from WebUI")
+    else:
+        print("Direct API request")
+    
+    # You can also check for presence of chat context
+    chat_id = __metadata__.get("chat_id") if __metadata__ else None
+    if not chat_id:
+        print("No chat context - likely a direct API call")
+    
+    return body
+```
+
+#### Example: Rate Limiting for All Requests
+
+Since `inlet()` is always called, use it for rate limiting that applies to both WebUI and API requests:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Optional
+import time
+
+class Filter:
+    class Valves(BaseModel):
+        requests_per_minute: int = Field(default=60, description="Max requests per minute per user")
+    
+    def __init__(self):
+        self.valves = self.Valves()
+        self.user_requests = {}  # Track requests per user
+    
+    def inlet(self, body: dict, __user__: dict = None) -> dict:
+        if not __user__:
+            return body
+        
+        user_id = __user__.get("id")
+        current_time = time.time()
+        
+        # Clean old entries and count recent requests
+        if user_id not in self.user_requests:
+            self.user_requests[user_id] = []
+        
+        # Keep only requests from the last minute
+        self.user_requests[user_id] = [
+            t for t in self.user_requests[user_id] 
+            if current_time - t < 60
+        ]
+        
+        if len(self.user_requests[user_id]) >= self.valves.requests_per_minute:
+            raise Exception(f"Rate limit exceeded: {self.valves.requests_per_minute} requests/minute")
+        
+        self.user_requests[user_id].append(current_time)
+        return body
+```
+
+#### Example: Logging All API Usage
+
+Track token usage and requests for both WebUI and direct API calls:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Optional
+import logging
+
+class Filter:
+    class Valves(BaseModel):
+        log_level: str = Field(default="INFO", description="Logging level")
+    
+    def __init__(self):
+        self.valves = self.Valves()
+        self.logger = logging.getLogger("api_usage")
+    
+    def inlet(self, body: dict, __user__: dict = None, __metadata__: dict = None) -> dict:
+        user_email = __user__.get("email", "unknown") if __user__ else "anonymous"
+        model = body.get("model", "unknown")
+        interface = __metadata__.get("interface", "api") if __metadata__ else "api"
+        chat_id = __metadata__.get("chat_id") if __metadata__ else None
+        
+        self.logger.info(
+            f"Request: user={user_email}, model={model}, "
+            f"interface={interface}, chat_id={chat_id or 'none'}"
+        )
+        
+        return body
+```
+
+:::note Event Emitter Behavior
+Filters that use `__event_emitter__` will still execute for API requests, but since there's no WebUI to display the events, the status messages won't be visible. The filter logic still runs—only the visual feedback is missing.
+:::
 
 ---
 
@@ -612,6 +764,18 @@ Modify and return the `body`. The modified version of the `body` is what the LLM
 
 4. **Streamlining User Input**: If your model’s output improves with additional guidance, you can use the `inlet` to inject clarifying instructions automatically!
 
+5. **Rate Limiting**: Track requests per user and reject requests that exceed your quota (works for both WebUI and API requests).
+
+6. **Request Logging**: Log all incoming requests for analytics, debugging, or billing purposes.
+
+7. **Language Detection**: Detect the user's language and inject translation instructions or route to a language-specific model.
+
+8. **Prompt Injection Detection**: Scan user input for attempts to manipulate the system prompt and block malicious requests.
+
+9. **Cost Estimation**: Estimate input tokens before sending to the model for budget tracking.
+
+10. **A/B Testing**: Route users to different model configurations based on user ID or random selection.
+
 ##### 💡 Example Use Cases: Build on Food Prep
 
 ###### 🥗 Example 1: Adding System Context
@@ -669,9 +833,12 @@ The **`stream` function** is a new feature introduced in Open WebUI **0.5.17** t
 Unlike `outlet`, which processes an entire completed response, `stream` operates on **individual chunks** as they are received from the model.
 
 ##### 🛠️ When to Use the Stream Hook?
-- Modify **streaming responses** before they are displayed to users.
-- Implement **real-time censorship or cleanup**.
-- **Monitor streamed data** for logging/debugging.
+- **Real-time content filtering** - Censor profanity or sensitive content as it streams
+- **Live word replacement** - Replace brand names, competitor mentions, or outdated terms
+- **Streaming analytics** - Count tokens and track response length in real-time
+- **Progress indicators** - Detect specific patterns to show loading states
+- **Debugging** - Log each chunk for troubleshooting streaming issues
+- **Format correction** - Fix common formatting issues as they appear
 
 ##### 📜 Example: Logging Streaming Chunks
 
@@ -718,6 +885,19 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 💡 **Best Practices**:
 - Prefer logging over direct edits in the outlet (e.g., for debugging or analytics).
 - If heavy modifications are needed (like formatting outputs), consider using the **pipe function** instead.
+
+##### 🛠️ Use Cases for `outlet`:
+- **Response logging** - Track all model outputs for analytics or compliance
+- **Token usage tracking** - Count output tokens after completion for billing
+- **Langfuse/observability integration** - Send traces to monitoring platforms
+- **Citation formatting** - Reformat reference links in the final output
+- **Disclaimer injection** - Append legal notices or AI disclosure statements
+- **Response caching** - Store responses for future retrieval
+- **Quality scoring** - Run automated quality checks on model outputs
+
+:::warning Outlet and API Requests
+Remember: `outlet()` is **not called** for direct API requests to `/api/chat/completions`. If you need outlet processing for API calls, see the [Filter Behavior with API Requests](#-filter-behavior-with-api-requests) section above.
+:::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
 ```python

@@ -176,7 +176,47 @@ Defines the number of worker threads available for handling requests.
 
 - **Env Var**: `THREAD_POOL_SIZE=2000`
 
+#### AIOHTTP Client Timeouts
+Long LLM completions can exceed default HTTP client timeouts. Configure these to prevent requests being cut off mid-response:
+
+- **Env Var**: `AIOHTTP_CLIENT_TIMEOUT=1800` (30 minutes for completions)
+- **Env Var**: `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15` (shorter for model listing)
+- **Env Var**: `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=15`
+
+#### Container Resource Limits
+For Docker deployments, ensure adequate resource allocation:
+
+```yaml
+deploy:
+  resources:
+    limits:
+      memory: 8G      # Adjust based on usage
+      cpus: '4.0'
+    reservations:
+      memory: 4G
+      cpus: '2.0'
+
+# Increase file descriptor limits
+ulimits:
+  nofile:
+    soft: 65536
+    hard: 65536
+```
+
+**Diagnosis commands:**
+```bash
+# Check container resource usage
+docker stats openwebui --no-stream
+
+# Check connection states
+docker exec openwebui netstat -an | grep -E "ESTABLISHED|TIME_WAIT|CLOSE_WAIT" | sort | uniq -c
+
+# Check open file descriptors
+docker exec openwebui ls -la /proc/1/fd | wc -l
+```
+
 ---
+
 
 ## ☁️ Cloud Infrastructure Latency
 
