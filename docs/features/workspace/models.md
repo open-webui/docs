@@ -74,6 +74,7 @@ You can transform a generic model into a specialized agent by toggling specific 
 
 - **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files. Click on attached items to toggle between **Focused Retrieval** (RAG chunks) and **Using Entire Document** (full content injection). See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
 - **Tools**: Force specific tools to be enabled by default (e.g., always enable the **Calculator** tool for a "Math Bot").
+- **Skills**: Bind [Skills](/features/workspace/skills) to this model so their manifests are always injected. The model can load full skill instructions on-demand via the `view_skill` builtin tool.
 - **Filters**: Attach specific Pipelines/Filters (e.g., a Profanity Filter or PII Redaction script) to run exclusively on this model.
 - **Actions**: Attach actionable scripts like `Add to Memories` or `Button` triggers.
 - **Capabilities**: Granularly control what the model is allowed to do:

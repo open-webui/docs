@@ -5294,6 +5294,13 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 - Description: Enables or disables user permission to access workspace tools.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ACCESS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to access workspace skills.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Sharing (Private)
 
 These settings control whether users can share workspace items with other users **privately** (non-public sharing).
@@ -5324,6 +5331,13 @@ These settings control whether users can share workspace items with other users 
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of workspace skills.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
@@ -5363,6 +5377,13 @@ These settings control whether users can share workspace items **publicly**.
 - Type: `str`
 - Default: `False`
 - Description: Enables or disables **public sharing** of workspace tools.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **public sharing** of workspace skills.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`

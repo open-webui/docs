@@ -47,6 +47,7 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. |
 | **Tools Import** | *(Requires Tools Access)* Ability to import tools. |
 | **Tools Export** | *(Requires Tools Access)* Ability to export tools. |
+| **Skills Access** | Access the **Skills** workspace to create and manage reusable instruction sets. |
 
 ### 2. Sharing Permissions
 Controls what users can share with the community or make public.
@@ -61,6 +62,8 @@ Controls what users can share with the community or make public.
 | **Public Prompts** | *(Requires Share Prompts)* Ability to make prompts public. |
 | **Share Tools** | **(Parent)** Ability to share tools. |
 | **Public Tools** | *(Requires Share Tools)* Ability to make tools public. |
+| **Share Skills** | **(Parent)** Ability to share skills. |
+| **Public Skills** | *(Requires Share Skills)* Ability to make skills public. |
 | **Share Notes** | **(Parent)** Ability to share Notes. |
 | **Public Notes** | *(Requires Share Notes)* Ability to make Notes public. |
 

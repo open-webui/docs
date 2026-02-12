@@ -81,9 +81,10 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 25      | oauth_session    | Manages active OAuth sessions for users                      |
 | 26      | prompt           | Stores templates and configurations for AI prompts           |
 | 27      | prompt_history   | Tracks version history and snapshots for prompts             |
-| 28      | tag              | Manages tags/labels for content categorization               |
-| 29      | tool             | Stores configurations for system tools and integrations      |
-| 30      | user             | Maintains user profiles and account information              |
+| 28      | skill            | Stores reusable markdown instruction sets (Skills)           |
+| 29      | tag              | Manages tags/labels for content categorization               |
+| 30      | tool             | Stores configurations for system tools and integrations      |
+| 31      | user             | Maintains user profiles and account information              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -483,6 +484,27 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | commit_message  | Text          | nullable                       | Version commit message            |
 | created_at      | BigInteger    | NOT NULL                       | Creation timestamp                |
 
+## Skill Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                    |
+| --------------- | ------------- | --------------- | ---------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)           |
+| user_id         | Text          | NOT NULL        | Owner/creator of the skill         |
+| name            | Text          | NOT NULL        | Display name of the skill          |
+| description     | Text          | nullable        | Short description (used in manifest) |
+| content         | Text          | NOT NULL        | Full skill instructions (Markdown) |
+| data            | JSON          | nullable        | Additional skill data              |
+| meta            | JSON          | nullable        | Skill metadata                     |
+| is_active       | Boolean       | default=True    | Active status                      |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                 |
+| updated_at      | BigInteger    | NOT NULL        | Last update timestamp              |
+
+Things to know about the skill table:
+
+- Uses UUID for primary key
+- Access control is managed through the `access_grant` table (resource_type `skill`)
+- `description` is injected into the system prompt as part of the manifest; `content` is loaded on-demand via the `view_skill` builtin tool
+
 ## Tag Table
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**           |
@@ -555,6 +577,7 @@ erDiagram
     user ||--o{ prompt_history : "creates"
     prompt ||--o{ prompt_history : "has"
     user ||--o{ tag : "creates"
+    user ||--o{ skill : "manages"
     user ||--o{ tool : "manages"
     user ||--o{ note : "owns"
     user ||--|| oauth_session : "has"
@@ -755,6 +778,17 @@ erDiagram
         string user_id PK "composite"
         string name
         json meta
+    }
+
+    skill {
+        text id PK
+        text user_id FK
+        text name
+        text description
+        text content
+        json data
+        json meta
+        boolean is_active
     }
 
     tool {
