@@ -77,3 +77,4 @@ You are now ready to use MiniMax M2.5!
 ---
 
 Enjoy using one of the best and most affordable coding-focused models! 🚀
+
