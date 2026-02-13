@@ -2893,22 +2893,19 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the prefix for the RAG embedding content.
-- Persistence: This environment variable is a `PersistentConfig` variable.
-
-#### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
-
-- Type: `str`
-- Default: `None`
-- Description: Specifies the field name for the RAG embedding prefix.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+- Description: Sets the prefix string prepended to document content before generating embeddings. Some embedding models (e.g., nomic-embed-text) require task-specific prefixes to differentiate between content being stored vs. queries being searched. For nomic-embed-text, set this to `search_document: `. Only needed if your embedding model's documentation specifies a content/document prefix.
 
 #### `RAG_EMBEDDING_QUERY_PREFIX`
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the prefix for the RAG embedding query.
-- Persistence: This environment variable is a `PersistentConfig` variable.
+- Description: Sets the prefix string prepended to user queries before generating embeddings for retrieval. This is the counterpart to `RAG_EMBEDDING_CONTENT_PREFIX`. For nomic-embed-text, set this to `search_query: `. Only needed if your embedding model's documentation specifies a query prefix.
+
+#### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
+
+- Type: `str`
+- Default: `None`
+- Description: Specifies the JSON field name used to pass the prefix to the embedding API request body. When set along with a prefix value, the prefix is sent as a separate field in the API request rather than being prepended to the text. Required for embedding APIs that accept the prefix as a dedicated parameter instead of inline text.
 
 #### OpenAI Embeddings
 
