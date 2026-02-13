@@ -5090,6 +5090,12 @@ This is useful when you need a JWT access token for downstream validation or whe
 - Description: Sets the bearer token for SCIM authentication. This token must be provided by identity providers when making SCIM API requests. Generate a secure random token (e.g., using `openssl rand -base64 32`) and configure it in both Open WebUI and your identity provider.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `SCIM_AUTH_PROVIDER`
+
+- Type: `str`
+- Default: `""`
+- Description: Specifies the OAuth provider name to associate with SCIM `externalId` values (e.g., `microsoft`, `oidc`). When set, SCIM operations store and look up `externalId` under this provider key in the user's `scim` JSON field, enabling account linking between SCIM-provisioned identities and OAuth logins. A warning is logged on startup if SCIM is enabled but this variable is not set.
+
 ## User Permissions
 
 ### Chat Permissions

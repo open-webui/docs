@@ -25,6 +25,7 @@ Configure SCIM by setting these environment variables:
 
 - **`SCIM_ENABLED`**: Set to `true` to enable SCIM support (default: `false`)
 - **`SCIM_TOKEN`**: The bearer token for SCIM authentication (required when SCIM is enabled)
+- **`SCIM_AUTH_PROVIDER`**: The OAuth provider name to associate with SCIM `externalId` values (e.g., `microsoft`, `oidc`). Required for `externalId` storage and account linking.
 
 :::warning
 
@@ -46,6 +47,9 @@ export SCIM_ENABLED=true
 
 # Set a secure token (replace with your own generated token)
 export SCIM_TOKEN="your-secure-token-here"
+
+# Set the OAuth provider name for externalId linking
+export SCIM_AUTH_PROVIDER="microsoft"
 ```
 
 ## SCIM API Configuration
@@ -88,9 +92,9 @@ Open WebUI's SCIM implementation supports the following operations:
 - `userName`: The user's email address (required, unique)
 - `name.givenName`: First name
 - `name.familyName`: Last name
-- `emails`: Email addresses
+- `emails`: Email addresses (when multiple are provided, the entry marked `primary: true` is used)
 - `active`: User status (active/inactive)
-- `externalId`: External identifier from the identity provider
+- `externalId`: External identifier from the identity provider (stored per-provider in the user's `scim` JSON field, see [externalId and Account Linking](#externalid-and-account-linking))
 
 #### Group Attributes
 - `displayName`: Group name (required)
@@ -103,6 +107,7 @@ The SCIM API supports filtering for both users and groups:
 
 ```
 GET /api/v1/scim/v2/Users?filter=userName eq "user@example.com"
+GET /api/v1/scim/v2/Users?filter=externalId eq "abc-123"
 GET /api/v1/scim/v2/Groups?filter=displayName eq "Engineering"
 ```
 
@@ -117,6 +122,29 @@ Supported filter operators:
 - `ge`: Greater than or equal
 - `lt`: Less than
 - `le`: Less than or equal
+
+## externalId and Account Linking
+
+When `SCIM_AUTH_PROVIDER` is configured, Open WebUI stores `externalId` values in a per-provider structure within the user's `scim` JSON field:
+
+```json
+{
+  "microsoft": { "external_id": "abc-123" },
+  "okta": { "external_id": "def-456" }
+}
+```
+
+This enables several behaviors:
+
+- **User lookup by externalId**: When an identity provider sends a `filter=externalId eq "..."` request, Open WebUI searches the `scim` field for a matching entry under the configured provider.
+- **OAuth fallback**: If no user is found by `externalId`, Open WebUI falls back to matching against OAuth `sub` values, automatically linking SCIM-provisioned accounts with existing OAuth-authenticated users.
+- **Create and update**: When creating or updating users via SCIM, the `externalId` is stored in the `scim` field and returned in subsequent responses.
+
+:::warning
+
+If `SCIM_AUTH_PROVIDER` is not set while SCIM is enabled, any operation that requires `externalId` (creation, lookup, or update) will return a `500` error. A warning is also logged on startup to alert you.
+
+:::
 
 ## Troubleshooting
 
@@ -133,7 +161,10 @@ Supported filter operators:
 
 3. **User Creation Failures**
    - Ensure the `userName` field contains a valid email address
-   - Check that the email is not already in use
+   - Check that the email or `externalId` is not already in use
+
+4. **500 Error on externalId Operations**
+   - Verify that `SCIM_AUTH_PROVIDER` is set to the correct OAuth provider name
 
 ### Testing SCIM Endpoints
 
@@ -156,6 +187,7 @@ curl -X POST \
   -d '{
     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
     "userName": "test@example.com",
+    "externalId": "idp-user-id-123",
     "displayName": "Test User",
     "name": {
       "givenName": "Test",
