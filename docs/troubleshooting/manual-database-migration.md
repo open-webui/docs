@@ -477,31 +477,67 @@ alembic history
 
 **Solution:**
 
-Since the table already exists, you need to tell Alembic to **skip** the migration that creates it, then continue with the remaining migrations:
+There are three ways to resolve this, listed from safest to most lossy:
 
-```bash title="Terminal - Stamp and Upgrade"
-# 1. Stamp the migration that's failing (marks it as applied without running it)
-#    Replace <revision_id> with the revision from the error
-alembic stamp <revision_id>
-# Example: alembic stamp 8452d01d26d7
+#### Option 1: Restore from Backup (Recommended)
 
-# 2. Verify the stamp worked
+Restore your database from the backup you created in [Step 1](#step-1-backup-your-database), then run `alembic upgrade head` on the clean backup. This guarantees the full migration — including all data backfills — completes correctly.
+
+#### Option 2: Drop the Table and Re-Run
+
+If you don't have a backup, you can drop the partially-created table and let the migration run from scratch. **Before doing this, verify it is safe:**
+
+```bash title="Terminal - Verify Before Dropping"
+# 1. Confirm the migration is incomplete (current revision should be BEFORE the failing one)
 alembic current
-# Should now show the stamped revision
 
-# 3. Continue upgrading to apply remaining migrations
+# 2. Check how much data the table has (if any)
+# SQLite:
+sqlite3 /app/backend/data/webui.db "SELECT COUNT(*) FROM <table_name>;"
+# PostgreSQL:
+psql $DATABASE_URL -c "SELECT COUNT(*) FROM <table_name>;"
+
+# 3. Open the migration file and verify the source data still exists
+#    Find the file by its revision ID:
+ls migrations/versions/ | grep <revision_id>
+#    Read it and look for which source columns/tables it copies FROM.
+#    Then verify those source columns still exist in your database.
+```
+
+Once you've confirmed the migration is incomplete and the source data is intact, drop the table and re-run:
+
+```bash title="Terminal - Drop and Re-Run"
+# SQLite:
+sqlite3 /app/backend/data/webui.db "DROP TABLE <table_name>;"
+
+# PostgreSQL:
+psql $DATABASE_URL -c "DROP TABLE <table_name>;"
+
+# Re-run migrations
 alembic upgrade head
 ```
 
-:::warning When alembic stamp Is Appropriate
-This is one of the few situations where `alembic stamp` is the correct fix. The table **does** already exist in your database, so the migration's DDL work is already done. Stamping simply updates Alembic's version tracking to match reality.
-
-**Do NOT use stamp to skip migrations where the table does NOT exist** — that would cause the ["no such table"](#no-such-table-errors) error later.
+:::caution Check the Migration File First
+This is only safe if the migration **copies** data from old columns into the new table (the original data remains intact). Open the migration file and verify it uses `INSERT INTO ... SELECT FROM` or similar — **not** destructive operations that modify or delete the source data. If you're unsure, use Option 1 instead.
 :::
 
-If `alembic upgrade head` fails again with another "table already exists" error for a different migration, repeat the stamp-and-upgrade process for each stuck migration.
+#### Option 3: Stamp Past It (Last Resort)
 
-**If the table already exists but the data backfill was incomplete** (e.g., `chat_message` table exists but is empty), the stamped migration will skip the backfill. In most cases, Open WebUI will continue to function normally and populate the table during regular use. If you need the historical data backfilled, you can run the backfill manually — see the [Getting Help](#getting-help) section.
+If neither option above is possible, you can tell Alembic to skip the stuck migration entirely:
+
+```bash title="Terminal"
+# Mark the migration as applied without running it
+alembic stamp <revision_id>
+
+# Continue with remaining migrations
+alembic upgrade head
+```
+
+:::warning This Skips the Data Backfill
+Stamping marks the migration as done but skips any remaining steps like copying historical data into the new table. Your old data is **not deleted** — it still exists in the original columns — but the application may not read from those old columns anymore. Some features may work with gaps in historical data, while others may lose settings entirely.
+:::
+
+If `alembic upgrade head` fails again with another "table already exists" error for a different migration, repeat the process for each stuck migration.
 
 ### "Required environment variable not found"
 
