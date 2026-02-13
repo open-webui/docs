@@ -23,6 +23,16 @@ You need manual migration only if:
 - A developer has instructed you to run migrations manually
 :::
 
+:::tip Quick Fix: "No such table" After Upgrading
+If Open WebUI crashes on startup with `no such table: access_grant` (or another missing table), your migrations didn't apply. Enter your container, set the required environment variables ([see Step 2](#step-2-diagnose-current-state)), and run:
+
+```bash
+cd /app/backend/open_webui && alembic upgrade head
+```
+
+Then restart Open WebUI. See the [full troubleshooting section](#no-such-table-errors) for details.
+:::
+
 :::danger Critical Warning
 Manual migration can corrupt your database if performed incorrectly. **Always create a verified backup before proceeding.**
 :::
@@ -409,6 +419,40 @@ INFO:     [main] Open WebUI starting on http://0.0.0.0:8080
 - No JavaScript console errors
 
 ## Troubleshooting
+
+### "No such table" Errors
+
+**Symptom:** Open WebUI crashes on startup with an error like:
+
+```
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: access_grant
+```
+
+or similar errors referencing other missing tables (e.g., `message`, `channel`).
+
+**Cause:** One or more Alembic migrations did not apply successfully. This can happen when:
+
+- A migration silently failed during an automated upgrade (Open WebUI logs the error but continues startup)
+- The upgrade process was interrupted while migrations were running
+- `ENABLE_DB_MIGRATIONS=False` was set in the environment (disables automatic migrations on startup)
+- Multiple workers or replicas attempted to run migrations simultaneously
+
+:::warning ENABLE_DB_MIGRATIONS Does Not Fix This
+Setting `ENABLE_DB_MIGRATIONS=True` (the default) only tells Open WebUI to **attempt** automatic migrations on the next startup. It will **not** retroactively fix migrations that already failed or were skipped. If your database is already in a bad state, you must apply the migrations manually.
+:::
+
+**Solution:**
+
+Follow [Step 2](#step-2-diagnose-current-state) to access your environment, then run:
+
+```bash title="Terminal"
+cd /app/backend/open_webui  # Docker
+alembic upgrade head
+```
+
+This will apply all pending migrations, including creating any missing tables. After a successful migration, restart Open WebUI normally.
+
+If you see additional errors during the manual migration, check the other troubleshooting sections below for specific error messages.
 
 ### "Required environment variable not found"
 
