@@ -68,32 +68,279 @@ async def action(self, body, __event_emitter__=None):
     return (html, {"Content-Disposition": "inline", "Content-Type": "text/html"})
 ```
 
-## Advanced Features
+## Iframe Height and Auto-Sizing
 
-The embedded iframes support auto-resizing and include configurable security settings. The system automatically handles:
+Rich UI embeds are rendered inside a sandboxed iframe. The iframe needs to know how tall its content is in order to display without scrollbars. There are two mechanisms for this:
 
-- **Auto-resizing**: Embedded content automatically adjusts height based on its content
-- **Cross-origin communication**: Safe message passing between the iframe and parent window
-- **Security sandbox**: Configurable security restrictions for embedded content
+### postMessage Height Reporting (Recommended)
 
-## Security Considerations
+When `allowSameOrigin` is **off** (the default), the parent page cannot read the iframe's content height directly. Your HTML must report its own height by posting a message to the parent window:
 
-When embedding external content, several security options can be configured through the UI settings:
+```html
+<script>
+  function reportHeight() {
+    const h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'iframe:height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  // Also re-report when content changes size
+  new ResizeObserver(reportHeight).observe(document.body);
+</script>
+```
 
-- `iframeSandboxAllowForms`: Allow form submissions within embedded content
-- `iframeSandboxAllowSameOrigin`: Allow same-origin requests (use with caution)
+Add this script to the end of your `<body>` in every Rich UI embed. Without it, the iframe will stay at a small default height and your content will be cut off with a scrollbar.
+
+### Same-Origin Auto-Resize
+
+When `allowSameOrigin` is **on** (via the user setting `iframeSandboxAllowSameOrigin`), the parent page can directly measure the iframe's content height and resize it automatically — no script needed in your HTML. However, this comes with security trade-offs (see below).
+
+## Sandbox and Security
+
+Embedded iframes run inside a [sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox). The following sandbox flags are always enabled by default:
+
+- `allow-scripts` — JavaScript execution
+- `allow-popups` — Popups (e.g. window.open)
+- `allow-downloads` — File downloads
+
+Two additional flags can be toggled by the user in **Settings → Interface**:
+
+| Setting | Default | Description |
+|---|---|---|
+| Allow Iframe Same-Origin Access | ❌ Off | Allows the iframe to access parent page context |
+| Allow Iframe Form Submissions | ❌ Off | Allows form submissions within embedded content |
+
+### allowSameOrigin
+
+This is the most important flag to be aware of. It is **off by default** for security reasons.
+
+**When off (default):**
+- The iframe is fully isolated from the parent page
+- It **cannot** read cookies, localStorage, or DOM of the parent
+- The parent **cannot** read the iframe's content height (so you must use the postMessage pattern above)
+- This is the safest option and recommended for most use cases
+
+**When on:**
+- The iframe can interact with the parent page's context
+- Auto-resizing works without any script in your HTML
+- Chart.js and Alpine.js dependencies are automatically injected if detected
+- ⚠️ **Use with caution** — only enable this when you trust the embedded content
+
+Users can toggle this setting in **Settings → Interface → Iframe Same-Origin Access**.
+
+## Rendering Position
+
+- **Tool embeds** inside a tool call result render **inline** at the tool call indicator (the "View Result from..." line)
+- **Action embeds** and message-level embeds render **below** the message text content
+
+## Advanced Communication
+
+The iframe and parent window can communicate beyond just height reporting. The following patterns are available:
+
+### Payload Requests
+
+The iframe can request a data payload from the parent. This is useful for passing dynamic data into the embed after it loads:
+
+```html
+<script>
+  // Request payload from parent
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'payload') {
+      const data = e.data.payload;
+      // Use the payload data to populate your UI
+      console.log('Received payload:', data);
+    }
+  });
+
+  // Trigger the request
+  parent.postMessage({ type: 'payload', requestId: 'my-request' }, '*');
+</script>
+```
+
+The parent responds with `{ type: 'payload', requestId: ..., payload: ... }` containing the configured payload data.
+
+### Tool Args Injection (Tools Only)
+
+When a **Tool** returns a Rich UI embed, the tool call arguments (the parameters the model passed to the tool) are automatically injected into the iframe's `window.args`. This allows your embedded HTML to access the tool's input:
+
+```html
+<script>
+  window.addEventListener('load', () => {
+    // window.args contains the JSON arguments the model passed to this tool
+    const args = window.args;
+    if (args) {
+      document.getElementById('output').textContent = JSON.stringify(args, null, 2);
+    }
+  });
+</script>
+```
+
+:::note
+This only works for Tool embeds rendered via the tool call display. Action embeds do not have `window.args` since they are triggered by the user, not the model.
+:::
+
+### Auto-Injected Libraries
+
+When `allowSameOrigin` is enabled, the iframe component auto-detects usage of certain libraries in your HTML and injects them automatically — no CDN `<script>` tags needed:
+
+- **Alpine.js** — Detected when any `x-data`, `x-init`, `x-show`, `x-bind`, `x-on`, `x-text`, `x-html`, `x-model`, `x-for`, `x-if`, `x-effect`, `x-transition`, `x-cloak`, `x-ref`, `x-teleport`, or `x-id` directives are found
+- **Chart.js** — Detected when `new Chart(` or `Chart.` appears in the HTML
+
+This means you can write Alpine or Chart.js code directly in your HTML and it will just work when same-origin is enabled, without importing scripts.
+
+### Ping/Pong Connectivity
+
+The iframe can test connectivity with the parent window using a simple ping/pong pattern:
+
+```html
+<script>
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'pong:ack') {
+      console.log('Parent is listening!');
+    }
+  });
+
+  // Send a pong to test connectivity
+  parent.postMessage({ type: 'pong' }, '*');
+</script>
+```
+
+## Rich UI Embeds vs Execute Event
+
+Rich UI embeds and the [`execute` event](/features/extensibility/plugin/development/events#execute-requires-__event_call__) are complementary ways to create interactive experiences. Choose based on your needs:
+
+| | Rich UI Embed | `execute` Event |
+|---|---|---|
+| **Runs in** | Sandboxed iframe | Main page context (no sandbox) |
+| **Persistence** | Persistent — saved in chat history | Ephemeral — gone on reload/navigate |
+| **Page access** | Isolated from parent by default | Full (DOM, cookies, localStorage) |
+| **Forms** | Requires `allowForms` setting enabled | Always works (no sandbox) |
+| **Best for** | Persistent visual content, dashboards, charts | Transient interactions, side effects, downloads, DOM manipulation |
+
+Use Rich UI embeds for persistent visual content you want to stay in the conversation. Use `execute` for transient interactions like custom dialogs, triggering downloads, or reading page state.
 
 ## Use Cases
 
 Rich UI embedding is perfect for:
 
-- **Interactive dashboards**: Real-time data visualization and controls
-- **Form interfaces**: Complex input forms with validation and dynamic behavior
-- **Charts and graphs**: Interactive plotting with libraries like Plotly, D3.js, or Chart.js
-- **Media players**: Video, audio, or interactive media content
-- **Custom widgets**: Specialized UI components for specific tool functionality
-- **External integrations**: Embedding content from external services or APIs
-- **Human-triggered visualizations**: Actions that display results when a user clicks a button, e.g. generating a report or triggering a download
+- **Interactive dashboards** — Real-time data visualization and controls
+- **Charts and graphs** — Interactive plotting with libraries like Plotly, D3.js, or Chart.js
+- **Form interfaces** — Complex input forms with validation and dynamic behavior
+- **Media players** — Video, audio, or interactive media content
+- **Download triggers** — Especially useful for iOS PWA where native download links are blocked
+- **Custom widgets** — Specialized UI components for specific tool functionality
+- **External integrations** — Embedding content from external services or APIs
+- **Human-triggered visualizations** — Actions that display results when a user clicks a button, e.g. generating a report or triggering a download
+
+## Full Sample Action
+
+<details>
+<summary>Complete working Sample Action with Rich UI embed</summary>
+
+This Action returns a styled card with stats, including the recommended height-reporting script:
+
+```python
+"""
+title: Rich UI Demo Action
+author: open-webui
+version: 0.1.0
+description: Demonstrates Rich UI embedding from an Action function.
+"""
+
+from pydantic import BaseModel, Field
+
+
+class Action:
+    class Valves(BaseModel):
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def action(self, body: dict, __user__=None, __event_emitter__=None) -> None:
+        from fastapi.responses import HTMLResponse
+
+        html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 24px;
+                    color: #fff;
+                }
+                .card {
+                    background: rgba(255,255,255,0.15);
+                    backdrop-filter: blur(10px);
+                    border-radius: 16px;
+                    padding: 24px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                }
+                h1 { font-size: 1.4em; margin-bottom: 8px; }
+                p { opacity: 0.9; line-height: 1.5; margin-bottom: 12px; }
+                .badge {
+                    display: inline-block;
+                    background: rgba(255,255,255,0.25);
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85em;
+                    font-weight: 600;
+                }
+                .stats {
+                    display: flex;
+                    gap: 16px;
+                    margin-top: 16px;
+                }
+                .stat {
+                    flex: 1;
+                    text-align: center;
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 12px;
+                    padding: 12px;
+                }
+                .stat-value { font-size: 1.8em; font-weight: 700; }
+                .stat-label { font-size: 0.8em; opacity: 0.8; margin-top: 4px; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Rich UI Embed Demo</h1>
+                <p>This embed renders <strong>below</strong> the message text.</p>
+                <span class="badge">Action Embed</span>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">Answers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">99%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">0ms</div>
+                        <div class="stat-label">Latency</div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                // Report height to parent so the iframe auto-sizes
+                function reportHeight() {
+                    const h = document.documentElement.scrollHeight;
+                    parent.postMessage({ type: 'iframe:height', height: h }, '*');
+                }
+                window.addEventListener('load', reportHeight);
+                new ResizeObserver(reportHeight).observe(document.body);
+            </script>
+        </body>
+        </html>
+        """
+
+        return HTMLResponse(content=html, headers={"Content-Disposition": "inline"})
+```
+
+</details>
 
 ## External Tool Example
 
@@ -123,7 +370,7 @@ async def create_dashboard():
     )
 ```
 
-The embedded content automatically inherits responsive design and integrates seamlessly with the chat interface, providing a native-feeling experience for users interacting with your tools.  
+The embedded content automatically inherits responsive design and integrates seamlessly with the chat interface, providing a native-feeling experience for users interacting with your tools.
 
 ## CORS and Direct Tools
 

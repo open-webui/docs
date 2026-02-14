@@ -379,14 +379,14 @@ await __event_emitter__(
 
 ### `execute` (**requires** `__event_call__`)
 
-**Run code dynamically on the user's side:**
+**Run JavaScript directly in the user's browser:**
 
 ```python
 result = await __event_call__(
     {
         "type": "execute",
         "data": {
-            "code": "print(40 + 2);",
+            "code": "return document.title;",
         }
     }
 )
@@ -396,11 +396,72 @@ await __event_emitter__(
         "type": "notification",
         "data": {
             "type": "info",
-            "content": f"Code executed, result: {result}"
+            "content": f"Page title: {result}"
         }
     }
 )
 ```
+
+#### How It Works
+
+The `execute` event runs JavaScript **directly in the main page context** using `new Function()`. This means:
+
+- It runs with **full access** to the page's DOM, cookies, localStorage, and session
+- It is **not sandboxed** — there are no iframe restrictions
+- It can manipulate the Open WebUI interface directly (show/hide elements, read form data, trigger downloads)
+- The code runs as an async function, so you can use `await` and `return` a value back to the backend
+
+#### Example: Display a Custom Form
+
+```python
+result = await __event_call__(
+    {
+        "type": "execute",
+        "data": {
+            "code": """
+                return new Promise((resolve) => {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999';
+                    overlay.innerHTML = `
+                        <div style="background:white;padding:24px;border-radius:12px;min-width:300px">
+                            <h3 style="margin:0 0 12px">Enter Details</h3>
+                            <input id="exec-name" placeholder="Name" style="width:100%;padding:8px;margin:4px 0;border:1px solid #ccc;border-radius:6px"/>
+                            <input id="exec-email" placeholder="Email" style="width:100%;padding:8px;margin:4px 0;border:1px solid #ccc;border-radius:6px"/>
+                            <button id="exec-submit" style="margin-top:12px;padding:8px 16px;background:#333;color:white;border:none;border-radius:6px;cursor:pointer">Submit</button>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                    document.getElementById('exec-submit').onclick = () => {
+                        const name = document.getElementById('exec-name').value;
+                        const email = document.getElementById('exec-email').value;
+                        overlay.remove();
+                        resolve({ name, email });
+                    };
+                });
+            """
+        }
+    }
+)
+# result will be {"name": "...", "email": "..."}
+```
+
+#### Execute vs Rich UI Embeds
+
+The `execute` event and [Rich UI Embeds](/features/extensibility/plugin/development/rich-ui) are complementary ways to create interactive experiences:
+
+| | `execute` Event | Rich UI Embed |
+|---|---|---|
+| **Runs in** | Main page context (no sandbox) | Sandboxed iframe |
+| **Persistence** | Ephemeral — gone on reload/navigate | Persistent — saved in chat history |
+| **Page access** | Full (DOM, cookies, localStorage) | Isolated from parent by default |
+| **Forms** | Always works (no sandbox) | Requires `allowForms` setting enabled |
+| **Best for** | Transient interactions, side effects, downloads, DOM manipulation | Persistent visual content, dashboards, charts |
+
+Use `execute` for transient interactions (confirmations, custom dialogs, triggering downloads, reading page state) and Rich UI embeds for persistent visual content you want to stay in the conversation.
+
+:::warning
+Because `execute` runs unsandboxed JavaScript in the user's browser session, it has full access to the Open WebUI page context. Only use this in trusted functions — never execute untrusted or user-provided code through this event.
+:::
 
 ---
 
