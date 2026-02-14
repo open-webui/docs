@@ -151,7 +151,7 @@ If you are deploying for **enterprise scale** (hundreds of users), simple Docker
 *   **Kubernetes / Helm**: For deploying on K8s with multiple replicas, see the **[Multi-Replica & High Availability Guide](/troubleshooting/multi-replica)**.
 *   **Redis (Mandatory)**: When running multiple workers (`UVICORN_WORKERS > 1`) or multiple replicas, **Redis is required** to handle WebSocket connections and session syncing. See **[Redis Integration](/tutorials/integrations/redis)**.
 *   **Load Balancing**: Ensure your Ingress controller supports **Session Affinity** (Sticky Sessions) for best performance.
-*   **Reverse Proxy Caching**: Configure your reverse proxy (e.g., Nginx, Caddy, Cloudflare) to **cache static assets** (JS, CSS, Images). This significantly reduces load on the application server. See **[Nginx Config](/tutorials/https/nginx)** or **[Caddy Config](/tutorials/https/caddy)**.
+*   **Reverse Proxy Caching**: Configure your reverse proxy (e.g., Nginx, Caddy, Cloudflare) to **cache static assets** (JS, CSS, Images). This significantly reduces load on the application server. See **[Nginx Config](/reference/https/nginx)** or **[Caddy Config](/reference/https/caddy)**.
 *   **Disable Proxy Buffering (Critical for Streaming)**: If using Nginx, you **must** disable `proxy_buffering` for Open WebUI. Proxy buffering re-chunks SSE streams, causing garbled markdown and slow streaming. Add `proxy_buffering off;` and `proxy_cache off;` to your location block. See **[Streaming Troubleshooting](/troubleshooting/connection-error#-garbled-markdown--streaming-response-corruption)**.
 
 ---
