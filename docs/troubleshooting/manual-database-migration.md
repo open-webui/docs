@@ -1,6 +1,6 @@
 ---
 sidebar_position: 900
-title: Manual Alembic Database Migration
+title: "Database Migration"
 sidebar_label: Manual Migration
 description: Complete guide for manually running Alembic database migrations when Open WebUI's automatic migration fails or requires direct intervention.
 keywords: [alembic, migration, database, troubleshooting, sqlite, postgresql, docker]

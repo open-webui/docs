@@ -1,6 +1,6 @@
 ---
 sidebar_position: 15
-title: "Optimization, Performance & RAM Usage"
+title: "Performance & RAM"
 ---
 
 # Optimization, Performance & RAM Usage

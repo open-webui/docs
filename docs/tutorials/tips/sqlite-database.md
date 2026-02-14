@@ -1,6 +1,6 @@
 ---
 sidebar_position: 11
-title: "SQLite Database Overview"
+title: "Database Schema"
 ---
 
 :::warning

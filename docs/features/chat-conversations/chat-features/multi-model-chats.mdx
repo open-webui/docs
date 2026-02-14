@@ -1,0 +1,71 @@
+﻿---
+slug: /features/chat-features/multi-model-chats
+sidebar_position: 2
+title: "Multi-Model Chats"
+---
+
+# Multi-Model Chats
+
+Open WebUI allows you to interact with **multiple models simultaneously** within a single chat interface. This powerful feature enables you to compare responses, verify facts, and leverage the unique strengths of different LLMs side-by-side.
+
+## Overview
+
+In a Multi-Model Chat, your prompt is sent to two or more selected models at the same time. Their responses are displayed in parallel columns (or stacked, depending on screen size), giving you immediate insight into how different AI architectures approach the same problem.
+
+## How to Use
+
+1.  **Select Models**: In the chat header (Model Selector), click the **+ (Plus)** button to add more models to your current session.
+    *   *Example Setup*: Select **GPT-5.1 Thinking** (for reasoning), **Gemini 3** (for creative writing), and **Claude Sonnet 4.5** (for overall performance).
+2.  **Send Prompt**: Type your question as usual.
+3.  **View Results**: Watch as all models generate their responses simultaneously in the chat window.
+
+## Usage Scenarios
+
+*   **Model Comparison/Benchmarking**: Test which model writes better Python code or which one hallucinates less on niche topics.
+*   **Fact Validation**: "Cross-examine" models. If two models say X and one says Y, you can investigate further.
+*   **Diverse Perspectives**: Get a "Creative" take from one model and a "Technical" take from another for the same query.
+
+## Permissions
+
+Admins can control access to Multi-Model Chats on a per-role or per-group basis.
+
+*   **Location**: Admin Panel > Settings > General > User Permissions > Chat > **Multiple Models**
+*   **Environment Variable**: `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS` (Default: `True`)
+
+If disabled, users will not see the "plus" button in the model selector and cannot initiate multi-model sessions.
+
+---
+
+## Merging Responses (Mixture of Agents)
+
+Once you have responses from multiple models, Open WebUI offers an advanced capability to **Merge** them into a single, superior answer. This implements a **Mixture of Agents (MOA)** workflow.
+
+### What is Merging?
+
+Merging takes the outputs from all your active models and sends them—along with your original prompt—to a "Synthesizer Model." This Synthesizer Model reads all the draft answers and combines them into one final, polished response.
+
+### How to Merge
+
+1.  Start a **Multi-Model Chat** and get responses from your selected models.
+2.  Look for the **Merge** (or "Synthesize") button in the response controls area (often near the regeneration controls).
+3.  Open WebUI will generate a **new response** that aggregates the best parts of the previous outputs.
+
+### Advantages of Merging
+
+*   **Higher Accuracy**: Research suggests that aggregating outputs from multiple models often outperforms any single model acting alone.
+*   **Best of Both Worlds**: You might get the code accuracy of Model A combined with the clear explanations of Model B.
+*   **Reduced Hallucinations**: The synthesizer model can filter out inconsistencies found in individual responses.
+
+### Configuration
+
+The merging process relies on the backend **Tasks** system.
+
+*   **Task Model**: The specific model used to perform the merger can be configured in **Admin Panel > Settings > Tasks**. We recommend using a highly capable model (like GPT-5.1 or Claude Sonnet 4.5) as the task model for the best results.
+*   **Prompt Template**: The system uses a specialized prompt template to instruct the AI on how to synthesize the answers.
+
+:::info Experimental
+The Merging/MOA feature is an advanced capability. While powerful, it requires a capable Task Model to work effectively.
+:::
+
+
+

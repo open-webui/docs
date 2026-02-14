@@ -1,6 +1,6 @@
 ---
 sidebar_position: 14
-title: "Setting up with Custom CA Store"
+title: "Custom CA Store"
 ---
 
 :::warning

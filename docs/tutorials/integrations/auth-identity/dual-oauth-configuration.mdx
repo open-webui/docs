@@ -1,0 +1,65 @@
+---
+slug: /tutorials/tips/dual-oauth-configuration
+title: "Dual OAuth Setup"
+sidebar_label: Dual OAuth Configuration
+sidebar_position: 100
+description: Learn how to configure both Microsoft and Google OAuth providers simultaneously in Open WebUI using an unofficial community workaround.
+---
+
+# 🔐 Dual OAuth Configuration (Microsoft & Google)
+
+:::caution Unofficial Workaround
+This configuration is a community-contributed workaround and is **not officially supported** by the Open WebUI team. While it works in current versions, behavior may change in future updates. This tutorial serves as a demonstration for advanced users.
+:::
+
+## Overview
+
+While Open WebUI officially supports only one **OpenID Connect (OIDC)** provider at a time via the `OPENID_PROVIDER_URL` variable, it is possible to support both **Microsoft** and **Google** simultaneously.
+
+The trick is to configure one provider (e.g., Microsoft) as the primary OIDC provider and the other (e.g., Google) as a standard OAuth provider by utilizing Open WebUI's built-in support for specific providers.
+
+## Prerequisites
+
+- Access to your Open WebUI environment variables (Docker or local).
+- Client IDs and Secrets from both [Google Cloud Console](https://console.cloud.google.com/) and [Microsoft Azure/Entra ID](https://entra.microsoft.com/).
+- `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true` must be enabled to ensure users are mapped to the same account regardless of the provider used.
+
+## Configuration logic
+
+Open WebUI uses `OPENID_PROVIDER_URL` as a generic "catch-all" for OIDC. However, it also has native modules for Google and Microsoft. By leaving the `OPENID_PROVIDER_URL` for Microsoft and providing only the Client IDs for Google, the system can internalize both flows.
+
+## Environment Variables
+
+Add the following to your `docker-compose.yaml` or environment config:
+
+```bash
+# Enable signup and account merging (CRITICAL)
+ENABLE_OAUTH_SIGNUP=true
+OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true
+
+# 1. Microsoft as the primary OIDC provider
+# This uses the generic OIDC flow via the OPENID_PROVIDER_URL
+MICROSOFT_CLIENT_ID=your_microsoft_client_id
+MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
+MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
+MICROSOFT_REDIRECT_URI=https://your-webui.com/oauth/microsoft/callback
+OPENID_PROVIDER_URL=https://login.microsoftonline.com/your_tenant_id/v2.0/.well-known/openid-configuration
+
+# 2. Google as a secondary OAuth provider
+# Note: Do NOT provide an OPENID_PROVIDER_URL for Google.
+# The system will use its internal Google OAuth implementation.
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+## Why This Works
+
+1.  **Microsoft** is handled via the generic OIDC flow because `OPENID_PROVIDER_URL` is set to the Microsoft endpoint.
+2.  **Google** is handled via the dedicated internal Google OAuth module because the system detects `GOOGLE_CLIENT_ID` but sees that the global `OPENID_PROVIDER_URL` is already "claimed" by Microsoft or simply isn't needed for the built-in Google module.
+3.  **Account Merging**: Since both providers return the user's email, `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true` ensures the user logs into the same profile whether they click "Sign in with Google" or "Sign in with Microsoft."
+
+## Troubleshooting
+
+- **Redirect Mismatch**: Ensure your Redirect URIs in both consoles match your `WEBUI_URL`.
+- **Merge Failures**: Double-check that `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is set to `true`.
+- **Microsoft Logout**: Microsoft often requires the `OPENID_PROVIDER_URL` to handle the logout redirect correctly. If logout fails, ensure this URL is correct for your tenant.

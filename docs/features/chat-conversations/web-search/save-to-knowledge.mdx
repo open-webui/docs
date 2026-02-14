@@ -1,0 +1,65 @@
+﻿---
+slug: /features/web-search/save-to-knowledge
+sidebar_position: 10
+title: "Save Search Results to Knowledge"
+---
+
+# Save Search Results to Knowledge 📚
+
+The **Add Web Sources to Knowledge Action** allows you to save web search result URLs directly to your Knowledge Base with a single click. This feature streamlines the process of building a research bank by automating the fetching, sanitizing, and uploading of web content.
+
+## Features
+
+- **One-Click Saving**: Quickly add selected sources from a chat message to any Knowledge Base.
+- **URL Selection**: Choose specific URLs to save from a numbered list.
+- **Batch Processing**: Handle multiple URLs in a single action.
+- **Duplicate Detection**: Automatically skip URLs that already exist in the target Knowledge Base.
+- **Configurable Defaults**: Set a default Knowledge Base and skip confirmation dialogs for a faster workflow.
+
+## Setup
+
+The "Add Web Sources to Knowledge" feature is implemented as a **Function Action**. To use it:
+
+1.  **Download the Action**: Visit the Open WebUI Community Hub and download the [Add Web Sources to Knowledge Action](https://openwebui.com/posts/65d97417-d079-4720-b2cc-a63dd59b7e3e).
+2.  **Enable the Action**: 
+    *   Navigate to **Workspace > Functions**.
+    *   Import or create a new function with the provided code.
+    *   Enable the action globally or for specific models.
+
+## How to Use
+
+1.  **Trigger Web Search**: Ask a question that triggers web search (e.g., using DDGS, Google PSE, etc.).
+2.  **Click the Action Button**: Once the model returns citations, click the **folder+** icon in the message toolbar.
+3.  **Select Sources**: A dialog will appear. Enter the numbers of the sources you wish to save (e.g., `1,3,5` or `1-3` or `all`).
+4.  **Choose Knowledge Base**: Select the target Knowledge Base where the content should be saved.
+5.  **Done**: The system will fetch the content using your configured **Web Loader** and add it to the Knowledge Base.
+
+## Configuration (Valves)
+
+You can customize the action's behavior through **Valves** in the function settings.
+
+### Admin Settings (Global Defaults)
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `max_urls_per_action` | `10` | Maximum number of URLs to process in a single action. |
+| `enable_duplicate_check` | `True` | Check if URL already exists in the Knowledge Base before adding. |
+| `default_knowledge_base` | `""` | System-wide default Knowledge Base name or ID. |
+| `skip_confirmation` | `False` | Skip confirmation dialogs and use the default Knowledge Base. |
+| `file_name_prefix` | `""` | Prefix for generated file names (e.g., `web_`). |
+
+### User Settings (Personal Overrides)
+
+Users can override global defaults in their own settings:
+- **Default Knowledge Base**: Set a preferred KB to avoid manual selection.
+- **Skip Confirmation**: Enable for instant one-click saving (requires a default KB).
+- **File Name Prefix**: Customize the prefix for your saved sources.
+
+:::tip Power User Tip
+Set your **Default Knowledge Base** and enable **Skip Confirmation** in your User Valves to achieve instant, one-click saving of web sources!
+:::
+
+## Troubleshooting
+
+- **Content Quality**: The quality of the saved content depends on your **Web Loader Engine** settings (Admin > Settings > Documents). For JavaScript-heavy sites, consider using **Firecrawl** or **Playwright**.
+- **No URLs Found**: This action works with web search results that return structured citations. If no URLs are detected, ensure web search is properly enabled and returning results.

@@ -1,0 +1,231 @@
+﻿---
+slug: /features/plugin/development/valves
+sidebar_position: 3
+title: "Valves"
+---
+
+## Valves
+
+Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function. They are always optional, but HIGHLY encouraged.
+
+Hence, Valves and UserValves class can be defined in either a `Pipe`, `Pipeline`, `Filter` or `Tools` class.
+
+Valves are configurable by admins alone via the Tools or Functions menus. On the other hand UserValves are configurable by any users directly from a chat session.
+
+<details>
+<summary>Commented example</summary>
+
+```python
+
+from pydantic import BaseModel, Field
+from typing import Literal
+
+# Define and Valves
+class Filter:
+   # Notice the current indentation: Valves and UserValves must be declared as
+   # attributes of a Tools, Filter or Pipe class. Here we take the
+   # example of a Filter.
+    class Valves(BaseModel):
+       # Valves and UserValves inherit from pydantic's BaseModel. This
+       # enables complex use cases like model validators etc.
+       test_valve: int = Field(  # Notice the type hint: it is used to
+           # choose the kind of UI element to show the user (buttons,
+           # texts, etc).
+           default=4,
+           description="A valve controlling a numberical value"
+           # required=False,  # you can enforce fields using True
+       )
+       # To give the user the choice between multiple strings, you can use Literal from typing:
+       choice_option: Literal["choiceA", "choiceB"] = Field(
+           default="choiceA",
+           description="An example of a multi choice valve",
+       )
+       priority: int = Field(
+           default=0,
+           description="Priority level for the filter operations. Lower values are passed through first"
+       )
+       # The priority field is optional but if present will be used to
+       # order the Filters.
+       pass
+       # Note that this 'pass' helps for parsing and is recommended.
+
+   # UserValves are defined the same way.
+    class UserValves(BaseModel):
+        test_user_valve: bool = Field(
+            default=False, description="A user valve controlling a True/False (on/off) switch"
+       )
+       pass
+
+   def __init__(self):
+       self.valves = self.Valves()
+       # Because they are set by the admin, they are accessible directly
+       # upon code execution.
+       pass
+
+   # The inlet method is only used for Filter but the __user__ handling is the same
+   def inlet(self, body: dict, __user__: dict):
+       # Because UserValves are defined per user they are only available
+       # on use.
+       # Note that although __user__ is a dict, __user__["valves"] is a
+       # UserValves object. Hence you can access values like that:
+       test_user_valve = __user__["valves"].test_user_valve
+       # Or:
+       test_user_valve = dict(__user__["valves"])["test_user_valve"]
+       # But this will return the default value instead of the actual value:
+       # test_user_valve = __user__["valves"]["test_user_valve"]  # Do not do that!
+```
+
+</details>
+
+## Input Types
+
+Valves support special input types that change how fields are rendered in the UI. You can configure these using `json_schema_extra` with the `input` key in your Pydantic `Field` definitions.
+
+### Password Input (Masked Fields)
+
+For sensitive fields like passwords, API keys, or secrets, you can use the password input type to mask the value in the UI. This prevents the password from being visible on screen (protecting against shoulder surfing).
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class UserValves(BaseModel):
+        service_password: str = Field(
+            default="",
+            description="Your service password",
+            json_schema_extra={"input": {"type": "password"}}
+        )
+```
+
+When rendered, this field will appear as a masked input (dots instead of characters) with a toggle to reveal the value if needed, using Open WebUI's `SensitiveInput` component.
+
+:::tip
+Use password input types for any credential or secret that users configure in their Valves or UserValves. This is especially important for UserValves since they are configurable by end users directly from the chat interface.
+:::
+
+### Select Dropdown Input
+
+For fields where users should choose from a predefined list of options, use the select input type to render a dropdown menu. Options can be either static (hardcoded list) or dynamic (generated at runtime by a method).
+
+#### Static Options
+
+Use a list directly for options that don't change:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class Valves(BaseModel):
+        priority: str = Field(
+            default="medium",
+            description="Processing priority level",
+            json_schema_extra={
+                "input": {
+                    "type": "select",
+                    "options": ["low", "medium", "high"]
+                }
+            }
+        )
+```
+
+You can also use label/value pairs for more descriptive options:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class Valves(BaseModel):
+        log_level: str = Field(
+            default="info",
+            description="Logging verbosity",
+            json_schema_extra={
+                "input": {
+                    "type": "select",
+                    "options": [
+                        {"value": "debug", "label": "Debug (Verbose)"},
+                        {"value": "info", "label": "Info (Standard)"},
+                        {"value": "warn", "label": "Warning (Minimal)"},
+                        {"value": "error", "label": "Error (Critical Only)"}
+                    ]
+                }
+            }
+        )
+```
+
+#### Dynamic Options
+
+For options that need to be generated at runtime (e.g., fetching available models, databases, or user-specific resources), specify a method name as a string. The method will be called when the configuration UI is rendered:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class Valves(BaseModel):
+        selected_model: str = Field(
+            default="",
+            description="Choose a model to use",
+            json_schema_extra={
+                "input": {
+                    "type": "select",
+                    "options": "get_model_options"  # Method name as string
+                }
+            }
+        )
+
+        @classmethod
+        def get_model_options(cls, __user__=None) -> list[dict]:
+            """
+            Dynamically fetch available models.
+            Called when the Valves configuration UI is opened.
+            """
+            # Example: Return options based on runtime state
+            return [
+                {"value": "gpt-4", "label": "GPT-4"},
+                {"value": "gpt-3.5-turbo", "label": "GPT-3.5 Turbo"},
+                {"value": "claude-3-opus", "label": "Claude 3 Opus"}
+            ]
+```
+
+The method can accept an optional `__user__` parameter to generate user-specific options:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class UserValves(BaseModel):
+        workspace: str = Field(
+            default="",
+            description="Select your workspace",
+            json_schema_extra={
+                "input": {
+                    "type": "select",
+                    "options": "get_user_workspaces"
+                }
+            }
+        )
+
+        @classmethod
+        def get_user_workspaces(cls, __user__=None) -> list[dict]:
+            """
+            Return workspaces available to the current user.
+            __user__ contains the user's information as a dict.
+            """
+            if not __user__:
+                return []
+
+            user_id = __user__.get("id")
+            # Fetch user-specific workspaces from your data source
+            return [
+                {"value": "ws-1", "label": "Personal Workspace"},
+                {"value": "ws-2", "label": "Team Workspace"}
+            ]
+```
+
+:::tip
+Dynamic options are particularly useful for:
+- Fetching available API models from connected providers
+- Loading database or file options based on current system state
+- Presenting user-specific resources like projects or workspaces
+- Any scenario where options change based on runtime context
+:::
+
