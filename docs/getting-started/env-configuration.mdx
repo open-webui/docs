@@ -5074,6 +5074,14 @@ This is useful when you need a JWT access token for downstream validation or whe
 - Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `LDAP_USE_AD_SID`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enable using Active Directory Security Identifier (SID) as the user ID in LDAP authentication instead of generating a random UUID. When enabled, the user's AD SID will be extracted from the `objectSid` attribute and used as the user ID in Open WebUI. 
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+
 ## SCIM
 
 #### `SCIM_ENABLED`
