@@ -625,7 +625,7 @@ REDIS_KEY_PREFIX="openwebui-dev"
 - [Redis Documentation](https://redis.io/docs)
 - [Valkey Documentation](https://valkey.io/docs/)
 - [Docker Compose Documentation](https://docs.docker.com/compose/overview/)
-- [Open WebUI Environment Variables](https://docs.openwebui.com/getting-started/env-configuration/)
+- [Open WebUI Environment Variables](https://docs.openwebui.com/reference/env-configuration/)
 - [sysctl Documentation](https://man7.org/linux/man-pages/man8/sysctl.8.html)
 
 ### Getting Help

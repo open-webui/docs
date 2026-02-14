@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "Troubleshooting Web Search"
+title: "Web Search"
 ---
 
 Web Search in Open WebUI allows language models to access real-time information from the internet. When things don't work as expected, this guide will help you diagnose and fix common issues.
@@ -23,7 +23,7 @@ This happens because the web content fetcher doesn't use your `http_proxy`/`http
 2. Enable **Trust Proxy Environment**
 3. Save changes
 
-Alternatively, set the environment variable [`WEB_SEARCH_TRUST_ENV`](../getting-started/env-configuration#web_search_trust_env):
+Alternatively, set the environment variable [`WEB_SEARCH_TRUST_ENV`](/reference/env-configuration#web_search_trust_env):
 
 ```bash
 WEB_SEARCH_TRUST_ENV=True
@@ -90,7 +90,7 @@ If web searches are timing out:
 
 ## Environment Variables Reference
 
-For a comprehensive list of all web search environment variables, see the [Environment Configuration documentation](../getting-started/env-configuration#web-search).
+For a comprehensive list of all web search environment variables, see the [Environment Configuration documentation](/reference/env-configuration#web-search).
 
 Key variables:
 
@@ -111,4 +111,4 @@ If you're still experiencing problems:
 1. Check the Open WebUI logs for detailed error messages
 2. Verify your search engine configuration is correct
 3. Test connectivity from the Open WebUI container to your search engine
-4. Review all [Web Search environment variables](../getting-started/env-configuration#web-search) for additional configuration options
+4. Review all [Web Search environment variables](/reference/env-configuration#web-search) for additional configuration options

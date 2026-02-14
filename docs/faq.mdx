@@ -158,7 +158,7 @@ docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host
 
 ### Q: Why are my reasoning model's thinking blocks showing as raw text instead of being hidden?
 
-**A:** This happens if the model's thinking tags are not recognized by Open WebUI. You can customize the tags in the model's Advanced Parameters. For more details, see the **[Reasoning & Thinking Models](/features/chat-features/reasoning-models)** guide.
+**A:** This happens if the model's thinking tags are not recognized by Open WebUI. You can customize the tags in the model's Advanced Parameters. For more details, see the **[Reasoning & Thinking Models](/features/chat-conversations/chat-features/reasoning-models)** guide.
 
 ### Q: RAG with Open WebUI is very bad or not working at all. Why?
 
@@ -193,7 +193,7 @@ def wait_for_processing(token, file_id):
         time.sleep(2)  # Wait before checking again
 ```
 
-For complete workflow examples, see the **[API Endpoints documentation](/getting-started/api-endpoints#checking-file-processing-status)** and the **[RAG Troubleshooting guide](/troubleshooting/rag#9-api-file-upload-the-content-provided-is-empty-error)**.
+For complete workflow examples, see the **[API Endpoints documentation](/reference/api-endpoints#checking-file-processing-status)** and the **[RAG Troubleshooting guide](/troubleshooting/rag#9-api-file-upload-the-content-provided-is-empty-error)**.
 
 ### Q: I asked the model what it is and it gave the wrong answer. Is Open WebUI routing to the wrong model?
 
@@ -249,7 +249,7 @@ For more optimization tips, see the **[Performance Tips Guide](troubleshooting/p
 
 ### Q: Why doesn't Open WebUI natively support [Provider X]'s proprietary API?
 
-**A:** Open WebUI is highly modular with a plugin system including tools, functions, and most notably **[pipes](/features/plugin/functions/pipe)**. These modular pipes allow you to add support for virtually any provider you want—you can build your own or choose from the many [community-built](https://openwebui.com/) and usually well-maintained ones already available.
+**A:** Open WebUI is highly modular with a plugin system including tools, functions, and most notably **[pipes](/features/extensibility/plugin/functions/pipe)**. These modular pipes allow you to add support for virtually any provider you want—you can build your own or choose from the many [community-built](https://openwebui.com/) and usually well-maintained ones already available.
 
 That said, Open WebUI's core is built around **universal protocols**, not specific providers. Our stance is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
 
