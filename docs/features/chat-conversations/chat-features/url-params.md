@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/url-params
+---
 sidebar_position: 7
 title: "URL Parameters"
 ---
@@ -26,7 +25,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 1. **Models and Model Selection**
 
-- **Description**: The `models` and `model` parameters allow you to specify which [language models](/features/workspace/models) should be used for a particular chat session.
+- **Description**: The `models` and `model` parameters allow you to specify which [language models](/features/ai-knowledge/models) should be used for a particular chat session.
 - **How to Set**: You can use either `models` for multiple models or `model` for a single model.
 - **Example**:
   - `/?models=model1,model2` – This initializes the chat with `model1` and `model2`.
@@ -55,7 +54,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 5. **Tool Selection**
 
-- **Description**: The `tools` or `tool-ids` parameters specify which [tools](/features/plugin/tools) to activate within the chat.
+- **Description**: The `tools` or `tool-ids` parameters specify which [tools](/features/extensibility/plugin/tools) to activate within the chat.
 - **How to Set**: Provide a comma-separated list of tool IDs as the parameter’s value.
 - **Example**: `/?tools=tool1,tool2` or `/?tool-ids=tool1,tool2`
 - **Behavior**: Each tool ID is matched and activated within the session for user interaction.

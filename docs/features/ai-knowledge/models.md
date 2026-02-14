@@ -1,5 +1,4 @@
-﻿---
-slug: /features/workspace/models
+---
 sidebar_position: 2
 title: "Models"
 sidebar_label: "Models"
@@ -73,22 +72,22 @@ Clicking **Show** on **Advanced Params** allows you to fine-tune the inference g
 
 You can transform a generic model into a specialized agent by toggling specific capabilities and binding resources.
 
-- **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files. Click on attached items to toggle between **Focused Retrieval** (RAG chunks) and **Using Entire Document** (full content injection). See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
+- **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files. Click on attached items to toggle between **Focused Retrieval** (RAG chunks) and **Using Entire Document** (full content injection). See [Full Context vs Focused Retrieval](/features/ai-knowledge/knowledge#full-context-vs-focused-retrieval) for details.
 - **Tools**: Force specific tools to be enabled by default (e.g., always enable the **Calculator** tool for a "Math Bot").
-- **Skills**: Bind [Skills](/features/workspace/skills) to this model so their manifests are always injected. The model can load full skill instructions on-demand via the `view_skill` builtin tool.
+- **Skills**: Bind [Skills](/features/ai-knowledge/skills) to this model so their manifests are always injected. The model can load full skill instructions on-demand via the `view_skill` builtin tool.
 - **Filters**: Attach specific Pipelines/Filters (e.g., a Profanity Filter or PII Redaction script) to run exclusively on this model.
 - **Actions**: Attach actionable scripts like `Add to Memories` or `Button` triggers.
 - **Capabilities**: Granularly control what the model is allowed to do:
   - **Vision**: Toggle to enable image analysis capabilities (requires a vision-capable Base Model).
   - **Web Search**: Enable the model to access the configured search provider (e.g., Google, SearxNG) for real-time information.
   - **File Upload**: Allow users to upload files to this model.
-  - **File Context**: When enabled (default), attached files are processed via RAG and their content is injected into the conversation. When disabled, file content is **not** extracted or injected—the model receives no file content unless it retrieves it via builtin tools. Only visible when File Upload is enabled. See [File Context vs Builtin Tools](/features/rag#file-context-vs-builtin-tools) for details.
-  - **Code Interpreter**: Enable Python code execution. See [Python Code Execution](/features/chat-features/code-execution/python) for details.
+  - **File Context**: When enabled (default), attached files are processed via RAG and their content is injected into the conversation. When disabled, file content is **not** extracted or injected—the model receives no file content unless it retrieves it via builtin tools. Only visible when File Upload is enabled. See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools) for details.
+  - **Code Interpreter**: Enable Python code execution. See [Python Code Execution](/features/chat-conversations/chat-features/code-execution/python) for details.
   - **Image Generation**: Enable image generation integration.
   - **Usage / Citations**: Toggle usage tracking or source citations.
   - **Status Updates**: Show visible progress steps in the chat UI (e.g., "Searching web...", "Reading file...") during generation. Useful for slower, complex tasks.
-  - **Builtin Tools**: When enabled (default), automatically injects system tools (timestamps, memory, chat history, knowledge base queries, notes, etc.) in [Native Function Calling mode](/features/plugin/tools#disabling-builtin-tools-per-model). When enabled, you can further control which **tool categories** are available (Time, Memory, Chats, Notes, Knowledge, Channels) via checkboxes in the Model Editor. Disable the main toggle if the model doesn't support function calling or you need to save context window tokens. Note: This is separate from **File Context**—see [File Context vs Builtin Tools](/features/rag#file-context-vs-builtin-tools) for the difference.
-- **TTS Voice**: Set a specific Text-to-Speech voice for this model. When users read responses aloud, this voice will be used instead of the global default. Useful for giving different personas distinct voices. Leave empty to use the user's settings or system default. See [Per-Model TTS Voice](/features/audio/text-to-speech/openai-tts-integration#per-model-tts-voice) for details.
+  - **Builtin Tools**: When enabled (default), automatically injects system tools (timestamps, memory, chat history, knowledge base queries, notes, etc.) in [Native Function Calling mode](/features/extensibility/plugin/tools#disabling-builtin-tools-per-model). When enabled, you can further control which **tool categories** are available (Time, Memory, Chats, Notes, Knowledge, Channels) via checkboxes in the Model Editor. Disable the main toggle if the model doesn't support function calling or you need to save context window tokens. Note: This is separate from **File Context**—see [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools) for the difference.
+- **TTS Voice**: Set a specific Text-to-Speech voice for this model. When users read responses aloud, this voice will be used instead of the global default. Useful for giving different personas distinct voices. Leave empty to use the user's settings or system default. See [Per-Model TTS Voice](/features/media-generation/audio/text-to-speech/openai-tts-integration#per-model-tts-voice) for details.
 - **Default Features**: Force specific toggles (like Web Search) to be "On" immediately when a user starts a chat with this model.
 
 ## Model Management

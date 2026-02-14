@@ -1,5 +1,4 @@
-﻿---
-slug: /features/data-controls/shared-chats
+---
 sidebar_position: 2
 title: "🔗 Shared Chats"
 ---
@@ -7,7 +6,7 @@ title: "🔗 Shared Chats"
 Open WebUI provides a centralized dashboard to manage every chat conversation you have shared. This feature allows users to audit their shared content and quickly revoke access if needed.
 
 :::info
-This page documents the **management dashboard** for shared chats. For information on how to share chats, see [Chat Sharing](/features/chat-features/chatshare).
+This page documents the **management dashboard** for shared chats. For information on how to share chats, see [Chat Sharing](/features/chat-conversations/chat-features/chatshare).
 :::
 
 ## Accessing the Management Dashboard
@@ -39,7 +38,7 @@ The **Shared Chats** modal provides a unified interface for your public content:
 **A:** No. Unsharing only deletes the public link. Your original chat history remains completely intact.
 
 **Q: Can I manage chats I've shared on the community platform here?**  
-**A:** No. This dashboard manages links generated on your local instance. For community-shared content, see [Deleting Shared Chats](/features/chat-features/chatshare#deleting-shared-chats).
+**A:** No. This dashboard manages links generated on your local instance. For community-shared content, see [Deleting Shared Chats](/features/chat-conversations/chat-features/chatshare#deleting-shared-chats).
 
 **Q: If I delete my original chat, what happens to the shared link?**  
 **A:** Deleting a chat also immediately invalidates and deletes any associated share links.

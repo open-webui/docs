@@ -481,7 +481,7 @@ There are three ways to resolve this, listed from safest to most lossy:
 
 #### Option 1: Restore from Backup (Recommended)
 
-Restore your database from the backup you created in [Step 1](#step-1-backup-your-database), then run `alembic upgrade head` on the clean backup. This guarantees the full migration — including all data backfills — completes correctly.
+Restore your database from the backup you created in [Step 1](#step-1-create-and-verify-backup), then run `alembic upgrade head` on the clean backup. This guarantees the full migration — including all data backfills — completes correctly.
 
 #### Option 2: Drop the Table and Re-Run
 

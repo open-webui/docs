@@ -1,5 +1,4 @@
 ---
-slug: /getting-started/api-endpoints
 sidebar_position: 400
 title: "API Endpoints"
 ---
@@ -216,7 +215,7 @@ The `outlet()` function only runs when the WebUI calls `/api/chat/completed` aft
   ```
 
 :::tip
-For more details on writing filters that work with API requests, see the [Filter Function documentation](/features/plugin/functions/filter#-filter-behavior-with-api-requests).
+For more details on writing filters that work with API requests, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#-filter-behavior-with-api-requests).
 :::
 
 ### 🦙 Ollama API Proxy Support

@@ -1,5 +1,4 @@
 ---
-slug: /tutorials/integrations/jupyter
 sidebar_position: 321
 title: "Jupyter Notebook Integration"
 ---

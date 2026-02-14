@@ -1,5 +1,4 @@
 ---
-slug: /getting-started/env-configuration
 sidebar_position: 1
 title: "Environment Variable Configuration"
 ---
@@ -159,7 +158,7 @@ After the admin account is created, sign-up is automatically disabled for securi
 
 :::danger
 
-This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/getting-started/env-configuration/#enable_oauth_signup)
+This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/reference/env-configuration/#enable_oauth_signup)
 is also being used and set to `True`. **Never disable this if OAUTH/SSO is not being used.** Failure to do so will result in the inability to login.
 
 :::
@@ -250,7 +249,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the [memory feature](/features/memory), allowing models to store and retrieve long-term information about users.
+- Description: Enables or disables the [memory feature](/features/chat-conversations/memory), allowing models to store and retrieve long-term information about users.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEBHOOK_URL`
@@ -1238,7 +1237,7 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 1. Enable API keys globally using this setting (`ENABLE_API_KEYS`)
 2. Grant the "API Keys" permission to users via Default Permissions or User Groups
 
-**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
+**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
@@ -1360,7 +1359,7 @@ If enabled, the following headers are forwarded:
   - `X-OpenWebUI-Chat-Id`
   - `X-OpenWebUI-Message-Id`
 
-This enables per-user authorization, auditing, rate limiting, and request tracing on external services. The chat and message ID headers are also required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
+This enables per-user authorization, auditing, rate limiting, and request tracing on external services. The chat and message ID headers are also required for [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
 
 #### `FORWARD_USER_INFO_HEADER_USER_NAME`
 
@@ -1396,7 +1395,7 @@ This enables per-user authorization, auditing, rate limiting, and request tracin
 
 - Type: `str`
 - Default: `X-OpenWebUI-Message-Id`
-- Description: Customizes the header name used to forward the current message ID. This header is required for [external tool event emitting](/features/plugin/development/events#-external-tool-events).
+- Description: Customizes the header name used to forward the current message ID. This header is required for [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
 
 :::tip Custom Header Prefix
 Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
@@ -1608,7 +1607,7 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 - OAuth authentication providers
 - Web search and RAG with external APIs
 
-Read more about `offline mode` in the [offline mode guide](/tutorials/offline-mode).
+Read more about `offline mode` in the [offline mode guide](/tutorials/maintenance/offline-mode).
 
 :::
 
@@ -2752,7 +2751,7 @@ Provide a clear and direct response to the user's query, including inline citati
 
 - Type: `int`
 - Default: `0`
-- Description: Chunks smaller than this threshold will be intelligently merged with neighboring chunks when possible. This helps prevent tiny, low-quality fragments that can hurt retrieval performance and waste embedding resources. This feature only works when `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER` is enabled. Set to `0` to disable merging. For more information on the benefits and configuration, see the [RAG guide](/features/rag#chunking-configuration).
+- Description: Chunks smaller than this threshold will be intelligently merged with neighboring chunks when possible. This helps prevent tiny, low-quality fragments that can hurt retrieval performance and waste embedding resources. This feature only works when `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER` is enabled. Set to `0` to disable merging. For more information on the benefits and configuration, see the [RAG guide](/features/chat-conversations/rag#chunking-configuration).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_TEXT_SPLITTER`
@@ -3402,7 +3401,7 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 
 :::info
 
-Brave's free tier enforces a rate limit of 1 request per second. Open WebUI automatically retries requests that receive HTTP 429 rate limit errors after a 1-second delay. For free tier users, set `WEB_SEARCH_CONCURRENT_REQUESTS` to `1` to ensure sequential request processing. See the [Brave web search documentation](/features/web-search/brave) for more details.
+Brave's free tier enforces a rate limit of 1 request per second. Open WebUI automatically retries requests that receive HTTP 429 rate limit errors after a 1-second delay. For free tier users, set `WEB_SEARCH_CONCURRENT_REQUESTS` to `1` to ensure sequential request processing. See the [Brave web search documentation](/features/chat-conversations/web-search/providers/brave) for more details.
 
 :::
 
@@ -4240,7 +4239,7 @@ Strictly return in JSON format:
 
 :::tip
 
-For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/image-generation-and-editing/gemini).
+For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/media-generation/image-generation-and-editing/gemini).
 
 :::
 
@@ -4615,18 +4614,18 @@ In any production environment running more than one instance of Open WebUI (e.g.
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for authentication. See [SSO docs](/features/auth/sso).
+- Description: Defines the trusted request header for authentication. See [SSO docs](/features/access-security/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
 - Description: Defines the trusted request header for the username of anyone registering with the
-`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/auth/sso).
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/access-security/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_GROUPS_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/auth/sso).
+- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/access-security/auth/sso).
 
 ### Google
 
@@ -5247,7 +5246,7 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables user permission to use the [memory feature](/features/memory).
+- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
@@ -5284,7 +5283,7 @@ For API Key creation (and the API keys themselves) to work, you need **both**:
 1. Grant the "API Keys" permission to users via this setting or User Groups
 2. Enable API keys globally using `ENABLE_API_KEYS`
 
-**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
+**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 

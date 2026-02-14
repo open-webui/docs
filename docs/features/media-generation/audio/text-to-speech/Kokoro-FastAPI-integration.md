@@ -1,5 +1,4 @@
-﻿---
-slug: /features/audio/text-to-speech/Kokoro-FastAPI-integration
+---
 sidebar_position: 2
 title: "Kokoro-FastAPI Using Docker"
 ---

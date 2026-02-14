@@ -1,5 +1,4 @@
-﻿---
-slug: /features/web-search/searxng
+---
 sidebar_position: 12
 title: "SearXNG"
 ---
@@ -12,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::tip
 
-For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](../../getting-started/env-configuration#web-search).
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](/reference/env-configuration#web-search).
 
 :::
 
@@ -348,7 +347,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 
 :::tip Troubleshooting
 
-Having issues with web search? Check out the [Web Search Troubleshooting Guide](../../troubleshooting/web-search) for solutions to common problems, including proxy configuration, connection timeouts, and empty content issues.
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](/troubleshooting/web-search) for solutions to common problems, including proxy configuration, connection timeouts, and empty content issues.
 
 :::
 

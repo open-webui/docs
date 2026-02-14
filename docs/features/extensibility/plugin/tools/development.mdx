@@ -1,5 +1,4 @@
-﻿---
-slug: /features/plugin/tools/development
+---
 sidebar_position: 2
 title: "Development"
 ---
@@ -57,7 +56,7 @@ Each tool must have type hints for arguments. The types may also be nested, such
 
 ### Valves and UserValves - (optional, but HIGHLY encouraged)
 
-Valves and UserValves are used for specifying customizable settings of the Tool, you can read more on the dedicated [Valves & UserValves page](/features/plugin/development/valves).
+Valves and UserValves are used for specifying customizable settings of the Tool, you can read more on the dedicated [Valves & UserValves page](/features/extensibility/plugin/development/valves).
 
 ### Optional Arguments
 Below is a list of optional arguments your tools can depend on:
@@ -70,7 +69,7 @@ Below is a list of optional arguments your tools can depend on:
 - `__model__`: A dictionary with model information
 - `__oauth_token__`: A dictionary containing the user's valid, automatically refreshed OAuth token payload. This is the **new, recommended, and secure** way to access user tokens for making authenticated API calls. The dictionary typically contains `access_token`, `id_token`, and other provider-specific data.
 
-For more information about `__oauth_token__` and how to configure this token to be sent to tools, check out the OAuth section in the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/) and the [SSO documentation](https://docs.openwebui.com/features/auth/).
+For more information about `__oauth_token__` and how to configure this token to be sent to tools, check out the OAuth section in the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/) and the [SSO documentation](https://docs.openwebui.com/features/auth/).
 
 Just add them as argument to any method of your Tool class just like `__user__` in the example above.
 
@@ -131,7 +130,7 @@ Before using event emitters, you must understand these critical limitations:
 - **Native Mode (Agentic Mode)** (`function_calling = "native"`): **Limited event emitter support** - many event types don't work properly due to native function calling bypassing Open WebUI's custom tool processing pipeline
 
 **When to Use Each Mode:**
-For a comprehensive guide on choosing a function calling mode, including model requirements and administrator setup, refer to the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+For a comprehensive guide on choosing a function calling mode, including model requirements and administrator setup, refer to the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 In general:
 - **Use Default Mode** when you need full event emitter functionality, complex tool interactions, or real-time UI updates.
@@ -147,7 +146,7 @@ You can configure the function calling mode in two places:
 If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field).
 
 :::info Native Mode & Built-in Tools
-When writing custom tools, be aware that Open WebUI also provides **built-in system tools** when Native Mode is enabled. For details on built-in tools, function calling modes, and model requirements, see the [**Tool Calling Modes Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native).
+When writing custom tools, be aware that Open WebUI also provides **built-in system tools** when Native Mode is enabled. For details on built-in tools, function calling modes, and model requirements, see the [**Tool Calling Modes Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 :::
 
 
@@ -1499,7 +1498,7 @@ from typing import Optional, Callable, Awaitable
 
 ### Rich UI Element Embedding
 
-Tools and Actions can return HTML content that renders as interactive iframes directly in the chat. For full documentation, examples, security considerations, and CORS configuration, see the dedicated **[Rich UI Embedding](/features/plugin/development/rich-ui)** guide.
+Tools and Actions can return HTML content that renders as interactive iframes directly in the chat. For full documentation, examples, security considerations, and CORS configuration, see the dedicated **[Rich UI Embedding](/features/extensibility/plugin/development/rich-ui)** guide.
 
 
 ## External packages
@@ -1514,7 +1513,7 @@ When multiple tools define different versions of the same package (e.g., Tool A 
 
 **The only robust solution to this problem is to use an OpenAPI tool server.**
 
-We strongly recommend using an [OpenAPI tool server](/features/plugin/tools/openapi-servers/) to avoid these dependency conflicts.
+We strongly recommend using an [OpenAPI tool server](/features/extensibility/plugin/tools/openapi-servers/) to avoid these dependency conflicts.
 
 :::
 

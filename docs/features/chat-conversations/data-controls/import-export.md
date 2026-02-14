@@ -1,5 +1,4 @@
-﻿---
-slug: /features/data-controls/import-export
+---
 sidebar_position: 4
 title: "💾 Import & Export"
 ---

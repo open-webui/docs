@@ -1,5 +1,4 @@
 ---
-slug: /getting-started/advanced-topics/https-encryption
 sidebar_position: 6
 title: "Enabling HTTPS Encryption"
 ---

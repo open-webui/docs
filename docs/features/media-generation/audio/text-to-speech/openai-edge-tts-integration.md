@@ -1,5 +1,4 @@
-﻿---
-slug: /features/audio/text-to-speech/openai-edge-tts-integration
+---
 sidebar_position: 1
 title: "Edge TTS Using Docker"
 ---

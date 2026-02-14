@@ -1,5 +1,4 @@
-﻿---
-slug: /features/plugin/tools/openapi-servers/mcp
+---
 sidebar_position: 3
 title: "MCP Support"
 ---
@@ -47,7 +46,7 @@ So even though adding mcpo might at first seem like "just one more layer"—in r
 ✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable—without changing a single line of tool server code.
 
 :::tip
-**Events Supported**: While mcpo exposes MCP tools as OpenAPI endpoints, they can still emit events (status updates, notifications) via Open WebUI's [event REST endpoint](/features/plugin/development/events#-external-tool-events). Open WebUI automatically passes the required `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to your tool. However, interactive events requiring user input are only available for native Python tools.
+**Events Supported**: While mcpo exposes MCP tools as OpenAPI endpoints, they can still emit events (status updates, notifications) via Open WebUI's [event REST endpoint](/features/extensibility/plugin/development/events#-external-tool-events). Open WebUI automatically passes the required `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to your tool. However, interactive events requiring user input are only available for native Python tools.
 :::
 
 ### ✅ Quickstart: Running the Proxy Locally

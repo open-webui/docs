@@ -1,5 +1,4 @@
-﻿---
-slug: /features/pipelines/filters
+---
 sidebar_position: 2
 title: "Filters"
 ---

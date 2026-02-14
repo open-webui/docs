@@ -1,5 +1,4 @@
-﻿---
-slug: /features/plugin/tools/openapi-servers/
+---
 sidebar_position: 400
 title: "OpenAPI Tool Servers"
 ---
@@ -30,10 +29,10 @@ By leveraging OpenAPI, we eliminate the need for a proprietary or unfamiliar com
 
 While OpenAPI tools are powerful for extending Open WebUI with external services, they have some constraints compared to native Python tools:
 
-- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/plugin/development/events#-external-tool-events) via the REST endpoint. Open WebUI passes `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to enable this. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
+- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/extensibility/plugin/development/events#-external-tool-events) via the REST endpoint. Open WebUI passes `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to enable this. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
 - **No streaming output**: Tool responses are returned as complete results, not streamed token-by-token.
 
-If you need interactive UI feedback (confirmations, user input prompts), consider implementing your tool as a [native Python Tool](/features/plugin/tools/development) instead.
+If you need interactive UI feedback (confirmations, user input prompts), consider implementing your tool as a [native Python Tool](/features/extensibility/plugin/tools/development) instead.
 
 ## 🚀 Quickstart
 

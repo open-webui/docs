@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/chatshare
+---
 sidebar_position: 3
 title: "Chat Sharing"
 ---
@@ -116,4 +115,4 @@ Once deleted, the shared link will no longer be valid, and users will not be abl
 
 Open WebUI provides a centralized dashboard to manage every chat conversation you have shared. From there you can search through your shared history, re-copy links, or revoke access instantly.
 
-For details on the management dashboard, see [Shared Chats Management](/features/data-controls/shared-chats).
+For details on the management dashboard, see [Shared Chats Management](/features/chat-conversations/data-controls/shared-chats).

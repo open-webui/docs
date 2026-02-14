@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/code-execution/mermaid
+---
 sidebar_position: 4
 title: "MermaidJS Rendering"
 ---

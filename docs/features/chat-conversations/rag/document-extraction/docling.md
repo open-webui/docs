@@ -1,5 +1,4 @@
-﻿---
-slug: /features/rag/document-extraction/docling
+---
 sidebar_position: 3
 title: "Docling Document Extraction"
 ---

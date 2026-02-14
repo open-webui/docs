@@ -1,11 +1,10 @@
-﻿---
-slug: /features/workspace/skills
+---
 sidebar_position: 6
 title: "Skills"
 sidebar_label: "Skills"
 ---
 
-Skills are reusable, markdown-based instruction sets that you can attach to models or invoke on-the-fly in chat. Unlike [Tools](/features/plugin/tools) (which are executable Python scripts), Skills are **plain-text instructions** that teach a model *how* to approach a task — such as code review guidelines, writing style rules, or troubleshooting playbooks.
+Skills are reusable, markdown-based instruction sets that you can attach to models or invoke on-the-fly in chat. Unlike [Tools](/features/extensibility/plugin/tools) (which are executable Python scripts), Skills are **plain-text instructions** that teach a model *how* to approach a task — such as code review guidelines, writing style rules, or troubleshooting playbooks.
 
 ## How Skills Work
 
@@ -89,7 +88,7 @@ Each skill has an **active/inactive toggle** visible on the list page. Inactive 
 
 The backend you choose affects what your skills can do — from simple text transformations (Pyodide) to full OS-level shell access (Open Terminal). Each has different trade-offs in library support, isolation, persistence, and multi-user safety.
 
-See the [Code Execution overview](/features/chat-features/code-execution) for a detailed comparison of all available backends and guidance on choosing the right one for your deployment.
+See the [Code Execution overview](/features/chat-conversations/chat-features/code-execution) for a detailed comparison of all available backends and guidance on choosing the right one for your deployment.
 
 ### Setting Up Open Terminal
 
@@ -97,11 +96,11 @@ Open Terminal is a FastAPI application that automatically exposes an [OpenAPI sp
 
 **1. Start an Open Terminal instance**
 
-Follow the [Open Terminal setup guide](/features/open-terminal#getting-started) to launch an instance using Docker or pip.
+Follow the [Open Terminal setup guide](/features/extensibility/open-terminal#getting-started) to launch an instance using Docker or pip.
 
 **2. Connect to Open WebUI**
 
-Add your Open Terminal instance as a Tool Server by following the [OpenAPI Tool Server Integration Guide](/features/plugin/tools/openapi-servers/open-webui). You can connect it as:
+Add your Open Terminal instance as a Tool Server by following the [OpenAPI Tool Server Integration Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui). You can connect it as:
 
 - A **User Tool Server** (in **Settings → Tools**) — connects from your browser, ideal for personal or local instances
 - A **Global Tool Server** (in **Admin Settings → Tools**) — connects from the backend, available to all users
@@ -109,14 +108,14 @@ Add your Open Terminal instance as a Tool Server by following the [OpenAPI Tool 
 Once connected, the Open Terminal tools (execute, file upload, file download) appear automatically in the chat interface.
 
 :::tip
-For the best experience, pair Open Terminal with a [Skill](/features/workspace/skills) that teaches the model how to use the tool effectively — for example, instructing it to always check exit codes, handle errors gracefully, and use streaming for long-running commands.
+For the best experience, pair Open Terminal with a [Skill](/features/ai-knowledge/skills) that teaches the model how to use the tool effectively — for example, instructing it to always check exit codes, handle errors gracefully, and use streaming for long-running commands.
 :::
 
-See the [Open Terminal documentation](/features/open-terminal) for the full API reference and detailed setup instructions.
+See the [Open Terminal documentation](/features/extensibility/open-terminal) for the full API reference and detailed setup instructions.
 
 ## Access Control
 
-Skills use the same [Access Control](/features/rbac) system as other workspace resources:
+Skills use the same [Access Control](/features/access-security/rbac) system as other workspace resources:
 
 - **Private by default**: Only the creator can see and edit a new skill.
 - **Share with users or groups**: Use the **Access** button in the skill editor to grant `read` or `write` access to specific users or groups.
@@ -128,4 +127,4 @@ Skills use the same [Access Control](/features/rbac) system as other workspace r
 - **Sharing → Share Skills**: Required to share skills with individual users or groups.
 - **Sharing → Public Skills**: Required to make skills publicly accessible.
 
-See [Permissions](/features/rbac/permissions) for details on how to configure these.
+See [Permissions](/features/access-security/rbac/permissions) for details on how to configure these.

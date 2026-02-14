@@ -895,5 +895,5 @@ To use SQLCipher with existing data, you must either:
 | `DATABASE_POOL_TIMEOUT` | `30` | Pool connection timeout in seconds |
 | `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |
 
-For more details, see the [Environment Variable Configuration](/getting-started/env-configuration) documentation.
+For more details, see the [Environment Variable Configuration](/reference/env-configuration) documentation.
 

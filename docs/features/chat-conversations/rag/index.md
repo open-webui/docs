@@ -1,5 +1,4 @@
-﻿---
-slug: /features/rag/
+---
 sidebar_position: 1
 title: "Retrieval Augmented Generation (RAG)"
 ---
@@ -19,7 +18,7 @@ One of the key advantages of RAG is its ability to access and integrate informat
 Local documents must first be uploaded via the Documents section of the Workspace area to access them using the `#` symbol before a query. Click on the formatted URL in the that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval.
 
 :::tip Bulk File Management
-Need to clean up multiple uploaded documents or audit your storage? You can now use the centralized **[File Manager](/features/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
+Need to clean up multiple uploaded documents or audit your storage? You can now use the centralized **[File Manager](/features/chat-conversations/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
 :::
 
 You can also load documents into the workspace area with their access by starting a prompt with `#`, followed by a URL. This can help incorporate web content directly into your conversations.
@@ -170,7 +169,7 @@ When File Context is disabled, file content is **not automatically extracted or 
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
+Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/ai-knowledge/knowledge#full-context-vs-focused-retrieval) for details.
 :::
 
 :::info
@@ -242,7 +241,7 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 ## Google Drive Integration
 
-When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/getting-started/env-configuration) environment variables to use.
+When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
 
 ### Detailed Instructions
 

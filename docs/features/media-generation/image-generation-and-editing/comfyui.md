@@ -1,5 +1,4 @@
-﻿---
-slug: /features/image-generation-and-editing/comfyui
+---
 sidebar_position: 3
 title: "ComfyUI"
 ---

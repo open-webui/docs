@@ -1,5 +1,4 @@
-﻿---
-slug: /features/data-controls/files
+---
 sidebar_position: 5
 title: "📁 File Management"
 ---

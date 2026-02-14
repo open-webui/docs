@@ -1,5 +1,4 @@
-﻿---
-slug: /features/interface/webhooks
+---
 sidebar_position: 17
 title: "Webhook Integrations"
 ---
@@ -36,7 +35,7 @@ You can configure the admin webhook in two ways:
 
 #### Option 2: Through Environment Variables
 
-You can also set the webhook URL using the `WEBHOOK_URL` environment variable. For more details, refer to the [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration/#webhook_url) documentation.
+You can also set the webhook URL using the `WEBHOOK_URL` environment variable. For more details, refer to the [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration/#webhook_url) documentation.
 
 ### Payload Format
 

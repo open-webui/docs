@@ -1,5 +1,4 @@
-﻿---
-slug: /features/audio/speech-to-text/env-variables
+---
 sidebar_position: 2
 title: "Environment Variables"
 ---
@@ -8,7 +7,7 @@ title: "Environment Variables"
 
 :::info
 
-For a complete list of all Open WebUI environment variables, see the [Environment Variable Configuration](https://docs.openwebui.com/getting-started/env-configuration) page.
+For a complete list of all Open WebUI environment variables, see the [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration) page.
 
 :::
 

@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/temporal-awareness
+---
 sidebar_position: 11
 title: "Temporal Awareness"
 ---
@@ -15,13 +14,13 @@ By default, Open WebUI injects temporal variables into the model's environment v
 - **`CURRENT_TIME`**: Injected as HH:MM.
 - **`CURRENT_WEEKDAY`**: (e.g., Monday, Tuesday).
 
-These variables can be manually used in [**Prompts**](/features/workspace/prompts) or [**Model Files**](/features/workspace/models) using the `{{CURRENT_DATE}}` syntax.
+These variables can be manually used in [**Prompts**](/features/ai-knowledge/prompts) or [**Model Files**](/features/ai-knowledge/models) using the `{{CURRENT_DATE}}` syntax.
 
 ---
 
 ## Native Temporal Tools (Agentic)
 
-When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), models gain granular control over time calculations and queries.
+When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)), models gain granular control over time calculations and queries.
 
 ### Available Time Tools:
 - **`get_current_timestamp`**: The model can retrieve the exact current Unix timestamp (UTC) and ISO date string.

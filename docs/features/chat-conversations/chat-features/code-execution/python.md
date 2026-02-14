@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/code-execution/python
+---
 sidebar_position: 3
 title: "Python Code Execution"
 ---
@@ -49,7 +48,7 @@ These settings can be configured at **Admin Panel → Settings → Code Executio
 | `CODE_INTERPRETER_PROMPT_TEMPLATE` | (built-in) | Custom prompt template for code interpreter |
 | `CODE_INTERPRETER_BLACKLISTED_MODULES` | `""` | Comma-separated list of blocked Python modules |
 
-For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/jupyter) tutorial.
+For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/dev-tools/jupyter) tutorial.
 
 ### Native Function Calling (Native Mode)
 
@@ -63,7 +62,7 @@ When using **Native function calling mode** with a capable model (e.g., GPT-5, C
 2. Model must have `code_interpreter` capability enabled
 3. Model must use **Native** function calling mode (set in model's advanced params)
 
-For more details on builtin tools and native mode, see the [Tool Development Guide](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
+For more details on builtin tools and native mode, see the [Tool Development Guide](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 
 ## Displaying Images Inline (matplotlib, etc.)
 
@@ -224,6 +223,6 @@ This is a known compatibility issue between Edge's enhanced security mode and We
 ## Further Reading
 
 - [Pyodide Documentation](https://pyodide.org/en/stable/)
-- [Jupyter Notebook Integration](/tutorials/integrations/jupyter)
-- [Environment Configuration](/getting-started/env-configuration) (search for `CODE_INTERPRETER`)
+- [Jupyter Notebook Integration](/tutorials/integrations/dev-tools/jupyter)
+- [Environment Configuration](/reference/env-configuration) (search for `CODE_INTERPRETER`)
 

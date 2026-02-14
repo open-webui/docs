@@ -1,5 +1,4 @@
-﻿---
-slug: /features/audio/text-to-speech/openai-tts-integration
+---
 sidebar_position: 0
 title: "OpenAI TTS Integration"
 ---
@@ -9,7 +8,7 @@ title: "OpenAI TTS Integration"
 This guide covers how to use OpenAI's official Text-to-Speech API with Open WebUI. This is the simplest setup if you already have an OpenAI API key.
 
 :::tip Looking for STT?
-See the companion guide: [Using OpenAI for Speech-to-Text](/features/audio/speech-to-text/openai-stt-integration)
+See the companion guide: [Using OpenAI for Speech-to-Text](/features/media-generation/audio/speech-to-text/openai-stt-integration)
 :::
 
 ## Requirements
@@ -159,5 +158,5 @@ For more troubleshooting, see the [Audio Troubleshooting Guide](/troubleshooting
 OpenAI charges per character for TTS. See [OpenAI Pricing](https://platform.openai.com/docs/pricing) for current rates. Note that `tts-1-hd` costs more than `tts-1`.
 
 :::info
-For a free alternative, consider [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration) which uses Microsoft's free Edge browser TTS.
+For a free alternative, consider [OpenAI Edge TTS](/features/media-generation/audio/text-to-speech/openai-edge-tts-integration) which uses Microsoft's free Edge browser TTS.
 :::

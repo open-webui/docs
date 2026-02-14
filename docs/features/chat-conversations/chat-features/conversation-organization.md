@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/conversation-organization
+---
 sidebar_position: 4
 title: "Folders & Projects"
 ---
@@ -13,7 +12,7 @@ Open WebUI provides powerful folder-based organization that turns simple chat co
 Folders are enabled by default. Administrators can control this feature via:
 
 - **Admin Panel**: The folders feature is controlled globally alongside other features.
-- **Environment Variable**: [`ENABLE_FOLDERS`](/getting-started/env-configuration#enable_folders) - Set to `True` (default) to enable or `False` to disable.
+- **Environment Variable**: [`ENABLE_FOLDERS`](/reference/env-configuration#enable_folders) - Set to `True` (default) to enable or `False` to disable.
 
 ## Core Features
 
@@ -126,5 +125,5 @@ If you frequently discuss topics like "marketing" or "development," tag conversa
 
 | Setting | Description |
 |---------|-------------|
-| [`ENABLE_FOLDERS`](/getting-started/env-configuration#enable_folders) | Enable/disable the folders feature globally (Default: `True`) |
-| [`USER_PERMISSIONS_FEATURES_FOLDERS`](/getting-started/env-configuration#user_permissions_features_folders) | Control user-level access to the folders feature (Default: `True`) |
+| [`ENABLE_FOLDERS`](/reference/env-configuration#enable_folders) | Enable/disable the folders feature globally (Default: `True`) |
+| [`USER_PERMISSIONS_FEATURES_FOLDERS`](/reference/env-configuration#user_permissions_features_folders) | Control user-level access to the folders feature (Default: `True`) |

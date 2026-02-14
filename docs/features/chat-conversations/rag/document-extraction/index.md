@@ -1,5 +1,4 @@
-﻿---
-slug: /features/rag/document-extraction/
+---
 sidebar_position: 1
 title: "Document Extraction"
 ---

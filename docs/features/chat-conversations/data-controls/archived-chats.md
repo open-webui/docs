@@ -1,5 +1,4 @@
-﻿---
-slug: /features/data-controls/archived-chats
+---
 sidebar_position: 3
 title: "📦 Archived Chats"
 ---

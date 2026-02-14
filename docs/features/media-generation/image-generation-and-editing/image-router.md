@@ -1,5 +1,4 @@
-﻿---
-slug: /features/image-generation-and-editing/image-router
+---
 sidebar_position: 6
 title: "Image Router"
 ---

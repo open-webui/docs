@@ -99,7 +99,7 @@ services:
       - AUDIO_TTS_OPENAI_API_KEY=not-needed
 ```
 
-→ See full guide: [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration)
+→ See full guide: [OpenAI Edge TTS](/features/media-generation/audio/text-to-speech/openai-edge-tts-integration)
 
 ### Browser-Only Setup (No Backend Config Needed)
 
@@ -191,7 +191,7 @@ docker exec open-webui bash -lc "pip show datasets"
 ```
 
 :::tip
-Consider using an external TTS service like [OpenAI Edge TTS](/features/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro](/features/audio/text-to-speech/Kokoro-FastAPI-integration) instead of local Transformers TTS to avoid these dependency conflicts.
+Consider using an external TTS service like [OpenAI Edge TTS](/features/media-generation/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro](/features/media-generation/audio/text-to-speech/Kokoro-FastAPI-integration) instead of local Transformers TTS to avoid these dependency conflicts.
 :::
 
 #### 2. Using External TTS Instead of Local
@@ -423,7 +423,7 @@ curl http://your-tts-service:port/health
 | `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |
 | `DEEPGRAM_API_KEY` | Deepgram API key |
 
-For a complete list of audio environment variables, see [Environment Variable Configuration](/getting-started/env-configuration#audio).
+For a complete list of audio environment variables, see [Environment Variable Configuration](/reference/env-configuration#audio).
 
 ---
 

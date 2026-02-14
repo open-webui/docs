@@ -1,5 +1,4 @@
 ---
-slug: /getting-started/advanced-topics/monitoring
 sidebar_position: 6
 title: "API Keys & Monitoring"
 ---
@@ -70,7 +69,7 @@ To go beyond basic availability, you can monitor the `/api/models` endpoint. Thi
 
 **API Endpoint Details:**
 
-See the [Open WebUI API documentation](https://docs.openwebui.com/getting-started/api-endpoints/#-retrieve-all-models) for full details about the `/api/models` endpoint and its response structure.
+See the [Open WebUI API documentation](https://docs.openwebui.com/reference/api-endpoints/#-retrieve-all-models) for full details about the `/api/models` endpoint and its response structure.
 
 **How to Test with `curl` (Authenticated):**
 
@@ -181,8 +180,8 @@ This approach limits the potential impact if the monitoring API key is compromis
 
 If you don't see the API key generation option in your account settings:
 
-- **Check global setting**: Verify that an administrator has enabled API keys globally under **Admin Panel** > **Settings** > **General** > **Enable API Keys**. See [`ENABLE_API_KEYS`](/getting-started/env-configuration#enable_api_keys).
-- **Check your permissions**: Verify that your user account or group has been granted the "API Keys" feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/getting-started/env-configuration#user_permissions_features_api_keys).
+- **Check global setting**: Verify that an administrator has enabled API keys globally under **Admin Panel** > **Settings** > **General** > **Enable API Keys**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
+- **Check your permissions**: Verify that your user account or group has been granted the "API Keys" feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
 
 ### Using Uptime Kuma for Model Connectivity Monitoring 🐻
 

@@ -1,5 +1,4 @@
-﻿---
-slug: /features/interface/banners
+---
 sidebar_position: 13
 title: "Customizable Banners"
 ---

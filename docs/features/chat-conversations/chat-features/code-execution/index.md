@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/code-execution/
+---
 sidebar_position: 1
 title: "Code Execution"
 ---
@@ -50,13 +49,13 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 
 ### Open Terminal
 
-[Open Terminal](/features/open-terminal) is a lightweight API for running shell commands remotely inside a Docker container. It provides full OS-level access — any language, any tool, any shell command — with container-level isolation.
+[Open Terminal](/features/extensibility/open-terminal) is a lightweight API for running shell commands remotely inside a Docker container. It provides full OS-level access — any language, any tool, any shell command — with container-level isolation.
 
 - **Full shell access** — models can install packages, run scripts in any language, use system tools like ffmpeg, git, curl, etc.
 - **Container isolation** — runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset** — the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
 
-Open Terminal is connected to Open WebUI as an easy to connect [OpenAPI Tool Server](/features/plugin/tools/openapi-servers/open-webui), not as a built-in code execution engine.
+Open Terminal is connected to Open WebUI as an easy to connect [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui), not as a built-in code execution engine.
 
 :::note
 Open Terminal currently operates as a **single shared instance** — there is no automatic per-user container provisioning yet. Each user connects to the same container unless separate instances are deployed manually.

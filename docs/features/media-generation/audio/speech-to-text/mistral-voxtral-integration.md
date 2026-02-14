@@ -1,5 +1,4 @@
-﻿---
-slug: /features/audio/speech-to-text/mistral-voxtral-integration
+---
 sidebar_position: 2
 title: "Mistral Voxtral STT"
 ---

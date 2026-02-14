@@ -17,7 +17,7 @@ This tutorial explains how to configure Microsoft Entra ID to return group **nam
 
 ## Prerequisites
 
-- An Open WebUI instance configured with [Microsoft OAuth](/features/auth/sso#microsoft)
+- An Open WebUI instance configured with [Microsoft OAuth](/features/access-security/auth/sso#microsoft)
 - An Azure account with permissions to modify App Registrations
 - Access to the Microsoft Entra admin center
 - Basic understanding of Microsoft Entra ID application configuration
@@ -30,7 +30,7 @@ To get human-readable group names in Open WebUI, you need to:
 2. Modify the application manifest to use `cloud_displayname`
 3. Set `groupMembershipClaims` to `ApplicationGroup` only
 4. Assign security groups to the Enterprise Application
-5. Configure Open WebUI environment variables for [OAuth Group Management](/features/auth/sso#oauth-group-management)
+5. Configure Open WebUI environment variables for [OAuth Group Management](/features/access-security/auth/sso#oauth-group-management)
 
 :::info Key Requirement
 
@@ -140,7 +140,7 @@ Ensure your App Registration has the required Microsoft Graph permissions:
 
 ## Step 5: Configure Open WebUI Environment Variables
 
-Configure the following environment variables for your Open WebUI deployment. For more details on each variable, see the [environment variable documentation](/getting-started/env-configuration).
+Configure the following environment variables for your Open WebUI deployment. For more details on each variable, see the [environment variable documentation](/reference/env-configuration).
 
 ```bash
 # Required: Your public WebUI address
@@ -201,9 +201,9 @@ Admin users' group memberships are **not** automatically updated via OAuth group
 
 ## Additional Resources
 
-- [SSO (OAuth, OIDC, Trusted Header)](/features/auth/sso) - OAuth configuration overview
-- [OAuth Group Management](/features/auth/sso#oauth-group-management) - Group synchronization details
-- [Groups](/features/rbac/groups) - Group management in Open WebUI
+- [SSO (OAuth, OIDC, Trusted Header)](/features/access-security/auth/sso) - OAuth configuration overview
+- [OAuth Group Management](/features/access-security/auth/sso#oauth-group-management) - Group synchronization details
+- [Groups](/features/access-security/rbac/groups) - Group management in Open WebUI
 - [SSO Troubleshooting Guide](/troubleshooting/sso) - Common OAuth issues and solutions
-- [Environment Configuration](/getting-started/env-configuration) - All environment variables
+- [Environment Configuration](/reference/env-configuration) - All environment variables
 - [Microsoft Optional Claims Documentation](https://learn.microsoft.com/en-us/entra/identity-platform/optional-claims) - Microsoft's official documentation

@@ -1,5 +1,4 @@
 ---
-slug: /getting-started/advanced-topics/development
 sidebar_position: 3
 title: "Local Development Guide"
 ---
@@ -311,7 +310,7 @@ If you find that **icons or other static assets are failing to load**, it is oft
 
 **Solution:**
 You need to configure the `CORS_ALLOW_ORIGIN` environment variable in your backend.
--   Check the [Environment Configuration](/getting-started/env-configuration#cors_allow_origin) guide for details on how to set `CORS_ALLOW_ORIGIN` to allow requests from your frontend's URL (e.g., `http://localhost:5173`).
+-   Check the [Environment Configuration](/reference/env-configuration#cors_allow_origin) guide for details on how to set `CORS_ALLOW_ORIGIN` to allow requests from your frontend's URL (e.g., `http://localhost:5173`).
 -   In a development environment, you can often set this in your `backend/dev.sh` script or your `.env` file.
 
 ## Contributing to Open WebUI

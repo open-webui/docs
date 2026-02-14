@@ -1,5 +1,4 @@
-﻿---
-slug: /features/pipelines/tutorials
+---
 sidebar_position: 5
 title: "Tutorials"
 ---

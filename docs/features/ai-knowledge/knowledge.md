@@ -1,5 +1,4 @@
-﻿---
-slug: /features/workspace/knowledge
+---
 sidebar_position: 4
 title: "Knowledge"
 ---
@@ -114,7 +113,7 @@ The Knowledge Base tools require the **Knowledge Base** category to be enabled f
 :::
 
 :::info Central Tool Documentation
-For complete details on all built-in agentic tools and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/plugin/tools#built-in-system-tools-nativeagentic-mode).
+For complete details on all built-in agentic tools and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 :::
 
 ### Setting Up Your Knowledge Base
@@ -145,7 +144,7 @@ Key API endpoints:
 :::warning Important: Async File Processing
 When uploading files via API, processing happens asynchronously. You **must** wait for file processing to complete before adding files to a knowledge base, or you will receive an "empty content" error.
 
-For detailed examples and proper workflow handling, see the [API Endpoints documentation](/getting-started/api-endpoints#-retrieval-augmented-generation-rag).
+For detailed examples and proper workflow handling, see the [API Endpoints documentation](/reference/api-endpoints#-retrieval-augmented-generation-rag).
 :::
 
 ## Summary

@@ -1,5 +1,4 @@
-﻿---
-slug: /features/notes
+---
 sidebar_position: 1300
 title: "Notes"
 ---
@@ -102,7 +101,7 @@ Open WebUI provides several ways to export and manage your notes via the **More 
 :::info Admin Visibility
 Notes are considered **workspace items**, just like models, knowledge, prompts, and tools. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), administrators can see **all users' notes** under the "All" and "Shared with you" filters.
 
-To prevent admins from seeing notes they were not explicitly shared with, set `BYPASS_ADMIN_ACCESS_CONTROL` to `False`. This also restricts admin access to other workspace items (models, knowledge, prompts, tools). See the [Environment Configuration](/getting-started/env-configuration#bypass_admin_access_control) for details.
+To prevent admins from seeing notes they were not explicitly shared with, set `BYPASS_ADMIN_ACCESS_CONTROL` to `False`. This also restricts admin access to other workspace items (models, knowledge, prompts, tools). See the [Environment Configuration](/reference/env-configuration#bypass_admin_access_control) for details.
 :::
 
 ### Download
@@ -170,7 +169,7 @@ These can also be configured in **Admin Panel > Settings > Users > Default Permi
 
 ## Native Note Management (Agentic)
 
-If you are using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), the AI can interact with your Notes workspace autonomously using built-in system tools.
+If you are using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)), the AI can interact with your Notes workspace autonomously using built-in system tools.
 
 ### Available Note Tools:
 - **`search_notes`**: The model can search your entire library of notes by title and content.

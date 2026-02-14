@@ -18,7 +18,7 @@ Whenever you forget a command or need a quick bash script for a repetitive task,
 
 ## Why connect to your Open WebUI instance?
 
-Open WebUI provides a simple and straightforward way to interact with your LLMs via its [API Endpoints](/getting-started/api-endpoints). This is particularly beneficial if you are running your own LLMs locally. Furthermore, you can leverage all your implemented features, monitoring, and other capabilities.
+Open WebUI provides a simple and straightforward way to interact with your LLMs via its [API Endpoints](/reference/api-endpoints). This is particularly beneficial if you are running your own LLMs locally. Furthermore, you can leverage all your implemented features, monitoring, and other capabilities.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ Unzip the file and move the application into your **Applications** folder.
 ### 2. Generate your Open WebUI API key
 
 To authenticate with your Open WebUI instance, you'll need to generate an API key.
-Follow the instructions in [this guide](https://docs.openwebui.com/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) to create it.
+Follow the instructions in [this guide](https://docs.openwebui.com/reference/monitoring#authentication-setup-for-api-key-) to create it.
 
 ## Configuration
 
@@ -92,7 +92,7 @@ Set your preferred amount of tokens here. Typically, your inference tool will al
 
 This is a crucial step: you need to direct the iTerm2 AI plugin requests to your Open WebUI instance.
 Either use an actual domain name if the instance is hosted somewhere (e.g., `https://example.com/api/chat/completions`) or your localhost setup (e.g., `http://localhost:8080/api/chat/completions`).
-You can find more information about the URLs in the [API Endpoints guide](/getting-started/api-endpoints).
+You can find more information about the URLs in the [API Endpoints guide](/reference/api-endpoints).
 
 ---
 

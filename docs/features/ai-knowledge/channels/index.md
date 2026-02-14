@@ -1,5 +1,4 @@
-﻿---
-slug: /features/channels/
+---
 sidebar_position: 1000
 title: "Channels"
 ---
@@ -169,7 +168,7 @@ Channels support granular access control:
 
 ## Native Channel Awareness (Agentic)
 
-When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/plugin/tools#tool-calling-modes-default-vs-native)), models can navigate and search through your organization's channels autonomously.
+When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)), models can navigate and search through your organization's channels autonomously.
 
 ### Available Channel Tools:
 - **`search_channels`**: The model can find channels by name or description to identify where relevant discussions might be happening.

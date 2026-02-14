@@ -1,5 +1,4 @@
-﻿---
-slug: /features/open-terminal/
+---
 sidebar_position: 5
 title: "Open Terminal"
 ---
@@ -14,7 +13,7 @@ This page is up-to-date with Open Terminal release version [v0.1.10](https://git
 
 ## Overview
 
-[Open Terminal](https://github.com/open-webui/open-terminal) is a lightweight API for running shell commands remotely — with real-time streaming and secure access. When connected to Open WebUI as a [Tool](/features/plugin/tools), it gives models full shell access, file management, and the ability to execute arbitrary commands in an isolated environment.
+[Open Terminal](https://github.com/open-webui/open-terminal) is a lightweight API for running shell commands remotely — with real-time streaming and secure access. When connected to Open WebUI as a [Tool](/features/extensibility/plugin/tools), it gives models full shell access, file management, and the ability to execute arbitrary commands in an isolated environment.
 
 Unlike Pyodide (browser-based, limited libraries) or Jupyter (shared environment, no per-user isolation), Open Terminal runs in its own Docker container with full OS-level capabilities. This makes it ideal for tasks that require:
 
@@ -111,12 +110,12 @@ When no API key is provided, Open Terminal generates a random key using a crypto
 
 ## Connecting to Open WebUI
 
-Open Terminal is a FastAPI application and automatically exposes an OpenAPI specification at `/openapi.json`. This means it works out of the box as an [OpenAPI Tool Server](/features/plugin/tools/openapi-servers/open-webui) — no manual tool creation required.
+Open Terminal is a FastAPI application and automatically exposes an OpenAPI specification at `/openapi.json`. This means it works out of the box as an [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui) — no manual tool creation required.
 
 - **As a User Tool Server**: Add it in **Settings → Tools** to connect directly from your browser. Ideal for personal or local instances.
 - **As a Global Tool Server**: Add it in **Admin Settings → Tools** to make it available to all users across the deployment.
 
-For step-by-step instructions with screenshots, see the [OpenAPI Tool Server Integration Guide](/features/plugin/tools/openapi-servers/open-webui).
+For step-by-step instructions with screenshots, see the [OpenAPI Tool Server Integration Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui).
 
 ## API Reference
 
@@ -252,6 +251,6 @@ Returns service status. No authentication required.
 
 - [Open Terminal GitHub Repository](https://github.com/open-webui/open-terminal)
 - [Interactive API Documentation](http://localhost:8000/docs) (available when running locally)
-- [Python Code Execution](/features/chat-features/code-execution/python) — Pyodide and Jupyter backends
-- [Jupyter Integration Tutorial](/tutorials/integrations/jupyter) — Setting up Jupyter as a code execution backend
-- [Skills](/features/workspace/skills) — Using skills with code execution
+- [Python Code Execution](/features/chat-conversations/chat-features/code-execution/python) — Pyodide and Jupyter backends
+- [Jupyter Integration Tutorial](/tutorials/integrations/dev-tools/jupyter) — Setting up Jupyter as a code execution backend
+- [Skills](/features/ai-knowledge/skills) — Using skills with code execution

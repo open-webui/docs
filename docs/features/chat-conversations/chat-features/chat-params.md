@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/chat-params
+---
 sidebar_position: 6
 title: "Chat Parameters"
 ---

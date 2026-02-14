@@ -1,5 +1,4 @@
-﻿---
-slug: /features/audio/speech-to-text/stt-config
+---
 sidebar_position: 1
 title: "Configuration"
 ---
@@ -16,9 +15,9 @@ The following speech-to-text providers are supported:
 
 | Service | API Key Required | Guide |
 |---------|------------------|-------|
-| Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/audio/speech-to-text/env-variables) |
-| OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/audio/speech-to-text/openai-stt-integration) |
-| Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/audio/speech-to-text/mistral-voxtral-integration) |
+| Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/media-generation/audio/speech-to-text/env-variables) |
+| OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/media-generation/audio/speech-to-text/openai-stt-integration) |
+| Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/media-generation/audio/speech-to-text/mistral-voxtral-integration) |
 | Deepgram | ✅ | — |
 | Azure | ✅ | — |
 

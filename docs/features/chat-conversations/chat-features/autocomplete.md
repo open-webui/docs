@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/autocomplete
+---
 sidebar_position: 5
 title: "Autocomplete"
 ---

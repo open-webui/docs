@@ -1,5 +1,4 @@
-﻿---
-slug: /features/image-generation-and-editing/automatic1111
+---
 sidebar_position: 2
 title: "AUTOMATIC1111"
 ---

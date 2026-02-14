@@ -1,12 +1,11 @@
-﻿---
-slug: /features/auth/sso/
+---
 sidebar_position: 1
 title: "SSO (OAuth, OIDC, Trusted Header)"
 ---
 
 :::info
 
-For more information about all environment variables, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
+For more information about all environment variables, check out the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/).
 It is highly recommended to check the environment variable page, to get more details about how to set the variable and what values are expected.
 
 :::
@@ -22,7 +21,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 Right now, you can only configure **one** OpenID Connect (OIDC) provider at a time via `OPENID_PROVIDER_URL`.
 You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 
-*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/tips/dual-oauth-configuration) for more details.*
+*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/integrations/auth-identity/dual-oauth-configuration) for more details.*
 :::
 
 ## OAuth Configuration Overview
@@ -52,7 +51,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
    - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
    - Update settings through the Admin Panel instead of environment variables
 
-3. **Required Variables**: Always verify you're using the exact variable names from the [environment configuration documentation](https://docs.openwebui.com/getting-started/env-configuration/). Common mistakes include using non-existent variables like `OIDC_CONFIG`.
+3. **Required Variables**: Always verify you're using the exact variable names from the [environment configuration documentation](https://docs.openwebui.com/reference/env-configuration/). Common mistakes include using non-existent variables like `OIDC_CONFIG`.
 
 :::
 
@@ -69,7 +68,7 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
-For more information, check out the [environment variable docs page](https://docs.openwebui.com/getting-started/env-configuration/).
+For more information, check out the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/).
 
 ### OAuth Token Exchange for External Applications
 
@@ -77,7 +76,7 @@ Open WebUI also supports **OAuth Token Exchange**, allowing external application
 
 **Example use case:** A CLI tool that has obtained an OAuth access token from your identity provider can exchange it for an Open WebUI token to make API calls to Open WebUI.
 
-To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/getting-started/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
+To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
 
 ### Google
 
@@ -175,7 +174,7 @@ The following environment variables are used:
 :::
 
 :::tip Community Workaround: Multi-Provider OAuth
-If you need to support both Microsoft and Google simultaneously, check out our **[Dual OAuth Configuration Tutorial](/tutorials/tips/dual-oauth-configuration)**. 
+If you need to support both Microsoft and Google simultaneously, check out our **[Dual OAuth Configuration Tutorial](/tutorials/integrations/auth-identity/dual-oauth-configuration)**. 
 :::
 ### OAuth Role Management
 

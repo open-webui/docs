@@ -153,7 +153,7 @@ env:
 
 This is a crucial step: you need to direct the continue.dev extension requests to your Open WebUI instance.
 Either use an actual domain name if the instance is hosted somewhere (e.g., `https://example.com/api`) or your localhost setup (e.g., `http://localhost:3000/api`).
-You can find more information about the URLs in the [API Endpoints guide](/getting-started/api-endpoints).
+You can find more information about the URLs in the [API Endpoints guide](/reference/api-endpoints).
 
 ```yaml
 apiBase: http://localhost:3000/api
@@ -164,7 +164,7 @@ apiBase: http://localhost:3000/api
 ### API Key
 
 To authenticate with your Open WebUI instance, you'll need to generate an API key.
-Follow the instructions in [this guide](https://docs.openwebui.com/getting-started/advanced-topics/monitoring#authentication-setup-for-api-key-) to create it.
+Follow the instructions in [this guide](https://docs.openwebui.com/reference/monitoring#authentication-setup-for-api-key-) to create it.
 
 ```yaml
 apiKey: YOUR_OPEN_WEBUI_API_KEY

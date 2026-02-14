@@ -1,5 +1,4 @@
 ---
-slug: /tutorials/offline-mode
 sidebar_position: 300
 title: "Offline Mode"
 ---
@@ -78,7 +77,7 @@ Consider if you need to start the application offline from the beginning of your
 
 ### I: Speech-To-Text
 
-The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/audio/speech-to-text/stt-config) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
+The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/media-generation/audio/speech-to-text/stt-config) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
 
 ```python
 from faster_whisper import WhisperModel
@@ -93,7 +92,7 @@ faster_whisper_kwargs = {
 WhisperModel(**faster_whisper_kwargs)
 ```
 
-The contents of the download directory must be copied to `/app/backend/data/cache/whisper/models/` within your Open WebUI deployment. It makes sense to directly declare your `whisper` model via the [environment variable](https://docs.openwebui.com/getting-started/env-configuration#whisper_model), like this: `WHISPER_MODEL=Systran/faster-whisper-large-v3`.
+The contents of the download directory must be copied to `/app/backend/data/cache/whisper/models/` within your Open WebUI deployment. It makes sense to directly declare your `whisper` model via the [environment variable](https://docs.openwebui.com/reference/env-configuration#whisper_model), like this: `WHISPER_MODEL=Systran/faster-whisper-large-v3`.
 
 ### I: Text-To-Speech
 
@@ -101,7 +100,7 @@ The default local transformer can already handle the text-to-speech function. If
 
 ### I: Embedding Model
 
-For various purposes, you will need an embedding model (e.g. [RAG](/features/rag)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+For various purposes, you will need an embedding model (e.g. [RAG](/features/chat-conversations/rag)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
 
 ```python
 from huggingface_hub import snapshot_download
@@ -109,7 +108,7 @@ from huggingface_hub import snapshot_download
 snapshot_download(repo_id="sentence-transformers/all-MiniLM-L6-v2", cache_dir="/path/of/your/choice")
 ```
 
-The contents of the download directory must be copied to `/app/backend/data/cache/embedding/models/` within your Open WebUI deployment. It makes sense to directly declare your embedding model via the [environment variable](https://docs.openwebui.com/getting-started/env-configuration#rag_embedding_model), like this: `RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2`.
+The contents of the download directory must be copied to `/app/backend/data/cache/embedding/models/` within your Open WebUI deployment. It makes sense to directly declare your embedding model via the [environment variable](https://docs.openwebui.com/reference/env-configuration#rag_embedding_model), like this: `RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2`.
 
 ## Approach II
 

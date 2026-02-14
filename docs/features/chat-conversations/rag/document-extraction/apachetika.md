@@ -1,5 +1,4 @@
-﻿---
-slug: /features/rag/document-extraction/apachetika
+---
 sidebar_position: 2
 title: "Apache Tika Extraction"
 ---

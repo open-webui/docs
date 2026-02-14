@@ -1,5 +1,4 @@
-﻿---
-slug: /features/chat-features/code-execution/artifacts
+---
 sidebar_position: 2
 title: "Artifacts"
 ---

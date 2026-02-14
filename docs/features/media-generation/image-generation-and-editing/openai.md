@@ -1,5 +1,4 @@
-﻿---
-slug: /features/image-generation-and-editing/openai
+---
 sidebar_position: 4
 title: "OpenAI"
 ---

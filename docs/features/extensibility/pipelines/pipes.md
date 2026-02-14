@@ -1,5 +1,4 @@
-﻿---
-slug: /features/pipelines/pipes
+---
 sidebar_position: 3
 title: "Pipes"
 ---

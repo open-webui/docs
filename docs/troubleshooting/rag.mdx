@@ -144,7 +144,7 @@ Open WebUI implements various limits to ensure system stability and prevent abus
     *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Admin Panel > Settings > Documents > General > Max Upload Size**.
     *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Admin Panel > Settings > Documents > General > Max Upload Count**.
     *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Admin Panel > Settings > Documents > General > Allowed File Extensions**.
-*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/getting-started/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
+*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
     *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used in **Full Context Mode** (accessible in chat settings), which feeds the full document content to the model instead of using vector search retrieval.
@@ -238,7 +238,7 @@ def wait_for_processing(token, file_id, timeout=300):
 | `failed` | Processing failed (check error field) |
 
 :::tip
-For complete API workflow examples including proper status checking, see the [API Endpoints documentation](/getting-started/api-endpoints#checking-file-processing-status).
+For complete API workflow examples including proper status checking, see the [API Endpoints documentation](/reference/api-endpoints#checking-file-processing-status).
 :::
 
 ---
@@ -353,7 +353,7 @@ If you are running a version with this fix and still experiencing worker death, 
    RAG_EMBEDDING_MODEL=nomic-embed-text
    ```
 
-4. **Optionally set a safety timeout** via [`RAG_EMBEDDING_TIMEOUT`](/getting-started/env-configuration#rag_embedding_timeout) to abort abnormally long embedding operations (does not affect health checks).
+4. **Optionally set a safety timeout** via [`RAG_EMBEDDING_TIMEOUT`](/reference/env-configuration#rag_embedding_timeout) to abort abnormally long embedding operations (does not affect health checks).
 
 ---
 

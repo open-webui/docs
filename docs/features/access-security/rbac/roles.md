@@ -1,5 +1,4 @@
-﻿---
-slug: /features/rbac/roles
+---
 sidebar_position: 3
 title: "Roles"
 ---
@@ -159,5 +158,5 @@ spec:
 - **One-Time Operation**: This is a one-time operation on first startup. Subsequent restarts with the same environment variables will not modify the existing admin account.
 :::
 
-For complete documentation on these environment variables, see the [Environment Configuration Guide](/getting-started/env-configuration#webui_admin_email).
+For complete documentation on these environment variables, see the [Environment Configuration Guide](/reference/env-configuration#webui_admin_email).
 

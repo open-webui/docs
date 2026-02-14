@@ -1,5 +1,4 @@
-﻿---
-slug: /features/rbac/permissions
+---
 sidebar_position: 3
 title: "Permissions"
 ---
@@ -149,4 +148,4 @@ While the UI is the recommended way to manage permissions, initial defaults can 
 *   `ENABLE_WEB_SEARCH=True`
 *   `USER_PERMISSIONS_CHAT_FILE_UPLOAD=True`
 
-See the [Environment Configuration](/getting-started/env-configuration) guide for a complete list of valid variables.
+See the [Environment Configuration](/reference/env-configuration) guide for a complete list of valid variables.
