@@ -1,6 +1,6 @@
 ---
 sidebar_position: 10
-title: "Multi-Replica / High Availability / Concurrency"
+title: "Scaling & HA"
 ---
 
 # Multi-Replica, High Availability & Concurrency Troubleshooting
@@ -11,12 +11,12 @@ This guide addresses common issues encountered when deploying Open WebUI in **mu
 
 Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
 
-1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/getting-started/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
-2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/getting-started/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
-3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/getting-started/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/getting-started/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/getting-started/env-configuration#websocket_redis_url) are required.
+1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
+2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/reference/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
+3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/reference/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
-5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/getting-started/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
-6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/getting-started/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
+5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
+6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/reference/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
 
 ---
 
@@ -54,7 +54,7 @@ env:
 - **Missing Redis:** WebSockets are defaulting to in-memory, so events on Replica A (e.g., LLM generation finish) are not broadcast to the user connected to Replica B.
 
 **Solution:**
-1.  **Configure CORS:** Ensure [`CORS_ALLOW_ORIGIN`](/getting-started/env-configuration#cors_allow_origin) includes your public domain *and* http/https variations.
+1.  **Configure CORS:** Ensure [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin) includes your public domain *and* http/https variations.
     
     If you see logs like `engineio.base_server:_log_error_once:354 - https://yourdomain.com is not an accepted origin`, you must update this variable. It accepts a **semicolon-separated list** of allowed origins.
     
@@ -143,7 +143,7 @@ Enabling session sharing can improve performance under high concurrency:
 DATABASE_ENABLE_SESSION_SHARING=true
 ```
 
-See [DATABASE_ENABLE_SESSION_SHARING](/getting-started/env-configuration#database_enable_session_sharing) for details.
+See [DATABASE_ENABLE_SESSION_SHARING](/reference/env-configuration#database_enable_session_sharing) for details.
 
 #### Connection Pool Sizing
 
@@ -172,7 +172,7 @@ For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, 3 re
 
 :::
 
-See [DATABASE_POOL_SIZE](/getting-started/env-configuration#database_pool_size) for details.
+See [DATABASE_POOL_SIZE](/reference/env-configuration#database_pool_size) for details.
 
 ---
 
@@ -213,7 +213,7 @@ While Open WebUI is designed to be stateless with proper Redis configuration, en
 
 ## Related Documentation
 
-- [Environment Variable Configuration](/getting-started/env-configuration)
+- [Environment Variable Configuration](/reference/env-configuration)
 - [Optimization, Performance & RAM Usage](/troubleshooting/performance)
 - [Troubleshooting Connection Errors](/troubleshooting/connection-error)
 - [Logging Configuration](/getting-started/advanced-topics/logging)

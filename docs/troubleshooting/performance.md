@@ -1,6 +1,6 @@
 ---
 sidebar_position: 15
-title: "Optimization, Performance & RAM Usage"
+title: "Performance & RAM"
 ---
 
 # Optimization, Performance & RAM Usage
@@ -91,7 +91,7 @@ By default, Open WebUI saves chats **after generation is complete**. While savin
 
 -   **Env Var**: `ENABLE_REALTIME_CHAT_SAVE=False` (Default)
 -   **Effect**: Chats are saved only when the generation is complete (or periodically).
--   **Recommendation**: **DO NOT ENABLE `ENABLE_REALTIME_CHAT_SAVE` in production.** It is highly recommended to keep this `False` to prevent database connection exhaustion and severe performance degradation under concurrent load. See the [Environment Variable Configuration](/getting-started/env-configuration#enable_realtime_chat_save) for details.
+-   **Recommendation**: **DO NOT ENABLE `ENABLE_REALTIME_CHAT_SAVE` in production.** It is highly recommended to keep this `False` to prevent database connection exhaustion and severe performance degradation under concurrent load. See the [Environment Variable Configuration](/reference/env-configuration#enable_realtime_chat_save) for details.
 
 ### Database Session Sharing
 
@@ -367,22 +367,22 @@ If resource usage is critical, disable automated features that constantly trigge
 
 ## 🔗 Environment Variable References
 
-For detailed information on all available variables, see the [Environment Configuration](/getting-started/env-configuration) guide.
+For detailed information on all available variables, see the [Environment Configuration](/reference/env-configuration) guide.
 
 | Variable | Description & Link |
 | :--- | :--- |
-| `TASK_MODEL` | [Task Model (Local)](/getting-started/env-configuration#task_model) |
-| `TASK_MODEL_EXTERNAL` | [Task Model (External)](/getting-started/env-configuration#task_model_external) |
-| `ENABLE_BASE_MODELS_CACHE` | [Cache Model List](/getting-started/env-configuration#enable_base_models_cache) |
-| `MODELS_CACHE_TTL` | [Model Cache TTL](/getting-started/env-configuration#models_cache_ttl) |
-| `ENABLE_QUERIES_CACHE` | [Queries Cache](/getting-started/env-configuration#enable_queries_cache) |
-| `DATABASE_URL` | [Database URL](/getting-started/env-configuration#database_url) |
-| `ENABLE_REALTIME_CHAT_SAVE` | [Realtime Chat Save](/getting-started/env-configuration#enable_realtime_chat_save) |
-| `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/getting-started/env-configuration#chat_response_stream_delta_chunk_size) |
-| `THREAD_POOL_SIZE` | [Thread Pool Size](/getting-started/env-configuration#thread_pool_size) |
-| `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/getting-started/env-configuration#rag_embedding_engine) |
-| `AUDIO_STT_ENGINE` | [STT Engine](/getting-started/env-configuration#audio_stt_engine) |
-| `ENABLE_IMAGE_GENERATION` | [Image Generation](/getting-started/env-configuration#enable_image_generation) |
-| `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/getting-started/env-configuration#enable_autocomplete_generation) |
-| `RAG_SYSTEM_CONTEXT` | [RAG System Context](/getting-started/env-configuration#rag_system_context) |
-| `DATABASE_ENABLE_SESSION_SHARING` | [Database Session Sharing](/getting-started/env-configuration#database_enable_session_sharing) |
+| `TASK_MODEL` | [Task Model (Local)](/reference/env-configuration#task_model) |
+| `TASK_MODEL_EXTERNAL` | [Task Model (External)](/reference/env-configuration#task_model_external) |
+| `ENABLE_BASE_MODELS_CACHE` | [Cache Model List](/reference/env-configuration#enable_base_models_cache) |
+| `MODELS_CACHE_TTL` | [Model Cache TTL](/reference/env-configuration#models_cache_ttl) |
+| `ENABLE_QUERIES_CACHE` | [Queries Cache](/reference/env-configuration#enable_queries_cache) |
+| `DATABASE_URL` | [Database URL](/reference/env-configuration#database_url) |
+| `ENABLE_REALTIME_CHAT_SAVE` | [Realtime Chat Save](/reference/env-configuration#enable_realtime_chat_save) |
+| `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
+| `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
+| `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
+| `AUDIO_STT_ENGINE` | [STT Engine](/reference/env-configuration#audio_stt_engine) |
+| `ENABLE_IMAGE_GENERATION` | [Image Generation](/reference/env-configuration#enable_image_generation) |
+| `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/reference/env-configuration#enable_autocomplete_generation) |
+| `RAG_SYSTEM_CONTEXT` | [RAG System Context](/reference/env-configuration#rag_system_context) |
+| `DATABASE_ENABLE_SESSION_SHARING` | [Database Session Sharing](/reference/env-configuration#database_enable_session_sharing) |

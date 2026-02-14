@@ -1,6 +1,6 @@
 ---
 sidebar_position: 11
-title: "SQLite Database Overview"
+title: "Database Schema"
 ---
 
 :::warning
@@ -553,6 +553,33 @@ Things to know about the tag table:
 | settings          | JSON          | nullable         | User preferences           |
 | info              | JSON          | nullable         | Additional user info       |
 | oauth_sub         | Text          | UNIQUE           | OAuth subject identifier   |
+| scim              | JSON          | nullable         | SCIM provisioning data     |
+
+Things to know about the user table:
+
+- Uses UUID for primary key
+- One-to-One relationship with `auth` table (shared id)
+- One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
+
+The `scim` field's expected structure:
+
+```python
+{
+    "<provider>": {
+        "external_id": string,  # externalId from the identity provider
+    },
+    # Multiple providers can be stored simultaneously
+    # Example:
+    # "microsoft": { "external_id": "abc-123" },
+    # "okta": { "external_id": "def-456" }
+}
+```
+
+**Why this column was added:**
+
+- **SCIM account linking**: Stores per-provider `externalId` values from SCIM provisioning, enabling identity providers (like Azure AD, Okta) to match users by their external identifiers rather than relying solely on email.
+- **Multi-provider support**: The per-provider key structure allows a single user to be provisioned from multiple identity providers simultaneously, each storing their own `externalId`.
+- **OAuth fallback**: When looking up a user by `externalId`, the system falls back to matching against `oauth_sub` if no `scim` entry is found, enabling seamless linking of SCIM-provisioned and OAuth-authenticated accounts.
 
 ## Entity Relationship Diagram
 
@@ -604,6 +631,7 @@ erDiagram
         json settings
         json info
         text oauth_sub
+        json scim
     }
 
     auth {
@@ -867,5 +895,5 @@ To use SQLCipher with existing data, you must either:
 | `DATABASE_POOL_TIMEOUT` | `30` | Pool connection timeout in seconds |
 | `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |
 
-For more details, see the [Environment Variable Configuration](/getting-started/env-configuration) documentation.
+For more details, see the [Environment Variable Configuration](/reference/env-configuration) documentation.
 

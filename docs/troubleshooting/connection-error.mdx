@@ -1,6 +1,6 @@
 ---
 sidebar_position: 0
-title: "Server Connectivity Issues"
+title: "Connection Errors"
 ---
 
 We're here to help you get everything set up and running smoothly. Below, you'll find step-by-step instructions tailored for different scenarios to solve common connection issues.
@@ -269,7 +269,7 @@ Manual database manipulation should be a last resort. Always back up your databa
 | `RESET_CONFIG_ON_START` | `false` | Reset database config to env var values on startup |
 | `ENABLE_PERSISTENT_CONFIG` | `true` | Whether database config takes precedence over env vars |
 
-See the [Environment Configuration](/getting-started/env-configuration#aiohttp_client_timeout_model_list) documentation for more details.
+See the [Environment Configuration](/reference/env-configuration#aiohttp_client_timeout_model_list) documentation for more details.
 
 ## 🐢 Slow Performance or Timeouts on Low-Spec Hardware
 
@@ -287,7 +287,7 @@ Disable database session sharing:
 DATABASE_ENABLE_SESSION_SHARING=false
 ```
 
-For PostgreSQL on adequate hardware, enabling this setting may improve performance. See the [DATABASE_ENABLE_SESSION_SHARING](/getting-started/env-configuration#database_enable_session_sharing) documentation for details.
+For PostgreSQL on adequate hardware, enabling this setting may improve performance. See the [DATABASE_ENABLE_SESSION_SHARING](/reference/env-configuration#database_enable_session_sharing) documentation for details.
 
 ## 🔒 SSL Connection Issue with Hugging Face
 
@@ -355,7 +355,7 @@ If you are having trouble connecting to MCP tools (e.g. "Failed to connect to MC
 *   **Authentication**: Ensure you aren't using "Bearer" without a token.
 *   **Filters**: Try adding a comma to the Function Name Filter List.
 
-See the [MCP Feature Documentation](/features/mcp#troubleshooting) for detailed troubleshooting steps.
+See the [MCP Feature Documentation](/features/extensibility/mcp#troubleshooting) for detailed troubleshooting steps.
 
 ## 🔐 SSL/TLS Errors with Web Search
 
