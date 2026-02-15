@@ -8,12 +8,20 @@ Skills are reusable, markdown-based instruction sets that you can attach to mode
 
 ## How Skills Work
 
-Skills use a **lazy-loading** architecture to keep the model's context window efficient:
+Skills behave differently depending on how they are activated:
 
-1. **Manifest injection** — When a skill is active (either bound to a model or mentioned in chat), only a lightweight manifest containing the skill's **name** and **description** is injected into the system prompt.
+### User-Selected Skills ($ Mention)
+
+When you mention a skill in chat with `$`, its **full content is injected directly** into the system prompt. The model has immediate access to the complete instructions without needing any extra tool calls.
+
+### Model-Attached Skills
+
+Skills bound to a model use a **lazy-loading** architecture to keep the context window efficient:
+
+1. **Manifest injection** — Only a lightweight manifest containing the skill's **name** and **description** is injected into the system prompt.
 2. **On-demand loading** — The model receives a `view_skill` builtin tool. When it determines it needs a skill's full instructions, it calls `view_skill` with the skill name to load the complete content.
 
-This design means that even if dozens of skills are available, only the ones the model actually needs are loaded into context.
+This design means that even if many skills are attached to a model, only the ones the model actually needs are loaded into context.
 
 ## Creating a Skill
 
@@ -23,8 +31,8 @@ Navigate to **Workspace → Skills** and click **+ New Skill**.
 | :--- | :--- |
 | **Name** | A human-readable display name (e.g., "Code Review Guidelines"). |
 | **Skill ID** | A unique slug identifier, auto-generated from the name (e.g., `code-review-guidelines`). Editable during creation, read-only afterwards. |
-| **Description** | A short summary shown in the manifest. The model uses this to decide whether to load the full instructions. |
-| **Content** | The full skill instructions in **Markdown**. This is the content loaded by `view_skill`. |
+| **Description** | A short summary shown in the manifest. For model-attached skills, the model uses this to decide whether to load the full instructions. |
+| **Content** | The full skill instructions in **Markdown**. For user-selected skills this is injected directly; for model-attached skills it is loaded on-demand via `view_skill`. |
 
 Click **Save & Create** to finalize.
 
@@ -32,7 +40,7 @@ Click **Save & Create** to finalize.
 
 ### In Chat ($ Mention)
 
-Type `$` in the chat input to open the skill picker. Select a skill, and it will be attached to the message as a **skill mention** (similar to `@` for models or `#` for knowledge). The skill manifest is injected for that conversation, and the model can call `view_skill` to load the full instructions when needed.
+Type `$` in the chat input to open the skill picker. Select a skill, and it will be attached to the message as a **skill mention** (similar to `@` for models or `#` for knowledge). The skill's **full content** is injected directly into the conversation, giving the model immediate access to the complete instructions.
 
 ### Bound to a Model
 
@@ -43,7 +51,7 @@ You can permanently attach skills to a model so they are always available:
 3. Check the skills you want this model to always have access to.
 4. Click **Save**.
 
-When a user chats with that model, the selected skills' manifests are automatically injected.
+When a user chats with that model, the selected skills' manifests (name and description) are automatically injected, and the model can load the full content on-demand via `view_skill`.
 
 ## Import and Export
 
