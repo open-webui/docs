@@ -5,7 +5,7 @@ title: "Opik"
 
 ## Comet Opik Integration with Open WebUI
 
-[Comet Opik](https://www.comet.com/docs/opik/) is an open-source LLM observability and evaluation platform. You can connect Open WebUI telemetry to Opik using OpenTelemetry-compatible pipelines.
+[Comet Opik](https://www.comet.com/site/products/opik/) is an open-source LLM observability and evaluation platform. You can connect Open WebUI telemetry to Opik using OpenTelemetry-compatible pipelines.
 
 ## How to integrate Opik with Open WebUI
 
