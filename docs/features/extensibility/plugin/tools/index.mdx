@@ -356,6 +356,10 @@ Enabling a per-model category toggle does **not** override global feature flags.
 This means users can disable web search (or image generation, or code interpreter) on a per-conversation basis, even if it's enabled globally and on the model. This is useful for chats where information must stay offline or where you want to prevent unintended tool usage.
 :::
 
+:::tip Full Agentic Experience
+For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In the **Admin Panel > Settings > Models**, find the **Model Specific Settings** for your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
+:::
+
 :::tip Builtin Tools vs File Context
 **Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG—that's controlled by the separate **File Context** capability.
 

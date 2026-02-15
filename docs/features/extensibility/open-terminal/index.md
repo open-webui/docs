@@ -7,7 +7,7 @@ title: "Open Terminal"
 
 :::info
 
-This page is up-to-date with Open Terminal release version [v0.1.10](https://github.com/open-webui/open-terminal).
+This page is up-to-date with Open Terminal release version [v0.2.3](https://github.com/open-webui/open-terminal).
 
 :::
 
@@ -68,6 +68,32 @@ open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 :::warning
 Running bare metal gives the model shell access to your actual machine. Only use this for local development or testing.
 :::
+
+### MCP Server Mode
+
+Open Terminal can also run as an [MCP (Model Context Protocol)](/features/extensibility/plugin/tools/openapi-servers/mcp) server, exposing all its endpoints as MCP tools. This requires an additional dependency:
+
+```bash
+pip install open-terminal[mcp]
+```
+
+Then start the MCP server:
+
+```bash
+# stdio transport (default — for local MCP clients)
+open-terminal mcp
+
+# streamable-http transport (for remote/networked MCP clients)
+open-terminal mcp --transport streamable-http --host 0.0.0.0 --port 8000
+```
+
+| Option | Default | Description |
+| :--- | :--- | :--- |
+| `--transport` | `stdio` | Transport mode: `stdio` or `streamable-http` |
+| `--host` | `0.0.0.0` | Bind address (streamable-http only) |
+| `--port` | `8000` | Bind port (streamable-http only) |
+
+Under the hood, this uses [FastMCP](https://github.com/jlowin/fastmcp) to automatically convert every FastAPI endpoint into an MCP tool — no manual tool definitions needed.
 
 ### Docker Compose (with Open WebUI)
 
@@ -140,11 +166,12 @@ The `/execute` endpoint description in the OpenAPI spec automatically includes l
 | `command` | string | (required) | Shell command to execute |
 | `timeout` | number | `30` | Max execution time in seconds. Process is killed if exceeded. Set to `null` to disable. |
 
-**Query parameter:**
+**Query parameters:**
 
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
 | `stream` | `false` | If `true`, stream output as JSONL instead of waiting for completion |
+| `tail` | (all) | Return only the last N output entries. Useful to limit response size for AI agents. |
 
 **Synchronous response:**
 
@@ -177,6 +204,45 @@ Streams as JSONL (`application/x-ndjson`):
 {"type": "stdout", "data": "2\n"}
 {"type": "stdout", "data": "3\n"}
 {"type": "exit", "data": 0}
+```
+
+:::info File-Backed Process Output
+All background process output (stdout/stderr) is persisted to JSONL log files under `~/.open-terminal/logs/processes/`. This means output is never lost, even if the server restarts. The response includes `next_offset` for stateless incremental polling — pass it as the `offset` query parameter on subsequent status requests to get only new output. The `log_path` field shows the path to the raw JSONL log file.
+:::
+
+### Search File Contents
+
+**`GET /files/search`**
+
+Search for a text pattern across files in a directory. Returns structured matches with file paths, line numbers, and matching lines. Skips binary files automatically.
+
+**Query parameters:**
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `query` | string | (required) | Text or regex pattern to search for |
+| `path` | string | `.` | Directory or file to search in |
+| `regex` | boolean | `false` | Treat query as a regex pattern |
+| `case_insensitive` | boolean | `false` | Perform case-insensitive matching |
+| `include` | string[] | (all files) | Glob patterns to filter files (e.g. `*.py`). Files must match at least one pattern. |
+| `match_per_line` | boolean | `true` | If true, return each matching line with line numbers. If false, return only matching filenames. |
+| `max_results` | integer | `50` | Maximum number of matches to return (1–500) |
+
+```bash
+curl "http://localhost:8000/files/search?query=TODO&include=*.py&case_insensitive=true" \
+  -H "Authorization: Bearer <api-key>"
+```
+
+```json
+{
+  "query": "TODO",
+  "path": "/root",
+  "matches": [
+    {"file": "/root/app.py", "line": 42, "content": "# TODO: refactor this"},
+    {"file": "/root/utils.py", "line": 7, "content": "# TODO: add tests"}
+  ],
+  "truncated": false
+}
 ```
 
 ### Upload a File
@@ -227,6 +293,38 @@ curl "http://localhost:8000/files/download/link?path=/tmp/output.csv" \
 
 ```json
 {"url": "http://localhost:8000/files/download/a1b2c3d4..."}
+```
+
+### Process Status (Background)
+
+**`GET /processes/{process_id}/status`**
+
+Poll the output of a running or finished background process. Uses offset-based pagination so agents can retrieve only new output since the last poll.
+
+**Query parameters:**
+
+| Parameter | Default | Description |
+| :--- | :--- | :--- |
+| `wait` | `0` | Seconds to wait for the process to finish before returning. |
+| `offset` | `0` | Number of output entries to skip. Use `next_offset` from the previous response. |
+| `tail` | (all) | Return only the last N output entries. Useful to limit response size. |
+
+```bash
+curl "http://localhost:8000/processes/a1b2c3d4/status?offset=0&tail=20" \
+  -H "Authorization: Bearer <api-key>"
+```
+
+```json
+{
+  "id": "a1b2c3d4",
+  "command": "make build",
+  "status": "running",
+  "exit_code": null,
+  "output": [{"type": "stdout", "data": "Building...\n"}],
+  "truncated": false,
+  "next_offset": 1,
+  "log_path": "/root/.open-terminal/logs/processes/a1b2c3d4.jsonl"
+}
 ```
 
 ### Health Check
