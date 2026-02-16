@@ -42,9 +42,10 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
 **Key things to know:**
 
-- Open WebUI does **not** migrate data between databases — plan this before you have production data in SQLite.
-- For high-concurrency deployments, tune `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` to match your usage patterns.
+- Open WebUI does **not** migrate data between databases — plan this before you have production data in SQLite. If you need to migrate an existing database, see the [Database Migration guide](/troubleshooting/manual-database-migration).
+- For high-concurrency deployments, tune `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` to match your usage patterns. See [Database Optimization](/troubleshooting/performance#-database-optimization) for detailed guidance.
 - Remember that **each Open WebUI instance maintains its own connection pool**, so total connections = pool size × number of instances.
+- If you skip this step and run multiple instances with SQLite, you will see `database is locked` errors and data corruption. See [Database Corruption / "Locked" Errors](/troubleshooting/multi-replica#4-database-corruption--locked-errors) for details.
 
 :::tip
 A good starting point for tuning is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`. Keep the combined total per instance well below your PostgreSQL `max_connections` limit (default is 100).
@@ -74,6 +75,9 @@ ENABLE_WEBSOCKET_SUPPORT=true
 - If you're using Redis Sentinel for high availability, also set `REDIS_SENTINEL_HOSTS` and consider setting `REDIS_SOCKET_CONNECT_TIMEOUT=5` to prevent hangs during failover.
 - For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
 - Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
+- Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
+
+For a complete step-by-step Redis setup (Docker Compose, Sentinel, Cluster mode, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
 
 ---
 
@@ -83,12 +87,16 @@ ENABLE_WEBSOCKET_SUPPORT=true
 
 Open WebUI is stateless, so you can run as many instances as needed behind a **load balancer**. Each instance is identical and interchangeable.
 
+:::warning
+Before running multiple instances, ensure you have completed **Steps 1 and 2** (PostgreSQL and Redis). You also need a shared `WEBUI_SECRET_KEY` across all replicas — without it, users will experience [login loops and 401 errors](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors). For a full pre-flight checklist, see the [Core Requirements Checklist](/troubleshooting/multi-replica#core-requirements-checklist).
+:::
+
 ### Option A: Container Orchestration (Recommended)
 
 Use Kubernetes, Docker Swarm, or similar platforms to manage multiple replicas:
 
 - Keep `UVICORN_WORKERS=1` per container (let the orchestrator handle scaling, not the app)
-- Set `ENABLE_DB_MIGRATIONS=false` on all replicas except one designated "primary" pod to prevent migration race conditions
+- Set `ENABLE_DB_MIGRATIONS=false` on all replicas except one designated "primary" pod to prevent migration race conditions — see [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the safe procedure
 - Scale up/down by adjusting your replica count
 
 ### Option B: Multiple Workers per Container
@@ -123,6 +131,8 @@ INFO:     Child process [pid] died
 
 This is a [well-known SQLite limitation](https://www.sqlite.org/howtocorrupt.html#_carrying_an_open_database_connection_across_a_fork_), not a bug. It also affects multi-replica deployments where multiple containers access the same ChromaDB data directory.
 
+For the full crash sequence analysis, see [Worker Crashes During Document Upload](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) or [RAG Troubleshooting: Worker Dies During Upload](/troubleshooting/rag#12-worker-dies-during-document-upload).
+
 :::
 
 **What to do:**
@@ -155,7 +165,7 @@ For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** b
 
 **When:** You're running multiple instances that need to share uploaded files, generated images, and other user data.
 
-By default, Open WebUI stores uploaded files on the local filesystem under `DATA_DIR` (typically `/app/backend/data`). In a multi-instance setup, each instance needs access to the same files.
+By default, Open WebUI stores uploaded files on the local filesystem under `DATA_DIR` (typically `/app/backend/data`). In a multi-instance setup, each instance needs access to the same files. Without shared storage, you will see [uploaded files and RAG knowledge become inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible) when requests hit different replicas.
 
 ### Do I need cloud storage (S3)?
 
@@ -229,6 +239,8 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
 
 This gives you visibility into request latency, database query performance, error rates, and more.
 
+For the full setup guide, see [OpenTelemetry Monitoring](/reference/monitoring/otel). For application-level log configuration (log levels, debug output), see [Logging Configuration](/getting-started/advanced-topics/logging).
+
 ---
 
 ## Putting It All Together
@@ -257,6 +269,8 @@ Here's what a production-ready scaled deployment typically looks like:
     │  Shared Storage (NFS or S3)   │   ← Shared file storage
     └───────────────────────────────┘
 ```
+
+**Running into issues?** The [Scaling & HA Troubleshooting](/troubleshooting/multi-replica) guide covers common problems (login loops, WebSocket failures, database locks, worker crashes) and their solutions. For performance tuning at scale, see [Optimization, Performance & RAM Usage](/troubleshooting/performance).
 
 ### Minimum Environment Variables for Scaled Deployments
 
