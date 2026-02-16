@@ -7,13 +7,13 @@ title: "Open WebUI Integration"
 
 Open WebUI v0.6+ supports seamless integration with external tools via the OpenAPI servers — meaning you can easily extend your LLM workflows using custom or community-powered tool servers 🧰.
 
-In this guide, you'll learn how to launch an OpenAPI-compatible tool server and connect it to Open WebUI through the intuitive user interface. Let’s get started! 🚀
+In this guide, you'll learn how to launch an OpenAPI-compatible tool server and connect it to Open WebUI through the intuitive user interface. Let's get started! 🚀
 
 ---
 
 ## Step 1: Launch an OpenAPI Tool Server
 
-To begin, you'll need to start one of the reference tool servers available in the [openapi-servers repo](https://github.com/open-webui/openapi-servers). For quick testing, we’ll use the time tool server as an example.
+To begin, you'll need to start one of the reference tool servers available in the [openapi-servers repo](https://github.com/open-webui/openapi-servers). For quick testing, we'll use the time tool server as an example.
 
 🛠️ Example: Starting the `time` server locally
 
@@ -42,7 +42,7 @@ Once running, this will host a local OpenAPI server at http://localhost:8000, wh
 Next, connect your running tool server to Open WebUI:
 
 1. Open WebUI in your browser.
-2. Open ⚙️ **Settings**.
+2. Open ⚙️ **Settings**.
 3. Click on ➕ **Tools** to add a new tool server.
 4. Enter the URL where your OpenAPI tool server is running (e.g., http://localhost:8000).
 5. Click "Save".
@@ -65,7 +65,7 @@ Admins can manage shared tool servers available to all or selected users across 
 
 - Go to 🛠️ **Admin Settings > Tools**.
 - Add the tool server URL just as you would in user settings.
-- These tools are treated similarly to Open WebUI’s built-in tools.
+- These tools are treated similarly to Open WebUI's built-in tools.
 
 #### Main Difference: Where Are Requests Made From?
 
@@ -101,7 +101,7 @@ If you're running multiple tools through mcpo using a config file, take note:
 
 🧩 Each tool is mounted under its own unique path!
 
-For example, if you’re using memory and time tools simultaneously through mcpo, they’ll each be available at a distinct route:
+For example, if you're using memory and time tools simultaneously through mcpo, they'll each be available at a distinct route:
 
 - http://localhost:8000/time
 - http://localhost:8000/memory
@@ -140,20 +140,20 @@ Clicking this icon opens a popup where you can:
 - See which tools are available and which server they're provided by
 - Debug or disconnect any tool if needed
 
-🔍 Here’s what the tool information modal looks like:
+🔍 Here's what the tool information modal looks like:
 
 ![Tool Info Modal Expanded](/images/openapi-servers/open-webui/info-modal.png)
 
 ### 🛠️ Global Tool Servers Look Different — And Are Hidden by Default!
 
-If you've connected a Global Tool Server (i.e., one that’s admin-configured), it will not appear automatically in the input area like user tool servers do.
+If you've connected a Global Tool Server (i.e., one that's admin-configured), it will not appear automatically in the input area like user tool servers do.
 
 Instead:
 
 - Global tools are hidden by default and must be explicitly activated per user.
 - To enable them, you'll need to click on the ➕ button in the message input area (bottom left of the chat box), and manually toggle on the specific global tool(s) you want to use.
 
-Here’s what that looks like:
+Here's what that looks like:
 
 ![Global Tool Server Message Input](/images/openapi-servers/open-webui/global-message-input.png)
 
@@ -181,7 +181,7 @@ Want to enable ReACT-style (Reasoning + Acting) native function calls directly i
 ✳️ How to enable native function calling:
 
 1. Open the chat window.
-2. Go to ⚙️ **Chat Controls > Advanced Params**.
+2. Go to ⚙️ **Chat Controls > Advanced Params**.
 3. Change the **Function Calling** parameter from `Default` to `Native`.
 
 ![Native Tool Call](/images/openapi-servers/open-webui/native.png)
@@ -204,8 +204,37 @@ You can run any of these in the same way and connect them to Open WebUI by repea
 
 ## Troubleshooting & Tips 🧩
 
-- ❌ Not connecting? Make sure the URL is correct and accessible from the browser used to run Open WebUI.
-- 🔒 If you're using remote servers, check firewalls and HTTPS configs!
-- 📝 To make servers persist, consider deploying them in Docker or with system services.
+### Connection fails immediately after adding the URL
+
+**Check the protocol (HTTP vs HTTPS).** The "Add Tool Server" modal may pre-fill `https://` in the URL field. Most local tool servers don't use TLS, so you need plain `http://`. Change the URL to `http://localhost:8000` (or whichever port your server uses).
+
+**Check the port number.** The default port varies by server. For example, uvicorn defaults to `8000`, while Open Terminal defaults to `8888`. Make sure the port in your URL matches the port your tool server is actually listening on.
+
+### Connection fails even though the server is running
+
+**Understand which machine "localhost" refers to.** This is the most common connectivity issue and depends on which type of tool server you are registering:
+
+- **User Tool Servers** — Requests come from **your browser**. `localhost` means *the machine running your browser*. This usually works for local development setups, but there is a catch (see below).
+- **Global Tool Servers** — Requests come from the **Open WebUI backend**. `localhost` means the *backend server*, not your personal machine. If the backend runs in Docker, `localhost` inside the container does not reach your host machine — use `host.docker.internal` or the machine's actual IP instead.
+
+:::warning User Tool Servers: Browser IP matters
+
+Even for User Tool Servers, `localhost` only works if you're accessing Open WebUI at `http://localhost:...` in your browser.
+
+If you're accessing Open WebUI at a different IP address — for example, connecting from another device on your LAN via `http://10.0.0.5:3000`, or using the network URL that `npm run dev` outputs — then your browser is *not* on `localhost` relative to the tool server. The browser will try to reach `localhost` on the device it's running on, not the machine hosting the tool server.
+
+**Fix:** Replace `localhost` with the actual IP of the machine where your tool server is running (e.g., `http://10.0.0.5:8000`), and ensure the tool server is binding to `0.0.0.0` (not just `127.0.0.1`).
+
+:::
+
+### CORS errors in the browser console
+
+If you see CORS errors, your tool server needs to allow requests from the Open WebUI origin. See the [FAQ entry on CORS](/features/extensibility/plugin/tools/openapi-servers/faq) for a FastAPI example.
+
+### General tips
+
+- 🔒 If you're using remote servers, check firewalls and HTTPS configs.
+- 📝 To make servers persist across reboots, consider deploying them in Docker or with system services.
+- 🔍 When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) directly in the same browser you use for Open WebUI — if it loads, the browser can reach it.
 
 Need help? Visit the 👉 [Discussions page](https://github.com/open-webui/openapi-servers/discussions) or [open an issue](https://github.com/open-webui/openapi-servers/issues).

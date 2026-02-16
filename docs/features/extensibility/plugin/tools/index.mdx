@@ -176,7 +176,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 
 | Tool | Purpose |
 |------|---------|
-| **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled.* |
+| **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled AND per-chat "Web Search" toggle enabled.* |
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
 | **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on).* |
@@ -186,9 +186,11 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `query_knowledge_files` | Search *file contents* inside KBs using vector search. **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename (not content). |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. |
-| **Image Gen** | *Requires image generation enabled (per-tool).* |
+| **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
+| **Code Interpreter** | *Requires `ENABLE_CODE_INTERPRETER` enabled (default: on) AND per-chat "Code Interpreter" toggle enabled.* |
+| `execute_code` | Executes code in a sandboxed environment and returns the output. |
 | **Memory** | *Requires Memory feature enabled AND per-model "Memory" category enabled (default: on).* |
 | `search_memories` | Searches the user's personal memory/personalization bank. |
 | `add_memory` | Stores a new fact in the user's personalization memory. |
@@ -229,6 +231,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
 | `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}` — auto-displayed |
+| **Code Interpreter** | | |
+| `execute_code` | `language` (required), `code` (required) | `{output, status}` |
 | **Memory** | | |
 | `search_memories` | `query` (required), `count` (default: 5) | Array of `{id, date, content}` |
 | `add_memory` | `content` (required) | `{status: "success", id}` |
@@ -317,6 +321,9 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
 | **Knowledge Base** | `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_knowledge_file` | Browse and query knowledge bases |
+| **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
+| **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
+| **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
 | **Channels** | `search_channels`, `search_channel_messages`, `view_channel_message`, `view_channel_thread` | Search channels and channel messages |
 | **Skills** | `view_skill` | Load skill instructions on-demand from the manifest |
 
@@ -337,6 +344,20 @@ These per-category toggles only appear when the main **Builtin Tools** capabilit
 
 :::info Global Features Take Precedence
 Enabling a per-model category toggle does **not** override global feature flags. For example, if `ENABLE_NOTES` is disabled globally (Admin Panel), Notes tools will not be available even if the "Notes" category is enabled for the model. The per-model toggles only allow you to *further restrict* what's already available—they cannot enable features that are disabled at the global level.
+:::
+
+:::tip Per-Chat Feature Toggles (Web Search, Image Generation, Code Interpreter)
+**Web Search**, **Image Generation**, and **Code Interpreter** built-in tools have an additional layer of control: the **per-chat feature toggle** in the chat input bar. For these tools to be injected in Native Mode, **all three conditions** must be met:
+
+1. **Global config enabled** — the feature is turned on in Admin Panel (e.g., `ENABLE_WEB_SEARCH`)
+2. **Model capability enabled** — the model has the capability checked in Workspace > Models (e.g., "Web Search")
+3. **Per-chat toggle enabled** — the user has activated the feature for this specific chat via the chat input bar toggles
+
+This means users can disable web search (or image generation, or code interpreter) on a per-conversation basis, even if it's enabled globally and on the model. This is useful for chats where information must stay offline or where you want to prevent unintended tool usage.
+:::
+
+:::tip Full Agentic Experience
+For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In the **Admin Panel > Settings > Models**, find the **Model Specific Settings** for your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
 :::
 
 :::tip Builtin Tools vs File Context
