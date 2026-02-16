@@ -3,9 +3,9 @@ sidebar_position: 100
 title: "🚀 Getting Started"
 ---
 
-import { TopBanners } from "@site/src/components/TopBanners";
+ 
 
-<TopBanners />
+ 
 
 ---
 

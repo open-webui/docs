@@ -8,7 +8,7 @@ export default function CustomLayout(props) {
 			{/* <div className=' z-[1000]' >
         <div className='w-full flex justify-center'>
             <div className=' px-2 py-1'>
-                <TopBanners />
+                 
             </div>
         </div>
       </div> */}
