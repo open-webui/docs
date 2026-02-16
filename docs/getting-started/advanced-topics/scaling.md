@@ -18,10 +18,11 @@ This guide walks you through the key concepts and configurations at a high level
 Out of the box, Open WebUI runs as a **single container** with:
 
 - An **embedded SQLite database** stored on a local volume
+- An **embedded ChromaDB vector database** (also backed by SQLite) for RAG embeddings
 - A **single Uvicorn worker** process
 - **No external dependencies** (no Redis, no external DB)
 
-This is perfect for personal use, small teams, or evaluation. The scaling journey begins when you outgrow any of these defaults.
+This is perfect for personal use, small teams, or evaluation. The scaling journey begins when you outgrow any of these defaults — and crucially, **both SQLite databases** (main and vector) must be replaced before you can safely run multiple processes.
 
 ---
 
@@ -106,11 +107,96 @@ Container orchestration is generally preferred because it provides automatic res
 
 ---
 
-## Step 4 — Use Cloud Storage
+## Step 4 — Switch to an External Vector Database
 
-**When:** You're running multiple instances that need to share uploaded files, or you want durable, managed file storage.
+**When:** You run more than one Uvicorn worker (`UVICORN_WORKERS > 1`) or more than one replica. **This is not optional.**
 
-By default, Open WebUI stores uploaded files on local disk. In a multi-instance setup, each instance would only see its own files. Cloud storage makes file uploads available to all instances.
+:::danger Default ChromaDB Will Crash in Multi-Process Setups
+
+The default vector database (ChromaDB) uses a local `PersistentClient` backed by **SQLite**. SQLite connections are **not fork-safe** — when uvicorn forks multiple workers, each process inherits the same database connection. Concurrent writes (e.g., during document uploads) cause **instant worker death**:
+
+```
+save_docs_to_vector_db:1619 - adding to collection file-id
+INFO:     Waiting for child process [pid]
+INFO:     Child process [pid] died
+```
+
+This is a [well-known SQLite limitation](https://www.sqlite.org/howtocorrupt.html#_carrying_an_open_database_connection_across_a_fork_), not a bug. It also affects multi-replica deployments where multiple containers access the same ChromaDB data directory.
+
+:::
+
+**What to do:**
+
+Set the `VECTOR_DB` environment variable to a client-server vector database:
+
+```
+VECTOR_DB=pgvector
+```
+
+**Recommended alternatives:**
+
+| Vector DB | Best For | Configuration |
+|---|---|---|
+| **PGVector** | Teams already using PostgreSQL — reuses your existing database infrastructure | `VECTOR_DB=pgvector` + `PGVECTOR_DB_URL=postgresql://...` |
+| **Milvus** | Large-scale self-hosted deployments with high query throughput; supports multitenancy for per-user isolation | `VECTOR_DB=milvus` + `MILVUS_URI=http://milvus-host:19530` |
+| **Qdrant** | Self-hosted deployments needing efficient filtering and metadata search; supports multitenancy | `VECTOR_DB=qdrant` + `QDRANT_URI=http://qdrant-host:6333` |
+| **Pinecone** | Fully managed cloud service — zero infrastructure to maintain, pay-per-use | `VECTOR_DB=pinecone` + `PINECONE_API_KEY=...` |
+| **ChromaDB (HTTP mode)** | Keeping ChromaDB but making it multi-process safe by running it as a separate server | `VECTOR_DB=chroma` + `CHROMA_HTTP_HOST=chroma-host` + `CHROMA_HTTP_PORT=8000` |
+
+:::tip
+**PGVector** is the simplest choice if you're already running PostgreSQL for the main database — it adds vector search to the database you already have, with no additional infrastructure.
+
+For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** both support **multitenancy mode** (`ENABLE_MILVUS_MULTITENANCY_MODE=True` / `ENABLE_QDRANT_MULTITENANCY_MODE=True`), which provides per-user vector isolation and better resource sharing at scale.
+:::
+
+---
+
+## Step 5 — Share File Storage Across Instances
+
+**When:** You're running multiple instances that need to share uploaded files, generated images, and other user data.
+
+By default, Open WebUI stores uploaded files on the local filesystem under `DATA_DIR` (typically `/app/backend/data`). In a multi-instance setup, each instance needs access to the same files.
+
+### Do I need cloud storage (S3)?
+
+**Not necessarily.** Open WebUI stores all uploaded files with **UUID-based unique filenames**. Multiple processes and replicas only ever **create new files** or **read existing ones** — they never write to the same file simultaneously. This means a simple **shared filesystem mount** works correctly without any risk of write conflicts.
+
+**Your options:**
+
+| Approach | When to Use |
+|---|---|
+| **Shared filesystem** (NFS, AWS EFS, CephFS, GlusterFS, or a shared Docker volume) | The simplest option for most deployments. Mount the same directory to `/app/backend/data` on all instances. Works well for on-prem, Docker Swarm, and Kubernetes with ReadWriteMany (RWX) volumes. |
+| **Cloud object storage** (S3, GCS, Azure Blob) | Better for cloud-native deployments at very large scale, or when you want managed durability (11 nines) and don't want to manage shared filesystems. Requires setting `STORAGE_PROVIDER`. |
+
+:::info What does STORAGE_PROVIDER actually control?
+`STORAGE_PROVIDER` only controls where **uploaded files** are stored (documents, images, etc.). It does **not** affect the main database (use `DATABASE_URL` for that) or the vector database (use `VECTOR_DB` for that). When left unset, files are stored on the local filesystem under `DATA_DIR`.
+:::
+
+### Option A: Shared Filesystem (Simplest)
+
+No configuration changes needed — just ensure all instances mount the same directory:
+
+**Kubernetes:**
+```yaml
+volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: openwebui-data  # Must be ReadWriteMany (RWX)
+```
+
+**Docker Swarm/Compose:**
+```yaml
+volumes:
+  - /mnt/shared-nfs/openwebui-data:/app/backend/data
+```
+
+:::warning
+Do **not** store the SQLite database on a network filesystem. SQLite's file locking does not work reliably over NFS. This is another reason to switch to PostgreSQL (Step 1) before scaling to multiple instances.
+:::
+
+### Option B: Cloud Object Storage
+
+Set `STORAGE_PROVIDER` and the corresponding credentials:
 
 **Supported providers:**
 
@@ -120,11 +206,17 @@ By default, Open WebUI stores uploaded files on local disk. In a multi-instance 
 | Google Cloud Storage | `gcs` |
 | Microsoft Azure Blob Storage | `azure` |
 
-Each provider has its own set of environment variables for credentials and bucket configuration. See the [Environment Variable Reference](/reference/env-configuration) for details.
+```
+STORAGE_PROVIDER=s3
+S3_BUCKET_NAME=my-openwebui-bucket
+S3_REGION_NAME=us-east-1
+```
+
+Each provider has its own set of environment variables for credentials and bucket configuration. See the [Environment Variable Reference](/reference/env-configuration#cloud-storage) for details.
 
 ---
 
-## Step 5 — Add Observability
+## Step 6 — Add Observability
 
 **When:** You want to monitor performance, troubleshoot issues, and understand how your deployment is behaving at scale.
 
@@ -156,12 +248,13 @@ Here's what a production-ready scaled deployment typically looks like:
          │          │          │
     ┌────▼──────────▼──────────▼────┐
     │         PostgreSQL            │   ← Shared database
+    │     (+ PGVector for RAG)      │   ← Vector DB (or Milvus/Qdrant)
     └───────────────────────────────┘
     ┌───────────────────────────────┐
     │           Redis               │   ← Shared state & websockets
     └───────────────────────────────┘
     ┌───────────────────────────────┐
-    │    Cloud Storage (S3/GCS)     │   ← Shared file storage
+    │  Shared Storage (NFS or S3)   │   ← Shared file storage
     └───────────────────────────────┘
 ```
 
@@ -171,15 +264,21 @@ Here's what a production-ready scaled deployment typically looks like:
 # Database
 DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
+# Vector Database (do NOT use default ChromaDB with multiple workers/replicas)
+VECTOR_DB=pgvector
+PGVECTOR_DB_URL=postgresql://user:password@db-host:5432/openwebui
+
 # Redis
 REDIS_URL=redis://redis-host:6379/0
 WEBSOCKET_MANAGER=redis
 ENABLE_WEBSOCKET_SUPPORT=true
 
-# Storage (example for S3)
-STORAGE_PROVIDER=s3
-S3_BUCKET_NAME=my-openwebui-bucket
-S3_REGION_NAME=us-east-1
+# Storage — pick ONE:
+# Option A: shared filesystem (no env vars needed, just mount the same volume)
+# Option B: cloud storage
+# STORAGE_PROVIDER=s3
+# S3_BUCKET_NAME=my-openwebui-bucket
+# S3_REGION_NAME=us-east-1
 
 # Workers (let orchestrator scale, keep workers at 1)
 UVICORN_WORKERS=1
@@ -192,10 +291,18 @@ ENABLE_DB_MIGRATIONS=false
 
 ## Quick Reference: When Do I Need What?
 
-| Scenario | PostgreSQL | Redis | Cloud Storage |
-|---|:---:|:---:|:---:|
-| Single user / evaluation | ✗ | ✗ | ✗ |
-| Small team (< 50 users, single instance) | Recommended | ✗ | ✗ |
-| Multiple instances / HA | **Required** | **Required** | **Required** |
-| Multiple Uvicorn workers | **Required** | **Required** | ✗ |
-| Large scale (1000+ users) | **Required** | **Required** | **Required** |
+| Scenario | PostgreSQL | Redis | External Vector DB | Shared Storage |
+|---|:---:|:---:|:---:|:---:|
+| Single user / evaluation | ✗ | ✗ | ✗ | ✗ |
+| Small team (< 50 users, single instance) | Recommended | ✗ | ✗ | ✗ |
+| Multiple Uvicorn workers | **Required** | **Required** | **Required** | ✗ (same filesystem) |
+| Multiple instances / HA | **Required** | **Required** | **Required** | **Required** (NFS or S3) |
+| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Required** (NFS or S3) |
+
+:::note About "External Vector DB"
+The default ChromaDB uses a local SQLite backend that crashes under multi-process access. "External Vector DB" means either a client-server database (PGVector, Milvus, Qdrant, Pinecone) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4--switch-to-an-external-vector-database) for details.
+:::
+
+:::note About "Shared Storage"
+For multiple instances, all replicas need access to the same uploaded files. A **shared filesystem mount** (NFS, EFS, CephFS) is sufficient — cloud object storage (S3/GCS/Azure) is an alternative, not a requirement. Files use UUID-based unique names, so there are no write conflicts. See [Step 5](#step-5--share-file-storage-across-instances) for details.
+:::
