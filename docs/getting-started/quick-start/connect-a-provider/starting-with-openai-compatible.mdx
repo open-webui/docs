@@ -4,93 +4,300 @@ title: "OpenAI-Compatible"
 
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Overview
 
-Open WebUI isn't just for OpenAI/Ollama/Llama.cpp—you can connect **any server that implements the OpenAI-compatible API**, running locally or remotely. This is perfect if you want to run different language models, or if you already have a favorite backend or ecosystem.
+Open WebUI connects to **any server or provider that implements the OpenAI-compatible API**. This guide covers how to set up connections for popular cloud providers and local servers.
+
+For OpenAI itself (or Azure OpenAI), see the dedicated **[OpenAI guide](/getting-started/quick-start/connect-a-provider/starting-with-openai)**.
 
 ---
 
 ## Protocol-Oriented Design
 
-Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider (which leads to inconsistent behavior and configuration bloat), Open WebUI focuses on the **OpenAI Chat Completions Protocol**. 
+Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider, Open WebUI focuses on the **OpenAI Chat Completions Protocol**.
 
-This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
+- **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
+- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a [pipe](/features/extensibility/plugin/functions/pipe) or a middleware proxy like LiteLLM or OpenRouter to bridge them.
 
-- **We Support Protocols**: Any provider that follows widely adopted API standards (like Groq, OpenRouter, OpenAI, Mistral, Perplexity and many more) is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
-- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a pipe or middleware proxy.
-
-If you are using a provider that requires a proprietary API, we recommend using a **[pipe](/features/extensibility/plugin/functions/pipe)** (browse [community pipes](https://openwebui.com/)) or a middleware proxy like LiteLLM or OpenRouter to bridge them to a supported protocol.
-
-For a detailed explanation of why we've made this architectural decision, see our **[FAQ: Why doesn't Open WebUI natively support proprietary APIs?](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**
-
-### Popular Compatible Servers and Providers
-
-There are many servers and tools that expose an OpenAI-compatible API. Pick whichever suits your workflow:
-
-- **Local Runners**: [Ollama](https://ollama.com/), [Llama.cpp](https://github.com/ggml-org/llama.cpp), [LM Studio](https://lmstudio.ai/), [vLLM](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html), [LocalAI](https://localai.io/), [Lemonade](https://lemonade-server.ai/), [Docker Model Runner](https://docs.docker.com/ai/model-runner/).
-- **Cloud Providers**: [Groq](https://groq.com/), [Mistral AI](https://mistral.ai/), [Perplexity](https://www.perplexity.ai/), [MiniMax](https://platform.minimax.io/), [DeepSeek](https://platform.deepseek.com/), [OpenRouter](https://openrouter.ai/), [LiteLLM](https://docs.litellm.ai/).
-- **Major Model Ecosystems**:
-  - **Google Gemini**: [OpenAI Endpoint](https://generativelanguage.googleapis.com/v1beta/openai/) (requires a Gemini API key).
-  - **Anthropic**: While they primarily use a proprietary API, they offer a [Chat Completions compatible endpoint](https://platform.claude.com/docs/en/api/openai-sdk) for easier integration.
-  - **Azure OpenAI**: Enterprise-grade OpenAI hosting via Microsoft Azure.
+For a detailed explanation of this architectural decision, see our **[FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**.
 
 ---
 
-## Step 1: Connect Your Server to Open WebUI
+:::warning Important: Connection Verification May Fail for Some Providers
 
-#### 🍋 Get Started with Lemonade
+When you add a connection, Open WebUI verifies it by calling the provider's `/models` endpoint using a standard `Bearer` token. **Some providers do not implement the `/models` endpoint** or use non-standard authentication for it. In these cases:
 
-Lemonade is a plug-and-play ONNX-based OpenAI-compatible server. Here’s how to try it on Windows:
+- The connection verification will **fail with an error** (e.g., 401 or 403).
+- This does **not** mean the provider is incompatible — **chat completions will still work**.
+- You just need to **manually add model names** to the **Model IDs (Filter)** allowlist in the connection settings.
 
-1. [Download the latest `.exe`](https://github.com/lemonade-sdk/lemonade/releases)
-2. Run `Lemonade_Server_Installer.exe`
-3. Install and download a model using Lemonade’s installer
-4. Once running, your API endpoint will be:
+**Providers with known `/models` issues:**
 
-   ```
-   http://localhost:8000/api/v1
-   ```
+| Provider | `/models` works? | Action Needed |
+|---|---|---|
+| Anthropic | No — uses non-standard auth headers | Add model IDs manually (e.g., `claude-sonnet-4-5-20250514`) |
+| Perplexity | No — endpoint doesn't exist | Add model IDs manually (e.g., `sonar-pro`, `sonar-reasoning-pro`) |
+| MiniMax | No — endpoint doesn't exist | Add model IDs manually (e.g., `MiniMax-M2.5`) |
+| OpenRouter | Yes — but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| Google Gemini | Yes | Auto-detection works |
+| DeepSeek | Yes | Auto-detection works |
+| Mistral | Yes | Auto-detection works |
+| Groq | Yes | Auto-detection works |
 
-![Lemonade Server](/images/getting-started/lemonade-server.png)
+**How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon. The models will then appear in your model selector even though the connection verification showed an error.
 
-See [their docs](https://lemonade-server.ai/docs/server/apps/open-webui/) for details.
+:::
 
 ---
 
-## Step 2: Connect Your Server to Open WebUI
+## Step 1: Add Your Provider Connection
 
 1. Open Open WebUI in your browser.
 2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
 3. Click ➕ **Add Connection**.
-4. Select the **Standard / Compatible** tab (if available).
-5. Fill in the following:
-   - **API URL**: Use your server’s API endpoint.
-     *   **Examples**: `http://localhost:11434/v1` (Ollama), `http://localhost:10000/v1` (Llama.cpp).
-   - **API Key**: Leave blank unless the server requires one.
+4. Fill in the **URL** and **API Key** for your provider (see tabs below).
+5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs (Filter)** allowlist.
 6. Click **Save**.
+
+:::tip
+If running Open WebUI in Docker and your model server is on the host machine, replace `localhost` with `host.docker.internal` in the URL.
+:::
+
+### Cloud Providers
+
+<Tabs>
+  <TabItem value="anthropic" label="Anthropic" default>
+
+  **Anthropic** (Claude) offers an OpenAI-compatible endpoint. Note that this is intended for testing and comparison — for production use with full Claude features (PDF processing, citations, extended thinking, prompt caching), Anthropic recommends their native API.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.anthropic.com/v1` |
+  | **API Key** | Your Anthropic API key from [console.anthropic.com](https://console.anthropic.com/) |
+  | **Model IDs** | **Required** — add manually (e.g., `claude-sonnet-4-5-20250514`, `claude-opus-4-0-20250514`) |
+
+  :::caution
+  The `/models` endpoint **will fail** for Anthropic because their API uses non-standard authentication headers (`x-api-key` instead of `Bearer`). This is a cosmetic issue — **chat completions will work correctly**. Just add your model IDs to the allowlist manually.
+  :::
+
+  </TabItem>
+  <TabItem value="gemini" label="Google Gemini">
+
+  **Google Gemini** provides an OpenAI-compatible endpoint that works well with Open WebUI.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://generativelanguage.googleapis.com/v1beta/openai` |
+  | **API Key** | Your Gemini API key from [aistudio.google.com](https://aistudio.google.com/apikey) |
+  | **Model IDs** | Auto-detected — leave empty or filter to specific models |
+
+  :::warning No trailing slash
+  The URL must be exactly `https://generativelanguage.googleapis.com/v1beta/openai` — **without** a trailing slash. A trailing slash will break the `/models` endpoint call.
+  :::
+
+  </TabItem>
+  <TabItem value="deepseek" label="DeepSeek">
+
+  **DeepSeek** is fully OpenAI-compatible with working `/models` auto-detection.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.deepseek.com/v1` |
+  | **API Key** | Your API key from [platform.deepseek.com](https://platform.deepseek.com/) |
+  | **Model IDs** | Auto-detected (e.g., `deepseek-chat`, `deepseek-reasoner`) |
+
+  </TabItem>
+  <TabItem value="mistral" label="Mistral">
+
+  **Mistral AI** is fully OpenAI-compatible with working `/models` auto-detection.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.mistral.ai/v1` |
+  | **API Key** | Your API key from [console.mistral.ai](https://console.mistral.ai/) |
+  | **Model IDs** | Auto-detected (e.g., `mistral-large-latest`, `codestral-latest`, `mistral-small-latest`) |
+
+  </TabItem>
+  <TabItem value="groq" label="Groq">
+
+  **Groq** provides extremely fast inference via an OpenAI-compatible API.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.groq.com/openai/v1` |
+  | **API Key** | Your API key from [console.groq.com](https://console.groq.com/) |
+  | **Model IDs** | Auto-detected (e.g., `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b`) |
+
+  </TabItem>
+  <TabItem value="perplexity" label="Perplexity">
+
+  **Perplexity** offers search-augmented AI models via an OpenAI-compatible chat completions endpoint.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.perplexity.ai` |
+  | **API Key** | Your API key from [perplexity.ai/settings](https://www.perplexity.ai/settings) (under API tab) |
+  | **Model IDs** | **Required** — add manually (e.g., `sonar-pro`, `sonar-reasoning-pro`, `sonar-deep-research`) |
+
+  :::caution
+  Perplexity does **not** have a `/models` endpoint. You must manually add model IDs to the allowlist. Some Perplexity models may also reject certain parameters like `stop` or `frequency_penalty`.
+  :::
+
+  </TabItem>
+  <TabItem value="minimax" label="MiniMax">
+
+  **MiniMax** offers high-performance coding-focused models. Their **Coding Plan** subscription is cost-effective for high-frequency programming use.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.minimax.io/v1` |
+  | **API Key** | Your API key from [platform.minimax.io](https://platform.minimax.io/) |
+  | **Model IDs** | **Required** — add manually (e.g., `MiniMax-M2.5`) |
+
+  **Getting started with MiniMax:**
+
+  1. Visit the [MiniMax Coding Plan](https://platform.minimax.io/subscribe/coding-plan) page and choose a plan.
+  2. Go to [Account > Coding Plan](https://platform.minimax.io/user-center/payment/coding-plan) and click **Reset & Copy** to get your API key.
+  3. Note: The Coding Plan API key is separate from the standard pay-as-you-go key.
+
+  :::caution
+  MiniMax does **not** expose a `/models` endpoint. You **must** add `MiniMax-M2.5` (or your desired model) to the **Model IDs (Filter)** allowlist for it to appear in the UI.
+  :::
+
+  </TabItem>
+  <TabItem value="openrouter" label="OpenRouter">
+
+  **OpenRouter** aggregates hundreds of models from multiple providers behind a single API.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://openrouter.ai/api/v1` |
+  | **API Key** | Your API key from [openrouter.ai/keys](https://openrouter.ai/keys) |
+  | **Model IDs** | **Strongly recommended** — add a filtered allowlist |
+
+  :::tip
+  OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
+  1. **Use an allowlist** — add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
+  2. **Enable model caching** via `Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
+  :::
+
+  </TabItem>
+  <TabItem value="bedrock" label="Amazon Bedrock">
+
+  **Amazon Bedrock** provides access to foundation models from multiple providers (Anthropic, Meta, Mistral, Amazon, etc.) through AWS. Bedrock does **not** natively expose an OpenAI-compatible API, so you need to run the **Bedrock Access Gateway (BAG)** — a middleware proxy that translates OpenAI API calls to Bedrock SDK calls.
+
+  **Prerequisites:**
+  - An active AWS account with Bedrock model access enabled ([Model Access docs](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html))
+  - AWS Access Key and Secret Key with Bedrock IAM permissions
+  - Docker installed
+
+  **Step 1: Set up the Bedrock Access Gateway**
+
+  ```bash
+  git clone https://github.com/aws-samples/bedrock-access-gateway
+  cd bedrock-access-gateway
+  # Use the ECS Dockerfile
+  mv Dockerfile_ecs Dockerfile
+  docker build . -f Dockerfile -t bedrock-gateway
+  docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+             -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+             -e AWS_REGION=us-east-1 \
+             -d -p 8000:80 bedrock-gateway
+  ```
+
+  Verify the gateway is running at `http://localhost:8000/docs`.
+
+  :::warning
+  If the container exits immediately, you may need to change `python:3.13-slim` to `python:3.12-slim` in the Dockerfile due to a Python 3.13 compatibility issue.
+  :::
+
+  **Step 2: Add the connection in Open WebUI**
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://host.docker.internal:8000/api/v1` |
+  | **API Key** | `bedrock` (default BAG key — change via `DEFAULT_API_KEYS` in BAG config) |
+  | **Model IDs** | Auto-detected from your enabled Bedrock models |
+
+  </TabItem>
+</Tabs>
+
+### Local Servers
+
+<Tabs>
+  <TabItem value="lemonade" label="Lemonade" default>
+
+  **Lemonade** is a plug-and-play ONNX-based OpenAI-compatible server for Windows.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:8000/api/v1` |
+  | **API Key** | Leave blank |
+
+  **Quick setup:** [Download the installer](https://github.com/lemonade-sdk/lemonade/releases), run it, install a model, and it will be available at the URL above. See [their docs](https://lemonade-server.ai/docs/server/apps/open-webui/) for details.
+
+  </TabItem>
+  <TabItem value="lmstudio" label="LM Studio">
+
+  **LM Studio** provides a local OpenAI-compatible server with a GUI for model management.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:1234/v1` |
+  | **API Key** | Leave blank (or `lm-studio` as placeholder) |
+
+  Start the server in LM Studio via the "Local Server" tab before connecting.
+
+  </TabItem>
+  <TabItem value="vllm" label="vLLM">
+
+  **vLLM** is a high-throughput inference engine with an OpenAI-compatible server. See the dedicated **[vLLM guide](/getting-started/quick-start/connect-a-provider/starting-with-vllm)** for full setup instructions.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:8000/v1` (default vLLM port) |
+  | **API Key** | Leave blank (unless configured) |
+
+  </TabItem>
+  <TabItem value="localai" label="LocalAI">
+
+  **LocalAI** is a drop-in OpenAI-compatible replacement that runs models locally.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:8080/v1` |
+  | **API Key** | Leave blank |
+
+  </TabItem>
+  <TabItem value="docker-model-runner" label="Docker Model Runner">
+
+  **Docker Model Runner** runs AI models directly in Docker containers.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:12434/engines/llama.cpp/v1` |
+  | **API Key** | Leave blank |
+
+  See the [Docker Model Runner docs](https://docs.docker.com/ai/model-runner/) for setup instructions.
+
+  </TabItem>
+</Tabs>
 
 :::tip Connection Timeout Configuration
 
-If your local server is slow to start or you're connecting over a high-latency network, you can adjust the model list fetch timeout:
+If your server is slow to start or you're connecting over a high-latency network, you can adjust the model list fetch timeout:
 
 ```bash
 # Adjust timeout for slower connections (default is 10 seconds)
-AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=5
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15
 ```
 
 If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
 
 :::
-
-:::tip
-
-If running Open WebUI in Docker and your model server on your host machine, use `http://host.docker.internal:<your-port>/v1`.
-
-:::
-
-##### **For Lemonade:**  When adding Lemonade, use `http://localhost:8000/api/v1` as the URL.
-
-![Lemonade Connection](/images/getting-started/lemonade-connection.png)
 
 ---
 
@@ -100,7 +307,7 @@ To ensure full compatibility with Open WebUI, your server should implement the f
 
 | Endpoint | Method | Required? | Purpose |
 | :--- | :--- | :--- | :--- |
-| `/v1/models` | `GET` | **Yes** | Used for model discovery and selecting models in the UI. |
+| `/v1/models` | `GET` | Recommended | Used for model discovery and selecting models in the UI. If not available, add models to the allowlist manually. |
 | `/v1/chat/completions` | `POST` | **Yes** | The core endpoint for chat, supporting streaming and parameters like temperature. |
 | `/v1/embeddings` | `POST` | No | Required if you want to use this provider for RAG (Retrieval Augmented Generation). |
 | `/v1/audio/speech` | `POST` | No | Required for Text-to-Speech (TTS) functionality. |
@@ -113,12 +320,12 @@ Open WebUI passes standard OpenAI parameters such as `temperature`, `top_p`, `ma
 
 ---
 
-## Step 3: Start Chatting!
+## Step 2: Start Chatting!
 
-Select your connected server’s model in the chat menu and get started!
+Select your connected provider's model in the chat menu and get started!
 
-That’s it! Whether you choose Llama.cpp, Ollama, LM Studio, or Lemonade, you can easily experiment and manage multiple model servers—all in Open WebUI.
+That's it! Whether you choose a cloud provider or a local server, you can manage multiple connections — all from within Open WebUI.
 
 ---
 
-🚀 Enjoy building your perfect local AI setup!
+🚀 Enjoy building your perfect AI setup!
