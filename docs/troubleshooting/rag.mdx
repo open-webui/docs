@@ -7,9 +7,9 @@ Retrieval-Augmented Generation (RAG) enables language models to reason over exte
 
 Let's break down the common causes and solutions so you can supercharge your RAG accuracy! 🚀
 
-## Common RAG Issues and How to Fix Them 🛠️
+## Common RAG Issues and How to Fix Them
 
-### 1. The Model "Can't See" Your Content 👁️❌
+### 1. The Model "Can't See" Your Content
 
 This is the most common problem—and it's typically caused by issues during your content ingestion process. The model doesn't hallucinate because it's wrong, it hallucinates because it was never given the right content in the first place.
 
@@ -29,7 +29,7 @@ Try uploading a document and preview the extracted content. If it's blank or mis
 
 ---
 
-### 2. Only a Small Part of the Document is Being Used 📄➡️✂️
+### 2. Only a Small Part of the Document is Being Used
 
 Open WebUI is designed to work with models that have limited context windows by default. For instance, many local models (e.g., Ollama's default models) are limited to 2048 tokens. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
 
@@ -48,7 +48,7 @@ Open WebUI is designed to work with models that have limited context windows by 
 
 ---
 
-### 3. Token Limit is Too Short ⏳
+### 3. Token Limit is Too Short
 
 Even if retrieval works, your model might still not process all the content it receives—because it simply can't.
 
@@ -88,7 +88,7 @@ For web search and complex document analysis, stick with models that support 819
 
 ---
 
-### 4. Embedding Model is Low-Quality or Mismatched 📉🧠
+### 4. Embedding Model is Low-Quality or Mismatched
 
 Bad embeddings = bad retrieval. If the vector representation of your content is poor, the retriever won't pull the right content—no matter how powerful your LLM is.
 
@@ -103,7 +103,7 @@ Bad embeddings = bad retrieval. If the vector representation of your content is 
 
 ---
 
-### 5. ❌ 400: 'NoneType' object has no attribute 'encode'
+### 5. 400: 'NoneType' object has no attribute 'encode'
 
 This error indicates a misconfigured or missing embedding model. When Open WebUI tries to create embeddings but doesn't have a valid model loaded, it can't process the text—and the result is this cryptic error.
 
@@ -126,7 +126,7 @@ After fixing the configuration, try re-embedding a document and verify no error 
 
 ---
 
-## 🧪 Pro Tip: Test with GPT-4o or GPT-4
+## Pro Tip: Test with GPT-4o or GPT-4
 
 If you're not sure whether the issue is with retrieval, token limits, or embedding—try using GPT-4o temporarily (e.g., via OpenAI API). If the results suddenly become more accurate, it's a strong signal that your local model's context limit (2048 by default in Ollama) is the bottleneck.
 
@@ -136,7 +136,7 @@ If you're not sure whether the issue is with retrieval, token limits, or embeddi
 
 ---
 
-### 6. Upload Limits and Restrictions 🛑
+### 6. Upload Limits and Restrictions
 
 Open WebUI implements various limits to ensure system stability and prevent abuse. It is important to understand how these limits apply to different upload methods:
 
@@ -155,7 +155,7 @@ By separating these limits, administrators can better manage resource usage acro
 
 ---
 
-### 7. Fragmented or Tiny Chunks 🧩
+### 7. Fragmented or Tiny Chunks
 
 When using the **Markdown Header Splitter**, documents can sometimes be split into very small fragments (e.g., just a table of contents entry or a short sub-header). These tiny chunks often lack enough semantic context for the embedding model to represent them accurately, leading to poor RAG results and unnecessary overhead.
 
@@ -167,7 +167,7 @@ When using the **Markdown Header Splitter**, documents can sometimes be split in
 
 ---
 
-### 8. Slow Follow-up Responses (KV Cache Invalidation) 🐌
+### 8. Slow Follow-up Responses (KV Cache Invalidation)
 
 If your initial response is fast but follow-up questions become increasingly slow, you are likely experiencing **KV Cache invalidation**.
 
@@ -243,7 +243,7 @@ For complete API workflow examples including proper status checking, see the [AP
 
 ---
 
-### 10. CUDA Out of Memory During Embedding 💥🎮
+### 10. CUDA Out of Memory During Embedding
 
 When processing large files or many files in sequence, you may encounter CUDA OOM errors like:
 
@@ -281,7 +281,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 
 ---
 
-### 11. PDF OCR Not Extracting Text from Images 📷❌
+### 11. PDF OCR Not Extracting Text from Images
 
 If PDFs containing images with text are returning empty content:
 
@@ -314,7 +314,7 @@ If PDFs containing images with text are returning empty content:
 
 ---
 
-### 12. Worker Dies During Document Upload 💀
+### 12. Worker Dies During Document Upload
 
 When uploading documents in a **multi-worker** deployment, you may see:
 
