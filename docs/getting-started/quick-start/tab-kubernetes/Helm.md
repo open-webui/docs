@@ -31,8 +31,10 @@ Helm helps you manage Kubernetes applications.
 
 :::warning
 
-If you intend to scale Open WebUI using multiple nodes/pods/workers in a clustered environment, you need to setup a NoSQL key-value database.
+If you intend to scale Open WebUI using multiple nodes/pods/workers in a clustered environment, you need to setup a NoSQL key-value database (Redis).
 There are some [environment variables](https://docs.openwebui.com/reference/env-configuration/) that need to be set to the same value for all service-instances, otherwise consistency problems, faulty sessions and other issues will occur!
+
+**Important:** The default vector database (ChromaDB) uses a local SQLite-backed client that is **not safe for multi-replica or multi-worker deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** switch to an external vector database (PGVector, Milvus, Qdrant) via [`VECTOR_DB`](https://docs.openwebui.com/reference/env-configuration#vector_db), or run ChromaDB as a separate HTTP server via [`CHROMA_HTTP_HOST`](https://docs.openwebui.com/reference/env-configuration#chroma_http_host). See the [Scaling & HA guide](https://docs.openwebui.com/troubleshooting/multi-replica) for full requirements.
 
 :::
 

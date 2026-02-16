@@ -5,6 +5,16 @@ This installation method requires knowledge on Docker Swarms, as it utilizes a s
 It includes isolated containers of ChromaDB, Ollama, and OpenWebUI.
 Additionally, there are pre-filled [Environment Variables](https://docs.openwebui.com/reference/env-configuration) to further illustrate the setup.
 
+:::info Why ChromaDB Runs as a Separate Container
+
+This stack correctly deploys ChromaDB as a **separate HTTP server** container, with Open WebUI connecting to it via `CHROMA_HTTP_HOST` and `CHROMA_HTTP_PORT`. This is **required** for any multi-worker or multi-replica deployment.
+
+The default ChromaDB mode (without `CHROMA_HTTP_HOST`) uses a local SQLite-backed `PersistentClient` that is **not fork-safe** — concurrent writes from multiple worker processes will crash workers instantly. Running ChromaDB as a separate server avoids this by using HTTP connections instead of direct SQLite access.
+
+If you plan to scale the `openWebUI` service to multiple replicas, you should also switch to PostgreSQL for the main database and set up Redis. See the [Scaling & HA guide](https://docs.openwebui.com/troubleshooting/multi-replica) for full requirements.
+
+:::
+
 Choose the appropriate command based on your hardware setup:
 
 - **Before Starting**:
