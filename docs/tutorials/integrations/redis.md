@@ -419,6 +419,20 @@ If you set `UVICORN_WORKERS` to any value greater than 1, you **must** configure
 
 :::
 
+:::danger
+
+**Critical: Default ChromaDB (SQLite) Not Compatible with Multiple Workers**
+
+In addition to Redis, you must also address the **vector database**. The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not fork-safe**. When uvicorn forks multiple workers, concurrent writes to the same SQLite file will crash workers instantly during document uploads (`Child process died`).
+
+You must either:
+- Switch to a client-server vector database (`VECTOR_DB=pgvector`, `milvus`, or `qdrant`)
+- Run ChromaDB as a separate HTTP server and set `CHROMA_HTTP_HOST` / `CHROMA_HTTP_PORT`
+
+See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for details.
+
+:::
+
 ## Verification
 
 ### Verify Redis Connection

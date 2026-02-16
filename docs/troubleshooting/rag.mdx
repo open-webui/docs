@@ -309,26 +309,48 @@ If PDFs containing images with text are returning empty content:
 | 📄 API returns "empty content" error | Wait for file processing to complete before adding to knowledge base |
 | 💥 CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
 | 📷 PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
-| 💀 Worker dies during upload | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
+| 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups |
+| 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
 
 ---
 
-### 12. Worker Dies During Document Upload (SentenceTransformers) 💀
+### 12. Worker Dies During Document Upload 💀
 
-When uploading documents with the default SentenceTransformers embedding engine in a **multi-worker** deployment, you may see:
+When uploading documents in a **multi-worker** deployment, you may see:
 
 ```
 INFO:     Waiting for child process [12]
 INFO:     Child process [12] died
 ```
 
-**The Problem**: When using **multiple uvicorn workers** (`--workers 2` or more), uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. Local SentenceTransformers embedding operations can take longer than this, and in older versions of Open WebUI, the embedding call blocked the event loop entirely — preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
+There are **two distinct causes** for this in multi-worker setups:
+
+#### Cause A: ChromaDB SQLite + Fork (Instant Crash)
+
+If you are using the **default ChromaDB** vector database (which uses a local SQLite-backed `PersistentClient`) with `UVICORN_WORKERS > 1`, the crash is caused by SQLite being **not fork-safe**. When uvicorn forks multiple workers, each process inherits the same SQLite database connection. Concurrent writes to the vector database from multiple workers cause an immediate crash — not a timeout, but an instant fatal error.
+
+You will typically see this pattern all within the same second:
+```
+save_docs_to_vector_db:1619 - adding to collection file-id
+INFO:     Waiting for child process [pid]
+INFO:     Child process [pid] died
+```
+
+**Solution:** You **must** switch away from the default local ChromaDB when using multiple workers:
+- Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `milvus`, or `qdrant`
+- Or run ChromaDB as a separate HTTP server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port)
+
+See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for full details.
+
+#### Cause B: SentenceTransformers Health Check Timeout (Older Versions)
+
+When using the **default SentenceTransformers** embedding engine (local embeddings) with multiple workers, uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. In older versions of Open WebUI, the embedding call blocked the event loop entirely — preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
 
 :::note
 
 This issue was **fixed** in Open WebUI. The embedding system now uses `run_coroutine_threadsafe` to keep the main event loop responsive during embedding operations, so workers will no longer be killed during uploads regardless of how long embeddings take.
 
-If you are running a version with this fix and still experiencing worker death, ensure your Open WebUI is up to date.
+If you are running a version with this fix and still experiencing worker death, check **Cause A** above (ChromaDB SQLite) first, then ensure your Open WebUI is up to date.
 
 :::
 

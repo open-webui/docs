@@ -28,7 +28,9 @@ For organizations with demanding uptime requirements, Open WebUI supports produc
 | Component | Capability |
 | :--- | :--- |
 | **Load Balancing** | Multiple container instances behind a load balancer for resilience and optimal performance. |
-| **External Databases** | Scalable, reliable data storage separate from application instances. |
+| **External Databases** | PostgreSQL for the main database (SQLite is not supported for multi-instance). |
+| **External Vector Database** | A client-server vector database (PGVector, Milvus, Qdrant) or ChromaDB in HTTP server mode. The default ChromaDB local mode uses SQLite which is not safe for multi-process access. |
+| **Redis** | Required for session management, WebSocket coordination, and configuration sync across instances. |
 | **Persistent Storage** | Flexible storage backends to meet your data residency and performance requirements. |
 | **Observability** | Integration with modern logging and metrics tools for proactive monitoring. |
 

@@ -15,7 +15,7 @@ Before troubleshooting specific errors, ensure your deployment meets these **abs
 2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/reference/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
 3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/reference/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
-5.  **External Vector Database (Recommended):** While embedded Chroma works with shared storage, using a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), Milvus, Qdrant) is **highly recommended** to avoid file locking issues and improve performance.
+5.  **External Vector Database (Required):** The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not safe for multi-worker or multi-replica deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** use a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a [separate HTTP server](/reference/env-configuration#chroma_http_host).
 6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/reference/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
 
 ---
@@ -117,7 +117,47 @@ The `/app/backend/data` directory is not shared or is not consistent across repl
 - **Kubernetes:** Use a `PersistentVolumeClaim` with `ReadWriteMany` (RWX) access mode if your storage provider supports it (e.g., NFS, CephFS, AWS EFS).
 - **Docker Swarm/Compose:** Mount a shared volume (e.g., NFS mount) to `/app/backend/data` on all containers.
 
-### 6. Slow Performance in Cloud vs. Local Kubernetes
+### 6. Worker Crashes During Document Upload (ChromaDB + Multi-Worker)
+
+**Symptoms:**
+- Logs show the following sequence, all within the same second:
+  ```
+  save_docs_to_vector_db:1619 - adding to collection file-id
+  INFO:     Waiting for child process [pid]
+  INFO:     Child process [pid] died
+  ```
+- Workers die immediately during RAG document ingestion.
+- The crash is instant (not a timeout).
+
+**Cause:**
+The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. When uvicorn forks multiple workers (`UVICORN_WORKERS > 1`), each worker process inherits a copy of the same SQLite database connection — all pointing at the same file on disk (`data/vector_db/`).
+
+When two workers attempt to write to the collection simultaneously (e.g., during document upload), SQLite's file-level locking fails across forked processes. The result is either a database lock error or a segfault from corrupted internal state inherited across the `fork()` call, which kills the worker process instantly.
+
+This is a [well-known SQLite limitation](https://www.sqlite.org/howtocorrupt.html#_carrying_an_open_database_connection_across_a_fork_): open database connections must not be carried across a `fork()`.
+
+**Solution:**
+You **must** stop using the default local ChromaDB with multiple workers. Pick one of these options:
+
+| Option | Change | Tradeoff |
+|--------|--------|----------|
+| **Keep 1 worker** | Set `UVICORN_WORKERS=1` (the default) | Simplest, but limits concurrency |
+| **Use ChromaDB HTTP mode** | Set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) to point to a separate Chroma server | Each worker connects via HTTP instead of SQLite — fully fork-safe |
+| **Switch vector DB** | Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `milvus`, `qdrant`, etc. | These are client-server databases, inherently multi-process safe |
+
+**Recommended fix** — run ChromaDB as a separate server:
+
+```bash
+# Run chroma server separately
+chroma run --host 0.0.0.0 --port 8000 --path /data/vector_db
+
+# Then set these env vars for Open WebUI
+CHROMA_HTTP_HOST=localhost
+CHROMA_HTTP_PORT=8000
+UVICORN_WORKERS=4
+```
+
+### 7. Slow Performance in Cloud vs. Local Kubernetes
 
 **Symptoms:**
 - Open WebUI performs well locally but experiences significant degradation or timeouts when deployed to cloud providers (AKS, EKS, GKE).
@@ -131,7 +171,7 @@ Refer to the **[Cloud Infrastructure Latency](/troubleshooting/performance#%EF%B
 
 If you need more tips for performance improvements, check out the full [Optimization & Performance Guide](/troubleshooting/performance).
 
-### 7. Optimizing Database Performance
+### 8. Optimizing Database Performance
 
 For PostgreSQL deployments with adequate resources, consider these optimizations:
 

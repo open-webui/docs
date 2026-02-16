@@ -1715,6 +1715,20 @@ modeling files for reranking.
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
+:::danger ChromaDB (Default) Is Not Safe for Multi-Worker or Multi-Replica Deployments
+
+The default ChromaDB configuration uses a **local `PersistentClient`** backed by **SQLite**. SQLite is not fork-safe — when uvicorn forks multiple worker processes (`UVICORN_WORKERS > 1`), each worker inherits a copy of the same SQLite connection. Concurrent writes from these forked processes cause immediate crashes (`Child process died`) or database corruption.
+
+**This also applies to multi-replica deployments** (Kubernetes, Docker Swarm) where multiple containers point at the same ChromaDB data directory.
+
+If you need multiple workers or replicas, you **must** either:
+1. **Switch to a client-server vector database** such as [PGVector](/reference/env-configuration#pgvector_db_url), Milvus, or Qdrant (recommended).
+2. **Run ChromaDB as a separate HTTP server** and configure [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) so that Open WebUI uses an `HttpClient` instead of the local `PersistentClient`.
+
+See the [Scaling & HA guide](/troubleshooting/multi-replica) for full details.
+
+:::
+
 :::note
 
 PostgreSQL Dependencies
@@ -1735,6 +1749,14 @@ The other vector stores are community-added vector databases.
 
 ### ChromaDB
 
+:::warning Local vs. HTTP Mode
+
+By default (when `CHROMA_HTTP_HOST` is **not** set), ChromaDB runs as a local `PersistentClient` using SQLite for storage. This mode is **only safe for single-worker, single-instance deployments** (`UVICORN_WORKERS=1`, one replica).
+
+For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HOST` and `CHROMA_HTTP_PORT` to point to a standalone ChromaDB server, or switch to a different vector database entirely. See the [VECTOR_DB](#vector_db) warning above.
+
+:::
+
 #### `CHROMA_TENANT`
 
 - Type: `str`
@@ -1750,7 +1772,7 @@ The other vector stores are community-added vector databases.
 #### `CHROMA_HTTP_HOST`
 
 - Type: `str`
-- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set.
+- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-worker or multi-replica deployments** — it switches ChromaDB from the local SQLite-backed `PersistentClient` to a fork-safe `HttpClient`.
 
 #### `CHROMA_HTTP_PORT`
 
@@ -6282,6 +6304,14 @@ For most deployments, the default browser cookie-based session management is suf
 When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
 
 If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-worker setups are set accordingly.
+
+:::
+
+:::danger ChromaDB Not Compatible with Multiple Workers
+
+The default vector database (ChromaDB) uses a local SQLite-backed `PersistentClient`. SQLite connections are **not fork-safe** — when uvicorn forks multiple workers, each process inherits the same SQLite connection, and concurrent writes will crash workers instantly (`Child process died`).
+
+If you set `UVICORN_WORKERS > 1`, you **must** either switch to a client-server vector database (PGVector, Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a separate server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host).
 
 :::
 
