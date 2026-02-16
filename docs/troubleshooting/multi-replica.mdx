@@ -7,6 +7,8 @@ title: "Scaling & HA"
 
 This guide addresses common issues encountered when deploying Open WebUI in **multi-replica** environments (e.g., Kubernetes, Docker Swarm) or when using **multiple workers** (`UVICORN_WORKERS > 1`) for increased concurrency.
 
+If you are setting up a scaled deployment for the first time, start with the [Scaling Open WebUI](/getting-started/advanced-topics/scaling) guide for a step-by-step walkthrough.
+
 ## Core Requirements Checklist
 
 Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
@@ -253,8 +255,11 @@ While Open WebUI is designed to be stateless with proper Redis configuration, en
 
 ## Related Documentation
 
+- [Scaling Open WebUI](/getting-started/advanced-topics/scaling) — Step-by-step guide to scaling from single instance to production
 - [Environment Variable Configuration](/reference/env-configuration)
 - [Optimization, Performance & RAM Usage](/troubleshooting/performance)
+- [Redis WebSocket Support](/tutorials/integrations/redis) — Detailed Redis setup tutorial
 - [Troubleshooting Connection Errors](/troubleshooting/connection-error)
+- [RAG Troubleshooting](/troubleshooting/rag) — Document upload and embedding issues
 - [Logging Configuration](/getting-started/advanced-topics/logging)
 

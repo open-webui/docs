@@ -17,7 +17,7 @@ This documentation page outlines the steps required to integrate Redis with Open
 
 ## When is Redis Required?
 
-Redis serves two distinct purposes in Open WebUI, and understanding when it's required is crucial for proper deployment:
+Redis serves two distinct purposes in Open WebUI, and understanding when it's required is crucial for proper deployment. For a high-level overview of all scaling requirements (PostgreSQL, Redis, vector DB, storage), see the [Scaling Open WebUI](/getting-started/advanced-topics/scaling) guide.
 
 ### Single Instance Deployments
 
