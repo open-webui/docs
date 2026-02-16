@@ -149,6 +149,8 @@ The way your documents are chunked directly impacts both storage efficiency and 
 
 If you are deploying for **enterprise scale** (hundreds of users), simple Docker Compose setups may not suffice. You will need to move to a clustered environment.
 
+For a step-by-step walkthrough of the entire scaling journey (PostgreSQL, Redis, vector DB, storage, observability), see the **[Scaling Open WebUI](/getting-started/advanced-topics/scaling)** guide.
+
 *   **Kubernetes / Helm**: For deploying on K8s with multiple replicas, see the **[Multi-Replica & High Availability Guide](/troubleshooting/multi-replica)**.
 *   **Redis (Mandatory)**: When running multiple workers (`UVICORN_WORKERS > 1`) or multiple replicas, **Redis is required** to handle WebSocket connections and session syncing. See **[Redis Integration](/tutorials/integrations/redis)**.
 *   **Load Balancing**: Ensure your Ingress controller supports **Session Affinity** (Sticky Sessions) for best performance.
