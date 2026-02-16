@@ -1,6 +1,5 @@
 import React from "react";
 import Layout from "@theme-original/Layout";
-import { TopBanners } from "../components/TopBanners";
 
 export default function CustomLayout(props) {
 	return (
