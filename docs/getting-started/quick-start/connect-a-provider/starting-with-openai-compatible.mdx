@@ -223,12 +223,77 @@ If running Open WebUI in Docker and your model server is on the host machine, re
   | **Model IDs** | Auto-detected from your enabled Bedrock models |
 
   </TabItem>
+  <TabItem value="azure" label="Azure OpenAI">
+
+  **Azure OpenAI** provides enterprise-grade OpenAI hosting through Microsoft Azure.
+
+  To add an Azure OpenAI connection, you need to **switch the provider type** in the connection dialog:
+
+  1. In the connection form, find the **Provider Type** button (it says **OpenAI** by default).
+  2. **Click it to toggle** it to **Azure OpenAI**.
+  3. Fill in the settings below.
+
+  | Setting | Value |
+  |---|---|
+  | **Provider Type** | Click to switch to **Azure OpenAI** |
+  | **URL** | Your Azure endpoint (e.g., `https://my-resource.openai.azure.com`) |
+  | **API Version** | e.g., `2024-02-15-preview` |
+  | **API Key** | Your Azure API Key |
+  | **Model IDs** | **Required** — add your specific Deployment Names (e.g., `my-gpt4-deployment`) |
+
+  :::info
+  Azure OpenAI uses **deployment names** as model IDs, not standard OpenAI model names. You must add your deployment names to the Model IDs allowlist.
+  :::
+
+  For advanced keyless authentication using Azure Entra ID (RBAC, Workload Identity, Managed Identity), see the [Azure OpenAI with EntraID](/tutorials/integrations/llm-providers/azure-openai) tutorial.
+
+  </TabItem>
+  <TabItem value="litellm" label="LiteLLM">
+
+  **LiteLLM** is a proxy server that provides a unified OpenAI-compatible API across 100+ LLM providers (Anthropic, Google, Azure, AWS Bedrock, Cohere, and more). It translates between provider-specific APIs and the OpenAI standard.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:4000/v1` (default LiteLLM proxy port) |
+  | **API Key** | Your LiteLLM proxy key (if configured) |
+  | **Model IDs** | Auto-detected from your LiteLLM configuration |
+
+  **Quick setup:**
+
+  ```bash
+  pip install litellm
+  litellm --model gpt-4 --port 4000
+  ```
+
+  For production deployments, configure models via `litellm_config.yaml`. See the [LiteLLM docs](https://docs.litellm.ai/) for details.
+
+  :::tip
+  LiteLLM is useful as a **universal bridge** when you want to use a provider that doesn't natively support the OpenAI API standard, or when you want to load-balance across multiple providers.
+  :::
+
+  </TabItem>
 </Tabs>
 
 ### Local Servers
 
 <Tabs>
-  <TabItem value="lemonade" label="Lemonade" default>
+  <TabItem value="llamacpp" label="Llama.cpp" default>
+
+  **Llama.cpp** runs efficient, quantized GGUF models locally with an OpenAI-compatible API server. See the dedicated **[Llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp)** for full setup instructions (installation, model download, server startup).
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:10000/v1` (or your configured port) |
+  | **API Key** | Leave blank |
+
+  **Quick start:**
+
+  ```bash
+  ./llama-server --model /path/to/model.gguf --port 10000 --ctx-size 1024 --n-gpu-layers 40
+  ```
+
+  </TabItem>
+  <TabItem value="lemonade" label="Lemonade">
 
   **Lemonade** is a plug-and-play ONNX-based OpenAI-compatible server for Windows.
 
