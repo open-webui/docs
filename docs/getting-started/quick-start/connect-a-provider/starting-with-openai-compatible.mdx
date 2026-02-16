@@ -17,7 +17,9 @@ For OpenAI itself (or Azure OpenAI), see the dedicated **[OpenAI guide](/getting
 
 ## Protocol-Oriented Design
 
-Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider, Open WebUI focuses on the **OpenAI Chat Completions Protocol**.
+Open WebUI is built around **Standard Protocols**. Instead of building specific modules for every individual AI provider (which leads to inconsistent behavior and configuration bloat), Open WebUI focuses on protocols like the **OpenAI Chat Completions Protocol**. 
+
+This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
 
 - **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
 - **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a [pipe](/features/extensibility/plugin/functions/pipe) or a middleware proxy like LiteLLM or OpenRouter to bridge them.
@@ -28,9 +30,9 @@ For a detailed explanation of this architectural decision, see our **[FAQ on pro
 
 :::warning Important: Connection Verification May Fail for Some Providers
 
-When you add a connection, Open WebUI verifies it by calling the provider's `/models` endpoint using a standard `Bearer` token. **Some providers do not implement the `/models` endpoint** or use non-standard authentication for it. In these cases:
+When you add a connection, Open WebUI verifies it by calling the provider's `/models` endpoint using a standard `Bearer` token. **Some providers do not implement the `/models` endpoint** at all or use non-standard authentication for it. In these cases:
 
-- The connection verification will **fail with an error** (e.g., 401 or 403).
+- The connection verification will **fail with an error** (e.g., 400, 401 or 403).
 - This does **not** mean the provider is incompatible — **chat completions will still work**.
 - You just need to **manually add model names** to the **Model IDs (Filter)** allowlist in the connection settings.
 
@@ -38,16 +40,17 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 
 | Provider | `/models` works? | Action Needed |
 |---|---|---|
-| Anthropic | No — uses non-standard auth headers | Add model IDs manually (e.g., `claude-sonnet-4-5-20250514`) |
-| Perplexity | No — endpoint doesn't exist | Add model IDs manually (e.g., `sonar-pro`, `sonar-reasoning-pro`) |
-| MiniMax | No — endpoint doesn't exist | Add model IDs manually (e.g., `MiniMax-M2.5`) |
+| Anthropic | No — uses non-standard auth headers | Add model IDs manually to the whitelist |
+| GitHub Models | No — uses non-standard path | Add model IDs manually to the whitelist |
+| Perplexity | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
+| MiniMax | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes — but returns thousands of models | Strongly recommend adding a filtered allowlist |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
 
-**How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon. The models will then appear in your model selector even though the connection verification showed an error.
+**How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error.
 
 :::
 
@@ -357,7 +360,7 @@ If your server is slow to start or you're connecting over a high-latency network
 
 ```bash
 # Adjust timeout for slower connections (default is 10 seconds)
-AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=5
 ```
 
 If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
