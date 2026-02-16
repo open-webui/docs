@@ -42,7 +42,7 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
 **Key things to know:**
 
-- Open WebUI does **not** migrate data between databases — plan this before you have production data in SQLite. If you need to migrate an existing database, see the [Database Migration guide](/troubleshooting/manual-database-migration).
+- Open WebUI does **not** migrate data between databases — plan this before you have production data in SQLite.
 - For high-concurrency deployments, tune `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` to match your usage patterns. See [Database Optimization](/troubleshooting/performance#-database-optimization) for detailed guidance.
 - Remember that **each Open WebUI instance maintains its own connection pool**, so total connections = pool size × number of instances.
 - If you skip this step and run multiple instances with SQLite, you will see `database is locked` errors and data corruption. See [Database Corruption / "Locked" Errors](/troubleshooting/multi-replica#4-database-corruption--locked-errors) for details.
@@ -153,10 +153,16 @@ VECTOR_DB=pgvector
 | **Pinecone** | Fully managed cloud service — zero infrastructure to maintain, pay-per-use | `VECTOR_DB=pinecone` + `PINECONE_API_KEY=...` |
 | **ChromaDB (HTTP mode)** | Keeping ChromaDB but making it multi-process safe by running it as a separate server | `VECTOR_DB=chroma` + `CHROMA_HTTP_HOST=chroma-host` + `CHROMA_HTTP_PORT=8000` |
 
+:::note
+
+Only PGVector and ChromaDB will be consistently maintained by the Open WebUI team. The other vector stores are mainly community-added vector databases.
+
+:::
+
 :::tip
 **PGVector** is the simplest choice if you're already running PostgreSQL for the main database — it adds vector search to the database you already have, with no additional infrastructure.
 
-For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** both support **multitenancy mode** (`ENABLE_MILVUS_MULTITENANCY_MODE=True` / `ENABLE_QDRANT_MULTITENANCY_MODE=True`), which provides per-user vector isolation and better resource sharing at scale.
+For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** both support **multitenancy mode** (`ENABLE_MILVUS_MULTITENANCY_MODE=True` / `ENABLE_QDRANT_MULTITENANCY_MODE=True`), which provides better resource sharing at scale.
 :::
 
 ---
@@ -169,13 +175,13 @@ By default, Open WebUI stores uploaded files on the local filesystem under `DATA
 
 ### Do I need cloud storage (S3)?
 
-**Not necessarily.** Open WebUI stores all uploaded files with **UUID-based unique filenames**. Multiple processes and replicas only ever **create new files** or **read existing ones** — they never write to the same file simultaneously. This means a simple **shared filesystem mount** works correctly without any risk of write conflicts.
+**Not necessarily.** Open WebUI stores all uploaded files with **UUID-based unique filenames**. Multiple processes and replicas only ever **create new files** or **read existing ones** — they never write to the same file simultaneously. This means a simple **shared filesystem mount** works correctly without any risk of write conflicts. Though you have to ensure, that all workers/replicas have access to the very same shared DATA_DIR directory in a shared storage.
 
 **Your options:**
 
 | Approach | When to Use |
 |---|---|
-| **Shared filesystem** (NFS, AWS EFS, CephFS, GlusterFS, or a shared Docker volume) | The simplest option for most deployments. Mount the same directory to `/app/backend/data` on all instances. Works well for on-prem, Docker Swarm, and Kubernetes with ReadWriteMany (RWX) volumes. |
+| **Shared filesystem** (NFS, AWS EFS, CephFS, GlusterFS, or a simple shared Docker volume) | The simplest option for most deployments. Mount the same directory to `/app/backend/data` on all instances. Works well for on-prem, Docker Swarm, and Kubernetes with ReadWriteMany (RWX) volumes. |
 | **Cloud object storage** (S3, GCS, Azure Blob) | Better for cloud-native deployments at very large scale, or when you want managed durability (11 nines) and don't want to manage shared filesystems. Requires setting `STORAGE_PROVIDER`. |
 
 :::info What does STORAGE_PROVIDER actually control?
@@ -186,7 +192,7 @@ By default, Open WebUI stores uploaded files on the local filesystem under `DATA
 
 No configuration changes needed — just ensure all instances mount the same directory:
 
-**Kubernetes:**
+**Example Kubernetes:**
 ```yaml
 volumes:
   - name: data
@@ -194,10 +200,10 @@ volumes:
       claimName: openwebui-data  # Must be ReadWriteMany (RWX)
 ```
 
-**Docker Swarm/Compose:**
+**Example Docker Compose:**
 ```yaml
 volumes:
-  - /mnt/shared-nfs/openwebui-data:/app/backend/data
+  - /opt/data/openwebui-data:/app/backend/data
 ```
 
 :::warning
@@ -260,7 +266,7 @@ Here's what a production-ready scaled deployment typically looks like:
          │          │          │
     ┌────▼──────────▼──────────▼────┐
     │         PostgreSQL            │   ← Shared database
-    │     (+ PGVector for RAG)      │   ← Vector DB (or Milvus/Qdrant)
+    │     (+ PGVector for RAG)      │   ← Vector DB (or other Vector DB)
     └───────────────────────────────┘
     ┌───────────────────────────────┐
     │           Redis               │   ← Shared state & websockets
@@ -310,13 +316,13 @@ ENABLE_DB_MIGRATIONS=false
 | Single user / evaluation | ✗ | ✗ | ✗ | ✗ |
 | Small team (< 50 users, single instance) | Recommended | ✗ | ✗ | ✗ |
 | Multiple Uvicorn workers | **Required** | **Required** | **Required** | ✗ (same filesystem) |
-| Multiple instances / HA | **Required** | **Required** | **Required** | **Required** (NFS or S3) |
-| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Required** (NFS or S3) |
+| Multiple instances / HA | **Required** | **Required** | **Required** | **Optional** (NFS or S3) |
+| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Optional** (NFS or S3) |
 
 :::note About "External Vector DB"
 The default ChromaDB uses a local SQLite backend that crashes under multi-process access. "External Vector DB" means either a client-server database (PGVector, Milvus, Qdrant, Pinecone) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4--switch-to-an-external-vector-database) for details.
 :::
 
 :::note About "Shared Storage"
-For multiple instances, all replicas need access to the same uploaded files. A **shared filesystem mount** (NFS, EFS, CephFS) is sufficient — cloud object storage (S3/GCS/Azure) is an alternative, not a requirement. Files use UUID-based unique names, so there are no write conflicts. See [Step 5](#step-5--share-file-storage-across-instances) for details.
+For multiple instances, all replicas need access to the same uploaded files. A **shared filesystem mount** (local drive, NFS, EFS, CephFS) is sufficient — cloud object storage (S3/GCS/Azure) is a scalable alternative, butt not a requirement. Files use UUID-based unique names, so there are no write conflicts. See [Step 5](#step-5--share-file-storage-across-instances) for details.
 :::
