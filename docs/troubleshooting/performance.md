@@ -125,10 +125,11 @@ For high-concurrency PostgreSQL deployments, the default connection pool setting
 ### Vector Database (RAG)
 For multi-user setups, the choice of Vector DB matters.
 
--   **ChromaDB**: **NOT RECOMMENDED** for multi-user environments due to performance limitations and locking issues.
+-   **ChromaDB (Default)**: **NOT SAFE** for multi-worker (`UVICORN_WORKERS > 1`) or multi-replica deployments. The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. SQLite connections are not fork-safe — when uvicorn forks multiple workers, each process inherits the same database connection, and concurrent writes cause instant worker crashes (`Child process died`) or database corruption. This is a fundamental SQLite limitation, not a bug. See the [Scaling & HA troubleshooting guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for the full crash sequence and solutions.
 -   **Recommendations**:
-    *   **Milvus** or **Qdrant**: Best for improved scale and performance.
-    *   **PGVector**: Excellent choice if you are already using PostgreSQL.
+    *   **Milvus** or **Qdrant**: Best for improved scale and performance. These are client-server databases, inherently safe for multi-process access.
+    *   **PGVector**: Excellent choice if you are already using PostgreSQL. Also fully multi-process safe.
+    *   **ChromaDB HTTP mode**: If you want to keep using ChromaDB, run it as a [separate server](/reference/env-configuration#chroma_http_host) so Open WebUI connects via HTTP instead of local SQLite.
 -   **Multitenancy**: If using Milvus or Qdrant, enabling multitenancy offers better resource sharing.
     *   `ENABLE_MILVUS_MULTITENANCY_MODE=True`
     *   `ENABLE_QDRANT_MULTITENANCY_MODE=True`
@@ -359,7 +360,7 @@ If resource usage is critical, disable automated features that constantly trigge
 2.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
 3.  **Streaming**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7` (Reduce CPU/Net/DB writes).
 4.  **Chat Saving**: `ENABLE_REALTIME_CHAT_SAVE=False`.
-5.  **Vector DB**: **Milvus**, **Qdrant**, or **PGVector**. **Avoid ChromaDB.**
+5.  **Vector DB**: **Milvus**, **Qdrant**, or **PGVector**. **Do not use ChromaDB's default local mode** — its SQLite backend will crash under multi-worker/multi-replica access.
 6.  **Task Model**: External/Hosted (Offload compute).
 7.  **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 
