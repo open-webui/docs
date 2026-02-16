@@ -47,7 +47,85 @@ These are **Python scripts** that run directly within the Open WebUI environment
 - **MCPO (Proxy)**: Most community MCP servers use `stdio` (local command line). To use these in Open WebUI, you use the [**MCPO Proxy**](../../plugin/tools/openapi-servers/mcp.mdx) to bridge the connection.
 
 ### 4. OpenAPI / Function Calling Servers
-Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification. Open WebUI can ingest these specs and treat every endpoint as a tool.
+Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification.
+Open WebUI can ingest these specs and treat every endpoint as a tool.
+
+---
+
+## Quick Selection Guide
+
+🎯 Not sure which extension type to use?
+Start here.
+
+### Categories Explained
+
+| Category | Purpose | Code Location |
+|----------|---------|---------------|
+| **Native Features** | Built-in capabilities (Web Search, Image Gen) | None (internal) |
+| **Functions** | Transform or intercept messages | Open WebUI server |
+| **Tools** | Execute tasks, call external services | Open WebUI server or external |
+| **Pipelines** | Offload heavy processing | Separate container/service |
+
+### Decision Tree
+
+```text
+Do you need a built-in capability (Web Search, Image Gen, etc.)?
+├─ Yes → Use Native Features (Admin Panel → Settings)
+│
+└─ No → Do you need to transform or intercept messages?
+    ├─ Yes → Use Functions
+    │   ├─ Modify input before model sees it? → Filter
+    │   ├─ Modify output before user sees it? → Pipe
+    │   └─ Trigger on message patterns (no modification)? → Action
+    │
+    └─ No → Do you need to execute tasks or call external services?
+        ├─ Yes → Use Tools
+        │   ├─ Custom Python code → Workspace Tools
+        │   ├─ REST API with OpenAPI spec → OpenAPI Server
+        │   │   └─ Need event emitters or advanced features? → Use extended tool API
+        │   └─ MCP-compatible service → MCP
+        │       ├─ Server supports HTTP/SSE streaming natively → Native HTTP MCP
+        │       └─ Stdio-only community server → MCPO Proxy bridge
+        │
+        └─ Yes, but heavy/long-running → Use Pipelines
+            (separate service/container for async processing)
+```
+
+### Common Scenarios
+
+**"I want the model to search the web."**
+→ **Native Web Search** (no code required).
+Enable in Admin Panel → Settings → Web Search, then toggle in chat if applicable.
+
+**"I need a custom weather lookup API call."**
+→ **Workspace Tools**.
+Write Python to call the API, parse JSON, return structured results to the model.
+
+**"I want to redact sensitive text (PII) before sending to the model."**
+→ **Functions → Filter**.
+Intercepts user input, applies regex/patterns, forwards sanitized text to the LLM.
+
+**"I want to format responses with custom markdown or add signatures."**
+→ **Functions → Pipe**.
+Transforms model output before displaying to user (e.g., add headers/footers).
+
+**"I want to trigger notifications when certain keywords appear."**
+→ **Functions → Action**.
+Event-driven handler: fires on message patterns without modifying message content.
+Useful for logging, alerts, or triggering external workflows.
+
+**"I need to run heavy ML classification without slowing the chat UI."**
+→ **Pipelines**.
+Separate container/service processes workload asynchronously, returns results when ready.
+
+**"I want to connect my company's internal REST API."**
+→ **OpenAPI Server**.
+Provide OpenAPI spec (JSON/YAML); endpoints become auto-generated tools.
+
+**"I have an MCP server from a desktop AI workflow (like Claude Desktop)."**
+→ **MCP**.
+- If server supports HTTP streaming: Connect directly (Settings → Connections)
+- If stdio-only (most community MCPs): Use [MCPO Proxy](../../plugin/tools/openapi-servers/mcp.mdx) to bridge to HTTP
 
 ---
 
