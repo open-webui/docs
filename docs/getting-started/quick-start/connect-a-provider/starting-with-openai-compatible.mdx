@@ -227,31 +227,40 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   </TabItem>
   <TabItem value="bedrock" label="Amazon Bedrock">
 
-  **Amazon Bedrock** is a fully managed AWS service that provides access to foundation models from leading AI companies (Anthropic, Meta, Mistral, Cohere, Stability AI, Amazon, and more) through a single API. Bedrock does **not** natively expose an OpenAI-compatible API, so you need to run the **Bedrock Access Gateway (BAG)** — a middleware proxy that translates OpenAI API calls to Bedrock SDK calls.
+  **Amazon Bedrock** is a fully managed AWS service that provides access to foundation models from leading AI companies (Anthropic, Meta, Mistral, Cohere, Stability AI, Amazon, and more) through a single API.
 
-  | Setting | Value |
-  |---|---|
-  | **URL** | `http://host.docker.internal:8000/api/v1` |
-  | **API Key** | `bedrock` (default BAG key — change via `DEFAULT_API_KEYS` in BAG config) |
-  | **Model IDs** | Auto-detected from your enabled Bedrock models |
+  There are multiple OpenAI-compatible ways to connect Open WebUI to AWS Bedrock:
 
-  **Prerequisites:**
+  * **Bedrock Access Gateway** (BAG)
+  * **stdapi.ai**
+  * **LiteLLM** with its Bedrock provider (LiteLLM is not dedicated to AWS).
+  * **Bedrock Mantle** - AWS native solution, no installation required
+
+  #### Feature Comparison
+
+  | Capability                   | Bedrock Access Gateway (BAG) | stdapi.ai | LiteLLM (Bedrock provider) | AWS Bedrock Mantle |
+  |------------------------------| --- | --- | --- | --- |
+  | Automatic models discovery   | ✅ | ✅ | — | ✅ |
+  | Chat completion              | ✅ | ✅ | ✅ | ✅ |
+  | Embeddings                   | ✅ | ✅ | ✅ | — |
+  | Text to speech               | — | ✅ | — | — |
+  | Speech to text               | — | ✅ | — | — |
+  | Image generation             | — | ✅ | ✅ | — |
+  | Image editing                | — | ✅ | — | — |
+  | Models from multiple regions | — | ✅ | ✅ | — |
+  | No installation required     | — | — | — | ✅ |
+  | License                      | MIT | AGPL or Commercial | MIT or Commercial | AWS Service |
+
+  #### Solution 1: Bedrock Access Gateway (BAG)
+
+  **Prerequisites**
+
   - An active AWS account
   - An active AWS Access Key and Secret Key
   - IAM permissions in AWS to enable Bedrock models (or already enabled models)
   - Docker installed on your system
 
-  To learn more about Bedrock, visit the [Amazon Bedrock Official Page](https://aws.amazon.com/bedrock/).
-
-  **Step 1: Verify Access to Amazon Bedrock Base Models**
-
-  Before integrating, verify you have access to at least one base model. You'll know if you have access if it says "Access Granted" next to the model. If you don't have access to any models, the next steps will fail.
-
-  AWS provides documentation for requesting model access in the [Amazon Bedrock Model Access docs](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html).
-
-  ![Amazon Bedrock Base Models](/images/tutorials/amazon-bedrock/amazon-bedrock-base-models.png)
-
-  **Step 2: Configure the Bedrock Access Gateway**
+  **Step 1: Configure the Bedrock Access Gateway**
 
   The BAG is a proxy developed by AWS that wraps around the native Bedrock SDK and exposes OpenAI-compatible endpoints. Here's the endpoint mapping:
 
@@ -285,7 +294,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   ![Bedrock Access Gateway Swagger](/images/tutorials/amazon-bedrock/amazon-bedrock-proxy-api.png)
 
-  **Step 3: Add Connection in Open WebUI**
+  **Step 2: Add Connection in Open WebUI**
 
   1. Under the **Admin Panel**, go to **Settings** → **Connections**.
   2. Use the **+** button to add a new connection under OpenAI.
@@ -295,15 +304,163 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   ![Add New Connection](/images/tutorials/amazon-bedrock/amazon-bedrock-proxy-connection.png)
 
-  **Step 4: Start Using Bedrock Models**
+  **Other Helpful Tutorials**
 
-  You should now see all your enabled Bedrock models available in the model selector.
+  - [Connecting Open WebUI to AWS Bedrock](https://gauravve.medium.com/connecting-open-webui-to-aws-bedrock-a1f0082c8cb2)
+  - [Using Amazon Bedrock with Open WebUI for Sensitive Data](https://jrpospos.blog/posts/2024/08/using-amazon-bedrock-with-openwebui-when-working-with-sensitive-data/)
+
+  #### Solution 2: stdapi.ai
+
+  [stdapi.ai](https://stdapi.ai/) is an OpenAI-compatible API gateway you deploy in your AWS account, or run locally using Docker.
+
+  Open WebUI connects to it as if it were OpenAI, and stdapi.ai routes requests to Bedrock and other AWS AI services such as Amazon Polly and Transcribe. It also supports multi-region access to Bedrock, making it easier to reach more models that may only be available in specific AWS regions.
+
+  **Deploying on AWS**
+
+  stdapi.ai provides a full Terraform sample that provisions Open WebUI on ECS Fargate, connects it to stdapi.ai, and includes supporting services like Elasticache Valkey, Aurora PostgreSQL with vector extension, SearXNG, and Playwright.
+  This method handles both the stdapi.ai and Open WebUI configuration:
+
+  - [stdapi.ai Documentation - Open WebUI integration](https://stdapi.ai/use_cases_openwebui/)
+  - [stdapi-ai GitHub - Open WebUI Terraform sample](https://github.com/stdapi-ai/samples/tree/main/getting_started_openwebui)
+
+  stdapi.ai also provides documentation and Terraform samples to deploy it independently if you prefer to connect it to an existing Open WebUI instance.
+
+  - [stdapi.ai Documentation - Getting started](https://stdapi.ai/operations_getting_started/)
+
+  **Deploying Locally**
+
+  stdapi.ai also provides a Docker image for local usage.
+
+  Here is a minimal command to run it using your AWS access key:
+  ```bash
+  docker run \
+    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+    -e AWS_BEDROCK_REGIONS=us-east-1,us-west-2 \
+    -e ENABLE_DOCS=true \
+    --rm \
+    -p 8000:8000 \
+    ghcr.io/stdapi-ai/stdapi.ai-community:latest
+  ```
+  The application is now available at http://localhost:8000 (use it as `YOUR_STDAPI_URL` in the Open WebUI configuration below).
+
+  The `AWS_BEDROCK_REGIONS` variable lets you select regions where you want to load models, in this case `us-east-1` and `us-west-2`.
+
+  If you pass the `ENABLE_DOCS=true` variable, an interactive Swagger documentation page is available at http://localhost:8000/docs.
+
+  `API_KEY=my_secret_password` can also be used to set a custom API key for the application (defaults to no API key required). This is highly recommended if the server is reachable from elsewhere. Use this API key as `YOUR_STDAPI_KEY` in the Open WebUI configuration below.
+
+  Many other configuration options are available; see [the documentation](https://stdapi.ai/operations_configuration/) for more information.
+
+  **Open WebUI Configuration**
+
+  Open WebUI is configured via environment variables, and you can also set the same values from the Open WebUI admin panel.
+
+  Use the same stdapi.ai key for all `*_OPENAI_API_KEY` entries.
+
+  Core connection (chat + background tasks):
+
+  ```bash
+  OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
+  OPENAI_API_KEY=YOUR_STDAPI_KEY
+  # Use a fast, low-cost chat model for `TASK_MODEL_EXTERNAL`.
+  TASK_MODEL_EXTERNAL=amazon.nova-micro-v1:0
+  ```
+
+  RAG embeddings:
+
+  ```bash
+  RAG_EMBEDDING_ENGINE=openai
+  RAG_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
+  RAG_OPENAI_API_KEY=YOUR_STDAPI_KEY
+  RAG_EMBEDDING_MODEL=cohere.embed-v4:0
+  ```
+
+  Image generation:
+
+  ```bash
+  ENABLE_IMAGE_GENERATION=true
+  IMAGE_GENERATION_ENGINE=openai
+  IMAGES_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
+  IMAGES_OPENAI_API_KEY=YOUR_STDAPI_KEY
+  IMAGE_GENERATION_MODEL=stability.stable-image-core-v1:1
+  ```
+
+  Image editing:
+
+  ```bash
+  ENABLE_IMAGE_EDIT=true
+  IMAGE_EDIT_ENGINE=openai
+  IMAGES_EDIT_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
+  IMAGES_EDIT_OPENAI_API_KEY=YOUR_STDAPI_KEY
+  IMAGE_EDIT_MODEL=stability.stable-image-control-structure-v1:0
+  ```
+
+  Speech to text (STT):
+
+  ```bash
+  AUDIO_STT_ENGINE=openai
+  AUDIO_STT_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
+  AUDIO_STT_OPENAI_API_KEY=YOUR_STDAPI_KEY
+  AUDIO_STT_MODEL=amazon.transcribe
+  ```
+
+  Text to speech (TTS):
+
+  ```bash
+  AUDIO_TTS_ENGINE=openai
+  AUDIO_TTS_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
+  AUDIO_TTS_OPENAI_API_KEY=YOUR_STDAPI_KEY
+  AUDIO_TTS_MODEL=amazon.polly-neural
+  ```
+
+  If you see inconsistent auto-detection for TTS languages, set a fixed language in stdapi.ai (for example, `DEFAULT_TTS_LANGUAGE=en-US`).
+
+  #### Solution 3: AWS Bedrock Mantle
+
+  [Bedrock Mantle](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-mantle.html) is an AWS-native solution that provides an OpenAI-compatible API endpoint for Amazon Bedrock without requiring any additional infrastructure or installation. This makes it the simplest integration option for accessing Bedrock models.
+
+  **Key Advantages**
+
+  - No installation required - Uses AWS-managed endpoints directly
+  - Simple configuration - Just requires an API key
+  - Native AWS integration - Fully managed by AWS
+
+  **Limitations**
+
+  - Chat completion only - Does not support embeddings, image generation, or other features
+  - Subset of models - Only provides access to a limited selection of Bedrock models (Open weight models)
+  - Single region - Does not support multi-region access
+
+  **Prerequisites**
+
+  - An active AWS account
+  - An [Amazon Bedrock API key](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html) (create one from the AWS console)
+  - IAM permissions to use Bedrock models (recommended: `AmazonBedrockMantleInferenceAccess` IAM policy)
+
+  **Configuration**
+
+  Configure Open WebUI using environment variables:
+
+  ```bash
+  OPENAI_API_BASE_URL=https://bedrock.us-east-1.api.aws/v1
+  OPENAI_API_KEY=your_bedrock_api_key
+  ```
+
+  Replace `your_bedrock_api_key` with the [Amazon Bedrock API key](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html) you created.
+
+  Replace `us-east-1` in the URL with your preferred AWS region (e.g., `us-west-2`, `eu-west-1`, etc.).
+
+  You can also set the same values from the Open WebUI admin panel.
+
+  For more information, see the [Bedrock Mantle documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-mantle.html).
+
+  #### Start using Bedrock Base Models
 
   ![Use Bedrock Models](/images/tutorials/amazon-bedrock/amazon-bedrock-models-in-oui.png)
 
-  **Other helpful tutorials:**
-  - [Connecting Open WebUI to AWS Bedrock](https://gauravve.medium.com/connecting-open-webui-to-aws-bedrock-a1f0082c8cb2)
-  - [Using Amazon Bedrock with Open WebUI for Sensitive Data](https://jrpospos.blog/posts/2024/08/using-amazon-bedrock-with-openwebui-when-working-with-sensitive-data/)
+  You should now see all your Bedrock models available!
 
   </TabItem>
   <TabItem value="azure" label="Azure OpenAI">
