@@ -30,7 +30,9 @@
 	--docusaurus-highlighted-code-line-bg: rgb(0 0 0 / 10%);
 	--ifm-hover-overlay: #fafafa;
 	--ifm-heading-color: #111;
-	--ifm-font-family-base: "Archivo", -apple-system, BlinkMacSystemFont, " Segoe UI", Roboto, " Helvetica Neue", Arial, sans-serif;
+	--ifm-font-family-base:
+		"Archivo", -apple-system, BlinkMacSystemFont, " Segoe UI", Roboto,
+		" Helvetica Neue", Arial, sans-serif;
 	--ifm-global-shadow-md: 0px;
 	/* Remove shadow on the left */
 }
@@ -56,7 +58,8 @@
 	display: flex;
 	flex: 1;
 	height: fit-content !important;
-	padding: var(--ifm-navbar-padding-vertical) var(--ifm-navbar-padding-horizontal);
+	padding: var(--ifm-navbar-padding-vertical)
+		var(--ifm-navbar-padding-horizontal);
 }
 
 .navbar-sidebar__items {
@@ -467,7 +470,6 @@ article p a {
 }
 
 @media screen and (width >=997px) {
-
 	/* Show inline table of contents on mobile only */
 	div[class^="tableOfContentsInline"] {
 		display: none;
@@ -504,11 +506,11 @@ article p a {
 	background-color: rgb(50 125 255);
 }
 
-.tabs+.margin-top--md {
+.tabs + .margin-top--md {
 	margin-top: 5px !important;
 }
 
-.tabs+.margin-top--md pre {
+.tabs + .margin-top--md pre {
 	border-top-right-radius: 0;
 	border-top-left-radius: 0;
 }
@@ -530,7 +532,7 @@ article p a {
 	background-color: rgb(120 120 120 / 20%);
 }
 
-div.special_table+table {
+div.special_table + table {
 	border: none;
 
 	/* border-collapse: separate; */
@@ -538,13 +540,13 @@ div.special_table+table {
 	/* border-spacing: 0px; */
 }
 
-div.special_table+table thead {
+div.special_table + table thead {
 	background: rgb(120 120 120 / 10%);
 	border-top-right-radius: 10px;
 	overflow: hidden;
 }
 
-div.special_table+table thead tr {
+div.special_table + table thead tr {
 	background: rgb(255 255 255 / 0%);
 	border-top: 0;
 	border-bottom: 0;
@@ -552,23 +554,23 @@ div.special_table+table thead tr {
 
 th,
 td,
-div.special_table+table {
+div.special_table + table {
 	border-width: 0 !important;
 }
 
-div.special_table+table tr th {
+div.special_table + table tr th {
 	background: rgb(255 255 255 / 0%);
 	color: #000;
 	font-weight: 600;
 	padding: 5px 20px;
 }
 
-div.special_table+table tr td {
+div.special_table + table tr td {
 	padding: 5px 20px;
 	text-align: left;
 }
 
-div.special_table+table tr:nth-child(even) {
+div.special_table + table tr:nth-child(even) {
 	background: rgb(255 255 255 / 0%);
 }
 
@@ -644,7 +646,6 @@ div.special_table+table tr:nth-child(even) {
 }
 
 @media screen and (width >=997px) {
-
 	.header-github-link,
 	.header-discord-link {
 		font-size: 0;
@@ -662,7 +663,8 @@ div.special_table+table tr:nth-child(even) {
 	display: flex;
 	background-color: var(--ifm-navbar-link-color);
 	mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E");
-	transition: background-color var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+	transition: background-color var(--ifm-transition-fast)
+		var(--ifm-transition-timing-default);
 }
 
 .header-github-link:hover::before {
@@ -678,7 +680,8 @@ div.special_table+table tr:nth-child(even) {
 
 	/* URL encode an svg https://yoksel.github.io/url-encoder/ */
 	mask-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' role='img' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath fill='currentColor' d='M19.73 4.87a18.2 18.2 0 0 0-4.6-1.44c-.21.4-.4.8-.58 1.21-1.69-.25-3.4-.25-5.1 0-.18-.41-.37-.82-.59-1.2-1.6.27-3.14.75-4.6 1.43A19.04 19.04 0 0 0 .96 17.7a18.43 18.43 0 0 0 5.63 2.87c.46-.62.86-1.28 1.2-1.98-.65-.25-1.29-.55-1.9-.92.17-.12.32-.24.47-.37 3.58 1.7 7.7 1.7 11.28 0l.46.37c-.6.36-1.25.67-1.9.92.35.7.75 1.35 1.2 1.98 2.03-.63 3.94-1.6 5.64-2.87.47-4.87-.78-9.09-3.3-12.83ZM8.3 15.12c-1.1 0-2-1.02-2-2.27 0-1.24.88-2.26 2-2.26s2.02 1.02 2 2.26c0 1.25-.89 2.27-2 2.27Zm7.4 0c-1.1 0-2-1.02-2-2.27 0-1.24.88-2.26 2-2.26s2.02 1.02 2 2.26c0 1.25-.88 2.27-2 2.27Z' %3E%3C/path%3E%3C/svg%3E");
-	transition: background-color var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+	transition: background-color var(--ifm-transition-fast)
+		var(--ifm-transition-timing-default);
 }
 
 .header-discord-link:hover::before {

@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 
 export const SidebarBanners = () => {
 	const items = [
-
 		{
 			imgSrc: "/sponsors/banners/openwebui-banner.png",
 			mobileImgSrc: "/sponsors/banners/openwebui-banner-mobile.png",
 			url: "https://careers.openwebui.com",
 			name: "Open WebUI Inc.",
-			description:
-				""
+			description: "",
 		},
 	];
 
