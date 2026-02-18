@@ -1,0 +1,77 @@
+---
+sidebar_position: 3
+title: "Anthropic (Claude)"
+
+---
+
+## Overview
+
+Open WebUI supports **Anthropic's Claude models** natively through their OpenAI-compatible endpoint. Just plug in your API key and start chatting — no middleware, no pipes, no extra setup required.
+
+Open WebUI includes a built-in compatibility layer that automatically detects Anthropic URLs, handles model discovery, and translates requests. Chat completions, streaming, and **tool calling** all work correctly out of the box.
+
+:::warning Anthropic's Compatibility Disclaimer
+Anthropic states that their OpenAI-compatible API is intended **for evaluation and testing**, not production workloads. In practice, everything — including tool calling — works as intended, but be aware of this official stance. For full Claude-native features (PDF processing, citations, extended thinking, prompt caching), Anthropic recommends their native `/v1/messages` API, which can be accessed via a [pipe function](/features/extensibility/plugin/functions/pipe) or a proxy like [LiteLLM](https://docs.litellm.ai/).
+:::
+
+---
+
+## Step 1: Get Your API Key
+
+1. Go to [console.anthropic.com](https://console.anthropic.com/).
+2. Create an account or sign in.
+3. Navigate to **API Keys** and generate a new key.
+
+---
+
+## Step 2: Add the Connection in Open WebUI
+
+1. Open Open WebUI in your browser.
+2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
+3. Click ➕ **Add Connection**.
+4. Enter the following:
+
+| Setting | Value |
+|---|---|
+| **URL** | `https://api.anthropic.com/v1` |
+| **API Key** | Your Anthropic API key |
+
+5. Click **Save**.
+
+:::tip
+The URL field will suggest common provider endpoints as you type — just select the Anthropic URL from the dropdown.
+:::
+
+---
+
+## Step 3: Start Chatting!
+
+That's it! Open WebUI automatically detects the Anthropic endpoint and fetches available models. Select a Claude model from the model dropdown and you're good to go.
+
+Streaming, multi-turn conversations, and tool calling all work seamlessly.
+
+:::info Optional: Filter Models
+If you want only specific models to appear, you can add model IDs to the **Model IDs (Filter)** allowlist in the connection settings. Common model IDs:
+
+| Model | ID |
+|---|---|
+| Claude Sonnet 4.5 | `claude-sonnet-4-5-20250514` |
+| Claude Opus 4 | `claude-opus-4-0-20250514` |
+| Claude Sonnet 4 | `claude-sonnet-4-20250514` |
+| Claude Haiku 3.5 | `claude-3-5-haiku-20241022` |
+
+Check [Anthropic's model documentation](https://docs.anthropic.com/en/docs/about-claude/models) for the latest available model IDs.
+:::
+
+---
+
+## Managing Your Connection
+
+You can **enable or disable** your Anthropic connection at any time using the toggle switch next to the connection entry. This lets you temporarily deactivate a provider without deleting the connection or losing your configuration.
+
+---
+
+## Learn More
+
+- **[OpenAI-Compatible Providers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)** — Protocol design philosophy and setup for other providers.
+- **[Pipe Functions](/features/extensibility/plugin/functions/pipe)** — Use Anthropic's native API with full feature support via a pipe function.
