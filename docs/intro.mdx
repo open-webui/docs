@@ -5,7 +5,7 @@ title: 🏡 Home
 hide_title: true
 ---
 
-import { TopBanners } from "@site/src/components/TopBanners";
+ 
 import { SponsorList } from "@site/src/components/SponsorList";
 
 # Open WebUI
@@ -13,7 +13,6 @@ import { SponsorList } from "@site/src/components/SponsorList";
 
 **Open WebUI is an [extensible](https://docs.openwebui.com/features/extensibility/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It is built around universal standards, supporting **Ollama** and **OpenAI-compatible Protocols** (specifically Chat Completions). This protocol-first approach makes it a powerful, provider-agnostic AI deployment solution for both local and cloud-based models.
 
-[![Open WebUI Banner](/images/banner.png)](https://openwebui.com)
 
 Passionate about open-source AI? [Join our team →](https://careers.openwebui.com/)
 
@@ -37,8 +36,6 @@ Passionate about open-source AI? [Join our team →](https://careers.openwebui.c
 Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
 
 :::
-
-<TopBanners />
 
 ## Quick Start with Docker 🐳
 
@@ -151,7 +148,7 @@ Always use a separate data volume (e.g., `-v open-webui-dev:/app/backend/data`) 
 To update Open WebUI container easily, follow these steps:
 
 #### Manual Update
-Use [Watchtower](https://github.com/nickfedor/watchtower) to update your Docker container manually:
+Use [Watchtower](https://github.com/nicholas-fedor/watchtower) to update your Docker container manually:
 ```bash
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
 ```
