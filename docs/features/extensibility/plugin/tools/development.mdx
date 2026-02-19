@@ -1521,7 +1521,7 @@ We strongly recommend using an [OpenAPI tool server](/features/extensibility/plu
 
 **Do not rely on runtime pip installation in production environments.** When running with `UVICORN_WORKERS > 1` or multiple replicas, each worker/replica attempts to install packages independently on startup. This causes **race conditions** where concurrent pip processes crash with `AssertionError` because pip's internal locking detects the simultaneous installs.
 
-**The recommended approach for production is to pre-install all required packages at image build time** using a custom Dockerfile:
+**Set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) in production** to disable runtime pip installs entirely. Then pre-install all required packages at image build time using a custom Dockerfile:
 
 ```dockerfile
 FROM ghcr.io/open-webui/open-webui:main
