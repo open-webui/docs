@@ -6366,7 +6366,7 @@ bypassed when accessing documents from MIT.
 
 Open WebUI provides environment variables to customize the pip installation process. Below are the environment variables used by Open WebUI for adjusting package installation behavior:
 
-#### `ENABLE_AUTO_DEPENDENCY_INSTALL`
+#### `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`
 
 - Type: `bool`
 - Default: `True`
@@ -6374,7 +6374,7 @@ Open WebUI provides environment variables to customize the pip installation proc
 
 :::warning Security Hardening for Production
 
-**Strongly recommended: set `ENABLE_AUTO_DEPENDENCY_INSTALL=False` in production.** Runtime pip installs allow any admin-uploaded function or tool to install arbitrary Python packages into the running process. Disabling this:
+**Strongly recommended: set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False` in production.** Runtime pip installs allow any admin-uploaded function or tool to install arbitrary Python packages into the running process. Disabling this:
 
 - **Prevents arbitrary package installation** from user-uploaded code
 - **Eliminates race conditions** that crash workers when `UVICORN_WORKERS > 1` or multiple replicas attempt concurrent pip installs

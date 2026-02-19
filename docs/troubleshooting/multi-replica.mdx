@@ -226,7 +226,7 @@ See [DATABASE_POOL_SIZE](/reference/env-configuration#database_pool_size) for de
 When a function or tool specifies `requirements` in its frontmatter, Open WebUI runs `pip install` at runtime. With multiple workers or replicas, each process attempts the installation independently, causing pip's internal lock to detect the conflict and crash.
 
 **Solution:**
-**Set [`ENABLE_AUTO_DEPENDENCY_INSTALL=False`](/reference/env-configuration#enable_auto_dependency_install)** to disable runtime pip installs entirely. Then pre-install all required packages at image build time:
+**Set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)** to disable runtime pip installs entirely. Then pre-install all required packages at image build time:
 
 ```dockerfile
 FROM ghcr.io/open-webui/open-webui:main
