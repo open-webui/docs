@@ -425,6 +425,65 @@ After uploading, you can group files into a knowledge collection or reference th
       return response.json()
   ```
 
+
+#### Processing Web URLs into Knowledge Collections
+
+Use this endpoint to fetch a webpage, extract content, and store the resulting chunks in a knowledge collection.
+
+- **Endpoint**: `POST /api/v1/retrieval/process/web`
+- **Query Parameters**:
+  - `process` (boolean, default: `true`): If `false`, only fetches and returns extracted content without saving vectors
+  - `overwrite` (boolean, default: `true`): Whether to replace existing vectors in the target collection before saving new chunks, effectively emptying the given collection and replacing it with the content of the given URL
+- **Request Body**:
+  - `url` (string, required): Web URL to fetch and parse
+  - `collection_name` (string, optional): Target collection name. If omitted, Open WebUI generates one from the URL
+
+**`overwrite` behavior:**
+| Value | Result |
+|-------|--------|
+| `true` (default) | Existing vectors in the target collection are replaced before inserting the new URL chunks |
+| `false` | Existing vectors are preserved and new URL chunks are added to the same collection |
+
+- **Curl Example** (preserve existing vectors):
+
+  ```bash
+  curl -X POST 'http://localhost:3000/api/v1/retrieval/process/web?process=true&overwrite=false' \
+  -H 'Authorization: Bearer YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "url": "https://example.com/docs",
+        "collection_name": "testkb"
+      }'
+  ```
+
+- **Python Example**:
+
+  ```python
+  import requests
+
+  def process_web_url(token, url, collection_name="testkb", overwrite=False):
+      response = requests.post(
+          'http://localhost:3000/api/v1/retrieval/process/web',
+          headers={
+              'Authorization': f'Bearer {token}',
+              'Content-Type': 'application/json'
+          },
+          params={
+              'process': 'true',
+              'overwrite': str(overwrite).lower()
+          },
+          json={
+              'url': url,
+              'collection_name': collection_name
+          }
+      )
+      return response.json()
+  ```
+
+:::tip
+If `ENV=dev` is enabled, this endpoint schema (including query params like `overwrite`) is also visible in Swagger at `/docs`.
+:::
+
 #### Complete Workflow Example
 
 Here's a complete example that uploads a file, waits for processing, and adds it to a knowledge base:
