@@ -81,6 +81,76 @@ Access detailed API documentation for different services provided by Open WebUI:
       return response.json()
   ```
 
+### 🔮 Anthropic Messages API
+
+Open WebUI provides an Anthropic Messages API compatible endpoint. This allows tools, SDKs, and applications built for the Anthropic API to work directly against Open WebUI — routing requests through all configured models, filters, and pipelines.
+
+Internally, the endpoint converts the Anthropic request format to OpenAI Chat Completions format, routes it through the existing chat completion pipeline, and converts the response back to Anthropic format. Both streaming and non-streaming requests are supported.
+
+- **Endpoints**: `POST /api/message`, `POST /api/v1/messages`
+- **Authentication**: Supports both `Authorization: Bearer YOUR_API_KEY` and Anthropic's `x-api-key: YOUR_API_KEY` header
+
+- **Curl Example** (non-streaming):
+
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/messages \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "gpt-4o",
+        "max_tokens": 1024,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Why is the sky blue?"
+          }
+        ]
+      }'
+  ```
+
+- **Curl Example** (streaming):
+
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/messages \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "gpt-4o",
+        "max_tokens": 1024,
+        "stream": true,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Why is the sky blue?"
+          }
+        ]
+      }'
+  ```
+
+- **Python Example** (using the Anthropic SDK):
+
+  ```python
+  from anthropic import Anthropic
+
+  client = Anthropic(
+      api_key="YOUR_OPEN_WEBUI_API_KEY",
+      base_url="http://localhost:3000/api/v1",
+  )
+
+  message = client.messages.create(
+      model="gpt-4o",
+      max_tokens=1024,
+      messages=[
+          {"role": "user", "content": "Why is the sky blue?"}
+      ],
+  )
+  print(message.content[0].text)
+  ```
+
+:::info
+All models configured in Open WebUI are accessible through this endpoint — including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
+:::
+
 ### 🔧 Filter and Function Behavior with API Requests
 
 When using the API endpoints directly, filters (Functions) behave differently than when requests come from the web interface.
