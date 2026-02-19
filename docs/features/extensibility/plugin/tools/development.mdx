@@ -1517,9 +1517,29 @@ We strongly recommend using an [OpenAPI tool server](/features/extensibility/plu
 
 :::
 
-Keep in mind that as pip is used in the same process as Open WebUI, the UI will be completely unresponsive during the installation.
+:::danger Production / Multi-Worker Deployments
 
-No measures are taken to handle package conflicts with Open WebUI's requirements. That means that specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
+**Do not rely on runtime pip installation in production environments.** When running with `UVICORN_WORKERS > 1` or multiple replicas, each worker/replica attempts to install packages independently on startup. This causes **race conditions** where concurrent pip processes crash with `AssertionError` because pip's internal locking detects the simultaneous installs.
+
+**The recommended approach for production is to pre-install all required packages at image build time** using a custom Dockerfile:
+
+```dockerfile
+FROM ghcr.io/open-webui/open-webui:main
+
+RUN pip install --no-cache-dir python-docx requests beautifulsoup4
+```
+
+Runtime installation is only suitable for **single-worker development or homelab environments** where you're experimenting with new functions and tools. For any deployment serving multiple users, bake your dependencies into the container image.
+
+:::
+
+:::note
+
+Keep in mind that pip runs in the same process as Open WebUI, so the **UI will be completely unresponsive** during installation.
+
+No measures are taken to handle package conflicts with Open WebUI's own dependencies. Specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
+
+:::
 
 <details>
 <summary>Example</summary>

@@ -81,68 +81,6 @@ Access detailed API documentation for different services provided by Open WebUI:
       return response.json()
   ```
 
-### 🔄 OpenResponses
-
-- **Endpoint**: `POST /api/responses`
-- **Description**: Proxies requests to the [OpenResponses API](https://openresponses.org). Automatically routes to the correct upstream backend based on the `model` field, including Azure OpenAI deployments. Supports both streaming (SSE) and non-streaming responses.
-
-- **Curl Example**:
-
-  ```bash
-  curl -X POST http://localhost:3000/api/responses \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-        "model": "gpt-4.1",
-        "input": "Explain quantum entanglement in simple terms."
-      }'
-  ```
-
-- **Python Example**:
-
-  ```python
-  import requests
-
-  def create_response(token, model, input_text):
-      url = 'http://localhost:3000/api/responses'
-      headers = {
-          'Authorization': f'Bearer {token}',
-          'Content-Type': 'application/json'
-      }
-      data = {
-          "model": model,
-          "input": input_text
-      }
-      response = requests.post(url, headers=headers, json=data)
-      return response.json()
-  ```
-
-- **Streaming Example**:
-
-  ```python
-  import requests
-
-  def stream_response(token, model, input_text):
-      url = 'http://localhost:3000/api/responses'
-      headers = {
-          'Authorization': f'Bearer {token}',
-          'Content-Type': 'application/json'
-      }
-      data = {
-          "model": model,
-          "input": input_text,
-          "stream": True
-      }
-      response = requests.post(url, headers=headers, json=data, stream=True)
-      for line in response.iter_lines():
-          if line:
-              print(line.decode('utf-8'))
-  ```
-
-:::info
-The Responses API endpoint supports the same model-based routing as Chat Completions. If you have multiple OpenAI-compatible backends configured, the request is automatically routed based on which backend hosts the specified model. Azure OpenAI deployments are also supported with appropriate API version handling.
-:::
-
 ### 🔧 Filter and Function Behavior with API Requests
 
 When using the API endpoints directly, filters (Functions) behave differently than when requests come from the web interface.
