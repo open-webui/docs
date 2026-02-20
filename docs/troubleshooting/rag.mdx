@@ -379,5 +379,65 @@ If you are running a version with this fix and still experiencing worker death, 
 
 ---
 
+### 13. Knowledge Base Attached to Model Not Working
+
+You attached a knowledge base to a model in **Workspace > Models > Edit**, but when you chat with the model it doesn't seem to know about the knowledge base content at all.
+
+**The Problem**: Open WebUI has two distinct RAG modes, and they handle model-attached knowledge bases very differently:
+
+| Mode | How Knowledge Works |
+|------|-------------------|
+| **Default (non-native)** | Open WebUI automatically performs RAG — it queries the attached knowledge base, retrieves relevant chunks, and injects them into the conversation context. This happens behind the scenes without the model doing anything. |
+| **Native Function Calling** | Knowledge is **not auto-injected**. Instead, the model receives tools (like `query_knowledge_bases`) and must actively decide to call them. This is **agentic RAG** — the model autonomously searches when it determines it needs information. |
+
+If you have **Native Function Calling enabled**, the model needs both the **ability** and the **instruction** to use the knowledge tools.
+
+#### Knowledge Retrieval Behavior Matrix
+
+| | **KB Attached to Model** | **No KB Attached** |
+|---|---|---|
+| **Default Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG — user must manually add a knowledge base to the chat via `#` |
+| **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** — must actively call them | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled) — must actively call them |
+
+Key takeaway: in default mode, attaching a KB enables automatic RAG scoped to those KBs. In native mode, the model must use its tools regardless — attaching a KB only restricts *which* KBs are searchable.
+
+:::tip Preventing Knowledge Base Access in Native Mode
+If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Workspace > Models > Edit > Builtin Tools**. This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.
+:::
+
+![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
+
+✅ **Solutions (check in order):**
+
+1. **Ensure Built-in Tools are enabled for the model**:
+   - Go to **Workspace > Models > Edit** for your model
+   - Under **Builtin Tools**, make sure the **Knowledge Base** category is enabled (it is by default)
+   - If this is disabled, the model has no way to query attached knowledge bases
+
+2. **Add a system prompt hint**:
+   - Some models need explicit guidance to use their tools. Add something like:
+     > "When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_bases to search for relevant information before answering."
+
+3. **Or disable Native Function Calling** for that model:
+   - In the model settings, disable Native Function Calling to restore the classic auto-injection RAG behavior from earlier versions
+
+4. **Or use Full Context mode**:
+   - Click on the attached knowledge base and select **"Use Entire Document"**
+   - This bypasses RAG entirely and always injects the full content, regardless of native function calling settings
+
+:::info Why the Change?
+Open WebUI is moving toward **agentic RAG**, where the model autonomously decides when and how to search knowledge bases. This is more powerful than classic RAG because the model can retry searches with different queries if the first attempt didn't yield good results. However, it does require models that are capable of using tools effectively. For smaller or older models that struggle with tool calling, disabling Native Function Calling is the recommended approach.
+:::
+
+For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/ai-knowledge/knowledge#native-mode-agentic-mode-knowledge-tools) and [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+
+---
+
+| Problem | Fix |
+|--------|---------:|
+| 🧠 Model ignores attached knowledge base | Enable Builtin Tools, add system prompt hints, or disable native function calling |
+
+---
+
 By optimizing these areas—extraction, embedding, retrieval, and model context—you can dramatically improve how accurately your LLM works with your documents. Don't let a 2048-token window or weak retrieval pipeline hold back your AI's power 🎯.
 
