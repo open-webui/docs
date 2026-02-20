@@ -1156,6 +1156,13 @@ Output:
 - Description: Enables message rating feature.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_TOOL_APPROVAL`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables the human-in-the-loop tool approval system. When enabled, AI tool calls pause and display an approval modal requiring the user to Allow Once, Always Approve, or Decline before execution. When disabled, all tool calls execute automatically without prompts. See [Tool Approval](/features/access-security/tool-approval) for full details.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `ENABLE_COMMUNITY_SHARING`
 
 - Type: `bool`
