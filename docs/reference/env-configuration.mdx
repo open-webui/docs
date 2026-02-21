@@ -776,6 +776,43 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 - Example: `sk-124781258123;sk-4389759834759834`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+### Anthropic
+
+#### `ENABLE_ANTHROPIC_API`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables the native Anthropic (Claude) provider for direct communication with the Anthropic Messages API.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ANTHROPIC_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.anthropic.com`
+- Description: Configures the Anthropic API base URL.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ANTHROPIC_API_BASE_URLS`
+
+- Type: `str`
+- Description: Supports multiple Anthropic API base URLs, semicolon-separated. Use with `ANTHROPIC_API_KEYS` for multiple connections.
+- Example: `https://api.anthropic.com;https://custom-proxy.example.com`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ANTHROPIC_API_KEY`
+
+- Type: `str`
+- Description: Sets the Anthropic API key.
+- Example: `sk-ant-api03-xxxxxxxxxxxx`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `ANTHROPIC_API_KEYS`
+
+- Type: `str`
+- Description: Supports multiple Anthropic API keys, semicolon-separated. Each key corresponds to the base URL at the same index in `ANTHROPIC_API_BASE_URLS`.
+- Example: `sk-ant-key-one;sk-ant-key-two`
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Tasks
 
 #### `TASK_MODEL`
