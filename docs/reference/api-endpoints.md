@@ -149,6 +149,8 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
 
 :::info
 All models configured in Open WebUI are accessible through this endpoint — including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
+
+**Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
 :::
 
 ### 🔧 Filter and Function Behavior with API Requests

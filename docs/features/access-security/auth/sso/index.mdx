@@ -204,6 +204,7 @@ You can configure the following environment variables:
 
 1. `OAUTH_GROUP_CLAIM` - The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
 1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
+1. `OAUTH_GROUP_DEFAULT_SHARE` - Controls the default sharing permission for groups created via JIT group creation. Defaults to `true` (share with anyone). Set to `members` to restrict sharing to group members only, or `false` to disable sharing entirely. Only applies when `ENABLE_OAUTH_GROUP_CREATION` is enabled.
 
 :::warning
 

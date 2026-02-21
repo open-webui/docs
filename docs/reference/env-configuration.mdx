@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.8.2](https://github.com/open-webui/open-webui/releases/tag/v0.8.2), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.8.4](https://github.com/open-webui/open-webui/releases/tag/v0.8.4), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -269,6 +269,12 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `bool`
 - Default: `True`
 - Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
+
+#### `ENABLE_ADMIN_ANALYTICS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the **Analytics** tab is visible and accessible in the admin panel. When set to `False`, the analytics API router is not mounted and the tab is hidden from the admin navigation. Useful for deployments where analytics data collection or display is not desired. Requires a restart to take effect.
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
@@ -2899,6 +2905,19 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 :::
 
+#### `RAG_EMBEDDING_CONCURRENT_REQUESTS`
+
+- Type: `int`
+- Default: `0`
+- Description: Limits the number of concurrent embedding API requests when async embedding is enabled. Uses an asyncio semaphore to throttle parallel requests. Set to `0` for unlimited concurrency (default behavior), or set to a positive integer to cap simultaneous requests. Useful for respecting rate limits on external embedding APIs or reducing load on local embedding servers.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches.
+
+:::
+
 #### `RAG_EMBEDDING_TIMEOUT`
 
 - Type: `int` (seconds)
@@ -3365,6 +3384,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `azure_ai_search`
   - `yacy`
   - `yandex` - Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
+  - `youcom` - Uses the [You.com](https://you.com/) YDC Index API for web search.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DDGS_BACKEND`
@@ -3692,6 +3712,13 @@ If you use `perplexity_search`, this variable is not relevant to you.
 If you use `perplexity`, this variable is not relevant to you.
 
 :::
+
+#### `YOUCOM_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for [You.com](https://you.com/) YDC Index API web search. Required when `WEB_SEARCH_ENGINE` is set to `youcom`. Obtain an API key from [You.com API](https://you.com/api).
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Web Loader Configuration
 
@@ -4923,6 +4950,17 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `bool`
 - Default: `False`
 - Description: When enabled, groups from OAuth claims that don't exist in Open WebUI will be automatically created.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_GROUP_DEFAULT_SHARE`
+
+- Type: `str`
+- Default: `true`
+- Options:
+  - `true` — Groups created via OAuth will have sharing enabled for anyone.
+  - `members` — Groups created via OAuth will only allow sharing with group members.
+  - `false` — Groups created via OAuth will have sharing disabled (no one can share).
+- Description: Controls the default sharing permission for groups that are automatically created via OAuth group management. Only applies when `ENABLE_OAUTH_GROUP_CREATION` is enabled. Existing groups are not affected by this setting.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_BLOCKED_GROUPS`

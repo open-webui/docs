@@ -281,6 +281,33 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 
 ---
 
+### 10b. 429 Rate Limit Errors During Embedding
+
+When using a **remote/external embedding provider** (OpenAI, Azure OpenAI, etc.) with [`ENABLE_ASYNC_EMBEDDING`](/reference/env-configuration#enable_async_embedding) enabled, you may see HTTP 429 "Too Many Requests" errors in the logs during bulk document ingestion:
+
+```
+Error generating embeddings: 429 Rate limit reached
+```
+
+**The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits — especially on free-tier or lower-tier plans.
+
+✅ **Solutions:**
+
+1. **Limit Concurrent Embedding Requests**:
+   Set [`RAG_EMBEDDING_CONCURRENT_REQUESTS`](/reference/env-configuration#rag_embedding_concurrent_requests) to cap the number of simultaneous embedding API calls. For example, set it to `5` or `10` depending on your provider's rate limits:
+   ```yaml
+   # docker-compose.yaml
+   environment:
+     RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
+   ```
+   Or configure it in the **Admin Panel > Settings > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
+
+2. **Reduce Batch Size**:
+   Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
+
+3. **Disable Async Embedding**:
+   If rate limits remain an issue, set `ENABLE_ASYNC_EMBEDDING` to `False` to process embeddings sequentially (slower but avoids rate limit pressure).
+
 ### 11. PDF OCR Not Extracting Text from Images
 
 If PDFs containing images with text are returning empty content:
