@@ -4633,6 +4633,13 @@ In any production environment running more than one instance of Open WebUI (e.g.
 
 :::
 
+#### `OAUTH_MAX_SESSIONS_PER_USER`
+
+- Type: `int`
+- Default: `10`
+- Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions are pruned to make room for the new one. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
+
+
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
