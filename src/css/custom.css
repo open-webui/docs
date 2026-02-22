@@ -31,9 +31,10 @@
 	--ifm-hover-overlay: #fafafa;
 	--ifm-heading-color: #111;
 	--ifm-font-family-base:
-		"Archivo", -apple-system, BlinkMacSystemFont, " Segoe UI", Roboto,
-		" Helvetica Neue", Arial, sans-serif;
+		"Archivo", -apple-system, blinkmacsystemfont, " Segoe UI", roboto,
+		" Helvetica Neue", arial, sans-serif;
 	--ifm-global-shadow-md: 0px;
+
 	/* Remove shadow on the left */
 }
 
