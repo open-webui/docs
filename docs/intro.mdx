@@ -45,6 +45,16 @@ Get **enhanced capabilities**, including **custom theming and branding**, **Serv
 
 :::
 
+:::tip Docker Hub Now Available
+
+Open WebUI images are now published to **both** registries:
+- **GitHub Container Registry:** `ghcr.io/open-webui/open-webui`
+- **Docker Hub:** `openwebui/open-webui`
+
+Both registries contain identical images. You can use either one — simply replace `ghcr.io/open-webui/open-webui` with `openwebui/open-webui` in any command below.
+
+:::
+
 **If Ollama is on your computer**, use this command:
 
 ```bash
@@ -92,6 +102,8 @@ For `production environments` where stability and reproducibility are important,
 
 ```
 ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
+# or equivalently:
+openwebui/open-webui:<RELEASE_VERSION>-<TYPE>
 ```
 
 Examples (pinned versions for illustration purposes only):
