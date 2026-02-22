@@ -185,6 +185,20 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Example: `gpt-4,claude-3-opus,llama-3-70b`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_MODEL_METADATA`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline — per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
+- Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `models.default_metadata`.
+
+#### `DEFAULT_MODEL_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time — per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
+- Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `models.default_params`.
+
 #### `DEFAULT_USER_ROLE`
 
 - Type: `str`
