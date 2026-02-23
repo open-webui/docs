@@ -667,6 +667,134 @@ async function myToolHandler(req) {
 
 ---
 
+## 🔒 Persistence & Browser Disconnection
+
+A common question is: **what happens if the browser tab is closed while a tool, action, or pipe is still running?**
+
+### Server-Side Execution Continues
+
+When you send a chat request, Open WebUI creates a background `asyncio` task that is **not tied to your HTTP connection or Socket.IO session**. If you close the tab:
+
+1. The WebSocket disconnects and the Socket.IO disconnect handler fires
+2. The disconnect handler cleans up session data but **does not cancel any running tasks**
+3. The background task continues running to completion on the server
+4. `sio.emit()` calls succeed silently — events are sent to an empty room and discarded
+5. **Database writes still happen** for persisted event types (see below)
+6. The task runs until the function returns, raises an error, or is manually cancelled
+
+:::info No Execution Timeout
+There is **no timeout** on pipe, tool, or action execution. Your code can run for minutes or hours — nothing in Open WebUI will kill it automatically. The only things that can stop a running task are:
+- The function itself returning or raising an exception
+- Manual cancellation via `POST /api/tasks/stop/{task_id}` (the stop button in the UI)
+- The Open WebUI server process restarting
+:::
+
+### Which Event Types Are Persisted to the Database?
+
+The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**. These writes are independent of the `ENABLE_REALTIME_CHAT_SAVE` setting.
+
+#### ✅ Persisted (survive tab close)
+
+| Type | What's saved |
+|------|-------------|
+| `status` | Appended to the message's `statusHistory` array |
+| `message` | Appended to the message's `content` field |
+| `replace` | Overwrites the message's `content` field |
+| `embeds` | Appended to the message's `embeds` array (Rich UI HTML) |
+| `files` | Appended to the message's `files` array |
+| `source` / `citation` | Appended to the message's `sources` array |
+
+These 6 types always write to the database inside the event emitter function itself, completely independent of `ENABLE_REALTIME_CHAT_SAVE`.
+
+:::warning Use Short Names for Persistence
+The backend event emitter only recognizes the short names above for DB writes. If you emit `"chat:message:embeds"` instead of `"embeds"`, the frontend handles it identically, but the **backend won't persist it**. Always use the short names (`"status"`, `"message"`, `"replace"`, `"embeds"`, `"files"`, `"source"`) if you need persistence.
+:::
+
+#### ❌ Not persisted (lost on tab close)
+
+| Type | Why it's lost |
+|------|--------------|
+| `chat:completion` | Streaming LLM deltas — Socket.IO only |
+| `chat:message:delta` | Frontend alias, backend doesn't persist |
+| `chat:message` | Frontend alias, backend doesn't persist |
+| `chat:message:files` | Frontend alias, backend doesn't persist |
+| `chat:message:embeds` | Frontend alias, backend doesn't persist |
+| `chat:message:error` | Socket.IO only |
+| `chat:message:follow_ups` | Socket.IO only |
+| `chat:message:favorite` | Socket.IO only (updates frontend state) |
+| `chat:title` | Socket.IO only |
+| `chat:tags` | Socket.IO only |
+| `notification` | Toast popup — Socket.IO only |
+
+:::tip Alternative for Streaming LLM Output
+If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
+:::
+
+#### ⚠️ Requires live connection (will error on tab close)
+
+| Type | Why |
+|------|-----|
+| `confirmation` | Uses `sio.call()` — waits for client response, will timeout |
+| `input` | Uses `sio.call()` — waits for client response, will timeout |
+| `execute` | Uses `sio.call()` — waits for client response, will timeout |
+
+These `__event_call__` types fundamentally require a live browser connection. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code.
+
+### Return Value Persistence
+
+The final return value of your function is **always saved to the database** when the task completes, regardless of browser state.
+
+#### Pipes
+
+When a pipe's `pipe()` method returns (or its generator finishes yielding), the streaming handler saves the final result at completion:
+- If `ENABLE_REALTIME_CHAT_SAVE` is **on**: intermediate chunks are saved during streaming
+- If `ENABLE_REALTIME_CHAT_SAVE` is **off**: the full final content is saved in one write at completion
+
+Either way, the final assistant message is always persisted. When you reopen the chat, it will be there.
+
+#### Tools
+
+| Return type | What happens | Persisted? |
+|-------------|-------------|-----------|
+| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
+| `HTMLResponse` (without inline) | Body decoded as plain text tool result | ✅ Yes |
+| `str` / `dict` | Used as tool result text | ✅ Yes |
+| `list` (MCP) | Text items joined, images converted to files | ✅ Yes |
+
+#### Actions
+
+Actions go through the same return handling as tools. The same persistence rules apply:
+
+| Return type | What happens | Persisted? |
+|-------------|-------------|-----------|
+| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
+| `HTMLResponse` (without inline) | Body decoded as plain text result | ✅ Yes |
+| `str` / `dict` | Used as action result text | ✅ Yes |
+
+#### Filters
+
+Filters transform `form_data` in the pipeline — they don't return results to the user directly. However, filters **do receive `__event_emitter__`** and can emit persisted event types like `"status"`, `"embeds"`, `"message"`, etc.
+
+### Function Type Capabilities Matrix
+
+| Capability | Tools | Actions | Pipes | Filters |
+|-----------|-------|---------|-------|---------|
+| `__event_emitter__` | ✅ | ✅ | ✅ | ✅ |
+| `__event_call__` | ✅ | ✅ | ✅ | ✅ |
+| Return value → user response | ✅ | ✅ | ✅ | ❌ (modifies `form_data`) |
+| `HTMLResponse` → Rich UI embed | ✅ | ✅ | ❌ | ❌ |
+
+### Practical Summary
+
+If you want your function's output to **survive a closed browser tab**, follow these rules:
+
+1. **Always return your final answer** from your `pipe()`, tool, or action function — the return value is always saved
+2. **Use short event type names** (`"status"`, `"message"`, `"embeds"`, `"files"`, `"source"`) for DB persistence
+3. **Avoid relying on** `"notification"`, `"confirmation"`, `"input"`, or `"execute"` for critical workflows — these require a live browser connection
+4. Rich UI HTML embeds (`"embeds"` type or `HTMLResponse` return) **are persisted** and will render when the user reopens the chat
+
+---
+
 ## 📝 Conclusion
 
 **Events** give you real-time, interactive superpowers inside Open WebUI. They let your code update content, trigger notifications, request user input, stream results, handle code, and much more—seamlessly plugging your backend intelligence into the chat UI.
