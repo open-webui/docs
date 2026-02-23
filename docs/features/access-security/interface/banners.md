@@ -67,6 +67,53 @@ Each banner object in the JSON list has the following properties:
 -   `dismissible` (boolean, required): Determines if the user can close the banner. `true` means it can be dismissed; `false` means it cannot.
 -   `timestamp` (integer, required): **Note:** While this field is present in the configuration, it is not currently used by the frontend. The timestamp does not affect whether a banner is displayed or not.
 
+## Supported Content Formatting
+
+Banner content supports a subset of **HTML only** — Markdown syntax is not rendered. The following elements work in the `title` and `content` fields:
+
+### Text Formatting
+
+| HTML | Effect |
+|------|--------|
+| `<b>` / `<strong>` | **Bold** |
+| `<i>` / `<em>` | *Italic* |
+| `<u>` | Underline |
+| `<s>` / `<del>` | ~~Strikethrough~~ |
+| `<mark>` | Highlight |
+| `<small>` | Slightly smaller text |
+| `<sub>` / `<sup>` | Subscript / Superscript |
+| `<code>` / `<kbd>` | `Monospace inline code` |
+| `<abbr title="tooltip">` | Hover tooltip |
+
+### Structure
+
+| HTML | Effect |
+|------|--------|
+| `<br>` or literal newlines | Line break |
+| `<hr>` | Horizontal rule |
+| `<details><summary>Click</summary>...</details>` | Collapsible section |
+
+### Links & Media
+
+| HTML | Effect |
+|------|--------|
+| `<a href="..." target="_blank">` | Clickable link |
+| `<img src="..." width="16" height="16">` | Inline image |
+
+### Custom Styling
+
+Any inline `style=""` attribute works on allowed tags:
+
+```html
+<span style="color: red;">Colored text</span>
+<span style="font-weight: bold; font-size: 14px;">Size override</span>
+<span style="background: linear-gradient(...)">Gradient</span>
+```
+
+:::warning Unsupported Content
+Headings (`<h1>`–`<h6>`), lists (`<ul>`, `<ol>`), tables, blockquotes, and **Markdown syntax** are not supported — they either render as plain text or break the layout.
+:::
+
 ## Troubleshooting
 
 -   **Banner Not Appearing:**
