@@ -127,6 +127,17 @@ This is the most important flag to be aware of. It is **off by default** for sec
 
 Users can toggle this setting in **Settings → Interface → Iframe Same-Origin Access**.
 
+:::caution Practical Impact of Sandbox Settings
+When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandboxed. This means:
+- **Downloads from within the embed** are difficult or impossible — especially on iOS, where sandboxed iframes cannot trigger file downloads at all
+- **JavaScript in the embed cannot interact with Open WebUI itself** — the iframe has no access to the parent page's DOM, cookies, localStorage, or any Open WebUI APIs
+- **Cross-frame communication** is limited to `postMessage` only
+
+If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → Iframe Same-Origin Access**.
+
+As an alternative for ephemeral interactions that need full page access, consider using the [`execute` event](/features/extensibility/plugin/development/events#execute-requires-__event_call__) instead, which runs unsandboxed in the main page context.
+:::
+
 ## Rendering Position
 
 - **Tool embeds** inside a tool call result render **inline** at the tool call indicator (the "View Result from..." line)

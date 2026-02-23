@@ -40,6 +40,7 @@ class Action:
     class Valves(BaseModel):
         # Configuration parameters
         parameter_name: str = "default_value"
+        priority: int = 0  # Controls button display order (lower = appears first)
 
     async def action(self, body: dict, __user__=None, __event_emitter__=None, __event_call__=None):
         # Action implementation
@@ -148,6 +149,19 @@ async def action(self, body: dict, __id__=None, **kwargs):
 ### Global vs Model-Specific Actions
 - **Global Actions** - Turn on the toggle in the Action's settings, to globally enable it for all users and all models.
 - **Model-Specific Actions** - Configure enabled actions for specific models in the model settings.
+
+### Button Display Order (Priority)
+
+Action buttons beneath assistant messages are sorted by their `priority` valve value in **ascending order** — lower values appear first (leftmost), higher values appear later (rightmost). The default priority is `0`.
+
+To control the order, add a `priority` field to your Action's Valves:
+
+```python
+class Valves(BaseModel):
+    priority: int = 0  # Lower = appears first in the button row
+```
+
+This uses the same priority mechanism as [filter functions](/features/extensibility/plugin/functions/filter), so the behavior is consistent across the plugin system. Without a `priority` valve, actions default to `0` and their order among equal priorities is non-deterministic.
 
 ## Advanced Capabilities
 
