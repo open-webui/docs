@@ -81,66 +81,76 @@ Access detailed API documentation for different services provided by Open WebUI:
       return response.json()
   ```
 
-### 🔄 OpenResponses
+### 🔮 Anthropic Messages API
 
-- **Endpoint**: `POST /api/responses`
-- **Description**: Proxies requests to the [OpenResponses API](https://openresponses.org). Automatically routes to the correct upstream backend based on the `model` field, including Azure OpenAI deployments. Supports both streaming (SSE) and non-streaming responses.
+Open WebUI provides an Anthropic Messages API compatible endpoint. This allows tools, SDKs, and applications built for the Anthropic API to work directly against Open WebUI — routing requests through all configured models, filters, and pipelines.
 
-- **Curl Example**:
+Internally, the endpoint converts the Anthropic request format to OpenAI Chat Completions format, routes it through the existing chat completion pipeline, and converts the response back to Anthropic format. Both streaming and non-streaming requests are supported.
+
+- **Endpoints**: `POST /api/message`, `POST /api/v1/messages`
+- **Authentication**: Supports both `Authorization: Bearer YOUR_API_KEY` and Anthropic's `x-api-key: YOUR_API_KEY` header
+
+- **Curl Example** (non-streaming):
 
   ```bash
-  curl -X POST http://localhost:3000/api/responses \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+  curl -X POST http://localhost:3000/api/v1/messages \
+  -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "gpt-4.1",
-        "input": "Explain quantum entanglement in simple terms."
+        "model": "gpt-4o",
+        "max_tokens": 1024,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Why is the sky blue?"
+          }
+        ]
       }'
   ```
 
-- **Python Example**:
+- **Curl Example** (streaming):
 
-  ```python
-  import requests
-
-  def create_response(token, model, input_text):
-      url = 'http://localhost:3000/api/responses'
-      headers = {
-          'Authorization': f'Bearer {token}',
-          'Content-Type': 'application/json'
-      }
-      data = {
-          "model": model,
-          "input": input_text
-      }
-      response = requests.post(url, headers=headers, json=data)
-      return response.json()
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/messages \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "gpt-4o",
+        "max_tokens": 1024,
+        "stream": true,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Why is the sky blue?"
+          }
+        ]
+      }'
   ```
 
-- **Streaming Example**:
+- **Python Example** (using the Anthropic SDK):
 
   ```python
-  import requests
+  from anthropic import Anthropic
 
-  def stream_response(token, model, input_text):
-      url = 'http://localhost:3000/api/responses'
-      headers = {
-          'Authorization': f'Bearer {token}',
-          'Content-Type': 'application/json'
-      }
-      data = {
-          "model": model,
-          "input": input_text,
-          "stream": True
-      }
-      response = requests.post(url, headers=headers, json=data, stream=True)
-      for line in response.iter_lines():
-          if line:
-              print(line.decode('utf-8'))
+  client = Anthropic(
+      api_key="YOUR_OPEN_WEBUI_API_KEY",
+      base_url="http://localhost:3000/api/v1",
+  )
+
+  message = client.messages.create(
+      model="gpt-4o",
+      max_tokens=1024,
+      messages=[
+          {"role": "user", "content": "Why is the sky blue?"}
+      ],
+  )
+  print(message.content[0].text)
   ```
 
 :::info
-The Responses API endpoint supports the same model-based routing as Chat Completions. If you have multiple OpenAI-compatible backends configured, the request is automatically routed based on which backend hosts the specified model. Azure OpenAI deployments are also supported with appropriate API version handling.
+All models configured in Open WebUI are accessible through this endpoint — including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
+
+**Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
 :::
 
 ### 🔧 Filter and Function Behavior with API Requests

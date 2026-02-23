@@ -12,6 +12,7 @@ The Prompts interface provides several key features for managing your custom pro
 * **Create**: Design new prompts with customizable names, tags, access levels, and content.
 * **Share**: Share prompts with other users based on configured access permissions.
 * **Access Control**: Set visibility and usage permissions for each prompt (refer to [Permissions](/features/access-security/rbac/permissions) for more details).
+* **Enable/Disable**: Toggle prompts on or off without deleting them. Disabled prompts won't appear in slash command suggestions but remain in your workspace for future use.
 * **Slash Commands**: Quickly access prompts using custom slash commands during chat sessions.
 * **Versioning & History**: Track every change with a full version history, allowing you to compare and revert to previous versions.
 * **Tags & Filtering**: Organize your prompts using tags and easily filter through your collection in the workspace.
@@ -293,6 +294,7 @@ Prompt management is controlled by the following permission settings:
 * Document any specific requirements or expected inputs in the prompt description
 * Test prompts with different variable combinations, including scenarios where optional fields are left blank
 * Consider access levels carefully when sharing prompts with other users - public sharing means that it will appear automatically for all users when they hit `/` in a chat, so you want to avoid creating too many
+* **Use the enable/disable toggle** to temporarily deactivate prompts you're not currently using instead of deleting them — this preserves the prompt's configuration and version history
 * **Consider user workflows**: Think about which information users will always have versus what they might want to customize occasionally
 
 ### Migration Notes

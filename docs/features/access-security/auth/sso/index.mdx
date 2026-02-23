@@ -40,6 +40,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server - used for OAuth 2.1 authentication for MCP servers. |
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. |
 | `ENABLE_OAUTH_TOKEN_EXCHANGE`         | `false`            | Enables the token exchange endpoint for external apps to exchange OAuth tokens for Open WebUI JWTs. |
+| `OAUTH_MAX_SESSIONS_PER_USER`         | `10`               | Maximum concurrent OAuth sessions per user per provider. Prevents unbounded growth while allowing multi-device usage. |
 
 :::warning
 
@@ -63,8 +64,9 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 
 1. **Server-Side Storage:** Instead of storing large `access_token` and `id_token` values in browser cookies, the entire token payload is now encrypted and stored securely in the Open WebUI database in a new `oauth_session` table.
 2. **Secure Session Cookie:** The user's browser is sent a single, small, and secure `httponly` cookie named `oauth_session_id`. This cookie acts as an opaque identifier, containing no sensitive information itself.
-3. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
-4. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
+3. **Multi-Device Support:** Multiple concurrent sessions are supported per user per provider. Logging in from a second device (e.g., mobile) does **not** invalidate the first device's session. To prevent unbounded session growth, a configurable limit (`OAUTH_MAX_SESSIONS_PER_USER`, default: 10) prunes the oldest sessions when exceeded.
+4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
+5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
@@ -202,6 +204,7 @@ You can configure the following environment variables:
 
 1. `OAUTH_GROUP_CLAIM` - The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
 1. `ENABLE_OAUTH_GROUP_CREATION` - If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
+1. `OAUTH_GROUP_DEFAULT_SHARE` - Controls the default sharing permission for groups created via JIT group creation. Defaults to `true` (share with anyone). Set to `members` to restrict sharing to group members only, or `false` to disable sharing entirely. Only applies when `ENABLE_OAUTH_GROUP_CREATION` is enabled.
 
 :::warning
 

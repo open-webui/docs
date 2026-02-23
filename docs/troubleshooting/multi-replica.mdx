@@ -216,6 +216,28 @@ For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, 3 re
 
 See [DATABASE_POOL_SIZE](/reference/env-configuration#database_pool_size) for details.
 
+### 9. Function/Tool Dependency Installation Crashes
+
+**Symptoms:**
+- Workers crash with `AssertionError` on startup or when a function/tool is first loaded.
+- Logs show pip locking errors or multiple pip processes competing.
+
+**Cause:**
+When a function or tool specifies `requirements` in its frontmatter, Open WebUI runs `pip install` at runtime. With multiple workers or replicas, each process attempts the installation independently, causing pip's internal lock to detect the conflict and crash.
+
+**Solution:**
+**Set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)** to disable runtime pip installs entirely. Then pre-install all required packages at image build time:
+
+```dockerfile
+FROM ghcr.io/open-webui/open-webui:main
+
+RUN pip install --no-cache-dir python-docx requests beautifulsoup4
+```
+
+Runtime `requirements` installation is only appropriate for single-worker development or homelab environments.
+
+For more details, see the [External Packages](/features/extensibility/plugin/tools/development#external-packages) section of the Tools documentation.
+
 ---
 
 ## Deployment Best Practices

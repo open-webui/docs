@@ -143,6 +143,19 @@ To streamline the management of large model collections, the Admin Panel include
 
 These tools are specifically designed to help administrators quickly manage external providers (like OpenAI or Anthropic) that expose a high volume of models, allowing for instant site-wide configuration changes.
 
+### Global Model Defaults
+
+Administrators can set **global default metadata and parameters** that apply as a baseline to all models. This eliminates the need to manually configure capabilities and inference settings for every model individually.
+
+- **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Sets baseline capabilities (vision, web search, code interpreter, etc.) and other model metadata for all models. For capabilities, defaults and per-model values are merged — per-model overrides always win on conflicts. For other metadata fields, the global default is only applied when a model has no value set.
+- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Sets baseline inference parameters (temperature, top_p, max_tokens, seed, etc.) for all models. Per-model parameter overrides always take precedence.
+
+These settings are accessible via **Admin Settings → Models** and are persisted via `PersistentConfig`. See [`DEFAULT_MODEL_METADATA`](/reference/env-configuration#default_model_metadata) and [`DEFAULT_MODEL_PARAMS`](/reference/env-configuration#default_model_params) for details.
+
+:::tip
+Global defaults are ideal for enforcing organizational policies — for example, disabling code interpreter by default across all models, or setting a consistent temperature for all models.
+:::
+
 ## Model Switching in Chat
 
 Open WebUI allows for dynamic model switching and parallel inference within a chat session.
