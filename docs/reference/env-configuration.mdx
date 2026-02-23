@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.8.2](https://github.com/open-webui/open-webui/releases/tag/v0.8.2), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.8.4](https://github.com/open-webui/open-webui/releases/tag/v0.8.4), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -185,6 +185,20 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Example: `gpt-4,claude-3-opus,llama-3-70b`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_MODEL_METADATA`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline — per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
+- Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `models.default_metadata`.
+
+#### `DEFAULT_MODEL_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time — per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
+- Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `models.default_params`.
+
 #### `DEFAULT_USER_ROLE`
 
 - Type: `str`
@@ -269,6 +283,12 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `bool`
 - Default: `True`
 - Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
+
+#### `ENABLE_ADMIN_ANALYTICS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether the **Analytics** tab is visible and accessible in the admin panel. When set to `False`, the analytics API router is not mounted and the tab is hidden from the admin navigation. Useful for deployments where analytics data collection or display is not desired. Requires a restart to take effect.
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
@@ -528,17 +548,13 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `list` of `dict`
 - Default: `[]` (which means to use the built-in default prompt suggestions)
-- Description: List of prompt suggestions. The format for prompt suggestions are:
+- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/ai-knowledge/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/ai-knowledge/models#global-model-defaults) feature. The format is:
 
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
 ```
 
-:::warning
 
-NEVER set this env var to `debug` in production.
-
-:::
 
 ### AIOHTTP Client
 
@@ -648,6 +664,12 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 - Type: `str`
 - Default: `INFO`
 - Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+
+#### `LOG_FORMAT`
+
+- Type: `str`
+- Default: Not set (plain-text logging)
+- Description: Controls the log output format. Set to `json` to switch all stdout logging to single-line JSON objects, suitable for log aggregators like Loki, Fluentd, CloudWatch, and Datadog. When set to `json`, the ASCII startup banner is also suppressed to keep the log stream parseable. Any other value (or unset) uses the default plain-text format. See the [JSON Logging documentation](/getting-started/advanced-topics/logging#-json-logging-log_format) for details on log fields and examples.
 
 #### `ENABLE_AUDIT_STDOUT`
 
@@ -2899,6 +2921,19 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 :::
 
+#### `RAG_EMBEDDING_CONCURRENT_REQUESTS`
+
+- Type: `int`
+- Default: `0`
+- Description: Limits the number of concurrent embedding API requests when async embedding is enabled. Uses an asyncio semaphore to throttle parallel requests. Set to `0` for unlimited concurrency (default behavior), or set to a positive integer to cap simultaneous requests. Useful for respecting rate limits on external embedding APIs or reducing load on local embedding servers.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches.
+
+:::
+
 #### `RAG_EMBEDDING_TIMEOUT`
 
 - Type: `int` (seconds)
@@ -3365,6 +3400,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `azure_ai_search`
   - `yacy`
   - `yandex` - Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
+  - `youcom` - Uses the [You.com](https://you.com/) YDC Index API for web search.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `DDGS_BACKEND`
@@ -3692,6 +3728,13 @@ If you use `perplexity_search`, this variable is not relevant to you.
 If you use `perplexity`, this variable is not relevant to you.
 
 :::
+
+#### `YOUCOM_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for [You.com](https://you.com/) YDC Index API web search. Required when `WEB_SEARCH_ENGINE` is set to `youcom`. Obtain an API key from [You.com API](https://you.com/api).
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Web Loader Configuration
 
@@ -4633,6 +4676,13 @@ In any production environment running more than one instance of Open WebUI (e.g.
 
 :::
 
+#### `OAUTH_MAX_SESSIONS_PER_USER`
+
+- Type: `int`
+- Default: `10`
+- Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions are pruned to make room for the new one. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
+
+
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
@@ -4916,6 +4966,17 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `bool`
 - Default: `False`
 - Description: When enabled, groups from OAuth claims that don't exist in Open WebUI will be automatically created.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `OAUTH_GROUP_DEFAULT_SHARE`
+
+- Type: `str`
+- Default: `true`
+- Options:
+  - `true` — Groups created via OAuth will have sharing enabled for anyone.
+  - `members` — Groups created via OAuth will only allow sharing with group members.
+  - `false` — Groups created via OAuth will have sharing disabled (no one can share).
+- Description: Controls the default sharing permission for groups that are automatically created via OAuth group management. Only applies when `ENABLE_OAUTH_GROUP_CREATION` is enabled. Existing groups are not affected by this setting.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OAUTH_BLOCKED_GROUPS`
@@ -6365,6 +6426,32 @@ bypassed when accessing documents from MIT.
 ### Install Required Python Packages
 
 Open WebUI provides environment variables to customize the pip installation process. Below are the environment variables used by Open WebUI for adjusting package installation behavior:
+
+#### `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether Open WebUI automatically runs `pip install` for Python packages declared in function and tool `requirements` frontmatter. When enabled, dependencies are installed at runtime — both on startup (for all active functions and admin tools) and when saving a function or tool with new requirements.
+
+:::warning Security Hardening for Production
+
+**Strongly recommended: set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False` in production.** Runtime pip installs allow any admin-uploaded function or tool to install arbitrary Python packages into the running process. Disabling this:
+
+- **Prevents arbitrary package installation** from user-uploaded code
+- **Eliminates race conditions** that crash workers when `UVICORN_WORKERS > 1` or multiple replicas attempt concurrent pip installs
+- **Ensures reproducible deployments** — all dependencies are baked into the container image
+
+Pre-install required packages in your Dockerfile instead:
+
+```dockerfile
+FROM ghcr.io/open-webui/open-webui:main
+
+RUN pip install --no-cache-dir python-docx requests beautifulsoup4
+```
+
+When disabled, functions and tools that import missing packages will fail with a `ModuleNotFoundError` at load time, clearly indicating which packages need to be pre-installed.
+
+:::
 
 #### `PIP_OPTIONS`
 

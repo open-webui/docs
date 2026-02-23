@@ -120,7 +120,7 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `source`,<br/>`citation`                     | Add a source/citation, or code execution result      | For code: See [below.](/features/extensibility/plugin/development/events#source-or-citation-and-code-execution) |
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
 | `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
-| `input` <br/>(needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ...}`                                     |
+| `input` <br/>(needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ..., type: "password"}` (type is optional) |
 | `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |
 | `chat:message:favorite`                      | Update the favorite/pin status of a message          | `{"favorite": bool}`                                                                                 |
 
@@ -374,6 +374,28 @@ await __event_emitter__(
     }
 )
 ```
+
+#### Masked / Password Input
+
+To hide sensitive input (e.g., API keys, passwords), set `type` to `"password"` in the data payload. The input field will be rendered as a masked password input with a show/hide toggle:
+
+```python
+result = await __event_call__(
+    {
+        "type": "input",
+        "data": {
+            "title": "Enter API Key",
+            "message": "Your API key is required for this integration.",
+            "placeholder": "sk-...",
+            "type": "password"
+        }
+    }
+)
+```
+
+:::tip
+This uses the same `SensitiveInput` component used for user valve password fields, providing a familiar "eye" icon toggle for showing/hiding the value.
+:::
 
 ---
 

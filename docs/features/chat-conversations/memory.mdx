@@ -23,7 +23,7 @@ Users can manually add, edit, or delete memories by navigating to:
 
 ### 2. Native Memory Tools (Agentic Mode)
 
-When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using three built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using five built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 :::tip Quality Models for Memory Management
 Autonomous memory management works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can intelligently decide what facts are worth saving and when to recall relevant memories. Small local models may struggle with appropriate memory selection.
@@ -32,12 +32,16 @@ Autonomous memory management works best with frontier models (GPT-5, Claude 4.5+
 -   **`add_memory`**: Allows the model to proactively save a new fact it learned about you during the conversation.
 -   **`search_memories`**: Allows the model to search your memory bank for relevant context. Results include a unique `id` for each memory snippet. The model can optionally specify how many memories to return (default is 5).
 -   **`replace_memory_content`**: Allows the model to update or correct a specific existing memory using its `id`.
+-   **`delete_memory`**: Allows the model to remove a memory that is no longer relevant or correct, using its `id`.
+-   **`list_memories`**: Allows the model to retrieve all stored memories for the user, including content and timestamps.
 
 ## Benefits of the New Memory System
 
 -   **Proactive Learning**: Instead of you manually typing preferences, a model can say: *"I'll remember that you prefer dark mode for your UI projects"* and call `add_memory` behind the scenes.
 -   **Contextual Retrieval**: If a conversation drifts into a topic mentioned months ago, the model can "search its brain" using `search_memories` to find those past details.
 -   **Dynamic Correction**: If the model remembers something incorrectly, it can use `replace_memory_content` to fix the fact rather than creating a duplicate.
+-   **Cleanup**: The model can use `delete_memory` to remove outdated or irrelevant facts, keeping your memory bank clean.
+-   **Full Visibility**: Using `list_memories`, the model can review everything it knows about you and identify gaps or contradictions.
 -   **User Control**: Even though models can add memories, users retain full control. Every memory added by a model can be reviewed and deleted in the Personalization settings.
 
 ## Enabling Memory Tools

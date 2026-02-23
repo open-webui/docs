@@ -4,7 +4,7 @@ Follow these steps to install Open WebUI with Docker.
 
 ## Step 1: Pull the Open WebUI Image
 
-Start by pulling the latest Open WebUI Docker image from the GitHub Container Registry.
+Start by pulling the latest Open WebUI Docker image from the GitHub Container Registry (or use `openwebui/open-webui:main` from Docker Hub).
 
 ```bash
 docker pull ghcr.io/open-webui/open-webui:main
@@ -23,7 +23,7 @@ docker pull ghcr.io/open-webui/open-webui:main-slim
 You can also pull a specific Open WebUI release version directly by using a versioned image tag. This is recommended for production environments to ensure stable and reproducible deployments.
 
 ```bash
-docker pull ghcr.io/open-webui/open-webui:v0.8.2
+docker pull ghcr.io/open-webui/open-webui:v0.8.4
 ```
 
 ## Step 2: Run the Container

@@ -85,5 +85,49 @@ Setting `GLOBAL_LOG_LEVEL` configures the root logger in Python, affecting all l
 
 **Impact:** Setting `GLOBAL_LOG_LEVEL` to `DEBUG` will produce the most verbose logs, including detailed information that is helpful for development and troubleshooting. For production environments, `INFO` or `WARNING` might be more appropriate to reduce log volume.
 
+### 📋 JSON Logging (`LOG_FORMAT`)
+
+For production environments using log aggregators (Loki, Fluentd, CloudWatch, Datadog, etc.), Open WebUI supports structured JSON logging. Set the `LOG_FORMAT` environment variable to `json` to switch all stdout logging to single-line JSON objects.
+
+**How to Enable:**
+
+- **Docker Parameter:**
+
+  ```bash
+  --env LOG_FORMAT="json"
+  ```
+
+- **Docker Compose (`docker-compose.yml`):**
+
+  ```yaml
+  environment:
+    - LOG_FORMAT=json
+  ```
+
+**JSON Log Fields:**
+
+| Field | Description |
+|-------|-------------|
+| `ts` | ISO 8601 timestamp |
+| `level` | Log level (`debug`, `info`, `warn`, `error`, `fatal`) |
+| `msg` | Log message |
+| `caller` | Source location (`module:function:line`) |
+| `extra` | Additional context data (if any) |
+| `error` | Error details (if applicable) |
+| `stacktrace` | Stack trace (if applicable) |
+
+**Example Output:**
+
+```json
+{"ts": "2026-02-22T20:14:53.386+00:00", "level": "info", "msg": "GLOBAL_LOG_LEVEL: INFO", "caller": "open_webui.env"}
+{"ts": "2026-02-22T20:15:02.245+00:00", "level": "info", "msg": "Context impl SQLiteImpl.", "caller": "alembic.runtime.migration"}
+```
+
+:::info
+- Default behavior (no `LOG_FORMAT` set) is unchanged — plain-text output
+- The ASCII banner is suppressed when `LOG_FORMAT=json` to keep the log stream parseable
+- JSON logging covers both early startup logs (stdlib `logging`) and runtime logs (Loguru)
+:::
+
 
 By understanding and utilizing these logging mechanisms, you can effectively monitor, debug, and gain insights into your Open WebUI instance.

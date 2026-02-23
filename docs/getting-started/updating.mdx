@@ -76,9 +76,9 @@ Without a persistent `WEBUI_SECRET_KEY`, a new key is generated each time the co
 By default the `:main` tag always points to the latest build. For production, pin a specific release:
 
 ```
-ghcr.io/open-webui/open-webui:v0.6.52
-ghcr.io/open-webui/open-webui:v0.6.52-cuda
-ghcr.io/open-webui/open-webui:v0.6.52-ollama
+ghcr.io/open-webui/open-webui:v0.8.4
+ghcr.io/open-webui/open-webui:v0.8.4-cuda
+ghcr.io/open-webui/open-webui:v0.8.4-ollama
 ```
 
 ### Rolling Back
@@ -87,10 +87,10 @@ If an update causes problems, pin the previous version:
 
 ```bash
 docker rm -f open-webui
-docker pull ghcr.io/open-webui/open-webui:v0.6.51
+docker pull ghcr.io/open-webui/open-webui:v0.8.3
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
   -e WEBUI_SECRET_KEY="your-secret-key" \
-  --name open-webui ghcr.io/open-webui/open-webui:v0.6.51
+  --name open-webui ghcr.io/open-webui/open-webui:v0.8.3
 ```
 
 ---
@@ -109,13 +109,18 @@ Automated updates can break your deployment if a release includes breaking chang
 | **Web interface** | ❌ | ✅ | ❌ |
 | **Notifications** | ✅ | ✅ | ✅ |
 | **Docker 29+** | ✅ (forks) | ✅ | ✅ |
+| **Resource usage** | Low | Medium | Very Low |
 | **Best for** | Homelabs | Visual monitoring | Notification-only |
+
+:::tip Recommendation
+- **For homelabs/personal use:** nicholas-fedor/watchtower (automated)
+- **For managed environments:** WUD (visual + manual control)
+- **For production/critical systems:** Diun (notifications only) + manual updates
+:::
 
 ### Watchtower
 
-:::note
-The original `containrrr/watchtower` is unmaintained and broken on Docker 29+. Use the [nickfedor/watchtower](https://watchtower.nickfedor.com/) fork instead.
-:::
+The original Watchtower project hasn't received updates in over two years and fails with Docker version 29.0.0 or newer due to API version incompatibility. Two maintained forks are available: [nicholas-fedor/watchtower](https://watchtower.nickfedor.com/) and Marrrrrrrrry/watchtower, both compatible with Docker 29+.
 
 **One-time update:**
 ```bash
@@ -139,7 +144,32 @@ Web UI for monitoring container updates and triggering them manually. See [WUD d
 
 ### Diun
 
-Notification-only — alerts you when updates are available (email, Slack, Discord, Telegram, etc.) without touching your containers. See [Diun documentation](https://crazymax.dev/diun/) for setup.
+Notification-only — alerts you when updates are available (email, Slack, Discord, Telegram, etc.) without touching your containers.
+
+```yaml title="docker-compose.yml"
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/data
+    environment:
+      - TZ=America/New_York
+      - LOG_LEVEL=info
+      - DIUN_WATCH_WORKERS=10
+      - DIUN_WATCH_SCHEDULE=0 */6 * * *  # Every 6 hours
+      - DIUN_PROVIDERS_DOCKER=true
+      - DIUN_NOTIF_MAIL_HOST=smtp.gmail.com
+      - DIUN_NOTIF_MAIL_PORT=587
+      - DIUN_NOTIF_MAIL_USERNAME=your-email@gmail.com
+      - DIUN_NOTIF_MAIL_PASSWORD=your-app-password
+      - DIUN_NOTIF_MAIL_FROM=your-email@gmail.com
+      - DIUN_NOTIF_MAIL_TO=your-email@gmail.com
+    restart: unless-stopped
+```
+
+See [Diun documentation](https://crazymax.dev/diun/) for full setup and notification options.
 
 ---
 

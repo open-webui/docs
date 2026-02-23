@@ -11,6 +11,12 @@ The **Analytics** feature in Open WebUI provides administrators with comprehensi
 Analytics is only accessible to users with **admin** role. Access it via **Admin Panel > Analytics**.
 :::
 
+:::tip Disabling Analytics
+
+If you don't need the Analytics tab, you can hide it entirely by setting the [`ENABLE_ADMIN_ANALYTICS`](/reference/env-configuration#enable_admin_analytics) environment variable to `False`. This prevents the analytics API router from being mounted and removes the tab from the admin navigation. A restart is required for this change to take effect.
+
+:::
+
 ## Overview
 
 The Analytics dashboard gives you a bird's-eye view of your Open WebUI instance's activity, including:

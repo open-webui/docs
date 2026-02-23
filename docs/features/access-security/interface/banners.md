@@ -16,7 +16,7 @@ You can configure banners in two ways: through the Admin Panel for a user-friend
 This is the most straightforward way to manage banners.
 
 1.  **Log in** to your Open WebUI instance as an administrator.
-2.  Navigate to the **Admin Panel** > **Settings** > **Interface**.
+2.  Navigate to the **Admin Panel** > **Settings** > **General**.
 3.  Locate the **"Banners"** section.
 4.  Click the **+** icon to add a new banner.
 

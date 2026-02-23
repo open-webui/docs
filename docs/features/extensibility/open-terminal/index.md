@@ -7,7 +7,7 @@ title: "Open Terminal"
 
 :::info
 
-This page is up-to-date with Open Terminal release version [v0.2.3](https://github.com/open-webui/open-terminal).
+This page is up-to-date with Open Terminal release version [v0.2.4](https://github.com/open-webui/open-terminal).
 
 :::
 
@@ -64,6 +64,10 @@ docker run -p 8000:8000 open-terminal
 ### pip Install (Bare Metal)
 
 ```bash
+# One-liner with uvx (no install needed)
+uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+
+# Or install globally with pip
 pip install open-terminal
 open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 ```
@@ -142,6 +146,10 @@ volumes:
 When no API key is provided, Open Terminal generates a random key using a cryptographically secure token and prints it to the console on startup.
 
 Process output is persisted to **JSONL log files** under `OPEN_TERMINAL_LOG_DIR/processes/`. These files provide a full audit trail that survives process cleanup and server restarts.
+
+:::note Performance
+As of v0.2.4, all file and upload endpoints use **fully async I/O** via `aiofiles`. Directory listing and file search operations run in a background thread via `asyncio.to_thread`. This means the server's event loop is never blocked by filesystem operations, even on large directories or slow storage.
+:::
 
 ## Connecting to Open WebUI
 
