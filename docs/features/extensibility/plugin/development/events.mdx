@@ -433,6 +433,10 @@ The `execute` event runs JavaScript **directly in the main page context** using 
 - It can manipulate the Open WebUI interface directly (show/hide elements, read form data, trigger downloads)
 - The code runs as an async function, so you can use `await` and `return` a value back to the backend
 
+:::tip Frontend Automation
+Because `execute` runs in the main page context with full DOM access, you can use it to **automate virtually anything on the Open WebUI frontend**: click buttons, fill input fields, navigate between pages, read page state, trigger downloads, interact with the model selector, submit messages on behalf of the user, and more. Think of it as a remote control for the browser UI — if a user can do it manually, your function can do it programmatically via `execute`.
+:::
+
 #### Example: Display a Custom Form
 
 ```python
