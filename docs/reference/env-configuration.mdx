@@ -3769,6 +3769,13 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10–30 seconds depending on your network conditions.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `WEB_LOADER_RETRY_COUNT`
+
+- Type: `int`
+- Default: `3`
+- Description: Sets the max amount of retries for a single URL in the Default web engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 :::warning
 
 This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or left empty (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
