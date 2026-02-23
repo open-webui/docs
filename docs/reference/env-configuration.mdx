@@ -548,17 +548,13 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `list` of `dict`
 - Default: `[]` (which means to use the built-in default prompt suggestions)
-- Description: List of prompt suggestions. The format for prompt suggestions are:
+- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/ai-knowledge/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/ai-knowledge/models#global-model-defaults) feature. The format is:
 
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
 ```
 
-:::warning
 
-NEVER set this env var to `debug` in production.
-
-:::
 
 ### AIOHTTP Client
 
@@ -668,6 +664,12 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 - Type: `str`
 - Default: `INFO`
 - Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+
+#### `LOG_FORMAT`
+
+- Type: `str`
+- Default: Not set (plain-text logging)
+- Description: Controls the log output format. Set to `json` to switch all stdout logging to single-line JSON objects, suitable for log aggregators like Loki, Fluentd, CloudWatch, and Datadog. When set to `json`, the ASCII startup banner is also suppressed to keep the log stream parseable. Any other value (or unset) uses the default plain-text format. See the [JSON Logging documentation](/getting-started/advanced-topics/logging#-json-logging-log_format) for details on log fields and examples.
 
 #### `ENABLE_AUDIT_STDOUT`
 
