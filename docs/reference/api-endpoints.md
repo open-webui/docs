@@ -134,7 +134,7 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
 
   client = Anthropic(
       api_key="YOUR_OPEN_WEBUI_API_KEY",
-      base_url="http://localhost:3000/api/v1",
+      base_url="http://localhost:3000/api",
   )
 
   message = client.messages.create(
@@ -146,6 +146,36 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
   )
   print(message.content[0].text)
   ```
+
+  :::warning
+  The `base_url` must be `http://localhost:3000/api` (not `/api/v1`). The Anthropic SDK automatically appends `/v1/messages` to the base URL.
+  :::
+
+- **Claude Code Configuration**:
+
+  To use [Claude Code](https://docs.anthropic.com/en/docs/claude-code) with Open WebUI as a proxy, configure it to point at your Open WebUI instance:
+
+  ```bash
+  # Set environment variables for Claude Code
+  export ANTHROPIC_BASE_URL="http://localhost:3000/api"
+  export ANTHROPIC_API_KEY="YOUR_OPEN_WEBUI_API_KEY"
+
+  # Then run Claude Code as normal
+  claude
+  ```
+
+  Alternatively, create or edit `~/.claude/settings.json`:
+
+  ```json
+  {
+    "env": {
+      "ANTHROPIC_BASE_URL": "http://localhost:3000/api",
+      "ANTHROPIC_AUTH_TOKEN": "YOUR_OPEN_WEBUI_API_KEY"
+    }
+  }
+  ```
+
+  This routes all Claude Code requests through Open WebUI's authentication and access control layer, letting you use any configured model (including local models via Ollama or vLLM) with Claude Code's interface.
 
 :::info
 All models configured in Open WebUI are accessible through this endpoint — including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
