@@ -560,6 +560,77 @@ async def inlet(self, body: dict, __event_emitter__) -> dict:
 
 ---
 
+### 🔌 Injecting Extra API Body Parameters
+
+Inlet filters can inject **extra fields into the request body** that get forwarded to the external LLM API. This is useful for API-specific parameters that Open WebUI doesn't expose in the UI.
+
+The request body flows from your inlet filter to the LLM API without stripping unknown fields — only internal keys like `metadata`, `features`, `tool_ids`, `files`, and `skill_ids` are removed. Any other field you add will be serialized to JSON and sent to the API provider.
+
+#### Example: OpenAI Safety Identifier
+
+OpenAI recommends sending a `safety_identifier` with each request for abuse detection. You can inject this automatically via a filter:
+
+```python
+import hashlib
+
+class Filter:
+    def inlet(self, body: dict, __user__: dict = None) -> dict:
+        if __user__ and __user__.get("id"):
+            body["safety_identifier"] = hashlib.sha256(
+                __user__["id"].encode()
+            ).hexdigest()
+        return body
+```
+
+The hashed user UUID is added as a top-level body parameter and forwarded directly to OpenAI's API — no PII is sent, just an opaque hash.
+
+:::warning Cannot Inject HTTP Headers
+Filters can only modify the **request body** (`form_data`). Outbound HTTP headers are constructed separately and cannot be influenced from a filter. To add custom headers to API requests, use the **Admin Panel → Settings → Connections → OpenAI API** headers configuration.
+:::
+
+---
+
+### 🔍 Resolving the Base Model (`__model__`)
+
+When a user selects a workspace or custom model, `body["model"]` contains the custom model ID (e.g. `"my-custom-gpt5"`), not the underlying base model. To discover the actual base model, use the `__model__` dunder parameter:
+
+```python
+class Filter:
+    def inlet(self, body: dict, __model__: dict = None) -> dict:
+        custom_model_id = body["model"]  # e.g. "my-custom-gpt5"
+
+        base_model_id = None
+        if __model__ and "info" in __model__:
+            base_model_id = __model__["info"].get("base_model_id")
+            # e.g. "gpt-5.2"
+
+        if base_model_id:
+            print(f"Workspace model '{custom_model_id}' → base model '{base_model_id}'")
+        else:
+            print(f"Direct base model: '{custom_model_id}'")
+
+        return body
+```
+
+If no `base_model_id` is present, the user selected a base model directly (no workspace wrapper).
+
+#### Available Dunder Parameters
+
+Filters can declare any of these parameters in their function signature to receive them automatically:
+
+| Parameter | What it provides |
+|-----------|-----------------|
+| `__model__` | Full model dict (including `info.base_model_id` for workspace models) |
+| `__user__` | User data (`id`, `email`, `name`, `role`) |
+| `__metadata__` | Request metadata (`chat_id`, `session_id`, `interface`, etc.) |
+| `__event_emitter__` | Function to send status updates, embeds, etc. to the client |
+| `__chat_id__` | Chat session ID |
+| `__request__` | The raw FastAPI `Request` object |
+
+Only parameters you declare in your function signature are injected — Open WebUI inspects the signature at runtime to determine what to pass.
+
+---
+
 ### 🎨 UI Indicators & Visual Feedback
 
 #### In the Admin Functions Panel
