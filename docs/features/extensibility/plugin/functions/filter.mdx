@@ -527,7 +527,7 @@ class Filter:
 | `2` | Runs after priority 1 |
 
 :::tip Lower Priority = Earlier Execution
-Filters are sorted in **ascending** order by priority. A filter with `priority=0` runs **before** a filter with `priority=1`, which runs before `priority=2`, and so forth.
+Filters are sorted in **ascending** order by priority. A filter with `priority=0` runs **before** a filter with `priority=1`, which runs before `priority=2`, and so forth. When multiple filters share the same priority value, they are sorted **alphabetically by function ID** for deterministic ordering.
 :::
 
 ---

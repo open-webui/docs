@@ -161,7 +161,7 @@ class Valves(BaseModel):
     priority: int = 0  # Lower = appears first in the button row
 ```
 
-This uses the same priority mechanism as [filter functions](/features/extensibility/plugin/functions/filter), so the behavior is consistent across the plugin system. Without a `priority` valve, actions default to `0` and their order among equal priorities is non-deterministic.
+This uses the same priority mechanism as [filter functions](/features/extensibility/plugin/functions/filter), so the behavior is consistent across the plugin system. Without a `priority` valve, actions default to `0` and their order among equal priorities is determined **alphabetically by function ID**.
 
 ## Advanced Capabilities
 
