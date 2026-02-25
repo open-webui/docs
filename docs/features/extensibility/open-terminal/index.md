@@ -7,7 +7,7 @@ title: "Open Terminal"
 
 :::info
 
-This page is up-to-date with Open Terminal release version [v0.2.4](https://github.com/open-webui/open-terminal).
+This page is up-to-date with Open Terminal release version [v0.2.6](https://github.com/open-webui/open-terminal).
 
 :::
 
@@ -70,6 +70,9 @@ uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 # Or install globally with pip
 pip install open-terminal
 open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+
+# Set a custom working directory
+open-terminal run --cwd /path/to/project
 ```
 
 :::warning
@@ -99,6 +102,7 @@ open-terminal mcp --transport streamable-http --host 0.0.0.0 --port 8000
 | `--transport` | `stdio` | Transport mode: `stdio` or `streamable-http` |
 | `--host` | `0.0.0.0` | Bind address (streamable-http only) |
 | `--port` | `8000` | Bind port (streamable-http only) |
+| `--cwd` | Server's current directory | Working directory for the server process |
 
 Under the hood, this uses [FastMCP](https://github.com/jlowin/fastmcp) to automatically convert every FastAPI endpoint into an MCP tool — no manual tool definitions needed.
 
@@ -140,15 +144,17 @@ volumes:
 | :--- | :--- | :--- | :--- |
 | `--host` | `0.0.0.0` | — | Bind address |
 | `--port` | `8000` | — | Bind port |
+| `--cwd` | Current directory | — | Working directory for the server process |
 | `--api-key` | Auto-generated | `OPEN_TERMINAL_API_KEY` | Bearer API key for authentication |
 | — | `~/.open-terminal/logs` | `OPEN_TERMINAL_LOG_DIR` | Directory for process JSONL log files |
+| — | `image` | `OPEN_TERMINAL_BINARY_MIME_PREFIXES` | Comma-separated MIME type prefixes for binary files that `read_file` returns as raw binary responses (e.g. `image,audio` or `image/png,image/jpeg`) |
 
 When no API key is provided, Open Terminal generates a random key using a cryptographically secure token and prints it to the console on startup.
 
 Process output is persisted to **JSONL log files** under `OPEN_TERMINAL_LOG_DIR/processes/`. These files provide a full audit trail that survives process cleanup and server restarts.
 
 :::note Performance
-As of v0.2.4, all file and upload endpoints use **fully async I/O** via `aiofiles`. Directory listing and file search operations run in a background thread via `asyncio.to_thread`. This means the server's event loop is never blocked by filesystem operations, even on large directories or slow storage.
+All file and upload endpoints use **fully async I/O** via `aiofiles`. Directory listing and file search operations run in a background thread via `asyncio.to_thread`. This means the server's event loop is never blocked by filesystem operations, even on large directories or slow storage. As of v0.2.5, all file endpoints gracefully handle permission errors and OS-level exceptions instead of crashing with HTTP 500.
 :::
 
 ## Connecting to Open WebUI
@@ -245,11 +251,15 @@ curl -X POST "http://localhost:8000/execute?wait=5" \
 All background process output (stdout/stderr) is persisted to JSONL log files under `~/.open-terminal/logs/processes/`. This means output is never lost, even if the server restarts. The response includes `next_offset` for stateless incremental polling — pass it as the `offset` query parameter on subsequent status requests to get only new output. The `log_path` field shows the path to the raw JSONL log file.
 :::
 
-### Search File Contents
+### Grep Search (File Contents)
 
-**`GET /files/search`**
+**`GET /files/grep`**
 
 Search for a text pattern across files in a directory. Returns structured matches with file paths, line numbers, and matching lines. Skips binary files automatically.
+
+:::note Renamed in v0.2.6
+This endpoint was renamed from `/files/search` to `/files/grep` to clearly distinguish content-level search from filename-level search (`/files/glob`).
+:::
 
 **Query parameters:**
 
@@ -264,7 +274,7 @@ Search for a text pattern across files in a directory. Returns structured matche
 | `max_results` | integer | `50` | Maximum number of matches to return (1–500) |
 
 ```bash
-curl "http://localhost:8000/files/search?query=TODO&include=*.py&case_insensitive=true" \
+curl "http://localhost:8000/files/grep?query=TODO&include=*.py&case_insensitive=true" \
 
 #### Get Command Status
 
@@ -388,7 +398,7 @@ curl "http://localhost:8000/files/list?directory=/home/user" \
 
 **`GET /files/read`**
 
-Returns the contents of a file. Text files return a content string; binary files return base64-encoded content. Optionally specify a line range for large text files.
+Returns the contents of a file. Text files return a JSON object with a content string. Supported binary types (configurable, default: `image/*`) return the raw binary with the appropriate `Content-Type` header. Unsupported binary types are rejected with HTTP 415.
 
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
@@ -408,6 +418,8 @@ curl "http://localhost:8000/files/read?path=/home/user/script.py&start_line=1&en
   "content": "#!/usr/bin/env python3\nimport sys\n..."
 }
 ```
+
+For binary files like images, the response is the raw file content with the detected MIME type. Control which binary types are allowed via the `OPEN_TERMINAL_BINARY_MIME_PREFIXES` environment variable (default: `image`).
 
 #### Write a File
 
@@ -464,9 +476,9 @@ curl -X POST http://localhost:8000/files/replace \
   }'
 ```
 
-#### Search File Contents
+#### Grep Search (File Contents)
 
-**`GET /files/search`**
+**`GET /files/grep`**
 
 Search for a text pattern across files in a directory. Returns structured matches with file paths, line numbers, and matching lines. Skips binary files.
 
@@ -481,7 +493,7 @@ Search for a text pattern across files in a directory. Returns structured matche
 | `max_results` | integer | `50` | Maximum number of matches to return (1–500). |
 
 ```bash
-curl "http://localhost:8000/files/search?query=TODO&path=/home/user/project&include=*.py" \
+curl "http://localhost:8000/files/grep?query=TODO&path=/home/user/project&include=*.py" \
   -H "Authorization: Bearer <api-key>"
 ```
 
@@ -492,6 +504,37 @@ curl "http://localhost:8000/files/search?query=TODO&path=/home/user/project&incl
   "matches": [
     {"file": "/root/app.py", "line": 42, "content": "# TODO: refactor this"},
     {"file": "/root/utils.py", "line": 7, "content": "# TODO: add tests"}
+  ],
+  "truncated": false
+}
+```
+
+#### Glob Search (Filenames)
+
+**`GET /files/glob`**
+
+Search for files and subdirectories by name within a directory using glob patterns. Returns relative paths, type, size, and modification time.
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `pattern` | string | (required) | Glob pattern to search for (e.g. `*.py`). |
+| `path` | string | `.` | Directory to search within. |
+| `exclude` | string[] | `null` | Glob patterns to exclude from results. |
+| `type` | string | `any` | Type filter: `file`, `directory`, or `any`. |
+| `max_results` | integer | `50` | Maximum number of matches to return (1–500). |
+
+```bash
+curl "http://localhost:8000/files/glob?pattern=*.py&path=/home/user/project&type=file" \
+  -H "Authorization: Bearer <api-key>"
+```
+
+```json
+{
+  "pattern": "*.py",
+  "path": "/home/user/project",
+  "matches": [
+    {"path": "app.py", "type": "file", "size": 2048, "modified": 1707955200.0},
+    {"path": "utils/helpers.py", "type": "file", "size": 512, "modified": 1707955200.0}
   ],
   "truncated": false
 }
