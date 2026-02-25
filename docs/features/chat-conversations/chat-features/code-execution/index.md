@@ -54,8 +54,9 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 - **Full shell access** — models can install packages, run scripts in any language, use system tools like ffmpeg, git, curl, etc.
 - **Container isolation** — runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset** — the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
+- **Built-in file browser** — browse, preview, create, delete, upload, and download files directly from the chat controls panel.
 
-Open Terminal is connected to Open WebUI as an easy to connect [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui), not as a built-in code execution engine.
+Open Terminal can be connected to Open WebUI as a [native integration](/features/extensibility/open-terminal#native-integration-recommended) via **Settings → Integrations** (recommended) or as a generic [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui). When using the native integration, Open Terminal endpoints are automatically injected as always-on tools into every chat.
 
 :::note
 Open Terminal currently operates as a **single shared instance** — there is no automatic per-user container provisioning yet. Each user connects to the same container unless separate instances are deployed manually.
@@ -72,7 +73,7 @@ Open Terminal currently operates as a **single shared instance** — there is no
 | **Isolation** | ✅ Browser sandbox | ❌ Shared environment | ✅ Container-level (when using Docker) |
 | **Multi-user safety** | ✅ Per-user by design | ⚠️ Not isolated | ⚠️ Single instance (per-user containers planned) |
 | **File generation** | ❌ Very limited | ✅ Full support | ✅ Full support with upload/download |
-| **Setup** | None (built-in) | Admin configures globally | Each user adds as a Tool Server |
+| **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations, or as a Tool Server |
 | **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation | ✅ Per-user by design |
 | **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ⚠️ Manual per-user instances |
 

@@ -189,11 +189,13 @@ When a terminal is connected, the chat controls panel gains a **Files** tab:
 
 - **Browse** directories on the remote terminal filesystem
 - **Preview** text files, images, and PDFs inline
+- **Create folders** using the new folder button in the breadcrumb bar
+- **Delete** files and folders via the context menu (⋯) on each entry
 - **Download** any file to your local machine
 - **Upload** files by dragging and dropping them onto the directory listing
 - **Attach** files to the current chat by downloading them through the file browser
 
-The file browser remembers your last-visited directory between panel open/close cycles.
+The file browser remembers your last-visited directory between panel open/close cycles and automatically syncs the terminal's working directory to match.
 
 ### Generic OpenAPI Tool Server
 
@@ -576,6 +578,70 @@ curl "http://localhost:8000/files/glob?pattern=*.py&path=/home/user/project&type
   ],
   "truncated": false
 }
+```
+
+#### Create a Directory
+
+**`POST /files/mkdir`**
+
+Creates a directory at the specified path. Parent directories are created automatically if they don't exist.
+
+**Request body:**
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `path` | string | Path of the directory to create. |
+
+```bash
+curl -X POST http://localhost:8000/files/mkdir \
+  -H "Authorization: Bearer <api-key>" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "/home/user/project/src"}'
+```
+
+```json
+{"path": "/home/user/project/src"}
+```
+
+#### Delete a File or Directory
+
+**`DELETE /files/delete`**
+
+Deletes a file or directory. Directories are removed recursively.
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `path` | string | Path to the file or directory to delete. |
+
+```bash
+curl -X DELETE "http://localhost:8000/files/delete?path=/home/user/old-file.txt" \
+  -H "Authorization: Bearer <api-key>"
+```
+
+```json
+{"path": "/home/user/old-file.txt", "type": "file"}
+```
+
+#### Get or Set Working Directory
+
+**`GET /files/cwd`** — Returns the server's current working directory.
+
+**`POST /files/cwd`** — Changes the server's working directory.
+
+```bash
+# Get current working directory
+curl "http://localhost:8000/files/cwd" \
+  -H "Authorization: Bearer <api-key>"
+
+# Set working directory
+curl -X POST http://localhost:8000/files/cwd \
+  -H "Authorization: Bearer <api-key>" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "/home/user/project"}'
+```
+
+```json
+{"cwd": "/home/user/project"}
 ```
 
 ### File Transfer
