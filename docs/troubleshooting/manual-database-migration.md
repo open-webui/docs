@@ -27,6 +27,8 @@ You need manual migration only if:
 **"No such table"** — Your migrations didn't apply. Enter your container, set the required environment variables ([see Step 2](#step-2-diagnose-current-state)), and run `alembic upgrade head`. See [details](#no-such-table-errors).
 
 **"Table already exists"** — A previous migration partially completed. You need to stamp the partially-applied migration and then upgrade. See [details](#table-already-exists-errors).
+
+**Multiple errors after a major version jump** (e.g., "duplicate column" then "table already exists" then "no such column") — Your database is partially migrated across several migrations. You need to step through them one at a time. See [details](#multiple-failures-after-a-major-version-jump).
 :::
 
 :::danger Critical Warning
@@ -539,6 +541,115 @@ Stamping marks the migration as done but skips any remaining steps like copying 
 
 If `alembic upgrade head` fails again with another "table already exists" error for a different migration, repeat the process for each stuck migration.
 
+:::tip Multiple Stuck Migrations?
+If you're hitting different errors on each retry — "duplicate column", then "table already exists", then "no such column" — your database is partially migrated across several steps. This typically happens after a major version jump (e.g., 0.7.x → 0.8.x). See [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump) for a step-by-step recovery workflow.
+:::
+
+### Multiple Failures After a Major Version Jump
+
+**Symptom:** After upgrading across several versions (e.g., 0.7.x → 0.8.x), Open WebUI crashes on startup with a "no such column" error (e.g., `no such column: user.scim`). Running `alembic upgrade head` fails with a "duplicate column" or "already exists" error on an *earlier* migration. Fixing that one reveals another error on the *next* migration, and so on.
+
+**Cause:** When Open WebUI starts after a major version jump, it attempts to run all pending migrations in sequence. If any single migration in the chain fails partway through (common causes: SQLite `NOT NULL` constraints without defaults, interrupted processes, memory limits on large backfills), the partial schema changes stick — because SQLite migrations are non-transactional — but `alembic_version` does not advance. Every subsequent startup retries the same failing migration, crashes on the already-applied parts, and never reaches the later migrations. The result is a database where the schema is a patchwork: some changes from early migrations applied, none from later ones.
+
+**Diagnosis:**
+
+```bash title="Terminal - Confirm Partial Migration Chain"
+# Check where Alembic thinks you are
+alembic current
+# Example: 37f288994c47  (several versions behind head)
+
+# Check where head is
+alembic heads
+# Example: b2c3d4e5f6a7  (head)
+
+# List the full chain between current and head
+alembic history
+
+# Check for schema elements that shouldn't exist yet at your current revision
+# (these indicate partial application of later migrations)
+sqlite3 /app/backend/data/webui.db "PRAGMA table_info(channel_member);" | grep status
+sqlite3 /app/backend/data/webui.db "SELECT name FROM sqlite_master WHERE type='table' AND name='chat_message';"
+```
+
+If `alembic current` shows an old revision but you can see tables or columns from later migrations already in the database, you have a partially-applied migration chain.
+
+**Solution — Step Through One Migration at a Time:**
+
+The approach: upgrade to each revision individually. If it succeeds, move on. If it fails with "duplicate column" or "already exists", stamp past it. If it fails with a different error, stop and investigate.
+
+```bash title="Terminal - Step-by-Step Recovery"
+# Get the ordered list of pending migrations
+alembic history
+
+# Try the first pending migration
+alembic upgrade <first_pending_revision>
+```
+
+If it succeeds:
+
+```bash
+# Move to the next one
+alembic upgrade <next_revision>
+```
+
+If it fails with "duplicate column name" or "already exists":
+
+```bash
+# The migration's schema changes already applied in a previous partial run.
+# Stamp past it to advance alembic_version without re-running the SQL.
+alembic stamp <that_revision>
+
+# Continue to the next migration
+alembic upgrade <next_revision>
+```
+
+Repeat until you reach head.
+
+:::info When is stamping safe here?
+Stamping is safe when you've confirmed that the migration's schema changes are already present in the database — which the "already exists" or "duplicate column" error itself confirms. This is different from blindly running `alembic stamp head`, which skips *all* pending migrations regardless of whether they applied.
+:::
+
+**Special case — migrations with data backfills:**
+
+Some migrations don't just change schema — they also copy data from old tables into new ones (e.g., the `chat_message` migration backfills from the `chat` table's JSON column). If such a migration's *table creation* succeeded but the *backfill* was interrupted:
+
+```bash title="Terminal - Check if Backfill Completed"
+# Check if the table has data
+sqlite3 /app/backend/data/webui.db "SELECT COUNT(*) FROM <table_name>;"
+```
+
+If the count is greater than zero, the backfill likely completed — stamp past it. If the count is zero, you have two options:
+
+1. **Drop and re-run** (preserves data, but the backfill may take a long time on large databases):
+   ```bash
+   sqlite3 /app/backend/data/webui.db "DROP TABLE <table_name>;"
+   alembic upgrade <that_revision>
+   ```
+
+2. **Stamp past it** (fast, but the backfill is skipped — some features that depend on the new table may show gaps in historical data):
+   ```bash
+   alembic stamp <that_revision>
+   ```
+
+**Verify and start:**
+
+```bash title="Terminal - Verify Recovery"
+alembic current
+# Should show: <latest_revision> (head)
+```
+
+Then exit the container and start normally:
+
+```bash
+exit
+docker start open-webui
+docker logs -f open-webui
+```
+
+:::warning Stop if You See Unexpected Errors
+The stamp-and-continue approach only applies to "already exists" and "duplicate column" errors, which confirm that schema changes from that migration are already in the database. If a migration fails with a *different* error (e.g., a data type mismatch, a foreign key violation, or a Python traceback unrelated to schema conflicts), do **not** stamp past it. Post the full error in a GitHub issue or on Discord.
+:::
+
 ### "Required environment variable not found"
 
 **Cause:** `WEBUI_SECRET_KEY` environment variable is missing.
@@ -669,19 +780,20 @@ alembic heads
   </TabItem>
 </Tabs>
 
-:::danger Never Use "alembic stamp" as a Fix
+:::danger Never Use "alembic stamp head" as a Fix
 You may see advice to run `alembic stamp head` to "fix" version mismatches. **This is dangerous.**
 
-`alembic stamp` tells Alembic "pretend this migration was applied" without actually running it. This creates permanent database corruption where Alembic thinks your schema is up-to-date when it isn't.
+`alembic stamp head` tells Alembic "pretend *all* migrations were applied" without actually running any of them. This creates permanent database corruption where Alembic thinks your schema is up-to-date when it isn't.
 
-**Only use `alembic stamp <revision>` if:**
+**`alembic stamp <specific_revision>` is safe only when:**
 
+- You have confirmed that the migration's schema changes are already present in the database (e.g., the "already exists" or "duplicate column" error proves it) — see [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump)
 - You manually created all tables using `create_all()` and need to mark them as migrated
 - You're a developer initializing a fresh database that matches current schema
 - You imported a database backup from another system and need to mark it at the correct revision
 - You've manually applied migrations via raw SQL and need to update the version tracking
 
-**Never use it to "fix" migration errors or skip failed migrations.**
+**Never use `alembic stamp head` to skip all pending migrations at once.**
 :::
 
 ### Process Hangs After "Will assume non-transactional DDL"
@@ -1076,8 +1188,8 @@ docker logs open-webui > migration-failure-logs.txt
 # 5. Get help with logs before attempting migration again
 ```
 
-:::warning Do Not Use "stamp" to Fix Failed Migrations
-Never use `alembic stamp` to mark a partially-failed migration as complete. This leaves your database in a corrupt state.
+:::warning Do Not Use "stamp" to Skip Incomplete Migrations
+Do not use `alembic stamp` to mark a migration as complete if its schema changes did *not* actually apply. If the migration failed with an error *other* than "already exists" or "duplicate column", the schema change is genuinely missing and stamping past it will leave your database in a corrupt state. See [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump) for when stamping *is* appropriate.
 :::
 
 ### Validate Database Integrity
@@ -1145,16 +1257,11 @@ alembic upgrade head 2>&1 >> diagnostics.txt
 
 **Where to get help:**
 
-1. **Open WebUI GitHub Issues:** https://github.com/open-webui/open-webui/issues
-   - Search existing issues first
-   - Include your `diagnostics.txt` file
-   - Specify your Open WebUI version and installation method
-
-2. **Open WebUI Discord Community**
+1. **Open WebUI Discord Community**
    - Real-time support from community members
    - Share error messages and diagnostics
 
-3. **Provide this information:**
+2. **Provide this information:**
    - Open WebUI version
    - Installation method (Docker/local)
    - Database type (SQLite/PostgreSQL)
