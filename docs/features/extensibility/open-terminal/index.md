@@ -159,10 +159,48 @@ All file and upload endpoints use **fully async I/O** via `aiofiles`. Directory 
 
 ## Connecting to Open WebUI
 
-Open Terminal is a FastAPI application and automatically exposes an OpenAPI specification at `/openapi.json`. This means it works out of the box as an [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui) — no manual tool creation required.
+There are two ways to connect Open Terminal to Open WebUI: the **native integration** (recommended) and the **generic OpenAPI Tool Server** method.
 
-- **As a User Tool Server**: Add it in **Settings → Tools** to connect directly from your browser. Ideal for personal or local instances.
-- **As a Global Tool Server**: Add it in **Admin Settings → Tools** to make it available to all users across the deployment.
+### Native Integration (Recommended)
+
+:::tip Experimental
+The native Open Terminal integration is currently marked as **experimental**. It provides a tighter experience than the generic OpenAPI approach, with features like the built-in file browser.
+:::
+
+Open WebUI has built-in support for Open Terminal connections under **Settings → Integrations**. This gives you:
+
+- **Always-on tools** — When enabled, all Open Terminal endpoints are automatically injected as tools into every chat. No need to manually select them.
+- **Built-in file browser** — A **Files** tab appears in the chat controls panel (alongside Controls), letting you browse, preview, download, upload, and attach files from the terminal directly in the chat UI.
+- **Active terminal indicator** — The message input area shows which terminal is connected.
+
+#### Setup
+
+1. Go to **Settings → Integrations**
+2. Scroll to the **Open Terminal** section
+3. Click **+** to add a new connection
+4. Enter the **URL** (e.g. `http://open-terminal:8000`) and **API key**
+5. Toggle the connection **on**
+
+Only **one terminal connection** can be active at a time. Enabling a new connection automatically disables the previous one.
+
+#### File Browser
+
+When a terminal is connected, the chat controls panel gains a **Files** tab:
+
+- **Browse** directories on the remote terminal filesystem
+- **Preview** text files, images, and PDFs inline
+- **Download** any file to your local machine
+- **Upload** files by dragging and dropping them onto the directory listing
+- **Attach** files to the current chat by downloading them through the file browser
+
+The file browser remembers your last-visited directory between panel open/close cycles.
+
+### Generic OpenAPI Tool Server
+
+Open Terminal is also a standard FastAPI application that exposes an OpenAPI specification at `/openapi.json`. This means it works as a generic [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui) — useful when you want more control over which tools are enabled per-chat.
+
+- **As a User Tool Server**: Add it in **Settings → Tools** to connect directly from your browser.
+- **As a Global Tool Server**: Add it in **Admin Settings → Tools** to make it available to all users.
 
 For step-by-step instructions with screenshots, see the [OpenAPI Tool Server Integration Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui).
 
