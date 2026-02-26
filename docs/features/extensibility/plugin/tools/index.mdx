@@ -180,12 +180,13 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled AND per-chat "Web Search" toggle enabled.* |
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
-| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on).* |
+| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge — see note below.* |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. **Use this first** to discover what knowledge is available. |
 | `query_knowledge_bases` | Search KB *names and descriptions* by semantic similarity. Use to find which KB is relevant when you don't know which one to query. |
 | `search_knowledge_bases` | Search knowledge bases by name/description (text match). |
 | `query_knowledge_files` | Search *file contents* inside KBs using vector search. **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename (not content). |
+| `view_file` | Get the full content of any user-accessible file by its ID. Only injected when the model has attached knowledge files. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
@@ -230,6 +231,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of `{id, filename, content_snippet, knowledge_id}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
+| `view_file` | `file_id` (required) | `{id, filename, content, updated_at, created_at}` |
 | `view_knowledge_file` | `file_id` (required) | `{id, filename, content}` |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
@@ -265,10 +267,52 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
 :::
 
-:::info Recommended KB Tool Workflow
-**When an attached KB is returning empty results:**
-1. First call `list_knowledge_bases` to confirm the model can see the attached KB
-2. Then use `query_knowledge_files` (without specifying `knowledge_ids` — it auto-scopes to attached KBs)
+:::warning Knowledge Tools Change Based on Attached Knowledge
+The set of knowledge tools injected into a model **changes depending on whether the model has knowledge attached** (via the Model Editor). These are **two mutually exclusive sets** — the model gets one or the other, never both.
+
+**Model with attached knowledge** (files, collections, or notes):
+
+| Tool | When Available |
+|------|---------------|
+| `query_knowledge_files` | Always (auto-scoped to attached KBs) |
+| `view_file` | When attached knowledge includes files or collections |
+
+The model **does not** get the browsing tools (`list_knowledge_bases`, `search_knowledge_bases`, etc.) because it doesn't need to discover KBs — the search is automatically scoped to its attachments.
+
+**Model without attached knowledge** (general-purpose):
+
+| Tool | Purpose |
+|------|---------|
+| `list_knowledge_bases` | Discover available KBs |
+| `search_knowledge_bases` | Search KBs by name/description (text match) |
+| `query_knowledge_bases` | Search KBs by name/description (semantic similarity) |
+| `search_knowledge_files` | Search files by filename |
+| `query_knowledge_files` | Search file contents (vector search) |
+| `view_knowledge_file` | Read a full file from a KB |
+
+This model has the full browsing set to autonomously discover and explore any KB the user has access to.
+:::
+
+:::caution Attached Knowledge Still Requires User Access
+Attaching a knowledge base to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge item. Items the user cannot access are silently excluded from search results.
+
+**Access requirements by knowledge type:**
+
+| Attached Type | User Needs |
+|---------------|-----------|
+| **Knowledge Base** (collection) | Owner, admin, or explicit read access grant |
+| **Individual File** | Owner or admin only (no access grants) |
+| **Note** | Owner, admin, or explicit read access grant |
+
+**Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself — even though they can use the model.
+
+**Solution**: Make sure users who need access to the model's knowledge also have read access to the underlying knowledge base (via access grants or group permissions in the Knowledge settings).
+:::
+
+:::info Recommended KB Tool Workflow (No Attached Knowledge)
+When using a model **without** attached knowledge:
+1. First call `list_knowledge_bases` to discover what knowledge is available
+2. Then use `query_knowledge_files` to search file contents within relevant KBs
 3. If still empty, the files may not be embedded yet, or you may have **Full Context mode enabled** which bypasses the vector store
 
 **Do NOT use Full Context mode with knowledge tools** — Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
