@@ -7,7 +7,7 @@ title: "Open Terminal"
 
 :::info
 
-This page is up-to-date with Open Terminal release version [v0.2.6](https://github.com/open-webui/open-terminal).
+This page is up-to-date with Open Terminal release version [v0.3.0](https://github.com/open-webui/open-terminal).
 
 :::
 
@@ -224,6 +224,10 @@ Runs a shell command as a **background process** and returns a process ID. All o
 The `/execute` endpoint description in the OpenAPI spec automatically includes live system metadata — OS, hostname, current user, default shell, Python version, and working directory. When Open WebUI discovers this tool via the OpenAPI spec, models see this context in the tool description and can adapt their commands accordingly.
 :::
 
+:::info PTY Execution (v0.3.0+)
+Commands now run under a **pseudo-terminal (PTY)** by default on Linux/macOS. This means programs see a real terminal and produce colored output, interactive TUI applications work correctly, and `isatty()` returns true. On Windows, execution falls back to pipe-based subprocess handling.
+:::
+
 **Request body:**
 
 | Field | Type | Default | Description |
@@ -377,13 +381,15 @@ Finished processes are automatically cleaned up after 5 minutes. Their JSONL log
 
 **`POST /execute/{process_id}/input`**
 
-Sends text to a running process's stdin. Useful for interacting with REPLs, interactive commands, or any process waiting for input.
+Sends text to a running process's stdin (or PTY). Useful for interacting with REPLs, interactive commands, or any process waiting for input.
+
+Literal escape strings from LLMs are automatically converted to real characters: `\n` → newline, `\t` → tab, `\x03` → Ctrl-C, `\x04` → Ctrl-D, etc.
 
 **Request body:**
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `input` | string | Text to send to stdin. Include newline characters as needed. |
+| `input` | string | Text to send to stdin. Escape sequences like `\n` and `\x03` are automatically converted. |
 
 ```bash
 curl -X POST http://localhost:8000/execute/a1b2c3d4e5f6/input \
@@ -438,7 +444,7 @@ curl "http://localhost:8000/files/list?directory=/home/user" \
 
 **`GET /files/read`**
 
-Returns the contents of a file. Text files return a JSON object with a content string. Supported binary types (configurable, default: `image/*`) return the raw binary with the appropriate `Content-Type` header. Unsupported binary types are rejected with HTTP 415.
+Returns the contents of a file. Text files return a JSON object with a content string. **PDF files** are automatically converted to text using pypdf and returned in the same JSON format. Supported binary types (configurable, default: `image/*`) return the raw binary with the appropriate `Content-Type` header. Unsupported binary types are rejected with HTTP 415.
 
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
@@ -460,6 +466,36 @@ curl "http://localhost:8000/files/read?path=/home/user/script.py&start_line=1&en
 ```
 
 For binary files like images, the response is the raw file content with the detected MIME type. Control which binary types are allowed via the `OPEN_TERMINAL_BINARY_MIME_PREFIXES` environment variable (default: `image`).
+
+#### View a File (Raw Binary)
+
+**`GET /files/view`**
+
+Serves the raw binary content of any file with the correct `Content-Type` header. Unlike `read_file`, this endpoint has no MIME type restrictions — it serves PDFs, images, videos, or any other file type. Designed for UI file previewing.
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `path` | string | Path to the file to serve. |
+
+```bash
+curl "http://localhost:8000/files/view?path=/home/user/report.pdf" \
+  -H "Authorization: Bearer <api-key>" --output report.pdf
+```
+
+#### Display a File (Agent Signaling)
+
+**`GET /files/display`**
+
+A signaling endpoint that lets AI agents request a file be shown to the user. Returns the file content with the detected `Content-Type`. The consuming client (e.g. Open WebUI) is responsible for handling the response and presenting the file in its UI.
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `path` | string | Path to the file to display. |
+
+```bash
+curl "http://localhost:8000/files/display?path=/home/user/chart.png" \
+  -H "Authorization: Bearer <api-key>"
+```
 
 #### Write a File
 
