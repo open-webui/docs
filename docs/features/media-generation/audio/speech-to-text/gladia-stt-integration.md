@@ -5,7 +5,7 @@ title: "Gladia STT Integration"
 
 # Using Gladia for Speech-to-Text
 
-This guide covers how to use [Gladia.io](https://www.gladia.io/) for Speech-to-Text with Open WebUI. Gladia provides a powerful pre-recorded transcription API with support for multiple languages and automatic language detection.
+This guide covers how to use [Gladia.io](https://www.gladia.io/) for Speech-to-Text with Open WebUI. Gladia provides a powerful pre-recorded transcription API with support for multiple languages and automatic language detection. Gladia offer a 10h per month for free.
 
 ## Requirements
 
