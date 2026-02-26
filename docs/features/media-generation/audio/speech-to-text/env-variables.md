@@ -44,7 +44,7 @@ If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=f
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `azure`, `deepgram`, `mistral` | empty |
+| `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `azure`, `deepgram`, `mistral`, `gladia` | empty |
 | `AUDIO_STT_MODEL` | STT model for external providers | empty |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | OpenAI-compatible API base URL | `https://api.openai.com/v1` |
 | `AUDIO_STT_OPENAI_API_KEY` | OpenAI API key | empty |
@@ -65,6 +65,12 @@ If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=f
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DEEPGRAM_API_KEY` | Deepgram API key | empty |
+
+### Gladia STT
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `AUDIO_STT_GLADIA_API_KEY` | Gladia API key | empty |
 
 ### Mistral STT
 
