@@ -7,6 +7,30 @@ Retrieval-Augmented Generation (RAG) enables language models to reason over exte
 
 Let's break down the common causes and solutions so you can supercharge your RAG accuracy! 🚀
 
+## Quick RAG Triage Checklist
+
+When a RAG answer looks wrong, it helps to start from the symptom you see in chat and work backwards. The table below maps common symptoms to typical failure patterns and the sections on this page that explain them in more detail.
+
+| ID  | Symptom you see first                                                                 | Likely pattern (high level)                                           | Where to look first on this page                                                |
+|-----|----------------------------------------------------------------------------------------|------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| P01 | Answers completely ignore your documents or knowledge base                            | Ingestion failure, extractor issue, wrong KB, or unsupported file     | The Model "Can't See" Your Content, Upload Limits and Restrictions, PDF OCR    |
+| P02 | Only a tiny slice of a long document seems to be used                                 | Over aggressive truncation, partial context, or file size limits      | Only a Small Part of the Document is Being Used, Upload Limits and Restrictions |
+| P03 | Model cuts off mid reasoning or misses facts from the end of long pages               | Context window too small for the retrieved content                    | Token Limit is Too Short, Pro Tip: Test with GPT-4o or GPT-4                    |
+| P04 | Retrieval feels random or off topic                                                   | Low quality or mismatched embedding model                             | Embedding Model is Low Quality or Mismatched                                    |
+| P05 | Errors like `NoneType` has no attribute `encode` during embedding                     | Embedding engine not configured or failing                            | 400: 'NoneType' object has no attribute 'encode'                                |
+| P06 | Very many tiny snippets in search results, answers feel fragmented                    | Over fragmented chunks from header based splitting                    | Fragmented or Tiny Chunks                                                       |
+| P07 | First answer is fast but follow up questions become slower and slower                 | KV cache invalidation, context injected in the wrong place            | Slow Follow-up Responses (KV Cache Invalidation)                                |
+| P08 | API says "content is empty" even though the file has text                             | Asynchronous ingestion race, file not processed yet                   | API File Upload: "The content provided is empty" Error                          |
+| P09 | GPU crashes or CUDA out of memory during large uploads or reindexing                  | Embedding batch too large, shared GPU with chat model                 | CUDA Out of Memory During Embedding                                             |
+| P10 | Worker processes die during document upload in multi worker deployments               | SQLite based vector store with forks, or health check timeouts        | Worker Dies During Document Upload                                              |
+| P11 | Model seems to ignore an attached knowledge base altogether                           | RAG mode and knowledge tools configuration mismatch                   | Knowledge Base Attached to Model Not Working                                    |
+| P12 | Same query works well with GPT 4 class models but fails with local models             | Local context window or quality not sufficient for your use case      | Pro Tip: Test with GPT-4o or GPT-4, Token Limit is Too Short                    |
+
+You can use this checklist in two passes:
+
+1. Find the closest symptom in the table and jump to the suggested section.
+2. After you apply the fix, run the same query again and confirm that the symptom disappears, rather than only tuning the prompt.
+
 ## Common RAG Issues and How to Fix Them
 
 ### 1. The Model "Can't See" Your Content
@@ -198,8 +222,10 @@ If your initial response is fast but follow-up questions become increasingly slo
 When uploading files via the API and immediately adding them to a knowledge base, you may encounter:
 
 ```
+
 400: The content provided is empty. Please ensure that there is text or data present before proceeding.
-```
+
+````
 
 **The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously—the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
 
@@ -228,18 +254,15 @@ def wait_for_processing(token, file_id, timeout=300):
         time.sleep(2)  # Poll every 2 seconds
     
     raise TimeoutError("File processing timed out")
-```
+````
 
 **Status Values:**
-| Status | Meaning |
-|--------|---------|
-| `pending` | Still processing |
-| `completed` | Ready to add to knowledge base |
-| `failed` | Processing failed (check error field) |
 
-:::tip
-For complete API workflow examples including proper status checking, see the [API Endpoints documentation](/reference/api-endpoints#checking-file-processing-status).
-:::
+| Status      | Meaning                               |
+| ----------- | ------------------------------------- |
+| `pending`   | Still processing                      |
+| `completed` | Ready to add to knowledge base        |
+| `failed`    | Processing failed (check error field) |
 
 ---
 
@@ -252,9 +275,10 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 ```
 
 **Common Causes:**
-- Embedding model competing with chat model for GPU memory
-- PyTorch memory fragmentation from repeated small allocations
-- Large documents creating memory spikes during embedding
+
+* Embedding model competing with chat model for GPU memory
+* PyTorch memory fragmentation from repeated small allocations
+* Large documents creating memory spikes during embedding
 
 ✅ **Solutions:**
 
@@ -266,6 +290,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 
 3. **Enable Expandable Segments**:
    Set the environment variable to reduce fragmentation:
+
    ```
    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
    ```
@@ -295,11 +320,13 @@ Error generating embeddings: 429 Rate limit reached
 
 1. **Limit Concurrent Embedding Requests**:
    Set [`RAG_EMBEDDING_CONCURRENT_REQUESTS`](/reference/env-configuration#rag_embedding_concurrent_requests) to cap the number of simultaneous embedding API calls. For example, set it to `5` or `10` depending on your provider's rate limits:
+
    ```yaml
    # docker-compose.yaml
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
+
    Or configure it in the **Admin Panel > Settings > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
@@ -317,11 +344,13 @@ If PDFs containing images with text are returning empty content:
 ✅ **Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
-   - Navigate to **Admin Settings > Documents**
-   - Try **Apache Tika** or **Docling** for better OCR support
+
+   * Navigate to **Admin Settings > Documents**
+   * Try **Apache Tika** or **Docling** for better OCR support
 
 2. **Enable PDF Image Extraction**:
-   - In **Admin Settings > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+
+   * In **Admin Settings > Documents**, ensure **PDF Extract Images (OCR)** is enabled
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
@@ -331,13 +360,13 @@ If PDFs containing images with text are returning empty content:
 
 ---
 
-| Problem | Fix |
-|--------|---------|
-| 📄 API returns "empty content" error | Wait for file processing to complete before adding to knowledge base |
-| 💥 CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
-| 📷 PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
-| 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups |
-| 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
+| Problem                                | Fix                                                                  |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| 📄 API returns "empty content" error   | Wait for file processing to complete before adding to knowledge base |
+| 💥 CUDA OOM during embedding           | Reduce batch size, isolate GPU, or restart container                 |
+| 📷 PDF images not extracted            | Use Tika/Docling, enable OCR, or update pypdf                        |
+| 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups    |
+| 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck`        |
 
 ---
 
@@ -357,6 +386,7 @@ There are **two distinct causes** for this in multi-worker setups:
 If you are using the **default ChromaDB** vector database (which uses a local SQLite-backed `PersistentClient`) with `UVICORN_WORKERS > 1`, the crash is caused by SQLite being **not fork-safe**. When uvicorn forks multiple workers, each process inherits the same SQLite database connection. Concurrent writes to the vector database from multiple workers cause an immediate crash — not a timeout, but an instant fatal error.
 
 You will typically see this pattern all within the same second:
+
 ```
 save_docs_to_vector_db:1619 - adding to collection file-id
 INFO:     Waiting for child process [pid]
@@ -364,8 +394,9 @@ INFO:     Child process [pid] died
 ```
 
 **Solution:** You **must** switch away from the default local ChromaDB when using multiple workers:
-- Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `milvus`, or `qdrant`
-- Or run ChromaDB as a separate HTTP server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port)
+
+* Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `milvus`, or `qdrant`
+* Or run ChromaDB as a separate HTTP server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port)
 
 See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for full details.
 
@@ -373,30 +404,25 @@ See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-dur
 
 When using the **default SentenceTransformers** embedding engine (local embeddings) with multiple workers, uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. In older versions of Open WebUI, the embedding call blocked the event loop entirely — preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
 
-:::note
-
-This issue was **fixed** in Open WebUI. The embedding system now uses `run_coroutine_threadsafe` to keep the main event loop responsive during embedding operations, so workers will no longer be killed during uploads regardless of how long embeddings take.
-
-If you are running a version with this fix and still experiencing worker death, check **Cause A** above (ChromaDB SQLite) first, then ensure your Open WebUI is up to date.
-
-:::
-
 **Who is affected:**
-- Only deployments using the **default SentenceTransformers** embedding engine (local embeddings).
-- Only when running **multiple uvicorn workers**. Single-worker deployments don't have health check timeouts.
-- External embedding engines (Ollama, OpenAI, Azure OpenAI) are **not affected** since their API calls don't block the event loop.
+
+* Only deployments using the **default SentenceTransformers** embedding engine (local embeddings).
+* Only when running **multiple uvicorn workers**. Single-worker deployments don't have health check timeouts.
+* External embedding engines (Ollama, OpenAI, Azure OpenAI) are **not affected** since their API calls don't block the event loop.
 
 ✅ **Solutions (for older versions without the fix):**
 
 1. **Update Open WebUI** to a version that includes the `run_coroutine_threadsafe` fix.
 
 2. **Increase the health check timeout** as a workaround:
+
    ```yaml
    # docker-compose.yaml
    command: ["bash", "start.sh", "--workers", "2", "--timeout-worker-healthcheck", "120"]
    ```
 
 3. **Switch to an external embedding engine** to avoid local blocking entirely:
+
    ```
    RAG_EMBEDDING_ENGINE=ollama
    RAG_EMBEDDING_MODEL=nomic-embed-text
@@ -412,18 +438,18 @@ You attached a knowledge base to a model in **Workspace > Models > Edit**, but w
 
 **The Problem**: Open WebUI has two distinct RAG modes, and they handle model-attached knowledge bases very differently:
 
-| Mode | How Knowledge Works |
-|------|-------------------|
-| **Default (non-native)** | Open WebUI automatically performs RAG — it queries the attached knowledge base, retrieves relevant chunks, and injects them into the conversation context. This happens behind the scenes without the model doing anything. |
+| Mode                        | How Knowledge Works                                                                                                                                                                                                                            |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Default (non-native)**    | Open WebUI automatically performs RAG — it queries the attached knowledge base, retrieves relevant chunks, and injects them into the conversation context. This happens behind the scenes without the model doing anything.                    |
 | **Native Function Calling** | Knowledge is **not auto-injected**. Instead, the model receives tools (like `query_knowledge_bases`) and must actively decide to call them. This is **agentic RAG** — the model autonomously searches when it determines it needs information. |
 
 If you have **Native Function Calling enabled**, the model needs both the **ability** and the **instruction** to use the knowledge tools.
 
 #### Knowledge Retrieval Behavior Matrix
 
-| | **KB Attached to Model** | **No KB Attached** |
-|---|---|---|
-| **Default Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG — user must manually add a knowledge base to the chat via `#` |
+|                             | **KB Attached to Model**                                                         | **No KB Attached**                                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Default Mode**            | Open WebUI auto-injects RAG results from the **attached KB(s) only**             | No automatic RAG — user must manually add a knowledge base to the chat via `#`                                  |
 | **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** — must actively call them | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled) — must actively call them |
 
 Key takeaway: in default mode, attaching a KB enables automatic RAG scoped to those KBs. In native mode, the model must use its tools regardless — attaching a KB only restricts *which* KBs are searchable.
@@ -437,20 +463,25 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 ✅ **Solutions (check in order):**
 
 1. **Ensure Built-in Tools are enabled for the model**:
-   - Go to **Workspace > Models > Edit** for your model
-   - Under **Builtin Tools**, make sure the **Knowledge Base** category is enabled (it is by default)
-   - If this is disabled, the model has no way to query attached knowledge bases
+
+   * Go to **Workspace > Models > Edit** for your model
+   * Under **Builtin Tools**, make sure the **Knowledge Base** category is enabled (it is by default)
+   * If this is disabled, the model has no way to query attached knowledge bases
 
 2. **Add a system prompt hint**:
-   - Some models need explicit guidance to use their tools. Add something like:
+
+   * Some models need explicit guidance to use their tools. Add something like:
+
      > "When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_bases to search for relevant information before answering."
 
 3. **Or disable Native Function Calling** for that model:
-   - In the model settings, disable Native Function Calling to restore the classic auto-injection RAG behavior from earlier versions
+
+   * In the model settings, disable Native Function Calling to restore the classic auto-injection RAG behavior from earlier versions
 
 4. **Or use Full Context mode**:
-   - Click on the attached knowledge base and select **"Use Entire Document"**
-   - This bypasses RAG entirely and always injects the full content, regardless of native function calling settings
+
+   * Click on the attached knowledge base and select **"Use Entire Document"**
+   * This bypasses RAG entirely and always injects the full content, regardless of native function calling settings
 
 :::info Why the Change?
 Open WebUI is moving toward **agentic RAG**, where the model autonomously decides when and how to search knowledge bases. This is more powerful than classic RAG because the model can retry searches with different queries if the first attempt didn't yield good results. However, it does require models that are capable of using tools effectively. For smaller or older models that struggle with tool calling, disabling Native Function Calling is the recommended approach.
@@ -460,11 +491,10 @@ For the full explanation of how knowledge scoping and retrieval modes work, see 
 
 ---
 
-| Problem | Fix |
-|--------|---------:|
+| Problem                                  |                                                                               Fix |
+| ---------------------------------------- | --------------------------------------------------------------------------------: |
 | 🧠 Model ignores attached knowledge base | Enable Builtin Tools, add system prompt hints, or disable native function calling |
 
 ---
 
 By optimizing these areas—extraction, embedding, retrieval, and model context—you can dramatically improve how accurately your LLM works with your documents. Don't let a 2048-token window or weak retrieval pipeline hold back your AI's power 🎯.
-
