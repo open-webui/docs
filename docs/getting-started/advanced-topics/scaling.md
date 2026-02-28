@@ -75,6 +75,7 @@ ENABLE_WEBSOCKET_SUPPORT=true
 - If you're using Redis Sentinel for high availability, also set `REDIS_SENTINEL_HOSTS` and consider setting `REDIS_SOCKET_CONNECT_TIMEOUT=5` to prevent hangs during failover.
 - For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
 - Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
+- A **single Redis instance** is sufficient for the vast majority of deployments, even with thousands of users. You almost certainly do not need Redis Cluster unless you have specific HA/bandwidth requirements. If you think you need Redis Cluster, first check whether your connection count and memory usage are caused by fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
 - Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
 
 For a complete step-by-step Redis setup (Docker Compose, Sentinel, Cluster mode, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
@@ -232,7 +233,40 @@ Each provider has its own set of environment variables for credentials and bucke
 
 ---
 
-## Step 6 — Add Observability
+## Step 6 — Fix Content Extraction & Embeddings
+
+**When:** You process documents regularly (RAG, knowledge bases) and are running in production.
+
+:::danger These Defaults Cause Memory Leaks at Scale
+The default content extraction engine (pypdf) and default embedding engine (SentenceTransformers) are the **two most common causes of memory leaks** in production Open WebUI deployments. Fixing these is just as important as switching to PostgreSQL or adding Redis.
+:::
+
+**What to do:**
+
+1. **Switch the content extraction engine** to an external service:
+
+```
+CONTENT_EXTRACTION_ENGINE=tika
+TIKA_SERVER_URL=http://tika:9998
+```
+
+2. **Switch the embedding engine** to an external provider:
+
+```
+RAG_EMBEDDING_ENGINE=openai
+# or for self-hosted:
+RAG_EMBEDDING_ENGINE=ollama
+```
+
+**Key things to know:**
+
+- The default content extractor (pypdf) has unavoidable **known memory leaks** that cause your Open WebUI process to grow in memory continuously. An external extractor (Tika, Docling) runs in its own process/container, isolating these leaks.
+- The default SentenceTransformers embedding model loads ~500MB per worker process. With 8 workers, that's 4GB of RAM just for embeddings. External embedding eliminates this.
+- For detailed guidance and configuration options, see [Content Extraction Engine](/troubleshooting/performance#content-extraction-engine) and [Embedding Engine](/troubleshooting/performance#embedding-engine) in the Performance guide.
+
+---
+
+## Step 7 — Add Observability
 
 **When:** You want to monitor performance, troubleshoot issues, and understand how your deployment is behaving at scale.
 
@@ -300,6 +334,14 @@ ENABLE_WEBSOCKET_SUPPORT=true
 # S3_BUCKET_NAME=my-openwebui-bucket
 # S3_REGION_NAME=us-east-1
 
+# Content Extraction (do NOT use default pypdf in production)
+CONTENT_EXTRACTION_ENGINE=tika
+TIKA_SERVER_URL=http://tika:9998
+
+# Embeddings (do NOT use default SentenceTransformers at scale)
+RAG_EMBEDDING_ENGINE=openai
+# or: RAG_EMBEDDING_ENGINE=ollama
+
 # Workers (let orchestrator scale, keep workers at 1)
 UVICORN_WORKERS=1
 
@@ -311,13 +353,13 @@ ENABLE_DB_MIGRATIONS=false
 
 ## Quick Reference: When Do I Need What?
 
-| Scenario | PostgreSQL | Redis | External Vector DB | Shared Storage |
-|---|:---:|:---:|:---:|:---:|
-| Single user / evaluation | ✗ | ✗ | ✗ | ✗ |
-| Small team (< 50 users, single instance) | Recommended | ✗ | ✗ | ✗ |
-| Multiple Uvicorn workers | **Required** | **Required** | **Required** | ✗ (same filesystem) |
-| Multiple instances / HA | **Required** | **Required** | **Required** | **Optional** (NFS or S3) |
-| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Optional** (NFS or S3) |
+| Scenario | PostgreSQL | Redis | External Vector DB | Ext. Content Extraction | Ext. Embeddings | Shared Storage |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Single user / evaluation | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| Small team (< 50 users, single instance) | Recommended | ✗ | ✗ | Recommended | ✗ | ✗ |
+| Multiple Uvicorn workers | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | ✗ (same filesystem) |
+| Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
+| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
 
 :::note About "External Vector DB"
 The default ChromaDB uses a local SQLite backend that crashes under multi-process access. "External Vector DB" means either a client-server database (PGVector, Milvus, Qdrant, Pinecone) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4--switch-to-an-external-vector-database) for details.

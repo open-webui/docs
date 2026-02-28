@@ -89,14 +89,22 @@ You can also let your LLM auto-select the right Tools using the [**AutoTool Filt
 
 Open WebUI offers two distinct ways for models to interact with tools: a standard **Default Mode** and a high-performance **Native Mode (Agentic Mode)**. Choosing the right mode depends on your model's capabilities and your performance requirements.
 
-### 🟡 Default Mode (Prompt-based)
+### 🟡 Default Mode (Prompt-based) — Legacy
+
+:::warning Legacy Mode
+Default Mode is maintained purely for **backwards compatibility** with older or smaller models that lack native function-calling support. It is considered **legacy** and should not be used when your model supports native tool calling. New deployments should use **Native Mode** exclusively.
+:::
+
 In Default Mode, Open WebUI manages tool selection by injecting a specific prompt template that guides the model to output a tool request.
 - **Compatibility**: Works with **practically any model**, including older or smaller local models that lack native function-calling support.
 - **Flexibility**: Highly customizable via prompt templates.
-- **Caveat**: Can be slower (requires extra tokens) and less reliable for complex, multi-step tool chaining.
+- **Caveats**:
+  - Can be slower (requires extra tokens) and less reliable for complex, multi-step tool chaining.
+  - **Breaks KV cache**: The injected prompt changes every turn, preventing LLM engines from reusing cached key-value pairs. This increases latency and cost for every message in the conversation.
+  - Does not support built-in system tools (memory, notes, channels, etc.).
 
-### 🟢 Native Mode (Agentic Mode / System Function Calling)
-Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for high-performance agentic workflows.
+### 🟢 Native Mode (Agentic Mode / System Function Calling) — Recommended
+Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for all models that support it — which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
 **Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.5**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
@@ -104,9 +112,11 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 
 #### Why use Native Mode (Agentic Mode)?
 - **Speed & Efficiency**: Lower latency as it avoids bulky prompt-based tool selection.
+- **KV Cache Friendly**: Tool definitions are sent as structured parameters (not injected into the prompt), so they don't invalidate the KV cache between turns. This can significantly reduce latency and token costs.
 - **Reliability**: Higher accuracy in following tool schemas (with quality models).
 - **Multi-step Chaining**: Essential for **Agentic Research** and **Interleaved Thinking** where a model needs to call multiple tools in succession.
 - **Autonomous Decision-Making**: Models can decide when to search, which tools to use, and how to combine results.
+- **System Tools**: Only Native Mode unlocks the [built-in system tools](#built-in-system-tools-nativeagentic-mode) (memory, notes, knowledge, channels, etc.).
 
 #### How to Enable Native Mode (Agentic Mode)
 Native Mode can be enabled at two levels:
@@ -164,11 +174,14 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 **This is a DeepSeek model/API issue**, not an Open WebUI issue. Open WebUI correctly sends tools in standard OpenAI format — the malformed output originates from DeepSeek's non-standard internal format.
 :::
 
-| Feature | Default Mode | Native Mode |
+| Feature | Default Mode (Legacy) | Native Mode (Recommended) |
 |:---|:---|:---|
+| **Status** | Legacy / backwards compat | ✅ Recommended |
 | **Latency** | Medium/High | Low |
+| **KV Cache** | ❌ Can break cache | ✅ Cache-friendly |
 | **Model Compatibility** | Universal | Requires Tool-Calling Support |
 | **Logic** | Prompt-based (Open WebUI) | Model-native (API/Ollama) |
+| **System Tools** | ❌ Not available | ✅ Full access |
 | **Complex Chaining** | ⚠️ Limited | ✅ Excellent |
 
 ### Built-in System Tools (Native/Agentic Mode)
