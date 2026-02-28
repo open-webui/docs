@@ -159,19 +159,57 @@ All file and upload endpoints use **fully async I/O** via `aiofiles`. Directory 
 
 ## Connecting to Open WebUI
 
-There are two ways to connect Open Terminal to Open WebUI: the **native integration** (recommended) and the **generic OpenAPI Tool Server** method.
+There are three ways to connect Open Terminal to Open WebUI: **admin-configured** (recommended), **user-configured**, and the **generic OpenAPI Tool Server** method.
 
-### Native Integration (Recommended)
+### Admin-Configured (Recommended)
 
 :::tip Experimental
 The native Open Terminal integration is currently marked as **experimental**. It provides a tighter experience than the generic OpenAPI approach, with features like the built-in file browser.
 :::
 
-Open WebUI has built-in support for Open Terminal connections under **Settings → Integrations**. This gives you:
+Administrators can add Open Terminal connections that are available to all users (or specific groups) without exposing the terminal URL or API key to the browser. All requests are **proxied through the Open WebUI backend**, which means:
 
-- **Always-on tools** — When enabled, all Open Terminal endpoints are automatically injected as tools into every chat. No need to manually select them.
-- **Built-in file browser** — A **Files** tab appears in the chat controls panel (alongside Controls), letting you browse, preview, download, upload, and attach files from the terminal directly in the chat UI.
-- **Active terminal indicator** — The message input area shows which terminal is connected.
+- The terminal's API key is never sent to the client.
+- Access control is enforced server-side using group-based permissions.
+- Multiple authentication types are supported: **Bearer** (default), **Session**, **OAuth**, or **None**.
+
+This gives every user with access:
+
+- **Always-on tools** — When a terminal is selected, all Open Terminal endpoints are automatically injected as tools into every chat. No need to manually select them.
+- **Built-in file browser** — A **Files** tab appears in the chat controls panel when a terminal is selected, letting you browse, preview, download, upload, and attach files from the terminal directly in the chat UI.
+- **Terminal selector** — A terminal dropdown in the message input area lets users pick which terminal to use. Admin-configured terminals appear under the **System** category.
+
+#### Setup
+
+1. Go to **Admin Settings → Integrations**
+2. Scroll to the **Open Terminal** section
+3. Click **+** to add a new connection
+4. Enter the **URL** (e.g. `http://open-terminal:8000`) and **API key**
+5. Choose an **authentication type** (Bearer is recommended for most setups)
+6. Optionally restrict access to specific groups via **access grants**
+
+Each connection has an **enable/disable toggle**. Only enabled terminals appear in the terminal selector for users. You can add multiple terminal connections and enable or disable them independently.
+
+:::info
+The terminal connection can also be pre-configured via the [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) environment variable.
+:::
+
+#### Authentication Types
+
+| Type | Description |
+| :--- | :--- |
+| **Bearer** | Open WebUI sends the configured API key as a `Bearer` token to the terminal server. This is the default and recommended method. |
+| **Session** | Forwards the user's Open WebUI session credentials to the terminal server. Useful when the terminal server validates against the same auth backend. |
+| **OAuth** | Forwards the user's OAuth access token. Requires OAuth to be configured in Open WebUI. |
+| **None** | No authentication header is sent. Only use this for terminals on a trusted internal network. |
+
+#### Access Control
+
+By default, all users can access admin-configured terminals. To restrict access, add **access grants** in the terminal connection configuration. Access grants work the same way as [group-based permissions](/features/access-security) — you can limit access to specific user groups.
+
+### User-Configured
+
+Individual users can also add their own Open Terminal connections under **Settings → Integrations**. This is useful for personal development terminals or when administrators haven't configured a shared instance. User-configured terminals appear under the **Direct** category in the terminal selector.
 
 #### Setup
 
@@ -179,30 +217,47 @@ Open WebUI has built-in support for Open Terminal connections under **Settings �
 2. Scroll to the **Open Terminal** section
 3. Click **+** to add a new connection
 4. Enter the **URL** (e.g. `http://open-terminal:8000`) and **API key**
-5. Toggle the connection **on**
+5. Select the terminal from the **terminal selector dropdown** in the chat input area
 
-Only **one terminal connection** can be active at a time. Enabling a new connection automatically disables the previous one.
+:::note
+User-configured terminals connect **directly from the browser** to the terminal server. The terminal URL must be reachable from the user's machine, and the API key is stored in the browser. For production deployments, prefer the admin-configured approach.
+:::
+
+### Terminal Selector
+
+The message input area includes a **terminal selector dropdown** that shows all available terminals organized into two categories:
+
+- **System** — Admin-configured terminals (proxied through Open WebUI)
+- **Direct** — User-configured terminals (direct browser connection)
+
+Click a terminal to select it. Selecting a terminal:
+
+- Activates its tools for the current chat
+- Opens the **Files** tab in the chat controls panel
+- Loads the terminal's current working directory in the file browser
+
+Click the same terminal again to deselect it. Only one terminal can be active at a time — selecting a system terminal automatically deactivates any direct terminal, and vice versa.
 
 #### File Browser
 
-When a terminal is connected, the chat controls panel gains a **Files** tab:
+When a terminal is selected, the chat controls panel gains a **Files** tab:
 
 - **Browse** directories on the remote terminal filesystem
-- **Preview** text files, images, and PDFs inline
+- **Preview** text files, images, PDFs, CSV/TSV files (rendered as formatted tables), and Markdown inline
 - **Create folders** using the new folder button in the breadcrumb bar
 - **Delete** files and folders via the context menu (⋯) on each entry
 - **Download** any file to your local machine
 - **Upload** files by dragging and dropping them onto the directory listing
 - **Attach** files to the current chat by downloading them through the file browser
 
-The file browser remembers your last-visited directory between panel open/close cycles and automatically syncs the terminal's working directory to match.
+The file browser remembers your last-visited directory between panel open/close cycles and automatically reloads when you switch terminals.
 
 ### Generic OpenAPI Tool Server
 
 Open Terminal is also a standard FastAPI application that exposes an OpenAPI specification at `/openapi.json`. This means it works as a generic [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui) — useful when you want more control over which tools are enabled per-chat.
 
 - **As a User Tool Server**: Add it in **Settings → Tools** to connect directly from your browser.
-- **As a Global Tool Server**: Add it in **Admin Settings → Tools** to make it available to all users.
+- **As a Global Tool Server**: Add it in **Admin Settings → Integrations** to make it available to all users.
 
 For step-by-step instructions with screenshots, see the [OpenAPI Tool Server Integration Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui).
 
@@ -486,7 +541,7 @@ curl "http://localhost:8000/files/view?path=/home/user/report.pdf" \
 
 **`GET /files/display`**
 
-A signaling endpoint that lets AI agents request a file be shown to the user. Returns the file content with the detected `Content-Type`. The consuming client (e.g. Open WebUI) is responsible for handling the response and presenting the file in its UI.
+A signaling endpoint that lets AI agents request a file be shown to the user. Returns the file content with the detected `Content-Type`. When used with the native Open WebUI integration, calling this tool automatically emits a `display_file` event that opens the file in the chat's **Files** tab — no extra configuration needed.
 
 | Parameter | Type | Description |
 | :--- | :--- | :--- |

@@ -1090,6 +1090,36 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 :::
 
+### Terminal Server
+
+#### `TERMINAL_SERVER_CONNECTIONS`
+
+- Type: `str` (JSON array)
+- Default: `[]`
+- Description: Specifies a JSON array of Open Terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/extensibility/open-terminal) instance. Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Example:
+```json
+[
+  {
+    "id": "unique-id",
+    "url": "http://open-terminal:8000",
+    "key": "your-api-key",
+    "name": "Dev Terminal",
+    "auth_type": "bearer",
+    "config": {
+      "access_grants": []
+    }
+  }
+]
+```
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time as new features are added.
+
+:::
+
 ### Autocomplete
 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
