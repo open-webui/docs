@@ -7,7 +7,7 @@ title: "Open Terminal"
 
 ## Overview
 
-[Open Terminal](https://github.com/open-webui/open-terminal) gives your AI a real shell. Instead of running code in a sandboxed browser snippet, the model gets a full operating system where it can install software, run code in any language, manage files, and execute multi-step workflows, all from your chat.
+[Open Terminal](https://github.com/open-webui/open-terminal) gives your AI a real computer. Instead of running code in a sandboxed browser snippet, the model gets a full operating system where it can install software, run code in any language, manage files, and execute multi-step workflows, all from your chat.
 
 When connected to Open WebUI, every terminal capability is **automatically available** to the model with no manual setup per chat. You also get a **built-in file browser** right in the conversation, so you can see, edit, and manage everything the AI creates.
 
@@ -232,7 +232,7 @@ The file browser remembers your last-visited directory and automatically reloads
 ## Security
 
 - **Always use Docker in production.** Bare metal exposes your host to any command the model generates.
-- **Set an API key.** Without one, anyone who can reach the port has full shell access.
+- **Set an API key.** Without one, anyone who can reach the port has full access.
 - **Use resource limits.** Apply `--memory` and `--cpus` flags in Docker to prevent runaway processes.
 - **Network isolation.** Place the terminal container on an internal Docker network that only Open WebUI can reach.
 - **Use named volumes.** Files inside the container are lost when removed. The default `docker run` command mounts a volume at `/home/user` for persistence.
