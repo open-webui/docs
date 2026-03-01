@@ -49,17 +49,11 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 
 ### Open Terminal
 
-[Open Terminal](/features/extensibility/open-terminal) is a lightweight API for running shell commands remotely inside a Docker container. It provides full OS-level access — any language, any tool, any shell command — with container-level isolation.
+[Open Terminal](https://github.com/open-webui/open-terminal) is a lightweight API for running shell commands remotely inside a Docker container. It provides full OS-level access — any language, any tool, any shell command — with container-level isolation.
 
 - **Full shell access** — models can install packages, run scripts in any language, use system tools like ffmpeg, git, curl, etc.
 - **Container isolation** — runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset** — the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
-
-Open Terminal is connected to Open WebUI as an easy to connect [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui), not as a built-in code execution engine.
-
-:::note
-Open Terminal currently operates as a **single shared instance** — there is no automatic per-user container provisioning yet. Each user connects to the same container unless separate instances are deployed manually.
-:::
 
 ### Comparison
 
@@ -75,19 +69,3 @@ Open Terminal currently operates as a **single shared instance** — there is no
 | **Setup** | None (built-in) | Admin configures globally | Each user adds as a Tool Server |
 | **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation | ✅ Per-user by design |
 | **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ⚠️ Manual per-user instances |
-
-:::tip On the Roadmap: Terminal Manager for Multi-Tenant Deployments
-
-For organizational and enterprise deployments, a **Terminal Manager** service is being explored that could automatically provision and manage per-user Docker containers. This would potentially:
-
-- Spin up isolated Open Terminal containers on demand, one per user
-- Route requests to the correct container based on user identity
-- Enforce resource limits (CPU, memory) per container
-- Automatically shut down idle containers (e.g., after 30 minutes of inactivity)
-- Clean up containers that haven't been used for a configurable period (e.g., 1 week)
-
-The idea is to configure this in the admin panel by adding a connection to a Terminal Manager (URL + API key), similar to how Jupyter is configured today. Individual users and self-hosters would continue using Open Terminal directly as a tool without needing the manager.
-
-This feature is on the roadmap but no timeline has been announced. Follow the [Open Terminal repository](https://github.com/open-webui/open-terminal) for updates.
-
-:::
