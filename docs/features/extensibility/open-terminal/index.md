@@ -243,12 +243,15 @@ Click the same terminal again to deselect it. Only one terminal can be active at
 When a terminal is selected, the chat controls panel gains a **Files** tab:
 
 - **Browse** directories on the remote terminal filesystem
-- **Preview** text files, images, PDFs, CSV/TSV files (rendered as formatted tables), and Markdown inline
-- **Create folders** using the new folder button in the breadcrumb bar
+- **Preview** text files, images, PDFs, CSV/TSV files (rendered as formatted tables), and Markdown inline — with a **Source/Preview toggle** for Markdown and CSV files
+- **Edit** text files inline — click the edit (pencil) icon in the toolbar to modify file contents, then save or cancel. Changes are written directly to the terminal filesystem.
+- **Create files** using the new file button in the toolbar (creates an empty file with the name you provide)
+- **Create folders** using the new folder button in the toolbar
 - **Delete** files and folders via the context menu (⋯) on each entry
-- **Download** any file to your local machine
+- **Download** any file to your local machine via the toolbar download button
 - **Upload** files by dragging and dropping them onto the directory listing
 - **Attach** files to the current chat by downloading them through the file browser
+- **Reset view** for images (resets zoom/pan back to default)
 
 The file browser remembers your last-visited directory between panel open/close cycles and automatically reloads when you switch terminals.
 
