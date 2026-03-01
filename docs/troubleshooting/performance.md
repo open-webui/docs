@@ -134,6 +134,40 @@ For multi-user setups, the choice of Vector DB matters.
     *   `ENABLE_MILVUS_MULTITENANCY_MODE=True`
     *   `ENABLE_QDRANT_MULTITENANCY_MODE=True`
 
+### Content Extraction Engine
+
+:::danger Default Content Extractor Causes Memory Leaks
+The **default content extraction engine** uses Python libraries including **pypdf**, which are known to have **persistent memory leaks** during document ingestion. In production deployments with regular document uploads, this will cause Open WebUI's memory usage to grow continuously until the process is killed or the container is restarted.
+
+This is the **#1 cause of unexplained memory growth** in production deployments.
+:::
+
+**Recommendation**: Switch to an external content extraction engine for any deployment that processes documents regularly:
+
+| Engine | Best For | Configuration |
+|---|---|---|
+| **Apache Tika** | General-purpose, widely used, handles most document types | `CONTENT_EXTRACTION_ENGINE=tika` + `TIKA_SERVER_URL=http://tika:9998` |
+| **Docling** | High-quality extraction with layout-aware parsing | `CONTENT_EXTRACTION_ENGINE=docling` |
+| **External Loader** | Recommended for production and custom extraction pipelines | `CONTENT_EXTRACTION_ENGINE=external` + `EXTERNAL_DOCUMENT_LOADER_URL=...` |
+
+Using an external extractor moves the memory-intensive parsing out of the Open WebUI process entirely, eliminating this class of memory leaks.
+
+### Embedding Engine
+
+:::warning SentenceTransformers at Scale
+The **default SentenceTransformers** embedding engine (all-MiniLM-L6-v2) loads a machine learning model into the Open WebUI process memory. While lightweight enough for personal use, at scale this model:
+
+- **Consumes significant RAM** (~500MB+ per worker process)
+- **Blocks the event loop** during embedding operations on older versions
+- **Multiplies with workers** — each Uvicorn worker loads its own copy of the model
+
+For multi-user or production deployments, **offload embeddings to an external service**.
+:::
+
+-   **Recommended**: Use `RAG_EMBEDDING_ENGINE=openai` (for cloud embeddings via OpenAI, Azure, or compatible APIs) or `RAG_EMBEDDING_ENGINE=ollama` (for self-hosted embedding via Ollama with models like `nomic-embed-text`).
+-   **Env Var**: `RAG_EMBEDDING_ENGINE=openai`
+-   **Effect**: The embedding model is no longer loaded into the Open WebUI process, freeing hundreds of MB of RAM per worker.
+
 ### Optimizing Document Chunking
 
 The way your documents are chunked directly impacts both storage efficiency and retrieval quality.
@@ -359,12 +393,43 @@ If resource usage is critical, disable automated features that constantly trigge
 *Target: Many concurrent users, Stability > Persistence.*
 
 1.  **Database**: **PostgreSQL** (Mandatory).
-2.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
-3.  **Streaming**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7` (Reduce CPU/Net/DB writes).
-4.  **Chat Saving**: `ENABLE_REALTIME_CHAT_SAVE=False`.
-5.  **Vector DB**: **Milvus**, **Qdrant**, or **PGVector**. **Do not use ChromaDB's default local mode** — its SQLite backend will crash under multi-worker/multi-replica access.
-6.  **Task Model**: External/Hosted (Offload compute).
-7.  **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
+2.  **Content Extraction**: **Tika** or **Docling** (Mandatory — default pypdf leaks memory). See [Content Extraction Engine](#content-extraction-engine).
+3.  **Embeddings**: **External** — `RAG_EMBEDDING_ENGINE=openai` or `ollama` (Mandatory — default SentenceTransformers consumes too much RAM at scale). See [Embedding Engine](#embedding-engine).
+4.  **Tool Calling**: **Native Mode** (strongly recommended — Default Mode is legacy and breaks KV cache). See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+5.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
+6.  **Streaming**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7` (Reduce CPU/Net/DB writes).
+7.  **Chat Saving**: `ENABLE_REALTIME_CHAT_SAVE=False`.
+8.  **Vector DB**: **Milvus**, **Qdrant**, or **PGVector**. **Do not use ChromaDB's default local mode** — its SQLite backend will crash under multi-worker/multi-replica access.
+9.  **Task Model**: External/Hosted (Offload compute).
+10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
+11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
+
+#### Redis Tuning
+
+A single Redis instance is sufficient for the vast majority of deployments, including those with thousands of users. **You almost certainly do not need Redis Cluster or Redis Sentinel** unless you have specific HA requirements.
+
+Common Redis configuration issues that cause unnecessary scaling:
+
+| Issue | Symptom | Fix |
+|---|---|---|
+| **Stale connections** | Redis runs out of connections or memory grows indefinitely | Set `timeout 1800` in redis.conf (kills idle connections after 30 minutes) |
+| **Low maxclients** | `max number of clients reached` errors | Set `maxclients 10000` or higher |
+| **No connection limits** | Open WebUI pods may accumulate connections that never close | Combine `timeout` with connection pool limits in your Redis client config |
+
+---
+
+## ⚠️ Common Anti-Patterns
+
+These are real-world mistakes that cause organizations to massively over-provision infrastructure:
+
+| Anti-Pattern | What Happens | Fix |
+|---|---|---|
+| **Using default content extractor in production** | pypdf leaks memory → containers restart constantly → you add more replicas to compensate | Switch to Tika or Docling (`CONTENT_EXTRACTION_ENGINE=tika`) |
+| **Running SentenceTransformers at scale** | Each worker loads ~500MB embedding model → RAM usage explodes → you add more machines | Use external embeddings (`RAG_EMBEDDING_ENGINE=openai` or `ollama`) |
+| **Redis Cluster when single Redis suffices** | Too many replicas → too many connections → Redis can't handle them → you deploy Redis Cluster to compensate | Fix the root cause (fewer replicas, `timeout 1800`, `maxclients 10000`) |
+| **Scaling replicas to mask memory leaks** | Leaky processes → OOM kills → auto-scaler adds more pods → more Redis connections → Redis overwhelmed | Fix the leaks first (content extraction, embedding engine), then right-size |
+| **Using Default (prompt-based) tool calling** | Injected prompts may break KV cache → higher latency → more resources needed per request | Switch to Native Mode for all capable models |
+| **Not configuring Redis stale connection timeout** | Connections accumulate forever → Redis OOM → you deploy Redis Cluster | Add `timeout 1800` to redis.conf |
 
 ---
 
@@ -384,6 +449,7 @@ For detailed information on all available variables, see the [Environment Config
 | `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
+| `CONTENT_EXTRACTION_ENGINE` | [Content Extraction Engine](/reference/env-configuration#content_extraction_engine) |
 | `AUDIO_STT_ENGINE` | [STT Engine](/reference/env-configuration#audio_stt_engine) |
 | `ENABLE_IMAGE_GENERATION` | [Image Generation](/reference/env-configuration#enable_image_generation) |
 | `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/reference/env-configuration#enable_autocomplete_generation) |

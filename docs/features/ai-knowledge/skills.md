@@ -111,7 +111,7 @@ Follow the [Open Terminal setup guide](/features/extensibility/open-terminal#get
 Add your Open Terminal instance as a Tool Server by following the [OpenAPI Tool Server Integration Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui). You can connect it as:
 
 - A **User Tool Server** (in **Settings → Tools**) — connects from your browser, ideal for personal or local instances
-- A **Global Tool Server** (in **Admin Settings → Tools**) — connects from the backend, available to all users
+- A **Global Tool Server** (in **Admin Settings → Integrations**) — connects from the backend, available to all users
 
 Once connected, the Open Terminal tools (execute, file upload, file download) appear automatically in the chat interface.
 

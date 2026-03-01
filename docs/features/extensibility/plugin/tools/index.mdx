@@ -22,6 +22,7 @@ Because there are several ways to integrate "Tools" in Open WebUI, it's importan
 | **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External MCP Servers |
 | **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | [MCPO Adapter](https://github.com/open-webui/mcpo) |
 | **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External Web APIs |
+| **Open Terminal** | `Settings > Integrations` | Full shell access in an isolated Docker container (always-on) | [Open Terminal](https://github.com/open-webui/open-terminal) |
 
 ### 1. Native Features (Built-in)
 These are deeply integrated into Open WebUI and generally don't require external scripts.
@@ -88,14 +89,22 @@ You can also let your LLM auto-select the right Tools using the [**AutoTool Filt
 
 Open WebUI offers two distinct ways for models to interact with tools: a standard **Default Mode** and a high-performance **Native Mode (Agentic Mode)**. Choosing the right mode depends on your model's capabilities and your performance requirements.
 
-### 🟡 Default Mode (Prompt-based)
+### 🟡 Default Mode (Prompt-based) — Legacy
+
+:::warning Legacy Mode
+Default Mode is maintained purely for **backwards compatibility** with older or smaller models that lack native function-calling support. It is considered **legacy** and should not be used when your model supports native tool calling. New deployments should use **Native Mode** exclusively.
+:::
+
 In Default Mode, Open WebUI manages tool selection by injecting a specific prompt template that guides the model to output a tool request.
 - **Compatibility**: Works with **practically any model**, including older or smaller local models that lack native function-calling support.
 - **Flexibility**: Highly customizable via prompt templates.
-- **Caveat**: Can be slower (requires extra tokens) and less reliable for complex, multi-step tool chaining.
+- **Caveats**:
+  - Can be slower (requires extra tokens) and less reliable for complex, multi-step tool chaining.
+  - **Breaks KV cache**: The injected prompt changes every turn, preventing LLM engines from reusing cached key-value pairs. This increases latency and cost for every message in the conversation.
+  - Does not support built-in system tools (memory, notes, channels, etc.).
 
-### 🟢 Native Mode (Agentic Mode / System Function Calling)
-Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for high-performance agentic workflows.
+### 🟢 Native Mode (Agentic Mode / System Function Calling) — Recommended
+Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). This is the **recommended mode** for all models that support it — which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
 **Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.5**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
@@ -103,9 +112,11 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 
 #### Why use Native Mode (Agentic Mode)?
 - **Speed & Efficiency**: Lower latency as it avoids bulky prompt-based tool selection.
+- **KV Cache Friendly**: Tool definitions are sent as structured parameters (not injected into the prompt), so they don't invalidate the KV cache between turns. This can significantly reduce latency and token costs.
 - **Reliability**: Higher accuracy in following tool schemas (with quality models).
 - **Multi-step Chaining**: Essential for **Agentic Research** and **Interleaved Thinking** where a model needs to call multiple tools in succession.
 - **Autonomous Decision-Making**: Models can decide when to search, which tools to use, and how to combine results.
+- **System Tools**: Only Native Mode unlocks the [built-in system tools](#built-in-system-tools-nativeagentic-mode) (memory, notes, knowledge, channels, etc.).
 
 #### How to Enable Native Mode (Agentic Mode)
 Native Mode can be enabled at two levels:
@@ -163,11 +174,14 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 **This is a DeepSeek model/API issue**, not an Open WebUI issue. Open WebUI correctly sends tools in standard OpenAI format — the malformed output originates from DeepSeek's non-standard internal format.
 :::
 
-| Feature | Default Mode | Native Mode |
+| Feature | Default Mode (Legacy) | Native Mode (Recommended) |
 |:---|:---|:---|
+| **Status** | Legacy / backwards compat | ✅ Recommended |
 | **Latency** | Medium/High | Low |
+| **KV Cache** | ❌ Can break cache | ✅ Cache-friendly |
 | **Model Compatibility** | Universal | Requires Tool-Calling Support |
 | **Logic** | Prompt-based (Open WebUI) | Model-native (API/Ollama) |
+| **System Tools** | ❌ Not available | ✅ Full access |
 | **Complex Chaining** | ⚠️ Limited | ✅ Excellent |
 
 ### Built-in System Tools (Native/Agentic Mode)
@@ -179,12 +193,13 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled AND per-chat "Web Search" toggle enabled.* |
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
-| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on).* |
+| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge — see note below.* |
 | `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. **Use this first** to discover what knowledge is available. |
 | `query_knowledge_bases` | Search KB *names and descriptions* by semantic similarity. Use to find which KB is relevant when you don't know which one to query. |
 | `search_knowledge_bases` | Search knowledge bases by name/description (text match). |
 | `query_knowledge_files` | Search *file contents* inside KBs using vector search. **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
 | `search_knowledge_files` | Search files across accessible knowledge bases by filename (not content). |
+| `view_file` | Get the full content of any user-accessible file by its ID. Only injected when the model has attached knowledge files. |
 | `view_knowledge_file` | Get the full content of a file from a knowledge base. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
@@ -229,6 +244,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of `{id, filename, content_snippet, knowledge_id}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
+| `view_file` | `file_id` (required) | `{id, filename, content, updated_at, created_at}` |
 | `view_knowledge_file` | `file_id` (required) | `{id, filename, content}` |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
@@ -264,10 +280,52 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
 :::
 
-:::info Recommended KB Tool Workflow
-**When an attached KB is returning empty results:**
-1. First call `list_knowledge_bases` to confirm the model can see the attached KB
-2. Then use `query_knowledge_files` (without specifying `knowledge_ids` — it auto-scopes to attached KBs)
+:::warning Knowledge Tools Change Based on Attached Knowledge
+The set of knowledge tools injected into a model **changes depending on whether the model has knowledge attached** (via the Model Editor). These are **two mutually exclusive sets** — the model gets one or the other, never both.
+
+**Model with attached knowledge** (files, collections, or notes):
+
+| Tool | When Available |
+|------|---------------|
+| `query_knowledge_files` | Always (auto-scoped to attached KBs) |
+| `view_file` | When attached knowledge includes files or collections |
+
+The model **does not** get the browsing tools (`list_knowledge_bases`, `search_knowledge_bases`, etc.) because it doesn't need to discover KBs — the search is automatically scoped to its attachments.
+
+**Model without attached knowledge** (general-purpose):
+
+| Tool | Purpose |
+|------|---------|
+| `list_knowledge_bases` | Discover available KBs |
+| `search_knowledge_bases` | Search KBs by name/description (text match) |
+| `query_knowledge_bases` | Search KBs by name/description (semantic similarity) |
+| `search_knowledge_files` | Search files by filename |
+| `query_knowledge_files` | Search file contents (vector search) |
+| `view_knowledge_file` | Read a full file from a KB |
+
+This model has the full browsing set to autonomously discover and explore any KB the user has access to.
+:::
+
+:::caution Attached Knowledge Still Requires User Access
+Attaching a knowledge base to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge item. Items the user cannot access are silently excluded from search results.
+
+**Access requirements by knowledge type:**
+
+| Attached Type | User Needs |
+|---------------|-----------|
+| **Knowledge Base** (collection) | Owner, admin, or explicit read access grant |
+| **Individual File** | Owner or admin only (no access grants) |
+| **Note** | Owner, admin, or explicit read access grant |
+
+**Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself — even though they can use the model.
+
+**Solution**: Make sure users who need access to the model's knowledge also have read access to the underlying knowledge base (via access grants or group permissions in the Knowledge settings).
+:::
+
+:::info Recommended KB Tool Workflow (No Attached Knowledge)
+When using a model **without** attached knowledge:
+1. First call `list_knowledge_bases` to discover what knowledge is available
+2. Then use `query_knowledge_files` to search file contents within relevant KBs
 3. If still empty, the files may not be embedded yet, or you may have **Full Context mode enabled** which bypasses the vector store
 
 **Do NOT use Full Context mode with knowledge tools** — Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.

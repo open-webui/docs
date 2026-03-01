@@ -54,6 +54,7 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 - **Full shell access** — models can install packages, run scripts in any language, use system tools like ffmpeg, git, curl, etc.
 - **Container isolation** — runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset** — the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
+- **Built-in file browser** — browse, preview, create, delete, upload, and download files directly from the chat controls panel.
 
 ### Comparison
 
@@ -66,6 +67,6 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 | **Isolation** | ✅ Browser sandbox | ❌ Shared environment | ✅ Container-level (when using Docker) |
 | **Multi-user safety** | ✅ Per-user by design | ⚠️ Not isolated | ⚠️ Single instance (per-user containers planned) |
 | **File generation** | ❌ Very limited | ✅ Full support | ✅ Full support with upload/download |
-| **Setup** | None (built-in) | Admin configures globally | Each user adds as a Tool Server |
+| **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations, or as a Tool Server |
 | **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation | ✅ Per-user by design |
 | **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ⚠️ Manual per-user instances |
