@@ -7,7 +7,7 @@ title: "Open Terminal"
 
 :::info
 
-This page is up-to-date with Open Terminal release version [v0.3.0](https://github.com/open-webui/open-terminal).
+This page is up-to-date with Open Terminal release version [v0.4.0](https://github.com/open-webui/open-terminal).
 
 :::
 
@@ -813,36 +813,7 @@ curl -X POST "http://localhost:8000/files/upload?directory=/home/user" \
   -F "file=@local_file.csv"
 ```
 
-**Via temporary upload link (no auth needed to upload):**
-```bash
-# 1. Generate an upload link
-curl -X POST "http://localhost:8000/files/upload/link?directory=/home/user" \
-  -H "Authorization: Bearer <api-key>"
-# → {"url": "http://localhost:8000/files/upload/a1b2c3d4..."}
-
-# 2. Upload to the link (no auth required)
-curl -X POST "http://localhost:8000/files/upload/a1b2c3d4..." \
-  -F "file=@local_file.csv"
-```
-
-Opening a temporary upload link in a browser shows a simple file picker form — useful for manual uploads without curl.
-
 The filename is automatically derived from the uploaded file or the URL.
-
-#### Download a File
-
-**`GET /files/download/link`**
-
-Returns a temporary download URL for a file. The link expires after 5 minutes and requires no authentication to use.
-
-```bash
-curl "http://localhost:8000/files/download/link?path=/home/user/output.csv" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{"url": "http://localhost:8000/files/download/a1b2c3d4..."}
-```
 
 ### Process Status (Background)
 
