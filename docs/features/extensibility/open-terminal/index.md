@@ -5,27 +5,28 @@ title: "Open Terminal"
 
 # ⚡ Open Terminal
 
-:::info
-
-This page is up-to-date with Open Terminal release version [v0.4.0](https://github.com/open-webui/open-terminal).
-
-:::
-
 ## Overview
 
-[Open Terminal](https://github.com/open-webui/open-terminal) is a lightweight API for running shell commands remotely — with background process management, file operations, and secure access. When connected to Open WebUI as a [Tool](/features/extensibility/plugin/tools), it gives models full shell access, a complete file system toolkit, and the ability to execute arbitrary commands in an isolated environment.
+[Open Terminal](https://github.com/open-webui/open-terminal) gives your AI a real shell. Instead of running code in a sandboxed browser snippet, the model gets a full operating system where it can install software, run code in any language, manage files, and execute multi-step workflows — all from your chat.
 
-Unlike Pyodide (browser-based, limited libraries) or Jupyter (shared environment, no per-user isolation), Open Terminal runs in its own Docker container with full OS-level capabilities. This makes it ideal for tasks that require:
-
-- Installing and running any software package or language
-- Working with system tools like ffmpeg, pandoc, git, etc.
-- Reading, writing, and editing files directly
-- Running multi-step build, analysis, or data processing pipelines
-- Interacting with REPLs and interactive commands via stdin
+When connected to Open WebUI, you also get a **built-in file browser** right in the chat interface — browse directories, preview files, edit code, upload and download, all without leaving the conversation.
 
 :::warning
-Open Terminal provides **unrestricted shell access** to the environment it runs in. In production deployments, always run it inside a Docker container with appropriate resource limits. Never run it on bare metal in a shared or untrusted environment.
+Open Terminal provides **unrestricted shell access** to the environment it runs in. In production deployments, always run it inside a Docker container with appropriate resource limits. Never expose it on bare metal in a shared or untrusted environment.
 :::
+
+## Why Open Terminal?
+
+Open WebUI already supports browser-based Python execution via [Pyodide](/features/chat-conversations/chat-features/code-execution/python) and Jupyter — but those environments are limited. Open Terminal removes those limits:
+
+- **Full OS access** — install any package, run any language (Python, Node.js, Rust, Go, C++, etc.), use system tools like `ffmpeg`, `git`, `pandoc`, `curl`, and more.
+- **Real file system** — the AI can read, write, edit, and search files on disk. It can work on actual projects, not throwaway snippets.
+- **Built-in file browser** — browse, preview, edit, create, delete, upload, and download files right from the chat UI. Supports inline preview of images, PDFs, CSV/TSV tables, and Markdown.
+- **Persistent storage** — with a Docker volume, files survive container restarts. Your AI's work doesn't disappear.
+- **Background processes** — start long-running tasks (builds, training runs, servers) and check back on them later.
+- **Two deployment modes**:
+  - **Docker (sandboxed)** — isolated container with a full toolkit pre-installed. Safe playground for AI agents.
+  - **Bare metal** — runs directly on your machine with access to your real files, tools, and environment. Perfect for local development and personal automation.
 
 ## Getting Started
 
@@ -35,16 +36,20 @@ Open Terminal provides **unrestricted shell access** to the environment it runs 
 docker run -d --name open-terminal --restart unless-stopped -p 8000:8000 -v open-terminal:/home/user -e OPEN_TERMINAL_API_KEY=your-secret-key ghcr.io/open-webui/open-terminal
 ```
 
-The `-v open-terminal:/home/user` flag creates a **named volume** so files in the user's home directory survive container restarts. If no API key is provided, one is auto-generated and printed on startup (`docker logs open-terminal`).
+That's it — you're up and running at `http://localhost:8000`.
 
-The container runs as a **non-root user** (`user`) with passwordless `sudo` available when elevated privileges are needed. The working directory is `/home/user`.
+The `-v open-terminal:/home/user` flag creates a **named volume** so files in the user's home directory survive container restarts. The container runs as a **non-root user** with passwordless `sudo` available when needed.
 
-The Docker image is based on Python 3.12 and comes pre-installed with a rich set of tools:
+:::tip
+If you don't set an API key, one is generated automatically. Grab it with `docker logs open-terminal`.
+:::
+
+The Docker image comes pre-installed with a broad toolkit:
 
 | Category | Included |
 | :--- | :--- |
 | **Core utilities** | coreutils, findutils, grep, sed, gawk, diffutils, patch, less, file, tree, bc |
-| **Networking** | curl, wget, net-tools, iputils-ping, dnsutils, netcat, socat, telnet, openssh-client, rsync |
+| **Networking** | curl, wget, net-tools, iputils-ping, dnsutils, netcat, socat, openssh-client, rsync |
 | **Editors** | vim, nano |
 | **Version control** | git |
 | **Build tools** | build-essential, cmake, make |
@@ -52,59 +57,24 @@ The Docker image is based on Python 3.12 and comes pre-installed with a rich set
 | **Data processing** | jq, xmlstarlet, sqlite3 |
 | **Compression** | zip, unzip, tar, gzip, bzip2, xz, zstd, p7zip |
 | **System** | procps, htop, lsof, strace, sysstat, sudo, tmux, screen |
-| **Python libraries** | numpy, pandas, scipy, scikit-learn, matplotlib, seaborn, plotly, jupyter, ipython, requests, beautifulsoup4, lxml, sqlalchemy, psycopg2, pyyaml, toml, jsonlines, tqdm, rich |
+| **Python libraries** | numpy, pandas, scipy, scikit-learn, matplotlib, seaborn, plotly, jupyter, ipython, requests, beautifulsoup4, lxml, sqlalchemy, pyyaml, rich, and more |
 
-### Build from Source
+You can customize the image by forking the repo and editing the [Dockerfile](https://github.com/open-webui/open-terminal/blob/main/Dockerfile).
 
-```bash
-docker build -t open-terminal .
-docker run -p 8000:8000 open-terminal
-```
+### Bare Metal
 
-### pip Install (Bare Metal)
+No Docker? No problem. Open Terminal is a standard Python package:
 
 ```bash
 # One-liner with uvx (no install needed)
 uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 
-# Or install globally with pip
+# Or install with pip
 pip install open-terminal
 open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
-
-# Set a custom working directory
-open-terminal run --cwd /path/to/project
 ```
 
-:::warning
-Running bare metal gives the model shell access to your actual machine. Only use this for local development or testing.
-:::
-
-### MCP Server Mode
-
-Open Terminal can also run as an [MCP (Model Context Protocol)](/features/extensibility/plugin/tools/openapi-servers/mcp) server, exposing all its endpoints as MCP tools. This requires an additional dependency:
-
-```bash
-pip install open-terminal[mcp]
-```
-
-Then start the MCP server:
-
-```bash
-# stdio transport (default — for local MCP clients)
-open-terminal mcp
-
-# streamable-http transport (for remote/networked MCP clients)
-open-terminal mcp --transport streamable-http --host 0.0.0.0 --port 8000
-```
-
-| Option | Default | Description |
-| :--- | :--- | :--- |
-| `--transport` | `stdio` | Transport mode: `stdio` or `streamable-http` |
-| `--host` | `0.0.0.0` | Bind address (streamable-http only) |
-| `--port` | `8000` | Bind port (streamable-http only) |
-| `--cwd` | Server's current directory | Working directory for the server process |
-
-Under the hood, this uses [FastMCP](https://github.com/jlowin/fastmcp) to automatically convert every FastAPI endpoint into an MCP tool — no manual tool definitions needed.
+On bare metal, commands run directly on your machine with your user's permissions — so the AI has access to your real files, your real tools, and your real environment. This is great for local development and personal automation, but **don't do this in a shared or production environment**.
 
 ### Docker Compose (with Open WebUI)
 
@@ -138,7 +108,11 @@ volumes:
   open-terminal:
 ```
 
-## Configuration
+:::tip
+When both services run in the same Docker Compose stack, use the **service name** as the hostname. For the admin-configured Open Terminal URL in Open WebUI, use `http://open-terminal:8000` — not `localhost:8000`.
+:::
+
+### Configuration
 
 | CLI Option | Default | Environment Variable | Description |
 | :--- | :--- | :--- | :--- |
@@ -146,40 +120,16 @@ volumes:
 | `--port` | `8000` | — | Bind port |
 | `--cwd` | Current directory | — | Working directory for the server process |
 | `--api-key` | Auto-generated | `OPEN_TERMINAL_API_KEY` | Bearer API key for authentication |
-| — | `~/.open-terminal/logs` | `OPEN_TERMINAL_LOG_DIR` | Directory for process JSONL log files |
-| — | `image` | `OPEN_TERMINAL_BINARY_MIME_PREFIXES` | Comma-separated MIME type prefixes for binary files that `read_file` returns as raw binary responses (e.g. `image,audio` or `image/png,image/jpeg`) |
 
-When no API key is provided, Open Terminal generates a random key using a cryptographically secure token and prints it to the console on startup.
-
-Process output is persisted to **JSONL log files** under `OPEN_TERMINAL_LOG_DIR/processes/`. These files provide a full audit trail that survives process cleanup and server restarts.
-
-:::note Performance
-All file and upload endpoints use **fully async I/O** via `aiofiles`. Directory listing and file search operations run in a background thread via `asyncio.to_thread`. This means the server's event loop is never blocked by filesystem operations, even on large directories or slow storage. As of v0.2.5, all file endpoints gracefully handle permission errors and OS-level exceptions instead of crashing with HTTP 500.
-:::
+When no API key is provided, Open Terminal generates a random key and prints it to the console on startup.
 
 ## Connecting to Open WebUI
 
-There are three ways to connect Open Terminal to Open WebUI: **admin-configured** (recommended), **user-configured**, and the **generic OpenAPI Tool Server** method.
+There are two ways to connect Open Terminal to Open WebUI. Make sure to add it under the **Open Terminal** section in integrations settings — this is a dedicated integration, not a generic tool server.
 
 ### Admin-Configured (Recommended)
 
-:::tip Experimental
-The native Open Terminal integration is currently marked as **experimental**. It provides a tighter experience than the generic OpenAPI approach, with features like the built-in file browser.
-:::
-
-Administrators can add Open Terminal connections that are available to all users (or specific groups) without exposing the terminal URL or API key to the browser. All requests are **proxied through the Open WebUI backend**, which means:
-
-- The terminal's API key is never sent to the client.
-- Access control is enforced server-side using group-based permissions.
-- Multiple authentication types are supported: **Bearer** (default), **Session**, **OAuth**, or **None**.
-
-This gives every user with access:
-
-- **Always-on tools** — When a terminal is selected, all Open Terminal endpoints are automatically injected as tools into every chat. No need to manually select them.
-- **Built-in file browser** — A **Files** tab appears in the chat controls panel when a terminal is selected, letting you browse, preview, download, upload, and attach files from the terminal directly in the chat UI.
-- **Terminal selector** — A terminal dropdown in the message input area lets users pick which terminal to use. Admin-configured terminals appear under the **System** category.
-
-#### Setup
+Administrators can set up Open Terminal connections that are available to all users (or specific groups). All requests are **proxied through the Open WebUI backend**, which means the terminal's API key never reaches the browser and access control is enforced server-side.
 
 1. Go to **Admin Settings → Integrations**
 2. Scroll to the **Open Terminal** section
@@ -188,689 +138,112 @@ This gives every user with access:
 5. Choose an **authentication type** (Bearer is recommended for most setups)
 6. Optionally restrict access to specific groups via **access grants**
 
-Each connection has an **enable/disable toggle**. Only enabled terminals appear in the terminal selector for users. You can add multiple terminal connections and enable or disable them independently.
+Each connection has an enable/disable toggle. You can add multiple terminal connections and control them independently.
 
 :::info
-The terminal connection can also be pre-configured via the [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) environment variable.
+Terminal connections can also be pre-configured via the [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) environment variable.
 :::
 
 #### Authentication Types
 
 | Type | Description |
 | :--- | :--- |
-| **Bearer** | Open WebUI sends the configured API key as a `Bearer` token to the terminal server. This is the default and recommended method. |
-| **Session** | Forwards the user's Open WebUI session credentials to the terminal server. Useful when the terminal server validates against the same auth backend. |
+| **Bearer** | Sends the configured API key as a `Bearer` token to the terminal server. Default and recommended. |
+| **Session** | Forwards the user's Open WebUI session credentials. Useful when the terminal validates against the same auth backend. |
 | **OAuth** | Forwards the user's OAuth access token. Requires OAuth to be configured in Open WebUI. |
-| **None** | No authentication header is sent. Only use this for terminals on a trusted internal network. |
+| **None** | No authentication header. Only for terminals on a trusted internal network. |
 
 #### Access Control
 
-By default, all users can access admin-configured terminals. To restrict access, add **access grants** in the terminal connection configuration. Access grants work the same way as [group-based permissions](/features/access-security/rbac/groups) — you can limit access to specific user groups.
+By default, all users can access admin-configured terminals. To restrict access, add **access grants** to limit to specific [user groups](/features/access-security/rbac/groups).
 
-### User-Configured
+### User-Configured (Direct)
 
-Individual users can also add their own Open Terminal connections under **Settings → Integrations**. This is useful for personal development terminals or when administrators haven't configured a shared instance. User-configured terminals appear under the **Direct** category in the terminal selector.
-
-#### Setup
+Individual users can add their own terminals under **Settings → Integrations → Open Terminal**. This is useful for personal terminals running on the user's local machine.
 
 1. Go to **Settings → Integrations**
 2. Scroll to the **Open Terminal** section
 3. Click **+** to add a new connection
-4. Enter the **URL** (e.g. `http://open-terminal:8000`) and **API key**
-5. Select the terminal from the **terminal selector dropdown** in the chat input area
+4. Enter the **URL** and **API key**
 
 :::note
-User-configured terminals connect **directly from the browser** to the terminal server. The terminal URL must be reachable from the user's machine, and the API key is stored in the browser. For production deployments, prefer the admin-configured approach.
+User-configured terminals connect **directly from the browser**. The terminal must be reachable from the user's machine, and the API key is stored in the browser. For production deployments, prefer the admin-configured approach.
 :::
 
-### Terminal Selector
+### Networking Tips
 
-The message input area includes a **terminal selector dropdown** that shows all available terminals organized into two categories:
-
-- **System** — Admin-configured terminals (proxied through Open WebUI)
-- **Direct** — User-configured terminals (direct browser connection)
-
-Click a terminal to select it. Selecting a terminal:
-
-- Activates its tools for the current chat
-- Opens the **Files** tab in the chat controls panel
-- Loads the terminal's current working directory in the file browser
-
-Click the same terminal again to deselect it. Only one terminal can be active at a time — selecting a system terminal automatically deactivates any direct terminal, and vice versa.
-
-#### File Browser
-
-When a terminal is selected, the chat controls panel gains a **Files** tab:
-
-- **Browse** directories on the remote terminal filesystem
-- **Preview** text files, images, PDFs, CSV/TSV files (rendered as formatted tables), and Markdown inline — with a **Source/Preview toggle** for Markdown and CSV files
-- **Edit** text files inline — click the edit (pencil) icon in the toolbar to modify file contents, then save or cancel. Changes are written directly to the terminal filesystem.
-- **Create files** using the new file button in the toolbar (creates an empty file with the name you provide)
-- **Create folders** using the new folder button in the toolbar
-- **Delete** files and folders via the context menu (⋯) on each entry
-- **Download** any file to your local machine via the toolbar download button
-- **Upload** files by dragging and dropping them onto the directory listing
-- **Attach** files to the current chat by downloading them through the file browser
-- **Reset view** for images (resets zoom/pan back to default)
-
-The file browser remembers your last-visited directory between panel open/close cycles and automatically reloads when you switch terminals.
-
-### Networking & Connectivity
-
-Understanding where requests originate is essential for configuring Open Terminal correctly. **Admin-configured and user-configured connections work fundamentally differently at the network level**, and using the wrong URL is the most common cause of connection failures.
-
-#### Where Do Requests Come From?
+Admin-configured and user-configured connections work differently at the network level — **the same URL can work for one but fail for the other.**
 
 | Connection Type | Request Origin | What `localhost` Means |
 | :--- | :--- | :--- |
-| **Admin-Configured (System)** | Open WebUI **backend server** | The machine/container running Open WebUI |
-| **User-Configured (Direct)** | User's **browser** | The machine running the browser |
-| **Generic OpenAPI (User)** | User's **browser** | The machine running the browser |
-| **Generic OpenAPI (Global)** | Open WebUI **backend server** | The machine/container running Open WebUI |
+| **Admin (System)** | Open WebUI **backend server** | The machine/container running Open WebUI |
+| **User (Direct)** | User's **browser** | The machine running the browser |
 
-This means:
-
-- **A URL that works for a user-configured terminal may not work for an admin-configured terminal** (and vice versa), even though the URL is identical.
-- If Open WebUI runs in Docker, `localhost` inside the container refers to the container itself — not the host machine. Use the container/service name (e.g. `http://open-terminal:8000`) or `host.docker.internal` instead.
-- If you use a reverse proxy (e.g. Nginx) to expose Open Terminal under a path like `https://yourdomain.com/terminal`, the backend must be able to resolve and reach that hostname. If the hostname resolves to `127.0.0.1` on the backend, the request will fail with a 502 error.
-
-#### Common Symptoms
+**Common issues:**
 
 | Symptom | Likely Cause | Fix |
 | :--- | :--- | :--- |
-| **502 Bad Gateway** on `/api/v1/terminals/...` endpoints | The Open WebUI backend cannot reach the terminal URL | Use a URL the backend can resolve — container name, internal IP, or `host.docker.internal` |
-| **User connection works, admin connection doesn't** | The URL resolves correctly from the browser but not from the backend container | Use a different URL for admin config that the backend can reach |
-| **`Connect call failed ('127.0.0.1', ...)`** in backend logs | Hostname resolves to localhost inside the container | Use the actual IP, container name, or Docker network hostname |
-| **Connection timeout** | Firewall blocking traffic between containers/hosts | Ensure both containers are on the same Docker network, or open the necessary ports |
-
-:::warning Same URL, Different Results
-**The same URL can work as a user-configured terminal but fail as an admin-configured terminal.** This is not a bug — it's how networking works.
-
-**Example:** You have Open Terminal at `https://myserver.com/terminal` with an Nginx reverse proxy. When a user adds this URL, their browser connects directly to `myserver.com` → Nginx → Open Terminal. When an admin adds the same URL, the Open WebUI backend tries to connect to `myserver.com`, which may resolve to `127.0.0.1` inside the Docker container — bypassing Nginx entirely and failing with a 502.
-
-**Fix:** For admin-configured terminals, use the **internal URL** that the backend can reach directly (e.g. `http://open-terminal:8000` if both containers are on the same Docker network).
-:::
+| **502 Bad Gateway** | Backend can't reach the terminal URL | Use a URL the backend can resolve — container name, internal IP, or `host.docker.internal` |
+| **User connection works, admin doesn't** | URL resolves from browser but not from backend container | Use different URLs: public URL for user connections, internal URL for admin |
+| **Connection timeout** | Firewall or network isolation | Ensure both containers are on the same Docker network |
 
 :::tip Quick Test
-To verify the backend can reach your terminal URL, exec into the Open WebUI container and test:
+To verify the backend can reach your terminal, exec into the Open WebUI container and test:
 
 ```bash
-# From inside the Open WebUI container
-curl -s http://open-terminal:8000/openapi.json | head -c 200
+curl -s http://open-terminal:8000/health
 ```
 
-If this returns JSON, the backend can reach it. If it fails, your admin-configured terminal will also fail.
+If this returns `{"status": "ok"}`, the backend can reach it.
 :::
 
-For the same networking concepts applied to generic OpenAPI tool servers, see the [Tool Server Networking Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from).
+## What You Get
 
-### Generic OpenAPI Tool Server
+Once a terminal is connected, the chat interface gains several features:
 
-Open Terminal is also a standard FastAPI application that exposes an OpenAPI specification at `/openapi.json`. This means it works as a generic [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui) — useful when you want more control over which tools are enabled per-chat.
+### Terminal Selector
 
-- **As a User Tool Server**: Add it in **Settings → Tools** to connect directly from your browser.
-- **As a Global Tool Server**: Add it in **Admin Settings → Integrations** to make it available to all users.
+A **terminal dropdown** appears in the message input area. Admin-configured terminals appear under **System**, user-configured ones under **Direct**. Click to select a terminal — click again to deselect. Only one terminal can be active at a time.
 
-For step-by-step instructions with screenshots, see the [OpenAPI Tool Server Integration Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui).
+Selecting a terminal automatically activates its tools for the current chat and opens the file browser.
 
-## API Reference
+### Always-On Tools
 
-All endpoints except `/health` and temporary download/upload links require Bearer token authentication.
+When a terminal is selected, all Open Terminal capabilities are **automatically available** to the model — no need to manually pick tools. The AI can:
 
-Interactive API documentation (Swagger UI) is available at `http://localhost:8000/docs` when the server is running.
+- Run shell commands in any language
+- Install packages and software
+- Read, write, and edit files
+- Search file contents and filenames
+- Start and monitor background processes
+- Send input to interactive commands (REPLs, prompts)
 
-### Command Execution
+### File Browser
 
-#### Execute a Command
+The chat controls panel gains a **Files** tab when a terminal is active:
 
-**`POST /execute`**
+- **Browse** directories on the remote filesystem
+- **Preview** text files, images, PDFs, CSV/TSV (as formatted tables), and Markdown — with a source/preview toggle
+- **Edit** text files inline with save/cancel
+- **Create** files and folders
+- **Delete** files and folders
+- **Download** files to your local machine
+- **Upload** files by dragging and dropping onto the directory listing
+- **Attach** files to the current chat
 
-Runs a shell command as a **background process** and returns a process ID. All output is persisted to a JSONL log file. Supports pipes, chaining (`&&`, `||`, `;`), and redirections.
+The file browser remembers your last-visited directory and automatically reloads when you switch terminals.
 
-:::tip
-The `/execute` endpoint description in the OpenAPI spec automatically includes live system metadata — OS, hostname, current user, default shell, Python version, and working directory. When Open WebUI discovers this tool via the OpenAPI spec, models see this context in the tool description and can adapt their commands accordingly.
-:::
+## Security
 
-:::info PTY Execution (v0.3.0+)
-Commands now run under a **pseudo-terminal (PTY)** by default on Linux/macOS. This means programs see a real terminal and produce colored output, interactive TUI applications work correctly, and `isatty()` returns true. On Windows, execution falls back to pipe-based subprocess handling.
-:::
-
-**Request body:**
-
-| Field | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `command` | string | (required) | Shell command to execute |
-| `cwd` | string | Server's working directory | Working directory for the command |
-| `env` | object | `null` | Extra environment variables merged into the subprocess environment |
-
-**Query parameters:**
-
-| Parameter | Default | Description |
-| :--- | :--- | :--- |
-| `stream` | `false` | If `true`, stream output as JSONL instead of waiting for completion |
-| `tail` | (all) | Return only the last N output entries. Useful to limit response size for AI agents. |
-| `wait` | number | `null` | Seconds to wait for the command to finish before returning (0–300). If the command completes in time, output is included inline. `null` to return immediately. |
-| `tail` | integer | `null` | Return only the last N output entries. Useful to keep responses bounded. |
-
-**Example — fire and forget:**
-
-```bash
-curl -X POST http://localhost:8000/execute \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"command": "echo hello"}'
-```
-
-```json
-{
-  "id": "a1b2c3d4e5f6",
-  "command": "echo hello",
-  "status": "running",
-  "exit_code": null,
-  "output": [],
-  "truncated": false,
-  "next_offset": 0,
-  "log_path": "/home/user/.open-terminal/logs/processes/a1b2c3d4e5f6.jsonl"
-}
-```
-
-**Example — wait for completion:**
-
-```bash
-curl -X POST "http://localhost:8000/execute?wait=5" \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"command": "echo hello"}'
-```
-
-```json
-{
-  "id": "a1b2c3d4e5f6",
-  "command": "echo hello",
-  "status": "done",
-  "exit_code": 0,
-  "output": [
-    {"type": "stdout", "data": "hello\n"}
-  ],
-  "truncated": false,
-  "next_offset": 1,
-  "log_path": "/home/user/.open-terminal/logs/processes/a1b2c3d4e5f6.jsonl"
-}
-```
-
-:::info File-Backed Process Output
-All background process output (stdout/stderr) is persisted to JSONL log files under `~/.open-terminal/logs/processes/`. This means output is never lost, even if the server restarts. The response includes `next_offset` for stateless incremental polling — pass it as the `offset` query parameter on subsequent status requests to get only new output. The `log_path` field shows the path to the raw JSONL log file.
-:::
-
-### Grep Search (File Contents)
-
-**`GET /files/grep`**
-
-Search for a text pattern across files in a directory. Returns structured matches with file paths, line numbers, and matching lines. Skips binary files automatically.
-
-:::note Renamed in v0.2.6
-This endpoint was renamed from `/files/search` to `/files/grep` to clearly distinguish content-level search from filename-level search (`/files/glob`).
-:::
-
-**Query parameters:**
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `query` | string | (required) | Text or regex pattern to search for |
-| `path` | string | `.` | Directory or file to search in |
-| `regex` | boolean | `false` | Treat query as a regex pattern |
-| `case_insensitive` | boolean | `false` | Perform case-insensitive matching |
-| `include` | string[] | (all files) | Glob patterns to filter files (e.g. `*.py`). Files must match at least one pattern. |
-| `match_per_line` | boolean | `true` | If true, return each matching line with line numbers. If false, return only matching filenames. |
-| `max_results` | integer | `50` | Maximum number of matches to return (1–500) |
-
-```bash
-curl "http://localhost:8000/files/grep?query=TODO&include=*.py&case_insensitive=true" \
-
-#### Get Command Status
-
-**`GET /execute/{process_id}/status`**
-
-Returns process status, exit code, and output since the last poll. Use `offset` and `next_offset` for stateless incremental reads — multiple clients can independently track the same process without data loss.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `wait` | number | `null` | Seconds to wait for the process to finish before returning. Returns early if the process exits. |
-| `offset` | integer | `0` | Number of output entries to skip. Use `next_offset` from the previous response to get only new output. |
-| `tail` | integer | `null` | Return only the last N output entries. |
-
-```bash
-curl "http://localhost:8000/execute/a1b2c3d4e5f6/status?offset=0&wait=10" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{
-  "id": "a1b2c3d4e5f6",
-  "command": "echo hello",
-  "status": "done",
-  "exit_code": 0,
-  "output": [
-    {"type": "stdout", "data": "hello\n"}
-  ],
-  "truncated": false,
-  "next_offset": 1,
-  "log_path": "/home/user/.open-terminal/logs/processes/a1b2c3d4e5f6.jsonl"
-}
-```
-
-#### List Processes
-
-**`GET /execute`**
-
-Returns a list of all tracked background processes, including running, done, and killed.
-
-```bash
-curl http://localhost:8000/execute \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-[
-  {
-    "id": "a1b2c3d4e5f6",
-    "command": "python train.py",
-    "status": "running",
-    "exit_code": null,
-    "log_path": "/home/user/.open-terminal/logs/processes/a1b2c3d4e5f6.jsonl"
-  }
-]
-```
-
-Finished processes are automatically cleaned up after 5 minutes. Their JSONL log files are retained on disk for audit purposes.
-
-#### Send Input
-
-**`POST /execute/{process_id}/input`**
-
-Sends text to a running process's stdin (or PTY). Useful for interacting with REPLs, interactive commands, or any process waiting for input.
-
-Literal escape strings from LLMs are automatically converted to real characters: `\n` → newline, `\t` → tab, `\x03` → Ctrl-C, `\x04` → Ctrl-D, etc.
-
-**Request body:**
-
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `input` | string | Text to send to stdin. Escape sequences like `\n` and `\x03` are automatically converted. |
-
-```bash
-curl -X POST http://localhost:8000/execute/a1b2c3d4e5f6/input \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"input": "print(42)\n"}'
-```
-
-#### Kill a Process
-
-**`DELETE /execute/{process_id}`**
-
-Terminates a running process. Sends `SIGTERM` by default for graceful shutdown.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `force` | boolean | `false` | Send `SIGKILL` instead of `SIGTERM`. |
-
-```bash
-curl -X DELETE "http://localhost:8000/execute/a1b2c3d4e5f6?force=true" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-### File Operations
-
-#### List Directory Contents
-
-**`GET /files/list`**
-
-Returns a structured listing of files and directories at the given path, including name, type, size, and modification time.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `directory` | string | `.` | Directory path to list. |
-
-```bash
-curl "http://localhost:8000/files/list?directory=/home/user" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{
-  "dir": "/home/user",
-  "entries": [
-    {"name": "data.csv", "type": "file", "size": 1024, "modified": 1707955200.0},
-    {"name": "scripts", "type": "directory", "size": 4096, "modified": 1707955200.0}
-  ]
-}
-```
-
-#### Read a File
-
-**`GET /files/read`**
-
-Returns the contents of a file. Text files return a JSON object with a content string. **PDF files** are automatically converted to text using pypdf and returned in the same JSON format. Supported binary types (configurable, default: `image/*`) return the raw binary with the appropriate `Content-Type` header. Unsupported binary types are rejected with HTTP 415.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `path` | string | (required) | Path to the file to read. |
-| `start_line` | integer | `null` | First line to return (1-indexed, inclusive). |
-| `end_line` | integer | `null` | Last line to return (1-indexed, inclusive). |
-
-```bash
-curl "http://localhost:8000/files/read?path=/home/user/script.py&start_line=1&end_line=10" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{
-  "path": "/home/user/script.py",
-  "total_lines": 50,
-  "content": "#!/usr/bin/env python3\nimport sys\n..."
-}
-```
-
-For binary files like images, the response is the raw file content with the detected MIME type. Control which binary types are allowed via the `OPEN_TERMINAL_BINARY_MIME_PREFIXES` environment variable (default: `image`).
-
-#### View a File (Raw Binary)
-
-**`GET /files/view`**
-
-Serves the raw binary content of any file with the correct `Content-Type` header. Unlike `read_file`, this endpoint has no MIME type restrictions — it serves PDFs, images, videos, or any other file type. Designed for UI file previewing.
-
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `path` | string | Path to the file to serve. |
-
-```bash
-curl "http://localhost:8000/files/view?path=/home/user/report.pdf" \
-  -H "Authorization: Bearer <api-key>" --output report.pdf
-```
-
-#### Display a File (Agent Signaling)
-
-**`GET /files/display`**
-
-A signaling endpoint that lets AI agents request a file be shown to the user. Returns the file content with the detected `Content-Type`. When used with the native Open WebUI integration, calling this tool automatically emits a `display_file` event that opens the file in the chat's **Files** tab — no extra configuration needed.
-
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `path` | string | Path to the file to display. |
-
-```bash
-curl "http://localhost:8000/files/display?path=/home/user/chart.png" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-#### Write a File
-
-**`POST /files/write`**
-
-Writes text content to a file. Creates parent directories automatically. Overwrites if the file already exists.
-
-**Request body:**
-
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `path` | string | Absolute or relative path. Parent directories are created automatically. |
-| `content` | string | Text content to write. |
-
-```bash
-curl -X POST http://localhost:8000/files/write \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"path": "/home/user/hello.py", "content": "print(\"hello\")\n"}'
-```
-
-#### Replace Content in a File
-
-**`POST /files/replace`**
-
-Find and replace exact strings in a file. Supports multiple replacements in one call with optional line range narrowing for precision.
-
-**Request body:**
-
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `path` | string | Path to the file to modify. |
-| `replacements` | array | List of find-and-replace operations (applied sequentially). |
-
-Each replacement chunk:
-
-| Field | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `target` | string | (required) | Exact string to find. Must match precisely, including whitespace. |
-| `replacement` | string | (required) | Content to replace the target with. |
-| `start_line` | integer | `null` | Narrow the search to lines at or after this (1-indexed). |
-| `end_line` | integer | `null` | Narrow the search to lines at or before this (1-indexed). |
-| `allow_multiple` | boolean | `false` | If true, replaces all occurrences. If false, errors when multiple matches are found. |
-
-```bash
-curl -X POST http://localhost:8000/files/replace \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "path": "/home/user/config.yaml",
-    "replacements": [
-      {"target": "debug: false", "replacement": "debug: true"}
-    ]
-  }'
-```
-
-#### Grep Search (File Contents)
-
-**`GET /files/grep`**
-
-Search for a text pattern across files in a directory. Returns structured matches with file paths, line numbers, and matching lines. Skips binary files.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `query` | string | (required) | Text or regex pattern to search for. |
-| `path` | string | `.` | Directory or file to search in. |
-| `regex` | boolean | `false` | Treat query as a regex pattern. |
-| `case_insensitive` | boolean | `false` | Perform case-insensitive matching. |
-| `include` | string[] | `null` | Glob patterns to filter files (e.g. `*.py`). Files must match at least one pattern. |
-| `match_per_line` | boolean | `true` | If true, return each matching line. If false, return only filenames. |
-| `max_results` | integer | `50` | Maximum number of matches to return (1–500). |
-
-```bash
-curl "http://localhost:8000/files/grep?query=TODO&path=/home/user/project&include=*.py" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{
-  "query": "TODO",
-  "path": "/root",
-  "matches": [
-    {"file": "/root/app.py", "line": 42, "content": "# TODO: refactor this"},
-    {"file": "/root/utils.py", "line": 7, "content": "# TODO: add tests"}
-  ],
-  "truncated": false
-}
-```
-
-#### Glob Search (Filenames)
-
-**`GET /files/glob`**
-
-Search for files and subdirectories by name within a directory using glob patterns. Returns relative paths, type, size, and modification time.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `pattern` | string | (required) | Glob pattern to search for (e.g. `*.py`). |
-| `path` | string | `.` | Directory to search within. |
-| `exclude` | string[] | `null` | Glob patterns to exclude from results. |
-| `type` | string | `any` | Type filter: `file`, `directory`, or `any`. |
-| `max_results` | integer | `50` | Maximum number of matches to return (1–500). |
-
-```bash
-curl "http://localhost:8000/files/glob?pattern=*.py&path=/home/user/project&type=file" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{
-  "pattern": "*.py",
-  "path": "/home/user/project",
-  "matches": [
-    {"path": "app.py", "type": "file", "size": 2048, "modified": 1707955200.0},
-    {"path": "utils/helpers.py", "type": "file", "size": 512, "modified": 1707955200.0}
-  ],
-  "truncated": false
-}
-```
-
-#### Create a Directory
-
-**`POST /files/mkdir`**
-
-Creates a directory at the specified path. Parent directories are created automatically if they don't exist.
-
-**Request body:**
-
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `path` | string | Path of the directory to create. |
-
-```bash
-curl -X POST http://localhost:8000/files/mkdir \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"path": "/home/user/project/src"}'
-```
-
-```json
-{"path": "/home/user/project/src"}
-```
-
-#### Delete a File or Directory
-
-**`DELETE /files/delete`**
-
-Deletes a file or directory. Directories are removed recursively.
-
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `path` | string | Path to the file or directory to delete. |
-
-```bash
-curl -X DELETE "http://localhost:8000/files/delete?path=/home/user/old-file.txt" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{"path": "/home/user/old-file.txt", "type": "file"}
-```
-
-#### Get or Set Working Directory
-
-**`GET /files/cwd`** — Returns the server's current working directory.
-
-**`POST /files/cwd`** — Changes the server's working directory.
-
-```bash
-# Get current working directory
-curl "http://localhost:8000/files/cwd" \
-  -H "Authorization: Bearer <api-key>"
-
-# Set working directory
-curl -X POST http://localhost:8000/files/cwd \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"path": "/home/user/project"}'
-```
-
-```json
-{"cwd": "/home/user/project"}
-```
-
-### File Transfer
-
-#### Upload a File
-
-**`POST /files/upload`**
-
-Save a file to the container filesystem. Provide either a `url` to fetch remotely, or send the file directly via multipart form data.
-
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `directory` | string | Destination directory for the file. |
-| `url` | string | (Optional) URL to download the file from. If omitted, expects a multipart file upload. |
-
-**From URL:**
-```bash
-curl -X POST "http://localhost:8000/files/upload?directory=/home/user&url=https://example.com/data.csv" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-**Direct upload:**
-```bash
-curl -X POST "http://localhost:8000/files/upload?directory=/home/user" \
-  -H "Authorization: Bearer <api-key>" \
-  -F "file=@local_file.csv"
-```
-
-The filename is automatically derived from the uploaded file or the URL.
-
-### Process Status (Background)
-
-**`GET /processes/{process_id}/status`**
-
-Poll the output of a running or finished background process. Uses offset-based pagination so agents can retrieve only new output since the last poll.
-
-**Query parameters:**
-
-| Parameter | Default | Description |
-| :--- | :--- | :--- |
-| `wait` | `0` | Seconds to wait for the process to finish before returning. |
-| `offset` | `0` | Number of output entries to skip. Use `next_offset` from the previous response. |
-| `tail` | (all) | Return only the last N output entries. Useful to limit response size. |
-
-```bash
-curl "http://localhost:8000/processes/a1b2c3d4/status?offset=0&tail=20" \
-  -H "Authorization: Bearer <api-key>"
-```
-
-```json
-{
-  "id": "a1b2c3d4",
-  "command": "make build",
-  "status": "running",
-  "exit_code": null,
-  "output": [{"type": "stdout", "data": "Building...\n"}],
-  "truncated": false,
-  "next_offset": 1,
-  "log_path": "/root/.open-terminal/logs/processes/a1b2c3d4.jsonl"
-}
-```
-
-### Health Check
-
-**`GET /health`**
-
-Returns service status. No authentication required.
-
-```json
-{"status": "ok"}
-```
-
-## Security Considerations
-
-- **Always use Docker** in production. Running Open Terminal on bare metal exposes the host system to any command the model generates.
-- **Non-root by default**. The container runs as a non-root user (`user`) with passwordless `sudo` available when elevated privileges are needed. This adds a layer of safety while preserving full capability.
-- **Set an API key**. Without one, anyone who can reach the port has full shell access. If you don't provide one, the auto-generated key is printed once at startup — save it.
-- **Use resource limits**. Apply `--memory` and `--cpus` flags in Docker to prevent runaway processes from consuming host resources.
-- **Network isolation**. Place the Open Terminal container on an internal Docker network that only Open WebUI can reach, rather than exposing it to the public internet.
-- **Use named volumes for persistence**. Files inside the container are lost when the container is removed. The default `docker run` command mounts a named volume at `/home/user` for persistence.
-- **Log files**. Process output is persisted as JSONL files under the configured log directory. Review these files periodically and apply retention policies as needed.
+- **Always use Docker in production.** Bare metal exposes your host to any command the model generates.
+- **Set an API key.** Without one, anyone who can reach the port has full shell access.
+- **Use resource limits.** Apply `--memory` and `--cpus` flags in Docker to prevent runaway processes.
+- **Network isolation.** Place the terminal container on an internal Docker network that only Open WebUI can reach.
+- **Use named volumes.** Files inside the container are lost when removed — the default `docker run` command mounts a volume at `/home/user` for persistence.
 
 ## Further Reading
 
-- [Open Terminal GitHub Repository](https://github.com/open-webui/open-terminal)
-- [Interactive API Documentation](http://localhost:8000/docs) (available when running locally)
+- [Open Terminal GitHub Repository](https://github.com/open-webui/open-terminal) — source code, issue tracker, and full API documentation
+- [Interactive API Docs](http://localhost:8000/docs) — Swagger UI available when your instance is running
 - [Python Code Execution](/features/chat-conversations/chat-features/code-execution/python) — Pyodide and Jupyter backends
-- [Jupyter Integration Tutorial](/tutorials/integrations/dev-tools/jupyter) — Setting up Jupyter as a code execution backend
-- [Skills](/features/ai-knowledge/skills) — Using skills with code execution
+- [Terminals](https://github.com/open-webui/terminals) — multi-tenant: provisions isolated Open Terminal containers per user
