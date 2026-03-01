@@ -252,6 +252,55 @@ When a terminal is selected, the chat controls panel gains a **Files** tab:
 
 The file browser remembers your last-visited directory between panel open/close cycles and automatically reloads when you switch terminals.
 
+### Networking & Connectivity
+
+Understanding where requests originate is essential for configuring Open Terminal correctly. **Admin-configured and user-configured connections work fundamentally differently at the network level**, and using the wrong URL is the most common cause of connection failures.
+
+#### Where Do Requests Come From?
+
+| Connection Type | Request Origin | What `localhost` Means |
+| :--- | :--- | :--- |
+| **Admin-Configured (System)** | Open WebUI **backend server** | The machine/container running Open WebUI |
+| **User-Configured (Direct)** | User's **browser** | The machine running the browser |
+| **Generic OpenAPI (User)** | User's **browser** | The machine running the browser |
+| **Generic OpenAPI (Global)** | Open WebUI **backend server** | The machine/container running Open WebUI |
+
+This means:
+
+- **A URL that works for a user-configured terminal may not work for an admin-configured terminal** (and vice versa), even though the URL is identical.
+- If Open WebUI runs in Docker, `localhost` inside the container refers to the container itself — not the host machine. Use the container/service name (e.g. `http://open-terminal:8000`) or `host.docker.internal` instead.
+- If you use a reverse proxy (e.g. Nginx) to expose Open Terminal under a path like `https://yourdomain.com/terminal`, the backend must be able to resolve and reach that hostname. If the hostname resolves to `127.0.0.1` on the backend, the request will fail with a 502 error.
+
+#### Common Symptoms
+
+| Symptom | Likely Cause | Fix |
+| :--- | :--- | :--- |
+| **502 Bad Gateway** on `/api/v1/terminals/...` endpoints | The Open WebUI backend cannot reach the terminal URL | Use a URL the backend can resolve — container name, internal IP, or `host.docker.internal` |
+| **User connection works, admin connection doesn't** | The URL resolves correctly from the browser but not from the backend container | Use a different URL for admin config that the backend can reach |
+| **`Connect call failed ('127.0.0.1', ...)`** in backend logs | Hostname resolves to localhost inside the container | Use the actual IP, container name, or Docker network hostname |
+| **Connection timeout** | Firewall blocking traffic between containers/hosts | Ensure both containers are on the same Docker network, or open the necessary ports |
+
+:::warning Same URL, Different Results
+**The same URL can work as a user-configured terminal but fail as an admin-configured terminal.** This is not a bug — it's how networking works.
+
+**Example:** You have Open Terminal at `https://myserver.com/terminal` with an Nginx reverse proxy. When a user adds this URL, their browser connects directly to `myserver.com` → Nginx → Open Terminal. When an admin adds the same URL, the Open WebUI backend tries to connect to `myserver.com`, which may resolve to `127.0.0.1` inside the Docker container — bypassing Nginx entirely and failing with a 502.
+
+**Fix:** For admin-configured terminals, use the **internal URL** that the backend can reach directly (e.g. `http://open-terminal:8000` if both containers are on the same Docker network).
+:::
+
+:::tip Quick Test
+To verify the backend can reach your terminal URL, exec into the Open WebUI container and test:
+
+```bash
+# From inside the Open WebUI container
+curl -s http://open-terminal:8000/openapi.json | head -c 200
+```
+
+If this returns JSON, the backend can reach it. If it fails, your admin-configured terminal will also fail.
+:::
+
+For the same networking concepts applied to generic OpenAPI tool servers, see the [Tool Server Networking Guide](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from).
+
 ### Generic OpenAPI Tool Server
 
 Open Terminal is also a standard FastAPI application that exposes an OpenAPI specification at `/openapi.json`. This means it works as a generic [OpenAPI Tool Server](/features/extensibility/plugin/tools/openapi-servers/open-webui) — useful when you want more control over which tools are enabled per-chat.

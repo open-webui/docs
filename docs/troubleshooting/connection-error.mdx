@@ -163,6 +163,35 @@ Disabling proxy buffering also **significantly improves streaming speed**, as re
 - **Traefik**: Check compression/buffering middleware settings
 - **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
 
+## 🌐 Frontend vs. Backend Connections (localhost Confusion)
+
+Several Open WebUI features offer **two ways** to configure connections: a **user/direct** method (from the browser) and an **admin/global** method (from the backend). These work at completely different network levels, and the same URL can succeed in one and fail in the other.
+
+### The Core Rule
+
+| Request Origin | What `localhost` Means | Who Uses This |
+| :--- | :--- | :--- |
+| **Browser (client-side)** | The machine running the browser | User Tool Servers, User-Configured Terminals, Direct Connections |
+| **Backend (server-side)** | The machine/container running Open WebUI | Global Tool Servers, Admin-Configured Terminals, Ollama connections |
+
+### Why the Same URL Can Work and Fail
+
+When you add a URL like `https://myserver.com/api` as a **user/direct** connection, your browser resolves `myserver.com` and connects directly. When you add the same URL as an **admin/global** connection, the Open WebUI backend resolves that hostname — and inside a Docker container, it may resolve to `127.0.0.1`, bypassing your reverse proxy entirely.
+
+**Common symptoms:**
+- 502 Bad Gateway on admin-configured connections while user connections work fine
+- `Connect call failed ('127.0.0.1', ...)` in backend logs
+- Connection timeout on global tool servers
+
+**Fix:** For backend/admin connections, use the **internal URL** that the backend can actually reach:
+- Docker service names (e.g. `http://open-terminal:8000`)
+- `host.docker.internal` (to reach the host machine from inside Docker)
+- Internal IPs (e.g. `http://192.168.1.50:8000`)
+
+:::tip
+This applies to **all** backend-proxied connections in Open WebUI — not just Open Terminal. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/extensibility/open-terminal#networking--connectivity), and Ollama/OpenAI API endpoints.
+:::
+
 ## 🌟 Connection to Ollama Server
 
 ### 🚀 Accessing Ollama from Open WebUI
