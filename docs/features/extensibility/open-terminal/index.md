@@ -205,7 +205,7 @@ The terminal connection can also be pre-configured via the [`TERMINAL_SERVER_CON
 
 #### Access Control
 
-By default, all users can access admin-configured terminals. To restrict access, add **access grants** in the terminal connection configuration. Access grants work the same way as [group-based permissions](/features/access-security) — you can limit access to specific user groups.
+By default, all users can access admin-configured terminals. To restrict access, add **access grants** in the terminal connection configuration. Access grants work the same way as [group-based permissions](/features/access-security/rbac/groups) — you can limit access to specific user groups.
 
 ### User-Configured
 
