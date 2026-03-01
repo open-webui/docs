@@ -217,6 +217,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets the default group ID to assign to new users upon registration.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `DEFAULT_GROUP_SHARE_PERMISSION`
+
+- Type: `str`
+- Options: `members`, `true`, `false`
+- Default: `members`
+- Description: Controls the default "Who can share to this group" setting for newly created groups. `members` means only group members can share to the group, `true` means anyone can share, and `false` means no one can share to the group. This applies both to groups created manually and groups created automatically (e.g. via SCIM or OAuth group sync). Existing groups are not affected — this only sets the initial default for new groups.
+
 #### `PENDING_USER_OVERLAY_TITLE`
 
 - Type: `str`
@@ -1080,6 +1087,36 @@ The format for the JSON response is strictly:
 :::warning
 
 The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as new features are added.
+
+:::
+
+### Terminal Server
+
+#### `TERMINAL_SERVER_CONNECTIONS`
+
+- Type: `str` (JSON array)
+- Default: `[]`
+- Description: Specifies a JSON array of Open Terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/extensibility/open-terminal) instance. Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Example:
+```json
+[
+  {
+    "id": "unique-id",
+    "url": "http://open-terminal:8000",
+    "key": "your-api-key",
+    "name": "Dev Terminal",
+    "auth_type": "bearer",
+    "config": {
+      "access_grants": []
+    }
+  }
+]
+```
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning
+
+The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time as new features are added.
 
 :::
 
@@ -5213,6 +5250,12 @@ This is useful when you need a JWT access token for downstream validation or whe
 - Description: Enables or disables user permission to upload files to chats.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CHAT_WEB_UPLOAD`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" button is hidden for non-admin users. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Chat Permissions → Allow Web Upload**.
+
 #### `USER_PERMISSIONS_CHAT_DELETE`
 
 - Type: `bool`
@@ -5496,6 +5539,14 @@ These settings control whether users can share workspace items **publicly**.
 - Default: `True`
 - Description: Enables or disables **public sharing** of notes.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Access Grants
+
+#### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists — group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Users**.
 
 ### Import / Export
 

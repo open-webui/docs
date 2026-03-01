@@ -64,6 +64,14 @@ Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-
 *   **Bearer**: Use this **only** if your MCP server requires a specific API token. You **must** populate the "Key" field.
 *   **OAuth 2.1**: For secured, enterprise deployments requiring Identity Provider flows.
 
+:::warning OAuth 2.1 Tools Cannot Be Set as Default Tools
+**Do not set OAuth 2.1 MCP tools as default/pre-enabled tools on a model.** The OAuth 2.1 authorization flow requires an interactive browser redirect (user consent, callback) that cannot happen transparently during a chat completion request.
+
+If an OAuth 2.1 tool is set as a default and the user hasn't previously authenticated (or their refresh token has expired), the tool call will fail with **"Failed to connect to MCP server"** because the backend cannot initiate the browser-based auth flow mid-request.
+
+**Workaround:** Users should manually enable OAuth 2.1 tools per-chat via the **➕** button in the chat input area. This triggers the auth flow before the tool is ever invoked. Token refresh works automatically once the initial authentication is complete.
+:::
+
 ### Connection URLs
 
 If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
@@ -85,6 +93,7 @@ The chat shows "Failed to connect to MCP server" when using a tool, even if the 
 **Solutions**:
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
+3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a [known limitation](#oauth-21-tools-cannot-be-set-as-default-tools). Remove it from the model's default tools and have users enable it manually per-chat.
 
 ### Infinite loading screen after adding External Tool
 
