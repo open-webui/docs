@@ -41,7 +41,7 @@ An admin configures one or more Open Terminal instances and makes them available
 
 ### Docker (Recommended)
 
-Run Open Terminal in an isolated container with a full toolkit pre-installed: Python, Node.js, git, build tools, data science libraries, and more. Great for giving AI agents a safe playground without touching your host system.
+Run Open Terminal in an isolated container with a full toolkit pre-installed: Python, git, build tools, data science libraries, and more. Great for giving AI agents a safe playground without touching your host system.
 
 ```bash
 docker run -d --name open-terminal --restart unless-stopped -p 8000:8000 -v open-terminal:/home/user -e OPEN_TERMINAL_API_KEY=your-secret-key ghcr.io/open-webui/open-terminal
@@ -89,6 +89,10 @@ open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 ```
 
 This is the most powerful way to use Open Terminal. Point it at your project directory with `--cwd` and let the AI help you run tests, refactor code, manage dependencies, search through files, and write scripts. Everything happens on your real machine with your real tools.
+
+:::info Windows Support
+Open Terminal works on Windows too. As of v0.8.0, commands and interactive terminals run under a real pseudo-terminal via [pywinpty](https://github.com/andfoy/pywinpty), which is automatically installed on Windows. You get colored output, interactive programs, and TUI apps — just like on Linux/macOS.
+:::
 
 :::warning
 Bare metal means the AI can run any command with your user's permissions. This is powerful but comes with real risk. Don't run this in a shared or production environment. If you want sandboxed execution, use Docker instead.
@@ -138,8 +142,59 @@ When both services run in the same Docker Compose stack, use the **service name*
 | `--port` | `8000` | | Bind port |
 | `--cwd` | Current directory | | Working directory for the server process |
 | `--api-key` | Auto-generated | `OPEN_TERMINAL_API_KEY` | Bearer API key for authentication |
+| `--config` | (see below) | | Path to a custom TOML config file |
+| | `~/.local/state/open-terminal/logs` | `OPEN_TERMINAL_LOG_DIR` | Directory for process log files |
+| | `16` | `OPEN_TERMINAL_MAX_SESSIONS` | Maximum concurrent interactive terminal sessions |
+| | `true` | `OPEN_TERMINAL_ENABLE_TERMINAL` | Enable or disable the interactive terminal feature |
+| | | `OPEN_TERMINAL_API_KEY_FILE` | Load the API key from a file instead of an env var (for Docker secrets) |
 
 When no API key is provided, Open Terminal generates a random key and prints it to the console on startup.
+
+<details>
+<summary><b>TOML configuration file</b></summary>
+
+Instead of passing everything via CLI flags or environment variables, you can use a TOML config file. Open Terminal checks two locations:
+
+1. **System config** — `/etc/open-terminal/config.toml`
+2. **User config** — `~/.config/open-terminal/config.toml`
+
+User values override system values. CLI flags and env vars always win. Use `--config /path/to/config.toml` to point to a custom file.
+
+```toml title="config.toml"
+host = "0.0.0.0"
+port = 8000
+api_key = "your-secret-key"
+log_dir = "/var/log/open-terminal"
+max_terminal_sessions = 16
+enable_terminal = true
+```
+
+Using a config file keeps the API key out of `ps` / `htop` output.
+
+</details>
+
+<details>
+<summary><b>Docker secrets</b></summary>
+
+You can load the API key from a file using `OPEN_TERMINAL_API_KEY_FILE`, following the convention used by the official PostgreSQL Docker image:
+
+```yaml title="docker-compose.yml"
+services:
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    environment:
+      - OPEN_TERMINAL_API_KEY_FILE=/run/secrets/terminal_api_key
+    secrets:
+      - terminal_api_key
+
+secrets:
+  terminal_api_key:
+    file: ./terminal_api_key.txt
+```
+
+`OPEN_TERMINAL_API_KEY` and `OPEN_TERMINAL_API_KEY_FILE` are mutually exclusive — setting both is an error.
+
+</details>
 
 ## Connecting to Open WebUI
 
@@ -229,13 +284,26 @@ When a terminal is selected, the chat controls panel gains a **Files** tab. This
 
 The file browser remembers your last-visited directory and automatically reloads when you switch terminals.
 
+## Interactive Terminal
+
+Open Terminal can also provide a full interactive terminal session via WebSocket — a real shell running in the container that you can type into directly from Open WebUI. This is the same kind of terminal you'd get from SSH, but accessed through the browser.
+
+This feature is **enabled by default** and is used by the native Open WebUI integration. When a terminal is connected, Open WebUI can open an interactive shell session without any extra setup.
+
+You can control this feature with:
+
+- **`OPEN_TERMINAL_ENABLE_TERMINAL=false`** — disables the interactive terminal entirely. Useful if you only want command execution and file operations.
+- **`OPEN_TERMINAL_MAX_SESSIONS=16`** — limits the number of concurrent terminal sessions (default: 16). Prevents resource exhaustion from too many open terminals.
+
 ## Security
 
 - **Always use Docker in production.** Bare metal exposes your host to any command the model generates.
-- **Set an API key.** Without one, anyone who can reach the port has full access.
+- **Set an API key.** Without one, anyone who can reach the port has full access. Consider using a [config file](#configuration) or Docker secrets to keep the key out of process listings.
 - **Use resource limits.** Apply `--memory` and `--cpus` flags in Docker to prevent runaway processes.
+- **Session limits.** The default limit of 16 concurrent terminal sessions prevents resource exhaustion. Adjust with `OPEN_TERMINAL_MAX_SESSIONS`.
 - **Network isolation.** Place the terminal container on an internal Docker network that only Open WebUI can reach.
 - **Use named volumes.** Files inside the container are lost when removed. The default `docker run` command mounts a volume at `/home/user` for persistence.
+- **Disable the interactive terminal** if you don't need it, with `OPEN_TERMINAL_ENABLE_TERMINAL=false`.
 
 ## Further Reading
 
