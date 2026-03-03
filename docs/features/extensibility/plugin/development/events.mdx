@@ -121,7 +121,7 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
 | `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
 | `input` <br/>(needs `__event_call__`)        | Request simple user input ("input box" dialog)       | `{title: "...", message: "...", placeholder: "...", value: ..., type: "password"}` (type is optional) |
-| `execute` <br/>(needs `__event_call__`)      | Request user-side code execution and return result   | `{code: "...javascript code..."}`                                                                    |
+| `execute` <br/>(`__event_call__` or `__event_emitter__`) | Run JavaScript in the user's browser. Use `__event_call__` to get a return value, or `__event_emitter__` for fire-and-forget | `{code: "...javascript code..."}`                                                                    |
 | `chat:message:favorite`                      | Update the favorite/pin status of a message          | `{"favorite": bool}`                                                                                 |
 
 **Other/Advanced types:**
@@ -399,9 +399,18 @@ This uses the same `SensitiveInput` component used for user valve password field
 
 ---
 
-### `execute` (**requires** `__event_call__`)
+### `execute` (works with both `__event_call__` and `__event_emitter__`)
 
-**Run JavaScript directly in the user's browser:**
+**Run JavaScript directly in the user's browser.**
+
+Unlike `confirmation` and `input`, the `execute` event works with **both** helpers:
+
+| Helper | Behavior | Use when |
+|---|---|---|
+| `__event_call__` | Runs JS and **waits for the return value** (two-way) | You need the result back in Python (e.g., reading `localStorage`, detecting browser state) |
+| `__event_emitter__` | Runs JS **fire-and-forget** (one-way) | You don't need the result (e.g., triggering a file download, manipulating the DOM) |
+
+#### Two-way example (with `__event_call__`)
 
 ```python
 result = await __event_call__(
@@ -424,6 +433,41 @@ await __event_emitter__(
 )
 ```
 
+#### Fire-and-forget example (with `__event_emitter__`)
+
+```python
+# Trigger a blob download — no return value needed
+try:
+    await __event_emitter__(
+        {
+            "type": "execute",
+            "data": {
+                "code": """
+                    (function() {
+                        const blob = new Blob([data], {type: 'application/octet-stream'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'file.bin';
+                        document.body.appendChild(a);
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        a.remove();
+                    })();
+                """
+            }
+        }
+    )
+except Exception:
+    pass
+```
+
+:::tip iOS PWA compatibility
+On iOS Safari (especially in PWA / standalone mode), using `__event_call__` for blob downloads can fail with a `"TypeError: Load failed"` error — the two-way response channel breaks when the browser processes the download. Using `__event_emitter__` (fire-and-forget) avoids this issue entirely, since no response channel is needed.
+
+If your `execute` code triggers a file download and you don't need a return value, prefer `__event_emitter__` for maximum cross-platform compatibility.
+:::
+
 #### How It Works
 
 The `execute` event runs JavaScript **directly in the main page context** using `new Function()`. This means:
@@ -431,7 +475,7 @@ The `execute` event runs JavaScript **directly in the main page context** using 
 - It runs with **full access** to the page's DOM, cookies, localStorage, and session
 - It is **not sandboxed** — there are no iframe restrictions
 - It can manipulate the Open WebUI interface directly (show/hide elements, read form data, trigger downloads)
-- The code runs as an async function, so you can use `await` and `return` a value back to the backend
+- The code runs as an async function, so you can use `await` and `return` a value back to the backend (when using `__event_call__`)
 
 :::tip Frontend Automation
 Because `execute` runs in the main page context with full DOM access, you can use it to **automate virtually anything on the Open WebUI frontend**: click buttons, fill input fields, navigate between pages, read page state, trigger downloads, interact with the model selector, submit messages on behalf of the user, and more. Think of it as a remote control for the browser UI — if a user can do it manually, your function can do it programmatically via `execute`.
@@ -496,7 +540,8 @@ Because `execute` runs unsandboxed JavaScript in the user's browser session, it 
 - **From any Tool, or Function** in Open WebUI.
 - To **stream responses**, show progress, request user data, update the UI, or display supplementary info/files.
 - `await __event_emitter__` is for one-way messages (fire and forget).
-- `await __event_call__` is for when you need a response from the user (input, execute, confirmation).
+- `await __event_call__` is for when you need a response from the user (input, confirmation) or a return value from client-side code (execute).
+- The `execute` event is unique: it works with **both** helpers. Use `__event_call__` when you need the JS return value, or `__event_emitter__` for fire-and-forget execution (e.g., triggering downloads).
 
 ---
 
@@ -537,7 +582,7 @@ response = await __event_call__({
 ### Q: What event types are available for `__event_call__`?
 - `"input"`: Input box dialog
 - `"confirmation"`: Yes/No, OK/Cancel dialog
-- `"execute"`: Run provided code on client and return result
+- `"execute"`: Run provided code on client and return result (also works with `__event_emitter__` for fire-and-forget — see [execute](#execute-works-with-both-__event_call__-and-__event_emitter__) above)
 
 ### Q: Can I update files attached to a message?
 Yes—use the `"files"` or `"chat:message:files"` event type with a `{files: [...]}` payload.
@@ -602,7 +647,7 @@ External tools can emit the same event types as native tools:
 - `source` / `citation` – Add citations
 
 :::note
-Interactive events (`input`, `confirmation`, `execute`) require `__event_call__` and are **not supported** for external tools as they need bidirectional WebSocket communication.
+Interactive events (`input`, `confirmation`) require `__event_call__` and are **not supported** for external tools as they need bidirectional WebSocket communication. `execute` via `__event_call__` is similarly unsupported for external tools; however, fire-and-forget `execute` via `__event_emitter__` does not require a return channel and may work depending on your setup.
 :::
 
 ### Example: Python External Tool
@@ -740,9 +785,12 @@ If your pipe or tool needs to call an LLM and have the result persist even when 
 |------|-----|
 | `confirmation` | Uses `sio.call()` — waits for client response, will timeout |
 | `input` | Uses `sio.call()` — waits for client response, will timeout |
-| `execute` | Uses `sio.call()` — waits for client response, will timeout |
+| `execute` via `__event_call__` | Uses `sio.call()` — waits for client response, will timeout |
+| `execute` via `__event_emitter__` | Fires and forgets — **will not error**, but JS may not run if no browser is connected |
 
-These `__event_call__` types fundamentally require a live browser connection. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code.
+`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code.
+
+`execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value — particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 
 ### Return Value Persistence
 
