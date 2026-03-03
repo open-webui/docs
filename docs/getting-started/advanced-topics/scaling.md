@@ -149,6 +149,7 @@ VECTOR_DB=pgvector
 | Vector DB | Best For | Configuration |
 |---|---|---|
 | **PGVector** | Teams already using PostgreSQL — reuses your existing database infrastructure | `VECTOR_DB=pgvector` + `PGVECTOR_DB_URL=postgresql://...` |
+| **MariaDB Vector** | HNSW-based vector search - performance comparable to other implementations, with stronger scalability under multi-connection workloads | `VECTOR_DB=mariadb-vector` + `MARIADB_VECTOR_DB_URL=mariadb+mariadbconnector://...` |
 | **Milvus** | Large-scale self-hosted deployments with high query throughput; supports multitenancy for per-user isolation | `VECTOR_DB=milvus` + `MILVUS_URI=http://milvus-host:19530` |
 | **Qdrant** | Self-hosted deployments needing efficient filtering and metadata search; supports multitenancy | `VECTOR_DB=qdrant` + `QDRANT_URI=http://qdrant-host:6333` |
 | **Pinecone** | Fully managed cloud service — zero infrastructure to maintain, pay-per-use | `VECTOR_DB=pinecone` + `PINECONE_API_KEY=...` |
