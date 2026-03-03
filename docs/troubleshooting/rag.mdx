@@ -364,7 +364,7 @@ INFO:     Child process [pid] died
 ```
 
 **Solution:** You **must** switch away from the default local ChromaDB when using multiple workers:
-- Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `milvus`, or `qdrant`
+- Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `mariadb-vector`, `milvus`, or `qdrant`
 - Or run ChromaDB as a separate HTTP server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port)
 
 See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for full details.

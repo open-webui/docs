@@ -17,7 +17,7 @@ Before troubleshooting specific errors, ensure your deployment meets these **abs
 2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/reference/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
 3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/reference/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
-5.  **External Vector Database (Required):** The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not safe for multi-worker or multi-replica deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** use a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a [separate HTTP server](/reference/env-configuration#chroma_http_host).
+5.  **External Vector Database (Required):** The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not safe for multi-worker or multi-replica deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** use a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), [MariaDB Vector](/reference/env-configuration#mariadb_vector_db_url), Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a [separate HTTP server](/reference/env-configuration#chroma_http_host).
 6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/reference/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
 
 ---
@@ -145,7 +145,7 @@ You **must** stop using the default local ChromaDB with multiple workers. Pick o
 |--------|--------|----------|
 | **Keep 1 worker** | Set `UVICORN_WORKERS=1` (the default) | Simplest, but limits concurrency |
 | **Use ChromaDB HTTP mode** | Set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) to point to a separate Chroma server | Each worker connects via HTTP instead of SQLite — fully fork-safe |
-| **Switch vector DB** | Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `milvus`, `qdrant`, etc. | These are client-server databases, inherently multi-process safe |
+| **Switch vector DB** | Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `mariadb-vector`, `milvus`, `qdrant`, etc. | These are client-server databases, inherently multi-process safe |
 
 **Recommended fix** — run ChromaDB as a separate server:
 

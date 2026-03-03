@@ -1770,7 +1770,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`
+- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `mariadb-vector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -1781,10 +1781,28 @@ The default ChromaDB configuration uses a **local `PersistentClient`** backed by
 **This also applies to multi-replica deployments** (Kubernetes, Docker Swarm) where multiple containers point at the same ChromaDB data directory.
 
 If you need multiple workers or replicas, you **must** either:
-1. **Switch to a client-server vector database** such as [PGVector](/reference/env-configuration#pgvector_db_url), Milvus, or Qdrant (recommended).
+1. **Switch to a client-server vector database** such as [PGVector](/reference/env-configuration#pgvector_db_url), [MariaDB Vector](/reference/env-configuration#mariadb_vector_db_url), Milvus, or Qdrant (recommended).
 2. **Run ChromaDB as a separate HTTP server** and configure [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) so that Open WebUI uses an `HttpClient` instead of the local `PersistentClient`.
 
 See the [Scaling & HA guide](/troubleshooting/multi-replica) for full details.
+
+:::
+
+:::note
+
+MariaDB Dependencies
+
+To use `mariadb-vector`, ensure the MariaDB python driver is installed:
+
+```bash
+pip install open-webui[mariadb]
+```
+
+Or install all optional vector DB dependencies:
+
+```bash
+pip install open-webui[all]
+```
 
 :::
 
@@ -2259,6 +2277,71 @@ For IVFFlat indexes, choosing the right number of lists is crucial for query per
 - Default: `3600`
 - Description: Specifies the time in seconds after which connections are recycled in the PGVector pool to prevent stale connections.
 
+### MariaDB Vector
+
+:::note
+
+MariaDB Vector requires the official MariaDB connector driver and a `mariadb+mariadbconnector://...` URL scheme so vectors can be bound correctly.
+
+:::
+
+#### `MARIADB_VECTOR_DB_URL`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Example: `mariadb+mariadbconnector://app:app@127.0.0.1:3306/openwebui`
+- Description: Database URL used by the MariaDB Vector backend. **Must** use the `mariadb+mariadbconnector://` scheme.
+
+#### `MARIADB_VECTOR_INITIALIZE_MAX_VECTOR_LENGTH`
+
+- Type: `int`
+- Default: `1536`
+- Description: Specifies the vector dimension for the MariaDB `VECTOR(n)` column during initialization. Set this to your embedding dimension (e.g., `768` for `nomic-embed-text`).
+
+:::warning
+
+MariaDB Vector cannot change the vector dimension for an existing `VECTOR(n)` column in-place. If you change this value after the table is created you must drop and recreate the backing vector table (and re-ingest/re-embed your documents).
+
+:::
+
+#### `MARIADB_VECTOR_DISTANCE_STRATEGY`
+
+- Type: `str`
+- Options:
+  - `cosine` - Uses `vec_distance_cosine(...)`
+  - `euclidean` - Uses `vec_distance_euclidean(...)`
+- Default: `cosine`
+- Description: Sets the distance function used by MariaDB Vector for similarity search.
+
+#### `MARIADB_VECTOR_INDEX_M`
+
+- Type: `int`
+- Default: `8`
+- Description: HNSW `M` parameter for the MariaDB `VECTOR INDEX` (number of graph connections). Higher values typically improve recall at the cost of larger indexes and slower builds.
+
+#### `MARIADB_VECTOR_POOL_SIZE`
+
+- Type: `int`
+- Default: `None`
+- Description: If set, enables a SQLAlchemy connection pool for MariaDB Vector and sets the pool size.
+
+#### `MARIADB_VECTOR_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Maximum number of overflow connections beyond `MARIADB_VECTOR_POOL_SIZE`.
+
+#### `MARIADB_VECTOR_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Maximum seconds to wait for a connection from the pool.
+
+#### `MARIADB_VECTOR_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Recycle connections after this many seconds.
 
 ### Qdrant
 
