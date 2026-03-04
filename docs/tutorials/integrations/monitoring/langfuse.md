@@ -3,6 +3,21 @@ sidebar_position: 20
 title: "Langfuse"
 ---
 
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+:::danger
+
+This tutorial was reported as **OUTDATED** / stale.
+It might not work anymore with newer versions of Open WebUI or Langfuse.
+
+Feel free to contribute to make it up to date again, by submitting a PR: [https://github.com/open-webui/docs](https://github.com/open-webui/docs)
+
+:::
+
 ## Langfuse Integration with Open WebUI
 
 [Langfuse](https://langfuse.com/) ([GitHub](https://github.com/langfuse/langfuse)) offers open source observability and evaluations for Open WebUI. By enabling the Langfuse integration, you can trace your application data with Langfuse to develop, monitor, and improve the use of Open WebUI, including:
