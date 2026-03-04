@@ -436,19 +436,30 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 
 ✅ **Solutions (check in order):**
 
-1. **Ensure Built-in Tools are enabled for the model**:
+1. **Check Global Model Settings first**:
+   - Go to **Admin Panel > Settings > Models > ⚙️ (gear icon)**
+   - Expand **Model Parameters** and check if **Function Calling** is set to `native`
+   - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter — even if you never intended for a specific model to use native mode
+   - Either change the global setting to `default`, or explicitly set `function_calling` in the per-model **Advanced Params** to override the global value
+   - Also check the **Model Capabilities** section — if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
+
+:::warning Global Settings Override
+The most common cause of this issue is a global `Function Calling: native` setting in **Admin Panel > Settings > Models > ⚙️ > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set — a model that simply doesn't have `function_calling` configured will inherit the global value.
+:::
+
+2. **Ensure Built-in Tools are enabled for the model** (if using native mode):
    - Go to **Workspace > Models > Edit** for your model
    - Under **Builtin Tools**, make sure the **Knowledge Base** category is enabled (it is by default)
    - If this is disabled, the model has no way to query attached knowledge bases
 
-2. **Add a system prompt hint**:
+3. **Add a system prompt hint** (if using native mode):
    - Some models need explicit guidance to use their tools. Add something like:
      > "When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_bases to search for relevant information before answering."
 
-3. **Or disable Native Function Calling** for that model:
+4. **Or disable Native Function Calling** for that model:
    - In the model settings, disable Native Function Calling to restore the classic auto-injection RAG behavior from earlier versions
 
-4. **Or use Full Context mode**:
+5. **Or use Full Context mode**:
    - Click on the attached knowledge base and select **"Use Entire Document"**
    - This bypasses RAG entirely and always injects the full content, regardless of native function calling settings
 

@@ -74,6 +74,22 @@ Most OAUTH errors (loops, 401s, unresponsiveness) are due to an environment vari
 
 :::
 
+:::warning
+
+**Kubernetes/YAML users:** Watch out for **trailing spaces in environment variable names!** In YAML, quoting a key like `'OAUTH_CLIENT_ID '` (with a trailing space inside the quotes) will set a variable named `OAUTH_CLIENT_ID ` (with a space at the end), which Open WebUI will **not** recognize. Always ensure your env var names have no trailing whitespace:
+
+```yaml
+# ❌ Wrong — trailing space inside quotes:
+- name: 'OAUTH_CLIENT_ID '
+  value: your_client_id
+
+# ✅ Correct — no trailing space:
+- name: OAUTH_CLIENT_ID
+  value: your_client_id
+```
+
+:::
+
 ---
 
 ### 3. Missing Required Variables 🚨⚠️
@@ -106,7 +122,12 @@ OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.w
 
 ### 4. Persistent Configuration Conflicts 🔄💾
 
-**New Issue:** Many users don't realize that OAuth settings are stored in the database after the first launch when `ENABLE_OAUTH_PERSISTENT_CONFIG=true` (default).
+**Important:** Open WebUI has **two** persistence settings that affect OAuth:
+
+1. **`ENABLE_PERSISTENT_CONFIG`** (defaults to **`true`**) — Controls whether *all* settings (including OAuth) are loaded from the database rather than environment variables, once they've been saved to the DB.
+2. **`ENABLE_OAUTH_PERSISTENT_CONFIG`** (defaults to **`false`**) — An *additional* gate specifically for OAuth settings. When set to `false`, OAuth settings with a config path starting with `oauth.` are **not** loaded from the database, even if `ENABLE_PERSISTENT_CONFIG` is `true`.
+
+By default, OAuth env vars **will** take priority over database values because `ENABLE_OAUTH_PERSISTENT_CONFIG` defaults to `false`. However, if you previously configured OAuth through the Admin Panel, those DB values may have been saved, and they will be loaded if `ENABLE_OAUTH_PERSISTENT_CONFIG` is later set to `true`.
 
 #### Symptoms:
 - Changes to environment variables don't take effect after restart
@@ -114,16 +135,16 @@ OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.w
 - "No token found in localStorage" errors after reconfiguration
 
 ✅ **Solutions:**
-1. **For Development/Testing:** Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
+1. **For Development/Testing:** Ensure `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (this is already the default) to always read from environment variables
 2. **For Production:** Either:
    - Configure settings through Admin Panel instead of environment variables, OR
-   - Temporarily set `ENABLE_OAUTH_PERSISTENT_CONFIG=false`, restart to apply new env vars, then set back to `true`
+   - Keep `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (default) so that env vars always take priority for OAuth settings
 3. **Fresh Start:** Delete the database volume and restart with correct configuration
 
 📌 **Example for Docker Compose:**
 ```yaml
 environment:
-  - ENABLE_OAUTH_PERSISTENT_CONFIG=false  # Forces reading from env vars
+  - ENABLE_OAUTH_PERSISTENT_CONFIG=false  # Forces reading from env vars (this is the default)
   - OAUTH_CLIENT_ID=your_client_id
   - OAUTH_CLIENT_SECRET=your_secret
   - OPENID_PROVIDER_URL=your_provider_url

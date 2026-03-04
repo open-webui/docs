@@ -147,6 +147,38 @@ await __event_emitter__(
 )
 ```
 
+#### The `done` Field
+
+The `done` field controls the **shimmer animation** on the status text in the UI:
+
+| `done` value | Visual effect |
+|---|---|
+| `false` (or omitted) | Status text has a **shimmer/loading animation** — indicates ongoing processing |
+| `true` | Status text appears **static** — indicates the step is complete |
+
+The backend does not inspect `done` at all — it simply saves the value and forwards it to the frontend. The shimmer effect is purely a frontend visual cue.
+
+:::warning Always Emit a Final `done: True`
+If you emit status events, always send at least one with `done: True` at the end of your status sequence. Without it, the last status item keeps its shimmer animation indefinitely, making it look like processing never finished — even after the response is complete.
+
+```python
+# ✅ Correct pattern
+await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
+# ... do work ...
+await __event_emitter__({"type": "status", "data": {"description": "Complete!", "done": True}})
+
+# ⚠️ Broken pattern — shimmer never stops
+await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
+# ... do work, return result, but never sent done: True
+```
+:::
+
+#### The `hidden` Field
+
+When `hidden` is `true`, the status is saved to `statusHistory` but **not shown** in the current status display. This is useful for internal status tracking that shouldn't be visible to the user.
+
+Additionally, when `message.content` is empty and the last status has `hidden: true` (or no status exists at all), the frontend shows a skeleton loader instead of the status bar — so hidden statuses don't replace the loading indicator.
+
 ---
 
 ### `chat:message:delta` or `message`
@@ -311,6 +343,10 @@ await __event_emitter__(
 
 **What this does exactly:**
 This event forces the Open WebUI frontend to update the "favorite" state of a message in its local cache. Without this emitter, if an **Action Function** modifies the `message.favorite` field in the database directly, the frontend (which maintains its own state) might overwrite your change during its next auto-save cycle. This emitter ensures the UI and database stay perfectly in sync.
+
+:::note Designed for Actions
+While this event can technically be emitted from any plugin type (tools, pipes, filters), it is **designed for and meaningful in Actions**. Actions operate on existing messages and can modify the database directly. From a pipe or tool, emitting this event would update the frontend state temporarily, but unless the plugin also wrote to the database, the change would be lost on the next chat auto-save.
+:::
 
 **Where it appears:**
 *   **Message Toolbar**: When set to `True`, the "Heart" icon beneath the message will fill in, indicating it is favorited.
@@ -542,6 +578,12 @@ Because `execute` runs unsandboxed JavaScript in the user's browser session, it 
 - `await __event_emitter__` is for one-way messages (fire and forget).
 - `await __event_call__` is for when you need a response from the user (input, confirmation) or a return value from client-side code (execute).
 - The `execute` event is unique: it works with **both** helpers. Use `__event_call__` when you need the JS return value, or `__event_emitter__` for fire-and-forget execution (e.g., triggering downloads).
+
+:::warning Pipes: Return Value vs Events
+For Pipes, be careful about mixing content delivery methods. If your `pipe()` method **returns a string**, that string becomes the final message content. If it **yields** (generator), the yielded chunks are streamed. If you also emit `chat:message:delta` events during execution, both the return/yield content and the event-based content are processed and can conflict.
+
+**Recommendation**: Either use return/yield for content delivery, **or** use `chat:message:delta`/`chat:message` events, but avoid using both simultaneously.
+:::
 
 ---
 
