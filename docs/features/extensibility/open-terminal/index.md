@@ -147,6 +147,8 @@ When both services run in the same Docker Compose stack, use the **service name*
 | | `16` | `OPEN_TERMINAL_MAX_SESSIONS` | Maximum concurrent interactive terminal sessions |
 | | `true` | `OPEN_TERMINAL_ENABLE_TERMINAL` | Enable or disable the interactive terminal feature |
 | | | `OPEN_TERMINAL_API_KEY_FILE` | Load the API key from a file instead of an env var (for Docker secrets) |
+| | `xterm-256color` | `OPEN_TERMINAL_TERM` | TERM environment variable set in terminal sessions (controls color support) |
+| | Unset | `OPEN_TERMINAL_EXECUTE_TIMEOUT` | Default wait time (seconds) for command execution when the caller omits the `wait` parameter. Helps smaller models get output inline. |
 
 When no API key is provided, Open Terminal generates a random key and prints it to the console on startup.
 
@@ -167,6 +169,8 @@ api_key = "your-secret-key"
 log_dir = "/var/log/open-terminal"
 max_terminal_sessions = 16
 enable_terminal = true
+term = "xterm-256color"
+execute_timeout = 5
 ```
 
 Using a config file keeps the API key out of `ps` / `htop` output.
