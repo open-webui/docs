@@ -16,6 +16,12 @@ Get up and running quickly with our [Quick Start Guide](/getting-started/quick-s
 
 ---
 
+## 🧰 Unraid Guide
+
+Running on Unraid? Use our beginner-safe [Open WebUI on Unraid](/getting-started/unraid) guide for Docker template setup, persistent volumes, upgrades, and reverse-proxy troubleshooting.
+
+---
+
 ## 🛠️ Advanced Topics
 
 Take a deeper dive into configurations and development tips in our [Advanced Topics Guide](/getting-started/advanced-topics).
