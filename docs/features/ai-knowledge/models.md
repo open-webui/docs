@@ -147,13 +147,33 @@ These tools are specifically designed to help administrators quickly manage exte
 
 Administrators can set **global default metadata and parameters** that apply as a baseline to all models. This eliminates the need to manually configure capabilities and inference settings for every model individually.
 
-- **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Sets baseline capabilities (vision, web search, code interpreter, etc.) and other model metadata for all models. For capabilities, defaults and per-model values are merged — per-model overrides always win on conflicts. For other metadata fields, the global default is only applied when a model has no value set.
-- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Sets baseline inference parameters (temperature, top_p, max_tokens, seed, etc.) for all models. Per-model parameter overrides always take precedence.
+- **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Sets baseline capabilities (vision, web search, file context, code interpreter, builtin tools, etc.) and other model metadata for all models. For capabilities, defaults and per-model values are merged — per-model overrides always win on conflicts. For other metadata fields, the global default is only applied when a model has no value set.
+- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Sets baseline inference parameters (temperature, top_p, max_tokens, seed, function_calling, etc.) for all models. Per-model parameter overrides always take precedence — but only when a per-model value is explicitly set.
 
-These settings are accessible via **Admin Settings → Models** and are persisted via `PersistentConfig`. See [`DEFAULT_MODEL_METADATA`](/reference/env-configuration#default_model_metadata) and [`DEFAULT_MODEL_PARAMS`](/reference/env-configuration#default_model_params) for details.
+These settings are accessible via **Admin Settings → Models → ⚙️ (gear icon)** and are persisted via `PersistentConfig`. See [`DEFAULT_MODEL_METADATA`](/reference/env-configuration#default_model_metadata) and [`DEFAULT_MODEL_PARAMS`](/reference/env-configuration#default_model_params) for details.
+
+#### Merge Behavior
+
+Understanding how defaults combine with per-model settings is important:
+
+| Setting Type | Merge Strategy | Example |
+|---|---|---|
+| **Capabilities** (metadata) | Deep merge: `{...global, ...per_model}` | Global sets `file_context: false`, model sets `vision: true` → model gets both |
+| **Other metadata** (description, tags, etc.) | Fill-only: global applied when model value is `None` | Global sets `description: "Default"`, model has no description → model gets "Default" |
+| **Parameters** | Simple merge: `{...global, ...per_model}` | Global sets `temperature: 0.7`, model sets `temperature: 0.3` → model gets `0.3` |
+
+The key subtlety: **if a model doesn't explicitly set a parameter, the global default is the only value**. This is especially important for `function_calling` — see the warning below.
+
+:::warning Knowledge Base + Function Calling Interaction
+Setting `function_calling: native` in Global Model Params changes how **all** models handle attached Knowledge Bases. In native mode, model-attached KBs are **not** auto-injected via RAG — instead, the model must autonomously call builtin tools to retrieve knowledge. If a model doesn't explicitly override `function_calling` in its own Advanced Params, it inherits the global value silently.
+
+Additionally, if `file_context` is disabled in Global Model Capabilities, the RAG retrieval handler is skipped for all models that don't explicitly enable it — meaning attached files and KBs produce no results.
+
+If your models' attached Knowledge Bases are not working, check global defaults first. See [Knowledge Base Attached to Model Not Working](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for detailed troubleshooting steps.
+:::
 
 :::tip
-Global defaults are ideal for enforcing organizational policies — for example, disabling code interpreter by default across all models, or setting a consistent temperature for all models.
+Global defaults are ideal for enforcing organizational policies — for example, disabling code interpreter by default across all models, or setting a consistent temperature for all models. However, be cautious with `function_calling` and capability toggles, as they can have unexpected effects on Knowledge Base behavior.
 :::
 
 ## Model Switching in Chat
