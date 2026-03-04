@@ -1,7 +1,13 @@
 ---
-sidebar_position: 3
-title: "Unraid (Beginner-Safe)"
+sidebar_position: 34
+title: "Unraid Deployment (Beginner-Safe)"
 ---
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/tutorials/tips/contributing-tutorial).
+
+:::
 
 # Open WebUI on Unraid (Beginner-Safe)
 
@@ -73,12 +79,13 @@ Choose one setup.
 1. Start the container.
 2. Open `http://<unraid-ip>:3000`.
 3. Complete initial admin setup.
-4. Open **Admin Settings > Connections > Ollama** and verify the endpoint.
+4. Open **Settings > Admin Settings > Connections** and verify the Ollama endpoint.
 5. Confirm models appear in the model selector.
 
 ## 4. Persistent Volume Notes
 
 - Open WebUI state is stored in `/app/backend/data`.
+- Set a fixed `WEBUI_SECRET_KEY` in your Unraid template and keep it the same across recreates to avoid unnecessary session invalidation.
 - Keep host mapping consistent across updates/recreates.
 - Use a directory mapping, not a file mapping.
 - If persistence fails, check folder permissions for `/mnt/user/appdata/open-webui`.
@@ -86,10 +93,11 @@ Choose one setup.
 ## 5. Upgrade Steps (Safe Workflow)
 
 1. Back up `/mnt/user/appdata/open-webui`.
-2. Update/pull your Open WebUI image tag.
-3. Recreate using the same template and same `/app/backend/data` mapping.
-4. Verify chats/settings are intact.
-5. If needed, roll back to the previous image and restore backup.
+2. Ensure your template keeps the same `WEBUI_SECRET_KEY`.
+3. Update/pull your Open WebUI image tag.
+4. Recreate using the same template and the same `/app/backend/data` mapping.
+5. Verify chats/settings are intact.
+6. If needed, roll back to the previous image and restore backup.
 
 For broader update options, see [Updating Open WebUI](/getting-started/updating).
 
