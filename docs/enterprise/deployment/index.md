@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "Deployment Options"
+title: "Scalable Enterprise Deployment Options"
 ---
 
 # Enterprise Deployment Options
