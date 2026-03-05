@@ -130,7 +130,7 @@ VS Code's integrated terminal feature makes managing multiple terminals incredib
 1. **Frontend Terminal (You likely already have this):** If you followed the Frontend Setup steps, you probably already have a terminal open in VS Code at the project root (`open-webui` directory). This is where you'll run your frontend commands (`npm run dev`, etc.). Ensure you are in the `open-webui` directory for the next steps if you are not already.
 
 2. **Backend Terminal (Open a New One):**
-   - In VS Code, go to **Terminal > New Terminal** (or use the shortcut `Ctrl+Shift+` on Windows/Linux or `Cmd+Shift+` on macOS). This will open a new integrated terminal panel.
+   - In VS Code, go to **Terminal > New Terminal** (or use the shortcut `` Ctrl+Shift+` `` on Windows/Linux or `` Cmd+Shift+` `` on macOS). This will open a new integrated terminal panel.
    - **Navigate to the `backend` directory:** In this *new* terminal, use the `cd backend` command to change the directory to the `backend` folder within your project. This ensures all backend-related commands are executed in the correct context.
 
    Now you have **two separate terminal instances within VS Code**: one for the frontend (likely in the `open-webui` directory) and one specifically for the backend (inside the `backend` directory). You can easily switch between these terminals within VS Code to manage your frontend and backend processes independently. This setup is highly recommended for a cleaner and more efficient development workflow.
