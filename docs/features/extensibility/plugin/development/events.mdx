@@ -87,6 +87,10 @@ result = await __event_call__(
 # result will contain the user's input value
 ```
 
+:::tip Configurable Timeout
+By default, `__event_call__` waits up to **300 seconds** (5 minutes) for a user response before timing out with an exception. This timeout is configurable via the [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) environment variable. Increase this value if your users need more time to fill out forms, make decisions, or complete complex interactions.
+:::
+
 ---
 
 ## 📜 Event Payload Structure
@@ -830,7 +834,7 @@ If your pipe or tool needs to call an LLM and have the result persist even when 
 | `execute` via `__event_call__` | Uses `sio.call()` — waits for client response, will timeout |
 | `execute` via `__event_emitter__` | Fires and forgets — **will not error**, but JS may not run if no browser is connected |
 
-`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code.
+`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code. The timeout is configurable via the [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) environment variable (default: 300 seconds).
 
 `execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value — particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 
