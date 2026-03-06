@@ -1,9 +1,9 @@
 ---
 sidebar_position: 4
-title: "Scalable Enterprise Deployment Options"
+title: "Deployment Options"
 ---
 
-# Enterprise Deployment Options
+# Scalable Enterprise Deployment Options
 
 Open WebUI's **stateless, container-first architecture** means the same application runs identically whether you deploy it as a Python process on a VM, a container in a managed service, or a pod in a Kubernetes cluster. The difference between deployment patterns is how you **orchestrate, scale, and operate** the application — not how the application itself behaves.
 
