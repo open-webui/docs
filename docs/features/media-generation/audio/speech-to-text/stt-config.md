@@ -17,6 +17,7 @@ The following speech-to-text providers are supported:
 |---------|------------------|-------|
 | Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/media-generation/audio/speech-to-text/env-variables) |
 | OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/media-generation/audio/speech-to-text/openai-stt-integration) |
+| Gladia | ✅ | [Gladia STT Guide](/features/media-generation/audio/speech-to-text/gladia-stt-integration) |
 | Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/media-generation/audio/speech-to-text/mistral-voxtral-integration) |
 | Deepgram | ✅ | — |
 | Azure | ✅ | — |
