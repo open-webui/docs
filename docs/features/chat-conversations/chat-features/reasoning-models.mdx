@@ -38,7 +38,7 @@ If your model uses different tags, you can provide a list of tag pairs in the `r
 ## Configuration & Behavior
 
 - **Stripping from Payload**: The `reasoning_tags` parameter itself is an Open WebUI-specific control and is **stripped** from the payload before being sent to the LLM backend (OpenAI, Ollama, etc.). This ensures compatibility with providers that do not recognize this parameter.
-- **Chat History**: Thinking tags are **not** stripped from the chat history. If previous messages in a conversation contain thinking blocks, they are sent back to the model as part of the context, allowing the model to "remember" its previous reasoning steps.
+- **Chat History**: Reasoning content is preserved in chat history and **sent back to the model** across turns. When building messages for subsequent requests, Open WebUI serializes the reasoning content with its original tags (e.g., `<think>...</think>`) and includes it in the assistant message's `content` field. This allows the model to "remember" its previous reasoning steps across the entire conversation.
 - **UI Rendering**: Internally, reasoning blocks are processed and rendered using a specialized UI component. When saved or exported, they may be represented as HTML `<details type="reasoning">` tags.
 
 ---
@@ -153,8 +153,8 @@ Open WebUI follows the **OpenAI Chat Completions API standard**. Reasoning conte
 
 ### Important Notes
 
-- **Within-turn preservation**: Reasoning is preserved and sent back to the API only within the same turn (while tool calls are being processed)
-- **Cross-turn behavior**: Between separate user messages, reasoning is **not** sent back to the API. The thinking content is displayed in the UI but stripped from the message content that gets sent in subsequent requests.
+- **Within-turn preservation**: Reasoning is preserved and sent back to the API within the same turn (while tool calls are being processed).
+- **Cross-turn behavior**: Reasoning content **is** sent back to the API across turns. When building messages for subsequent requests, Open WebUI serializes the reasoning content with its original tags (e.g., `<think>...</think>`) and includes it in the assistant message's `content` field. This allows the model to maintain context of its previous reasoning throughout the conversation.
 - **Text-based serialization**: Reasoning is sent as text wrapped in tags (e.g., `<think>thinking content</think>`), not as structured content blocks. This works with most OpenAI-compatible APIs but may not align with provider-specific formats like Anthropic's extended thinking content blocks.
 
 ---
@@ -373,11 +373,11 @@ If the model uses tags that are not in the default list and have not been config
 
 ### Does the model see its own thinking?
 
-**It depends on the context:**
+**Yes.** Reasoning content is preserved and sent back to the model in both scenarios:
 
 - **Within the same turn (during tool calls)**: **Yes**. When a model makes tool calls, Open WebUI preserves the reasoning content and sends it back to the API as part of the assistant message. This enables the model to maintain context about what it was thinking when it made the tool call.
 
-- **Across different turns**: **No**. When a user message starts a fresh turn, the reasoning from previous turns is **not** sent back to the API. The thinking content is extracted and displayed in the UI but stripped from the message content before being sent in subsequent requests. This follows the design of reasoning models like OpenAI's `o1`, where the "chain of thought" is intended to be internal and ephemeral.
+- **Across different turns**: **Yes**. When building messages for subsequent requests, Open WebUI serializes reasoning content from previous turns with its original tags (e.g., `<think>...</think>`) and includes it in the assistant message's `content` field. This allows the model to reference its previous reasoning throughout the conversation.
 
 ### How is reasoning sent during tool calls?
 
