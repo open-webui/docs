@@ -69,11 +69,49 @@ If you don't set an API key, one is generated automatically. Grab it with `docke
 | **Data processing** | jq, xmlstarlet, sqlite3 |
 | **Compression** | zip, unzip, tar, gzip, bzip2, xz, zstd, p7zip |
 | **System** | procps, htop, lsof, strace, sysstat, sudo, tmux, screen |
+| **Container tools** | Docker CLI, Docker Compose, Docker Buildx |
 | **Python libraries** | numpy, pandas, scipy, scikit-learn, matplotlib, seaborn, plotly, jupyter, ipython, requests, beautifulsoup4, lxml, sqlalchemy, pyyaml, rich, and more |
 
 You can customize the image by forking the repo and editing the [Dockerfile](https://github.com/open-webui/open-terminal/blob/main/Dockerfile).
 
 </details>
+
+#### Customizing the Docker Environment
+
+The easiest way to add extra packages is with environment variables — no fork needed:
+
+```bash
+docker run -d --name open-terminal -p 8000:8000 \
+  -e OPEN_TERMINAL_PACKAGES="cowsay figlet" \
+  -e OPEN_TERMINAL_PIP_PACKAGES="httpx polars" \
+  ghcr.io/open-webui/open-terminal
+```
+
+| Variable | Description |
+| :--- | :--- |
+| `OPEN_TERMINAL_PACKAGES` | Space-separated list of **apt** packages to install at startup |
+| `OPEN_TERMINAL_PIP_PACKAGES` | Space-separated list of **pip** packages to install at startup |
+
+:::note
+Packages are installed each time the container starts, so startup will take longer with large package lists. For heavy customization, build a custom image instead.
+:::
+
+#### Docker Access
+
+The container image includes the Docker CLI, Compose, and Buildx. To let agents build images, run containers, and manage Docker resources, mount the host's Docker socket:
+
+```bash
+docker run -d --name open-terminal -p 8000:8000 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v open-terminal:/home/user \
+  ghcr.io/open-webui/open-terminal
+```
+
+The entrypoint automatically fixes socket group permissions so `docker` commands work without `sudo`.
+
+:::warning
+Mounting the Docker socket gives the container full access to the host's Docker daemon. Only do this in trusted environments.
+:::
 
 ### Bare Metal
 
@@ -146,9 +184,11 @@ When both services run in the same Docker Compose stack, use the **service name*
 | | `~/.local/state/open-terminal/logs` | `OPEN_TERMINAL_LOG_DIR` | Directory for process log files |
 | | `16` | `OPEN_TERMINAL_MAX_SESSIONS` | Maximum concurrent interactive terminal sessions |
 | | `true` | `OPEN_TERMINAL_ENABLE_TERMINAL` | Enable or disable the interactive terminal feature |
+| | `true` | `OPEN_TERMINAL_ENABLE_NOTEBOOKS` | Enable or disable the notebook execution endpoints |
 | | | `OPEN_TERMINAL_API_KEY_FILE` | Load the API key from a file instead of an env var (for Docker secrets) |
 | | `xterm-256color` | `OPEN_TERMINAL_TERM` | TERM environment variable set in terminal sessions (controls color support) |
 | | Unset | `OPEN_TERMINAL_EXECUTE_TIMEOUT` | Default wait time (seconds) for command execution when the caller omits the `wait` parameter. Helps smaller models get output inline. |
+| | Unset | `OPEN_TERMINAL_EXECUTE_DESCRIPTION` | Custom text appended to the execute endpoint's OpenAPI description, letting you tell AI models about installed tools, capabilities, or conventions. |
 
 When no API key is provided, Open Terminal generates a random key and prints it to the console on startup.
 
@@ -169,8 +209,10 @@ api_key = "your-secret-key"
 log_dir = "/var/log/open-terminal"
 max_terminal_sessions = 16
 enable_terminal = true
+enable_notebooks = true
 term = "xterm-256color"
 execute_timeout = 5
+execute_description = "This terminal has ffmpeg and ImageMagick pre-installed."
 ```
 
 Using a config file keeps the API key out of `ps` / `htop` output.
@@ -299,6 +341,28 @@ You can control this feature with:
 - **`OPEN_TERMINAL_ENABLE_TERMINAL=false`** — disables the interactive terminal entirely. Useful if you only want command execution and file operations.
 - **`OPEN_TERMINAL_MAX_SESSIONS=16`** — limits the number of concurrent terminal sessions (default: 16). Prevents resource exhaustion from too many open terminals.
 
+## Port Detection and Proxy
+
+Open Terminal can discover TCP ports that servers (started via the terminal or `/execute`) are listening on and proxy HTTP traffic to them.
+
+- **`GET /ports`** — returns a list of TCP ports listening on localhost, scoped to descendant processes of Open Terminal. Cross-platform: parses `/proc/net/tcp` on Linux, `lsof` on macOS, and `netstat` on Windows. No extra dependencies.
+- **`/proxy/{port}/{path}`** — reverse-proxies HTTP requests to `localhost:{port}`. Supports all HTTP methods, forwards headers and body, and returns 502 on connection failure.
+
+This is useful when the AI starts a development server (e.g. a Flask app, a Node.js server, or a static file server) inside the terminal and you want to interact with it from Open WebUI or your browser.
+
+## Notebook Execution
+
+Open Terminal includes built-in Jupyter notebook execution via REST endpoints, powered by `nbclient`. Each session gets its own kernel, and you can execute cells one at a time with full rich output support (images, HTML, LaTeX).
+
+- **`POST /notebooks`** — create a new notebook session (starts a kernel)
+- **`POST /notebooks/{id}/execute`** — execute a cell in the session
+- **`GET /notebooks/{id}`** — get session status
+- **`DELETE /notebooks/{id}`** — stop the kernel and clean up
+
+Notebook execution is **enabled by default**. Disable it with `OPEN_TERMINAL_ENABLE_NOTEBOOKS=false` (or `enable_notebooks = false` in config.toml).
+
+`nbclient` and `ipykernel` are core dependencies and included in the Docker image. For bare metal installs, they are included by default with `pip install open-terminal`.
+
 ## Security
 
 - **Always use Docker in production.** Bare metal exposes your host to any command the model generates.
@@ -308,6 +372,7 @@ You can control this feature with:
 - **Network isolation.** Place the terminal container on an internal Docker network that only Open WebUI can reach.
 - **Use named volumes.** Files inside the container are lost when removed. The default `docker run` command mounts a volume at `/home/user` for persistence.
 - **Disable the interactive terminal** if you don't need it, with `OPEN_TERMINAL_ENABLE_TERMINAL=false`.
+- **Docker socket access.** Only mount the Docker socket (`/var/run/docker.sock`) in trusted environments. It gives the container full control over the host's Docker daemon.
 
 ## Further Reading
 
