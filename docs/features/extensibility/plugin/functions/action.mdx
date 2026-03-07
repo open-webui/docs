@@ -128,12 +128,12 @@ actions = [
     {
         "id": "summarize",
         "name": "Summarize",
-        "icon_url": "data:image/svg+xml;base64,..."
+        "icon_url": "https://example.com/icons/summarize.svg"
     },
     {
         "id": "translate",
         "name": "Translate",
-        "icon_url": "data:image/svg+xml;base64,..."
+        "icon_url": "https://example.com/icons/translate.svg"
     }
 ]
 
@@ -231,9 +231,20 @@ Example of supported frontmatter fields:
 - `author`: Name of the creator.
 - `version`: Version number of the Action.
 - `required_open_webui_version`: Minimum compatible version of Open WebUI.
-- `icon_url (optional)`: URL or Base64 string for a custom icon.
+- `icon_url (optional)`: A URL pointing to an icon image (PNG, SVG, JPEG, etc.). While base64 data URIs are technically supported, **using a hosted URL is strongly recommended** — see the warning below.
 
-**Base64-Encoded Example:**
+:::danger Avoid Base64 Icons — Use URLs Instead
+Do **not** embed base64-encoded images as your `icon_url`. The icon data for every action is included in the `/api/models` API response, which is sent to the frontend on every page load for **every model** that has the action enabled.
+
+**Example of the impact:** If you use a 500 KB base64 icon for an action, and that action is enabled on 20 models, the API response grows by **20 × 500 KB = ~10 MB** — just for that one action. If you have three such actions, that becomes **~30 MB of unnecessary payload**. This will:
+- **Significantly slow down frontend load times** for all users
+- **Increase backend memory usage and network bandwidth** on every request
+- **Degrade the overall user experience**, especially on slower connections
+
+Instead, host your icon as a static file (e.g., on your web server, a CDN, or a public URL) and reference it by URL. This keeps the API payload minimal.
+:::
+
+**Example (Recommended — URL icon):**
 
 <details>
 <summary>Example</summary>
@@ -244,7 +255,7 @@ title: Enhanced Message Processor
 author: @admin
 version: 1.2.0
 required_open_webui_version: 0.5.0
-icon_url: data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHN2Zz4K
+icon_url: https://example.com/icons/message-processor.svg
 requirements: requests,beautifulsoup4
 """
 
