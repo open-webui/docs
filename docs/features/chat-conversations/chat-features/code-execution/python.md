@@ -155,7 +155,11 @@ Pyodide includes the following pre-configured packages:
 - regex
 
 :::note
-Packages not pre-compiled in Pyodide cannot be installed at runtime. For additional packages, consider using the Jupyter integration or forking Pyodide to add custom packages.
+Packages not pre-compiled in Pyodide cannot be installed at runtime. For additional packages, consider using Open Terminal or forking Pyodide to add custom packages.
+:::
+
+:::warning Performance Limitations
+Pyodide executes Python via WebAssembly in the browser, which is **significantly slower** than native execution. Heavy computations, large dataset processing, ML training, and memory-intensive tasks may be slow, unresponsive, or hit browser memory limits. Many packages that depend on C extensions or system-level libraries are also unavailable. For demanding workloads, use **[Open Terminal](/features/chat-conversations/chat-features/code-execution#open-terminal)** instead — it provides full native performance and unrestricted package access.
 :::
 
 ## Persistent File System

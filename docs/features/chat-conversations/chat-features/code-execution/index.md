@@ -37,6 +37,10 @@ Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for
 Pyodide works well for **text analysis, hash computation, chart generation, file processing**, and other self-contained tasks. Chart libraries like matplotlib produce base64-encoded images that Open WebUI automatically captures, uploads as files, and injects direct image links into the output — so models can display charts directly in chat without any extra setup.
 :::
 
+:::warning Not suited for heavy workloads
+Pyodide runs Python via WebAssembly inside the browser, which is **significantly slower** than native Python execution. Large datasets, complex computations, ML model training, and CPU-intensive tasks will be noticeably slow or may hit memory limits. Additionally, many Python packages that rely on C extensions, system calls, or native binaries are **not available** in Pyodide — the library ecosystem is a limited subset of what a full Python environment offers. For demanding workloads, use **Open Terminal** instead, which provides full native performance and unrestricted package access inside a Docker container.
+:::
+
 :::note Mutually exclusive with Open Terminal
 The Code Interpreter toggle and the Open Terminal toggle cannot be active at the same time. Activating one will deactivate the other — they serve similar purposes but use different execution backends.
 :::
