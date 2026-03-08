@@ -4802,7 +4802,7 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 
 - Type: `str`
 - Default: `openid email profile`
-- Description: Sets the scope for Microsoft OAuth authentication.
+- Description: Sets the scope for Microsoft OAuth authentication. This scope is also included in refresh token requests when `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE` is enabled, which is required by Azure AD to avoid `AADSTS90009` errors. If you use custom API scopes, include them here (e.g., `openid email profile offline_access api://<Application ID URI>/<custom_scope>`).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `MICROSOFT_REDIRECT_URI`
@@ -5070,6 +5070,19 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 :::info
 
 This is useful when you need a JWT access token for downstream validation or when your OAuth provider requires an audience hint for proper token generation. For Auth0, this is typically your API identifier (e.g., `https://your-api.auth0.com/api/v2/`). For Ory, specify the resource server you want to access.
+
+:::
+
+#### `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, includes the configured OAuth scope in refresh token requests. Some OAuth providers, notably Microsoft Azure AD, require the scope to be explicitly provided when refreshing a token. Without it, Azure AD treats the request as the application requesting a token for itself, resulting in `AADSTS90009` errors. Enable this if you encounter token refresh failures with your OAuth provider.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org/doc/html/rfc6749#section-6), where the `scope` parameter is optional during refresh token requests. Only enable this for providers that require it, such as certain Azure AD configurations.
 
 :::
 
