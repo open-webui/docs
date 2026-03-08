@@ -586,7 +586,30 @@ Because `execute` runs unsandboxed JavaScript in the user's browser session, it 
 :::warning Pipes: Return Value vs Events
 For Pipes, be careful about mixing content delivery methods. If your `pipe()` method **returns a string**, that string becomes the final message content. If it **yields** (generator), the yielded chunks are streamed. If you also emit `chat:message:delta` events during execution, both the return/yield content and the event-based content are processed and can conflict.
 
-**Recommendation**: Either use return/yield for content delivery, **or** use `chat:message:delta`/`chat:message` events, but avoid using both simultaneously.
+**Recommendation**: Use return/yield as your primary content delivery mechanism. Events like `status`, `source`, `files`, and `notification` work well alongside return/yield, but avoid using `chat:message:delta` or `chat:message` events as your **sole** way to deliver message content from a pipe.
+
+**Why event-only content delivery is fragile for pipes**: When a pipe completes, the frontend saves the entire chat history (including all message content from its local state) to the database. This full-history save can **overwrite** content that was previously persisted by the backend event emitter. If the pipe returns `None` or an empty string and relies solely on `type: "message"` events for content, the final save may write empty content to the database — erasing what the event emitter had written.
+
+```python
+# ❌ Fragile: relies only on events for content — can be overwritten on save
+async def pipe(self, body: dict, __event_emitter__=None):
+    await __event_emitter__({"type": "message", "data": {"content": "Hello!"}})
+    # Returns None — frontend may save empty content, overwriting the emitted content
+
+# ✅ Correct: return content directly, use events for supplementary data
+async def pipe(self, body: dict, __event_emitter__=None):
+    await __event_emitter__({"type": "status", "data": {"description": "Working...", "done": False}})
+    result = "Hello!"
+    await __event_emitter__({"type": "status", "data": {"description": "Done", "done": True}})
+    return result
+
+# ✅ Also correct: yield for streaming, use events for supplementary data
+async def pipe(self, body: dict, __event_emitter__=None):
+    await __event_emitter__({"type": "status", "data": {"description": "Streaming...", "done": False}})
+    for chunk in ["Hello", ", ", "world", "!"]:
+        yield chunk
+    await __event_emitter__({"type": "status", "data": {"description": "Done", "done": True}})
+```
 :::
 
 ---
@@ -805,6 +828,14 @@ These 6 types always write to the database inside the event emitter function its
 The backend event emitter only recognizes the short names above for DB writes. If you emit `"chat:message:embeds"` instead of `"embeds"`, the frontend handles it identically, but the **backend won't persist it**. Always use the short names (`"status"`, `"message"`, `"replace"`, `"embeds"`, `"files"`, `"source"`) if you need persistence.
 :::
 
+:::caution Pipes: Backend Persistence Can Be Overwritten
+For **Pipes specifically**, the backend-persisted content from `"message"` and `"replace"` events can be **overwritten** by the frontend after the pipe completes. When a pipe's `pipe()` method returns, the frontend saves the entire local chat history to the database. If the pipe returned `None` or empty content and relied solely on `"message"` events, the frontend's local state may still have empty content for the assistant message — causing it to overwrite the event-emitter-written content with an empty string.
+
+This does **not** affect Tools, Actions, or Filters, where events supplement the return value rather than replace it. It also does not affect `"status"`, `"files"`, `"source"`, or `"embeds"` events, which update separate fields that aren't overwritten by the content save.
+
+**Bottom line for Pipes**: Use return/yield for message content. Use events for status updates, sources, files, embeds, and notifications.
+:::
+
 #### ❌ Not persisted (lost on tab close)
 
 | Type | Why it's lost |
@@ -849,6 +880,10 @@ When a pipe's `pipe()` method returns (or its generator finishes yielding), the 
 - If `ENABLE_REALTIME_CHAT_SAVE` is **off**: the full final content is saved in one write at completion
 
 Either way, the final assistant message is always persisted. When you reopen the chat, it will be there.
+
+:::caution
+The return value takes precedence over event-emitted content. If your pipe emits `"message"` events but returns `None`, the saved content will be empty — the frontend's final save overwrites whatever the event emitter wrote to the database. Always return or yield your content directly from the `pipe()` method.
+:::
 
 #### Tools
 
