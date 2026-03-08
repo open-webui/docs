@@ -36,9 +36,11 @@ Organize existing chats by moving them into folders:
 
 Folders can be nested within other folders to create hierarchical organization:
 
-- Drag a folder onto another folder to make it a subfolder.
-- Use the right-click menu to move folders between parent folders.
+- **Create subfolder from menu**: Right-click (or click the three-dot menu ⋯) on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
+- **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
+- **Move via context menu**: Right-click on a folder and use the move option to relocate it under a different parent.
 - Folders can be expanded or collapsed to show/hide their contents.
+- Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
 ### Starting a Chat in a Folder
 
