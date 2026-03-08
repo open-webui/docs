@@ -61,7 +61,7 @@ Valves and UserValves are used for specifying customizable settings of the Tool,
 ### Optional Arguments
 Below is a list of optional arguments your tools can depend on:
 - `__event_emitter__`: Emit events (see following section)
-- `__event_call__`: Same as event emitter but can be used for user interactions
+- `__event_call__`: Same as event emitter but can be used for user interactions. The server-side timeout for event calls is configurable via [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) (default: 300s).
 - `__user__`: A dictionary with user information. It also contains the `UserValves` object in `__user__["valves"]`.
 - `__metadata__`: Dictionary with chat metadata
 - `__messages__`: List of previous messages

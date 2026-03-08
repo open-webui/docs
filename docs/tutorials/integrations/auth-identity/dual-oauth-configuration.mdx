@@ -44,6 +44,12 @@ MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
 MICROSOFT_REDIRECT_URI=https://your-webui.com/oauth/microsoft/callback
 OPENID_PROVIDER_URL=https://login.microsoftonline.com/your_tenant_id/v2.0/.well-known/openid-configuration
 
+# Optional: Custom scope for Microsoft OAuth (required if using custom API scopes)
+# MICROSOFT_OAUTH_SCOPE=openid email profile offline_access api://<Application ID URI>/<custom_scope>
+
+# Optional: Include scope in refresh token requests (required for some Azure AD configurations)
+# OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE=true
+
 # 2. Google as a secondary OAuth provider
 # Note: Do NOT provide an OPENID_PROVIDER_URL for Google.
 # The system will use its internal Google OAuth implementation.
@@ -62,3 +68,4 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 - **Redirect Mismatch**: Ensure your Redirect URIs in both consoles match your `WEBUI_URL`.
 - **Merge Failures**: Double-check that `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is set to `true`.
 - **Microsoft Logout**: Microsoft often requires the `OPENID_PROVIDER_URL` to handle the logout redirect correctly. If logout fails, ensure this URL is correct for your tenant.
+- **Azure AD Refresh Token Failures (`AADSTS90009`)**: If token refresh fails with the error "Application is requesting a token for itself", set `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE=true`. Azure AD requires the scope to be explicitly included in refresh token requests. You may also need to set `MICROSOFT_OAUTH_SCOPE` to include `offline_access` and any custom API scopes.
