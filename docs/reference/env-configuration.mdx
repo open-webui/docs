@@ -4998,7 +4998,16 @@ See https://open.feishu.cn/document/sso/web-application-sso/login-overview
 The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
 Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
 
+Alternatively, if your provider does not support standard OIDC discovery (e.g., AWS Cognito), you can set `OPENID_END_SESSION_ENDPOINT` to a custom logout URL instead.
+
 :::
+
+#### `OPENID_END_SESSION_ENDPOINT`
+
+- Type: `str`
+- Default: Empty string (`""`)
+- Description: Sets a custom end-session (logout) endpoint URL. When configured, Open WebUI will redirect to this URL on logout instead of attempting OIDC discovery via `OPENID_PROVIDER_URL`. This is useful for OAuth providers that do not support standard OIDC discovery for logout, such as AWS Cognito.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OPENID_REDIRECT_URI`
 
