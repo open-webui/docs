@@ -141,25 +141,28 @@ The Pyodide worker is **persistent** — it is created once and reused across co
 
 ### Supported Libraries
 
-Pyodide includes the following pre-configured packages:
+Pyodide includes the following packages, which are auto-detected from import statements and loaded on demand:
 
-- micropip
-- packaging
-- requests
-- beautifulsoup4
-- numpy
-- pandas
-- matplotlib
-- scikit-learn
-- scipy
-- regex
+| Package | Use case |
+|---------|----------|
+| micropip | Package installer (internal use) |
+| requests | HTTP requests |
+| beautifulsoup4 | HTML/XML parsing |
+| numpy | Numerical computing |
+| pandas | Data analysis and manipulation |
+| matplotlib | Chart and plot generation |
+| seaborn | Statistical data visualization |
+| scikit-learn | Machine learning |
+| scipy | Scientific computing |
+| regex | Advanced regular expressions |
+| sympy | Symbolic mathematics |
+| tiktoken | Token counting for LLMs |
+| pytz | Timezone handling |
 
-:::note
-Packages not pre-compiled in Pyodide cannot be installed at runtime. For additional packages, consider using Open Terminal or forking Pyodide to add custom packages.
-:::
+The Python standard library is also fully available (json, csv, math, datetime, os, io, etc.).
 
-:::warning Performance Limitations
-Pyodide executes Python via WebAssembly in the browser, which is **significantly slower** than native execution. Heavy computations, large dataset processing, ML training, and memory-intensive tasks may be slow, unresponsive, or hit browser memory limits. Many packages that depend on C extensions or system-level libraries are also unavailable. For demanding workloads, use **[Open Terminal](/features/chat-conversations/chat-features/code-execution#open-terminal)** instead — it provides full native performance and unrestricted package access.
+:::warning No runtime installation
+The AI **cannot install additional libraries** beyond the list above. Any code that imports an unsupported package will fail with an import error. Packages that require C extensions, system calls, or native binaries (e.g., torch, tensorflow, opencv, psycopg2) are **not available** and cannot be made available in Pyodide. Pyodide is best suited for **basic file analysis, simple calculations, text processing, and chart generation**. For full Python package access, use **[Open Terminal](/features/chat-conversations/chat-features/code-execution#open-terminal)** instead.
 :::
 
 ## Persistent File System

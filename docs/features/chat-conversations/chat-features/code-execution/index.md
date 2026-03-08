@@ -37,8 +37,10 @@ Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for
 Pyodide works well for **text analysis, hash computation, chart generation, file processing**, and other self-contained tasks. Chart libraries like matplotlib produce base64-encoded images that Open WebUI automatically captures, uploads as files, and injects direct image links into the output — so models can display charts directly in chat without any extra setup.
 :::
 
-:::warning Not suited for heavy workloads
-Pyodide runs Python via WebAssembly inside the browser, which is **significantly slower** than native Python execution. Large datasets, complex computations, ML model training, and CPU-intensive tasks will be noticeably slow or may hit memory limits. Additionally, many Python packages that rely on C extensions, system calls, or native binaries are **not available** in Pyodide — the library ecosystem is a limited subset of what a full Python environment offers. For demanding workloads, use **Open Terminal** instead, which provides full native performance and unrestricted package access inside a Docker container.
+:::warning Best for basic analysis only
+Pyodide runs Python via WebAssembly inside the browser. The AI **cannot install additional libraries** beyond the small fixed set listed below — any code that imports an unsupported package will fail. Execution is also **significantly slower** than native Python, and large datasets or CPU-intensive tasks may hit browser memory limits. Pyodide is best suited for **basic file analysis, simple calculations, text processing, and chart generation**. For anything more demanding, use **Open Terminal** instead, which provides full native performance and unrestricted package access inside a Docker container.
+
+Available libraries: micropip, requests, beautifulsoup4, numpy, pandas, matplotlib, seaborn, scikit-learn, scipy, regex, sympy, tiktoken, pytz, and the Python standard library. **Nothing else can be installed at runtime.**
 :::
 
 :::note Mutually exclusive with Open Terminal
