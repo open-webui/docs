@@ -25,17 +25,27 @@ Open WebUI supports multiple code execution backends, each suited to different u
 
 ### Pyodide (Default)
 
-Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with constraints:
+Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with some constraints:
 
-- **No persistent storage** — the filesystem resets between executions.
+- **Persistent file storage** — the virtual filesystem at `/mnt/uploads/` is backed by IndexedDB (IDBFS). Files persist across code executions within the same session and survive page reloads.
+- **Built-in file browser** — when Code Interpreter is enabled, a file browser panel appears in the chat controls sidebar. You can browse, preview, upload, download, and delete files in the Pyodide filesystem — no terminal needed.
+- **User file access** — files attached to messages are automatically placed in `/mnt/uploads/` before code execution, so the model (and your code) can read them directly.
 - **Limited library support** — only a subset of Python packages are available. Libraries that rely on C extensions or system calls may not work.
 - **No shell access** — cannot run shell commands, install packages, or interact with the OS.
 
 :::tip
-Pyodide works well for **text analysis, hash computation, chart generation**, and other self-contained tasks. Chart libraries like matplotlib produce base64-encoded images that Open WebUI automatically captures, uploads as files, and injects direct image links into the output — so models can display charts directly in chat without any extra setup.
+Pyodide works well for **text analysis, hash computation, chart generation, file processing**, and other self-contained tasks. Chart libraries like matplotlib produce base64-encoded images that Open WebUI automatically captures, uploads as files, and injects direct image links into the output — so models can display charts directly in chat without any extra setup.
 :::
 
-### Jupyter
+:::note Mutually exclusive with Open Terminal
+The Code Interpreter toggle and the Open Terminal toggle cannot be active at the same time. Activating one will deactivate the other — they serve similar purposes but use different execution backends.
+:::
+
+### Jupyter (Legacy)
+
+:::caution Legacy Engine
+Jupyter is now considered a **legacy** code execution engine. The Pyodide engine is recommended for most use cases, and Open Terminal is recommended when you need full server-side execution. Jupyter support may be deprecated in a future release.
+:::
 
 Jupyter provides a full Python environment and can handle virtually any task — file creation, package installation, and complex library usage. However, it has significant drawbacks in shared deployments:
 
@@ -58,15 +68,17 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 
 ### Comparison
 
-| Consideration | Pyodide | Jupyter | Open Terminal |
+| Consideration | Pyodide | Jupyter (Legacy) | Open Terminal |
 | :--- | :--- | :--- | :--- |
 | **Runs in** | Browser (WebAssembly) | Server (Python kernel) | Server (Docker container) |
 | **Library support** | Limited subset | Full Python ecosystem | Full OS — any language, any tool |
 | **Shell access** | ❌ None | ⚠️ Limited | ✅ Full shell |
-| **File persistence** | ❌ Resets each execution | ✅ Shared filesystem | ✅ Container filesystem (until removal) |
+| **File persistence** | ✅ IDBFS (persists across executions & reloads) | ✅ Shared filesystem | ✅ Container filesystem (until removal) |
+| **File browser** | ✅ Built-in sidebar panel | ❌ None | ✅ Built-in sidebar panel |
+| **User file access** | ✅ Attached files placed in `/mnt/uploads/` | ❌ Manual | ✅ Attached files available |
 | **Isolation** | ✅ Browser sandbox | ❌ Shared environment | ✅ Container-level (when using Docker) |
 | **Multi-user safety** | ✅ Per-user by design | ⚠️ Not isolated | ⚠️ Single instance (per-user containers planned) |
-| **File generation** | ❌ Very limited | ✅ Full support | ✅ Full support with upload/download |
+| **File generation** | ✅ Write to `/mnt/uploads/`, download via file browser | ✅ Full support | ✅ Full support with upload/download |
 | **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations, or as a Tool Server |
 | **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation | ✅ Per-user by design |
 | **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ⚠️ Manual per-user instances |
