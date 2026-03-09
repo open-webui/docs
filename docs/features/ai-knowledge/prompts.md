@@ -75,7 +75,32 @@ Certain system variables like `{{prompt}}` and `{{MESSAGES}}` support optional m
 * **End Truncation**: `{{prompt:end:N}}` - Includes only the last **N** characters of the content.
 * **Middle Truncation**: `{{prompt:middletruncate:N}}` - Includes a total of **N** characters, taking half from the beginning and half from the end, with `...` in the middle.
 
-These modifiers also work with the `{{MESSAGES}}` variable (e.g., `{{MESSAGES:START:5}}` to include only the first 5 messages).
+These modifiers also work with the `{{MESSAGES}}` variable to control how many messages are included:
+
+* `{{MESSAGES:START:5}}` - Includes only the first 5 messages.
+* `{{MESSAGES:END:5}}` - Includes only the last 5 messages.
+* `{{MESSAGES:MIDDLETRUNCATE:6}}` - Includes the first 3 and last 3 messages (split evenly).
+
+#### Per-Message Content Truncation (Pipe Filters)
+
+In addition to selecting which messages to include, you can also truncate the **content of each individual message** using pipe filters. This is especially useful for task model prompts (title generation, tags, follow-ups) where conversations contain very long messages — for example, pasted documents or code. Truncating per-message content reduces latency for local models and API costs.
+
+Pipe filters are appended after the message selector with a `|` character:
+
+* `{{MESSAGES|middletruncate:500}}` - All messages, each truncated to 500 characters (keeping start and end with `...` in the middle).
+* `{{MESSAGES|start:300}}` - All messages, each truncated to the first 300 characters.
+* `{{MESSAGES|end:300}}` - All messages, each truncated to the last 300 characters.
+
+Pipe filters can be combined with message selectors:
+
+* `{{MESSAGES:END:2|middletruncate:500}}` - Last 2 messages, each truncated to 500 characters.
+* `{{MESSAGES:START:5|start:200}}` - First 5 messages, each truncated to the first 200 characters.
+
+:::tip
+
+Using pipe filters on task model templates (title generation, tag generation, follow-up suggestions) is highly recommended for deployments that handle long conversations. For example, changing the title generation template to use `{{MESSAGES:END:2|middletruncate:500}}` prevents the task model from processing entire pasted documents just to generate a short title.
+
+:::
 
 ---
 

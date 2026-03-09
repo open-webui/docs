@@ -1770,7 +1770,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`
+- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -2104,6 +2104,88 @@ If you use Multitenancy Mode, you should always check for any changes to the col
 - Type: `str`
 - Default: `open_webui`
 - Description: Sets the prefix for Milvus collection names. In multitenancy mode, collections become `{prefix}_memories`, `{prefix}_knowledge`, etc. In legacy mode, collections are `{prefix}_{collection_name}`. Changing this value creates an entirely separate namespace—existing collections with the old prefix become invisible to Open WebUI but remain in Milvus consuming resources. Use this for true multi-instance isolation on a shared Milvus server, not for migration between modes. Milvus only accepts underscores, hyphens/dashes are not possible and will cause errors.
+
+### MariaDB Vector
+
+:::warning
+
+MariaDB Vector is not actively maintained by the Open WebUI team. It is an addition by the community and is maintained by the community.
+If you want to use MariaDB Vector, be careful when upgrading Open WebUI (create backups and snapshots for rollbacks) in case internal changes in Open WebUI lead to breakage.
+
+:::
+
+:::note
+
+MariaDB Dependencies
+To use `mariadb-vector`, ensure you have the MariaDB connector and system library installed:
+
+```bash
+pip install open-webui[mariadb]
+```
+
+The Docker image includes `libmariadb-dev` by default. For non-Docker deployments, you must install the MariaDB C connector library (`libmariadb-dev` on Debian/Ubuntu) before installing the Python driver.
+
+:::
+
+:::info
+
+MariaDB Vector requires the **official MariaDB connector** (`mariadb+mariadbconnector://...`) as the connection scheme. This is mandatory because the official driver provides the correct `qmark` paramstyle and proper binary binding for `VECTOR(n)` float32 payloads. Other MySQL-compatible drivers will not work.
+
+Your MariaDB server must support `VECTOR` and `VECTOR INDEX` features (MariaDB 11.7+).
+
+:::
+
+#### `MARIADB_VECTOR_DB_URL`
+
+- Type: `str`
+- Default: Empty string (`""`)
+- Description: Sets the database URL for MariaDB Vector storage. Must use the `mariadb+mariadbconnector://` scheme (official MariaDB driver).
+- Example: `mariadb+mariadbconnector://user:password@localhost:3306/openwebui`
+
+#### `MARIADB_VECTOR_INITIALIZE_MAX_VECTOR_LENGTH`
+
+- Type: `int`
+- Default: `1536`
+- Description: Specifies the maximum vector length (number of dimensions) for the `VECTOR(n)` column. Must match the dimensionality of your embedding model. Once the table is created, changing this value requires data migration — the backend will refuse to start if the configured dimension differs from the stored column dimension.
+
+#### `MARIADB_VECTOR_DISTANCE_STRATEGY`
+
+- Type: `str`
+- Options:
+  - `cosine` - Uses `vec_distance_cosine()` for similarity measurement.
+  - `euclidean` - Uses `vec_distance_euclidean()` for similarity measurement.
+- Default: `cosine`
+- Description: Controls which distance function is used for the `VECTOR INDEX` and similarity search queries.
+
+#### `MARIADB_VECTOR_INDEX_M`
+
+- Type: `int`
+- Default: `8`
+- Description: HNSW index parameter that controls the maximum number of bi-directional connections per layer during index construction (`M=<int>` in the MariaDB `VECTOR INDEX` definition). Higher values improve recall but increase index size and build time.
+
+#### `MARIADB_VECTOR_POOL_SIZE`
+
+- Type: `int`
+- Default: `None`
+- Description: Sets the number of connections to maintain in the MariaDB Vector database connection pool. If not set, uses SQLAlchemy defaults. Setting this to `0` disables connection pooling entirely (uses `NullPool`).
+
+#### `MARIADB_VECTOR_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the maximum number of connections that can be created beyond `MARIADB_VECTOR_POOL_SIZE` when the pool is exhausted.
+
+#### `MARIADB_VECTOR_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Sets the timeout in seconds for acquiring a connection from the MariaDB Vector pool.
+
+#### `MARIADB_VECTOR_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the time in seconds after which connections are recycled in the MariaDB Vector pool to prevent stale connections.
 
 ### OpenSearch
 
@@ -4916,7 +4998,16 @@ See https://open.feishu.cn/document/sso/web-application-sso/login-overview
 The environment variable `OPENID_PROVIDER_URL` MUST be configured, otherwise the logout functionality will not work for most providers.
 Even when using Microsoft, GitHub or other providers, you MUST set the `OPENID_PROVIDER_URL` environment variable.
 
+Alternatively, if your provider does not support standard OIDC discovery (e.g., AWS Cognito), you can set `OPENID_END_SESSION_ENDPOINT` to a custom logout URL instead.
+
 :::
+
+#### `OPENID_END_SESSION_ENDPOINT`
+
+- Type: `str`
+- Default: Empty string (`""`)
+- Description: Sets a custom end-session (logout) endpoint URL. When configured, Open WebUI will redirect to this URL on logout instead of attempting OIDC discovery via `OPENID_PROVIDER_URL`. This is useful for OAuth providers that do not support standard OIDC discovery for logout, such as AWS Cognito.
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `OPENID_REDIRECT_URI`
 
