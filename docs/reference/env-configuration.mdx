@@ -2117,13 +2117,14 @@ If you want to use MariaDB Vector, be careful when upgrading Open WebUI (create 
 :::note
 
 MariaDB Dependencies
-To use `mariadb-vector`, ensure you have the MariaDB connector and system library installed:
+
+The `mariadb` Python connector is **not included by default** — it was removed from the bundled dependencies. To use `mariadb-vector`, you must install it explicitly:
 
 ```bash
 pip install open-webui[mariadb]
 ```
 
-The Docker image includes `libmariadb-dev` by default. For non-Docker deployments, you must install the MariaDB C connector library (`libmariadb-dev` on Debian/Ubuntu) before installing the Python driver.
+The official Docker image includes the system-level C library (`libmariadb-dev`) needed to compile the connector, so `pip install open-webui[mariadb]` will work inside the container without additional system packages. For non-Docker deployments, you must install the MariaDB C connector library (`libmariadb-dev` on Debian/Ubuntu) before installing the Python driver.
 
 :::
 
