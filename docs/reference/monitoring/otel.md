@@ -47,6 +47,7 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 | `OTEL_EXPORTER_OTLP_ENDPOINT`        | `http://grafana:4317` in Compose| OTLP gRPC/HTTP Collector endpoint URL               |
 | `OTEL_EXPORTER_OTLP_INSECURE`        | **true** in Compose             | Insecure (no TLS) connection for OTLP               |
 | `OTEL_SERVICE_NAME`                  | `open-webui`                    | Service name (tagged in traces and metrics)         |
+| `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`| `10000`                         | Metrics export interval in ms (10s = ~6 DPM; set `60000` for ~1 DPM) |
 | `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | *(empty)*      | Basic Auth credentials if Collector requires them   |
 
 :::tip
@@ -93,7 +94,7 @@ WebUI exports the following metrics via OpenTelemetry:
 | `http.server.requests` | Counter   | 1    | `http.method`, `http.route`, `http.status_code` |
 | `http.server.duration` | Histogram | ms   | (same as above)                      |
 
-Metrics are sent via OTLP (default every 10 seconds) and can be visualized in **Grafana** (via Prometheus/Mimir).
+Metrics are sent via OTLP (default every 10 seconds, configurable via `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`) and can be visualized in **Grafana** (via Prometheus/Mimir).
 
 ## 🔧 Custom Collector Setup
 

@@ -726,7 +726,17 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 
 - Type: `str`
 - Default: `/chats,/chat,/folders`
-- Description: Comma-separated list of URL paths to exclude from audit logging. Paths are matched without leading slashes.RetryTo run code, enable code execution and file creation in Settings > Capabilities.Claude can make mistakes. Please double-check responses.
+- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set.
+
+#### `AUDIT_INCLUDED_PATHS`
+
+- Type: `str`
+- Default: Empty string (disabled)
+- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Auth endpoints (signin, signout, signup) are always logged regardless of filtering mode.
+
+:::tip Whitelist vs Blacklist
+By default, audit logging uses **blacklist mode** — all paths are logged except those in `AUDIT_EXCLUDED_PATHS`. If you set `AUDIT_INCLUDED_PATHS`, it switches to **whitelist mode** — only the specified paths are logged. If both are set, whitelist mode takes precedence and a warning is logged at startup.
+:::
 
 
 ### Ollama
@@ -5915,6 +5925,12 @@ pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 - Type: `str`
 - Default: Empty string (' ')
 - Description: Sets the password for basic authentication with the default OTLP endpoint. This applies to traces, and by default, to metrics and logs unless overridden by their specific authentication variables.
+
+#### `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`
+
+- Type: `int`
+- Default: `10000` (10 seconds)
+- Description: Controls how often OpenTelemetry metrics are exported, in milliseconds. The default of 10 seconds produces approximately 6 data points per minute. Lower this value for higher resolution, or increase it to reduce cost on platforms that charge per data point (e.g. Grafana Cloud recommends staying below 1 DPM — set to `60000` for one export per minute).
 
 #### `OTEL_METRICS_BASIC_AUTH_USERNAME`
 
