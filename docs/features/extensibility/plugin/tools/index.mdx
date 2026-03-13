@@ -225,8 +225,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
 | `view_channel_message` | View a specific message or its details in a channel. |
 | `view_channel_thread` | View a full message thread/replies in a channel. |
-| **Skills** | *Requires per-model "Skills" category enabled (default: on).* |
-| `view_skill` | Load the full instructions of a skill from the available skills manifest. |
+| **Skills** | *Requires at least one skill to be attached to the model via **Workspace → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
+| `view_skill` | Load the full instructions of a skill by name. Only skills attached to the current model (via the Model Editor's Skills selector) are accessible. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
@@ -389,9 +389,18 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
 | **Channels** | `search_channels`, `search_channel_messages`, `view_channel_message`, `view_channel_thread` | Search channels and channel messages |
-| **Skills** | `view_skill` | Load skill instructions on-demand from the manifest |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
+
+:::info Skills / view_skill — Not a Category Toggle
+The `view_skill` tool does **not** appear in the Builtin Tools category checkboxes. It is injected automatically when at least one skill is **attached to the model** via **Workspace → Models → Edit → Skills**. When skills are attached:
+
+1. The model receives a summary of each attached skill (name + description) in its system prompt via `<available_skills>` tags
+2. The `view_skill` tool is injected so the model can load the full instructions of any attached skill on demand
+3. If no skills are attached, `view_skill` is not available
+
+Users can also select skills per-chat (via the chat input bar), which injects the skill's full content directly into the system prompt instead of requiring a `view_skill` call.
+:::
 
 **Use cases for granular control:**
 
