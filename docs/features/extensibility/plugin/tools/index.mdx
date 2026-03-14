@@ -83,6 +83,14 @@ While chatting, click the **➕ (plus)** icon in the input area. You’ll see a 
 
 You can also let your LLM auto-select the right Tools using the [**AutoTool Filter**](https://openwebui.com/f/hub/autotool_filter/).
 
+:::caution Attached Tools Still Require User Access
+Attaching a workspace tool to a model does **not** bypass access control. When a user chats with the model, Open WebUI checks whether **that specific user** has read access to each attached tool. Tools the user cannot access are silently skipped — the model won't be able to call them.
+
+**Example scenario**: An admin creates a private tool and attaches it to a model shared with all users. Regular users chatting with this model will **not** have the tool available because they don't have read access to the tool itself.
+
+**Solution**: Make sure users who need the model's tools also have read access to each tool (via access grants, group permissions, or by making the tool public). The "Workspace → Tools" permission controls whether users can *create and manage* tools — it does **not** affect whether model-attached tools work for them.
+:::
+
 ---
 
 ## Tool Calling Modes: Default vs. Native
@@ -225,7 +233,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
 | `view_channel_message` | View a specific message or its details in a channel. |
 | `view_channel_thread` | View a full message thread/replies in a channel. |
-| **Skills** | *Requires at least one skill to be attached to the model via **Workspace → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
+| **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
 | `view_skill` | Load the full instructions of a skill by name. Only skills attached to the current model (via the Model Editor's Skills selector) are accessible. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
