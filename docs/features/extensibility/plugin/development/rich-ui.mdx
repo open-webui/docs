@@ -46,6 +46,30 @@ def create_visualization_tool(self, data: str) -> HTMLResponse:
     return HTMLResponse(content=html_content, headers=headers)
 ```
 
+### Custom LLM Context Messages (Tools)
+
+By default, when a Tool successfully returns an HTMLResponse embed, the LLM is sent a generic system message: "{tool_function_name}: Embedded UI result is active and visible to the user."
+
+While this prevents the LLM from trying to read raw HTML, it also hides all the context of what actually happened. If you want the LLM to know specific details about the generated embed—like the parameters used, the status of the action, or what the user is seeing—you can override this generic message using the optional Tool-Result-Message header.
+
+```python
+from fastapi.responses import HTMLResponse
+def generate_music_tool(self, genre: str, duration: int) -> HTMLResponse:
+    """
+    Generates music and embeds a player in the chat.
+    """
+    # Your HTML player generation logic
+    html_content = f"<html><body><audio controls src='...'></audio></body></html>"
+    headers = {
+        "Content-Disposition": "inline",
+        # This message is sent to the LLM instead of the generic default
+        "Tool-Result-Message": f"Audio player embedded successfully. A {duration}-second {genre} track was generated. The user can play or download it from the player above."
+    }
+    
+    return HTMLResponse(content=html_content, headers=headers)
+```
+
+This ensures the LLM receives actionable, semantic feedback about the visualization or embedded UI, allowing it to provide relevant follow-up responses to the user.
 ## Action Usage
 
 Actions work exactly the same way. The rich UI embed is delivered to the chat via the event emitter:
