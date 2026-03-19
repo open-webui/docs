@@ -81,6 +81,27 @@ You can customize the image by forking the repo and editing the [Dockerfile](htt
 
 </details>
 
+#### Image Variants
+
+| | `latest` | `slim` | `alpine` |
+| :--- | :--- | :--- | :--- |
+| **Best for** | AI agent sandboxes | Production / hardened | Edge / CI / minimal footprint |
+| **Size** | ~4 GB | ~430 MB | ~230 MB |
+| **Bundled tooling** | Node.js, gcc, ffmpeg, LaTeX, Docker CLI, data science libs | git, curl, jq | git, curl, jq |
+| **Install packages at runtime** | ✅ (has `sudo`) | ❌ | ❌ |
+| **Multi-user / egress firewall** | ✅ | ✅ | ✅ |
+
+**`slim`** and **`alpine`** have the same feature set. Slim uses Debian (glibc) for broader binary compatibility; Alpine uses musl libc and is smaller, but some C-extension pip packages may need to compile from source.
+
+```bash
+docker run -d -p 8000:8000 -e OPEN_TERMINAL_API_KEY=secret ghcr.io/open-webui/open-terminal:slim
+docker run -d -p 8000:8000 -e OPEN_TERMINAL_API_KEY=secret ghcr.io/open-webui/open-terminal:alpine
+```
+
+:::note
+Slim and Alpine don't support `OPEN_TERMINAL_PACKAGES` / `OPEN_TERMINAL_PIP_PACKAGES` at runtime. To add packages, extend the [Dockerfile.slim](https://github.com/open-webui/open-terminal/blob/main/Dockerfile.slim) or [Dockerfile.alpine](https://github.com/open-webui/open-terminal/blob/main/Dockerfile.alpine) and build a custom image.
+:::
+
 #### Customizing the Docker Environment
 
 The easiest way to add extra packages is with environment variables — no fork needed:
@@ -115,7 +136,7 @@ docker run -d --name open-terminal -p 8000:8000 \
 The entrypoint automatically fixes socket group permissions so `docker` commands work without `sudo`.
 
 :::warning
-Mounting the Docker socket gives the container full access to the host's Docker daemon. Only do this in trusted environments.
+Mounting the Docker socket gives the container **full control over the host's Docker daemon**, which is effectively root access on the host machine. Anyone with access to the terminal can pull/run arbitrary containers (including privileged ones), mount host directories, access host networking, and manage all containers on the host. Only do this in fully trusted environments.
 :::
 
 ### Bare Metal
@@ -183,10 +204,15 @@ For **small team** deployments where a handful of users connect through Open Web
 
 ```bash
 docker run -d --name open-terminal -p 8000:8000 \
+  -v open-terminal:/home \
   -e OPEN_TERMINAL_MULTI_USER=true \
   -e OPEN_TERMINAL_API_KEY=your-secret-key \
   ghcr.io/open-webui/open-terminal
 ```
+
+:::tip
+Mount the volume at `/home` (not `/home/user`) so that each provisioned user's home directory is persisted. The container can also run as root (`user: '0:0'` in Compose) — in this case it provisions users directly without needing `sudo`.
+:::
 
 When enabled, each `X-User-Id` header (sent automatically by Open WebUI for admin-configured connections) is mapped to a dedicated Linux user account with its own home directory. Files, commands, terminal sessions, and port visibility are all isolated via standard Unix permissions.
 
@@ -230,6 +256,11 @@ For deployments beyond a small trusted team, use **[Terminals](https://github.co
 | | (empty) | `OPEN_TERMINAL_USER_PREFIX` | Prefix prepended to generated Linux usernames in multi-user mode. Useful for avoiding collisions with existing system users. |
 | | `auto` | `OPEN_TERMINAL_UVICORN_LOOP` | Uvicorn event loop policy. Set to `asyncio` to avoid uvloop segfaults on Python 3.12 in some environments. |
 | | (empty) | `OPEN_TERMINAL_INFO` | When set, enables a `GET /info` endpoint that returns this string. Use it to describe the environment to AI models (e.g. installed tools, available databases, conventions). |
+| | `50000000` (50 MB) | `OPEN_TERMINAL_MAX_LOG_SIZE` | Maximum size in bytes for per-process JSONL log files. Once exceeded, the log is rotated (oldest half discarded) and the process continues running. |
+| | `604800` (7 days) | `OPEN_TERMINAL_LOG_RETENTION` | How long in seconds to keep finished-process log files on disk before automatic cleanup. |
+| | `0` | `OPEN_TERMINAL_LOG_FLUSH_INTERVAL` | Minimum interval in seconds between log flushes. `0` = flush after every chunk (safest). Set to e.g. `1.0` to reduce I/O pressure on high-output commands. |
+| | `0` | `OPEN_TERMINAL_LOG_FLUSH_BUFFER` | Maximum unflushed buffer in bytes before a forced flush. Only relevant when `OPEN_TERMINAL_LOG_FLUSH_INTERVAL` > 0. `0` = no buffer limit. |
+| | (unset) | `OPEN_TERMINAL_ALLOWED_DOMAINS` | Network egress filtering. See [Network Egress Filtering](#network-egress-filtering). |
 
 When no API key is provided, Open Terminal generates a random key and prints it to the console on startup.
 
@@ -258,6 +289,10 @@ multi_user = false
 user_prefix = ""
 uvicorn_loop = "auto"
 info = ""
+max_log_size = 50000000
+log_retention = 604800
+log_flush_interval = 0
+log_flush_buffer = 0
 ```
 
 Using a config file keeps the API key out of `ps` / `htop` output.
@@ -408,16 +443,46 @@ Notebook execution is **enabled by default**. Disable it with `OPEN_TERMINAL_ENA
 
 `nbclient` and `ipykernel` are core dependencies and included in the Docker image. For bare metal installs, they are included by default with `pip install open-terminal`.
 
+## Network Egress Filtering
+
+Open Terminal supports network egress filtering to restrict which external domains the container can reach. This is useful for preventing data exfiltration, limiting AI agent access to specific APIs, or enforcing compliance policies.
+
+Control egress via the `OPEN_TERMINAL_ALLOWED_DOMAINS` environment variable:
+
+| Value | Behaviour |
+| :--- | :--- |
+| **Not set** (default) | Full outbound access — no restrictions |
+| **Empty string** (`""`) | Block **all** outbound traffic |
+| **Comma-separated domains** | DNS whitelist — only listed domains (and their subdomains) are reachable |
+
+```bash
+# Only allow access to the OpenAI API and GitHub
+docker run -d --name open-terminal -p 8000:8000 \
+  -e OPEN_TERMINAL_ALLOWED_DOMAINS="api.openai.com,github.com" \
+  -e OPEN_TERMINAL_API_KEY=your-secret-key \
+  ghcr.io/open-webui/open-terminal
+```
+
+**How it works:**
+
+1. A local `dnsmasq` instance starts, configured to only resolve whitelisted domains (all other DNS queries return NXDOMAIN)
+2. `iptables` rules block external DNS and only allow traffic to IPs resolved by the local DNS (via `ipset`)
+3. `CAP_NET_ADMIN` is permanently dropped via `capsh`, so processes inside the container cannot modify the firewall rules
+
+:::note
+Egress filtering requires `iptables`, `ipset`, `dnsmasq`, and `libcap` — all included in the default, slim, and alpine Docker images. It is not available in bare metal mode.
+:::
+
 ## Security
 
 - **Always use Docker in production.** Bare metal exposes your host to any command the model generates.
 - **Set an API key.** Without one, anyone who can reach the port has full access. Consider using a [config file](#configuration) or Docker secrets to keep the key out of process listings.
 - **Use resource limits.** Apply `--memory` and `--cpus` flags in Docker to prevent runaway processes.
 - **Session limits.** The default limit of 16 concurrent terminal sessions prevents resource exhaustion. Adjust with `OPEN_TERMINAL_MAX_SESSIONS`.
-- **Network isolation.** Place the terminal container on an internal Docker network that only Open WebUI can reach.
+- **Network isolation.** Place the terminal container on an internal Docker network that only Open WebUI can reach. Use [egress filtering](#network-egress-filtering) to restrict outbound domains.
 - **Use named volumes.** Files inside the container are lost when removed. The default `docker run` command mounts a volume at `/home/user` for persistence.
 - **Disable the interactive terminal** if you don't need it, with `OPEN_TERMINAL_ENABLE_TERMINAL=false`.
-- **Docker socket access.** Only mount the Docker socket (`/var/run/docker.sock`) in trusted environments. It gives the container full control over the host's Docker daemon.
+- **Docker socket access.** Only mount the Docker socket (`/var/run/docker.sock`) in fully trusted environments. It gives the container full control over the host's Docker daemon, which is effectively root access on the host.
 - **Multi-user mode is not a security sandbox.** It provides process-level isolation via Unix permissions, but users share the same kernel, network, and package set. Do not use it for untrusted users — use [per-container isolation](https://github.com/open-webui/terminals) instead (requires an [enterprise license](/enterprise)).
 
 ## Further Reading

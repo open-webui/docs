@@ -86,7 +86,7 @@ The `{{MESSAGES}}` variable has **two distinct modifier types** that work at dif
 | Modifier Type | Syntax | What It Controls | Example |
 | :--- | :--- | :--- | :--- |
 | **Message Selector** (colon `:`) | `{{MESSAGES:SELECTOR:N}}` | **How many messages** to include | `{{MESSAGES:END:5}}` = last 5 messages |
-| **Pipe Filter** (pipe `|`) | `{{MESSAGES|filter:N}}` | **Character limit per message** | `{{MESSAGES|middletruncate:500}}` = each message to 500 chars |
+| **Pipe Filter** (pipe `\|`) | `\{\{MESSAGES\|filter:N\}\}` | **Character limit per message** | `\{\{MESSAGES\|middletruncate:500\}\}` = each message to 500 chars |
 
 :::warning Important Distinction
 
@@ -124,9 +124,9 @@ Pipe filters truncate the **content of each individual message** to a character 
 
 | Filter | Description | Example |
 | :--- | :--- | :--- |
-| `|start:N` | First N characters of each message | `{{MESSAGES|start:300}}` |
-| `|end:N` | Last N characters of each message | `{{MESSAGES|end:300}}` |
-| `|middletruncate:N` | First half + last half of each message (N chars total) | `{{MESSAGES|middletruncate:500}}` |
+| `\|start:N` | First N characters of each message | `\{\{MESSAGES\|start:300\}\}` |
+| `\|end:N` | Last N characters of each message | `\{\{MESSAGES\|end:300\}\}` |
+| `\|middletruncate:N` | First half + last half of each message (N chars total) | `\{\{MESSAGES\|middletruncate:500\}\}` |
 
 ##### Combining Message Selectors and Pipe Filters
 
@@ -136,10 +136,10 @@ You can combine both modifiers to control both **which messages** are included a
 
 | Combined Syntax | What It Does |
 | :--- | :--- |
-| `{{MESSAGES|middletruncate:500}}` | All messages, each truncated to 500 characters |
-| `{{MESSAGES:END:2|middletruncate:500}}` | Last 2 messages, each truncated to 500 characters |
-| `{{MESSAGES:START:5|start:200}}` | First 5 messages, each truncated to first 200 characters |
-| `{{MESSAGES:MIDDLETRUNCATE:10|middletruncate:50}}` | First 5 + last 5 messages, each truncated to 50 characters |
+| `\{\{MESSAGES\|middletruncate:500\}\}` | All messages, each truncated to 500 characters |
+| `\{\{MESSAGES:END:2\|middletruncate:500\}\}` | Last 2 messages, each truncated to 500 characters |
+| `\{\{MESSAGES:START:5\|start:200\}\}` | First 5 messages, each truncated to first 200 characters |
+| `\{\{MESSAGES:MIDDLETRUNCATE:10\|middletruncate:50\}\}` | First 5 + last 5 messages, each truncated to 50 characters |
 
 ##### Practical Examples
 
@@ -171,8 +171,8 @@ This takes the first 5 and last 5 messages (skipping the middle), and each messa
 
 | Wrong | Right | Why |
 | :--- | :--- | :--- |
-| `{{MESSAGES:MIDDLETRUNCATE:500}}` expecting 500 tokens | `{{MESSAGES|middletruncate:500}}` | The first selects 500 **messages**, the second limits each message to 500 **characters** |
-| `{{MESSAGES:END:2}}` expecting 2000 chars | `{{MESSAGES:END:2|middletruncate:1000}}` | Without a pipe filter, messages may be thousands of characters each |
+| `\{\{MESSAGES:MIDDLETRUNCATE:500\}\}` expecting 500 tokens | `\{\{MESSAGES\|middletruncate:500\}\}` | The first selects 500 **messages**, the second limits each message to 500 **characters** |
+| `\{\{MESSAGES:END:2\}\}` expecting 2000 chars | `\{\{MESSAGES:END:2\|middletruncate:1000\}\}` | Without a pipe filter, messages may be thousands of characters each |
 
 :::tip
 

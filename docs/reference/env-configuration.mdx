@@ -3490,6 +3490,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Description: Limits the number of concurrent search requests to the search engine provider. Set to `0` for unlimited concurrency (default). Set to `1` for sequential execution to prevent rate limiting errors (e.g., Brave Free Tier).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `WEB_FETCH_MAX_CONTENT_LENGTH`
+
+- Type: `int`
+- Default: None (no limit)
+- Description: Maximum number of characters to return from fetched URLs. When set, content exceeding this limit is truncated. Previously hardcoded at 50,000 characters. Leave empty or unset to return full content without truncation. Useful for controlling context window usage with large web pages.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `WEB_LOADER_CONCURRENT_REQUESTS`
 
 - Type: `int`
