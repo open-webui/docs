@@ -187,7 +187,29 @@ VS Code's integrated terminal feature makes managing multiple terminals incredib
 
      This command uses `pip` (Python Package Installer) to read the `requirements.txt` file in the `backend` directory. `requirements.txt` lists all the Python libraries that the backend needs to run. `pip install` downloads and installs these libraries into your active Python environment (your Conda environment if you are using it, or your system-wide Python environment otherwise). The `-U` flag ensures you get the latest compatible versions of the libraries.
 
-2. **Start the Backend Development Server:**
+   As of v0.8.10, **MariaDB** is a dependency, which requires you to install **MariaDB Connector/C** on your system.
+   To do so, you can follow these steps:
+   - Debian
+     ```bash
+     apt install libmariadb3 libmariadb-dev
+     ```
+   - Fedora
+     ```bash
+     dnf install mariadb-connector-c mariadb-connector-c-devel
+     ```
+   - Arch
+     ```bash
+     pacman -S mariadb-libs
+     ```
+   - macOS
+     ```bash
+     brew install mariadb-connector-c
+     ```
+     *You might also need to set the environment variable MARIADB_CONFIG or update your PATH as suggested by brew after installation*
+   - Windows
+      - Download and run the MSI installer from [https://mariadb.com/downloads/connectors/](https://mariadb.com/downloads/connectors/)
+
+3. **Start the Backend Development Server:**
      - In your *backend* terminal, run:
 
      ```bash
