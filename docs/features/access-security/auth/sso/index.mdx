@@ -165,6 +165,7 @@ The following environment variables are used:
 1. `OAUTH_SCOPES` - Scopes to request. Defaults to `openid email profile`
 1. `OPENID_REDIRECT_URI` - The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
 1. `OAUTH_AUDIENCE` - Optional `audience` value that will be passed to the oauth provider's authorization endpoint as an additional query parameter.
+1. `OAUTH_AUTHORIZE_PARAMS` - Optional JSON object of extra query parameters to append to the OIDC authorization redirect URL. Useful for OIDC brokers (CILogon, Keycloak, Dex, etc.) that support parameters to pre-select or restrict the upstream identity provider. For example: `{"idphint": "urn:mace:incommon:ucsc.edu"}` for CILogon, `{"kc_idp_hint": "google"}` for Keycloak, or `{"acr_values": "https://refeds.org/profile/mfa"}` to require MFA. Invalid JSON is logged as a warning and ignored.
 
 :::warning
 
