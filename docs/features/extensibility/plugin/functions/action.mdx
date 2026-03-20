@@ -5,6 +5,10 @@ title: "Action Function"
 
 Action functions allow you to write custom buttons that appear in the message toolbar for end users to interact with. This feature enables more interactive messaging, allowing users to grant permission before a task is performed, generate visualizations of structured data, download an audio snippet of chats, and many other use cases.
 
+:::danger ⚠️ Critical Security Warning
+**Action Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/#-critical-security-warning).
+:::
+
 :::warning Use Async Functions for Future Compatibility
 Action functions should always be defined as `async`. The backend is progressively moving toward fully async execution, and synchronous functions may block execution or cause issues in future releases.
 :::
