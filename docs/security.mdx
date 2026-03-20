@@ -13,6 +13,7 @@ We employ a mixture of automated and manual techniques to keep up with evolving 
 | Version | Supported          |
 | ------- | ------------------ |
 | main    | :white_check_mark: |
+| dev     | :x:                |
 | others  | :x:                |
 
 ## Where and How to Report Security Vulnerabilities
@@ -53,7 +54,7 @@ To ensure constructive, actionable reports that genuinely improve security, all 
 
 4. **Proof of Concept (PoC) is Mandatory**: Each submission must include a well-documented proof of concept that demonstrates the vulnerability. A PoC must show what security boundary was crossed (Confidentiality, Integrity, Availability, Authenticity, Non-repudiation), how this vulnerability was abused, and what actions the attacker can now perform. Valid PoCs include step-by-step reproduction instructions with exact commands, complete exploit code with detailed execution instructions, or screenshots/videos demonstrating the exploit (supplementary to written steps). If confidentiality is a concern, reporters are encouraged to create a private fork of the repository and share access with the maintainers. Reports lacking valid evidence may be disregarded. We will notify you if we struggle to reproduce the exploit using your PoC, but if we repeatedly cannot reproduce it, the report may be closed.
 
-5. **Required Patch or Actionable Remediation Plan Submission**: Along with the PoC, reporters must provide a patch or actionable steps to remediate the identified vulnerability. This helps us evaluate and implement fixes rapidly and demonstrates commitment to the project's ongoing robustness.
+5. **Remediation is required**: Along with the PoC, you must provide **either** a patch/PR **or** a remediation plan (actionable steps) that a maintainer can apply without guesswork. Your remediation guidance can include, for example: the likely root cause (what's wrong and where), the location(s) to change (file/module/function names if known), the recommended fix approach (validation/sanitization rules, auth checks, safe defaults, etc.), and any security tradeoffs or potential regressions to watch for.
 
 6. **Streamlined Merging Process**: When vulnerability reports meet the above criteria, we can consider provided patches for immediate merging, similar to regular pull requests. Well-structured and thorough submissions will expedite the process of enhancing our security.
 
@@ -70,6 +71,24 @@ To ensure constructive, actionable reports that genuinely improve security, all 
 Non-compliant submissions will be closed, and repeat extreme violators may be banned. Our goal is to foster a constructive reporting environment where quality submissions promote better security for all users. Contributors who not only identify a vulnerability but also present a robust, ready-to-merge fix help accelerate our response and strengthen the community.
 
 If you feel like you are not able to follow all outlined requirements for vulnerability-specific reasons, still do report it—we will check every report either way.
+
+## Expected Response Timeframe
+
+Due to the volume of incoming vulnerability reports, issues, discussions, pull requests, and general project maintenance — lately compounded by a large number of invalid AI-generated reports (see AI report transparency above) — our capacity to respond is limited. Open WebUI is a community-driven project maintained by a small team, and security reports are handled alongside all other project responsibilities.
+
+**Please expect several weeks** for your report to be triaged, investigated, fixed, and published. While we aim to respond to every report as quickly as possible, it is normal to experience periods of silence lasting up to several weeks. **This does not mean your report has been ignored** — it means we have not yet had the capacity to address it. The entire process can realistically take multiple weeks from initial submission to final publication. We appreciate your patience and understanding.
+
+## Confidential Disclosure
+
+Vulnerability reports submitted through GitHub Security Advisories are **private and confidential**. Public disclosure of **ANY** details related to a submitted vulnerability report is **STRICTLY PROHIBITED** until the advisory has been **fully published** — not merely when a CVE ID has been assigned, but when the advisory itself is publicly visible.
+
+This prohibition applies to **all channels**, including but not limited to:
+
+- Comments on pull requests, issues, or discussions (on GitHub or elsewhere)
+- Social media, blogs, forums, or any other website
+- Discord, Reddit, or any other platform, website or service
+
+Premature disclosure undermines the security of all Open WebUI users and **violates the trust** inherent in the responsible disclosure process. **Reporters who publicly disclose vulnerability details before official publication <ins>may be permanently banned from future reporting.</ins>**
 
 ## For Non-Vulnerability Related Security Concerns
 
@@ -117,14 +136,16 @@ When you install a Tool, Function, or Pipeline, you are granting it the ability 
 
 ### What Is NOT a Vulnerability
 
-The following scenarios are **not** considered vulnerabilities because they require administrator action:
+The following scenarios are **not** considered vulnerabilities because they require administrator action (see also [Admin Actions Are Out of Scope](#reporting-guidelines) and [Threat Model Understanding](#reporting-guidelines) in the reporting guidelines above):
 
 - An admin installing a malicious Tool or Function
 - An admin granting Workspace access to an untrusted user
 - An admin importing code from an untrusted source
 - An attacker with write access to the data volume injecting malicious plugins
 
-These scenarios represent **admin negligence** or **environment compromise**, not vulnerabilities in Open WebUI itself. See [our Security Policy](https://github.com/open-webui/open-webui/security) for details.
+More generally, **reports describing ANY attack chain that involves Tools or Functions — including but not limited to code execution, file access, network requests, or environment variable access — will be closed as not a vulnerability / intended behavior.** If an administrator grants Tool permissions to untrusted users, this constitutes intentional misconfiguration.
+
+These scenarios represent **admin negligence** or **environment compromise**, not vulnerabilities in Open WebUI itself. See [our Security Policy](https://github.com/open-webui/open-webui/security) and the [Plugin Security documentation](/features/extensibility/plugin/) for details.
 
 ## Product Security Process
 

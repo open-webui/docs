@@ -3,6 +3,10 @@ sidebar_position: 3
 title: "Filter Function"
 ---
 
+:::danger ⚠️ Critical Security Warning
+**Filter Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/#-critical-security-warning).
+:::
+
 # 🪄 Filter Function: Modify Inputs and Outputs
 
 Welcome to the comprehensive guide on Filter Functions in Open WebUI! Filters are a flexible and powerful **plugin system** for modifying data *before it's sent to the Large Language Model (LLM)* (input) or *after it’s returned from the LLM* (output). Whether you’re transforming inputs for better context or cleaning up outputs for improved readability, **Filter Functions** let you do it all.

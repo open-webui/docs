@@ -47,6 +47,11 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. |
 | **Tools Import** | *(Requires Tools Access)* Ability to import tools. |
 | **Tools Export** | *(Requires Tools Access)* Ability to export tools. |
+
+:::danger ⚠️ Tools Access = Root-Equivalent Access
+**Treat the Tools Access permission as root-equivalent access.** Granting a user access to create or import Tools is equivalent to giving them shell access to your server, because Tools and Functions execute arbitrary Python code. Only grant this permission to users you would trust with direct access to your server. If you enable this permission for untrusted users, you are accepting the risk of arbitrary code execution on your host. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/#-critical-security-warning).
+:::
+
 | **Skills Access** | Access the **Skills** workspace to create and manage reusable instruction sets. |
 
 ### 2. Sharing Permissions

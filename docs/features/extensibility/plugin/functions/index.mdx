@@ -11,10 +11,8 @@ Unlike external tools that may require complex integrations, **Functions are bui
 
 Think of Functions as **modular building blocks** that let you enhance how the WebUI works, tailored exactly to what you need. They’re lightweight, highly customizable, and written in **pure Python**, so you have the freedom to create anything—from new AI-powered workflows to integrations with anything you use, like Google Search or Home Assistant.
 
-:::danger ⚠️ Security Warning
-
-**Functions execute arbitrary Python code on your server.** Only install Functions from trusted sources. Before importing any Function, review its source code to understand what it does. A malicious Function could access your file system, exfiltrate data, or compromise your system. See the [Security Policy](/security) for more details.
-
+:::danger ⚠️ Critical Security Warning
+**Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/#-critical-security-warning).
 :::
 
 ---
