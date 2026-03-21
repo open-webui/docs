@@ -85,7 +85,7 @@ Native function calling lets the model invoke tools directly using the provider'
 :::
 
 :::tip Performance depends on the model
-Not all models are equally capable with tools. Frontier models (GPT-5, Claude Sonnet 4, Gemini 3 Pro) handle multi-step terminal workflows well. Smaller or older models may struggle with complex tasks, fail to invoke tools, or produce malformed tool calls. If results are poor, try a more capable model.
+Not all models are equally capable with tools. Frontier models (GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro) handle multi-step terminal workflows well. Smaller or older models may struggle with complex tasks, fail to invoke tools, or produce malformed tool calls. If results are poor, try a more capable model.
 :::
 
 ### 9. Try it out
