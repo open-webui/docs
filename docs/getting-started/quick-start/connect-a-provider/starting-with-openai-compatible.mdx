@@ -602,6 +602,31 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   See the [Docker Model Runner docs](https://docs.docker.com/ai/model-runner/) for setup instructions.
 
   </TabItem>
+  <TabItem value="rapid-mlx" label="Rapid-MLX">
+
+  **Rapid-MLX** is an OpenAI-compatible inference server optimized for Apple Silicon (MLX). It delivers 2-4x faster inference than Ollama, with built-in tool calling, reasoning separation, and prompt caching.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:8000/v1` |
+  | **API Key** | Leave blank |
+
+  **Quick start:**
+
+  ```bash
+  # Install via Homebrew
+  brew install raullenchai/tap/rapid-mlx
+
+  # Or install via script
+  curl -fsSL https://raw.githubusercontent.com/raullenchai/Rapid-MLX/main/install.sh | bash
+
+  # Start the server with a model
+  rapid-mlx serve qwen3.5-9b
+  ```
+
+  See the [Rapid-MLX GitHub repo](https://github.com/raullenchai/Rapid-MLX) for more details and supported models.
+
+  </TabItem>
 </Tabs>
 
 :::tip Connection Timeout Configuration
