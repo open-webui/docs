@@ -8,18 +8,22 @@ import TabItem from '@theme/TabItem';
 
 # Installation
 
+Choose an installation method based on your needs:
+
 | Method | When to use |
 | :--- | :--- |
 | **Docker** | Runs in an isolated container, separated from your host system. |
 | **Bare Metal** | The AI works directly on your machine — your real files, tools, and environment. |
 | **Docker Compose** | You already run Open WebUI with Docker Compose and want to add Open Terminal to it. |
 
+Select your method below, then follow the steps.
+
 <Tabs>
   <TabItem value="docker" label="Docker" default>
 
-Runs Open Terminal in an isolated container. The AI operates in a sandbox — nothing affects your host system.
-
 Requires [Docker](https://www.docker.com/products/docker-desktop/).
+
+### 1. Start the container
 
 ```bash
 docker run -d \
@@ -49,7 +53,7 @@ Replace `your-secret-key` with a password of your choice.
 
 </details>
 
-#### Verify
+### 2. Verify
 
 Open `http://localhost:8000/docs` in your browser. You should see the Open Terminal API page.
 
@@ -63,11 +67,11 @@ docker logs open-terminal
   </TabItem>
   <TabItem value="bare-metal" label="Bare Metal">
 
-Runs Open Terminal directly on your machine. The AI has access to your real filesystem, installed tools, and environment.
-
 :::warning
-The AI can do anything your user account can do, including modifying and deleting files.
+In this mode, the AI can do anything your user account can do, including modifying and deleting files.
 :::
+
+### 1. Run Open Terminal
 
 **Option A — Run without installing:**
 
@@ -86,7 +90,7 @@ open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 
 {/* TODO: Screenshot — Terminal showing Open Terminal starting up with server address and API key. */}
 
-#### Working directory
+### 2. Working directory
 
 Open Terminal serves files from the current directory. To scope it to a specific project:
 
@@ -95,14 +99,16 @@ cd /path/to/your/project
 uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 ```
 
-#### Windows
+### Windows
 
 Supported via [pywinpty](https://github.com/andfoy/pywinpty). Full PowerShell support with colored output and interactive programs.
 
   </TabItem>
   <TabItem value="compose" label="Docker Compose">
 
-If Open WebUI already runs via Docker Compose, add Open Terminal to the same file:
+Add Open Terminal as a service in your existing `docker-compose.yml`:
+
+### 1. Update your Compose file
 
 ```yaml title="docker-compose.yml"
 services:
@@ -126,6 +132,8 @@ volumes:
   open-webui:
   open-terminal:
 ```
+
+### 2. Start the services
 
 ```bash
 docker compose up -d
