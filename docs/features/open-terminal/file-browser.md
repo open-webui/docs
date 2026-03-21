@@ -88,14 +88,6 @@ You can create new files and folders, or delete things you don't need anymore, d
 
 ---
 
-## Sharing files with the AI
-
-Click the **attach** button on a file to send it directly into your chat. The AI can then reference that file's contents in its response — useful when you want to ask about a specific file.
-
-{/* TODO: Screenshot — The attach button on a file in the file browser. After clicking, the file appears as an attachment in the chat input area at the bottom, ready to be sent with a message. */}
-
----
-
 ## Good to know
 
 :::tip Files update automatically
