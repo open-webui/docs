@@ -1,0 +1,145 @@
+---
+sidebar_position: 1
+title: "Installation"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Installation
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+
+Runs Open Terminal in an isolated container. The AI operates in a sandbox — nothing affects your host system.
+
+Requires [Docker](https://www.docker.com/products/docker-desktop/).
+
+```bash
+docker run -d \
+  --name open-terminal \
+  --restart unless-stopped \
+  -p 8000:8000 \
+  -v open-terminal:/home/user \
+  -e OPEN_TERMINAL_API_KEY=your-secret-key \
+  ghcr.io/open-webui/open-terminal
+```
+
+Replace `your-secret-key` with a password of your choice.
+
+{/* TODO: Screenshot — Terminal showing the docker run command with Docker pulling the image. */}
+
+<details>
+<summary><b>Command breakdown</b></summary>
+
+| Flag | Purpose |
+| :--- | :--- |
+| `-d` | Run in background |
+| `--name open-terminal` | Container name for reference |
+| `--restart unless-stopped` | Auto-restart on reboot |
+| `-p 8000:8000` | Expose on `http://localhost:8000` |
+| `-v open-terminal:/home/user` | Persist files across restarts |
+| `-e OPEN_TERMINAL_API_KEY=...` | Authentication key |
+
+</details>
+
+#### Verify
+
+Open `http://localhost:8000/docs` in your browser. You should see the Open Terminal API page.
+
+:::tip Auto-generated API key
+If no API key was set, one is generated automatically. Find it with:
+```bash
+docker logs open-terminal
+```
+:::
+
+  </TabItem>
+  <TabItem value="bare-metal" label="Bare Metal">
+
+Runs Open Terminal directly on your machine. The AI has access to your real filesystem, installed tools, and environment.
+
+:::warning
+The AI can do anything your user account can do, including modifying and deleting files.
+:::
+
+**Option A — Run without installing:**
+
+```bash
+uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+Downloads and runs via [uv](https://docs.astral.sh/uv/) with no permanent installation.
+
+**Option B — Install with pip:**
+
+```bash
+pip install open-terminal
+open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+{/* TODO: Screenshot — Terminal showing Open Terminal starting up with server address and API key. */}
+
+#### Working directory
+
+Open Terminal serves files from the current directory. To scope it to a specific project:
+
+```bash
+cd /path/to/your/project
+uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+#### Windows
+
+Supported via [pywinpty](https://github.com/andfoy/pywinpty). Full PowerShell support with colored output and interactive programs.
+
+  </TabItem>
+  <TabItem value="compose" label="Docker Compose">
+
+If Open WebUI already runs via Docker Compose, add Open Terminal to the same file:
+
+```yaml title="docker-compose.yml"
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    container_name: open-terminal
+    volumes:
+      - open-terminal:/home/user
+    environment:
+      - OPEN_TERMINAL_API_KEY=your-secret-key
+
+volumes:
+  open-webui:
+  open-terminal:
+```
+
+```bash
+docker compose up -d
+```
+
+{/* TODO: Screenshot — Terminal showing docker compose up -d with both containers starting. */}
+
+:::tip Connection URL
+When both services share a Docker Compose network, use the service name as the host:
+```
+http://open-terminal:8000
+```
+`localhost` won't resolve between containers.
+:::
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Next step
+
+[**Connect to Open WebUI →**](./connecting)
