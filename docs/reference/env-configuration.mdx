@@ -460,6 +460,18 @@ It is recommended to set this to a high single-digit or low double-digit value i
 
 :::
 
+#### `ENABLE_RESPONSES_API_STATEFUL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables stateful session handling for the Responses API by forwarding `previous_response_id` to the upstream endpoint. When enabled, Open WebUI anchors each response to the previous one, allowing the upstream provider to maintain conversation state server-side.
+
+:::warning Experimental
+
+**Only enable this if your upstream Responses API endpoint supports stateful sessions** (i.e., server-side response storage with `previous_response_id` anchoring). Most proxies and third-party endpoints are stateless and **will break** if this is enabled. This is intended for direct connections to providers like OpenAI that natively support the Responses API with session state.
+
+:::
+
 #### `BYPASS_MODEL_ACCESS_CONTROL`
 
 - Type: `bool`
@@ -2840,7 +2852,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models.
+- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models. When enabled, this applies to both the standard RAG retrieval pipeline and the native knowledge tools used in agentic mode.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_HYBRID_BM25_WEIGHT`

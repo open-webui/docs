@@ -171,7 +171,7 @@ Users can toggle this setting in **Settings → Interface → Iframe Same-Origin
 When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandboxed. This means:
 - **Downloads from within the embed** are difficult or impossible — especially on iOS, where sandboxed iframes cannot trigger file downloads at all
 - **JavaScript in the embed cannot interact with Open WebUI itself** — the iframe has no access to the parent page's DOM, cookies, localStorage, or any Open WebUI APIs
-- **Cross-frame communication** is limited to `postMessage` only
+- **Cross-frame communication** is limited to `postMessage` only — however, [prompt submission](#prompt-submission) works cross-origin with a user confirmation dialog
 
 If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → Iframe Same-Origin Access**.
 
@@ -254,6 +254,39 @@ The iframe can test connectivity with the parent window using a simple ping/pong
   parent.postMessage({ type: 'pong' }, '*');
 </script>
 ```
+
+### Prompt Submission
+
+Rich UI embeds can interact with the chat input using three message types:
+
+| Message Type | Behavior |
+|---|---|
+| `input:prompt` | Fills the chat input box with text (does not submit) |
+| `input:prompt:submit` | Fills and submits the prompt to the chat |
+| `action:submit` | Submits the current text already in the chat input |
+
+```html
+<script>
+  // Fill the chat input without submitting
+  parent.postMessage({ type: 'input:prompt', text: 'Analyze this data' }, '*');
+
+  // Fill and submit a prompt
+  parent.postMessage({ type: 'input:prompt:submit', text: 'Show me a summary' }, '*');
+
+  // Submit whatever is currently in the chat input
+  parent.postMessage({ type: 'action:submit', text: '' }, '*');
+</script>
+```
+
+**Same-origin vs cross-origin behavior:**
+
+- When `allowSameOrigin` is **on**, `input:prompt:submit` submits the prompt **immediately** — no user interaction required.
+- When `allowSameOrigin` is **off** (default), `input:prompt:submit` from cross-origin iframes shows a **confirmation dialog** to the user before submitting. This prevents abuse while still enabling interactive embeds without requiring same-origin access.
+- `input:prompt` and `action:submit` work the same regardless of origin — they only fill or submit text that the user can already see.
+
+:::tip
+This means your Rich UI embed can include interactive buttons (e.g., "Explain this chart", "Regenerate with different parameters") that submit prompts to the chat, **without requiring the user to enable same-origin access**. The user simply sees a confirmation dialog and clicks "Confirm" to proceed.
+:::
 
 ## Rich UI Embeds vs Execute Event
 

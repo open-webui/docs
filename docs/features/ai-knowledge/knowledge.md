@@ -48,7 +48,7 @@ When using **Native Function Calling (Agentic Mode)**, quality models can intera
 Autonomous knowledge base exploration works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can intelligently search, browse, and synthesize information from multiple documents. Small local models may struggle with multi-step knowledge retrieval.
 :::
 
-- **`query_knowledge_bases`**: Search across knowledge bases using semantic/vector search. This should be the model's first choice for finding information before searching the web.
+- **`query_knowledge_bases`**: Search across knowledge bases using semantic/vector search (with hybrid search and reranking when enabled in admin settings). This should be the model's first choice for finding information before searching the web.
 - **`list_knowledge_bases`**: Browse available knowledge bases with file counts.
 - **`search_knowledge_bases`**: Find specific knowledge bases by name or description.
 - **`search_knowledge_files`**: Locate files within knowledge bases by filename.
@@ -92,6 +92,7 @@ When attaching files, notes, or knowledge bases to a model, you can choose betwe
 
 - Uses **RAG (Retrieval Augmented Generation)** to find relevant chunks
 - Only injects the most relevant portions of documents based on the user's query
+- When **hybrid search** is enabled (`ENABLE_RAG_HYBRID_SEARCH`), retrieval uses BM25 keyword search combined with vector search, plus reranking for improved accuracy — this applies to both the standard RAG pipeline and the native knowledge tools
 - Best for large documents or knowledge bases where only specific sections are relevant
 - With native function calling enabled, the model decides when to search
 
