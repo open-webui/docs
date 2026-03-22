@@ -26,4 +26,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 - **[🧠 Reasoning & Thinking Models](./reasoning-models.mdx)**: Specialized support for models that generate internal chains of thought using thinking tags.
 
 - **[💬 Follow-Up Prompts](./follow-up-prompts.md)**: Automatic generation of suggested follow-up questions after model responses.
+
 - **Skill Mentions**: Use `$` in the chat input to mention and activate [Skills](/features/ai-knowledge/skills) on-the-fly, injecting their manifests into the conversation.
+
+- **Writing & Content Blocks**: Responses from models that include colon-fence blocks (e.g., `:::writing`, `:::code_execution`, `:::search_results`) are automatically rendered as formatted content in a styled container with a copy button. This is commonly used by newer OpenAI models to distinguish different types of output (prose, code results, search results) from the main response text.

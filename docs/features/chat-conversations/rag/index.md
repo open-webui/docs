@@ -142,6 +142,49 @@ Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size 
 
 Change the RAG embedding model directly in the `Admin Panel` > `Settings` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
 
+## Changing RAG Settings After Initial Setup
+
+If you need to change your chunking configuration (chunk size, overlap) or embedding model after documents have already been indexed, it is important to understand what actions are required and what effects those changes will have.
+
+### Changing Chunk Size and Overlap
+
+New documents will **automatically** use the updated chunk size and overlap settings — no action is required for newly uploaded files.
+
+Existing documents in knowledge bases **retain their original chunking** until you run a re-index. Retrieval will still work for these old chunks (vector similarity search does not depend on chunk size), but you may notice inconsistent retrieval quality if old and new documents have very different chunk sizes.
+
+:::tip
+If you are only changing chunk settings and not the embedding model, a re-index is not strictly required — old documents will continue to work. However, for consistent retrieval quality across all documents, running a re-index is recommended.
+:::
+
+### Changing the Embedding Model
+
+Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
+
+After changing the embedding model in `Admin Panel` > `Settings` > `Documents`, navigate to `Admin Panel` > `Settings` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+
+### What Does Re-Indexing Do?
+
+The re-index process performs the following steps for each knowledge base:
+
+1. **Deletes** the existing vector collection for the knowledge base.
+2. **Re-chunks** all files using the current chunk size, overlap, and text splitter settings.
+3. **Re-embeds** all chunks using the currently configured embedding model.
+
+This means a single re-index applies both chunking setting changes and embedding model changes simultaneously.
+
+:::warning Re-indexing does not cover chat files
+The re-index operation only processes files that belong to **knowledge bases**. Files that were uploaded directly into a chat (without being added to a knowledge base) have their own per-file vector collections that are not touched by re-indexing.
+
+If you change the embedding model, those standalone chat file embeddings will still use the old model and retrieval quality for those files will degrade. The only way to update them is to re-upload the files.
+:::
+
+### Summary
+
+| Change | New Documents | Knowledge Base Documents (no re-index) | Knowledge Base Documents (after re-index) | Standalone Chat Files |
+|---|---|---|---|---|
+| **Chunk Size / Overlap** | ✅ Uses new settings | ⚠️ Old chunks still work, but quality may vary | ✅ Re-chunked with new settings | ⚠️ Old chunks, re-upload to update |
+| **Embedding Model** | ✅ Uses new model | ❌ Old embeddings, incompatible vector space | ✅ Re-embedded with new model | ❌ Old embeddings, re-upload to update |
+
 ## Citations in RAG Feature
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats.

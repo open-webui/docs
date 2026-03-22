@@ -265,6 +265,21 @@ When a request is authenticated via `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`, and the t
 - User will be unassigned from groups not present in the header.
 - Group creation via trusted header is not automatic; only existing groups in Open WebUI will be assigned.
 
+#### Role Management
+
+You can use the `WEBUI_AUTH_TRUSTED_ROLE_HEADER` environment variable to control a user's role via the authenticating reverse proxy. Set this variable to the name of the HTTP header that will contain the desired role for the authenticated user.
+
+- The header value must be one of `admin`, `user`, or `pending` (case-insensitive, trimmed).
+- When the header is present and valid, the user's role is updated on every sign-in to match the header value.
+- If the header contains an invalid value, the role is not changed and a warning is logged.
+- If the header is not present or empty, the user's existing role is left unchanged.
+
+:::warning
+
+When configured, this header allows clients to set admin-level access via an HTTP header. You **must** ensure that only your trusted reverse proxy or identity provider can set this header. Allowing untrusted clients to reach Open WebUI directly would let anyone escalate to admin. This is the same security model as the other trusted headers — see the warning at the top of this section.
+
+:::
+
 ### Tailscale Serve
 
 [Tailscale Serve](https://tailscale.com/kb/1242/tailscale-serve) allows you to share a service within your tailnet, and Tailscale will set the header `Tailscale-User-Login` with the email address of the requester.
