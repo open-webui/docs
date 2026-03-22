@@ -4834,6 +4834,11 @@ In any production environment running more than one instance of Open WebUI (e.g.
 - Type: `str`
 - Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/access-security/auth/sso).
 
+#### `WEBUI_AUTH_TRUSTED_ROLE_HEADER`
+
+- Type: `str`
+- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/access-security/auth/sso).
+
 ### Google
 
 See https://support.google.com/cloud/answer/6158849?hl=en

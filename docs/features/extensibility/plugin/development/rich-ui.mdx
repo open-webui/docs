@@ -46,6 +46,46 @@ def create_visualization_tool(self, data: str) -> HTMLResponse:
     return HTMLResponse(content=html_content, headers=headers)
 ```
 
+### Custom Result Context
+
+By default, when a tool returns an `HTMLResponse`, the LLM receives a generic message: `"<tool_name>: Embedded UI result is active and visible to the user."` This gives the model no information about *what* was actually generated.
+
+To provide the LLM with actionable context about the embed, return a **tuple** of `(HTMLResponse, context)` where the second element is a `str`, `dict`, or `list`:
+
+```python
+from fastapi.responses import HTMLResponse
+
+def create_chart(self, data: str) -> tuple:
+    """
+    Creates an interactive chart and returns context to the LLM.
+
+    :param data: The data to chart
+    """
+    html_content = "<html>...</html>"
+    headers = {"Content-Disposition": "inline"}
+
+    # The LLM receives this context instead of the generic message
+    result_context = {
+        "status": "success",
+        "chart_type": "scatter",
+        "data_points": 42,
+        "description": "Scatter plot showing correlation between X and Y"
+    }
+
+    return HTMLResponse(content=html_content, headers=headers), result_context
+```
+
+The context can be:
+- A **string** — sent as-is to the LLM (e.g., `"Generated a bar chart with 5 categories"`)
+- A **dict** — serialized as JSON for structured context
+- A **list** — serialized as JSON for multiple items
+
+If the second element is missing or not one of these types, the generic fallback message is used.
+
+:::tip When to use this
+This is particularly useful when your tool generates dynamic content and the LLM needs to reference what was generated in follow-up conversation — for example, telling the LLM which parameters were used, what data is being displayed, or what actions the user can take next.
+:::
+
 ## Action Usage
 
 Actions work exactly the same way. The rich UI embed is delivered to the chat via the event emitter:
