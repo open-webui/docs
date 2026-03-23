@@ -78,7 +78,7 @@ Skills have access controls. You can:
 
 Click the **Access** button in the skill editor to configure who can use your skill.
 
-![AI integration settings and access controls](/images/open-terminal-integrations.png)
+![AI integration settings and access controls](/images/open-terminal-integrations-page.png)
 
 ---
 
