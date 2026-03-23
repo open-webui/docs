@@ -19,9 +19,7 @@ The AI:
 3. Identifies the tech stack, entry points, and major components
 4. Returns a structured summary with file counts, dependencies, and architecture notes
 
-{/* TODO: Screenshot — Chat showing the AI cloning a repo, then providing a codebase overview: "This is a FastAPI app with 3 main modules: auth, users, and billing. Entry point is main.py. Database: PostgreSQL via SQLAlchemy. 47 files, 12 API endpoints." */}
-
-{/* TODO: Screenshot — File browser showing the cloned repo's directory tree with folders like src/, tests/, docs/ expanded. */}
+![AI listing project files and describing the structure](/images/open-terminal-ai-file-listing.png)
 
 ---
 
@@ -36,7 +34,7 @@ The AI:
 4. Reads failure output, traces the bug, edits the source code
 5. Re-runs the failing tests to confirm the fix
 
-{/* TODO: Screenshot — Chat showing the AI running pytest, getting 2 failures, reading the tracebacks, editing a source file, and re-running to show all tests passing. */}
+![AI running tests and iterating on fixes](/images/open-terminal-ai-test-suite.png)
 
 :::tip Iterative debugging
 The AI sees the same terminal output a developer would — stack traces, assertion errors, log messages. Multiple rounds of "run → read error → fix → re-run" happen automatically.
@@ -55,7 +53,7 @@ The AI:
 4. Starts the dev server and confirms it's working
 5. Reports the URL where you can access it
 
-{/* TODO: Screenshot — Chat showing the AI reading a README, running pip install, running database migrations, starting a Flask dev server, and reporting "Server running on port 5000." */}
+![AI installing dependencies and running a project](/images/open-terminal-ai-install-run.png)
 
 ---
 
@@ -70,7 +68,7 @@ The AI:
 4. If tests fail, adjusts the refactored code until they pass
 5. Shows you a `git diff` of what changed
 
-{/* TODO: Screenshot — Chat showing the AI refactoring code, running tests (all pass), then displaying a git diff with the changes highlighted: old synchronous queries removed, new async queries added. */}
+![AI debugging and fixing code errors automatically](/images/open-terminal-ai-debug-fix.png)
 
 ---
 
@@ -86,7 +84,7 @@ The AI works with Git directly:
 - Find when a bug was introduced with `git bisect`
 - Resolve merge conflicts
 
-{/* TODO: Screenshot — Chat showing the AI running git log between two tags, then summarizing: "23 commits since v1.2.0. Key changes: new billing module (5 commits), auth refactor (8 commits), bug fixes (10 commits)." */}
+![AI initializing a git repo and working with git](/images/open-terminal-ai-git-workflow.png)
 
 ---
 
@@ -101,7 +99,7 @@ The AI:
 4. Runs them to verify they pass
 5. If any fail, it determines whether it's a test bug or a code bug
 
-{/* TODO: Screenshot — Chat showing the AI reading the function, writing 8 test cases, running pytest, and reporting "8 tests passed. Coverage for calculate_shipping: 94%." */}
+![AI writing and running unit tests with pytest](/images/open-terminal-ai-test-suite.png)
 
 ---
 
@@ -117,7 +115,7 @@ The AI:
 5. Adds a test case for the edge case
 6. Runs the tests to confirm
 
-{/* TODO: Screenshot — Chat showing the AI using grep to find the bug location, reading the code, explaining the root cause, applying a fix, and running the test suite. */}
+![AI finding and fixing a bug in the codebase](/images/open-terminal-ai-debug-fix.png)
 
 ---
 
@@ -133,9 +131,7 @@ The AI:
 5. Starts the server and tests every endpoint with `curl`
 6. Shows you the Swagger docs page
 
-{/* TODO: Screenshot — Chat showing the AI testing each endpoint with curl: POST /books (201 Created), GET /books (returns list), PUT /books/1 (updated), DELETE /books/1 (deleted). */}
-
-{/* TODO: Screenshot — Port preview showing the FastAPI Swagger UI at /docs with all endpoints visible. */}
+![AI creating and running a web application](/images/open-terminal-ai-web-dev.png)
 
 ---
 

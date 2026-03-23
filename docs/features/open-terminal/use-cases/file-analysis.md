@@ -27,9 +27,7 @@ The AI can read all of these directly — it doesn't need to upload them to any 
 
 The AI opens the PDF, reads through it, and gives you a concise summary — pulling out revenue figures, key decisions, notable changes, whatever matters.
 
-{/* TODO: Screenshot — File browser showing a quarterly_report.pdf file that was just uploaded. The chat shows the AI's response: a bulleted summary with key financial figures, decisions made, and upcoming milestones. */}
-
-{/* TODO: Screenshot — A follow-up question: "What was the total revenue?" with the AI pulling the exact number from the document. */}
+![AI reading and analyzing file contents](/images/open-terminal-ai-csv-analysis.png)
 
 ---
 
@@ -39,11 +37,7 @@ The AI opens the PDF, reads through it, and gives you a concise summary — pull
 
 The AI opens every file in the folder — even if they're a mix of PDFs and Word documents — extracts the information, and creates a clean spreadsheet you can download.
 
-{/* TODO: Screenshot — Chat showing the AI listing files found in /invoices (invoice_001.pdf, invoice_002.docx, invoice_003.pdf, etc.). The AI reports "Reading 30 files..." */}
-
-{/* TODO: Screenshot — The AI's response: "Done! I created invoices_summary.csv with columns: Vendor, Date, Amount, File. Here's a preview:" followed by a table showing the first few rows. */}
-
-{/* TODO: Screenshot — File browser showing invoices_summary.csv, previewed as a formatted table with the extracted data. */}
+![AI listing files and providing structured analysis](/images/open-terminal-ai-file-listing.png)
 
 ---
 
@@ -54,7 +48,7 @@ The AI opens every file in the folder — even if they're a mix of PDFs and Word
 
 The AI reads the email files — including sender, date, subject, and body — and pulls out the relevant information.
 
-{/* TODO: Screenshot — Chat showing the AI reading 5 email files. It responds with a list: "I found 3 mentions of deadlines:" with the email subject, date, and the relevant sentence highlighted for each. */}
+![AI reading files and extracting specific information](/images/open-terminal-ai-file-listing.png)
 
 ---
 
@@ -65,9 +59,7 @@ The AI reads the email files — including sender, date, subject, and body — a
 
 The AI reads the spreadsheet, processes the data, creates a chart, and saves it as an image you can preview and download.
 
-{/* TODO: Screenshot — Chat showing the AI reading the spreadsheet (it reports the sheet names and row count), then confirming it created "sales_by_region.png". */}
-
-{/* TODO: Screenshot — File browser previewing the generated pie chart showing sales broken down by region with percentages. */}
+![AI analyzing sales data and summarizing by product](/images/open-terminal-ai-csv-analysis.png)
 
 ---
 
@@ -77,7 +69,7 @@ The AI reads the spreadsheet, processes the data, creates a chart, and saves it 
 
 The AI searches across every file — PDFs, Word docs, spreadsheets, whatever's there — and tells you exactly where it found matches.
 
-{/* TODO: Screenshot — Chat showing the AI searching through 12 files and finding matches in 3 of them. For each match, it shows the filename and the surrounding context: "...either party may invoke the termination clause with 30 days written notice..." */}
+![AI searching across files for specific content](/images/open-terminal-ai-file-listing.png)
 
 :::tip No indexing required
 Unlike traditional search or RAG systems, the AI reads files live every time you ask. That means it always sees the latest version — no re-indexing, no sync delays, no database to manage.

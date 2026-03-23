@@ -15,9 +15,7 @@ Open Terminal isn't just for code. The AI can manage files, organize folders, pr
 
 The AI reads the file dates, renames everything, and creates monthly folders:
 
-{/* TODO: Screenshot — Chat showing the AI processing 200 files. The response says "Done! Renamed 200 files and sorted into 8 monthly folders." An example shows: IMG_4521.jpg → 2025-03/2025-03-15_IMG_4521.jpg */}
-
-{/* TODO: Screenshot — File browser showing the new folder structure: 2025-01/, 2025-02/, 2025-03/, etc., with renamed photos inside each. */}
+![AI creating and renaming files with date prefixes](/images/open-terminal-ai-file-rename.png)
 
 ---
 
@@ -27,7 +25,7 @@ The AI reads the file dates, renames everything, and creates monthly folders:
 
 The AI checks file sizes and content to find exact duplicates, then asks you what to do:
 
-{/* TODO: Screenshot — Chat showing the AI's report: "Found 12 duplicate pairs (saving 340 MB total). Here are the largest:" followed by a table showing file names, sizes, and locations of each duplicate pair. The AI asks "Would you like me to delete the duplicates?" */}
+![AI analyzing files with disk usage details](/images/open-terminal-ai-disk-usage.png)
 
 ---
 
@@ -35,7 +33,7 @@ The AI checks file sizes and content to find exact duplicates, then asks you wha
 
 > **You:** Create a zip backup of the /projects folder with today's date in the filename.
 
-{/* TODO: Screenshot — Chat showing the AI creating the backup: "Created backup: projects_2025-03-20.zip (245 MB). Saved to /backups/". The file browser shows the zip file. */}
+![AI executing system automation commands](/images/open-terminal-ai-file-rename.png)
 
 ---
 
@@ -45,9 +43,7 @@ The AI checks file sizes and content to find exact duplicates, then asks you wha
 
 The AI uses image tools (which come pre-installed in Docker) to batch-convert and resize:
 
-{/* TODO: Screenshot — Chat showing the AI processing files: "Converted 25 images from PNG to JPG. Average file size reduced from 2.1 MB to 380 KB." */}
-
-{/* TODO: Screenshot — File browser showing the converted .jpg files alongside or replacing the originals. */}
+![AI using run_command for batch file operations](/images/open-terminal-ai-install-run.png)
 
 ---
 
@@ -55,7 +51,7 @@ The AI uses image tools (which come pre-installed in Docker) to batch-convert an
 
 > **You:** How much disk space is left? Are any big files I should clean up?
 
-{/* TODO: Screenshot — Chat showing the AI running a disk usage analysis: "You have 12 GB free out of 50 GB. The largest directories are: /home/user/data (8.2 GB), /home/user/logs (3.1 GB). The single largest file is access.log at 1.4 GB — it's 6 months old. Want me to clean it up?" */}
+![AI checking disk usage and analyzing storage](/images/open-terminal-ai-disk-usage.png)
 
 ---
 
@@ -65,7 +61,7 @@ The AI uses image tools (which come pre-installed in Docker) to batch-convert an
 
 The AI writes a script, processes every file, and reports back:
 
-{/* TODO: Screenshot — Chat showing the AI processing CSV files: "Updated 15 CSV files with the header row. Here's a preview of the first one:" followed by a small table showing the first few rows with the new header. */}
+![AI reading and analyzing CSV data](/images/open-terminal-ai-csv-analysis.png)
 
 ---
 

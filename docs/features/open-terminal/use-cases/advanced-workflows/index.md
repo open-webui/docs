@@ -24,9 +24,7 @@ Think of it like giving someone a detailed SOP (standard operating procedure) be
 5. Write the instructions in markdown in the **content area**
 6. Click **Save & Create**
 
-{/* TODO: Screenshot — The Workspace → Skills page showing a list of existing skills (e.g., "Data Report Generator", "Research Assistant", "Email Processor"). The Create button is visible in the top-right corner. */}
-
-{/* TODO: Screenshot — The Skill Editor showing a skill being created. The name field says "Data Report Generator", the description says "Analyzes data files and creates professional PDF reports". The content area shows markdown instructions with numbered steps. */}
+![Open WebUI model capabilities page](/images/open-terminal-model-capabilities.png)
 
 :::tip Frontmatter shortcut
 If your skill instructions start with YAML frontmatter, the name and description fields auto-populate:
@@ -51,9 +49,7 @@ There are two ways to use a skill:
 
 Type `$` in the chat input, then search for your skill by name. Select it, and the AI receives the **full instructions** for that conversation. This is best when you want to explicitly tell the AI to follow a specific skill right now.
 
-{/* TODO: Screenshot — The chat input showing the $ mention dropdown. The user has typed "$Data" and the autocomplete shows "Data Report Generator" as a suggestion, with its description visible. */}
-
-{/* TODO: Screenshot — A chat where the user has $mentioned a skill and then asked a question. The skill name appears as a tag in the message. The AI's response clearly follows the skill's structured approach. */}
+![AI interacting with data using skills and structured workflows](/images/open-terminal-ai-csv-analysis.png)
 
 **Option 2: Attach it to a Model (auto-discovery)**
 
@@ -67,7 +63,7 @@ Here's how it works behind the scenes:
 
 This means you can attach a "Data Report Generator" skill to your model, and any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions — without you needing to remember the skill exists.
 
-{/* TODO: Screenshot — The Model Editor showing the Skills section with checkboxes. "Data Report Generator" and "Research Assistant" are checked. A note says "To select skills here, add them to the Skills workspace first." */}
+![Model capabilities settings page](/images/open-terminal-model-capabilities.png)
 
 :::tip Attach multiple skills for a Swiss-army-knife model
 Attach several skills to a single model and it becomes a multi-purpose expert. Drop a spreadsheet → it loads the data analysis skill. Ask "research EV batteries" → it loads the research skill. Build a landing page → it loads the web dev skill. All automatically.
@@ -82,7 +78,7 @@ Skills have access controls. You can:
 
 Click the **Access** button in the skill editor to configure who can use your skill.
 
-{/* TODO: Screenshot — The Access Control modal for a skill, showing options to set visibility: Private, specific users/groups, or Public. */}
+![AI integration settings and access controls](/images/open-terminal-integrations.png)
 
 ---
 

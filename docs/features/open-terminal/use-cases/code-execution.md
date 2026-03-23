@@ -15,9 +15,7 @@ Open Terminal allows the AI to write, execute, and debug code in real time. It h
 
 The AI writes a Python script, executes it, and saves the output. Results are available in the file browser.
 
-{/* TODO: Screenshot — Chat showing the AI responding with "I'll create a bar chart of the top 10 countries by population." The AI creates and runs a script. Below, the output shows "Chart saved to population_chart.png". */}
-
-{/* TODO: Screenshot — The file browser previewing the generated population_chart.png — a clean bar chart with country names and populations. */}
+![AI creating and running a Python script with output](/images/open-terminal-ai-code-execution.png)
 
 ---
 
@@ -27,9 +25,7 @@ The AI writes a Python script, executes it, and saves the output. Results are av
 
 The AI installs required packages, writes the script, downloads files, and organizes them:
 
-{/* TODO: Screenshot — Chat showing the AI installing the requests library, running a download script, and reporting: "Downloaded 15 images. Sorted into 3 folders: small (under 100KB), medium (100KB–1MB), large (over 1MB)." */}
-
-{/* TODO: Screenshot — File browser showing the three folders (small/, medium/, large/) with images sorted inside each. */}
+![AI installing a library and running a script](/images/open-terminal-ai-install-run.png)
 
 :::tip Automatic dependency installation
 In Docker mode, the AI can install packages as needed. If a task requires a library that isn't pre-installed, it installs it automatically before proceeding.
@@ -45,7 +41,7 @@ When code fails, the AI reads the error output and adjusts:
 
 The AI writes a scraper, hits an unexpected page layout, reads the `AttributeError` traceback, adjusts the CSS selectors, and re-runs successfully.
 
-{/* TODO: Screenshot — Chat showing the AI's first attempt failing with an error: "AttributeError: 'NoneType' object has no attribute 'text'". The AI responds: "The page structure is different than expected — the titles are inside <h2> tags, not <h1>. Let me adjust..." Then it runs the fixed version successfully, listing 20 article titles. */}
+![AI detecting an error, fixing the script, and running it successfully](/images/open-terminal-ai-debug-fix.png)
 
 ---
 
@@ -60,9 +56,9 @@ The AI:
 4. Starts the server
 5. Verifies the result in the web preview
 
-{/* TODO: Screenshot — File browser showing a complete project structure: app.py, templates/ folder with HTML files, static/ folder with CSS, requirements.txt. */}
+![AI listing files and describing the project structure](/images/open-terminal-ai-file-listing.png)
 
-{/* TODO: Screenshot — The web preview panel showing the running to-do app with a text input, an "Add" button, and a list of example tasks with checkboxes. */}
+
 
 ---
 
@@ -70,7 +66,7 @@ The AI:
 
 > **You:** Check what's using the most disk space.
 
-{/* TODO: Screenshot — Chat showing the AI running a disk usage command and interpreting the results: "The /home/user/data directory is using 2.3 GB, mostly from log files. The largest single file is access.log at 800 MB. Would you like me to clean up old logs?" */}
+![AI analyzing disk usage and identifying large files](/images/open-terminal-ai-disk-usage.png)
 
 ---
 

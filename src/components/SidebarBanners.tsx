@@ -7,7 +7,7 @@ export const SidebarBanners = () => {
 			imgSrc: "/sponsors/banners/openwebui-banner.png",
 			mobileImgSrc: "/sponsors/banners/openwebui-banner-mobile.png",
 			url: "https://careers.openwebui.com",
-			name: "Open WebUI Inc.",
+			name: "Open WebUI",
 			description: "",
 		},
 	];

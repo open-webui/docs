@@ -9,7 +9,7 @@ title: "Open Terminal"
 
 Open Terminal connects a sandboxed Linux environment to Open WebUI, allowing the AI to execute code, manage files, install packages, and return results directly in the chat.
 
-{/* TODO: Screenshot — A chat conversation where a user asks "What's 2+2 in Python?" and the AI creates and runs a script, showing the result "4" inline. The file browser is visible on the right side of the screen. */}
+![Open WebUI with Open Terminal — file browser sidebar and chat](/images/open-terminal-file-browser.png)
 
 ---
 
@@ -19,7 +19,7 @@ Open Terminal connects a sandboxed Linux environment to Open WebUI, allowing the
 
 Upload spreadsheets, CSVs, or databases. The AI reads the data, runs analysis scripts, and generates charts or reports.
 
-{/* TODO: Screenshot — A user dragging an .xlsx file into the file browser sidebar. The AI responds with a text summary of the data and an embedded chart image showing expenses by category. */}
+![AI analyzing data from a spreadsheet](/images/open-terminal-ai-csv-analysis.png)
 
 ### Document search and extraction
 

@@ -17,7 +17,7 @@ One of the most impressive things Open Terminal can do: the AI builds a website,
 4. A **preview panel** appears in Open WebUI showing the live page
 5. You ask for changes → the AI edits the files → the preview updates
 
-{/* TODO: Screenshot — Full view of Open WebUI showing a chat on the left ("Create a landing page for a bakery") and a live website preview panel on the right displaying a beautiful bakery landing page with a hero image, menu section, and contact info. */}
+![AI creating a landing page with file browser showing the created files](/images/open-terminal-ai-web-dev.png)
 
 ---
 
@@ -27,9 +27,7 @@ One of the most impressive things Open Terminal can do: the AI builds a website,
 
 The AI creates the HTML, CSS, and JavaScript files, starts a web server, and the preview appears automatically. It looks professional and polished — not a skeleton wireframe.
 
-{/* TODO: Screenshot — The preview panel showing a photography business landing page with a hero banner, grid gallery of sample images, an "About" section, and a contact form. */}
-
-{/* TODO: Screenshot — File browser showing the created files: index.html, styles.css, script.js. */}
+![File browser showing the created HTML files](/images/open-terminal-ai-web-dev-files.png)
 
 ---
 
@@ -41,11 +39,7 @@ Once the page is live, just keep talking to iterate:
 
 The AI edits the files, and the preview updates.
 
-{/* TODO: Screenshot — Side-by-side or before/after: the original light-themed page, then the updated dark-themed page with warm accent colors and rearranged sections. */}
-
-> **You:** Add a logo at the top and make the contact form prettier.
-
-{/* TODO: Screenshot — The updated page with a logo header and a redesigned contact form with styled inputs and a gradient submit button. */}
+The AI edits the CSS and HTML files, and the preview updates instantly.
 
 ---
 
@@ -55,11 +49,7 @@ The AI can create interactive web applications, not just static pages:
 
 > **You:** Build a simple calculator that runs in the browser.
 
-{/* TODO: Screenshot — Preview panel showing a working calculator web app with number buttons, operation buttons, and a display showing a calculation result. */}
-
-> **You:** Make a habit tracker where I can check off daily habits.
-
-{/* TODO: Screenshot — Preview panel showing a habit tracker with a weekly grid, habit names on the left, and checkmarks for completed days. */}
+![AI creating and running code for interactive applications](/images/open-terminal-ai-code-execution.png)
 
 ---
 
@@ -72,7 +62,7 @@ Got an existing website that's broken or needs changes? Upload the files and ask
 
 The AI reads your code, identifies the problem, fixes it, and you verify in the preview.
 
-{/* TODO: Screenshot — Chat showing the AI reading the uploaded HTML, identifying the bug ("The form action URL is pointing to a non-existent endpoint"), fixing it, and confirming the form now works. The preview shows the working form. */}
+![AI identifying and fixing code errors](/images/open-terminal-ai-debug-fix.png)
 
 ---
 

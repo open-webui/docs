@@ -19,19 +19,19 @@ Recommended for all deployments, including single-user. The Admin Panel keeps th
 
 Click your **name** at the bottom of the left sidebar to open the user menu, then click **Admin Panel**.
 
-{/* TODO: Screenshot — Open WebUI sidebar with the user menu open at the bottom, showing "Settings", "Admin Panel", and "Sign Out" options. An arrow points to "Admin Panel". */}
+![User menu showing Admin Panel option](/images/open-terminal-user-menu.png)
 
 ### 2. Go to Settings → Integrations
 
 In the Admin Panel, click **Settings** in the top nav, then click **Integrations**.
 
-{/* TODO: Screenshot — Admin Panel with "Settings" selected in the top nav and "Integrations" visible in the sidebar. */}
+![Admin Panel — Settings → Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
 
 Scroll down until you see the **Open Terminal** section.
 
-{/* TODO: Screenshot — The Admin Integrations page scrolled to show the "Open Terminal" section with a "+" button to add a connection. */}
+![The Open Terminal section under Integrations](/images/open-terminal-connected.png)
 
 :::warning Don't confuse it with "Tools"
 Open Terminal has its **own section** under Integrations — don't add it under "External Tools" or "Tool Servers". Using the dedicated section gives you the built-in file browser and terminal sidebar.
@@ -45,13 +45,13 @@ Open Terminal has its **own section** under Integrations — don't add it under 
 | **API Key** | The password you chose during installation |
 | **Auth Type** | Leave as `Bearer` (the default) |
 
-{/* TODO: Screenshot — The "Add connection" form filled in with the URL "http://open-terminal:8000" and an API key. Auth type shows "Bearer" selected. */}
+![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
 
 ### 5. Save
 
 Click **Save**. A green "Connected" indicator confirms the connection.
 
-{/* TODO: Screenshot — The saved connection showing a green "Connected" indicator next to the Open Terminal entry. */}
+![Connected status with green indicator](/images/open-terminal-connected.png)
 
 ### 6. (Optional) Restrict access to specific groups
 
@@ -63,9 +63,7 @@ Limit terminal access to specific user groups via the access control button.
 
 In the chat input area, click the **terminal button** (cloud icon ☁). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
 
-{/* TODO: Screenshot — The chat input bar with the Terminal button (cloud icon) highlighted. */}
-
-{/* TODO: Screenshot — The Terminal dropdown open, showing a "System" section with the admin-configured terminal listed. A checkmark appears next to the selected terminal. */}
+![Terminal dropdown showing Docs Terminal under System](/images/open-terminal-chat-dropdown.png)
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it.
 
@@ -78,7 +76,7 @@ For the AI to use terminal tools reliably, you need to enable **native function 
 3. Under **Capabilities**, enable **Native Function Calling** (also called "tool use")
 4. Save
 
-{/* TODO: Screenshot — The Model Editor showing the Capabilities section with "Native Function Calling" toggled on. */}
+![Model capabilities showing Builtin Tools enabled](/images/open-terminal-model-capabilities.png)
 
 :::warning Without this, tools may not work
 Native function calling lets the model invoke tools directly using the provider's built-in tool-calling format. Without it, Open WebUI falls back to prompt-based tool calling, which is less reliable and may not trigger terminal commands at all.
@@ -96,7 +94,7 @@ Ask your AI something like:
 
 The AI should use Open Terminal to run a command and tell you the answer.
 
-{/* TODO: Screenshot — The AI responding to "What operating system are you running on?" by executing a command and showing output like "Linux 5.15, Debian 12 (bookworm)". */}
+![AI using run_command to check the operating system](/images/open-terminal-ai-os-query.png)
 
 
 :::tip Pre-configure via environment variable
