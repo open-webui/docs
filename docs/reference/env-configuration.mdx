@@ -5170,6 +5170,30 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 :::
 
+#### `OAUTH_AUTHORIZE_PARAMS`
+
+- Type: `str` (JSON object)
+- Default: Empty string (`''`)
+- Description: A JSON object of extra query parameters to append to the OIDC authorization redirect URL. Its key/value pairs are merged into the kwargs passed to authlib's `authorize_redirect()`, which passes them verbatim to the authorization URL query string. This is useful when using an OIDC broker (such as CILogon, Keycloak, or Dex) that supports parameters to pre-select or restrict the upstream identity provider picker.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+**Common examples:**
+
+| Broker | Parameter | Example |
+|--------|-----------|---------|
+| CILogon | `idphint` | `{"idphint": "urn:mace:incommon:ucsc.edu"}` |
+| Keycloak | `kc_idp_hint` | `{"kc_idp_hint": "google"}` |
+| Dex | `connector_id` | `{"connector_id": "ldap"}` |
+| Any provider | `acr_values` | `{"acr_values": "https://refeds.org/profile/mfa"}` |
+
+Multiple parameters can be combined in a single JSON object, e.g. `{"idphint": "urn:mace:incommon:ucsc.edu", "skin": "myapp"}`.
+
+Invalid JSON is caught and logged as a warning; non-dict JSON (e.g. an array) is silently ignored. `OAUTH_AUDIENCE` behaviour is not affected.
+
+:::
+
 #### `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE`
 
 - Type: `bool`
