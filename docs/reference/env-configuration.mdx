@@ -156,6 +156,12 @@ After the admin account is created, sign-up is automatically disabled for securi
 - Default: `True`
 - Description: Allows both password and SSO authentication methods to coexist when set to True. When set to False, it disables all password-based login attempts on the /signin and /ldap endpoints, enforcing strict SSO-only authentication. Disable this setting in production environments with fully configured SSO to prevent credential-based account takeover attacks; keep it enabled if you require password authentication as a backup or have not yet completed SSO configuration. Should never be disabled if OAUTH/SSO is not being used.
 
+:::tip
+
+This SHOULD be set to `False` if you only use SSO/OAUTH for Login and expose your Open WebUI publicly as to prevent password based logins.
+
+:::
+
 :::danger
 
 This should **only** ever be set to `False` when [ENABLE_OAUTH_SIGNUP](https://docs.openwebui.com/reference/env-configuration/#enable_oauth_signup)
@@ -1096,7 +1102,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of Open Terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/extensibility/open-terminal) instance. Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Description: Specifies a JSON array of Open Terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance. Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
 - Example:
 ```json
 [
