@@ -104,7 +104,7 @@ Open Terminal is a FastAPI application that automatically exposes an [OpenAPI sp
 
 **1. Start an Open Terminal instance**
 
-Follow the [Open Terminal setup guide](/features/extensibility/open-terminal#getting-started) to launch an instance using Docker or pip.
+Follow the [Open Terminal setup guide](/features/open-terminal#getting-started) to launch an instance using Docker or pip.
 
 **2. Connect to Open WebUI**
 
@@ -119,7 +119,7 @@ Once connected, the Open Terminal tools (execute, file upload, file download) ap
 For the best experience, pair Open Terminal with a [Skill](/features/ai-knowledge/skills) that teaches the model how to use the tool effectively — for example, instructing it to always check exit codes, handle errors gracefully, and use streaming for long-running commands.
 :::
 
-See the [Open Terminal documentation](/features/extensibility/open-terminal) for the full API reference and detailed setup instructions.
+See the [Open Terminal documentation](/features/open-terminal) for the full API reference and detailed setup instructions.
 
 ## Access Control
 
