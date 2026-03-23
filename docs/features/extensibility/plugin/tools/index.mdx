@@ -206,13 +206,14 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
 | **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge — see note below.* |
-| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. **Use this first** to discover what knowledge is available. |
-| `query_knowledge_bases` | Search KB *names and descriptions* by semantic similarity. Use to find which KB is relevant when you don't know which one to query. |
-| `search_knowledge_bases` | Search knowledge bases by name/description (text match). |
-| `query_knowledge_files` | Search *file contents* inside KBs using vector search. **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
-| `search_knowledge_files` | Search files across accessible knowledge bases by filename (not content). |
-| `view_file` | Get the full content of any user-accessible file by its ID. Only injected when the model has attached knowledge files. |
-| `view_knowledge_file` | Get the full content of a file from a knowledge base. |
+| `list_knowledge` | List all knowledge bases, files, and notes attached to the current model. **Use this first** to discover what knowledge is available. When no knowledge is attached, this tool is not available — use the browsing tools instead. |
+| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. Only available when the model has **no** attached knowledge. |
+| `query_knowledge_bases` | Search KB *names and descriptions* by semantic similarity. Use to find which KB is relevant when you don't know which one to query. Only available when the model has **no** attached knowledge. |
+| `search_knowledge_bases` | Search knowledge bases by name/description (text match). Only available when the model has **no** attached knowledge. |
+| `query_knowledge_files` | Search *file contents* inside KBs using vector search (with hybrid search and reranking when enabled). **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
+| `search_knowledge_files` | Search files by filename. When the model has attached knowledge, searches are automatically scoped to attached KBs and files. When no knowledge is attached, searches all accessible KBs. |
+| `view_file` | Read the content of any user-accessible file by its ID. Supports pagination for large files via `offset` and `max_chars` parameters. Only injected when the model has attached knowledge files. |
+| `view_knowledge_file` | Read the content of a file from a knowledge base. Supports pagination for large files via `offset` and `max_chars` parameters. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
@@ -251,13 +252,14 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_web` | `query` (required), `count` (default: 5) | Array of `{title, link, snippet}` |
 | `fetch_url` | `url` (required) | Plain text content (max 50,000 chars) |
 | **Knowledge Base** | | |
+| `list_knowledge` | None | `{knowledge_bases: [{id, name, description, file_count, files: [{id, filename}]}], files: [{id, filename}], notes: [{id, title}]}` |
 | `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_bases` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` by similarity |
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of `{id, filename, content_snippet, knowledge_id}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
-| `view_file` | `file_id` (required) | `{id, filename, content, updated_at, created_at}` |
-| `view_knowledge_file` | `file_id` (required) | `{id, filename, content}` |
+| `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, updated_at, created_at}` — includes `truncated`, `total_chars`, `next_offset` when paginated |
+| `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, knowledge_id, knowledge_name}` — includes pagination metadata when truncated |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
 | `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}` — auto-displayed |
@@ -293,16 +295,20 @@ Open WebUI automatically detects and stores your timezone when you log in. This 
 :::
 
 :::warning Knowledge Tools Change Based on Attached Knowledge
-The set of knowledge tools injected into a model **changes depending on whether the model has knowledge attached** (via the Model Editor). These are **two mutually exclusive sets** — the model gets one or the other, never both.
+The set of knowledge tools injected into a model **changes depending on whether the model has knowledge attached** (via the Model Editor). The model gets different tool sets — one for scoped access, one for open exploration.
 
 **Model with attached knowledge** (files, collections, or notes):
 
 | Tool | When Available |
 |------|---------------|
-| `query_knowledge_files` | Always (auto-scoped to attached KBs) |
+| `list_knowledge` | Always — lists all attached KBs, files, and notes with file details |
+| `search_knowledge_files` | Always — auto-scoped to attached KBs and files |
+| `query_knowledge_files` | Always — auto-scoped to attached KBs |
 | `view_file` | When attached knowledge includes files or collections |
+| `view_knowledge_file` | When attached knowledge includes files or collections |
+| `view_note` | When attached knowledge includes notes |
 
-The model **does not** get the browsing tools (`list_knowledge_bases`, `search_knowledge_bases`, etc.) because it doesn't need to discover KBs — the search is automatically scoped to its attachments.
+The model **does not** get the browsing tools (`list_knowledge_bases`, `search_knowledge_bases`, etc.) because it doesn't need to discover KBs — the search is automatically scoped to its attachments. Use `list_knowledge` to see what's available.
 
 **Model without attached knowledge** (general-purpose):
 
@@ -311,9 +317,9 @@ The model **does not** get the browsing tools (`list_knowledge_bases`, `search_k
 | `list_knowledge_bases` | Discover available KBs |
 | `search_knowledge_bases` | Search KBs by name/description (text match) |
 | `query_knowledge_bases` | Search KBs by name/description (semantic similarity) |
-| `search_knowledge_files` | Search files by filename |
+| `search_knowledge_files` | Search files by filename (all accessible KBs) |
 | `query_knowledge_files` | Search file contents (vector search) |
-| `view_knowledge_file` | Read a full file from a KB |
+| `view_knowledge_file` | Read a file from a KB (with pagination) |
 
 This model has the full browsing set to autonomously discover and explore any KB the user has access to.
 :::
@@ -334,8 +340,13 @@ Attaching a knowledge base to a custom model does **not** bypass access control.
 **Solution**: Make sure users who need access to the model's knowledge also have read access to the underlying knowledge base (via access grants or group permissions in the Knowledge settings).
 :::
 
-:::info Recommended KB Tool Workflow (No Attached Knowledge)
-When using a model **without** attached knowledge:
+:::info Recommended KB Tool Workflow
+**With attached knowledge:**
+1. First call `list_knowledge` to discover attached KBs, files, and notes
+2. Use `query_knowledge_files` to search file contents (auto-scoped to attachments)
+3. Use `view_file` or `view_knowledge_file` to read specific files — use `offset` and `max_chars` for large files
+
+**Without attached knowledge:**
 1. First call `list_knowledge_bases` to discover what knowledge is available
 2. Then use `query_knowledge_files` to search file contents within relevant KBs
 3. If still empty, the files may not be embedded yet, or you may have **Full Context mode enabled** which bypasses the vector store
@@ -343,20 +354,15 @@ When using a model **without** attached knowledge:
 **Do NOT use Full Context mode with knowledge tools** — Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
 :::
 
-:::tip Knowledge Base Tools vs RAG Pipeline
-The native `query_knowledge_files` tool uses **simple vector search** with a default of 5 results. It does **not** use:
-- Hybrid search (BM25 + vector)
-- Reranking (external reranker endpoint)
-- The "Top K Reranker" admin setting
-
-For the full RAG pipeline with hybrid search and reranking, use the **File Context** capability (attach files via `#` or knowledge base assignment) instead of relying on autonomous tool calls.
+:::tip Knowledge Base Tools and Hybrid Search
+The native `query_knowledge_files` tool uses **hybrid search + reranking** when `ENABLE_RAG_HYBRID_SEARCH` is enabled in admin settings, giving you the same search quality as the standard RAG pipeline. When hybrid search is disabled, it falls back to simple vector search.
 :::
 
 :::warning Knowledge is NOT Auto-Injected in Native Mode
 **Important:** When using Native Function Calling, attached knowledge is **not automatically injected** into the conversation. The model must actively call knowledge tools to search and retrieve information.
 
 **If your model isn't using attached knowledge:**
-1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering."*
+1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering."*
 2. **Or disable Native Function Calling** for that model to restore automatic RAG injection.
 3. **Or use "Full Context" mode** for attached knowledge (click on the attachment and select "Use Entire Document") which always injects the full content.
 
@@ -396,7 +402,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `add_memory`, `replace_memory_content`, `delete_memory`, `list_memories` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_knowledge_file` | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge` / `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file` | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
