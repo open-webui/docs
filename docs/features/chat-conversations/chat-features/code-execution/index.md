@@ -73,7 +73,7 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 - **Built-in file browser** — browse, preview, create, delete, upload, and download files directly from the chat controls panel.
 - **Built-in multi-user mode** — a single container can serve multiple users with per-user Linux account isolation (good for small teams, not for large-scale deployments).
 
-For full documentation, see the [Open Terminal integration guide](/features/extensibility/open-terminal).
+For full documentation, see the [Open Terminal integration guide](/features/open-terminal).
 
 ### Terminals (Multi-Tenant Orchestrator)
 
@@ -112,4 +112,3 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 | **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ℹ️ Single container, shared resources | ✅ Horizontally scalable (Docker or Kubernetes) |
 | **Idle management** | N/A | N/A | N/A (always running) | ✅ Auto-stop after configurable timeout |
 | **License** | MIT | MIT | MIT | [Enterprise](/enterprise) |
-
