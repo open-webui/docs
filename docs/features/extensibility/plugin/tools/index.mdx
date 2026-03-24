@@ -206,14 +206,14 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
 | **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge — see note below.* |
-| `list_knowledge` | List all knowledge bases, files, and notes attached to the current model. **Use this first** to discover what knowledge is available. When no knowledge is attached, this tool is not available — use the browsing tools instead. |
-| `list_knowledge_bases` | List the user's accessible knowledge bases with file counts. Only available when the model has **no** attached knowledge. |
-| `query_knowledge_bases` | Search KB *names and descriptions* by semantic similarity. Use to find which KB is relevant when you don't know which one to query. Only available when the model has **no** attached knowledge. |
-| `search_knowledge_bases` | Search knowledge bases by name/description (text match). Only available when the model has **no** attached knowledge. |
-| `query_knowledge_files` | Search *file contents* inside KBs using vector search (with hybrid search and reranking when enabled). **This is your main tool for finding information.** When a KB is attached to the model, searches are automatically scoped to that KB. |
-| `search_knowledge_files` | Search files by filename. When the model has attached knowledge, searches are automatically scoped to attached KBs and files. When no knowledge is attached, searches all accessible KBs. |
-| `view_file` | Read the content of any user-accessible file by its ID. Supports pagination for large files via `offset` and `max_chars` parameters. Only injected when the model has attached knowledge files. |
-| `view_knowledge_file` | Read the content of a file from a knowledge base. Supports pagination for large files via `offset` and `max_chars` parameters. |
+| `list_knowledge` | List attached knowledge (KBs, files, notes). Start here when attachments exist. |
+| `list_knowledge_bases` | List accessible knowledge bases with file counts. |
+| `query_knowledge_bases` | Semantic search over KB names/descriptions to find the right KB. |
+| `search_knowledge_bases` | Text search over KB names/descriptions. |
+| `query_knowledge_files` | Search file contents via the RAG retrieval pipeline (hybrid + rerank when enabled). Main tool for finding answers in docs. |
+| `search_knowledge_files` | Search files by filename. |
+| `view_file` | Read a user-accessible file by ID with pagination (`offset`, `max_chars`). |
+| `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
@@ -239,10 +239,28 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `view_channel_message` | View a specific message or its details in a channel. |
 | `view_channel_thread` | View a full message thread/replies in a channel. |
 | **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
-| `view_skill` | Load the full instructions of a skill by name. Only skills attached to the current model (via the Model Editor's Skills selector) are accessible. |
+| `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
+
+#### Knowledge Tool Availability (At a Glance)
+
+Use this quick matrix instead of memorizing per-row caveats.
+
+| Tool | Model has attached knowledge | Model has no attached knowledge |
+|------|------------------------------|---------------------------------|
+| `list_knowledge` | ✅ | ❌ |
+| `list_knowledge_bases` | ❌ | ✅ |
+| `search_knowledge_bases` | ❌ | ✅ |
+| `query_knowledge_bases` | ❌ | ✅ |
+| `search_knowledge_files` | ✅ (auto-scoped) | ✅ (all accessible KBs) |
+| `query_knowledge_files` | ✅ (auto-scoped) | ✅ |
+| `view_file` | ✅ (when attached items include files/collections) | ❌ |
+| `view_knowledge_file` | ✅ (when attached items include files/collections) | ✅ |
+| `view_note` | ✅ (when attached items include notes) | ❌ |
+
+Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
 #### Tool Reference
 
@@ -256,7 +274,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_bases` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` by similarity |
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
-| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of `{id, filename, content_snippet, knowledge_id}` |
+| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
 | `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, updated_at, created_at}` — includes `truncated`, `total_chars`, `next_offset` when paginated |
 | `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, knowledge_id, knowledge_name}` — includes pagination metadata when truncated |
@@ -264,7 +282,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
 | `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}` — auto-displayed |
 | **Code Interpreter** | | |
-| `execute_code` | `language` (required), `code` (required) | `{output, status}` |
+| `execute_code` | `code` (required) | `{status, stdout, stderr, result}` |
 | **Memory** | | |
 | `search_memories` | `query` (required), `count` (default: 5) | Array of `{id, date, content}` |
 | `add_memory` | `content` (required) | `{status: "success", id}` |
@@ -280,10 +298,10 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_chats` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
 | **Channels** | | |
-| `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` |
-| `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{id, channel_id, content, user_name, created_at}` |
+| `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
+| `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{channel_id, channel_name, message_id, content_snippet, is_thread_reply, parent_id, created_at}` |
 | `view_channel_message` | `message_id` (required) | `{id, content, user_name, created_at, reply_count}` |
-| `view_channel_thread` | `parent_message_id` (required) | Array of `{id, content, user_name, created_at}` |
+| `view_channel_thread` | `parent_message_id` (required) | `{channel_id, channel_name, thread_id, message_count, messages: [...]}` |
 | **Skills** | | |
 | `view_skill` | `name` (required) | `{name, content}` |
 | **Time Tools** | | |
@@ -294,34 +312,12 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
 :::
 
-:::warning Knowledge Tools Change Based on Attached Knowledge
-The set of knowledge tools injected into a model **changes depending on whether the model has knowledge attached** (via the Model Editor). The model gets different tool sets — one for scoped access, one for open exploration.
+:::warning Knowledge Tool Injection Depends on Attachments
+Knowledge tool availability changes based on whether the model has attached knowledge. Use the **Knowledge Tool Availability** matrix above as the source of truth.
 
-**Model with attached knowledge** (files, collections, or notes):
-
-| Tool | When Available |
-|------|---------------|
-| `list_knowledge` | Always — lists all attached KBs, files, and notes with file details |
-| `search_knowledge_files` | Always — auto-scoped to attached KBs and files |
-| `query_knowledge_files` | Always — auto-scoped to attached KBs |
-| `view_file` | When attached knowledge includes files or collections |
-| `view_knowledge_file` | When attached knowledge includes files or collections |
-| `view_note` | When attached knowledge includes notes |
-
-The model **does not** get the browsing tools (`list_knowledge_bases`, `search_knowledge_bases`, etc.) because it doesn't need to discover KBs — the search is automatically scoped to its attachments. Use `list_knowledge` to see what's available.
-
-**Model without attached knowledge** (general-purpose):
-
-| Tool | Purpose |
-|------|---------|
-| `list_knowledge_bases` | Discover available KBs |
-| `search_knowledge_bases` | Search KBs by name/description (text match) |
-| `query_knowledge_bases` | Search KBs by name/description (semantic similarity) |
-| `search_knowledge_files` | Search files by filename (all accessible KBs) |
-| `query_knowledge_files` | Search file contents (vector search) |
-| `view_knowledge_file` | Read a file from a KB (with pagination) |
-
-This model has the full browsing set to autonomously discover and explore any KB the user has access to.
+- With attachments: the model gets scoped knowledge tools.
+- Without attachments: the model gets KB discovery tools.
+- `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 :::
 
 :::caution Attached Knowledge Still Requires User Access
@@ -362,7 +358,7 @@ The native `query_knowledge_files` tool uses **hybrid search + reranking** when 
 **Important:** When using Native Function Calling, attached knowledge is **not automatically injected** into the conversation. The model must actively call knowledge tools to search and retrieve information.
 
 **If your model isn't using attached knowledge:**
-1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering."*
+1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering. If no knowledge is attached to this model, use list_knowledge_bases first to discover available KBs."*
 2. **Or disable Native Function Calling** for that model to restore automatic RAG injection.
 3. **Or use "Full Context" mode** for attached knowledge (click on the attachment and select "Use Entire Document") which always injects the full content.
 
@@ -402,7 +398,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `add_memory`, `replace_memory_content`, `delete_memory`, `list_memories` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge` / `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file` | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file` | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
@@ -411,10 +407,10 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
 :::info Skills / view_skill — Not a Category Toggle
-The `view_skill` tool does **not** appear in the Builtin Tools category checkboxes. It is injected automatically when at least one skill is **attached to the model** via **Workspace → Models → Edit → Skills**. When skills are attached:
+The `view_skill` tool does **not** appear in the Builtin Tools category checkboxes. It is injected when at least one skill is **attached to the model** via **Workspace → Models → Edit → Skills**. When skills are attached:
 
 1. The model receives a summary of each attached skill (name + description) in its system prompt via `<available_skills>` tags
-2. The `view_skill` tool is injected so the model can load the full instructions of any attached skill on demand
+2. The `view_skill` tool is injected so the model can load full instructions on demand
 3. If no skills are attached, `view_skill` is not available
 
 Users can also select skills per-chat (via the chat input bar), which injects the skill's full content directly into the system prompt instead of requiring a `view_skill` call.

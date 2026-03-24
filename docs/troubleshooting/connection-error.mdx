@@ -295,6 +295,8 @@ Manual database manipulation should be a last resort. Always back up your databa
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER` | Inherits `AIOHTTP_CLIENT_TIMEOUT` | Timeout (seconds) for executing tool server API calls |
+| `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA` | `10` | Timeout (seconds) for loading tool server metadata/spec data |
 | `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` | `10` | Timeout (seconds) for fetching model lists |
 | `AIOHTTP_CLIENT_TIMEOUT` | `300` | General API request timeout |
 | `RESET_CONFIG_ON_START` | `false` | Reset database config to env var values on startup |

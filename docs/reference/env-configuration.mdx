@@ -633,6 +633,18 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 - Type: `int`
 - Description: Sets the timeout in seconds for fetching the model list. This can be useful in cases where network latency requires a longer timeout duration to successfully retrieve the model list.
 
+#### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`
+
+- Type: `int`
+- Default: Inherits `AIOHTTP_CLIENT_TIMEOUT` when unset
+- Description: Sets the timeout in seconds for executing tool server API calls (OpenAPI/MCP proxy calls made by Open WebUI). Use this to control how long Open WebUI waits for actual tool execution responses.
+
+:::info
+
+If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_TIMEOUT`.
+
+:::
+
 #### `AIOHTTP_CLIENT_SESSION_SSL`
 
 - Type: `bool`
@@ -643,7 +655,7 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 
 - Type: `int`
 - Default: `10`
-- Description: Sets the timeout in seconds for retrieving data from tool servers via AIOHTTP client.
+- Description: Sets the timeout in seconds for retrieving tool server metadata/configuration (for example, loading server data/spec information).
 
 #### `AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`
 
@@ -5202,6 +5214,37 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 :::info
 
 This is useful when you need a JWT access token for downstream validation or when your OAuth provider requires an audience hint for proper token generation. For Auth0, this is typically your API identifier (e.g., `https://your-api.auth0.com/api/v2/`). For Ory, specify the resource server you want to access.
+
+:::
+
+#### `OAUTH_AUTHORIZE_PARAMS`
+
+- Type: `str` (JSON object)
+- Default: `{}`
+- Description: Passes extra parameters directly to the OAuth provider's authorization endpoint during login. Use this when your provider requires custom authorize-time parameters that are not covered by dedicated variables.
+
+Common examples include parameters like `prompt`, `login_hint`, `domain_hint`, `resource`, `audience`, or provider-specific flags.
+
+```bash
+# Example (.env)
+OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com"}
+```
+
+```yaml
+# Example (docker-compose)
+environment:
+  - OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com"}
+```
+
+:::warning
+
+`OAUTH_AUTHORIZE_PARAMS` must be valid JSON and must be a JSON object (key/value map). If parsing fails, Open WebUI ignores it and logs a warning.
+
+:::
+
+:::info
+
+If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `audience` key, the value from `OAUTH_AUTHORIZE_PARAMS` takes precedence.
 
 :::
 
