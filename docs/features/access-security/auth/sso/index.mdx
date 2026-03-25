@@ -91,6 +91,14 @@ The following environment variables are required:
 1. `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly. (Usually to `https://accounts.google.com/.well-known/openid-configuration`)
 
+Optional Google-specific setting:
+
+1. `GOOGLE_OAUTH_AUTHORIZE_PARAMS` - JSON object for extra Google `/authorize` params (for example `prompt`, `login_hint`, `hd`).
+
+```bash
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
+```
+
 ### Microsoft
 
 To configure a Microsoft OAuth client, please refer to [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) on how to create a Microsoft OAuth client for a **web application**.

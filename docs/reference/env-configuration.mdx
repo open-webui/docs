@@ -4905,6 +4905,23 @@ You must also set `OPENID_PROVIDER_URL` or otherwise logout may not work.
 - Description: Sets the redirect URI for Google OAuth.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `GOOGLE_OAUTH_AUTHORIZE_PARAMS`
+
+- Type: `str` (JSON object)
+- Default: `{}`
+- Description: Adds Google-specific parameters to the OAuth `/authorize` request. Useful for Google flows that require extra parameters such as `prompt`, `login_hint`, or `hd`.
+
+```bash
+# Example (.env)
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
+```
+
+:::warning
+
+`GOOGLE_OAUTH_AUTHORIZE_PARAMS` must be valid JSON and must be a JSON object. If parsing fails, Open WebUI ignores it and logs a warning.
+
+:::
+
 ### Microsoft
 
 See https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app

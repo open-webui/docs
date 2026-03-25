@@ -54,6 +54,12 @@ OPENID_REDIRECT_URI=https://your-domain/oauth/oidc/callback
 OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com"}
 ```
 
+#### ✅ Google-specific optional authorize params:
+```bash
+# Optional: extra Google /authorize params as JSON
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
+```
+
 #### ✅ Correct Microsoft Variables:
 ```bash
 
@@ -75,6 +81,8 @@ ENABLE_OAUTH_SIGNUP=true
 :::info
 
 If your provider needs extra parameters at the `/authorize` step (for example `prompt`, `login_hint`, `domain_hint`, or `resource`), set them via `OAUTH_AUTHORIZE_PARAMS` as a JSON object.
+
+For Google-specific customization, you can also use `GOOGLE_OAUTH_AUTHORIZE_PARAMS`.
 
 :::
 
