@@ -75,10 +75,18 @@ Not all providers support the Open Responses format yet. Try:
 
 ### Streaming or tool calls behave unexpectedly
 
-This feature is experimental. If you encounter issues:
+Tool calls, re-invocations, and streaming are supported for Responses API connections. Open WebUI transparently converts between Chat Completions and Responses API formats, including tool call arguments, function call outputs, and multi-turn tool use. If you still encounter issues:
 
 1. Check the [Open WebUI Discord](https://discord.gg/5rJgQTnV4s) for known issues
 2. Report bugs on [GitHub](https://github.com/open-webui/open-webui/issues)
+
+### Stateful sessions
+
+By default, Open WebUI treats Responses API connections as **stateless** — it manages conversation history locally and sends the full context with each request. If your upstream provider supports **stateful sessions** (server-side response storage with `previous_response_id` anchoring, e.g., direct OpenAI connections), you can enable `ENABLE_RESPONSES_API_STATEFUL=true` to let the provider manage conversation state.
+
+:::warning
+Most proxies and third-party Responses API endpoints are stateless and will break if stateful mode is enabled. Only use this with providers that explicitly support stateful Responses API sessions.
+:::
 
 ---
 

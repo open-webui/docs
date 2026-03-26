@@ -129,6 +129,14 @@ Skills use the same [Access Control](/features/access-security/rbac) system as o
 - **Share with users or groups**: Use the **Access** button in the skill editor to grant `read` or `write` access to specific users or groups.
 - **Read-only access**: Users with only read access can view the skill content but cannot edit it. The editor displays a "Read Only" badge.
 
+:::caution Attached Skills Still Require User Access
+Attaching a skill to a model does **not** bypass access control. When a user chats with the model, Open WebUI checks whether **that specific user** has read access to each attached skill. Skills the user cannot access are silently excluded — the model won't receive the skill manifest and cannot call `view_skill` for it.
+
+**Example scenario**: An admin creates a private skill and attaches it to a model shared with all users. Regular users chatting with this model will **not** have the skill available because they don't have read access to the skill itself.
+
+**Solution**: Make sure users who need access to the model's skills also have read access to each skill (via access grants, group permissions, or by making the skill public). The "Workspace → Skills Access" permission controls whether users can *create and manage* skills — it does **not** affect whether model-attached skills work for them.
+:::
+
 ### Required Permissions
 
 - **Workspace → Skills Access**: Required to access the Skills workspace and create/manage skills.

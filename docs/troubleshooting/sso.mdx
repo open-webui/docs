@@ -48,6 +48,16 @@ ENABLE_OAUTH_SIGNUP=true
 OAUTH_PROVIDER_NAME=Your Provider Name
 OAUTH_SCOPES=openid email profile
 OPENID_REDIRECT_URI=https://your-domain/oauth/oidc/callback
+
+# Optional: pass provider-specific authorize params (JSON object)
+# e.g. force consent screen, prefill user/email hint
+OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com"}
+```
+
+#### ✅ Google-specific optional authorize params:
+```bash
+# Optional: extra Google /authorize params as JSON
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
 ```
 
 #### ✅ Correct Microsoft Variables:
@@ -67,6 +77,14 @@ ENABLE_OAUTH_SIGNUP=true
   - Ensure all required environment variables are set exactly as documented
   - If self-hosting, confirm these variables are present in your Docker Compose, Kubernetes manifest, or `.env` file
 - Restart your backend/app after changing variables so the new values are loaded
+
+:::info
+
+If your provider needs extra parameters at the `/authorize` step (for example `prompt`, `login_hint`, `domain_hint`, or `resource`), set them via `OAUTH_AUTHORIZE_PARAMS` as a JSON object.
+
+For Google-specific customization, you can also use `GOOGLE_OAUTH_AUTHORIZE_PARAMS`.
+
+:::
 
 :::tip
 

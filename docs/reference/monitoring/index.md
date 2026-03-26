@@ -86,7 +86,7 @@ You'll need an API key to access this endpoint. See the "Authentication Setup" s
 
 ### Authentication Setup for API Key 🔑
 
-Before you can monitor the `/api/models` endpoint, you need to configure API keys in Open WebUI. **API key access now requires a two-level permission structure**: first, the global API keys feature must be enabled, and second, individual users or groups must be granted API key creation permissions.
+Before you can monitor the `/api/models` endpoint, you need to configure API keys in Open WebUI. API key creation requires that the global API keys feature is enabled. For non-admin users, API key creation also requires the API Keys feature permission.
 
 #### Step 1: Enable API Keys Globally (Admin Required)
 
@@ -102,13 +102,16 @@ Before you can monitor the `/api/models` endpoint, you need to configure API key
 
 :::info
 
-This enables the API key feature globally but does not automatically grant users permission to create API keys. You must also configure user or group permissions in Step 2.
+This enables the API key feature globally.
+
+- Admin users can now generate API keys immediately.
+- Non-admin users still require API Keys permission (configured in Step 2).
 
 :::
 
 #### Step 2: Grant API Key Permission (Admin Required)
 
-**API key creation is disabled by default for all users, including administrators.** Admins are **not** exempt from this permission requirement—to use API keys, they must also grant themselves the permission. Administrators can grant API key permissions using one of the following methods:
+Non-admin users need explicit API Keys permission. Administrators can grant API key permissions for non-admin users using one of the following methods:
 
 ##### Option A: Grant Permission via Default Permissions
 
@@ -122,7 +125,7 @@ This grants the API Keys permission to **all users with the "user" role**:
 
 :::info
 
-**Note for Administrators:** "Default permissions" only applies to accounts with the "user" role. If you are an admin and need API key access, you must use **Option B** (User Groups)—create or select a group with API Keys enabled and add yourself to that group.
+**Note for Administrators:** "Default permissions" only applies to accounts with the "user" role. Admin accounts do not need `features.api_keys` to generate API keys, but you may still use groups to grant that permission to non-admin users.
 
 :::
 
@@ -151,7 +154,7 @@ Create a dedicated monitoring group (e.g., "Monitoring Users") and add only the 
 
 #### Step 3: Generate an API Key (User Action)
 
-Once global API keys are enabled and the user has been granted permission:
+Once global API keys are enabled (and for non-admin users, API Keys permission is granted):
 
 1. Log in to Open WebUI with a user account that has API key permissions.
 2. Click on your **profile icon** in the bottom-left corner of the sidebar.
@@ -181,7 +184,7 @@ This approach limits the potential impact if the monitoring API key is compromis
 If you don't see the API key generation option in your account settings:
 
 - **Check global setting**: Verify that an administrator has enabled API keys globally under **Admin Panel** > **Settings** > **General** > **Enable API Keys**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
-- **Check your permissions**: Verify that your user account or group has been granted the "API Keys" feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
+- **Check your permissions (non-admin users)**: Verify that your user account or group has been granted the "API Keys" feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
 
 ### Using Uptime Kuma for Model Connectivity Monitoring 🐻
 

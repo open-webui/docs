@@ -62,7 +62,41 @@ Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-
 *   **None**: Use this for **local MCP servers** or internal networks where no token is required.
     *   **⚠️ Important**: Default to "None" unless your server strictly requires a token. Selecting "Bearer" without providing a key sends an empty Authorization header (`Authorization: Bearer`), which causes many servers to reject the connection immediately.
 *   **Bearer**: Use this **only** if your MCP server requires a specific API token. You **must** populate the "Key" field.
-*   **OAuth 2.1**: For secured, enterprise deployments requiring Identity Provider flows.
+*   **OAuth 2.1**: Uses Dynamic Client Registration (DCR). Best when your MCP server supports registering OAuth clients automatically.
+*   **OAuth 2.1 (Static)**: Uses a pre-created client ID/client secret. Best when your provider does not support DCR, or when your security team requires manually managed credentials.
+
+:::tip Choosing Between OAuth 2.1 and OAuth 2.1 (Static)
+
+- Start with **OAuth 2.1** if your server supports DCR.
+- Use **OAuth 2.1 (Static)** when you already have credentials from your IdP and want Open WebUI to use those directly.
+
+:::
+
+### OAuth 2.1 (Static) Setup
+
+Use this when you already have a client ID/client secret from your identity provider.
+
+1. Open **Admin Settings → External Tools**.
+2. Click **+ (Add Server)**.
+3. Set **Type** to **MCP (Streamable HTTP)**.
+4. Enter your MCP server **URL**.
+5. In **Auth**, select **OAuth 2.1 (Static)**.
+6. Enter **Client ID** and **Client Secret**.
+7. Click **Register Client**.
+8. Click **Save**.
+
+After saving:
+
+1. Open a chat.
+2. Click **+ → Integrations → Tools**.
+3. Enable your MCP tool.
+4. Complete the OAuth consent/authorization flow in the browser redirect.
+
+:::info
+
+`Register Client` is required for both `oauth_2.1` and `oauth_2.1_static`. With static auth, Open WebUI uses your provided credentials and server metadata discovery (no dynamic client registration).
+
+:::
 
 :::warning OAuth 2.1 Tools Cannot Be Set as Default Tools
 **Do not set OAuth 2.1 MCP tools as default/pre-enabled tools on a model.** The OAuth 2.1 authorization flow requires an interactive browser redirect (user consent, callback) that cannot happen transparently during a chat completion request.

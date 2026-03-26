@@ -91,6 +91,14 @@ The following environment variables are required:
 1. `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 1. `OPENID_PROVIDER_URL` - Must be set for logout to work properly. (Usually to `https://accounts.google.com/.well-known/openid-configuration`)
 
+Optional Google-specific setting:
+
+1. `GOOGLE_OAUTH_AUTHORIZE_PARAMS` - JSON object for extra Google `/authorize` params (for example `prompt`, `login_hint`, `hd`).
+
+```bash
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
+```
+
 ### Microsoft
 
 To configure a Microsoft OAuth client, please refer to [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) on how to create a Microsoft OAuth client for a **web application**.
@@ -264,6 +272,21 @@ When a request is authenticated via `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`, and the t
 - If the header is not present or empty, the user's group memberships will not be updated.
 - User will be unassigned from groups not present in the header.
 - Group creation via trusted header is not automatic; only existing groups in Open WebUI will be assigned.
+
+#### Role Management
+
+You can use the `WEBUI_AUTH_TRUSTED_ROLE_HEADER` environment variable to control a user's role via the authenticating reverse proxy. Set this variable to the name of the HTTP header that will contain the desired role for the authenticated user.
+
+- The header value must be one of `admin`, `user`, or `pending` (case-insensitive, trimmed).
+- When the header is present and valid, the user's role is updated on every sign-in to match the header value.
+- If the header contains an invalid value, the role is not changed and a warning is logged.
+- If the header is not present or empty, the user's existing role is left unchanged.
+
+:::warning
+
+When configured, this header allows clients to set admin-level access via an HTTP header. You **must** ensure that only your trusted reverse proxy or identity provider can set this header. Allowing untrusted clients to reach Open WebUI directly would let anyone escalate to admin. This is the same security model as the other trusted headers — see the warning at the top of this section.
+
+:::
 
 ### Tailscale Serve
 

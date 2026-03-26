@@ -71,34 +71,112 @@ By leveraging custom input variables, you can move beyond static text and build 
 
 Certain system variables like `{{prompt}}` and `{{MESSAGES}}` support optional modifiers to control their length and which part of the content is included. This is particularly useful for managing context window limits.
 
+##### Prompt Modifiers
+
+The `{{prompt}}` variable supports character-based truncation:
+
 * **Start Truncation**: `{{prompt:start:N}}` - Includes only the first **N** characters of the content.
 * **End Truncation**: `{{prompt:end:N}}` - Includes only the last **N** characters of the content.
 * **Middle Truncation**: `{{prompt:middletruncate:N}}` - Includes a total of **N** characters, taking half from the beginning and half from the end, with `...` in the middle.
 
-These modifiers also work with the `{{MESSAGES}}` variable to control how many messages are included:
+##### Messages Variable: Two Types of Modifiers
 
-* `{{MESSAGES:START:5}}` - Includes only the first 5 messages.
-* `{{MESSAGES:END:5}}` - Includes only the last 5 messages.
-* `{{MESSAGES:MIDDLETRUNCATE:6}}` - Includes the first 3 and last 3 messages (split evenly).
+The `{{MESSAGES}}` variable has **two distinct modifier types** that work at different levels:
 
-#### Per-Message Content Truncation (Pipe Filters)
+| Modifier Type | Syntax | What It Controls | Example |
+| :--- | :--- | :--- | :--- |
+| **Message Selector** (colon `:`) | `{{MESSAGES:SELECTOR:N}}` | **How many messages** to include | `{{MESSAGES:END:5}}` = last 5 messages |
+| **Pipe Filter** (pipe `\|`) | `\{\{MESSAGES\|filter:N\}\}` | **Character limit per message** | `\{\{MESSAGES\|middletruncate:500\}\}` = each message to 500 chars |
 
-In addition to selecting which messages to include, you can also truncate the **content of each individual message** using pipe filters. This is especially useful for task model prompts (title generation, tags, follow-ups) where conversations contain very long messages — for example, pasted documents or code. Truncating per-message content reduces latency for local models and API costs.
+:::warning Important Distinction
 
-Pipe filters are appended after the message selector with a `|` character:
+**Message selectors control MESSAGE COUNT, not token count or character count.** 
 
-* `{{MESSAGES|middletruncate:500}}` - All messages, each truncated to 500 characters (keeping start and end with `...` in the middle).
-* `{{MESSAGES|start:300}}` - All messages, each truncated to the first 300 characters.
-* `{{MESSAGES|end:300}}` - All messages, each truncated to the last 300 characters.
+- `{{MESSAGES:MIDDLETRUNCATE:500}}` selects **500 messages** (not 500 tokens/characters)
+- If you have 600 messages, it keeps the first ~250 and last ~250 messages
+- This does **not** truncate the content of each message
 
-Pipe filters can be combined with message selectors:
+To limit content length, use **pipe filters** instead.
 
-* `{{MESSAGES:END:2|middletruncate:500}}` - Last 2 messages, each truncated to 500 characters.
-* `{{MESSAGES:START:5|start:200}}` - First 5 messages, each truncated to the first 200 characters.
+:::
+
+##### Message Selectors
+
+Message selectors control **how many messages** are included in the output:
+
+| Selector | Description | Example |
+| :--- | :--- | :--- |
+| `START:N` | First N messages | `{{MESSAGES:START:5}}` = first 5 messages |
+| `END:N` | Last N messages | `{{MESSAGES:END:5}}` = last 5 messages |
+| `MIDDLETRUNCATE:N` | First half + last half (total N messages) | `{{MESSAGES:MIDDLETRUNCATE:6}}` = first 3 + last 3 messages |
+
+**How MIDDLETRUNCATE works for messages:**
+
+If you have 20 messages and use `{{MESSAGES:MIDDLETRUNCATE:6}}`:
+- Takes the first 3 messages
+- Takes the last 3 messages  
+- Skips the 14 messages in the middle
+- Result: 6 messages total
+
+##### Pipe Filters (Per-Message Content Truncation)
+
+Pipe filters truncate the **content of each individual message** to a character limit. This is especially useful for task model prompts (title generation, tags, follow-ups) where conversations contain very long messages — for example, pasted documents or code.
+
+| Filter | Description | Example |
+| :--- | :--- | :--- |
+| `\|start:N` | First N characters of each message | `\{\{MESSAGES\|start:300\}\}` |
+| `\|end:N` | Last N characters of each message | `\{\{MESSAGES\|end:300\}\}` |
+| `\|middletruncate:N` | First half + last half of each message (N chars total) | `\{\{MESSAGES\|middletruncate:500\}\}` |
+
+##### Combining Message Selectors and Pipe Filters
+
+You can combine both modifiers to control both **which messages** are included and **how long** each message's content is:
+
+**Syntax:** `{{MESSAGES:SELECTOR:N|filter:N}}`
+
+| Combined Syntax | What It Does |
+| :--- | :--- |
+| `\{\{MESSAGES\|middletruncate:500\}\}` | All messages, each truncated to 500 characters |
+| `\{\{MESSAGES:END:2\|middletruncate:500\}\}` | Last 2 messages, each truncated to 500 characters |
+| `\{\{MESSAGES:START:5\|start:200\}\}` | First 5 messages, each truncated to first 200 characters |
+| `\{\{MESSAGES:MIDDLETRUNCATE:10\|middletruncate:50\}\}` | First 5 + last 5 messages, each truncated to 50 characters |
+
+##### Practical Examples
+
+**Example 1: Title Generation with Limited Context**
+
+```txt
+Chat history:
+<chat_history>
+{{MESSAGES:END:2|middletruncate:500}}
+</chat_history>
+
+Generate a short title for this conversation.
+```
+
+This sends only the last 2 messages, each limited to 500 characters — ideal for generating titles without processing entire pasted documents.
+
+**Example 2: Summarization with Message Sampling**
+
+```txt
+Conversation summary:
+{{MESSAGES:MIDDLETRUNCATE:10|start:300}}
+
+Summarize the key points.
+```
+
+This takes the first 5 and last 5 messages (skipping the middle), and each message is truncated to its first 300 characters.
+
+**Example 3: Avoiding Common Mistakes**
+
+| Wrong | Right | Why |
+| :--- | :--- | :--- |
+| `\{\{MESSAGES:MIDDLETRUNCATE:500\}\}` expecting 500 tokens | `\{\{MESSAGES\|middletruncate:500\}\}` | The first selects 500 **messages**, the second limits each message to 500 **characters** |
+| `\{\{MESSAGES:END:2\}\}` expecting 2000 chars | `\{\{MESSAGES:END:2\|middletruncate:1000\}\}` | Without a pipe filter, messages may be thousands of characters each |
 
 :::tip
 
-Using pipe filters on task model templates (title generation, tag generation, follow-up suggestions) is highly recommended for deployments that handle long conversations. For example, changing the title generation template to use `{{MESSAGES:END:2|middletruncate:500}}` prevents the task model from processing entire pasted documents just to generate a short title.
+Using pipe filters on task model templates (title generation, tag generation, follow-up suggestions) is highly recommended for deployments that handle long conversations. Without pipe filters, a single message containing a pasted document could consume your entire context window.
 
 :::
 
