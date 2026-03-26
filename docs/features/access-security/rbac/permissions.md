@@ -102,7 +102,7 @@ Controls access to broad platform capabilities.
 
 | Permission | Description |
 | :--- | :--- |
-| **API Keys** | Ability to generate Personal Access Tokens (API Keys) in User Settings. |
+| **API Keys** | Ability for non-admin users to generate Personal Access Tokens (API Keys) in User Settings. |
 | **Notes** | Access to the "Notes" feature. |
 | **Channels** | Access to the "Channels" feature. |
 | **Folders** | Ability to use folders for organizing chats. |
@@ -119,18 +119,13 @@ Controls access to user settings areas.
 | :--- | :--- |
 | **Interface Settings Access** | Ability to access and modify interface settings in user settings. |
 
-:::warning Permissions That Apply to Admins
+:::info API Keys Permission Scope
 
-Certain permissions apply to **all users including administrators**. Currently, this includes:
+For API key creation:
 
-- **API Keys** (`features.api_keys`) — Administrators must have this permission to generate API keys, just like regular users.
-
-**More permissions may be added to this category in future versions.** As Open WebUI evolves, additional security-sensitive features may require explicit permission grants even for admins.
-
-**API Keys Specifics:**
 1.  **Global Toggle Required**: The feature must be enabled globally in **Admin Settings > General > Enable API Keys**. If this is off, *no one* can generate keys.
-2.  **Permission Check Required**: The user must have the `features.api_keys` permission.
-3.  **Admins Are Not Exempt**: Administrators are subject to the same permission checks as regular users for this feature.
+2.  **Permission Check for Non-Admins**: Users with the `user` role must have the `features.api_keys` permission.
+3.  **Admins Are Exempt from `features.api_keys`**: Users with the `admin` role can generate API keys when API keys are globally enabled, even without that specific permission.
 
 :::
 
@@ -140,7 +135,7 @@ Certain permissions apply to **all users including administrators**. Currently, 
 
 1.  **Create an "Administrators" group** via **Admin Panel > Users > Groups**
 2.  **Add all admin users** to this group
-3.  **Grant necessary permissions** to the group (e.g., API Keys, and any future admin-applicable permissions)
+3.  **Grant user-facing feature permissions** to the group as needed (for example, API Keys for non-admin group members)
 
 This approach ensures that when new permissions are added that apply to admins, you can easily grant them to all administrators via the group rather than modifying individual user settings. It also provides fine-grained control over which admins have access to which features.
 

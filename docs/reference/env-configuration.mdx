@@ -1332,11 +1332,11 @@ This variable replaces the deprecated `ENABLE_API_KEY` environment variable.
 
 :::info
 
-For API Key creation (and the API keys themselves) to work, you need **both**:
+For API Key creation (and the API keys themselves) to work:
 1. Enable API keys globally using this setting (`ENABLE_API_KEYS`)
-2. Grant the "API Keys" permission to users via Default Permissions or User Groups
+2. For non-admin users, grant the "API Keys" permission via Default Permissions or User Groups
 
-**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
+**Note:** Administrators can generate API keys whenever `ENABLE_API_KEYS` is enabled, even without `features.api_keys`. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
@@ -5608,11 +5608,11 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 :::info
 
-For API Key creation (and the API keys themselves) to work, you need **both**:
-1. Grant the "API Keys" permission to users via this setting or User Groups
-2. Enable API keys globally using `ENABLE_API_KEYS`
+For API Key creation (and the API keys themselves):
+1. This setting controls API key creation permission for non-admin users (directly or via User Groups)
+2. API keys must also be globally enabled using `ENABLE_API_KEYS`
 
-**Note:** Administrators are not exempt—they must also be granted the permission via a User Group to use API keys. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
+**Note:** Administrators can generate API keys whenever `ENABLE_API_KEYS` is enabled, even without `features.api_keys`. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
 
 :::
 
