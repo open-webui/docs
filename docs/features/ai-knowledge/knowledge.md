@@ -48,11 +48,13 @@ When using **Native Function Calling (Agentic Mode)**, quality models can intera
 Autonomous knowledge base exploration works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can intelligently search, browse, and synthesize information from multiple documents. Small local models may struggle with multi-step knowledge retrieval.
 :::
 
-- **`query_knowledge_bases`**: Search across knowledge bases using semantic/vector search. This should be the model's first choice for finding information before searching the web.
-- **`list_knowledge_bases`**: Browse available knowledge bases with file counts.
-- **`search_knowledge_bases`**: Find specific knowledge bases by name or description.
-- **`search_knowledge_files`**: Locate files within knowledge bases by filename.
-- **`view_knowledge_file`**: Read the full content of a specific file from a knowledge base.
+- **`list_knowledge`**: List all knowledge bases, files, and notes attached to the current model with file details. **Use this first** to discover what knowledge is available. Only available when the model has attached knowledge.
+- **`query_knowledge_files`**: Search file contents using retrieval over the configured RAG pipeline (including hybrid search/reranking when `ENABLE_RAG_HYBRID_SEARCH` is enabled). When a KB is attached to the model, searches are automatically scoped. This should be the model's first choice for finding information before searching the web.
+- **`search_knowledge_files`**: Search files by filename. Available in both modes; auto-scopes to attached KBs when the model has attached knowledge.
+- **`list_knowledge_bases`**: Browse available knowledge bases with file counts. Only available when the model has **no** attached knowledge.
+- **`search_knowledge_bases`**: Find specific knowledge bases by name or description. Only available when the model has **no** attached knowledge.
+- **`query_knowledge_bases`**: Search KB names/descriptions by semantic similarity. Only available when the model has **no** attached knowledge.
+- **`view_file`** / **`view_knowledge_file`**: Read file content with pagination support (`offset` and `max_chars` parameters for large files, default 10K chars, hard cap 100K).
 
 These tools enable models to autonomously explore and retrieve information from your knowledge bases, making conversations more contextually aware and grounded in your stored documents.
 
@@ -65,6 +67,22 @@ When native function calling is enabled, the model's access to knowledge bases d
 | **No KB attached** | Model can access **all** knowledge bases the user has access to (public KBs, user's own KBs) |
 | **KB attached to model** | Model is **limited** to only the attached knowledge base(s) |
 
+Knowledge tool availability at a glance:
+
+| Tool | Model has attached knowledge | Model has no attached knowledge |
+|------|------------------------------|---------------------------------|
+| `list_knowledge` | ✅ | ❌ |
+| `list_knowledge_bases` | ❌ | ✅ |
+| `search_knowledge_bases` | ❌ | ✅ |
+| `query_knowledge_bases` | ❌ | ✅ |
+| `search_knowledge_files` | ✅ (auto-scoped) | ✅ (all accessible KBs) |
+| `query_knowledge_files` | ✅ (auto-scoped) | ✅ |
+| `view_file` | ✅ (when attached items include files/collections) | ❌ |
+| `view_knowledge_file` | ✅ (when attached items include files/collections) | ✅ |
+| `view_note` | ✅ (when attached items include notes) | ❌ |
+
+Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
+
 :::warning Knowledge is NOT Auto-Injected with Native Function Calling
 
 **Important behavioral difference:** When using Native Function Calling, attached knowledge is **not automatically injected** into the conversation. Instead, the model must actively call the knowledge tools to search and retrieve information.
@@ -72,7 +90,7 @@ When native function calling is enabled, the model's access to knowledge bases d
 **If your model isn't using attached knowledge:**
 
 1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. For example:
-   > "When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering."
+   > "When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering. If no knowledge is attached to this model, use list_knowledge_bases first to discover available KBs."
 
 2. **Or disable Native Function Calling** for that model to restore the automatic RAG injection behavior from earlier versions.
 
@@ -92,6 +110,7 @@ When attaching files, notes, or knowledge bases to a model, you can choose betwe
 
 - Uses **RAG (Retrieval Augmented Generation)** to find relevant chunks
 - Only injects the most relevant portions of documents based on the user's query
+- When **hybrid search** is enabled (`ENABLE_RAG_HYBRID_SEARCH`), retrieval uses BM25 keyword search combined with vector search, plus reranking for improved accuracy — this applies to both the standard RAG pipeline and native knowledge tool retrieval paths
 - Best for large documents or knowledge bases where only specific sections are relevant
 - With native function calling enabled, the model decides when to search
 

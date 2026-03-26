@@ -23,7 +23,7 @@ The Admin role is designed for system maintainers.
 :::warning Admin Limitations & Best Practices
 While Administrators generally have unrestricted access, certain system configurations can limit their capabilities for security and privacy:
 *   **Privacy Controls**: Environment variables like `ENABLE_ADMIN_CHAT_ACCESS=False` can prevent Admins from viewing user chats.
-*   **Strict Feature Checks**: Critical security features like **API Keys** (`features.api_keys`) require explicit permission, even for Admins.
+*   **Feature-Specific Exceptions May Apply**: Some features can enforce additional checks beyond the standard admin bypass behavior. For API keys specifically, admins can generate keys whenever `ENABLE_API_KEYS` is enabled.
 *   **Access Control Exceptions**: If `BYPASS_ADMIN_ACCESS_CONTROL` is disabled, Admins may require explicit permissions to access private model/knowledge/notes resources.
 
 For a robust security posture, we recommend including Admins in your permission schema (via Groups) rather than relying solely on the role's implicit bypasses. This ensures consistent access if bypass limitations are ever enabled.
@@ -159,4 +159,3 @@ spec:
 :::
 
 For complete documentation on these environment variables, see the [Environment Configuration Guide](/reference/env-configuration#webui_admin_email).
-
