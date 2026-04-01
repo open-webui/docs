@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation was created/updated based on version 0.8.6 and updated for recent migrations.
+> This documentation reflects schema changes up to Open WebUI v0.8.13.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -85,6 +85,8 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 29      | tag              | Manages tags/labels for content categorization               |
 | 30      | tool             | Stores configurations for system tools and integrations      |
 | 31      | user             | Maintains user profiles and account information              |
+| 32      | automation       | Stores user-defined scheduled automations                    |
+| 33      | automation_run   | Stores execution history for automation runs                 |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -189,6 +191,50 @@ Things to know about the channel_file table:
 | pinned          | Boolean       | default=False, nullable | Pin status               |
 | meta            | JSON          | server_default="{}"     | Metadata including tags  |
 | folder_id       | Text          | nullable                | Parent folder ID         |
+| tasks           | JSON          | nullable                | Chat-level task/todo list used by agentic workflows |
+| summary         | Text          | nullable                | Optional chat summary text |
+| last_read_at    | BigInteger    | nullable                | Last read timestamp used for unread indicators |
+
+Things to know about the chat table:
+
+- `tasks` and `summary` support structured planning/status UX in chat sessions.
+- `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
+
+## Automation Table
+
+| **Column Name** | **Data Type** | **Constraints**         | **Description** |
+| --------------- | ------------- | ----------------------- | --------------- |
+| id              | Text          | PRIMARY KEY             | Unique identifier (UUID) |
+| user_id         | Text          | NOT NULL                | Owner of the automation |
+| name            | Text          | NOT NULL                | Automation display name |
+| data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional terminal config) |
+| meta            | JSON          | nullable                | Optional metadata |
+| is_active       | Boolean       | NOT NULL, default=True  | Active/paused state |
+| last_run_at     | BigInteger    | nullable                | Last execution time |
+| next_run_at     | BigInteger    | nullable                | Next scheduled execution time |
+| created_at      | BigInteger    | NOT NULL                | Creation timestamp |
+| updated_at      | BigInteger    | NOT NULL                | Last update timestamp |
+
+Things to know about the automation table:
+
+- `next_run_at` is indexed for efficient due-run polling.
+- `data.rrule` defines recurrence and drives scheduler calculations.
+
+## Automation Run Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description** |
+| --------------- | ------------- | --------------- | --------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID) |
+| automation_id   | Text          | NOT NULL        | Reference to automation |
+| chat_id         | Text          | nullable        | Chat created by this run (if available) |
+| status          | Text          | NOT NULL        | Run status (`success` / `error`) |
+| error           | Text          | nullable        | Error details when status is `error` |
+| created_at      | BigInteger    | NOT NULL        | Execution record timestamp |
+
+Things to know about the automation_run table:
+
+- Indexed by `automation_id` for fast per-automation run history queries.
+- Rows are deleted when an automation is deleted.
 
 ## Chat File Table
 
@@ -896,4 +942,3 @@ To use SQLCipher with existing data, you must either:
 | `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |
 
 For more details, see the [Environment Variable Configuration](/reference/env-configuration) documentation.
-
