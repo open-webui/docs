@@ -148,7 +148,7 @@ These tools are specifically designed to help administrators quickly manage exte
 Administrators can set **global default metadata and parameters** that apply as a baseline to all models. This eliminates the need to manually configure capabilities and inference settings for every model individually.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Sets baseline capabilities (vision, web search, file context, code interpreter, builtin tools, etc.) and other model metadata for all models. For capabilities, defaults and per-model values are merged — per-model overrides always win on conflicts. For other metadata fields, the global default is only applied when a model has no value set.
-- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Sets baseline inference parameters (temperature, top_p, max_tokens, seed, function_calling, etc.) for all models. Per-model parameter overrides always take precedence — but only when a per-model value is explicitly set.
+- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Sets baseline inference parameters (temperature, top_p, max_tokens, seed, function_calling, etc.) for all models. Per-model parameter overrides always take precedence — but only when a per-model value is explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
 
 These settings are accessible via **Admin Settings → Models → ⚙️ (gear icon)** and are persisted via `PersistentConfig`. See [`DEFAULT_MODEL_METADATA`](/reference/env-configuration#default_model_metadata) and [`DEFAULT_MODEL_PARAMS`](/reference/env-configuration#default_model_params) for details.
 
