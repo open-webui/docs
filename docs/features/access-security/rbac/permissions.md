@@ -111,6 +111,18 @@ Controls access to broad platform capabilities.
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
 | **Memories** | Access to the Memories feature for persistent user context. |
+| **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
+
+:::info Automations Permission Scope
+
+For Automations access:
+
+1. **Permission Check for Non-Admins**: Users with the `user` role need **Features > Automations** (`features.automations`).
+2. **Admins Are Exempt from `features.automations`**: Users with the `admin` role can access Automations without that specific permission.
+
+Default permission can be configured via [`USER_PERMISSIONS_FEATURES_AUTOMATIONS`](/reference/env-configuration#user_permissions_features_automations).
+
+:::
 
 ### 5. Settings Permissions
 Controls access to user settings areas.
