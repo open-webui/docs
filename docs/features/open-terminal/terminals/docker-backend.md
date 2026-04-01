@@ -164,9 +164,11 @@ All orchestrator settings are configured via environment variables prefixed with
 
 The orchestrator supports **policies** — named environment configurations that let you offer different setups to different teams. For example, a `data-science` policy might use a larger image with pre-installed Python packages, while a `development` policy uses the default slim image.
 
-Policies are managed via the orchestrator's REST API (`/api/v1/policies`) or through the Open WebUI Admin Panel under **Settings → Integrations → Open Terminal → Policies**.
+Policies are managed via the orchestrator's REST API (`/api/v1/policies`). Each policy is then referenced by a terminal connection in Open WebUI under **Settings → Connections**.
 
 When a policy is configured, requests are routed through `/p/{policy_id}/` — for example, `/p/data-science/execute`.
+
+👉 **[See the Policies guide for full details →](./policies.md)**
 
 ---
 

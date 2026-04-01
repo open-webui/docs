@@ -60,12 +60,15 @@ Policies let you define different terminal environments for different teams or u
 
 - **Container image** — use a custom image with pre-installed tools for data science, web development, etc.
 - **Resource limits** — set CPU, memory, and storage caps per policy
-- **Pre-installed packages** — apt and pip packages installed on first launch
-- **Environment variables** — inject configuration into terminal containers
+- **Environment variables** — inject API keys, egress filtering rules, or custom configuration into terminal containers
+- **Persistent storage** — choose per-user or shared volumes with configurable size
+- **Idle timeout** — automatically reclaim resources after a period of inactivity
 
-Policies are managed via the orchestrator's REST API or through the Open WebUI Admin Panel under **Settings → Integrations → Open Terminal → Policies**.
+Policies are managed via the orchestrator's REST API. Each policy is then wired to a terminal connection in Open WebUI under **Settings → Connections**, where you can also restrict access by group.
 
 When multiple policies are configured, Open WebUI shows them as separate terminal connections that users (or groups) can be granted access to.
+
+👉 **[Policies deep-dive →](./policies.md)**
 
 ---
 
