@@ -5604,6 +5604,24 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables Automations access for non-admin users. When enabled, users can access `/automations` and manage their own scheduled automations.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This setting maps to **Features > Automations** in RBAC permissions.
+
+- Non-admin users need this permission to access and use Automations.
+- Admin users are exempt from this specific permission check.
+
+See [Permissions](/features/access-security/rbac/permissions#4-features-permissions) for role/permission behavior.
+
+:::
+
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
 
 - Type: `str`
