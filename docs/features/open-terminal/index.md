@@ -76,3 +76,12 @@ Open Terminal requires models with **native function calling** support. Frontier
 - **[System automation](./use-cases/system-automation)** — file management, backups, batch operations
 - **[Advanced workflows](./use-cases/advanced-workflows)** — skills for data reports, research, code review, and more
 - **[File browser](./file-browser)** — uploading, previewing, editing files
+
+---
+
+## Enterprise Multi-User
+
+Need isolated, per-user terminal containers for your team? **[Terminals](./terminals/)** provisions a dedicated Open Terminal instance for every user with automatic lifecycle management, resource controls, and policy-based environments.
+
+- **[Docker Backend](./terminals/docker-backend)** — single Docker host deployment with Docker Compose
+- **[Kubernetes Operator](./terminals/kubernetes-operator)** — production-grade deployment via the Open WebUI Helm chart

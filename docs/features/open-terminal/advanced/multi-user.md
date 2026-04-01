@@ -58,13 +58,33 @@ Each user sees only their own files in the file browser.
 This mode gives everyone their own workspace, but they're all running inside the same container. If one user runs a script that uses too much memory, it can slow things down for everyone. Use this for small, trusted groups — not for wide-open deployments.
 :::
 
-{/* TODO: Screenshot — A simple diagram showing a single container with multiple user accounts inside it. Each user has a private home directory but shares system resources. */}
+```mermaid
+flowchart LR
+    OW["Open WebUI"]
+
+    subgraph container ["Single Open Terminal Container"]
+        direction TB
+        UA["/home/user-a"]
+        UB["/home/user-b"]
+        UC["/home/user-c"]
+        SH["Shared: CPU, memory,<br/>packages, network"]
+    end
+
+    OW --> container
+
+    style OW fill:#4a90d9,color:#fff
+    style UA fill:#27ae60,color:#fff
+    style UB fill:#27ae60,color:#fff
+    style UC fill:#27ae60,color:#fff
+    style SH fill:#e67e22,color:#fff
+    style container fill:#f0f0f0,stroke:#ccc
+```
 
 ---
 
 ## Option 2: Per-user containers with Terminals
 
-For larger deployments or when you need real isolation, [**Terminals**](https://github.com/open-webui/terminals) gives each user their own container, completely separate from everyone else.
+For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, completely separate from everyone else.
 
 - **Full isolation** — each user's container is independent with its own files, processes, and resources
 - **On-demand provisioning** — containers are created when users start a session and cleaned up when idle
@@ -72,15 +92,35 @@ For larger deployments or when you need real isolation, [**Terminals**](https://
 - **Multiple environments** — different setups for different teams (e.g., data science, development)
 - **Kubernetes support** — works with Docker, Kubernetes, and k3s
 
-{/* TODO: Screenshot — Architecture diagram showing Terminals as a management layer between Open WebUI and multiple Open Terminal containers (one per user). */}
+```mermaid
+flowchart LR
+    OW["Open WebUI"]
+    OR["Orchestrator"]
+    OW --> OR
+    OR --> CA["Container<br/>User A"]
+    OR --> CB["Container<br/>User B"]
+    OR --> CC["Container<br/>User C"]
 
-See the [Terminals repository](https://github.com/open-webui/terminals) for setup instructions and documentation.
+    style OW fill:#4a90d9,color:#fff
+    style OR fill:#e67e22,color:#fff
+    style CA fill:#27ae60,color:#fff
+    style CB fill:#27ae60,color:#fff
+    style CC fill:#27ae60,color:#fff
+```
+
+Two deployment backends are available:
+
+- **[Docker Backend](../terminals/docker-backend)** — runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
+- **[Kubernetes Operator](../terminals/kubernetes-operator)** — production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
-Terminals requires an [Open WebUI Enterprise License](https://github.com/open-webui/terminals/blob/main/LICENSE).
+Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
 :::
 
 ## Related
 
+- [Terminals overview →](../terminals/)
+- [Terminals: Docker Backend →](../terminals/docker-backend)
+- [Terminals: Kubernetes Operator →](../terminals/kubernetes-operator)
 - [Security best practices →](./security)
 - [All configuration options →](./configuration)
