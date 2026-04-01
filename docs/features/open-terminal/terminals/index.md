@@ -27,13 +27,13 @@ flowchart LR
 
 ## Why Terminals?
 
-Open Terminal's [built-in multi-user mode](../advanced/multi-user#option-1-built-in-multi-user-mode) works well for small, trusted teams — but everyone shares the same container, CPU, memory, and network. Terminals solves this by giving each user a dedicated container:
+Open Terminal's [built-in multi-user mode](../advanced/multi-user#option-1-built-in-multi-user-mode) works well for small, trusted teams — but everyone shares the same container, CPU, memory, and network. This approach does not scale well beyond a few users, or enable multi-team approaches. Terminals solves these issues by giving each user a dedicated container:
 
 | | Built-in multi-user | Terminals |
 | :--- | :--- | :--- |
 | **Isolation** | Separate files, shared system | Fully separate containers |
 | **Resources** | Shared CPU, memory, network | Per-user CPU, memory, and storage limits |
-| **Provisioning** | Always running | On-demand — created on first use, cleaned up when idle |
+| **Provisioning** | Always running | On-demand. Created on first use, cleaned up when idle |
 | **Environments** | One setup for everyone | Multiple policies for different teams |
 | **Infrastructure** | Single container | Docker host or Kubernetes cluster |
 | **Best for** | Small trusted teams | Production, larger teams, untrusted users |
@@ -47,8 +47,8 @@ Terminals sits between Open WebUI and the Open Terminal instances:
 1. A user activates a terminal in Open WebUI.
 2. Open WebUI proxies the request to the **Terminals orchestrator**.
 3. The orchestrator provisions a personal Open Terminal container for that user (or reconnects to an existing one).
-4. All traffic is proxied through the orchestrator — the user never connects to their container directly.
-5. Idle containers are automatically cleaned up after a configurable timeout. Data persists across sessions.
+4. All traffic is proxied through the orchestrator. The user never connects to their container directly.
+5. Idle containers are automatically cleaned up after a configurable timeout. Data optionally persists across sessions.
 
 The orchestrator also exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can execute commands, read files, and run code — all scoped to the requesting user's container.
 
