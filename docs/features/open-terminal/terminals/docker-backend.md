@@ -65,7 +65,7 @@ services:
     environment:
       # Point Open WebUI at the orchestrator.
       # This is auto-detected as an orchestrator connection.
-      - TERMINAL_SERVER_CONNECTIONS=[{"id":"terminals","name":"Terminals","enabled":true,"url":"http://terminals:8080","key":"${TERMINALS_API_KEY}","auth_type":"bearer","config":{"access_grants":[{"principal_type":"user","principal_id":"*","permission":"read"}]}}]
+      - TERMINAL_SERVER_CONNECTIONS=[{"id":"terminals","name":"Terminals","enabled":true,"url":"http://terminals:3000","key":"${TERMINALS_API_KEY}","auth_type":"bearer","config":{"access_grants":[{"principal_type":"user","principal_id":"*","permission":"read"}]}}]
     volumes:
       - open-webui:/app/backend/data
     networks:
@@ -79,7 +79,7 @@ services:
       - TERMINALS_BACKEND=docker
       - TERMINALS_API_KEY=${TERMINALS_API_KEY}
       - TERMINALS_IMAGE=ghcr.io/open-webui/open-terminal:latest
-      - TERMINALS_NETWORK=open-webui_webui
+      - TERMINALS_NETWORK=open-webui-network
       - TERMINALS_IDLE_TIMEOUT_MINUTES=30
     volumes:
       # The orchestrator needs Docker socket access to manage containers.
@@ -95,6 +95,7 @@ volumes:
 
 networks:
   webui:
+    name: open-webui-network
 ```
 
 :::warning Docker socket access
