@@ -12,6 +12,12 @@ Administrators can manage permissions in two primary ways:
 
 Users with the `Pending` role have no access until approved, `Admin` users have full administrative access, and `User` accounts are subject to the permission system described below.
 
+:::warning RBAC Scope Boundary
+RBAC permissions control what users can do inside Open WebUI.
+
+RBAC does not replace provider-side least-privilege design. For OpenAI-compatible providers/proxies (including LiteLLM), configure credentials with the minimum required scope for your deployment.
+:::
+
 :::info Permission Logic
 Permissions in Open WebUI are **additive**.
 *   A user's effective permissions are the combination of **Global Defaults** and all their **Group Memberships**.

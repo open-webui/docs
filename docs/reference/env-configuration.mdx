@@ -847,6 +847,12 @@ By default, audit logging uses **blacklist mode** — all paths are logged excep
 - Example: `sk-124781258123`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+:::warning Provider Key Scope (Important)
+For OpenAI-compatible backends and proxies (including LiteLLM), configure least-privilege keys for regular user traffic whenever possible.
+
+Do not use provider management/master keys unless your deployment explicitly requires that trust level.
+:::
+
 #### `OPENAI_API_KEYS`
 
 - Type: `str`
