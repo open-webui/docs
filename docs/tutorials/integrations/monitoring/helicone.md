@@ -3,13 +3,13 @@ title: "Helicone"
 sidebar_position: 19
 ---
 
+# Helicone Integration with Open WebUI
+
 :::warning
 
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 
 :::
-
-# Helicone Integration with Open WebUI
 
 Helicone is an open-source LLM observability platform for developers to monitor, debug, and improve **production-ready** applications, including your Open WebUI deployment.
 

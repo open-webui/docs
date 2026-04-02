@@ -26,7 +26,12 @@ import PythonUpdating from './tab-python/PythonUpdating.md';
 
 :::info
 
-**Important Note on User Roles and Privacy:**
+### Platform Compatibility
+Open WebUI works on macOS, Linux (x86_64 and ARM64, including Raspberry Pi and other ARM boards like NVIDIA DGX Spark), and Windows.
+
+:::
+
+:::tip User Roles and Privacy
 
 - **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
 - **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
@@ -91,15 +96,6 @@ Choose your preferred installation method below:
           <WSL />
         </div>
       </TabItem>
-      <TabItem value="development" label="Beta/Development">
-        <div className='mt-5'>
-
-### Beta/Development
-
-Want to test the latest features or contribute to Open WebUI? Use the `:dev` Docker tag to run the latest development build, or check out the [Local Development Guide](/getting-started/development) to set up a full dev environment from source.
-
-        </div>
-      </TabItem>
     </Tabs>
 
   </TabItem>
@@ -127,16 +123,6 @@ Want to test the latest features or contribute to Open WebUI? Use the `:dev` Doc
 
       </TabItem>
 
-      <TabItem value="development" label="Beta/Development">
-        <div className='mt-5'>
-
-### Beta/Development
-
-Want to test the latest features or contribute to Open WebUI? Our [Local Development Guide](/getting-started/development) walks you through cloning the repo, setting up the frontend and backend, and getting a full dev environment running from source.
-
-        </div>
-      </TabItem>
-
     </Tabs>
   </TabItem>
 
@@ -146,6 +132,20 @@ Want to test the latest features or contribute to Open WebUI? Our [Local Develop
         <Helm />
       </TabItem>
     </Tabs>
+  </TabItem>
+
+  <TabItem value="desktop" label="Desktop">
+
+### Desktop App
+
+Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It offers a convenient way to run Open WebUI natively on your system without Docker or manual setup.
+
+:::warning Experimental
+
+The desktop app is actively a **work in progress** and is not yet stable. For production use, we recommend installing via **Docker** or **Python (`uv` or `pip`)**.
+
+:::
+
   </TabItem>
 
   <TabItem value="third-party" label="Third Party">
@@ -181,6 +181,8 @@ If you're using Open WebUI with Ollama, be sure to check out our [Starting with 
 
 ## Experimental: Open Responses
 Open WebUI has experimental support for the [Open Responses](https://www.openresponses.org/) specification. See the [Starting with Open Responses Guide](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) to learn how to enable it.
+
+
 
 ## Help Us Improve Open WebUI 🧪
 

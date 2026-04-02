@@ -5,6 +5,7 @@ import { themes as prismThemes } from "prism-react-renderer";
 
 const config: Config = {
 	title: "Open WebUI",
+	titleDelimiter: "/",
 	tagline: "On a mission to build the best AI interface",
 	favicon: "images/favicon.png",
 
@@ -99,10 +100,6 @@ const config: Config = {
 			],
 		},
 		footer: {
-			logo: {
-				src: "images/logo-dark.png",
-				height: 100,
-			},
 			style: "light",
 			links: [
 				{

@@ -2,13 +2,13 @@
 title: "Iterm2 AI Integration"
 ---
 
+# Use your Open WebUI models with Iterm2
+
 :::warning
 
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/contributing).
 
 :::
-
-# Use your Open WebUI models with Iterm2
 
 You can use your Open WebUI models within the Iterm2 AI plugin. This guide shows you how to set up the necessary configuration.
 
