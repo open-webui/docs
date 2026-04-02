@@ -50,7 +50,7 @@
 }
 
 /* Mobile nav height fix */
-@media screen and (width <=996px) {
+@media screen and (width <= 996px) {
 	:root {
 		--ifm-navbar-height: 100%;
 	}
@@ -381,7 +381,7 @@ article p a {
 }
 
 /* ─── Article max width ─── */
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	article {
 		max-width: 700px;
 		margin-left: auto;
@@ -391,7 +391,7 @@ article p a {
 }
 
 /* ─── Heading sizes ─── */
-@media screen and (width <=996px) {
+@media screen and (width <= 996px) {
 	h1 {
 		font-size: 1.5rem !important;
 		font-weight: 600;
@@ -407,7 +407,7 @@ article p a {
 	}
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	h1 {
 		font-size: 1.75rem !important;
 	}
@@ -659,7 +659,7 @@ a.footer__link-item:hover {
 	gap: 0.25rem;
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.header-github-link,
 	.header-discord-link {
 		font-size: 0;
@@ -701,7 +701,7 @@ a.footer__link-item:hover {
 }
 
 /* ─── Sidebar menu spacing ─── */
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.menu_node_modules-\@docusaurus-theme-classic-lib-theme-DocSidebar-Desktop-Content-styles-module {
 		padding: 0 !important;
 	}
@@ -759,9 +759,7 @@ a.footer__link-item:hover {
 [data-theme="dark"] .homepage-svg path {
 	filter: invert(1);
 }
-
-
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.hero--container {
 		padding: 60px 200px;
 	}
