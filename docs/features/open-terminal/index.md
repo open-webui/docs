@@ -71,10 +71,16 @@ Open Terminal requires models with **native function calling** support. Frontier
 
 ## Use Cases
 
-- **[Code execution](./use-cases/code-execution)** - write, run, and debug scripts
-- **[Software development](./use-cases/software-development)** - repos, tests, debugging, refactoring, Git
-- **[Document & data analysis](./use-cases/file-analysis)** - spreadsheets, PDFs, Word docs, emails
-- **[Web development](./use-cases/web-development)** - build and preview websites
-- **[System automation](./use-cases/system-automation)** - file management, backups, batch operations
-- **[Advanced workflows](./use-cases/advanced-workflows)** - skills for data reports, research, code review, and more
-- **[File browser](./file-browser)** - uploading, previewing, editing files
+- **[Code execution](./use-cases/code-execution)** — write, run, and debug scripts
+- **[Software development](./use-cases/software-development)** — repos, tests, debugging, refactoring, Git
+- **[Document & data analysis](./use-cases/file-analysis)** — spreadsheets, PDFs, Word docs, emails
+- **[Web development](./use-cases/web-development)** — build and preview websites
+- **[System automation](./use-cases/system-automation)** — file management, backups, batch operations
+- **[Advanced workflows](./use-cases/advanced-workflows)** — skills for data reports, research, code review, and more
+- **[File browser](./file-browser)** — uploading, previewing, editing files
+
+---
+
+## Enterprise Multi-User
+
+Need isolated, per-user terminal containers for your team? **[Terminals](./terminals/)** provisions a dedicated Open Terminal instance for every user with automatic lifecycle management, resource controls, and policy-based environments.
