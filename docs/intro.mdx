@@ -7,281 +7,105 @@ hide_title: true
 
  
 import { SponsorList } from "@site/src/components/SponsorList";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # Open WebUI
 
-
-**Open WebUI is an [extensible](https://docs.openwebui.com/features/extensibility/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It is built around universal standards, supporting **Ollama** and **OpenAI-compatible Protocols** (specifically Chat Completions). This protocol-first approach makes it a powerful, provider-agnostic AI deployment solution for both local and cloud-based models.
-
-
-Passionate about open-source AI? [Join our team →](https://careers.openwebui.com/)
-
-
-![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
-![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/open-webui/open-webui?style=social)
-![GitHub repo size](https://img.shields.io/github/repo-size/open-webui/open-webui)
-![GitHub language count](https://img.shields.io/github/languages/count/open-webui/open-webui)
-![GitHub top language](https://img.shields.io/github/languages/top/open-webui/open-webui)
-![GitHub last commit](https://img.shields.io/github/last-commit/open-webui/open-webui?color=red)
-[![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
-[![Image Description](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/tjbck)
+**Open WebUI is an [extensible](https://docs.openwebui.com/features/extensibility/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It supports **Ollama** and **OpenAI-compatible APIs**, making it a powerful, provider-agnostic solution for both local and cloud-based models.
 
 ![Open WebUI Demo](/images/demo.png)
 
-:::tip
+![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
+![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
+[![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
 
-**Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** — **[Speak with Our Sales Team Today!](https://docs.openwebui.com/enterprise)**
+---
 
-Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
+## Quick Start
 
-:::
-
-## Quick Start with Docker 🐳
-
-:::info
-
-**WebSocket** support is required for Open WebUI to function correctly. Ensure that your network configuration allows WebSocket connections.
-
-:::
-
-:::tip Docker Hub Now Available
-
-Open WebUI images are now published to **both** registries:
-- **GitHub Container Registry:** `ghcr.io/open-webui/open-webui`
-- **Docker Hub:** `openwebui/open-webui`
-
-Both registries contain identical images. You can use either one — simply replace `ghcr.io/open-webui/open-webui` with `openwebui/open-webui` in any command below.
-
-:::
-
-**If Ollama is on your computer**, use this command:
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
 
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-**To run Open WebUI with Nvidia GPU support**, use this command:
+Then open [http://localhost:3000](http://localhost:3000).
+
+For GPU support, Docker Compose, and more → [Full Docker guide](/getting-started/quick-start)
+
+  </TabItem>
+  <TabItem value="uv" label="uv (Python)">
 
 ```bash
-docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+curl -LsSf https://astral.sh/uv/install.sh | sh
+DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
 ```
 
-For environments with limited storage or bandwidth, Open WebUI offers slim image variants that exclude pre-bundled models. These images are significantly smaller but download required models on first use:
+Then open [http://localhost:8080](http://localhost:8080).
+
+  </TabItem>
+  <TabItem value="pip" label="pip">
 
 ```bash
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main-slim
+pip install open-webui
+open-webui serve
 ```
 
-### Open WebUI Bundled with Ollama
+Then open [http://localhost:8080](http://localhost:8080).
 
-This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command. Choose the appropriate command based on your hardware setup:
+  </TabItem>
+</Tabs>
 
-- **With GPU Support**:
-  Utilize GPU resources by running the following command:
+---
 
-  ```bash
-  docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
-  ```
+## Getting Started
 
-- **For CPU Only**:
-  If you're not using a GPU, use this command instead:
+- [**Quick Start**](/getting-started/quick-start) — Docker, Python, Kubernetes install options
+- [**Connect a Provider**](/getting-started/quick-start/connect-a-provider/starting-with-ollama) — Ollama, OpenAI, Anthropic, vLLM, and more
+- [**Updating**](/getting-started/updating) — Keep your instance current
+- [**Development Branch**](/getting-started/quick-start) — Help test the latest changes before stable release
+- [**Advanced Topics**](/getting-started/advanced-topics) — Scaling, logging, and advanced configuration
 
-  ```bash
-  docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
-  ```
+---
 
-Both commands facilitate a built-in, hassle-free installation of both Open WebUI and Ollama, ensuring that you can get everything up and running swiftly.
+## Explore
 
-After installation, you can access Open WebUI at [http://localhost:3000](http://localhost:3000). Enjoy! 😄
+- [**Features**](/features) — Discover what Open WebUI can do
+- [**Tutorials**](/category/-tutorials) — Step-by-step guides
+- [**FAQ**](/faq) — Common questions answered
+- [**Troubleshooting**](/troubleshooting) — Fix common issues
+- [**Reference**](/category/-reference) — Environment variables and API details
 
-### Using image tags in production
+---
 
-If you want to always run the latest version of Open WebUI, you can use the `:main`, `:cuda`, or `:ollama` image tags, depending on your setup, as shown in the examples above.
-For `production environments` where stability and reproducibility are important, it is recommended to pin a specific release version instead of using these floating tags. Versioned images follow this format:
+## Enterprise
 
-```
-ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
-# or equivalently:
-openwebui/open-webui:<RELEASE_VERSION>-<TYPE>
-```
+Need **custom branding**, **SLA support**, or **Long-Term Support (LTS)** versions?
+→ [Learn about Enterprise plans](/enterprise)
 
-Examples (pinned versions for illustration purposes only):
-```
-ghcr.io/open-webui/open-webui:v0.8.6
-ghcr.io/open-webui/open-webui:v0.8.6-ollama
-ghcr.io/open-webui/open-webui:v0.8.6-cuda
-```
+---
 
-### Using the Dev Branch 🌙
+## Get Involved
 
-:::tip Help Us Build Better Software!
+- [**Contributing**](/contributing) — Help build Open WebUI
+- [**Development Setup**](/getting-started/development) — Run the project locally from source
+- [**Discord**](https://discord.gg/5rJgQTnV4s) — Join the community
+- [**GitHub**](https://github.com/open-webui/open-webui) — Report issues, submit PRs
+- [**Careers**](https://careers.openwebui.com/) — Join our team
 
-**We encourage users to run the development branch!** Testing dev builds is one of the most valuable ways to contribute to Open WebUI. By running the latest development version, you help us catch bugs early, validate new features, and ensure stable releases for everyone.
+---
 
-**Community testing makes a real difference.** Early feedback from dev-branch users helps us catch bugs sooner, refine new features, and ship more polished stable releases. Every issue you report on dev is one fewer surprise in production.
-
-:::
-
-The `:dev` branch contains the latest features and changes before they reach a stable release. While it may occasionally have bugs or incomplete features, it's generally usable for day-to-day testing.
-
-**Standard dev image:**
-```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
-```
-
-**Slim variant (excludes bundled models):**
-```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev-slim
-```
-
-**How to help:**
-- Run the dev image on a test instance (not your primary production setup)
-- **Keep it updated regularly** — the dev branch moves fast! Pull the latest image frequently or see [Updating Open WebUI](#updating-open-webui) below
-- Report issues on [GitHub](https://github.com/open-webui/open-webui/issues) with clear reproduction steps
-- Join our [Discord](https://discord.gg/5rJgQTnV4s) to discuss findings
-
-:::note Alternative: Local Development Setup
-
-If Docker doesn't work for your environment, you can also run the latest development code using the [Local Development Guide](/getting-started/development). Conversely, if you prefer Docker over a local setup, the dev image is the easiest way to test.
-
-:::
-
-:::warning Do Not Share Data with Production
-
-**Never share your database or data volume between dev and production setups.** Dev builds may include database migrations that are not backward-compatible. If a dev migration runs on your production data and you later need to roll back, your production setup may break.
-
-Always use a separate data volume (e.g., `-v open-webui-dev:/app/backend/data`) for testing.
-
-:::
-
-### Updating Open WebUI
-
-To update Open WebUI container easily, follow these steps:
-
-#### Manual Update
-Use [Watchtower](https://github.com/nicholas-fedor/watchtower) to update your Docker container manually:
-```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
-```
-
-#### Automatic Updates
-Keep your container updated automatically every 5 minutes:
-```bash
-docker run -d --name watchtower --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --interval 300 open-webui
-```
-
-🔧 **Note**: Replace `open-webui` with your container name if it's different.
-
-## Manual Installation
-
-:::info
-
-### Platform Compatibility
-Open WebUI works on macOS, Linux (x86_64 and ARM64, including Raspberry Pi and other ARM boards like NVIDIA DGX Spark), and Windows.
-
-:::
-
-There are two main ways to install and run Open WebUI: using the `uv` runtime manager or Python's `pip`. While both methods are effective, **we strongly recommend using `uv`** as it simplifies environment management and minimizes potential conflicts.
-
-### Installation with `uv` (Recommended)
-
-The `uv` runtime manager ensures seamless Python environment management for applications like Open WebUI. Follow these steps to get started:
-
-#### 1. Install `uv`
-
-Pick the appropriate installation command for your operating system:
-
-- **macOS/Linux**:
-  ```bash
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  ```
-
-- **Windows**:
-  ```powershell
-  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-  ```
-
-#### 2. Run Open WebUI
-
-Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
-
-- **macOS/Linux**:
-  ```bash
-  DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
-  ```
-
-- **Windows**:
-  ```powershell
-  $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
-  ```
-
-:::note
-
-**For PostgreSQL Support:**
-
-The default installation now uses a slimmed-down package. If you need **PostgreSQL support**, install with all optional dependencies:
-
-```bash
-pip install open-webui[all]
-```
-
-:::
-
-### Installation with `pip`
-
-For users installing Open WebUI with Python's package manager `pip`, **it is strongly recommended to use Python runtime managers like `uv` or `conda`**. These tools help manage Python environments effectively and avoid conflicts.
-
-Python 3.11 is the development environment. Python 3.12 seems to work but has not been thoroughly tested. Python 3.13 is entirely untested and some dependencies do not work with Python 3.13 yet—**use at your own risk**.
-
-1. **Install Open WebUI**:
-
-   Open your terminal and run the following command:
-   ```bash
-   pip install open-webui
-   ```
-
-2. **Start Open WebUI**:
-
-   Once installed, start the server using:
-   ```bash
-   open-webui serve
-   ```
-
-### Updating Open WebUI
-
-To update to the latest version, simply run:
-
-```bash
-pip install --upgrade open-webui
-```
-
-This method installs all necessary dependencies and starts Open WebUI, allowing for a simple and efficient setup. After installation, you can access Open WebUI at [http://localhost:8080](http://localhost:8080). Enjoy! 😄
-
-## Other Installation Methods
-
-We offer various installation alternatives, including non-Docker native installation methods, Docker Compose, Kustomize, and Helm. Visit our [Open WebUI Documentation](https://docs.openwebui.com/getting-started/) or join our [Discord community](https://discord.gg/5rJgQTnV4s) for comprehensive guidance.
-
-Continue with the full [getting started guide](/getting-started).
-
-### Desktop App
-
-We also have an **experimental** desktop app, which is actively a **work in progress (WIP)**. While it offers a convenient way to run Open WebUI natively on your system without Docker or manual setup, it is **not yet stable**.
-
-👉 For stability and production use, we strongly recommend installing via **Docker** or **Python (`uv` or `pip`)**.
-
-## Sponsors 🙌
+## Sponsors
 
 <SponsorList />
 
-We are incredibly grateful for the generous support of our sponsors. Their contributions help us to maintain and improve our project, ensuring we can continue to deliver quality work to our community. Thank you!
+---
 
+## Acknowledgements
 
-## Acknowledgements 🙏
-
-We are deeply grateful for the generous grant support provided by:
-
-<div className="grid gap-4 items-start grid-cols-1 md:grid-cols-2">
+<div className="grid gap-4 items-start grid-cols-1 md:grid-cols-3">
 
   <a href="https://a16z.com/advancing-open-source-ai-through-benchmarks-and-bold-experimentation/" title="A16z Open Source AI Grant 2025" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
     <div className="max-w-full h-auto">
@@ -290,8 +114,6 @@ We are deeply grateful for the generous grant support provided by:
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>A16z Open Source AI Grant 2025</span>
   </a>
 
-
-
   <a href="https://builders.mozilla.org/" title="Mozilla Builders 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
     <div className="max-w-full h-auto">
       ![Mozilla](/sponsors/grants/mozilla.png)
@@ -299,13 +121,11 @@ We are deeply grateful for the generous grant support provided by:
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>Mozilla Builders 2024</span>
   </a>
 
-
   <a href="https://github.com/accelerator" title="GitHub Accelerator 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
     <div className="max-w-full h-auto">
       ![GitHub](/sponsors/grants/github.png)
     </div>
     <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>GitHub Accelerator 2024</span>
   </a>
-
 
 </div>

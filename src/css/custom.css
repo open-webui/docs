@@ -395,6 +395,10 @@ article p a {
 	background-color: transparent;
 }
 
+.tabs {
+	margin-bottom: 8px;
+}
+
 .tabs + .margin-top--md {
 	margin-top: 4px !important;
 }

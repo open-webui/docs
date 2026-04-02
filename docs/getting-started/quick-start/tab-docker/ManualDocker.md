@@ -2,6 +2,22 @@
 
 Follow these steps to install Open WebUI with Docker.
 
+:::info
+
+**WebSocket** support is required for Open WebUI to function correctly. Ensure that your network configuration allows WebSocket connections.
+
+:::
+
+:::tip Docker Hub Now Available
+
+Open WebUI images are now published to **both** registries:
+- **GitHub Container Registry:** `ghcr.io/open-webui/open-webui`
+- **Docker Hub:** `openwebui/open-webui`
+
+Both registries contain identical images. You can use either one — simply replace `ghcr.io/open-webui/open-webui` with `openwebui/open-webui` in any command below.
+
+:::
+
 ## Step 1: Pull the Open WebUI Image
 
 Start by pulling the latest Open WebUI Docker image from the GitHub Container Registry (or use `openwebui/open-webui:main` from Docker Hub).
@@ -22,9 +38,22 @@ docker pull ghcr.io/open-webui/open-webui:main-slim
 
 You can also pull a specific Open WebUI release version directly by using a versioned image tag. This is recommended for production environments to ensure stable and reproducible deployments.
 
+Versioned images follow this format:
+
+```
+ghcr.io/open-webui/open-webui:<RELEASE_VERSION>-<TYPE>
+# or equivalently:
+openwebui/open-webui:<RELEASE_VERSION>-<TYPE>
+```
+
+Examples:
 ```bash
 docker pull ghcr.io/open-webui/open-webui:v0.8.6
+docker pull ghcr.io/open-webui/open-webui:v0.8.6-ollama
+docker pull ghcr.io/open-webui/open-webui:v0.8.6-cuda
 ```
+
+If you want to always run the latest version, you can use the floating tags `:main`, `:cuda`, or `:ollama`. For production environments where stability and reproducibility are important, pin a specific release version instead.
 
 ## Step 2: Run the Container
 
@@ -52,6 +81,22 @@ For Nvidia GPU support, add `--gpus all` to the `docker run` command:
 ```bash
 docker run -d -p 3000:8080 --gpus all -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:cuda
 ```
+
+### Bundled with Ollama
+
+This installation method uses a single container image that bundles Open WebUI with Ollama, allowing for a streamlined setup via a single command.
+
+- **With GPU Support:**
+
+  ```bash
+  docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+  ```
+
+- **CPU Only:**
+
+  ```bash
+  docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+  ```
 
 #### Single-User Mode (Disabling Login)
 
@@ -82,6 +127,44 @@ After the container is running, access Open WebUI at:
 [http://localhost:3000](http://localhost:3000)
 
 For detailed help on each Docker flag, see [Docker's documentation](https://docs.docker.com/engine/reference/commandline/run/).
+
+## Using the Dev Branch 🌙
+
+:::tip Help Us Build Better Software!
+
+**We encourage users to run the development branch!** Testing dev builds is one of the most valuable ways to contribute to Open WebUI. By running the latest development version, you help us catch bugs early, validate new features, and ensure stable releases for everyone.
+
+**Community testing makes a real difference.** Early feedback from dev-branch users helps us catch bugs sooner, refine new features, and ship more polished stable releases. Every issue you report on dev is one fewer surprise in production.
+
+:::
+
+The `:dev` tag contains the latest features and changes before they reach a stable release. While it may occasionally have bugs or incomplete features, it's generally usable for day-to-day testing.
+
+**Standard dev image:**
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
+```
+
+**Slim variant (excludes bundled models):**
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev-slim
+```
+
+**How to help:**
+- Run the dev image on a test instance (not your primary production setup)
+- **Keep it updated regularly** — the dev branch moves fast! Pull the latest image frequently
+- Report issues on [GitHub](https://github.com/open-webui/open-webui/issues) with clear reproduction steps
+- Join our [Discord](https://discord.gg/5rJgQTnV4s) to discuss findings
+
+:::warning Do Not Share Data with Production
+
+**Never share your database or data volume between dev and production setups.** Dev builds may include database migrations that are not backward-compatible. If a dev migration runs on your production data and you later need to roll back, your production setup may break.
+
+Always use a separate data volume (e.g., `-v open-webui-dev:/app/backend/data`) for testing.
+
+:::
+
+If Docker doesn't work for your environment, you can also run the latest development code using the [Local Development Guide](/getting-started/development).
 
 ## Uninstall
 
