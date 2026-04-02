@@ -67,7 +67,7 @@ The notification is only sent if you are **not actively using the WebUI**. If yo
 
 ### Enabling/Disabling User Webhooks
 
-User webhooks are enabled by default. However, administrators can disable this feature for all users to prevent external requests or for security reasons.
+User webhooks are disabled by default. Administrators can enable this feature for all users when needed, or keep it disabled to prevent external requests.
 
 This can be done in two ways:
 
