@@ -4858,6 +4858,33 @@ curl -X POST "http://localhost:8080/api/v1/oauth/google/token/exchange" \
 - The OAuth provider must be properly configured
 - The token exchange uses the same user lookup logic as regular OAuth login (by OAuth `sub` claim first, then by email if `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is enabled)
 
+#### `ENABLE_OAUTH_BACKCHANNEL_LOGOUT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables OpenID Connect Back-Channel Logout support. When enabled, Open WebUI exposes `POST /oauth/backchannel-logout` so your identity provider can trigger server-side logout without browser redirects.
+- Usage: Set to `true` to enable the endpoint. Your identity provider should send a form-encoded `logout_token` that follows the OpenID Connect Back-Channel Logout 1.0 specification.
+
+:::warning
+
+**Redis Requirement for JWT Revocation**
+
+Back-channel logout revokes existing Open WebUI JWT sessions through Redis-based revocation keys. Without Redis, Open WebUI can still remove stored OAuth sessions, but already-issued JWTs remain valid until they naturally expire.
+
+For production SSO deployments, especially with multiple workers or replicas, configure `REDIS_URL` when enabling this feature.
+
+:::
+
+:::info
+
+**Behavior Notes**
+
+- The endpoint returns `200` with an empty body for valid requests, including cases where no matching user is found.
+- Invalid or malformed `logout_token` requests return `400` with `invalid_request` details.
+- Back-channel logout revokes users by provider + `sub` claim matching. `sid`-only logout matching is not currently supported.
+
+:::
+
 #### `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`
 
 - Type: `str`
