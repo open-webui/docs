@@ -3,13 +3,13 @@ sidebar_position: 15
 title: "Entra ID Group Sync"
 ---
 
+# Microsoft Entra ID Group Name Sync
+
 :::warning
 
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 
 :::
-
-# Microsoft Entra ID Group Name Sync
 
 By default, when you configure Microsoft Entra ID OAuth and automatic group creation with Open WebUI, security groups are synced using their **Group IDs (GUIDs)** rather than human-readable group names. This is a Microsoft limitation where the ID token doesn't include group display names by default.
 

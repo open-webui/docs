@@ -9,7 +9,7 @@ Excited to dive into Open WebUI development? This comprehensive guide will walk 
 
 :::tip Help Us Build Better Software!
 
-**Running the development setup is one of the most valuable ways to contribute.** You don't need to write code—just using and testing the latest changes helps us catch bugs before stable releases. We cannot deliver high-quality software without community testing.
+**Running the development setup is one of the most valuable ways to contribute.** You don't need to write code—just using and testing the latest changes helps us catch bugs before stable releases. Community testing makes a real difference in the quality of every release.
 
 **Prefer Docker?** If setting up a local dev environment seems like too much, you can also test by running the [dev Docker image](/#using-the-dev-branch-) — it's the same code, just containerized.
 
