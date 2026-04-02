@@ -172,6 +172,7 @@ code {
 	padding: 2px 6px;
 	font-size: 0.85em;
 	font-weight: 500;
+	border-radius: 4px;
 }
 
 [data-theme="dark"] code {
@@ -179,16 +180,22 @@ code {
 }
 
 [data-theme="light"] code {
-	background-color: #f5f5f5;
+	background-color: #ebebeb;
 }
 
 [data-theme="dark"] code {
-	background-color: #1a1a1a;
+	background-color: #222;
 }
 
 .theme-code-block {
 	font-family: "IBM Plex Mono", monospace;
 	font-size: 0.875em;
+	border-radius: 16px !important;
+	overflow: hidden;
+}
+
+.theme-code-block pre {
+	border-radius: 16px !important;
 }
 
 .theme-code-block .token {
@@ -196,7 +203,7 @@ code {
 }
 
 [data-theme="light"] .theme-code-block pre {
-	background-color: #fafafa;
+	background-color: #f3f3f3;
 }
 
 /* ─── Blockquotes ─── */
