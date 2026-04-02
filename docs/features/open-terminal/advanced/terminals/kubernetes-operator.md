@@ -340,9 +340,9 @@ kubectl logs -n open-webui deployment/<release>-terminals-orchestrator --tail=50
 ## Next steps
 
 - [Docker Backend](./docker-backend) — simpler single-host deployment without Kubernetes
-- [Multi-User Setup](../advanced/multi-user) — comparison of isolation approaches
-- [Security best practices](../advanced/security)
-- [Configuration reference](../advanced/configuration) — all Open Terminal container settings
+- [Multi-User Setup](../multi-user) — comparison of isolation approaches
+- [Security best practices](../security)
+- [Configuration reference](../configuration) — all Open Terminal container settings
 
 :::info Enterprise license required
 Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.

@@ -1151,7 +1151,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/docker-backend). Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/advanced/terminals/docker-backend). Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
 - Example (direct Open Terminal connection):
 ```json
 [
@@ -1187,7 +1187,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 :::tip Helm chart auto-configuration
-When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Kubernetes Operator guide](/features/open-terminal/terminals/kubernetes-operator) for details.
+When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Kubernetes Operator guide](/features/open-terminal/advanced/terminals/kubernetes-operator) for details.
 :::
 
 :::warning
