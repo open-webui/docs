@@ -31,8 +31,6 @@ flowchart LR
     style Resources fill:#27ae60,color:#fff
     style k8s fill:#f0f0f0,stroke:#ccc
 ```
-    style k8s fill:#f0f0f0,stroke:#ccc
-```
 
 ---
 
