@@ -151,6 +151,14 @@ To export a knowledge base, open the item menu (three dots) on any knowledge bas
 The export feature is restricted to admin users. Regular users will not see the Export option in the menu.
 :::
 
+### File Metadata
+
+You can attach structured metadata to knowledge base files — such as title, author, tags, source URL, and more. Metadata enhances the RAG pipeline by improving search ranking, providing the LLM with richer context for citations, and enabling API-based filtering.
+
+Metadata is displayed in the file viewer UI below the filename and is fully config-driven — admins can add new metadata fields without any code changes.
+
+For full details on configuration, API endpoints, and how metadata flows through the RAG pipeline, see the [File Metadata Fields](./file-metadata-fields.md) documentation.
+
 ### Programmatic Access via API
 
 Knowledge bases can also be managed programmatically through the Open WebUI API. This is useful for automated workflows, bulk imports, or integrating with external systems.
