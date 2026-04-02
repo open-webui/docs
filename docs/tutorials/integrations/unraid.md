@@ -3,13 +3,13 @@ sidebar_position: 34
 title: "Unraid Deployment (Beginner-Safe)"
 ---
 
+# Open WebUI on Unraid (Beginner-Safe)
+
 :::warning
 
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/tutorials/tips/contributing-tutorial).
 
 :::
-
-# Open WebUI on Unraid (Beginner-Safe)
 
 This guide is for first-time Unraid users who want a stable Docker deployment with persistent data and safe upgrades.
 
