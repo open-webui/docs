@@ -511,6 +511,12 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   LiteLLM is useful as a **universal bridge** when you want to use a provider that doesn't natively support the OpenAI API standard, or when you want to load-balance across multiple providers.
   :::
 
+  :::warning Security Recommendation: Key Scope
+  For multi-user deployments, avoid using provider management/master keys for your main Open WebUI connection.
+
+  Prefer least-privilege provider credentials (inference-scoped keys where supported). This reduces blast radius if users invoke provider-specific endpoints through OpenAI-compatible integrations.
+  :::
+
   </TabItem>
 </Tabs>
 
