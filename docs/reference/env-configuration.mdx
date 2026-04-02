@@ -1151,8 +1151,8 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of Open Terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance. Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
-- Example:
+- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/docker-backend). Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Example (direct Open Terminal connection):
 ```json
 [
   {
@@ -1167,7 +1167,28 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
   }
 ]
 ```
+- Example (Terminals orchestrator connection):
+```json
+[
+  {
+    "id": "terminals",
+    "url": "http://terminals-orchestrator:8080",
+    "key": "your-api-key",
+    "name": "Terminals",
+    "auth_type": "bearer",
+    "config": {
+      "access_grants": [
+        {"principal_type": "user", "principal_id": "*", "permission": "read"}
+      ]
+    }
+  }
+]
+```
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip Helm chart auto-configuration
+When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Kubernetes Operator guide](/features/open-terminal/terminals/kubernetes-operator) for details.
+:::
 
 :::warning
 
