@@ -686,18 +686,6 @@ a.footer__link-item:hover {
 	filter: invert(1);
 }
 
-.hero--banner {
-	padding: 8px !important;
-}
-
-.hero--banner,
-.hero--banner a {
-	margin: 0;
-	color: #fff;
-	background-color: #111;
-	width: 100%;
-	font-size: 13px;
-}
 
 @media screen and (width >=997px) {
 	.hero--container {
@@ -731,10 +719,6 @@ a.footer__link-item:hover {
 
 	.index-buttons a {
 		margin-bottom: 10px;
-	}
-
-	.hero--banner a {
-		font-size: 0.8em;
 	}
 
 	.homepage-svg svg {

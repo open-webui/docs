@@ -36,21 +36,21 @@ Then open [http://localhost:3000](http://localhost:3000).
 For GPU support, Docker Compose, and more → [Full Docker guide](/getting-started/quick-start)
 
   </TabItem>
-  <TabItem value="uv" label="uv (Python)">
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
-```
-
-Then open [http://localhost:8080](http://localhost:8080).
-
-  </TabItem>
   <TabItem value="pip" label="pip">
 
 ```bash
 pip install open-webui
 open-webui serve
+```
+
+Then open [http://localhost:8080](http://localhost:8080).
+
+  </TabItem>
+  <TabItem value="uv" label="uv">
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
 ```
 
 Then open [http://localhost:8080](http://localhost:8080).

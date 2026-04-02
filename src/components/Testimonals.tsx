@@ -1,5 +1,4 @@
-import { TopBanner } from "@site/src/components/Sponsors/TopBanner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const Testimonals = ({
 	bannerClassName = "h-18",
