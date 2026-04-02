@@ -99,10 +99,6 @@ const config: Config = {
 			],
 		},
 		footer: {
-			logo: {
-				src: "images/logo-dark.png",
-				height: 100,
-			},
 			style: "light",
 			links: [
 				{
