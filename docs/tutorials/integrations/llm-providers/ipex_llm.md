@@ -1,6 +1,6 @@
 ---
-sidebar_position: 11
-title: "IPEX-LLM (Intel GPU)"
+sidebar_position: 30
+title: "Intel GPU (IPEX-LLM)"
 ---
 
 :::warning

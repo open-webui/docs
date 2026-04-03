@@ -127,7 +127,7 @@ The chat shows "Failed to connect to MCP server" when using a tool, even if the 
 **Solutions**:
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
-3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a [known limitation](#oauth-21-tools-cannot-be-set-as-default-tools). Remove it from the model's default tools and have users enable it manually per-chat.
+3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
 
 ### Infinite loading screen after adding External Tool
 

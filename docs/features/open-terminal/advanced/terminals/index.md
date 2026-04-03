@@ -27,7 +27,7 @@ flowchart LR
 
 ## Why Terminals?
 
-Open Terminal's [built-in multi-user mode](../advanced/multi-user#option-1-built-in-multi-user-mode) works well for small, trusted teams — but everyone shares the same container, CPU, memory, and network. This approach does not scale well beyond a few users, or enable multi-team approaches. Terminals solves these issues by giving each user a dedicated container:
+Open Terminal's [built-in multi-user mode](../multi-user#option-1-built-in-multi-user-mode) works well for small, trusted teams — but everyone shares the same container, CPU, memory, and network. This approach does not scale well beyond a few users, or enable multi-team approaches. Terminals solves these issues by giving each user a dedicated container:
 
 | | Built-in multi-user | Terminals |
 | :--- | :--- | :--- |

@@ -78,7 +78,7 @@ ENABLE_WEBSOCKET_SUPPORT=true
 - A **single Redis instance** is sufficient for the vast majority of deployments, even with thousands of users. You almost certainly do not need Redis Cluster unless you have specific HA/bandwidth requirements. If you think you need Redis Cluster, first check whether your connection count and memory usage are caused by fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
 - Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
 
-For a complete step-by-step Redis setup (Docker Compose, Sentinel, Cluster mode, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
+For a complete step-by-step Redis setup (Docker Compose, Sentinel, Cluster mode, verification), see the [Redis WebSocket Support](/getting-started/advanced-topics/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
 
 ---
 

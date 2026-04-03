@@ -212,7 +212,7 @@ When File Context is disabled, file content is **not automatically extracted or 
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/ai-knowledge/knowledge#full-context-vs-focused-retrieval) for details.
+Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
 :::
 
 :::info

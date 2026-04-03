@@ -18,33 +18,20 @@ import WSL from './tab-docker/WSL.md';
 import DockerUpdating from './tab-docker/DockerUpdating.md';
 import Helm from './tab-kubernetes/Helm.md';
 import Venv from './tab-python/Venv.md';
+import Pip from './tab-python/Pip.md';
 import Uv from './tab-python/Uv.md';
 import Conda from './tab-python/Conda.md';
 import PythonUpdating from './tab-python/PythonUpdating.md';
 
- 
+# Quick Start
 
-:::info
+Get Open WebUI running on your machine. Pick your preferred method below.
 
-### Platform Compatibility
-Open WebUI works on macOS, Linux (x86_64 and ARM64, including Raspberry Pi and other ARM boards like NVIDIA DGX Spark), and Windows.
+Open WebUI works on **macOS, Linux** (x86_64 and ARM64, including Raspberry Pi and NVIDIA DGX Spark), and **Windows**.
 
-:::
-
-:::tip User Roles and Privacy
-
-- **Admin Creation:** The first account created on Open WebUI gains **Administrator privileges**, controlling user management and system settings.
-- **User Registrations:** Subsequent sign-ups start with **Pending** status, requiring Administrator approval for access.
-- **Privacy and Data Security:** **All your data**, including login details, is **locally stored** on your device. Open WebUI ensures **strict confidentiality** and **no external requests** for enhanced privacy and security.
-  - **All models are private by default.** Models must be explicitly shared via groups or by being made public. If a model is assigned to a group, only members of that group can see it. If a model is made public, anyone on the instance can see it.
-
-:::
-
-Choose your preferred installation method below:
-
-- **Docker:** **Officially supported and recommended for most users**
-- **Python:** Suitable for low-resource environments or those wanting a manual setup
-- **Kubernetes:** Ideal for enterprise deployments that require scaling and orchestration
+- **Docker:** Officially supported and recommended for most users. Requires [Docker](https://docs.docker.com/get-docker/) installed.
+- **Python:** Suitable for low-resource environments or manual setups
+- **Kubernetes:** Ideal for enterprise deployments requiring scaling and orchestration
 
 <Tabs>
   <TabItem value="docker" label="Docker">
@@ -101,6 +88,13 @@ Choose your preferred installation method below:
   </TabItem>
   <TabItem value="python" label="Python">
     <Tabs>
+      <TabItem value="pip" label="pip">
+        <div className='mt-5'>
+          <Pip />
+        </div>
+        <PythonUpdating />
+      </TabItem>
+
       <TabItem value="uv" label="uv">
         <div className='mt-5'>
           <Uv />
@@ -138,12 +132,10 @@ Choose your preferred installation method below:
 
 ### Desktop App
 
-Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It offers a convenient way to run Open WebUI natively on your system without Docker or manual setup.
+Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
 
 :::warning Experimental
-
-The desktop app is actively a **work in progress** and is not yet stable. For production use, we recommend installing via **Docker** or **Python (`uv` or `pip`)**.
-
+The desktop app is a **work in progress** and is not yet stable. For production use, install via **Docker** or **Python**.
 :::
 
   </TabItem>
@@ -153,46 +145,53 @@ The desktop app is actively a **work in progress** and is not yet stable. For pr
       <TabItem value="pinokio-computer" label="Pinokio.computer">
         ### Pinokio.computer Installation
 
-        For installation via Pinokio.computer, please visit their website:
+        For installation via Pinokio.computer, visit their website:
 
         [https://pinokio.computer/](https://pinokio.computer/)
 
         Support for this installation method is provided through their website.
       </TabItem>
     </Tabs>
-
-    ### Additional Third-Party Integrations
-
-    *(Add information about third-party integrations as they become available.)*
   </TabItem>
 </Tabs>
 
-## Next Steps
+---
 
-After installing, visit:
+## After You Install
 
-- [http://localhost:3000](http://localhost:3000) to access Open WebUI.
-- or [http://localhost:8080/](http://localhost:8080/) when using a Python deployment.
+:::tip First Login
 
-You are now ready to start using Open WebUI!
+- **Admin account:** The first account created gets **Administrator privileges** and controls user management and system settings.
+- **New sign-ups:** Subsequent registrations start with **Pending** status and require Administrator approval.
+- **Privacy:** All data, including login details, is stored locally on your device. Open WebUI makes no external requests. All models are private by default and must be explicitly shared.
 
-## Using Open WebUI with Ollama
-If you're using Open WebUI with Ollama, be sure to check out our [Starting with Ollama Guide](/getting-started/quick-start/connect-a-provider/starting-with-ollama) to learn how to manage your Ollama instances with Open WebUI.
+:::
 
-## Experimental: Open Responses
-Open WebUI has experimental support for the [Open Responses](https://www.openresponses.org/) specification. See the [Starting with Open Responses Guide](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) to learn how to enable it.
+### Connect a model provider
 
+Open WebUI needs at least one model provider to start chatting. Choose yours:
 
+| Provider | Guide |
+|----------|-------|
+| **Ollama** (local models) | [Starting with Ollama →](/getting-started/quick-start/connect-a-provider/starting-with-ollama) |
+| **OpenAI** | [Starting with OpenAI →](/getting-started/quick-start/connect-a-provider/starting-with-openai) |
+| **Any OpenAI-compatible API** | [OpenAI-Compatible Providers →](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) |
+| **Anthropic** | [Starting with Anthropic →](/getting-started/quick-start/connect-a-provider/starting-with-anthropic) |
+| **llama.cpp** | [Starting with llama.cpp →](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) |
+| **vLLM** | [Starting with vLLM →](/getting-started/quick-start/connect-a-provider/starting-with-vllm) |
 
-## Help Us Improve Open WebUI 🧪
+### Explore features
 
-**Want to help make Open WebUI better?** Consider running the [development branch](/#using-the-dev-branch-)! Testing dev builds is one of the most valuable contributions you can make—no code required. Just use it and report any issues you find on [GitHub](https://github.com/open-webui/open-webui/issues).
+Once connected, explore what Open WebUI can do: [Features Overview →](/features)
 
-## Join the Community
+### Experimental: Open Responses
 
-Need help? Have questions? Join our community:
+Open WebUI has experimental support for the [Open Responses](https://www.openresponses.org/) specification. See the [Starting with Open Responses Guide](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) to learn more.
 
-- [Open WebUI Discord](https://discord.gg/5rJgQTnV4s)
-- [GitHub Issues](https://github.com/open-webui/open-webui/issues)
+---
 
-Stay updated with the latest features, troubleshooting tips, and announcements!
+## Community
+
+- [**Discord**](https://discord.gg/5rJgQTnV4s) for questions, discussion, and support
+- [**GitHub Issues**](https://github.com/open-webui/open-webui/issues) for bug reports and feature requests
+- **Want to help?** Test the [development branch](/contributing) and report issues. No code required.

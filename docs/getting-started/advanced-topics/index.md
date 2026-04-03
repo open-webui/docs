@@ -5,9 +5,32 @@ title: "Advanced Topics"
 
 # Advanced Topics
 
-This section covers advanced deployment and operational topics for Open WebUI.
+**Go beyond the defaults: scale, debug, and develop Open WebUI for production and contribution.**
 
-## Guides
+Open WebUI works out of the box for personal use, but real-world deployments need more: production databases, horizontal scaling, structured logging, observability. This section covers everything between "it runs on my laptop" and "it serves my entire organization."
 
-- **[Scaling Open WebUI](/getting-started/advanced-topics/scaling)** — Scale from a single instance to a production-ready multi-replica deployment with PostgreSQL, Redis, shared storage, and observability.
-- **[Logging Configuration](/getting-started/advanced-topics/logging)** — Configure log levels, debug output, and structured JSON logging for production environments.
+---
+
+## Why Advanced Topics?
+
+### Scale beyond a single container
+
+The default SQLite database and single-worker setup top out at small-team usage. Learn how to swap in PostgreSQL, add Redis for shared state, run multiple replicas behind a load balancer, and choose an external vector database, all without re-architecting your deployment.
+
+### Debug with confidence
+
+When something goes wrong at scale, the first question is always "what do the logs say?" Configure log levels, enable structured JSON output for log aggregators, and connect OpenTelemetry for end-to-end traces across your entire stack.
+
+### Contribute to the project
+
+Set up a local development environment with hot-reloading frontend and backend, understand the contribution workflow, and start shipping pull requests.
+
+---
+
+## What's Covered
+
+| | |
+| :--- | :--- |
+| 🚀 **[Scaling Open WebUI](scaling)** | Move from SQLite to PostgreSQL, add Redis, run multiple replicas, configure external vector databases, and set up shared storage and observability |
+| 🪵 **[Logging Configuration](logging)** | Configure log levels, enable debug output, and switch to structured JSON logging for production log aggregators |
+| 🛠️ **[Local Development](development)** | Clone the repo, run the frontend and backend side by side, test on other devices, and submit pull requests |

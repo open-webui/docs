@@ -96,7 +96,7 @@ services:
       - AUDIO_TTS_OPENAI_API_KEY=not-needed
 ```
 
-→ See full guide: [OpenAI Edge TTS](/features/media-generation/audio/text-to-speech/openai-edge-tts-integration)
+→ See full guide: [OpenAI Edge TTS](/features/chat-conversations/audio/text-to-speech/openai-edge-tts-integration)
 
 ### Browser-Only Setup (No Backend Config Needed)
 
@@ -112,7 +112,7 @@ When the admin leaves `AUDIO_TTS_ENGINE` as an empty string (the default), no ba
 
 ## Microphone Access Issues
 
-### Understanding Secure Contexts 🔒
+### Understanding Secure Contexts
 
 For security reasons, accessing the microphone is restricted to pages served over HTTPS or locally from `localhost`. This requirement is meant to safeguard your data by ensuring it is transmitted over secure channels.
 
@@ -188,7 +188,7 @@ docker exec open-webui bash -lc "pip show datasets"
 ```
 
 :::tip
-Consider using an external TTS service like [OpenAI Edge TTS](/features/media-generation/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro](/features/media-generation/audio/text-to-speech/Kokoro-FastAPI-integration) instead of local Transformers TTS to avoid these dependency conflicts.
+Consider using an external TTS service like [OpenAI Edge TTS](/features/chat-conversations/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro](/features/chat-conversations/audio/text-to-speech/Kokoro-FastAPI-integration) instead of local Transformers TTS to avoid these dependency conflicts.
 :::
 
 #### 2. Using External TTS Instead of Local
