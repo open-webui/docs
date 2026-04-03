@@ -185,21 +185,6 @@ code {
 	border-radius: 16px !important;
 }
 
-/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
-[data-theme="light"] .shiki-code-block pre,
-[data-theme="light"] .shiki-code-block pre span {
-	color: var(--shiki-light) !important;
-}
-
-[data-theme="dark"] .shiki-code-block pre,
-[data-theme="dark"] .shiki-code-block pre span {
-	color: var(--shiki-dark) !important;
-}
-
-[data-theme="dark"] .shiki-code-block pre {
-	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
-}
-
 /* ─── Shiki code block styling ─── */
 .shiki-code-block {
 	margin-bottom: var(--ifm-leading);
@@ -216,12 +201,23 @@ code {
 	font-weight: inherit;
 }
 
+/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
+[data-theme="light"] .shiki-code-block pre,
+[data-theme="light"] .shiki-code-block pre span {
+	color: var(--shiki-light) !important;
+}
+
 [data-theme="light"] .shiki-code-block pre {
 	background-color: #f3f3f3;
 }
 
+[data-theme="dark"] .shiki-code-block pre,
+[data-theme="dark"] .shiki-code-block pre span {
+	color: var(--shiki-dark) !important;
+}
+
 [data-theme="dark"] .shiki-code-block pre {
-	background-color: #1a1a1a;
+	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
 }
 
 .shiki-code-block-content {
@@ -256,13 +252,13 @@ code {
 	color: #ccc;
 }
 
-.shiki-code-block:hover .shiki-copy-button {
-	opacity: 0.4;
-}
-
 .shiki-copy-button:hover,
 .shiki-copy-button:focus-visible {
 	opacity: 1 !important;
+}
+
+.shiki-code-block:hover .shiki-copy-button {
+	opacity: 0.4;
 }
 
 [data-theme="light"] .theme-code-block pre {
