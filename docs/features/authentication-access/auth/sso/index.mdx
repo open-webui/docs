@@ -290,6 +290,10 @@ When configured, this header allows clients to set admin-level access via an HTT
 
 ### Tailscale Serve
 
+:::tip
+For a complete end-to-end guide covering installation, HTTPS, authentication, and Docker Compose setup, see the [**Tailscale Integration Tutorial**](/tutorials/integrations/tailscale).
+:::
+
 [Tailscale Serve](https://tailscale.com/kb/1242/tailscale-serve) allows you to share a service within your tailnet, and Tailscale will set the header `Tailscale-User-Login` with the email address of the requester.
 
 Below is an example serve config with a corresponding Docker Compose file that starts a Tailscale sidecar, exposing Open WebUI to the tailnet with the tag `open-webui` and hostname `open-webui`, and can be reachable at `https://open-webui.TAILNET_NAME.ts.net`.

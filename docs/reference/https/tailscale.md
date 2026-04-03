@@ -13,6 +13,10 @@ Tailscale creates an encrypted mesh VPN (a "tailnet") between your devices. Ever
 Tailscale is ideal when you want **private, authenticated access** across devices without exposing Open WebUI to the public internet. Perfect for personal setups, small teams, or accessing a home server from your phone or laptop on the go.
 :::
 
+:::info Looking for the full guide?
+This page covers **HTTPS setup** specifically. For the complete Tailscale integration story, including SSO authentication, Docker Compose sidecar setup, and more, see the [**Tailscale Integration Tutorial**](/tutorials/integrations/tailscale).
+:::
+
 ---
 
 ## Prerequisites
