@@ -52,7 +52,9 @@ The `storage_mode` field controls how persistent volumes are allocated on Kubern
 | :--- | :--- | :--- |
 | `per-user` | Each user gets their own PVC. Full isolation. | ReadWriteOnce |
 | `shared` | A single PVC is shared by all users, with each user's data in a `subPath` under their user ID. Requires a storage class that supports ReadWriteMany (e.g., NFS, EFS). | ReadWriteMany |
-| `shared-rwo` | A single ReadWriteOnce PVC is shared. All terminal pods are scheduled to the same node via pod affinity. Useful when RWX storage is unavailable. | ReadWriteOnce |
+| `shared-rwo` | A single ReadWriteOnce PVC is shared. All terminal pods are scheduled to the same node via pod affinity (Kubernetes ensures they all land on the machine that has the volume mounted). Useful when ReadWriteMany storage is unavailable. | ReadWriteOnce |
+
+**ReadWriteOnce (RWO)** means the volume can only be mounted by pods on a single node at a time. **ReadWriteMany (RWX)** means multiple nodes can mount and write to the volume simultaneously.
 
 ### Environment variables
 
@@ -71,6 +73,10 @@ Environment variables in a policy are visible to the terminal user (they can run
 ## Managing policies
 
 Policies are managed via the orchestrator's REST API. All endpoints require authentication with the orchestrator's API key.
+
+:::tip New to REST APIs?
+The examples below use `curl`, a command-line tool for making HTTP requests. You can also use graphical tools like [Postman](https://www.postman.com/) or [HTTPie Desktop](https://httpie.io/) if you prefer. The key concepts: `PUT` creates or updates a resource, `GET` retrieves it, and `DELETE` removes it.
+:::
 
 ### Create a policy
 
