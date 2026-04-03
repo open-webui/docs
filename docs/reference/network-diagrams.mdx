@@ -11,7 +11,10 @@ Visual C4 diagrams for common deployment topologies showing how Open WebUI, Olla
 <Tabs groupId="os-platform">
   <TabItem value="macos-windows" label="macOS / Windows" default>
 
-### Ollama on Host, Open WebUI in Container
+  <Tabs groupId="macos-topology">
+    <TabItem value="host-ollama-mac" label="Host Ollama" default>
+
+#### Ollama on Host, Open WebUI in Container
 
 `Ollama` runs directly on the host machine while `Open WebUI` operates within a Docker container.
 
@@ -29,7 +32,10 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Ollama and Open WebUI in Compose Stack
+    </TabItem>
+    <TabItem value="compose-stack-mac" label="Compose Stack">
+
+#### Ollama and Open WebUI in Compose Stack
 
 Both `Ollama` and `Open WebUI` are configured within the same Docker Compose stack, simplifying network communications.
 
@@ -49,7 +55,10 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Ollama and Open WebUI, Separate Networks
+    </TabItem>
+    <TabItem value="separate-networks-mac" label="Separate Networks">
+
+#### Ollama and Open WebUI, Separate Networks
 
 `Ollama` and `Open WebUI` are deployed in separate Docker networks. This leads to connectivity issues.
 
@@ -71,7 +80,10 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Open WebUI in Host Network
+    </TabItem>
+    <TabItem value="host-network-mac" label="Host Network">
+
+#### Open WebUI in Host Network
 
 `Open WebUI` utilizes the host network, which impacts its ability to connect in certain environments.
 
@@ -87,10 +99,16 @@ Rel(user, openwebui, "Unable to connect, host network is the VM's network")
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
+    </TabItem>
+  </Tabs>
+
   </TabItem>
   <TabItem value="linux" label="Linux">
 
-### Ollama on Host, Open WebUI in Container
+  <Tabs groupId="linux-topology">
+    <TabItem value="host-ollama-linux" label="Host Ollama" default>
+
+#### Ollama on Host, Open WebUI in Container
 
 `Ollama` runs on the host and `Open WebUI` is deployed inside a Docker container.
 
@@ -108,7 +126,10 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Ollama and Open WebUI in Compose Stack
+    </TabItem>
+    <TabItem value="compose-stack-linux" label="Compose Stack">
+
+#### Ollama and Open WebUI in Compose Stack
 
 Both `Ollama` and `Open WebUI` reside within the same Docker Compose stack, allowing for straightforward networking.
 
@@ -128,7 +149,10 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Ollama and Open WebUI, Separate Networks
+    </TabItem>
+    <TabItem value="separate-networks-linux" label="Separate Networks">
+
+#### Ollama and Open WebUI, Separate Networks
 
 `Ollama` and `Open WebUI` are in different Docker networks, which can hinder connectivity.
 
@@ -148,7 +172,10 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Open WebUI in Host Network, Ollama on Host
+    </TabItem>
+    <TabItem value="host-network-linux" label="Host Network">
+
+#### Open WebUI in Host Network, Ollama on Host
 
 Both `Open WebUI` and `Ollama` use the host's network, enabling seamless interaction.
 
@@ -163,6 +190,9 @@ Rel(openwebui, ollama, "Makes API calls via localhost", "http://localhost:11434"
 Rel(user, openwebui, "Makes requests via listening port", "http://localhost:8080")
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
+
+    </TabItem>
+  </Tabs>
 
   </TabItem>
 </Tabs>
