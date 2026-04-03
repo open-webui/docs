@@ -7,6 +7,8 @@ title: "Docker Backend"
 
 Terminals with the Docker backend runs on a single Docker host and provisions an isolated [Open Terminal](/features/open-terminal) container for every user. Each person gets their own filesystem, processes, and resource limits — without needing Kubernetes.
 
+For an overview of how Terminals works and how it compares to the built-in multi-user mode, see the [Terminals overview](./).
+
 ```mermaid
 flowchart LR
     OW["Open WebUI"]
@@ -30,23 +32,9 @@ flowchart LR
 
 ---
 
-## How it works
-
-1. A user opens a terminal in Open WebUI.
-2. Open WebUI proxies the request to the **Terminals orchestrator**.
-3. The orchestrator checks if the user already has a running container.
-   - If not, it pulls the Open Terminal image and creates a new container for that user.
-   - If the container exists but is stopped, it starts it back up.
-4. Once the container is healthy (responds to `/health`), the orchestrator proxies all traffic to it.
-5. A background cleanup loop tears down containers that have been idle longer than the configured timeout.
-
-On restart, the orchestrator **reconciles** — it rediscovers existing containers by label so no work is lost.
-
----
-
 ## Prerequisites
 
-- Docker Engine installed
+- [Docker Engine](https://docs.docker.com/engine/install/) installed and running
 - Open WebUI running (or ready to deploy alongside)
 - [Open WebUI Enterprise License](https://openwebui.com/enterprise)
 
@@ -63,9 +51,29 @@ services:
     ports:
       - "3000:8080"
     environment:
-      # Point Open WebUI at the orchestrator.
-      # This is auto-detected as an orchestrator connection.
-      - TERMINAL_SERVER_CONNECTIONS=[{"id":"terminals","name":"Terminals","enabled":true,"url":"http://terminals:3000","key":"${TERMINALS_API_KEY}","auth_type":"bearer","config":{"access_grants":[{"principal_type":"user","principal_id":"*","permission":"read"}]}}]
+      # Connect Open WebUI to the Terminals orchestrator.
+      # The JSON array defines one terminal connection:
+      #   id/name   — identifier shown in the UI
+      #   url/key   — orchestrator address and shared API key
+      #   auth_type — "bearer" sends the key as a Bearer token
+      #   access_grants — who can use this connection
+      #     principal_type: "user", principal_id: "*" → all users
+      - >-
+        TERMINAL_SERVER_CONNECTIONS=[{
+          "id": "terminals",
+          "name": "Terminals",
+          "enabled": true,
+          "url": "http://terminals:3000",
+          "key": "${TERMINALS_API_KEY}",
+          "auth_type": "bearer",
+          "config": {
+            "access_grants": [{
+              "principal_type": "user",
+              "principal_id": "*",
+              "permission": "read"
+            }]
+          }
+        }]
     volumes:
       - open-webui:/app/backend/data
     networks:
@@ -99,7 +107,9 @@ networks:
 ```
 
 :::warning Docker socket access
-The orchestrator mounts the Docker socket so it can create and manage containers. This grants broad control over the Docker daemon. In production, consider using a Docker socket proxy like [Tecnativa/docker-socket-proxy](https://github.com/Tecnativa/docker-socket-proxy) to restrict which API calls are allowed.
+The Docker socket (`/var/run/docker.sock`) is the API endpoint that programs use to create, start, and stop containers on the host. Mounting it into the orchestrator gives it full control over the Docker daemon — meaning it could, in theory, access any container on the host.
+
+For production deployments, use a Docker socket proxy like [Tecnativa/docker-socket-proxy](https://github.com/Tecnativa/docker-socket-proxy) to restrict the orchestrator to only the API calls it needs (container create, start, stop, remove, inspect).
 :::
 
 Set the shared API key in a `.env` file next to your Compose file:
@@ -163,13 +173,7 @@ All orchestrator settings are configured via environment variables prefixed with
 
 ## Policies
 
-The orchestrator supports **policies** — named environment configurations that let you offer different setups to different teams. For example, a `data-science` policy might use a larger image with pre-installed Python packages, while a `development` policy uses the default slim image.
-
-Policies are managed via the orchestrator's REST API (`/api/v1/policies`). Each policy is then referenced by a terminal connection in Open WebUI under **Settings → Connections**.
-
-When a policy is configured, requests are routed through `/p/{policy_id}/` — for example, `/p/data-science/execute`.
-
-👉 **[See the Policies guide for full details →](./policies.md)**
+The orchestrator supports **policies** — named environment configurations that let you offer different setups to different teams. See the [Policies guide](./policies) for full details on creating and managing policies.
 
 ---
 
@@ -202,16 +206,3 @@ If a container with the same name already exists (e.g., from a previous failed c
 - **Single host** — all user containers run on one Docker host. For high availability or larger teams, use the [Kubernetes Operator](./kubernetes-operator).
 - **No built-in HA** — if the orchestrator goes down, active terminal sessions are interrupted (though containers keep running and are reconciled on restart).
 - **Docker socket required** — the orchestrator needs access to the Docker socket to manage containers.
-
----
-
-## Next steps
-
-- [Kubernetes Operator](./kubernetes-operator) — production-grade deployment with CRD-based lifecycle management
-- [Multi-User Setup](../multi-user) — comparison of isolation approaches
-- [Security best practices](../security)
-- [Configuration reference](../configuration) — all Open Terminal container settings
-
-:::info Enterprise license required
-Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
-:::

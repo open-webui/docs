@@ -7,6 +7,8 @@ title: "Kubernetes Operator"
 
 Terminals with the Kubernetes Operator backend is the production-grade deployment for multi-tenant terminals on Kubernetes. A [Kopf](https://kopf.readthedocs.io/)-based operator watches `Terminal` custom resources and manages the full lifecycle of per-user Pods, Services, PVCs, and Secrets.
 
+For an overview of how Terminals works and how it compares to the built-in multi-user mode, see the [Terminals overview](./).
+
 ```mermaid
 flowchart LR
     OW["Open WebUI"]
@@ -41,10 +43,10 @@ The Kubernetes deployment includes three components:
 | Component | Role |
 | :--- | :--- |
 | **Orchestrator** | FastAPI service that receives requests from Open WebUI, creates `Terminal` custom resources, and proxies traffic to user Pods once they're running. |
-| **Operator** | Kopf controller that watches `Terminal` CRs and reconciles the underlying infrastructure — creates Pods, Services, Secrets, and PVCs for each terminal. |
-| **Terminal CRD** | A `Terminal` custom resource (`terminals.openwebui.com/v1alpha1`) that declaratively represents a user's terminal instance. |
+| **Operator** | [Kopf](https://kopf.readthedocs.io/) controller that watches `Terminal` CRs and reconciles the underlying infrastructure — creates Pods, Services, Secrets, and PVCs for each terminal. (Kopf is a Python framework for building Kubernetes operators.) |
+| **Terminal CRD** | A `Terminal` custom resource definition (`terminals.openwebui.com/v1alpha1`) that declares a new Kubernetes object type representing a user's terminal instance. |
 
-When a user opens a terminal in Open WebUI:
+The provisioning flow works as follows:
 
 1. Open WebUI proxies the request to the **orchestrator**.
 2. The orchestrator creates a `Terminal` CR in the cluster.
@@ -53,6 +55,15 @@ When a user opens a terminal in Open WebUI:
 5. The orchestrator reads the service URL and API key from the CR status, then proxies all traffic.
 6. When the terminal is idle past the configured timeout, the operator deletes the Pod (the PVC and Secret survive so the workspace persists).
 7. On the next request, the orchestrator creates a new CR and the cycle repeats — the existing PVC is reattached.
+
+---
+
+## Prerequisites
+
+- A running Kubernetes cluster (v1.24+)
+- [Helm](https://helm.sh/docs/intro/install/) v3 installed
+- `kubectl` configured to access your cluster
+- [Open WebUI Enterprise License](https://openwebui.com/enterprise)
 
 ---
 
@@ -248,7 +259,8 @@ kubectl get terminals -n open-webui
 # Inspect a specific terminal
 kubectl describe terminal terminal-a1b2c3-default -n open-webui
 
-# Delete a terminal (Pod, Service, and Secret are garbage-collected via ownerReferences)
+# Delete a terminal (Pod, Service, and Secret are garbage-collected via ownerReferences —
+# Kubernetes automatically deletes child resources when the parent is removed)
 kubectl delete terminal terminal-a1b2c3-default -n open-webui
 ```
 
@@ -297,7 +309,7 @@ All configurable values under the `terminals` key:
 
 ## RBAC requirements
 
-If you're not using the Helm chart, the operator's ServiceAccount needs a ClusterRole with these permissions:
+RBAC (Role-Based Access Control) defines what Kubernetes permissions the operator needs. If you're not using the Helm chart (which configures RBAC automatically), the operator's ServiceAccount needs a ClusterRole with these permissions:
 
 | Resource | Verbs |
 | :--- | :--- |
@@ -334,16 +346,3 @@ kubectl logs -n open-webui deployment/<release>-terminals-operator --tail=50
 ```bash
 kubectl logs -n open-webui deployment/<release>-terminals-orchestrator --tail=50
 ```
-
----
-
-## Next steps
-
-- [Docker Backend](./docker-backend) — simpler single-host deployment without Kubernetes
-- [Multi-User Setup](../multi-user) — comparison of isolation approaches
-- [Security best practices](../security)
-- [Configuration reference](../configuration) — all Open Terminal container settings
-
-:::info Enterprise license required
-Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
-:::

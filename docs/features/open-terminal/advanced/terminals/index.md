@@ -7,6 +7,12 @@ title: "Overview"
 
 **Terminals** is an enterprise orchestration layer for [Open Terminal](/features/open-terminal) that provisions a fully isolated terminal container for every user. Instead of sharing a single container, each person gets their own — with separate files, processes, resource limits, and network isolation.
 
+:::tip Quick navigation
+- **Just want to try it?** → [Docker Compose quickstart](./docker-backend)
+- **Running Kubernetes?** → [Helm chart deployment](./kubernetes-operator)
+- **Need different environments per team?** → [Policies guide](./policies)
+:::
+
 ```mermaid
 flowchart LR
     OW["Open WebUI"]
@@ -38,6 +44,17 @@ Open Terminal's [built-in multi-user mode](../multi-user#option-1-built-in-multi
 | **Infrastructure** | Single container | Docker host or Kubernetes cluster |
 | **Best for** | Small trusted teams | Production, larger teams, untrusted users |
 
+:::info Key concepts
+If you're new to containers and orchestration, here's a quick glossary:
+
+- **Container** — a lightweight, isolated environment that packages an application and its dependencies. Think of it as a mini virtual machine.
+- **Docker** — a tool for running containers on a single machine.
+- **Kubernetes (K8s)** — a platform for running and managing containers across a cluster of machines. Used for production-scale deployments.
+- **Helm chart** — a package format for Kubernetes. Similar to `docker-compose.yaml` but for Kubernetes clusters.
+- **CRD (Custom Resource Definition)** — a way to extend Kubernetes with new object types. Terminals defines a `Terminal` CRD so Kubernetes can manage terminal instances natively.
+- **API key** — a secret token used to authenticate requests between services.
+:::
+
 ---
 
 ## How it works
@@ -45,12 +62,14 @@ Open Terminal's [built-in multi-user mode](../multi-user#option-1-built-in-multi
 Terminals sits between Open WebUI and the Open Terminal instances:
 
 1. A user activates a terminal in Open WebUI.
-2. Open WebUI proxies the request to the **Terminals orchestrator**.
+2. Open WebUI proxies the request to the **Terminals orchestrator** — a service that manages the lifecycle of terminal containers.
 3. The orchestrator provisions a personal Open Terminal container for that user (or reconnects to an existing one).
 4. All traffic is proxied through the orchestrator. The user never connects to their container directly.
 5. Idle containers are automatically cleaned up after a configurable timeout. Data optionally persists across sessions.
 
 The orchestrator also exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can execute commands, read files, and run code — all scoped to the requesting user's container.
+
+The [Docker Backend](./docker-backend) and [Kubernetes Operator](./kubernetes-operator) pages cover backend-specific details of how provisioning works in each environment.
 
 ---
 
@@ -88,7 +107,7 @@ Includes a ready-to-use Docker Compose file. **[Get started →](./docker-backen
 
 ### [Kubernetes Operator](./kubernetes-operator)
 
-Production-grade deployment using a CRD-based Kopf operator. Deploys alongside Open WebUI via the Helm chart. Best for:
+Production-grade deployment using a Kubernetes operator. Deploys alongside Open WebUI via the Helm chart. Best for:
 
 - Production environments
 - Larger teams requiring scalability
@@ -102,13 +121,46 @@ Integrates as a subchart of the Open WebUI Helm chart — enable with `terminals
 
 The orchestrator supports three authentication modes:
 
-| Mode | When to use |
-| :--- | :--- |
-| **Open WebUI JWT** | Production. Set `TERMINALS_OPEN_WEBUI_URL` and the orchestrator validates tokens against your Open WebUI instance. |
-| **Shared API key** | Standard. Set `TERMINALS_API_KEY` to a shared secret that Open WebUI includes in requests. |
-| **Open** | Development only. No auth — do not use in production. |
+| Mode | When to use | How to configure |
+| :--- | :--- | :--- |
+| **Open WebUI JWT** | Production. The orchestrator validates tokens against your Open WebUI instance. | Set `TERMINALS_OPEN_WEBUI_URL` on the orchestrator to your Open WebUI URL. |
+| **Shared API key** | Standard. Open WebUI includes a shared secret in every request. | Set `TERMINALS_API_KEY` to the same value on both Open WebUI and the orchestrator. |
+| **Open** | Development only. No auth — do not use in production. | Leave both `TERMINALS_OPEN_WEBUI_URL` and `TERMINALS_API_KEY` unset. |
 
 When deployed via Docker Compose or Helm, the shared API key is configured automatically between Open WebUI and the orchestrator.
+
+---
+
+## Troubleshooting
+
+### Terminal won't start
+
+1. **Check orchestrator logs** — the orchestrator logs the full provisioning flow, including image pull and container creation. Look for errors related to image availability or resource limits.
+2. **Verify the API key** — ensure `TERMINALS_API_KEY` matches between Open WebUI and the orchestrator. A mismatch causes silent auth failures.
+3. **Check image pull access** — if using a private container registry, make sure the orchestrator (Docker) or cluster (Kubernetes) has pull credentials configured.
+
+### Authentication failures
+
+- If using **JWT mode**, confirm `TERMINALS_OPEN_WEBUI_URL` points to a reachable Open WebUI instance.
+- If using **API key mode**, confirm the key is set identically on both sides. Check for extra whitespace or newlines.
+- Check the orchestrator logs for `401` or `403` responses.
+
+### Container is reaped too quickly
+
+Increase `TERMINALS_IDLE_TIMEOUT_MINUTES` (or `idle_timeout_minutes` in a policy). The default is `0` (disabled), but if set too low, containers may be cleaned up while users are still working. A value of `30` is typical.
+
+### Connection refused
+
+- **Docker:** ensure `TERMINALS_NETWORK` is set so containers can communicate by name. Without it, containers use published ports and the `TERMINALS_DOCKER_HOST` address must be reachable.
+- **Kubernetes:** verify the orchestrator Service is accessible from the Open WebUI Pod. Run `kubectl get svc -n open-webui` to confirm the service exists.
+
+---
+
+## Further reading
+
+- [Multi-User Setup](../multi-user) — comparison of isolation approaches
+- [Security best practices](../security)
+- [Configuration reference](../configuration) — all Open Terminal container settings
 
 ---
 
