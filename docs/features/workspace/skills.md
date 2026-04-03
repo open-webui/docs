@@ -116,7 +116,7 @@ Add your Open Terminal instance as a Tool Server by following the [OpenAPI Tool 
 Once connected, the Open Terminal tools (execute, file upload, file download) appear automatically in the chat interface.
 
 :::tip
-For the best experience, pair Open Terminal with a [Skill](/features/ai-knowledge/skills) that teaches the model how to use the tool effectively — for example, instructing it to always check exit codes, handle errors gracefully, and use streaming for long-running commands.
+For the best experience, pair Open Terminal with a [Skill](/features/workspace/skills) that teaches the model how to use the tool effectively — for example, instructing it to always check exit codes, handle errors gracefully, and use streaming for long-running commands.
 :::
 
 See the [Open Terminal documentation](/features/open-terminal) for the full API reference and detailed setup instructions.
