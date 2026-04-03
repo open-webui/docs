@@ -74,6 +74,7 @@ Step-by-step reverse proxy configurations for securing your deployment with HTTP
 | ⚡ **Caddy** | Automatic HTTPS with minimal configuration |
 | 🔄 **HAProxy** | Enterprise-grade load balancing with TLS offloading |
 | ☁️ **Cloudflare Tunnel** | Expose Open WebUI securely without opening ports |
+| 🔒 **Tailscale** | Private encrypted access across your devices, no public exposure |
 | 🧪 **ngrok** | Instant HTTPS tunnels for development and testing |
 
 [**Set up HTTPS →**](/reference/https)

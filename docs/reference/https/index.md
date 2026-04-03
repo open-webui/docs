@@ -21,6 +21,7 @@ Modern browsers block microphone access on non-HTTPS origins. **Voice Calls will
 | :--- | :--- | :--- |
 | [**Cloudflare Tunnel**](./cloudflare-tunnel) | Production without open ports | Automatic (Cloudflare edge) |
 | [**ngrok**](./ngrok) | Development and testing | Automatic (ngrok edge) |
+| [**Tailscale**](./tailscale) | Private access across devices | Automatic (tailscale serve) |
 | [**Nginx**](./nginx) | Self-hosted production with full control | Manual or Let's Encrypt |
 | [**Caddy**](./caddy) | Self-hosted production, minimal config | Automatic (Let's Encrypt) |
 | [**HAProxy**](./haproxy) | High-availability / load balancing | Manual or Let's Encrypt |
