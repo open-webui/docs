@@ -47,21 +47,6 @@ Open WebUI exposes a full REST API authenticated via Bearer tokens or JWTs. Use 
 
 ---
 
-## 🌐 Network Diagrams
-
-**See exactly how Open WebUI, Ollama, and Docker talk to each other.**
-
-Visual C4 diagrams for every common deployment topology: host networking, Docker Compose stacks, separate networks, and Linux vs. macOS/Windows differences. Use these to debug connectivity issues or plan your architecture.
-
-| | |
-| :--- | :--- |
-| 🖥️ **macOS / Windows** | Host Ollama, Compose stack, separate networks, host-network pitfalls |
-| 🐧 **Linux** | Same topologies with Linux-specific networking behavior |
-
-[**View network diagrams →**](/reference/network-diagrams)
-
----
-
 ## 🔒 HTTPS Configuration
 
 **Terminate TLS in front of Open WebUI with Nginx, Caddy, or HAProxy.**
@@ -81,16 +66,47 @@ Step-by-step reverse proxy configurations for securing your deployment with HTTP
 
 ---
 
-## 📊 Monitoring
+## 🔑 API Keys
 
-**Observe your deployment with OpenTelemetry, Prometheus, Grafana, and Langfuse.**
+**Programmatic access to Open WebUI for scripts, bots, and integrations.**
 
-Production monitoring guides covering traces, metrics, structured logs, and LLM-specific observability. Integrate with your existing observability stack or set up a new one from scratch.
+Generate personal access tokens that let external code call the same endpoints the web UI uses. Each key inherits the permissions of the user who created it.
 
 | | |
 | :--- | :--- |
+| 🔐 **Bearer token auth** | Standard `Authorization: Bearer` header, works with any HTTP client |
+| 🛡️ **Scoped to user** | Key inherits your role and group permissions |
+| 🚫 **Endpoint restrictions** | Optionally limit which API routes a key can access |
+
+[**Set up API keys →**](/features/access-security/api-keys)
+
+---
+
+## 📊 Monitoring
+
+**Observe your deployment with Uptime Kuma, OpenTelemetry, Prometheus, and Grafana.**
+
+Production monitoring guides covering health checks, model connectivity verification, distributed tracing, metrics, and structured logs. Integrate with your existing observability stack or set up a new one from scratch.
+
+| | |
+| :--- | :--- |
+| ✅ **Health checks** | Basic, model connectivity, and deep health checks with Uptime Kuma |
 | 📡 **OpenTelemetry** | Traces, metrics, and logs piped to any OTLP-compatible backend |
 | 📈 **Dashboards** | Prometheus + Grafana for real-time system and model metrics |
-| 🔍 **LLM tracing** | Langfuse integration for prompt-level observability |
 
 [**Set up monitoring →**](/reference/monitoring)
+
+---
+
+## 🌐 Network Diagrams
+
+**See how Open WebUI, Ollama, and Docker communicate across different deployment topologies.**
+
+Visual C4 diagrams covering host networking, Docker Compose stacks, separate networks, and platform-specific differences. Useful for debugging connectivity issues or planning your architecture.
+
+| | |
+| :--- | :--- |
+| 🖥️ **macOS / Windows** | Host Ollama, Compose stack, separate networks, host-network pitfalls |
+| 🐧 **Linux** | Same topologies with Linux-specific networking behavior |
+
+[**View network diagrams →**](/reference/network-diagrams)

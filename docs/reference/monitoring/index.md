@@ -1,11 +1,11 @@
 ---
 sidebar_position: 6
-title: "API Keys & Monitoring"
+title: "Monitoring"
 ---
 
-# API Keys & Monitoring Your Open WebUI 🔑🩺
+# Monitoring Your Open WebUI 🩺
 
-This guide covers two essential topics: setting up API keys for programmatic access to Open WebUI, and monitoring your instance to ensure reliability and performance.
+This guide covers monitoring your Open WebUI instance to ensure reliability and performance.
 
 **Why Monitor?**
 
@@ -73,118 +73,20 @@ See the [Open WebUI API documentation](https://docs.openwebui.com/reference/api-
 
 **How to Test with `curl` (Authenticated):**
 
-You'll need an API key to access this endpoint. See the "Authentication Setup" section below for instructions on generating an API key.
+You'll need an API key to access this endpoint. See [API Keys](/features/access-security/api-keys) for instructions on generating one.
 
 ```bash
    # Authenticated model connectivity check
-   curl -H "Authorization: Bearer YOUR_API_KEY" https://your-open-webui-instance/api/models
+   curl -H "Authorization: Bearer YOUR_API_KEY" http://your-open-webui-instance:8080/api/models
 ```
 
 *(Replace `YOUR_API_KEY` with your actual API key and `your-open-webui-instance` with your Open WebUI address.)*
 
 **Expected Output:** A successful request will return a `200 OK` status code and a JSON response containing a list of models.
 
-### Authentication Setup for API Key 🔑
-
-Before you can monitor the `/api/models` endpoint, you need to configure API keys in Open WebUI. API key creation requires that the global API keys feature is enabled. For non-admin users, API key creation also requires the API Keys feature permission.
-
-#### Step 1: Enable API Keys Globally (Admin Required)
-
-1. Log in to Open WebUI as an **administrator**.
-2. Click on your **profile icon** in the bottom-left corner of the sidebar, then select **Admin Panel**.
-3. Navigate to **Settings** > **General**.
-4. Scroll down to the **Authentication** section.
-5. Find the **"Enable API Keys"** toggle and **turn it ON**.
-6. *(Optional)* Configure additional API key restrictions:
-   - **API Key Endpoint Restrictions**: Enable this to limit which endpoints can be accessed via API keys.
-   - **Allowed Endpoints**: Specify a comma-separated list of allowed endpoints (e.g., `/api/v1/models,/api/v1/chat/completions`).
-7. Click **Save** at the bottom of the page.
-
-:::info
-
-This enables the API key feature globally.
-
-- Admin users can now generate API keys immediately.
-- Non-admin users still require API Keys permission (configured in Step 2).
-
+:::tip Dedicated Monitoring Account
+For production monitoring, create a **non-admin user** specifically for monitoring (e.g., `monitoring-bot`), generate an API key from that account, and use it for all monitoring requests. This limits blast radius if the key is ever compromised.
 :::
-
-#### Step 2: Grant API Key Permission (Admin Required)
-
-Non-admin users need explicit API Keys permission. Administrators can grant API key permissions for non-admin users using one of the following methods:
-
-##### Option A: Grant Permission via Default Permissions
-
-This grants the API Keys permission to **all users with the "user" role**:
-
-1. In the **Admin Panel**, navigate to **Users** > **Groups**.
-2. At the bottom of the Groups page, click on **"Default permissions"** (this applies to all users with the "user" role).
-3. In the modal that opens, scroll to the **Features Permissions** section.
-4. Find **"API Keys"** and **toggle it ON**.
-5. Click **Save**.
-
-:::info
-
-**Note for Administrators:** "Default permissions" only applies to accounts with the "user" role. Admin accounts do not need `features.api_keys` to generate API keys, but you may still use groups to grant that permission to non-admin users.
-
-:::
-
-:::warning
-
-Enabling API Keys for all users means any user can generate API keys that provide programmatic access to Open WebUI with their account's permissions. Consider using User Groups (Option B) for more restrictive access control.
-
-:::
-
-##### Option B: Grant Permission via User Groups
-
-For more granular control, you can grant API key permissions to specific user groups only:
-
-1. In the **Admin Panel**, navigate to **Users** > **Groups**.
-2. Select the group you want to grant API key permissions to (or click the **+ button** to create a new group).
-3. In the group edit modal, click on the **Permissions** tab.
-4. Scroll to **Features Permissions**.
-5. Find **"API Keys"** and **toggle it ON**.
-6. Click **Save**.
-
-:::tip
-
-Create a dedicated monitoring group (e.g., "Monitoring Users") and add only the accounts that need API key access for monitoring purposes. This follows the principle of least privilege.
-
-:::
-
-#### Step 3: Generate an API Key (User Action)
-
-Once global API keys are enabled (and for non-admin users, API Keys permission is granted):
-
-1. Log in to Open WebUI with a user account that has API key permissions.
-2. Click on your **profile icon** in the bottom-left corner of the sidebar.
-3. Select **Settings** > **Account**.
-4. In the **API Keys** section, click **Generate New API Key**.
-5. Give the API key a descriptive name (e.g., "Monitoring API Key").
-6. **Copy the generated API key** immediately and store it securely—you won't be able to view it again.
-
-:::warning
-
-Treat your API key like a password! Store it securely and never share it publicly. If you suspect an API key has been compromised, delete it immediately and generate a new one.
-
-:::
-
-#### Recommended: Create a Dedicated Monitoring Account
-
-For production monitoring, we recommend:
-
-1. Create a **non-administrator user account** specifically for monitoring (e.g., "monitoring-bot").
-2. Add this account to a group with API key permissions (or ensure default permissions allow API key creation).
-3. Generate an API key from this account.
-
-This approach limits the potential impact if the monitoring API key is compromised—the attacker would only have access to the permissions granted to that specific monitoring account, not administrator privileges.
-
-#### Troubleshooting
-
-If you don't see the API key generation option in your account settings:
-
-- **Check global setting**: Verify that an administrator has enabled API keys globally under **Admin Panel** > **Settings** > **General** > **Enable API Keys**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
-- **Check your permissions (non-admin users)**: Verify that your user account or group has been granted the "API Keys" feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
 
 ### Using Uptime Kuma for Model Connectivity Monitoring 🐻
 
@@ -251,3 +153,10 @@ curl -X POST https://your-open-webui-instance/api/chat/completions \
 **Setting up Level 3 Monitoring in Uptime Kuma would involve configuring an HTTP(s) monitor with a POST request, JSON body, authentication headers, and potentially JSON query to validate the response content. This is a more advanced setup and can be customized based on your specific needs.**
 
 By implementing these monitoring levels, you can proactively ensure the health, reliability, and performance of your Open WebUI instance, providing a consistently positive experience for users.
+
+---
+
+## Next Steps
+
+- **[OpenTelemetry](/reference/monitoring/otel)** - Distributed tracing, metrics, and logs with Grafana, Prometheus, Jaeger, and more
+- **[API Keys](/features/access-security/api-keys)** - Full guide on enabling and generating API keys for programmatic access

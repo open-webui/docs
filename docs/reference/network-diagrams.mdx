@@ -1,15 +1,19 @@
 ---
-sidebar_position: 3
+sidebar_position: 100
 title: "Network Diagrams"
 ---
 
-Here, we provide clear and structured diagrams to help you understand how various components of the network interact within different setups. This documentation is designed to assist both macOS/Windows and Linux users. Each scenario is illustrated using Mermaid diagrams to show how the interactions are set up depending on the different system configurations and deployment strategies.
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-## Mac OS/Windows Setup Options 🖥️
+Visual C4 diagrams for common deployment topologies showing how Open WebUI, Ollama, and Docker communicate. Use these to debug connectivity issues or plan your architecture.
+
+<Tabs groupId="os-platform">
+  <TabItem value="macos-windows" label="macOS / Windows" default>
 
 ### Ollama on Host, Open WebUI in Container
 
-In this scenario, `Ollama` runs directly on the host machine while `Open WebUI` operates within a Docker container.
+`Ollama` runs directly on the host machine while `Open WebUI` operates within a Docker container.
 
 ```mermaid
 C4Context
@@ -47,7 +51,7 @@ UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 
 ### Ollama and Open WebUI, Separate Networks
 
-Here, `Ollama` and `Open WebUI` are deployed in separate Docker networks, potentially leading to connectivity issues.
+`Ollama` and `Open WebUI` are deployed in separate Docker networks. This leads to connectivity issues.
 
 ```mermaid
 C4Context
@@ -69,7 +73,7 @@ UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 
 ### Open WebUI in Host Network
 
-In this configuration, `Open WebUI` utilizes the host network, which impacts its ability to connect in certain environments.
+`Open WebUI` utilizes the host network, which impacts its ability to connect in certain environments.
 
 ```mermaid
 C4Context
@@ -83,11 +87,12 @@ Rel(user, openwebui, "Unable to connect, host network is the VM's network")
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-## Linux Setup Options 🐧
+  </TabItem>
+  <TabItem value="linux" label="Linux">
 
-### Ollama on Host, Open WebUI in Container (Linux)
+### Ollama on Host, Open WebUI in Container
 
-This diagram is specific to the Linux platform, with `Ollama` running on the host and `Open WebUI` deployed inside a Docker container.
+`Ollama` runs on the host and `Open WebUI` is deployed inside a Docker container.
 
 ```mermaid
 C4Context
@@ -103,9 +108,9 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Ollama and Open WebUI in Compose Stack (Linux)
+### Ollama and Open WebUI in Compose Stack
 
-A set-up where both `Ollama` and `Open WebUI` reside within the same Docker Compose stack, allowing for straightforward networking on Linux.
+Both `Ollama` and `Open WebUI` reside within the same Docker Compose stack, allowing for straightforward networking.
 
 ```mermaid
 C4Context
@@ -123,9 +128,9 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Ollama and Open WebUI, Separate Networks (Linux)
+### Ollama and Open WebUI, Separate Networks
 
-A scenario in which `Ollama` and `Open WebUI` are in different Docker networks under a Linux environment, which could hinder connectivity.
+`Ollama` and `Open WebUI` are in different Docker networks, which can hinder connectivity.
 
 ```mermaid
 C4Context
@@ -143,9 +148,9 @@ Rel(user, openwebui, "Makes requests via exposed port -p 3000:8080", "http://loc
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-### Open WebUI in Host Network, Ollama on Host (Linux)
+### Open WebUI in Host Network, Ollama on Host
 
-An optimal layout where both `Open WebUI` and `Ollama` use the host’s network, facilitating seamless interaction on Linux systems.
+Both `Open WebUI` and `Ollama` use the host's network, enabling seamless interaction.
 
 ```mermaid
 C4Context
@@ -159,4 +164,5 @@ Rel(user, openwebui, "Makes requests via listening port", "http://localhost:8080
 UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
 ```
 
-Each setup addresses different deployment strategies and networking configurations to help you choose the best layout for your requirements.
+  </TabItem>
+</Tabs>
