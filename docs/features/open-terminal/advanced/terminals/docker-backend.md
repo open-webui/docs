@@ -208,9 +208,9 @@ If a container with the same name already exists (e.g., from a previous failed c
 ## Next steps
 
 - [Kubernetes Operator](./kubernetes-operator) — production-grade deployment with CRD-based lifecycle management
-- [Multi-User Setup](../advanced/multi-user) — comparison of isolation approaches
-- [Security best practices](../advanced/security)
-- [Configuration reference](../advanced/configuration) — all Open Terminal container settings
+- [Multi-User Setup](../multi-user) — comparison of isolation approaches
+- [Security best practices](../security)
+- [Configuration reference](../configuration) — all Open Terminal container settings
 
 :::info Enterprise license required
 Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.

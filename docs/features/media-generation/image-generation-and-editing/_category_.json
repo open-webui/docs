@@ -2,6 +2,7 @@
 	"label": "Create & Edit Images",
 	"position": 400,
 	"link": {
-		"type": "generated-index"
+		"type": "generated-index",
+		"slug": "/features/media-generation/image-generation-and-editing"
 	}
 }
