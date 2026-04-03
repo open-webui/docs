@@ -64,7 +64,6 @@ Reuses the LLM-generated Web-Search search queries for RAG search within the sam
 - **Env Var**: `ENABLE_QUERIES_CACHE=True`
   *   *Note*: If enabled, the same search query will be reused for RAG instead of generating new queries for RAG, saving on inference cost and API calls, thus improving performance.
 
-I.e. the LLM generates "US News 2025" as a Web Search query, if this setting is enabled, the same search query will be reused for RAG instead of generating new queries for RAG, saving on inference cost and API calls, thus improving performance.
 
 #### KV Cache Optimization (RAG Performance)
 Drastically improves the speed of follow-up questions when chatting with large documents or knowledge bases.

@@ -654,49 +654,7 @@ The stamp-and-continue approach only applies to "already exists" and "duplicate 
 
 **Cause:** `WEBUI_SECRET_KEY` environment variable is missing.
 
-**Solution:**
-
-<Tabs groupId="install-type">
-  <TabItem value="docker" label="Docker" default>
-
-```bash title="Terminal - Fix Missing Secret Key (Docker)"
-# Method 1: Check backend directory first (most common location)
-export WEBUI_SECRET_KEY=$(cat /app/backend/.webui_secret_key)
-
-# Method 2: If that fails, try data directory
-# export WEBUI_SECRET_KEY=$(cat /app/backend/data/.webui_secret_key)
-
-# Method 3: If neither file exists, generate new key
-# export WEBUI_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-# echo $WEBUI_SECRET_KEY > /app/backend/.webui_secret_key
-
-# Verify it's set
-echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
-
-# Try alembic again
-alembic current -v
-```
-
-  </TabItem>
-  <TabItem value="local" label="Local Install">
-
-```bash title="Terminal - Fix Missing Secret Key (Local)"
-# Method 1: Use existing key from file
-export WEBUI_SECRET_KEY=$(cat ../data/.webui_secret_key)
-
-# Method 2: Check if it's in your .env file
-grep WEBUI_SECRET_KEY .env
-# Then export it: export WEBUI_SECRET_KEY="value-from-env-file"
-
-# Verify it's set
-echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
-
-# Try alembic again
-alembic current -v
-```
-
-  </TabItem>
-</Tabs>
+**Solution:** Set the `WEBUI_SECRET_KEY` environment variable as described in [Step 2: Set Required Environment Variables](#set-required-environment-variables), then retry your Alembic command.
 
 :::warning Why This Happens
 Open WebUI's `env.py` file imports models, which import `open_webui.env`, which validates that `WEBUI_SECRET_KEY` exists. Without it, Python crashes before Alembic can even connect to the database.

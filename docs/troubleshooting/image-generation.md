@@ -7,7 +7,7 @@ title: "Image Generation"
 
 ### General Issues
 
-- **Image Not Generating**:
+- **Image Not Generating** (clicking generate produces no result, or an error appears in the chat):
     - Check the **Images** settings in the **Admin Panel** > **Settings** > **Images**. Ensure "Image Generation" is toggled **ON**.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
@@ -15,7 +15,7 @@ title: "Image Generation"
 
 ### ComfyUI Issues
 
-- **Incompatible Workflow / JSON Errors**:
+- **Incompatible Workflow / JSON Errors** (you see `Invalid workflow` or JSON parse errors after uploading a workflow):
     - **API Format Required**: Open WebUI requires workflows to be in the **API Format**. 
     - In ComfyUI:
         1. Click the "Settings" (gear icon).
@@ -23,16 +23,16 @@ title: "Image Generation"
         3. Click "Save (API Format)" in the menu.
     - **Do not** use the standard "Save" button or standard JSON export.
 
-- **Image Editing / Image Variation Fails**:
+- **Image Editing / Image Variation Fails** (generating from text works, but editing or image-to-image fails silently):
     - If you are using Image Editing or Image+Image generation, your custom workflow **must** have nodes configured to accept an input image (usually a `LoadImage` node replaced/linked effectively).
     - Check the default "Image Editing" workflow in the Open WebUI settings for the required node structure to ensure compatibility.
 
 ### Automatic1111 Issues
 
-- **Connection Refused / "Api Not Found"**:
+- **Connection Refused / "Api Not Found"** (Automatic1111 is running, but Open WebUI reports connection errors):
     - Ensure you are running Automatic1111 with the `--api` flag enabled in your command line arguments.
     
-- **Docker Connectivity**:
+- **Docker Connectivity** (Open WebUI can't reach Automatic1111 on `localhost`):
     - If Open WebUI is running in Docker and Automatic1111 is on your host machine:
         - Use `http://host.docker.internal:7860` as the Base URL.
         - Ensure `host.docker.internal` is resolvable (added via `--add-host=host.docker.internal:host-gateway` in your Docker run command).
