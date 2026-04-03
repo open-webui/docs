@@ -30,6 +30,23 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 
 ---
 
+## Sharing Open WebUI
+
+**Bring AI to your entire organization with a single deployment.**
+
+Open WebUI isn't just a local interface for AI. It is designed to be a centralized AI operating system for teams. Deploy it once to leverage frictionless onboarding, collaborative intelligence, resource pooling, and centralized security.
+
+| | |
+| :--- | :--- |
+| **LAN & Tunnels** | Tailscale, Cloudflare Tunnels, and local IP access |
+| **Reverse Proxies** | Secure your instance with Nginx, Caddy, or HAProxy |
+| **Team Onboarding** | Admin approval flows and Enterprise SSO integrations |
+| **Shared Context** | Channels, shared chats, and common knowledge bases |
+
+[**Learn how to share Open WebUI →**](/getting-started/sharing)
+
+---
+
 ## 🛠️ Advanced Topics
 
 **Scale, observe, and customize your deployment.**
