@@ -4,192 +4,192 @@ title: "Models"
 sidebar_label: "Models"
 ---
 
-The `Models` section of the `Workspace` within Open WebUI is a powerful tool that allows you to create and manage custom models tailored to specific purposes.
+# 🤖 Models
 
-While backends like Ollama have their own `Modelfile` format, Open WebUI employs a robust internal **Preset System**. This allows you to "wrap" any model (including GPT-4, Claude, or local Llama 3) to bind specific **System Prompts**, **Knowledge Collections**, **Tools**, and **Dynamic Variables** to it.
+**Wrap any model with custom instructions, tools, and knowledge to build specialized agents.**
 
-This section serves as a central hub for all your models, providing a range of features to edit, clone, share, export, and hide your custom agents.
+The Models workspace lets you create configuration presets that sit on top of any base model. Pick GPT-4o, Claude, Llama 3, or anything else connected to Open WebUI, then bind a system prompt, knowledge bases, tools, skills, and parameter overrides to it. The result is a purpose-built agent that behaves exactly the way you need without modifying the underlying model.
 
-## Creating and Editing Models
+A "Python Tutor" that always uses your style guide. A "Meeting Summarizer" with your company's template. A "Code Reviewer" with your linting rules baked in. Every agent is a thin wrapper: pick a base model, configure it, and share it with your team.
 
-When you create a new model or edit an existing one, you are building a configuration wrapper around a "Base Model".
-To access the model configuration interface, you have two primary entry points from the main Models list:
+---
 
-1. **New Model**: Click the **+ New Model** button in the top-right corner. This opens a blank configuration page to create a preset from scratch.
-2. **Edit Model**: Click the ellipsis (**...**) on an existing model card and select **Edit**. This opens the configuration page pre-filled with that model's current settings.
+## Why Models?
 
-Both actions lead to the same Model Builder interface, where you can configure the settings below.
+### One base model, many personas
 
-### Core Configuration
+The same GPT-4o can power a coding assistant, a customer support bot, and a creative writer. Each preset has its own system prompt, tools, and knowledge, so the model behaves differently depending on which preset is selected.
 
-- **Avatar Photo**: Upload a custom image to represent your model in the chat interface. **Animated formats** (GIF and WebP) are supported and their animations will be preserved during the upload process.
-- **Model Name & ID**: The display name and unique identifier for your custom preset (e.g., "Python Tutor" or "Meeting Summarizer").
-- **Base Model**: The actual model beneath the hood that powers the agent. You can choose *any* model connected to Open WebUI. You can create a custom preset for `gpt-4o` just as easily as `llama3`.
-  - **Fallback Behavior**: If the configured Base Model is unavailable and the `ENABLE_CUSTOM_MODEL_FALLBACK` environment variable is set to `True`, the system will automatically fall back to the first configured default model (set in Admin Panel > Settings > Models > Default Models). This ensures mission-critical custom models remain functional even if their specific base model is removed or temporarily unavailable.
-- **Description**: A short summary of what the model does.
-- **Tags**: Add tags to organize models in the selector dropdown.
-- **Visibility & Groups**:
-  - **Private**: Restricts access to specific users or groups.
-  - **Access Control Selector**: Use the access control panel to grant access to specific groups (e.g., "Admins", "Developers") or individual users without making the model public to everyone. The redesigned interface makes it easy to add multiple groups and users at once.
+### Knowledge and tools come pre-attached
 
-### System Prompt & Dynamic Variables
+Instead of manually attaching documents and enabling tools every chat, bind them once to the model preset. Users get a fully configured agent out of the box.
 
-The **System Prompt** defines the behavior and persona of the model. Unlike standard prompts, Open WebUI supports **Dynamic Variable Injection** using Jinja2-style placeholders. This allows the model to be aware of time, date, and user details.
+### Granular access control
 
-| Variable | Description | Output Example |
-| :--- | :--- | :--- |
-| `{{ CURRENT_DATE }}` | Injects today's date (YYYY-MM-DD). | `2024-10-27` |
-| `{{ CURRENT_TIME }}` | Injects the current time (24hr). | `14:30:05` |
-| `{{ USER_NAME }}` | The display name of the logged-in user. | `Admin` |
+Restrict models to specific users or groups. A finance team sees their models; engineering sees theirs. Admins control what's available instance-wide.
 
-**Example System Prompt:**
+### Dynamic system prompts
+
+Use Jinja2-style variables like `{{ USER_NAME }}` and `{{ CURRENT_DATE }}` so the system prompt adapts to each user and session automatically.
+
+---
+
+## Key Features
+
+| | |
+| :--- | :--- |
+| 🧩 **Model presets** | System prompt, tools, knowledge, skills, and parameters in one package |
+| 🏷️ **Dynamic variables** | `{{ USER_NAME }}`, `{{ CURRENT_DATE }}`, `{{ CURRENT_TIME }}` injected automatically |
+| 🔧 **Bound tools** | Force-enable specific tools per model |
+| 📚 **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
+| 🎭 **Skills** | Bind markdown instruction sets loaded on-demand via `view_skill` |
+| 👥 **Access control** | Restrict to specific users or groups |
+| 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
+| 🔊 **Per-model TTS voice** | Give each persona its own voice |
+
+---
+
+## Creating a Model
+
+Click **+ New Model** in **Workspace > Models**, or click the ellipsis (**...**) on an existing model and select **Edit**.
+
+### Core configuration
+
+| Field | Description |
+| :--- | :--- |
+| **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
+| **Name and ID** | Display name and unique identifier |
+| **Base Model** | The actual model that powers this agent |
+| **Description** | Short summary shown in the model selector |
+| **Tags** | Organize models in the dropdown |
+| **Visibility** | Private (specific users/groups) or public |
+
+### System prompt and variables
+
+The system prompt defines the behavior and persona. Use dynamic variables for context-aware instructions:
+
+| Variable | Output example |
+| :--- | :--- |
+| `{{ CURRENT_DATE }}` | `2024-10-27` |
+| `{{ CURRENT_TIME }}` | `14:30:05` |
+| `{{ USER_NAME }}` | `Admin` |
 
 ```
 You are a helpful assistant for {{ USER_NAME }}.
 The current date is {{ CURRENT_DATE }}.
 ```
 
-### Advanced Parameters
+### Capabilities and bindings
 
-Clicking **Show** on **Advanced Params** allows you to fine-tune the inference generation.
+Toggle what the model can do and bind resources:
 
-- **Stop Sequences**: A powerful feature that tells the model to force-stop generating text when it hits specific characters. This is vital for roleplay or coding models to prevent them from hallucinating both sides of a conversation.
-  - *Format:* Enter the string (e.g., `<|end_of_text|>`, `User:`) and press `Enter`.
-- **Temperature, Top P, etc.**: Adjust the creativity and determinism of the model.
+| Setting | What it controls |
+| :--- | :--- |
+| **Knowledge** | Bind collections or files. Click attached items to toggle between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
+| **Tools** | Force-enable specific tools (e.g., Calculator for a Math Bot) |
+| **Skills** | Bind [Skills](/features/workspace/skills) so their manifests are always injected |
+| **Filters** | Attach pipeline filters (e.g., PII redaction) |
+| **Actions** | Attach action scripts (e.g., "Add to Memories") |
+| **Vision** | Enable image analysis (requires a vision-capable base model) |
+| **Web Search** | Enable the configured search provider |
+| **Code Interpreter** | Enable Python code execution |
+| **Image Generation** | Enable image generation |
+| **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels |
+| **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
+| **TTS Voice** | Set a specific voice for this model's responses |
 
-### Prompt Suggestions
+### Advanced parameters
 
-**Prompt Suggestions** are clickable "starter chips" that appear above the input bar when a user opens a fresh chat with this model. These are vital for onboarding users to specialized agents.
+- **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). Press Enter after each.
+- **Temperature, Top P, etc.**: Adjust creativity and determinism.
 
-- **Purpose**: To guide the user on what the model is capable of or to provide one-click shortcuts for common tasks.
-- **How to add**: Type a phrase (e.g., "Summarize this text") and click the **+** button. You can add multiple suggestions.
-- **Example**: For a "Python Tutor" model, you might add:
-  - *"Explain this code step-by-step"*
-  - *"Find bugs in the following script"*
-  - *"Write a Unit Test for this function"*
+### Prompt suggestions
 
-### Capabilities, Binding & Defaults
+Clickable starter chips that appear when a user opens a fresh chat with this model. Add phrases like "Explain this code step-by-step" or "Summarize this document" to guide users.
 
-You can transform a generic model into a specialized agent by toggling specific capabilities and binding resources.
-
-- **Knowledge**: Instead of manually selecting documents for every chat, you can bind a specific knowledgebase **Collection** or **File** to this model. Whenever this model is selected, RAG (Retrieval Augmented Generation) is automatically active for those specific files. Click on attached items to toggle between **Focused Retrieval** (RAG chunks) and **Using Entire Document** (full content injection). See [Full Context vs Focused Retrieval](/features/workspace/knowledge#full-context-vs-focused-retrieval) for details.
-- **Tools**: Force specific tools to be enabled by default (e.g., always enable the **Calculator** tool for a "Math Bot").
-- **Skills**: Bind [Skills](/features/workspace/skills) to this model so their manifests are always injected. The model can load full skill instructions on-demand via the `view_skill` builtin tool.
-- **Filters**: Attach specific Pipelines/Filters (e.g., a Profanity Filter or PII Redaction script) to run exclusively on this model.
-- **Actions**: Attach actionable scripts like `Add to Memories` or `Button` triggers.
-- **Capabilities**: Granularly control what the model is allowed to do:
-  - **Vision**: Toggle to enable image analysis capabilities (requires a vision-capable Base Model).
-  - **Web Search**: Enable the model to access the configured search provider (e.g., Google, SearxNG) for real-time information.
-  - **File Upload**: Allow users to upload files to this model.
-  - **File Context**: When enabled (default), attached files are processed via RAG and their content is injected into the conversation. When disabled, file content is **not** extracted or injected—the model receives no file content unless it retrieves it via builtin tools. Only visible when File Upload is enabled. See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools) for details.
-  - **Code Interpreter**: Enable Python code execution. See [Python Code Execution](/features/chat-conversations/chat-features/code-execution/python) for details.
-  - **Image Generation**: Enable image generation integration.
-  - **Usage / Citations**: Toggle usage tracking or source citations.
-  - **Status Updates**: Show visible progress steps in the chat UI (e.g., "Searching web...", "Reading file...") during generation. Useful for slower, complex tasks.
-  - **Builtin Tools**: When enabled (default), automatically injects system tools (timestamps, memory, chat history, knowledge base queries, notes, etc.) in [Native Function Calling mode](/features/extensibility/plugin/tools#disabling-builtin-tools-per-model). When enabled, you can further control which **tool categories** are available (Time, Memory, Chats, Notes, Knowledge, Channels) via checkboxes in the Model Editor. Disable the main toggle if the model doesn't support function calling or you need to save context window tokens. Note: This is separate from **File Context**—see [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools) for the difference.
-- **TTS Voice**: Set a specific Text-to-Speech voice for this model. When users read responses aloud, this voice will be used instead of the global default. Useful for giving different personas distinct voices. Leave empty to use the user's settings or system default. See [Per-Model TTS Voice](/features/media-generation/audio/text-to-speech/openai-tts-integration#per-model-tts-voice) for details.
-- **Default Features**: Force specific toggles (like Web Search) to be "On" immediately when a user starts a chat with this model.
+---
 
 ## Model Management
 
-From the main list view in the `Models` section, click the ellipsis (`...`) next to any model to perform actions:
+From the model list, click the ellipsis (**...**) on any model:
 
-- **Edit**: Open the configuration panel for this model.
-- **Hide**: Hide the model from the model selector dropdown within chats (useful for deprecated models) without deleting it.
-- **Clone**: Create a copy of a model configuration, which will be appended with `-clone`.
+| Action | Description |
+| :--- | :--- |
+| **Edit** | Open the configuration panel |
+| **Hide** | Remove from the model selector without deleting |
+| **Clone** | Create a copy (appends `-clone`) |
+| **Copy Link** | Copy a direct URL to the model settings |
+| **Export** | Download the configuration as `.json` |
+| **Share** | Share to the Open WebUI community |
+| **Delete** | Permanently remove the preset |
 
-:::note
-A raw Base Model can be cloned as a custom Workspace model, but it will not clone the raw Base Model itself.
+### Import and export
+
+- **Import**: From `.json` files or Open WebUI community links
+- **Export**: Download all custom model configurations as a single `.json`
+- **Discover**: Browse community presets at the bottom of the page
+
+:::info Downloading base models
+To download new base models, go to **Settings > Connections > Ollama** or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
 :::
 
-- **Copy Link**: Copies a direct URL to the model settings.
-- **Export**: Download the model configuration as a `.json` file.
-- **Share**: Share your model configuration with the Open WebUI community by clicking the `Share` button (redirects to [openwebui.com](https://openwebui.com/models/create)).
-- **Delete**: Permanently remove the preset.
+---
 
-### Import and Export
+## Global Model Defaults (Admin)
 
-- **Import Models**: Import models from a `.json` file or from Open WebUI community links.
-- **Export Models**: Export all your custom model configurations into a single `.json` file for backup or migration.
-- **Discover a Model**: At the bottom of the page, you can explore and download presets made by the Open WebUI community.
+Administrators can set baseline capabilities and parameters that apply to all models via **Admin Panel > Settings > Models > ⚙️ (gear icon)**.
 
-:::info Downloading Raw Models
-To download new raw Base Models (like `Llama-3.2-3B-Instruct-GGUF:Q8_0` or `Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`), navigate to **Settings > Connections > Ollama**. Alternatively, type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector to pull directly from Hugging Face. This action will create a button within the model selector labeled "Pull [Model Name]" that will begin downloading the model from its source once clicked.
-:::
+- **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
+- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set.
 
-## Global Model Management (Admin)
+### Merge behavior
 
-Administrators have access to a centralized management interface via **Admin Panel > Settings > Models**. This page provides powerful tools for decluttering and organizing the model list, especially when connected to providers with hundreds of available models.
-
-### View Filtering
-
-The **Admin View Selector** allows you to filter the entire list of models by their operational status. This is located next to the search bar and includes the following views:
-
-- **All**: Shows every model available to the system.
-- **Enabled**: Displays only models that are currently active and selectable by users.
-- **Disabled**: Shows models that have been deactivated.
-- **Visible**: Shows models that are currently visible in the user model selector.
-- **Hidden**: Displays only the models that have been hidden (these appear with reduced opacity in the list).
-
-### Bulk Actions
-
-To streamline the management of large model collections, the Admin Panel includes **Bulk Actions** that apply to the models currently visible in your filtered view.
-
-1.  **Filter your view** (e.g., select "Disabled" or "Hidden").
-2.  **Open the Actions menu** (Ellipsis icon next to the search bar).
-3.  **Select an action**:
-    - **Enable All**: Activates all models in the current filtered list simultaneously.
-    - **Disable All**: Deactivates all models in the current filtered list.
-
-These tools are specifically designed to help administrators quickly manage external providers (like OpenAI or Anthropic) that expose a high volume of models, allowing for instant site-wide configuration changes.
-
-### Global Model Defaults
-
-Administrators can set **global default metadata and parameters** that apply as a baseline to all models. This eliminates the need to manually configure capabilities and inference settings for every model individually.
-
-- **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Sets baseline capabilities (vision, web search, file context, code interpreter, builtin tools, etc.) and other model metadata for all models. For capabilities, defaults and per-model values are merged — per-model overrides always win on conflicts. For other metadata fields, the global default is only applied when a model has no value set.
-- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Sets baseline inference parameters (temperature, top_p, max_tokens, seed, function_calling, etc.) for all models. Per-model parameter overrides always take precedence — but only when a per-model value is explicitly set.
-
-These settings are accessible via **Admin Settings → Models → ⚙️ (gear icon)** and are persisted via `PersistentConfig`. See [`DEFAULT_MODEL_METADATA`](/reference/env-configuration#default_model_metadata) and [`DEFAULT_MODEL_PARAMS`](/reference/env-configuration#default_model_params) for details.
-
-#### Merge Behavior
-
-Understanding how defaults combine with per-model settings is important:
-
-| Setting Type | Merge Strategy | Example |
+| Setting type | Strategy | Example |
 |---|---|---|
-| **Capabilities** (metadata) | Deep merge: `{...global, ...per_model}` | Global sets `file_context: false`, model sets `vision: true` → model gets both |
-| **Other metadata** (description, tags, etc.) | Fill-only: global applied when model value is `None` | Global sets `description: "Default"`, model has no description → model gets "Default" |
-| **Parameters** | Simple merge: `{...global, ...per_model}` | Global sets `temperature: 0.7`, model sets `temperature: 0.3` → model gets `0.3` |
+| **Capabilities** | Deep merge | Global sets `file_context: false`, model sets `vision: true` > model gets both |
+| **Other metadata** | Fill-only | Global sets description, model has none > model gets the global value |
+| **Parameters** | Simple merge | Global sets `temperature: 0.7`, model sets `0.3` > model gets `0.3` |
 
-The key subtlety: **if a model doesn't explicitly set a parameter, the global default is the only value**. This is especially important for `function_calling` — see the warning below.
+:::warning Knowledge base + function calling interaction
+Setting `function_calling: native` in global params changes how **all** models handle attached knowledge bases. In native mode, model-attached KBs are not auto-injected. The model must call builtin tools to retrieve knowledge. If your knowledge bases suddenly stop working, check global defaults first.
 
-:::warning Knowledge Base + Function Calling Interaction
-Setting `function_calling: native` in Global Model Params changes how **all** models handle attached Knowledge Bases. In native mode, model-attached KBs are **not** auto-injected via RAG — instead, the model must autonomously call builtin tools to retrieve knowledge. If a model doesn't explicitly override `function_calling` in its own Advanced Params, it inherits the global value silently.
-
-Additionally, if `file_context` is disabled in Global Model Capabilities, the RAG retrieval handler is skipped for all models that don't explicitly enable it — meaning attached files and KBs produce no results.
-
-If your models' attached Knowledge Bases are not working, check global defaults first. See [Knowledge Base Attached to Model Not Working](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for detailed troubleshooting steps.
+See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working).
 :::
 
-:::tip
-Global defaults are ideal for enforcing organizational policies — for example, disabling code interpreter by default across all models, or setting a consistent temperature for all models. However, be cautious with `function_calling` and capability toggles, as they can have unexpected effects on Knowledge Base behavior.
-:::
+### Bulk management
+
+Filter the admin model list by status (Enabled, Disabled, Visible, Hidden) and use **Bulk Actions** to enable or disable all models in the current view at once. Useful when external providers expose hundreds of models.
+
+---
 
 ## Model Switching in Chat
 
-Open WebUI allows for dynamic model switching and parallel inference within a chat session.
+Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them.
 
-**Example**: Switching between **Mistral**, **LLaVA**, and **GPT-4** in a Multi-Stage Task.
+---
 
-- **Scenario**: A multi-stage conversation involves different task types, such as starting with a simple FAQ, interpreting an image, and then generating a creative response.
-- **Reason for Switching**: The user can leverage each model's specific strengths for each stage:
-  - **Mistral** for general questions to reduce computation time and costs.
-  - **LLaVA** for visual tasks to gain insights from image-based data.
-  - **GPT-4** for generating more sophisticated and nuanced language output.
-- **Process**: The user switches between models, depending on the task type, to maximize efficiency and response quality.
+## Use Cases
 
-**How To:**
+### Team-specific agents
 
-1. **Select the Model**: Within the chat interface, select the desired models from the model switcher dropdown. You can select up to two models simultaneously, and both responses will be generated. You can then navigate between them by using the back and forth arrows.
-2. **Context Preservation**: Open WebUI retains the conversation context across model switches, allowing smooth transitions.
+Create a "Sales Assistant" with your CRM knowledge base, objection-handling prompts, and email drafting tools. Share it with the sales group. Engineering never sees it.
+
+### Onboarding new users
+
+Build models with descriptive prompt suggestions ("Ask me about our company policies", "Help me set up my development environment") so new team members know exactly what to ask.
+
+### Enforcing organizational standards
+
+Set global defaults to disable code interpreter across all models, enforce a consistent temperature, or require function calling. Individual models can override when needed.
+
+---
+
+## Limitations
+
+### Preset, not fine-tune
+
+Model presets configure behavior through system prompts and tool bindings. They do not modify the underlying model weights. For deep behavioral changes, you need actual fine-tuning.
+
+### Fallback requires configuration
+
+If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and a default model is configured in Admin Panel > Settings > Models.
