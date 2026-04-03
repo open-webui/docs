@@ -241,7 +241,9 @@ code {
 	border-radius: var(--ifm-global-radius);
 	cursor: pointer;
 	opacity: 0;
-	transition: opacity 200ms ease-in-out, background-color 200ms ease-in-out;
+	transition:
+		opacity 200ms ease-in-out,
+		background-color 200ms ease-in-out;
 }
 
 [data-theme="light"] .shiki-copy-button {

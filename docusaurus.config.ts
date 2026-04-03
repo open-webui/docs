@@ -176,8 +176,14 @@ const config: Config = {
 			// copyright: `Copyright © ${new Date().getFullYear()} OpenWebUI`,
 		},
 		prism: {
-			theme: { plain: { color: "#333", backgroundColor: "#f3f3f3" }, styles: [] },
-			darkTheme: { plain: { color: "#ccc", backgroundColor: "#1a1a1a" }, styles: [] },
+			theme: {
+				plain: { color: "#333", backgroundColor: "#f3f3f3" },
+				styles: [],
+			},
+			darkTheme: {
+				plain: { color: "#ccc", backgroundColor: "#1a1a1a" },
+				styles: [],
+			},
 		},
 	} satisfies Preset.ThemeConfig,
 	plugins: [require.resolve("docusaurus-lunr-search")],
