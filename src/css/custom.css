@@ -198,8 +198,82 @@ code {
 	border-radius: 16px !important;
 }
 
-.theme-code-block .token {
-	font-family: "IBM Plex Mono", monospace;
+/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
+[data-theme="light"] .shiki-code-block pre,
+[data-theme="light"] .shiki-code-block pre span {
+	color: var(--shiki-light) !important;
+}
+
+[data-theme="dark"] .shiki-code-block pre,
+[data-theme="dark"] .shiki-code-block pre span {
+	color: var(--shiki-dark) !important;
+}
+
+[data-theme="dark"] .shiki-code-block pre {
+	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
+}
+
+/* ─── Shiki code block styling ─── */
+.shiki-code-block {
+	margin-bottom: var(--ifm-leading);
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+.shiki-code-block code,
+.shiki-code-block span {
+	background-color: transparent !important;
+	padding: 0;
+	border-radius: 0;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+[data-theme="light"] .shiki-code-block pre {
+	background-color: #f3f3f3;
+}
+
+[data-theme="dark"] .shiki-code-block pre {
+	background-color: #1a1a1a;
+}
+
+.shiki-code-block-content {
+	position: relative;
+	direction: ltr;
+}
+
+/* ─── Shiki copy button ─── */
+.shiki-copy-button {
+	display: flex;
+	align-items: center;
+	position: absolute;
+	right: calc(var(--ifm-pre-padding) / 2);
+	top: calc(var(--ifm-pre-padding) / 2);
+	padding: 0.4rem;
+	border: 1px solid var(--ifm-color-emphasis-300);
+	border-radius: var(--ifm-global-radius);
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 200ms ease-in-out, background-color 200ms ease-in-out;
+}
+
+[data-theme="light"] .shiki-copy-button {
+	background: #f3f3f3;
+	color: #333;
+}
+
+[data-theme="dark"] .shiki-copy-button {
+	background: #1a1a1a;
+	color: #ccc;
+}
+
+.shiki-code-block:hover .shiki-copy-button {
+	opacity: 0.4;
+}
+
+.shiki-copy-button:hover,
+.shiki-copy-button:focus-visible {
+	opacity: 1 !important;
 }
 
 [data-theme="light"] .theme-code-block pre {

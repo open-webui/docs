@@ -26,14 +26,15 @@
 		"@docusaurus/preset-classic": "^3.5.2",
 		"@docusaurus/theme-mermaid": "^3.5.2",
 		"@mdx-js/react": "^3.0.1",
+		"@shikijs/rehype": "^4.0.2",
 		"clsx": "^2.1.1",
 		"docusaurus-lunr-search": "^3.6.0",
 		"docusaurus-plugin-sass": "^0.2.5",
 		"marked": "^17.0.1",
-		"prism-react-renderer": "^2.4.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"sass": "^1.79.3"
+		"sass": "^1.79.3",
+		"shiki": "^4.0.2"
 	},
 	"devDependencies": {
 		"@docusaurus/eslint-plugin": "^3.5.2",
