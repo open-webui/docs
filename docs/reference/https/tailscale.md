@@ -14,7 +14,7 @@ Tailscale is ideal when you want **private, authenticated access** across device
 :::
 
 :::info Looking for the full guide?
-This page covers **HTTPS setup** specifically. For the complete Tailscale integration story, including SSO authentication, Docker Compose sidecar setup, and more, see the [**Tailscale Integration Tutorial**](/tutorials/integrations/tailscale).
+This page covers **HTTPS setup** specifically. For the complete Tailscale integration story, including SSO authentication, Docker Compose sidecar setup, and more, see the [**Tailscale Integration Tutorial**](/tutorials/auth-sso/tailscale).
 :::
 
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Helicone"
-sidebar_position: 19
+sidebar_position: 10
 ---
 
 # Helicone Integration with Open WebUI

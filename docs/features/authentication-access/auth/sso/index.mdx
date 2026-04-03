@@ -21,7 +21,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 Right now, you can only configure **one** OpenID Connect (OIDC) provider at a time via `OPENID_PROVIDER_URL`.
 You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 
-*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/integrations/auth-identity/dual-oauth-configuration) for more details.*
+*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/auth-sso/dual-oauth-configuration) for more details.*
 :::
 
 ## OAuth Configuration Overview
@@ -184,7 +184,7 @@ The following environment variables are used:
 :::
 
 :::tip Community Workaround: Multi-Provider OAuth
-If you need to support both Microsoft and Google simultaneously, check out our **[Dual OAuth Configuration Tutorial](/tutorials/integrations/auth-identity/dual-oauth-configuration)**. 
+If you need to support both Microsoft and Google simultaneously, check out our **[Dual OAuth Configuration Tutorial](/tutorials/auth-sso/dual-oauth-configuration)**. 
 :::
 ### OAuth Role Management
 
@@ -291,7 +291,7 @@ When configured, this header allows clients to set admin-level access via an HTT
 ### Tailscale Serve
 
 :::tip
-For a complete end-to-end guide covering installation, HTTPS, authentication, and Docker Compose setup, see the [**Tailscale Integration Tutorial**](/tutorials/integrations/tailscale).
+For a complete end-to-end guide covering installation, HTTPS, authentication, and Docker Compose setup, see the [**Tailscale Integration Tutorial**](/tutorials/auth-sso/tailscale).
 :::
 
 [Tailscale Serve](https://tailscale.com/kb/1242/tailscale-serve) allows you to share a service within your tailnet, and Tailscale will set the header `Tailscale-User-Login` with the email address of the requester.

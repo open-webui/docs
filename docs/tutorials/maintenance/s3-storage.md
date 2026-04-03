@@ -1,6 +1,6 @@
 ---
-sidebar_position: 320
-title: "Switching to S3 Storage"
+sidebar_position: 40
+title: "S3 Storage"
 ---
 
 # 🪣 Switching to S3 Storage

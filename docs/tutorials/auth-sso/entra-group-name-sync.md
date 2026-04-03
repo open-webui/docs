@@ -1,6 +1,6 @@
 ---
-sidebar_position: 15
-title: "Entra ID Group Sync"
+sidebar_position: 40
+title: "Entra ID Group Name Sync"
 ---
 
 # Microsoft Entra ID Group Name Sync

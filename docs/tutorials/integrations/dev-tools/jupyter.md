@@ -1,6 +1,6 @@
 ---
-sidebar_position: 321
-title: "Jupyter Notebook Integration"
+sidebar_position: 30
+title: "Jupyter Notebooks"
 ---
 
 > [!WARNING]

@@ -1,5 +1,5 @@
 ---
-title: "Iterm2 AI Integration"
+title: "iTerm2"
 ---
 
 # Use your Open WebUI models with Iterm2
@@ -30,7 +30,7 @@ Unzip the file and move the application into your **Applications** folder.
 ### 2. Generate your Open WebUI API key
 
 To authenticate with your Open WebUI instance, you'll need to generate an API key.
-Follow the instructions in [this guide](https://docs.openwebui.com/reference/monitoring#authentication-setup-for-api-key-) to create it.
+Follow the instructions in the [API Endpoints guide](/reference/api-endpoints) to create it.
 
 ## Configuration
 

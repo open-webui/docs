@@ -1,9 +1,9 @@
 ---
-sidebar_position: 2
-title: "Contributing Tutorials"
+sidebar_position: 900
+title: "Contributing to Docs"
 ---
 
-# Contributing Tutorials
+# Contributing to Documentation
 
 :::warning
 
