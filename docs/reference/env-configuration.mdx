@@ -582,7 +582,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `list` of `dict`
 - Default: `[]` (which means to use the built-in default prompt suggestions)
-- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/ai-knowledge/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/ai-knowledge/models#global-model-defaults) feature. The format is:
+- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
 
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
@@ -715,7 +715,7 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 - Type: `str`
 - Default: Not set (plain-text logging)
-- Description: Controls the log output format. Set to `json` to switch all stdout logging to single-line JSON objects, suitable for log aggregators like Loki, Fluentd, CloudWatch, and Datadog. When set to `json`, the ASCII startup banner is also suppressed to keep the log stream parseable. Any other value (or unset) uses the default plain-text format. See the [JSON Logging documentation](/getting-started/advanced-topics/logging#-json-logging-log_format) for details on log fields and examples.
+- Description: Controls the log output format. Set to `json` to switch all stdout logging to single-line JSON objects, suitable for log aggregators like Loki, Fluentd, CloudWatch, and Datadog. When set to `json`, the ASCII startup banner is also suppressed to keep the log stream parseable. Any other value (or unset) uses the default plain-text format. See the [JSON Logging documentation](/getting-started/advanced-topics/logging#structured-json-logging) for details on log fields and examples.
 
 #### `ENABLE_AUDIT_STDOUT`
 
@@ -1372,7 +1372,7 @@ For API Key creation (and the API keys themselves) to work:
 1. Enable API keys globally using this setting (`ENABLE_API_KEYS`)
 2. For non-admin users, grant the "API Keys" permission via Default Permissions or User Groups
 
-**Note:** Administrators can generate API keys whenever `ENABLE_API_KEYS` is enabled, even without `features.api_keys`. See the [Authentication Setup for API Key](/reference/monitoring#authentication-setup-for-api-key-) guide for detailed setup instructions.
+**Note:** Administrators can generate API keys whenever `ENABLE_API_KEYS` is enabled, even without `features.api_keys`.
 
 :::
 
@@ -4528,7 +4528,7 @@ Strictly return in JSON format:
 
 :::tip
 
-For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/media-generation/image-generation-and-editing/gemini).
+For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/chat-conversations/image-generation-and-editing/gemini).
 
 :::
 
@@ -4937,23 +4937,23 @@ In any production environment running more than one instance of Open WebUI (e.g.
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for authentication. See [SSO docs](/features/access-security/auth/sso).
+- Description: Defines the trusted request header for authentication. See [SSO docs](/features/authentication-access/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
 - Description: Defines the trusted request header for the username of anyone registering with the
-`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/access-security/auth/sso).
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/authentication-access/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_GROUPS_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/access-security/auth/sso).
+- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/authentication-access/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_ROLE_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/access-security/auth/sso).
+- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/authentication-access/auth/sso).
 
 ### Google
 

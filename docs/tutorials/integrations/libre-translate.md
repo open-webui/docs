@@ -1,6 +1,6 @@
 ---
-sidebar_position: 25
-title: "LibreTranslate Integration"
+sidebar_position: 30
+title: "LibreTranslate"
 ---
 
 :::warning

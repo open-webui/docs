@@ -1,5 +1,5 @@
 ---
-sidebar_position: 16
+sidebar_position: 50
 title: "Browser Search Engine"
 ---
 

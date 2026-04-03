@@ -110,8 +110,8 @@ flowchart LR
 
 Two deployment backends are available:
 
-- **[Docker Backend](./terminals/docker-backend)** - runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
-- **[Kubernetes Operator](./terminals/kubernetes-operator)** - production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
+- **[Docker Backend](./terminals/docker-backend)** — runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
+- **[Kubernetes Operator](./terminals/kubernetes-operator)** — production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
 Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.

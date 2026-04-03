@@ -1,0 +1,72 @@
+---
+sidebar_position: 0
+title: "Administration"
+---
+
+# 🔧 Administration
+
+**Monitor usage, evaluate model quality, and communicate with your users, all from the Admin Panel.**
+
+Open WebUI gives administrators a full operational toolkit. Track which models your team uses and how much they cost. Run blind evaluations to find the best model for your workload. Push announcements to every user with customizable banners. Wire up webhooks to get notified when users sign up or when long-running tasks finish.
+
+---
+
+## What's In This Section
+
+| | |
+| :--- | :--- |
+| 📊 **[Analytics](./analytics)** | Usage dashboards with message volume, token consumption, model breakdowns, and per-user activity |
+| 🏆 **[Evaluation](./evaluation)** | Model arena, blind A/B testing, ELO-based leaderboards, and chat snapshots for fine-tuning |
+| 📢 **[Banners](./banners)** | Customizable system-wide announcements with dismissible notifications |
+| 🔔 **[Webhooks](./webhooks)** | Automated notifications for user sign-ups, chat completions, and external service integration |
+
+---
+
+## Analytics
+
+Get a bird's-eye view of how your instance is being used. The analytics dashboard shows message volume, token consumption, model popularity, and user activity, filterable by time period and user group.
+
+**Use it for:** capacity planning, cost estimation, identifying popular models, tracking adoption trends, and per-department usage reporting.
+
+[**Learn about Analytics →**](./analytics)
+
+---
+
+## Evaluation
+
+Not sure which model fits your team best? The evaluation system lets users rate model responses with thumbs up/down during normal conversations. Ratings feed into an ELO-based leaderboard, and rated chats are snapshotted for future model fine-tuning.
+
+**Two evaluation modes:**
+- **Arena Mode**: Randomly selects models for blind comparison, removing bias
+- **Normal interaction**: Rate responses during regular use, then compare models by swapping them out
+
+[**Learn about Evaluation →**](./evaluation)
+
+---
+
+## Banners
+
+Push high-visibility messages to every logged-in user. Use banners for maintenance windows, incident alerts, policy reminders, and feature announcements. Configure via the Admin Panel or the `WEBUI_BANNERS` environment variable for GitOps workflows.
+
+| Type | Color | Best for |
+|------|-------|----------|
+| `info` | Blue | General announcements |
+| `success` | Green | Resolved incidents, completed changes |
+| `warning` | Yellow | Planned maintenance, partial degradation |
+| `error` | Red | Active incidents, outages |
+
+[**Learn about Banners →**](./banners)
+
+---
+
+## Webhooks
+
+Three types of webhook integrations keep your external services in sync:
+
+| Webhook | Purpose |
+|---------|---------|
+| **Admin Webhook** | Notifies a Slack/Discord channel when a new user signs up |
+| **User Webhook** | Notifies individual users when a long-running chat response is ready |
+| **Channel Webhooks** | Let external services (CI/CD, monitoring, scripts) post messages into Open WebUI channels |
+
+[**Learn about Webhooks →**](./webhooks)

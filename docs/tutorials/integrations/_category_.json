@@ -1,7 +1,4 @@
 {
 	"label": "Integrations",
-	"position": 20,
-	"link": {
-		"type": "generated-index"
-	}
+	"position": 20
 }

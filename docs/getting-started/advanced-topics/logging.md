@@ -1,113 +1,88 @@
 ---
 sidebar_position: 5
-title: "Logging in Open WebUI"
+title: "Logging Configuration"
 ---
 
-# Understanding Open WebUI Logging 🪵
+# Logging Configuration
 
-Logging is essential for debugging, monitoring, and understanding how Open WebUI is behaving. This guide explains how logging works in both the **browser client** (frontend) and the **application server/backend**.
+**Control what Open WebUI logs, where it goes, and how it's formatted, from quick debugging to production log pipelines.**
 
-## 🖥️ Browser Client Logging (Frontend)
+Open WebUI has two logging surfaces: the **browser console** for frontend debugging and the **Python backend** for server-side events. Most configuration happens on the backend, where you can adjust verbosity with a single environment variable or switch to structured JSON output for log aggregators like Loki, Datadog, or CloudWatch.
 
-For frontend development and debugging, Open WebUI utilizes standard browser console logging. This means you can see logs directly within your web browser's built-in developer tools.
+---
 
-**How to Access Browser Logs:**
+## Frontend Logging
 
-1. **Open Developer Tools:** In most browsers, you can open developer tools by:
-   - **Right-clicking** anywhere on the Open WebUI page and selecting "Inspect" or "Inspect Element".
-   - Pressing **F12** (or Cmd+Opt+I on macOS).
+The frontend uses standard browser `console.log()` calls. Open your browser's developer tools (**F12** or **Cmd+Option+I** on macOS), navigate to the **Console** tab, and you'll see informational messages, warnings, and errors from the client application.
 
-2. **Navigate to the "Console" Tab:**  Within the developer tools panel, find and click on the "Console" tab.
+Browser-specific documentation:
 
-**Types of Browser Logs:**
+- [Chrome/Chromium DevTools](https://developer.chrome.com/docs/devtools/)
+- [Firefox Developer Tools](https://firefox-source-docs.mozilla.org/devtools-user/)
+- [Safari Developer Tools](https://developer.apple.com/safari/tools/)
 
-Open WebUI primarily uses [JavaScript's](https://developer.mozilla.org/en-US/docs/Web/API/console/log_static) `console.log()` for client-side logging. You'll see various types of messages in the console, including:
+---
 
-- **Informational messages:**  General application flow and status.
-- **Warnings:** Potential issues or non-critical errors.
-- **Errors:**  Problems that might be affecting functionality.
+## Backend Logging
 
-**Browser-Specific Developer Tools:**
+The backend uses Python's built-in `logging` module. By default, logs are written to **stdout** at the `INFO` level, making them visible in your terminal or container logs.
 
-Different browsers offer slightly different developer tools, but they all provide a console for viewing JavaScript logs. Here are links to documentation for popular browsers:
+### Log Levels
 
-- **[Blink] Chrome/Chromium (e.g., Chrome, Edge):** [Chrome DevTools Documentation](https://developer.chrome.com/docs/devtools/)
-- **[Gecko] Firefox:** [Firefox Developer Tools Documentation](https://firefox-source-docs.mozilla.org/devtools-user/)
-- **[WebKit] Safari:** [Safari Developer Tools Documentation](https://developer.apple.com/safari/tools/)
+| Level | Value | When to use |
+|---|---|---|
+| `CRITICAL` | 50 | Catastrophic failures; the application may terminate |
+| `ERROR` | 40 | Failed operations; the application continues but something broke |
+| `WARNING` | 30 | Unexpected situations worth investigating: deprecations, resource pressure |
+| `INFO` | 20 | Normal operation flow: startup, key events, request handling **(default)** |
+| `DEBUG` | 10 | Detailed diagnostic output: function calls, variable values, execution steps |
 
-## ⚙️ Application Server/Backend Logging (Python)
+---
 
-The backend of Open WebUI uses Python's built-in `logging` module to record events and information on the server side. These logs are crucial for understanding server behavior, diagnosing errors, and monitoring performance.
+### Setting the Global Log Level
 
-**Key Concepts:**
+Set `GLOBAL_LOG_LEVEL` to change verbosity for the entire backend. This configures the root Python logger via `logging.basicConfig(force=True)`, affecting all Open WebUI loggers and most third-party libraries.
 
-- **Python `logging` Module:** Open WebUI leverages the standard Python `logging` library. If you're familiar with Python logging, you'll find this section straightforward. (For more in-depth information, see the [Python Logging Documentation](https://docs.python.org/3/howto/logging.html#logging-levels)).
-- **Console Output:** By default, backend logs are sent to the console (standard output), making them visible in your terminal or Docker container logs.
-- **Logging Levels:**  Logging levels control the verbosity of the logs. You can configure Open WebUI to show more or less detailed information based on these levels.
+**Docker:**
 
-### 🚦 Logging Levels Explained
+```bash
+--env GLOBAL_LOG_LEVEL="DEBUG"
+```
 
-Python logging uses a hierarchy of levels to categorize log messages by severity. Here's a breakdown of the levels, from most to least severe:
+**Docker Compose:**
 
-| Level       | Numeric Value | Description                                                                 | Use Case                                                                    |
-| ----------- | ------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `CRITICAL`  | 50            | **Severe errors** that may lead to application termination. | Catastrophic failures, data corruption. |
-| `ERROR`     | 40            | **Errors** that indicate problems but the application might still function. | Recoverable errors, failed operations. |
-| `WARNING`   | 30            | **Potential issues** or unexpected situations that should be investigated. | Deprecation warnings, resource constraints. |
-| `INFO`      | 20            | **General informational messages** about application operation. | Startup messages, key events, normal operation flow. |
-| `DEBUG`     | 10            | **Detailed debugging information** for developers. | Function calls, variable values, detailed execution steps. |
-| `NOTSET`    | 0             | **All messages are logged.**  (Usually defaults to `WARNING` if not set). | Useful for capturing absolutely everything, typically for very specific debugging. |
+```yaml
+environment:
+  - GLOBAL_LOG_LEVEL=DEBUG
+```
 
-**Default Level:** Open WebUI's default logging level is `INFO`.
+:::tip
+Use `DEBUG` for development and troubleshooting. For production, stick with `INFO` or `WARNING` to keep log volume manageable.
+:::
 
-### 🌍 Global Logging Level (`GLOBAL_LOG_LEVEL`)
+---
 
-You can change the **global** logging level for the entire Open WebUI backend using the `GLOBAL_LOG_LEVEL` environment variable. This is the most straightforward way to control overall logging verbosity.
+### Structured JSON Logging
 
-**How it Works:**
+For production environments using log aggregators, set `LOG_FORMAT=json` to switch all stdout output to single-line JSON objects.
 
-Setting `GLOBAL_LOG_LEVEL` configures the root logger in Python, affecting all loggers in Open WebUI and potentially some third-party libraries that use [basicConfig](https://docs.python.org/3/library/logging.html#logging.basicConfig). It uses `logging.basicConfig(force=True)`, which means it will override any existing root logger configuration.
+**Docker:**
 
-**Example: Setting to `DEBUG`**
+```bash
+--env LOG_FORMAT="json"
+```
 
-- **Docker Parameter:**
+**Docker Compose:**
 
-  ```bash
-  --env GLOBAL_LOG_LEVEL="DEBUG"
-  ```
+```yaml
+environment:
+  - LOG_FORMAT=json
+```
 
-- **Docker Compose (`docker-compose.yml`):**
-
-  ```yaml
-  environment:
-    - GLOBAL_LOG_LEVEL=DEBUG
-  ```
-
-**Impact:** Setting `GLOBAL_LOG_LEVEL` to `DEBUG` will produce the most verbose logs, including detailed information that is helpful for development and troubleshooting. For production environments, `INFO` or `WARNING` might be more appropriate to reduce log volume.
-
-### 📋 JSON Logging (`LOG_FORMAT`)
-
-For production environments using log aggregators (Loki, Fluentd, CloudWatch, Datadog, etc.), Open WebUI supports structured JSON logging. Set the `LOG_FORMAT` environment variable to `json` to switch all stdout logging to single-line JSON objects.
-
-**How to Enable:**
-
-- **Docker Parameter:**
-
-  ```bash
-  --env LOG_FORMAT="json"
-  ```
-
-- **Docker Compose (`docker-compose.yml`):**
-
-  ```yaml
-  environment:
-    - LOG_FORMAT=json
-  ```
-
-**JSON Log Fields:**
+**JSON fields:**
 
 | Field | Description |
-|-------|-------------|
+|---|---|
 | `ts` | ISO 8601 timestamp |
 | `level` | Log level (`debug`, `info`, `warn`, `error`, `fatal`) |
 | `msg` | Log message |
@@ -116,18 +91,15 @@ For production environments using log aggregators (Loki, Fluentd, CloudWatch, Da
 | `error` | Error details (if applicable) |
 | `stacktrace` | Stack trace (if applicable) |
 
-**Example Output:**
+**Example output:**
 
 ```json
 {"ts": "2026-02-22T20:14:53.386+00:00", "level": "info", "msg": "GLOBAL_LOG_LEVEL: INFO", "caller": "open_webui.env"}
 {"ts": "2026-02-22T20:15:02.245+00:00", "level": "info", "msg": "Context impl SQLiteImpl.", "caller": "alembic.runtime.migration"}
 ```
 
-:::info
-- Default behavior (no `LOG_FORMAT` set) is unchanged — plain-text output
+:::note
+- Default behavior (no `LOG_FORMAT` set) is unchanged: plain-text output
 - The ASCII banner is suppressed when `LOG_FORMAT=json` to keep the log stream parseable
 - JSON logging covers both early startup logs (stdlib `logging`) and runtime logs (Loguru)
 :::
-
-
-By understanding and utilizing these logging mechanisms, you can effectively monitor, debug, and gain insights into your Open WebUI instance.

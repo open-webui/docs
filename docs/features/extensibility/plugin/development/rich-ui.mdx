@@ -175,7 +175,7 @@ When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandb
 
 If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → Iframe Same-Origin Access**.
 
-As an alternative for ephemeral interactions that need full page access, consider using the [`execute` event](/features/extensibility/plugin/development/events#execute-requires-__event_call__) instead, which runs unsandboxed in the main page context.
+As an alternative for ephemeral interactions that need full page access, consider using the [`execute` event](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__) instead, which runs unsandboxed in the main page context.
 :::
 
 ## Rendering Position
@@ -290,7 +290,7 @@ This means your Rich UI embed can include interactive buttons (e.g., "Explain th
 
 ## Rich UI Embeds vs Execute Event
 
-Rich UI embeds and the [`execute` event](/features/extensibility/plugin/development/events#execute-requires-__event_call__) are complementary ways to create interactive experiences. Choose based on your needs:
+Rich UI embeds and the [`execute` event](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__) are complementary ways to create interactive experiences. Choose based on your needs:
 
 | | Rich UI Embed | `execute` Event |
 |---|---|---|

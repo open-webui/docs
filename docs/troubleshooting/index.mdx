@@ -3,23 +3,70 @@ sidebar_position: 300
 title: "🛠️ Troubleshooting"
 ---
 
-## 🌟 General Troubleshooting Tips
+# Troubleshooting
 
-Encountering issues? Don't worry, we're here to help! 😊 Start with this important step:
+Use this page to find the right guide for your issue. If you're unsure where to start, match your symptom in the table below.
 
-- 🔄 Make sure you're using the **latest version** of the software.
-- 💾 **Check for Configuration Persistence:** Open WebUI prioritizes settings stored in its internal database over environment variables for certain settings (marked as `PersistentConfig`). If your environment changes (like `ENABLE_SIGNUP=True`) seem to be ignored, see the **[Environment Variable Configuration](/reference/env-configuration#important-note-on-persistentconfig-environment-variables)** page for how to force updates or manually edit the database.
+## Quick Symptom Lookup
 
-With this project constantly evolving, updates and fixes are regularly added. Keeping your software up-to-date is crucial to take advantage of all the enhancements and fixes, ensuring the best possible experience. 🚀
+| What you're seeing | Go to |
+| :--- | :--- |
+| Empty `"{}"` responses, garbled markdown, CORS errors in console | [Connection Errors → HTTPS/CORS/WebSocket](./connection-error#-https-tls-cors--websocket-issues) |
+| `WebSocket connection failed: 403` or chat hangs | [Connection Errors → WebSocket](./connection-error#websocket-troubleshooting) |
+| Can't connect to Ollama from Open WebUI | [Connection Errors → Ollama](./connection-error#connection-to-ollama-server) |
+| Model list takes forever to load / `500` on `/api/models` | [Connection Errors → Model List Loading](./connection-error#%EF%B8%8F-model-list-loading-issues-slow-ui--unreachable-endpoints) |
+| `[SSL: CERTIFICATE_VERIFY_FAILED]` | [Connection Errors → SSL](./connection-error#-ssl-certificate-issues-with-internal-tools) |
+| Login loops, 401 Unauthorized, token errors across replicas | [Scaling & HA → Login Loops](./multi-replica#1-login-loops--401-unauthorized-errors) |
+| `database is locked`, data disappearing across instances | [Scaling & HA → Database](./multi-replica#4-database-corruption--locked-errors) |
+| Worker crash: `Child process [pid] died` during upload | [RAG → Worker Crashes](./rag#12-worker-dies-during-document-upload) |
+| Model ignores attached knowledge base | [RAG → Knowledge Base Not Working](./rag#13-knowledge-base-attached-to-model-not-working) |
+| `NoneType object has no attribute 'encode'` | [RAG → Embedding Error](./rag#5-400-nonetype-object-has-no-attribute-encode) |
+| CUDA out of memory during embedding | [RAG → CUDA OOM](./rag#10-cuda-out-of-memory-during-embedding) |
+| OAuth redirect loops, CSRF state mismatch | [SSO & OAuth](./sso) |
+| `CSRF Warning! State not equal in request and response` | [SSO → CSRF Errors](./sso#9-session-state-mismatch-csrf-errors) |
+| TTS loading forever, `Dataset scripts are no longer supported` | [Audio → TTS Issues](./audio#tts-loading-forever--not-working) |
+| Whisper `int8 compute type` error | [Audio → STT Issues](./audio#whisper-stt-not-working--compute-type-error) |
+| Microphone not working (non-HTTPS) | [Audio → Microphone](./audio#microphone-access-issues) |
+| Image not generating, ComfyUI workflow errors | [Image Generation](./image-generation) |
+| Web search returns empty content or proxy errors | [Web Search](./web-search) |
+| Slow performance, high RAM, OOM crashes | [Performance & RAM](./performance) |
+| Forgot admin password | [Reset Admin Password](./password-reset) |
+| `no such table` or `table already exists` on startup | [Database Migration](./manual-database-migration) |
 
-### 🤝 Community Support
+## All Troubleshooting Guides
 
-This project thrives on community spirit and passion. If you still face problems after updating, we warmly invite you to join our vibrant community on [Discord](https://discord.com/invite/5rJgQTnV4s) or [Reddit](https://www.reddit.com/r/OpenWebUI/). There, you can share your experiences, find solutions, and connect with fellow enthusiasts who might be navigating similar challenges. Engaging with our community doesn't just help solve your problems; it strengthens the entire network of support, so we all grow together. 🌱
+| Guide | Covers |
+| :--- | :--- |
+| [Connection Errors](./connection-error) | HTTPS, CORS, WebSocket, reverse proxy, Ollama, SSL, Podman, MCP |
+| [Performance & RAM](./performance) | Speed tuning, database optimization, scaling infrastructure, resource efficiency |
+| [RAG](./rag) | Document ingestion, retrieval quality, embeddings, upload limits, worker crashes |
+| [SSO & OAuth](./sso) | OIDC, Microsoft, Google, Authentik, cookie & session issues |
+| [Audio](./audio) | Speech-to-Text, Text-to-Speech, microphone access, ElevenLabs |
+| [Scaling & HA](./multi-replica) | Multi-replica, multi-worker, Redis, shared storage, database concurrency |
+| [Image Generation](./image-generation) | OpenAI, ComfyUI, Automatic1111, Gemini |
+| [Web Search](./web-search) | Proxy issues, SearXNG, empty results, timeouts |
+| [Reset Admin Password](./password-reset) | Password reset for Docker and local installations |
+| [Database Migration](./manual-database-migration) | Manual Alembic migrations, recovery from failed upgrades |
 
-🌟 If your issues are pressing and you need a quicker resolution, consider [supporting our project](/sponsorships). Your sponsorship not only fast-tracks your queries in a dedicated sponsor-only channel, but also directly supports the [dedicated maintainer](/mission) who is passionately committed to refining and enhancing this tool for everyone.
+## Before You Start
 
-### 🧪 Help Prevent Future Issues
+- **Update first.** Many issues are fixed in newer releases. Make sure you're on the latest version.
+- **Check PersistentConfig.** Open WebUI stores some settings in its database, which take priority over environment variables. If an env var change seems ignored, see the [Environment Variable Configuration](/reference/env-configuration#important-note-on-persistentconfig-environment-variables) page.
 
-**Want to help prevent issues like this from reaching stable releases?** Consider running the [development branch](/#using-the-dev-branch-)! Testing dev builds is one of the most valuable contributions you can make—no code required. Just use it and report any issues you find.
+## Browser Compatibility
 
-Together, let's harness these opportunities to create the best environment and keep pushing the boundaries of what we can achieve with our project. Thank you from the bottom of our hearts for your understanding, cooperation, and belief in our mission! 🙏
+Open WebUI requires a modern browser. Minimum supported versions:
+
+- **Chrome 111+** *(March 2023)*
+- **Safari 16.4+** *(March 2023)*
+- **Firefox 128+** *(July 2024)*
+
+If you experience rendering or functionality issues, ensure your browser meets these requirements.
+
+## Community Support
+
+If you're still stuck after following the relevant guide:
+
+- Search existing issues on [GitHub](https://github.com/open-webui/open-webui/issues)
+- Ask on [Discord](https://discord.com/invite/5rJgQTnV4s) or [Reddit](https://www.reddit.com/r/OpenWebUI/)
+- [Sponsors](/sponsorships) get access to a dedicated support channel with faster response times

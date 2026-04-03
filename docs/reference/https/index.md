@@ -3,38 +3,48 @@ sidebar_position: 6
 title: "HTTPS & Reverse Proxies"
 ---
 
-# Secure Your Open WebUI with HTTPS 🔒
+# HTTPS & Reverse Proxies
 
-While **HTTPS is not strictly required** for basic local operation, it is **highly recommended** for all deployments and **mandatory** for enabling specific features like Voice Calls.
+**Secure your Open WebUI deployment with TLS encryption, reverse proxies, or managed tunnels.**
 
-:::warning Critical Feature Dependency
-Modern browsers require a **Secure Context** (HTTPS) to access the microphone. 
-**Voice Calls will NOT work** if you access Open WebUI via `http://` (unless using `localhost`).
+HTTPS encrypts all traffic between users and Open WebUI, protecting chat history, credentials, and uploaded files. It is also **required** for browser features like Voice Calls, which need a secure context to access the microphone.
+
+:::warning Voice Calls require HTTPS
+Modern browsers block microphone access on non-HTTPS origins. **Voice Calls will not work** over plain `http://` unless you are on `localhost`.
 :::
 
-## Why HTTPS Matters 🛡️
+---
 
-Enabling HTTPS encryption provides essential benefits:
+## Choose your approach
 
-1.  **🔒 Privacy & Security**: Encrypts all data between the user and the server, protecting chat history and credentials.
-2.  **🎤 Feature Unlocking**: Enables browser restrictions for Microphone (Voice Mode) and Camera access.
-3.  **💪 Integrity**: Ensures data is not tampered with in transit.
-4.  **✅ Trust**: Displays the padlock icon, reassuring users that the service is secure.
+| Method | Best for | TLS management |
+| :--- | :--- | :--- |
+| [**Cloudflare Tunnel**](./cloudflare-tunnel) | Production without open ports | Automatic (Cloudflare edge) |
+| [**ngrok**](./ngrok) | Development and testing | Automatic (ngrok edge) |
+| [**Tailscale**](./tailscale) | Private access across devices | Automatic (tailscale serve) |
+| [**Nginx**](./nginx) | Self-hosted production with full control | Manual or Let's Encrypt |
+| [**Caddy**](./caddy) | Self-hosted production, minimal config | Automatic (Let's Encrypt) |
+| [**HAProxy**](./haproxy) | High-availability / load balancing | Manual or Let's Encrypt |
+| **Cloud load balancers** | AWS ALB, GCP LB, Azure App Gateway | Managed by cloud provider |
 
-## Choosing Your Solution 🛠️
+---
 
-The best method depends on your infrastructure.
+## Quick recommendations
 
-### 🏠 For Local/Docker Users
-If you are running Open WebUI with Docker, the standard approach is to use a **Reverse Proxy**. This sits in front of Open WebUI and handles the SSL encryption.
+- **Just want HTTPS fast?** Use [Cloudflare Tunnel](./cloudflare-tunnel) (production) or [ngrok](./ngrok) (development). No certificates to manage, no ports to open.
+- **Running a reverse proxy already?** Add [Caddy](./caddy) for automatic certs or [Nginx](./nginx) for maximum control.
+- **Need load balancing?** Use [HAProxy](./haproxy) or your cloud provider's load balancer.
 
-*   **[Nginx](./nginx)**: The industry standard. Highly configurable, great performance.
-*   **[Caddy](./caddy)**: **Easiest option**. Automatically obtains and renews Let's Encrypt certificates with minimal config.
-*   **[HAProxy](./haproxy)**: Robust choice for advanced load balancing needs.
+---
 
-### ☁️ For Cloud Deployments
-*   **Cloud Load Balancers**: (AWS ALB, Google Cloud Load Balancing) often handle SSL termination natively.
-*   **Cloudflare Tunnel**: Excellent for exposing localhost to the web securely without opening ports.
+## Key configuration notes
 
-### 🧪 For Development
-*   **Ngrok**: Good for quickly testing Voice features locally. *Not for production.*
+Regardless of which approach you choose, keep these in mind:
+
+| Setting | Why it matters |
+| :--- | :--- |
+| `WEBUI_URL` | Set this to your public HTTPS URL so OAuth callbacks and internal links resolve correctly |
+| `CORS_ALLOW_ORIGIN` | Must match your public URL, or WebSocket connections will fail silently |
+| Proxy buffering **off** | Required for SSE streaming. Buffering breaks markdown rendering in chat responses |
+| WebSocket support | Ensure your proxy passes `Upgrade` and `Connection` headers for real-time features |
+| Extended timeouts | LLM responses can take minutes. Set proxy read timeouts to at least 300s |

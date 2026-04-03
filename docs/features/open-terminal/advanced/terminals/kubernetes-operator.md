@@ -196,13 +196,13 @@ The `Terminal` custom resource is the declarative API for managing terminal inst
 ### Printer columns
 
 ```bash
-kubectl get terminals -n open-webui
+kubectl get terminals -n open-webui -o wide
 ```
 
 ```
-NAME                       USER          PHASE     SERVICE URL                                               LAST ACTIVITY          AGE
-terminal-a1b2c3-default    user-123      Running   http://terminal-a1b2c3-default-svc.open-webui.svc:8000   2026-04-01T10:30:00Z   5m
-terminal-d4e5f6-datascience user-456     Idle      http://terminal-d4e5f6-datascience-svc.open-webui.svc:8000 2026-04-01T09:45:00Z  1h
+NAME                        USER      PHASE     SERVICE URL                                                  LAST ACTIVITY   AGE
+terminal-a1b2c3-default     user-123  Running   http://terminal-a1b2c3-default-svc.open-webui.svc:8000       5m              5m
+terminal-d4e5f6-datascience  user-456  Idle      http://terminal-d4e5f6-datascience-svc.open-webui.svc:8000   1h              1h
 ```
 
 ---

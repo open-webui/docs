@@ -6,15 +6,51 @@ title: "Updating Open WebUI"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Overview
+# Updating Open WebUI
 
-Keeping Open WebUI updated ensures you have the latest features, security patches, and bug fixes. You can update manually or automate the process using container update tools.
+**Stay current without losing your data.**
 
-:::info Before Updating
-- **Backup your data** — especially before releases that include database migrations, since they can be hard to undo. Check [release notes](https://github.com/open-webui/open-webui/releases) for breaking changes
-- **Clear browser cache** after updating (Ctrl+F5 / Cmd+Shift+R)
-- **Multiple workers/replicas?** Run migrations with `UVICORN_WORKERS=1` first, or set `ENABLE_DB_MIGRATIONS=False` on all but one instance
+Your data (chats, users, settings, uploads) lives in a Docker volume or local database, not inside the container. Updating Open WebUI means swapping the container image for a newer one. Your data stays exactly where it is.
+
+---
+
+## Choose Your Update Strategy
+
+Before running any commands, decide how you want to track releases. The right choice depends on how you use Open WebUI.
+
+| Scenario | Recommended approach |
+|---|---|
+| **Personal / homelab** | Use the `:main` tag and pull manually when you want the latest |
+| **Shared / team instance** | Pin a specific version (e.g. `:v0.8.6`) and use [Diun](#diun) for update notifications |
+| **Production / critical** | Pin a version, review [release notes](https://github.com/open-webui/open-webui/releases) before upgrading, test in staging first |
+
+### `:main` vs. Pinned Versions
+
+The `:main` tag always points to the **latest build**. It's convenient but can include breaking changes without warning.
+
+For stability, pin a specific release tag:
+
+```
+ghcr.io/open-webui/open-webui:v0.8.13
+ghcr.io/open-webui/open-webui:v0.8.13-cuda
+ghcr.io/open-webui/open-webui:v0.8.13-ollama
+```
+
+Browse all available tags on the [GitHub releases page](https://github.com/open-webui/open-webui/releases).
+
+---
+
+## Before You Update
+
+1. **Back up your data** (see [Backup & Restore](#backup--restore) below). Especially important before releases with database migrations, which can be hard to undo.
+2. **Check the [release notes](https://github.com/open-webui/open-webui/releases)** for breaking changes.
+3. **Clear your browser cache** after updating (`Ctrl+F5` / `Cmd+Shift+R`) to avoid stale frontend assets.
+
+:::warning Running multiple workers or replicas?
+Run migrations on a single instance first: set `UVICORN_WORKERS=1` or `ENABLE_DB_MIGRATIONS=false` on all but one instance. See the [Scaling guide](/getting-started/advanced-topics/scaling) for details.
 :::
+
+---
 
 ## Manual Update
 
@@ -25,7 +61,7 @@ Keeping Open WebUI updated ensures you have the latest features, security patche
 # 1. Stop and remove the container (data in the volume is preserved)
 docker rm -f open-webui
 
-# 2. Pull the latest image
+# 2. Pull the latest image (or replace :main with a pinned version)
 docker pull ghcr.io/open-webui/open-webui:main
 
 # 3. Recreate the container
@@ -65,86 +101,109 @@ volumes:
 ```
 
   </TabItem>
+  <TabItem value="python" label="Python (pip)">
+
+```bash
+pip install -U open-webui
+```
+
+The `-U` flag upgrades to the latest version. Then restart the server:
+
+```bash
+open-webui serve
+```
+
+  </TabItem>
 </Tabs>
 
 :::warning Set WEBUI_SECRET_KEY to avoid logout on every update
-Without a persistent `WEBUI_SECRET_KEY`, a new key is generated each time the container is recreated, invalidating all sessions. Generate one with `openssl rand -hex 32` and keep it across updates.
+Without a persistent `WEBUI_SECRET_KEY`, a new key is generated each time the container is recreated, invalidating all sessions. Generate one with `openssl rand -hex 32` and keep it across updates. See the [Environment Variable Reference](/reference/env-configuration) for details.
 :::
 
-### Pinning a Version
+### Verify the Update
 
-By default the `:main` tag always points to the latest build. For production, pin a specific release:
+After updating, confirm everything is working:
 
-```
-ghcr.io/open-webui/open-webui:v0.8.13
-ghcr.io/open-webui/open-webui:v0.8.13-cuda
-ghcr.io/open-webui/open-webui:v0.8.13-ollama
-```
+1. **Check version in logs:**
+   ```bash
+   docker logs open-webui 2>&1 | head -20
+   ```
+2. **Load the UI** at [http://localhost:3000](http://localhost:3000). You should see the login page.
+3. **If the UI looks broken**, clear your browser cache (`Ctrl+F5` / `Cmd+Shift+R`).
+4. **If you see migration errors** in the logs, check the [release notes](https://github.com/open-webui/open-webui/releases) for known issues and the [Connection Errors](/troubleshooting/connection-error) troubleshooting page.
 
-### Rolling Back
+---
 
-If an update causes problems, pin the previous version:
+## Rolling Back
+
+If an update causes problems, you can go back to a previous version by pinning its tag.
+
+<Tabs groupId="setup-method">
+  <TabItem value="docker-run" label="Docker Run" default>
 
 ```bash
 docker rm -f open-webui
 docker pull ghcr.io/open-webui/open-webui:v0.8.3
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
   -e WEBUI_SECRET_KEY="your-secret-key" \
-  --name open-webui ghcr.io/open-webui/open-webui:v0.8.3
+  --name open-webui --restart always \
+  ghcr.io/open-webui/open-webui:v0.8.3
 ```
+
+  </TabItem>
+  <TabItem value="docker-compose" label="Docker Compose">
+
+Change the image tag in your `docker-compose.yml`:
+
+```yaml
+image: ghcr.io/open-webui/open-webui:v0.8.3
+```
+
+Then:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+  </TabItem>
+  <TabItem value="python" label="Python (pip)">
+
+```bash
+pip install open-webui==0.8.3
+open-webui serve
+```
+
+  </TabItem>
+</Tabs>
+
+:::caution Database migrations are one-way
+If the version you updated to ran a database migration, rolling back the container **does not** undo the migration. The older version may not work with the newer database schema. In that case, you need to restore from a backup taken **before** the update. For database-specific recovery, see the [Manual Database Migration](/troubleshooting/manual-database-migration) guide.
+:::
 
 ---
 
-## Automated Updates
+## Stay Notified About Updates
 
-:::warning
-Automated updates can break your deployment if a release includes breaking changes or migration issues. Review release notes before auto-updating production systems, and always have a backup.
-:::
-
-### Choosing a Tool
-
-| Feature | Watchtower | WUD | Diun |
-|---------|:---:|:---:|:---:|
-| **Auto-updates containers** | ✅ | ❌ (manual via UI) | ❌ |
-| **Web interface** | ❌ | ✅ | ❌ |
-| **Notifications** | ✅ | ✅ | ✅ |
-| **Docker 29+** | ✅ (forks) | ✅ | ✅ |
-| **Resource usage** | Low | Medium | Very Low |
-| **Best for** | Homelabs | Visual monitoring | Notification-only |
+Instead of checking manually, use a tool to monitor for new releases. Options are listed from safest to most hands-on.
 
 :::tip Recommendation
-- **For homelabs/personal use:** nicholas-fedor/watchtower (automated)
-- **For managed environments:** WUD (visual + manual control)
-- **For production/critical systems:** Diun (notifications only) + manual updates
+- **Production / critical systems:** Diun (notification-only) + manual updates
+- **Managed environments:** WUD (visual dashboard + manual trigger)
+- **Homelabs / personal use:** Watchtower (fully automated)
 :::
 
-### Watchtower
-
-The original Watchtower project hasn't received updates in over two years and fails with Docker version 29.0.0 or newer due to API version incompatibility. Two maintained forks are available: [nicholas-fedor/watchtower](https://watchtower.nickfedor.com/) and Marrrrrrrrry/watchtower, both compatible with Docker 29+.
-
-**One-time update:**
-```bash
-docker run --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  nickfedor/watchtower --run-once open-webui
-```
-
-**Continuous (check every 6 hours):**
-```bash
-docker run -d --name watchtower --restart unless-stopped \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  nickfedor/watchtower --interval 21600 open-webui
-```
-
-Set `WATCHTOWER_CLEANUP=true` to auto-remove old images. See [Watchtower docs](https://watchtower.nickfedor.com/) for scheduling, notifications, and monitor-only mode.
-
-### What's Up Docker (WUD)
-
-Web UI for monitoring container updates and triggering them manually. See [WUD documentation](https://getwud.github.io/wud/) for setup.
+| Feature | Diun | WUD | Watchtower |
+|---------|:---:|:---:|:---:|
+| **Auto-updates containers** | ❌ | ❌ (manual via UI) | ✅ |
+| **Web interface** | ❌ | ✅ | ❌ |
+| **Notifications** | ✅ | ✅ | ✅ |
+| **Docker 29+** | ✅ | ✅ | ✅ (forks) |
+| **Resource usage** | Very Low | Medium | Low |
 
 ### Diun
 
-Notification-only — alerts you when updates are available (email, Slack, Discord, Telegram, etc.) without touching your containers.
+Notification-only. Alerts you when updates are available (email, Slack, Discord, Telegram, etc.) without touching your containers. You decide when and how to update.
 
 ```yaml title="docker-compose.yml"
 services:
@@ -171,24 +230,78 @@ services:
 
 See [Diun documentation](https://crazymax.dev/diun/) for full setup and notification options.
 
+### What's Up Docker (WUD)
+
+Web UI for monitoring container updates and triggering them manually. See [WUD documentation](https://getwud.github.io/wud/) for setup.
+
+### Watchtower
+
+Fully automated. Pulls new images and recreates containers without intervention.
+
+:::warning
+The original `containrrr/watchtower` is **no longer maintained** and fails with Docker 29+. Use the [nicholas-fedor/watchtower](https://watchtower.nickfedor.com/) fork instead.
+:::
+
+:::warning
+Automated updates can break your deployment if a release includes breaking changes or database migrations. Review release notes before auto-updating production systems, and always have a backup.
+:::
+
+**One-time update:**
+```bash
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  nickfedor/watchtower --run-once open-webui
+```
+
+**Continuous (check every 6 hours):**
+```bash
+docker run -d --name watchtower --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  nickfedor/watchtower --interval 21600 open-webui
+```
+
+Set `WATCHTOWER_CLEANUP=true` to auto-remove old images. See [Watchtower docs](https://watchtower.nickfedor.com/) for scheduling, notifications, and monitor-only mode.
+
 ---
 
 ## Backup & Restore
 
-All data (chats, users, uploads) lives in the `open-webui` Docker volume.
+All data lives in the `open-webui` Docker volume, including:
+- **Database**: chats, users, settings, admin configuration
+- **Uploaded files**: documents, images, knowledge base content
+- **Generated content**: image generation outputs, exported data
 
-**Backup:**
+### Backup
+
 ```bash
 docker run --rm -v open-webui:/data -v $(pwd):/backup \
   alpine tar czf /backup/openwebui-$(date +%Y%m%d).tar.gz /data
 ```
 
-**Restore:**
+Back up **before every update** and on a regular schedule (daily or weekly, depending on how actively you use Open WebUI).
+
+### Restore
+
+:::caution
+The restore command **deletes everything in the volume** before extracting the backup. Make sure you're restoring the right file.
+:::
+
 ```bash
 docker stop open-webui
 docker run --rm -v open-webui:/data -v $(pwd):/backup \
-  alpine sh -c "rm -rf /data/* && tar xzf /backup/openwebui-20250216.tar.gz -C /"
+  alpine sh -c "rm -rf /data/* && tar xzf /backup/openwebui-YYYYMMDD.tar.gz -C /"
 docker start open-webui
 ```
 
-For database-specific recovery, see the [Manual Database Migration](/troubleshooting/manual-database-migration.md) guide.
+Replace `YYYYMMDD` with the actual date of your backup file.
+
+For database-specific recovery, see the [Manual Database Migration](/troubleshooting/manual-database-migration) guide.
+
+---
+
+## Related Guides
+
+- [Scaling Open WebUI](/getting-started/advanced-topics/scaling): multi-worker and multi-instance deployments
+- [Connection Errors](/troubleshooting/connection-error): troubleshooting post-update connectivity issues
+- [Environment Variable Reference](/reference/env-configuration): all configuration options including `WEBUI_SECRET_KEY`
+- [Release Notes](https://github.com/open-webui/open-webui/releases): changelog for every version

@@ -8,7 +8,11 @@ pip install -U open-webui
 
 The `-U` (or `--upgrade`) flag ensures that `pip` upgrades the package to the latest available version.
 
-That's it! Your **Open-WebUI** package is now updated and ready to use.
+After upgrading, restart the server and verify it starts correctly:
+
+```bash
+open-webui serve
+```
 
 :::warning Multi-Worker Environments
 If you run Open WebUI with `UVICORN_WORKERS > 1` (e.g., in a production environment), you **MUST** ensure the update migration runs on a single worker first to prevent database schema corruption.
@@ -19,3 +23,5 @@ If you run Open WebUI with `UVICORN_WORKERS > 1` (e.g., in a production environm
 3. Wait for the application to fully start and complete migrations.
 4. Stop and restart the application with your desired number of workers.
 :::
+
+For version pinning, rollback, and backup procedures, see the [full update guide](/getting-started/updating).

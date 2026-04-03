@@ -2,20 +2,7 @@
 
 To update your local Docker installation to the latest version, you can either use **Watchtower** or manually update the container.
 
-### Option 1: Using Watchtower (Recommended Fork)
-
-:::info Deprecation Notice
-The original `containrrr/watchtower` is **no longer maintained** and may fail with newer Docker versions. We recommend using the `nicholas-fedor/watchtower` fork.
-:::
-
-:::warning Multi-Worker Environments
-If you run Open WebUI with `UVICORN_WORKERS > 1` (e.g., in a production environment), you **MUST** ensure the update migration runs on a single worker first to prevent database schema corruption.
-
-**Steps for proper update:**
-1. Update and start your container with `UVICORN_WORKERS=1`.
-2. Wait for the application to fully start and complete migrations.
-3. Stop and restart the container with your desired number of workers.
-:::
+### Option 1: Using Watchtower
 
 With [Watchtower](https://github.com/nicholas-fedor/watchtower), you can automate the update process:
 
@@ -42,7 +29,14 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock nickfedor/wat
 3. Start the container again:
 
    ```bash
-   docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+   docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
+     -e WEBUI_SECRET_KEY="your-secret-key" \
+     --name open-webui --restart always \
+     ghcr.io/open-webui/open-webui:main
    ```
 
-Both methods will get your Docker instance updated and running with the latest build.
+:::warning Set WEBUI_SECRET_KEY
+Without a persistent `WEBUI_SECRET_KEY`, you'll be logged out every time the container is recreated. Generate one with `openssl rand -hex 32`.
+:::
+
+For version pinning, rollback, automated update tools, and backup procedures, see the [full update guide](/getting-started/updating).

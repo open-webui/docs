@@ -1,6 +1,6 @@
 ---
-sidebar_position: 4100
-title: "Firefox AI Chatbot Sidebar"
+sidebar_position: 40
+title: "Firefox Sidebar"
 ---
 
 ## 🦊 Firefox AI Chatbot Sidebar

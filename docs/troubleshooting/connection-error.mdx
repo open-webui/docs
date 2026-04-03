@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Connection Errors"
 ---
 
-We're here to help you get everything set up and running smoothly. Below, you'll find step-by-step instructions tailored for different scenarios to solve common connection issues.
+This page covers common connection issues, their causes, and how to resolve them.
 
 ## 🔐 HTTPS, TLS, CORS & WebSocket Issues
 
@@ -90,7 +90,7 @@ WEBSOCKET_MANAGER=redis
 WEBSOCKET_REDIS_URL=redis://redis:6379/1
 ```
 
-For detailed Redis setup instructions, see [Redis WebSocket Support](/tutorials/integrations/redis). For a complete multi-instance scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). If you're seeing WebSocket 403 errors specifically in a multi-replica setup, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures).
+For detailed Redis setup instructions, see [Redis WebSocket Support](/getting-started/advanced-topics/redis). For a complete multi-instance scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). If you're seeing WebSocket 403 errors specifically in a multi-replica setup, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures).
 
 ### Testing Your Configuration
 
@@ -189,33 +189,27 @@ When you add a URL like `https://myserver.com/api` as a **user/direct** connecti
 - Internal IPs (e.g. `http://192.168.1.50:8000`)
 
 :::tip
-This applies to **all** backend-proxied connections in Open WebUI — not just Open Terminal. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#networking-tips), and Ollama/OpenAI API endpoints.
+This applies to **all** backend-proxied connections in Open WebUI — not just Open Terminal. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
+This applies to **all** backend-proxied connections in Open WebUI. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
 :::
 
-## 🌟 Connection to Ollama Server
+## Connection to Ollama Server
 
-### 🚀 Accessing Ollama from Open WebUI
+### Accessing Ollama from Open WebUI
 
-Struggling to connect to Ollama from Open WebUI? It could be because Ollama isn’t listening on a network interface that allows external connections. Let’s sort that out:
+If Open WebUI cannot reach Ollama, it's likely because Ollama is only listening on `127.0.0.1` (localhost). To fix this:
 
-1. **Configure Ollama to Listen Broadly** 🎧:
-   Set `OLLAMA_HOST` to `0.0.0.0` to make Ollama listen on all network interfaces.
+1. **Set `OLLAMA_HOST=0.0.0.0`** to make Ollama listen on all network interfaces.
+2. **Ensure the variable is set** in your deployment environment (systemd service, Docker, shell profile).
+3. **Restart Ollama** for the change to take effect.
 
-2. **Update Environment Variables**:
-   Ensure that the `OLLAMA_HOST` is accurately set within your deployment environment.
+Verify connectivity by accessing the WebUI interface after restarting. For detailed instructions, see the [Ollama documentation](https://github.com/ollama/ollama/blob/main/docs/faq.md#setting-environment-variables-on-linux).
 
-3. **Restart Ollama**🔄:
-   A restart is needed for the changes to take effect.
+### Docker Connection Error
 
-💡 After setting up, verify that Ollama is accessible by visiting the WebUI interface.
+If Open WebUI in Docker cannot connect to Ollama running on the host machine:
 
-For more detailed instructions on configuring Ollama, please refer to the [Ollama's Official Documentation](https://github.com/ollama/ollama/blob/main/docs/faq.md#setting-environment-variables-on-linux).
-
-### 🐳 Docker Connection Error
-
-If you're seeing a connection error when trying to access Ollama, it might be because the WebUI docker container can't talk to the Ollama server running on your host. Let’s fix that:
-
-1. **Adjust the Network Settings** 🛠️:
+1. **Adjust the Network Settings**:
    Use the `--network=host` flag in your Docker command. This links your container directly to your host’s network.
 
 2. **Change the Port**:
@@ -225,7 +219,7 @@ If you're seeing a connection error when trying to access Ollama, it might be be
 ```bash
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
-🔗 After running the above, your WebUI should be available at `http://localhost:8080`.
+After running the above, your WebUI should be available at `http://localhost:8080`.
 
 ## ⏱️ Model List Loading Issues (Slow UI / Unreachable Endpoints)
 
@@ -324,7 +318,7 @@ For PostgreSQL on adequate hardware, enabling this setting may improve performan
 
 ## 🔒 SSL Connection Issue with Hugging Face
 
-Encountered an SSL error? It could be an issue with the Hugging Face server. Here's what to do:
+If you encounter an SSL error connecting to Hugging Face:
 
 1. **Check Hugging Face Server Status**:
    Verify if there's a known outage or issue on their end.
@@ -368,27 +362,16 @@ Disabling SSL verification reduces security. Only do this if you trust the netwo
 
 ## 🍏 Podman on MacOS
 
-Running on MacOS with Podman? Here’s how to ensure connectivity:
+For Podman on MacOS:
 
-1. **Enable Host Access**:
-   Podman 5.0+ uses **pasta** by default, which simplifies host loopback. If you are on an older version, you may need `--network slirp4netns:allow_host_loopback=true`.
-
-2. **Set OLLAMA_BASE_URL**:
-   Ensure it points to **`http://host.containers.internal:11434`**.
+1. **Enable Host Access**: Podman 5.0+ uses **pasta** by default, which simplifies host loopback. On older versions, use `--network slirp4netns:allow_host_loopback=true`.
+2. **Set OLLAMA_BASE_URL** to **`http://host.containers.internal:11434`**.
 
 **Example Podman Command**:
 ```bash
 podman run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-
-## 🛠️ MCP Tool Connections
-
-If you are having trouble connecting to MCP tools (e.g. "Failed to connect to MCP server"):
-*   **Authentication**: Ensure you aren't using "Bearer" without a token.
-*   **Filters**: Try adding a comma to the Function Name Filter List.
-
-See the [MCP Feature Documentation](/features/extensibility/mcp#troubleshooting) for detailed troubleshooting steps.
 
 ## 🔐 SSL/TLS Errors with Web Search
 
