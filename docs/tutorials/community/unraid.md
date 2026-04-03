@@ -1,5 +1,5 @@
 ---
-sidebar_position: 34
+sidebar_position: 10
 title: "Unraid Deployment (Beginner-Safe)"
 ---
 

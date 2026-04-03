@@ -17,12 +17,9 @@ Connect Open WebUI to external services, identity providers, and developer tools
 
 | Tutorial | What you will learn |
 |----------|-------------------|
-| [Redis Setup](/tutorials/integrations/redis) | Configure Redis for multi-node session management and caching |
 | [MCP with Notion](/tutorials/integrations/mcp-notion) | Connect Notion as a knowledge source via Model Context Protocol |
 | [OneDrive and SharePoint](/tutorials/integrations/onedrive-sharepoint) | Pull documents from Microsoft 365 into Open WebUI |
 | [LibreTranslate](/tutorials/integrations/libre-translate) | Add self-hosted translation capabilities |
-| [Custom CA Certificates](/tutorials/integrations/custom-ca) | Trust internal or private certificate authorities |
-| [Unraid](/tutorials/integrations/unraid) | Deploy Open WebUI on Unraid servers |
 
 ### Authentication and Identity
 
@@ -80,7 +77,6 @@ Practical techniques to get more out of Open WebUI.
 | Tutorial | What you will learn |
 |----------|-------------------|
 | [RAG Tutorial](/tutorials/tips/rag-tutorial) | Use Retrieval-Augmented Generation with your own documents |
-| [SQLite Database](/tutorials/tips/sqlite-database) | Query and manage the SQLite backend directly |
 | [One-Click Ollama Launcher](/tutorials/tips/one-click-ollama-launcher) | Set up a one-click launcher for Ollama models |
 | [Contributing Tutorial](/tutorials/tips/contributing-tutorial) | Walk through the contribution workflow step by step |
 
@@ -90,4 +86,4 @@ Practical techniques to get more out of Open WebUI.
 
 Deployment tutorials, videos, and walkthroughs created by the community.
 
-[Browse community guides and video gallery →](/tutorials/deployment)
+[Browse community guides and video gallery →](/tutorials/community)
