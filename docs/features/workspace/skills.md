@@ -123,7 +123,7 @@ From the Skills workspace list, use the ellipsis menu (**...**):
 
 ## Access Control
 
-Skills use the same [Access Control](/features/access-security/rbac) system as other workspace resources:
+Skills use the same [Access Control](/features/authentication-access/rbac) system as other workspace resources:
 
 - **Private by default**: Only the creator can see and edit a new skill.
 - **Share with users or groups**: Grant `read` or `write` access via the **Access** button.
@@ -145,7 +145,7 @@ Attaching a skill to a model does **not** bypass access control. When a user cha
 | **Sharing > Share Skills** | Share skills with individual users or groups |
 | **Sharing > Public Skills** | Make skills publicly accessible |
 
-See [Permissions](/features/access-security/rbac/permissions) for configuration details.
+See [Permissions](/features/authentication-access/rbac/permissions) for configuration details.
 
 ---
 

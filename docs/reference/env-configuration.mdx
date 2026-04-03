@@ -4490,7 +4490,7 @@ Strictly return in JSON format:
 
 :::tip
 
-For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/media-generation/image-generation-and-editing/gemini).
+For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/chat-conversations/image-generation-and-editing/gemini).
 
 :::
 
@@ -4872,23 +4872,23 @@ In any production environment running more than one instance of Open WebUI (e.g.
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header for authentication. See [SSO docs](/features/access-security/auth/sso).
+- Description: Defines the trusted request header for authentication. See [SSO docs](/features/authentication-access/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_NAME_HEADER`
 
 - Type: `str`
 - Description: Defines the trusted request header for the username of anyone registering with the
-`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/access-security/auth/sso).
+`WEBUI_AUTH_TRUSTED_EMAIL_HEADER` header. See [SSO docs](/features/authentication-access/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_GROUPS_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/access-security/auth/sso).
+- Description: Defines the trusted request header containing a comma-separated list of group memberships for the user when using trusted header authentication. See [SSO docs](/features/authentication-access/auth/sso).
 
 #### `WEBUI_AUTH_TRUSTED_ROLE_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/access-security/auth/sso).
+- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/authentication-access/auth/sso).
 
 ### Google
 

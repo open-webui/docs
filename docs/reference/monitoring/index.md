@@ -66,7 +66,7 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \
   http://your-open-webui-instance:8080/api/models
 ```
 
-You'll need an API key. See [API Keys](/features/access-security/api-keys) for setup instructions.
+You'll need an API key. See [API Keys](/features/authentication-access/api-keys) for setup instructions.
 
 :::tip Dedicated Monitoring Account
 Create a **non-admin user** (e.g., `monitoring-bot`), generate an API key from that account, and use it for all monitoring requests. This limits blast radius if the key is ever compromised.
@@ -120,4 +120,4 @@ Setting up Level 3 in Uptime Kuma requires an HTTP(s) monitor with a POST body, 
 ## Next Steps
 
 - **[OpenTelemetry](/reference/monitoring/otel)** - Distributed tracing, metrics, and logs with Grafana, Prometheus, Jaeger, and more
-- **[API Keys](/features/access-security/api-keys)** - Full guide on enabling and generating API keys for programmatic access
+- **[API Keys](/features/authentication-access/api-keys)** - Full guide on enabling and generating API keys for programmatic access

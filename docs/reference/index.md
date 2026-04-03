@@ -78,7 +78,7 @@ Generate personal access tokens that let external code call the same endpoints t
 | 🛡️ **Scoped to user** | Key inherits your role and group permissions |
 | 🚫 **Endpoint restrictions** | Optionally limit which API routes a key can access |
 
-[**Set up API keys →**](/features/access-security/api-keys)
+[**Set up API keys →**](/features/authentication-access/api-keys)
 
 ---
 

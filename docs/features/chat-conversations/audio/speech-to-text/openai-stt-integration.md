@@ -8,7 +8,7 @@ title: "OpenAI STT Integration"
 This guide covers how to use OpenAI's Whisper API for Speech-to-Text with Open WebUI. This provides cloud-based transcription without needing local GPU resources.
 
 :::tip Looking for TTS?
-See the companion guide: [Using OpenAI for Text-to-Speech](/features/media-generation/audio/text-to-speech/openai-tts-integration)
+See the companion guide: [Using OpenAI for Text-to-Speech](/features/chat-conversations/audio/text-to-speech/openai-tts-integration)
 :::
 
 ## Requirements

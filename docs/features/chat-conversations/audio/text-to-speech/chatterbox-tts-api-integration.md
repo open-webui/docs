@@ -244,7 +244,7 @@ Chatterbox has higher memory requirements than other TTS solutions:
 - **Recommended:** 8GB+ RAM
 - **GPU:** NVIDIA CUDA or Apple M-series (MPS) recommended
 
-If you experience memory issues, consider using a lighter alternative like [OpenAI Edge TTS](/features/media-generation/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](/features/media-generation/audio/text-to-speech/Kokoro-FastAPI-integration).
+If you experience memory issues, consider using a lighter alternative like [OpenAI Edge TTS](/features/chat-conversations/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](/features/chat-conversations/audio/text-to-speech/Kokoro-FastAPI-integration).
 
 ### Docker Networking
 

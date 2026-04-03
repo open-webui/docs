@@ -64,7 +64,7 @@ For advanced configuration, you can set the following environment variables.
 
 **Gemini**
 - `IMAGES_GEMINI_API_KEY`: API Key for Gemini.
-- [View Gemini Configuration Guide](/features/media-generation/image-generation-and-editing/gemini)
+- [View Gemini Configuration Guide](/features/chat-conversations/image-generation-and-editing/gemini)
 
 :::tip
 For a complete list of environment variables and detailed configuration options, please refer to the [Environment Configuration Guide](/reference/env-configuration).

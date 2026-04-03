@@ -33,7 +33,7 @@ When running local models, a single powerful server (or cluster) serves your ent
 
 ### Centralized Administration
 
-Manage everything from one place: control which models users can access, configure [**Role-Based Access Control (RBAC)**](/features/access-security/rbac), review audit logs, and restrict features as needed.
+Manage everything from one place: control which models users can access, configure [**Role-Based Access Control (RBAC)**](/features/authentication-access/rbac), review audit logs, and restrict features as needed.
 
 ---
 
@@ -54,7 +54,7 @@ For remote teams that don't need public internet exposure. Overlay networks and 
 | | |
 | :--- | :--- |
 | **[Tailscale](/reference/https/tailscale)** | Private mesh network with MagicDNS (`https://open-webui.tailnet-name.ts.net`) |
-| **[Cloudflare Tunnels](/reference/https/cloudflare-tunnels)** | Expose via Cloudflare's edge, protected by Cloudflare Access (Zero Trust) |
+| **[Cloudflare Tunnels](/reference/https/cloudflare-tunnel)** | Expose via Cloudflare's edge, protected by Cloudflare Access (Zero Trust) |
 | **[ngrok](/reference/https/ngrok)** | Quick temporary sharing for development or testing |
 
 ### 3. Public HTTPS (Reverse Proxy)
@@ -85,6 +85,6 @@ For organizations where manual approval doesn't scale, Open WebUI integrates wit
 | :--- | :--- |
 | **OAuth / OIDC** | Authenticate via **Google**, **Microsoft**, **Okta**, or **Keycloak** |
 | **Group mapping** | Map IdP groups directly to Open WebUI groups |
-| **[SCIM 2.0](/features/access-security/auth/scim)** | Automated user and group provisioning and deprovisioning |
+| **[SCIM 2.0](/features/authentication-access/auth/scim)** | Automated user and group provisioning and deprovisioning |
 
-[**Learn how to set up SSO →**](/features/access-security/auth/sso)
+[**Learn how to set up SSO →**](/features/authentication-access/auth/sso)
