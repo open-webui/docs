@@ -880,7 +880,7 @@ To use SQLCipher with existing data, you must either:
 1. **Start fresh** - Enable SQLCipher on a new installation and have users export/re-import their chats manually
 2. **Manual database migration** - Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
 3. **Use filesystem-level encryption** - Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
-4. **Switch to PostgreSQL** - For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
+4. **Switch to an external SQL database** - For multi-user deployments, PostgreSQL or MariaDB with TLS provides encryption in transit and can be combined with encrypted storage
 
 :::
 

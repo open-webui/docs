@@ -14,7 +14,7 @@ If you are setting up a scaled deployment for the first time, start with the [Sc
 Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
 
 1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
-2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/reference/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
+2.  **External Database:** You **MUST** use an external SQL database such as PostgreSQL or MariaDB (see [`DATABASE_URL`](/reference/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
 3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/reference/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) are required.
 4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
 5.  **External Vector Database (Required):** The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not safe for multi-worker or multi-replica deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** use a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), [MariaDB Vector](/reference/env-configuration#mariadb_vector_db_url), Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a [separate HTTP server](/reference/env-configuration#chroma_http_host).
@@ -100,10 +100,14 @@ REDIS_URL=redis://your-redis-host:6379/0
 Using **SQLite** with multiple replicas. SQLite is a file-based database and does not support concurrent network writes from multiple containers.
 
 **Solution:**
-Migrate to **PostgreSQL**. Update your connection string:
+Migrate to an **external SQL database**. Update your connection string:
 
 ```bash
+# PostgreSQL
 DATABASE_URL=postgresql://user:password@postgres-host:5432/openwebui
+
+# MariaDB (recommended when targeting MariaDB specifically)
+DATABASE_URL=mariadb+mariadbconnector://user:password@db-host:3306/openwebui
 ```
 
 ### 5. Uploaded Files or RAG Knowledge Inaccessible

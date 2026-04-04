@@ -21,7 +21,7 @@ Over 200 environment variables control authentication, model routing, storage, l
 | :--- | :--- |
 | 🔐 **Authentication & signup** | `ENABLE_SIGNUP`, `ENABLE_LOGIN_FORM`, `WEBUI_ADMIN_EMAIL`, OIDC/LDAP/SCIM |
 | 🤖 **Model connections** | Ollama, OpenAI, direct pipeline URLs, timeouts, load balancing |
-| 💾 **Storage & databases** | SQLite, PostgreSQL, S3/GCS/Azure Blob, Redis |
+| 💾 **Storage & databases** | SQLite, PostgreSQL, MariaDB, S3/GCS/Azure Blob, Redis |
 | 📊 **Logging & audit** | `GLOBAL_LOG_LEVEL`, JSON logging, audit log levels and paths |
 | 🧠 **RAG & retrieval** | Chunk size, overlap, embedding engines, reranking, vector DB selection |
 

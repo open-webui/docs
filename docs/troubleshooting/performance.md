@@ -17,7 +17,7 @@ This guide provides a comprehensive overview of strategies to optimize Open WebU
 
 3.  **High Scale for Many Users (e.g., Enterprise/Production)**:
     *   *Goal*: Stability and concurrency.
-    *   *Strategy*: Requires dedicated Vector DBs (Milvus/Qdrant), increased thread pools, caching to handle load, and **PostgreSQL** instead of SQLite.
+    *   *Strategy*: Requires dedicated Vector DBs (Milvus/Qdrant), increased thread pools, caching to handle load, and an **external SQL database** (PostgreSQL or MariaDB) instead of SQLite.
 
 ---
 
@@ -78,11 +78,14 @@ Drastically improves the speed of follow-up questions when chatting with large d
 
 For high-scale deployments, your database configuration is the single most critical factor for stability.
 
-### PostgreSQL (Mandatory for Scale)
-For any multi-user or high-concurrency setup, **PostgreSQL is mandatory**. SQLite (the default) is not designed for high concurrency and will become a bottleneck (database locking errors).
+### External SQL Database (Mandatory for Scale)
+For any multi-user or high-concurrency setup, an **external SQL database** is mandatory. SQLite (the default) is not designed for high concurrency and will become a bottleneck (database locking errors).
 
 -   **Variable**: `DATABASE_URL`
--   **Example**: `postgres://user:password@localhost:5432/webui`
+-   **Examples**:
+    - `postgresql://user:password@localhost:5432/webui`
+    - `mariadb+mariadbconnector://user:password@localhost:3306/webui`
+    - `mysql+pymysql://user:password@localhost:3306/webui`
 
 ### Chat Saving Strategy
 
@@ -128,6 +131,7 @@ For multi-user setups, the choice of Vector DB matters.
 -   **Recommendations**:
     *   **Milvus** or **Qdrant**: Best for improved scale and performance. These are client-server databases, inherently safe for multi-process access.
     *   **PGVector**: Excellent choice if you are already using PostgreSQL. Also fully multi-process safe.
+    *   **MariaDB Vector**: Good fit if you are already using MariaDB as the primary database and want both application data and vector search on one database system.
     *   **ChromaDB HTTP mode**: If you want to keep using ChromaDB, run it as a [separate server](/reference/env-configuration#chroma_http_host) so Open WebUI connects via HTTP instead of local SQLite.
 -   **Multitenancy**: If using Milvus or Qdrant, enabling multitenancy offers better resource sharing.
     *   `ENABLE_MILVUS_MULTITENANCY_MODE=True`

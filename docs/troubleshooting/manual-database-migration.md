@@ -3,7 +3,7 @@ sidebar_position: 900
 title: "Database Migration"
 sidebar_label: Manual Migration
 description: Complete guide for manually running Alembic database migrations when Open WebUI's automatic migration fails or requires direct intervention.
-keywords: [alembic, migration, database, troubleshooting, sqlite, postgresql, docker]
+keywords: [alembic, migration, database, troubleshooting, sqlite, postgresql, mariadb, mysql, docker]
 ---
 
 import Tabs from '@theme/Tabs';
@@ -19,7 +19,7 @@ You need manual migration only if:
 - Open WebUI logs show specific migration errors during startup
 - You're performing offline database maintenance
 - Automatic migration fails after a version upgrade
-- You're migrating between database types (SQLite ↔ PostgreSQL)
+- You're migrating between database types (SQLite ↔ PostgreSQL/MariaDB)
 - A developer has instructed you to run migrations manually
 :::
 
@@ -68,6 +68,11 @@ Database migrations cannot run while Open WebUI is active. You **must** stop all
     pg_dump -h localhost -U your_user -d open_webui_db > backup_$(date +%Y%m%d_%H%M%S).sql
     ```
   </TabItem>
+  <TabItem value="mariadb" label="MariaDB / MySQL">
+    ```bash title="Terminal"
+    mysqldump -h localhost -u your_user -p open_webui_db > backup_$(date +%Y%m%d_%H%M%S).sql
+    ```
+  </TabItem>
 </Tabs>
 
 ### Verify Backup Integrity
@@ -87,6 +92,13 @@ Database migrations cannot run while Open WebUI is active. You **must** stop all
     ```
   </TabItem>
   <TabItem value="postgresql" label="PostgreSQL">
+    ```bash title="Terminal - Verify Backup"
+    # Verify backup file is not empty and contains SQL
+    head -n 20 backup_*.sql
+    grep -c "CREATE TABLE" backup_*.sql
+    ```
+  </TabItem>
+  <TabItem value="mariadb" label="MariaDB / MySQL">
     ```bash title="Terminal - Verify Backup"
     # Verify backup file is not empty and contains SQL
     head -n 20 backup_*.sql
@@ -168,6 +180,12 @@ export DATABASE_URL="sqlite:////app/backend/data/webui.db"
 # For PostgreSQL
 export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
 
+# For MariaDB (preferred)
+export DATABASE_URL="mariadb+mariadbconnector://user:password@localhost:3306/open_webui_db"
+
+# MariaDB compatibility fallback
+export DATABASE_URL="mysql+pymysql://user:password@localhost:3306/open_webui_db"
+
 # Required: WEBUI_SECRET_KEY
 # Get from existing file in backend directory (NOT data directory)
 export WEBUI_SECRET_KEY=$(cat /app/backend/.webui_secret_key)
@@ -197,6 +215,12 @@ export DATABASE_URL="sqlite:////full/path/to/webui.db"
 
 # For PostgreSQL
 export DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_db"
+
+# For MariaDB (preferred)
+export DATABASE_URL="mariadb+mariadbconnector://user:password@localhost:3306/open_webui_db"
+
+# MariaDB compatibility fallback
+export DATABASE_URL="mysql+pymysql://user:password@localhost:3306/open_webui_db"
 
 # Required: WEBUI_SECRET_KEY
 # If using .env file, Alembic may not pick it up automatically - export manually
