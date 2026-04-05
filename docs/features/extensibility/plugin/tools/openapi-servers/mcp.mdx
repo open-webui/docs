@@ -5,6 +5,10 @@ title: "MCP Support"
 
 This documentation explains how to easily set up and deploy the [**MCP (Model Context Protocol)-to-OpenAPI proxy server** (mcpo)](https://github.com/open-webui/mcpo) provided by Open WebUI. Learn how you can effortlessly expose MCP-based tool servers using standard, familiar OpenAPI endpoints suitable for end-users and developers.
 
+:::info
+This page covers `mcpo`, the MCP-to-OpenAPI bridge. If you want Open WebUI's native MCP support, see [Model Context Protocol (MCP)](/features/extensibility/mcp).
+:::
+
 :::danger Critical for Persistence
 If you connect Open WebUI to this proxy using an API Key or Auth Token, you **MUST** set `WEBUI_SECRET_KEY` in your Open WebUI Docker config. If this key changes (e.g., on container restart), Open WebUI will fail to decrypt the stored credentials for your tool.
 :::
