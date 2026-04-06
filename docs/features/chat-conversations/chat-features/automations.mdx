@@ -1,0 +1,81 @@
+---
+sidebar_position: 11
+title: "Automations"
+---
+
+# Automations
+
+Automations let you schedule prompts to run automatically at recurring times. Each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
+
+## What You Can Automate
+
+- Run a prompt on a schedule (hourly, daily, weekly, monthly, custom RRULE)
+- Trigger a run manually with **Run Now**
+- Pause/resume automations without deleting them
+- Review execution history for each automation
+- Optionally attach a terminal server and working directory for runs that need terminal context
+
+## Access Control
+
+Automations are permission-gated for non-admin users.
+
+- **Admins**: always have access to Automations
+- **Users**: require the **Features > Automations** permission
+
+See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
+
+To grant user access:
+
+1. Open **Admin Panel > Users > Groups**
+2. Edit **Default permissions** or a specific group
+3. Enable **Features > Automations**
+
+You can also set this default via [`USER_PERMISSIONS_FEATURES_AUTOMATIONS`](/reference/env-configuration#user_permissions_features_automations).
+
+## Create an Automation
+
+1. Open **User Menu > Automations**
+2. Click **New Automation**
+3. Set:
+   - **Title**
+   - **Instructions** (prompt)
+   - **Model**
+   - **Schedule**
+4. (Optional) Select a **Terminal** server and **Working Directory**
+5. Click **Create**
+
+After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
+
+## Edit and Manage
+
+From the Automations list, click an automation to open its dedicated editor page.
+
+On the editor page, you can:
+
+- Update title, instructions, model, schedule, and terminal settings
+- Save changes
+- Run immediately with **Run now**
+- Pause/resume automation state
+- Delete the automation
+- Review execution logs and open run chats
+
+Execution logs are paginated with infinite scroll in the editor, so large run histories load incrementally.
+
+## Scheduling
+
+Supported schedule modes:
+
+- **Once**
+- **Hourly**
+- **Daily**
+- **Weekly**
+- **Monthly**
+- **Custom** (`RRULE`)
+
+Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
+
+## Notes
+
+- Automations run in the background worker loop on a polling interval.
+- Every run records a status (`success` or `error`) and optional error details.
+- Deleting an automation also removes its run history.

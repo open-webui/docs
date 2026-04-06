@@ -49,9 +49,9 @@ Visit [http://localhost:3000](http://localhost:3000).
 For production environments, pin a specific version instead of using floating tags:
 
 ```bash
-docker pull ghcr.io/open-webui/open-webui:v0.8.6
-docker pull ghcr.io/open-webui/open-webui:v0.8.6-cuda
-docker pull ghcr.io/open-webui/open-webui:v0.8.6-ollama
+docker pull ghcr.io/open-webui/open-webui:v0.8.13
+docker pull ghcr.io/open-webui/open-webui:v0.8.13-cuda
+docker pull ghcr.io/open-webui/open-webui:v0.8.13-ollama
 ```
 
 ---

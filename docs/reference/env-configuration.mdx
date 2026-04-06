@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.8.5](https://github.com/open-webui/open-webui/releases/tag/v0.8.5), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.8.13](https://github.com/open-webui/open-webui/releases/tag/v0.8.13), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -204,6 +204,15 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `{}`
 - Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time — per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
 - Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `models.default_params`.
+
+:::info
+
+`DEFAULT_MODEL_PARAMS` is read from the environment as a JSON string at startup.
+
+- Use valid JSON (for example: `{"temperature":0.7,"function_calling":"native"}`)
+- If parsing fails, Open WebUI logs the error and falls back to `{}`
+
+:::
 
 #### `DEFAULT_USER_ROLE`
 
@@ -837,6 +846,12 @@ By default, audit logging uses **blacklist mode** — all paths are logged excep
 - Description: Sets the OpenAI API key.
 - Example: `sk-124781258123`
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::warning Provider Key Scope (Important)
+For OpenAI-compatible backends and proxies (including LiteLLM), configure least-privilege keys for regular user traffic whenever possible.
+
+Do not use provider management/master keys unless your deployment explicitly requires that trust level.
+:::
 
 #### `OPENAI_API_KEYS`
 
@@ -1663,21 +1678,39 @@ When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_
 #### `WEBUI_SECRET_KEY`
 
 - Type: `str`
-- Default: `t0p-s3cr3t`
-- Docker Default: Randomly generated on first start
-- Description: Overrides the randomly generated string used for JSON Web Token and **encryption of sensitive data** (like OAuth tokens for MCP).
+- Default: Automatically generated (see below)
+- Description: The secret key used for signing JSON Web Tokens (JWTs) and **encrypting sensitive data** at rest (including OAuth tokens for MCP). Can be set via the `WEBUI_SECRET_KEY` environment variable or the legacy `WEBUI_JWT_SECRET_KEY` variable (deprecated).
 
-:::danger Critical for Docker/Production
+:::info How the secret key is generated
 
-You **MUST** set `WEBUI_SECRET_KEY` to a secure, persistent value.
+You do **not** need to manually set this variable for a secure installation — **all standard launch methods automatically generate and persist a cryptographically random key on first start:**
 
-If you do NOT set this:
-1.  It will be randomly generated each time the container restarts/recreates.
-2.  **All OAuth sessions will become invalid.**
-3.  **MCP Tools will break** (Error: `Error decrypting tokens`) because they cannot decrypt the tokens stored with the previous key.
-4.  You will be logged out.
+| Launch method | Auto-generates? | Persisted to |
+|---|---|---|
+| **Docker** (`start.sh`) | ✅ Yes | `.webui_secret_key` file inside the container |
+| **pip install** (`open-webui serve`) | ✅ Yes | `.webui_secret_key` file in the working directory |
+| **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A — uses the code-level fallback |
 
-**Do not leave this unset in production.**
+The code-level fallback value (`t0p-s3cr3t`) exists **only** for development convenience and is **never used** when Open WebUI is launched through the standard Docker or `open-webui serve` methods. Both of those methods check for the environment variable first, and if it is not set, generate a secure random key, save it to a file, and inject it into the environment — all before the application starts.
+
+:::
+
+:::danger Recommended: Set an explicit, persistent value
+
+While the auto-generated key is secure, it is tied to a file inside the container or working directory. **If the container is recreated (not just restarted) and the key file is not in a persisted volume, a new key is generated**, which causes:
+
+1. **All existing user sessions become invalid** (users are logged out).
+2. **All OAuth sessions become invalid.**
+3. **MCP Tools break** (Error: `Error decrypting tokens`) because tokens encrypted with the previous key cannot be decrypted.
+
+To avoid this, explicitly set `WEBUI_SECRET_KEY` to a secure, persistent value that survives container recreates:
+
+```bash
+# Generate a secure key
+openssl rand -hex 32
+```
+
+Then pass it as an environment variable in your Docker Compose or deployment configuration.
 
 :::
 
@@ -1685,7 +1718,7 @@ If you do NOT set this:
 
 **Required for Multi-Worker and Multi-Node Deployments AND HIGHLY RECOMMENDED IN SINGLE-WORKER ENVIRONMENTS**
 
-When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set this variable. Without it, the following issues will occur:
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s), you **must** set this variable to the **same value across all replicas**. Without it, the following issues will occur:
 
 - Session management will fail across workers
 - Application state will be inconsistent between instances
@@ -4203,6 +4236,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Options:
   - `""` (empty string) - **Disables backend TTS.** When empty, TTS requests do not reach the backend. All TTS is handled client-side using the browser's Web Speech API or the user-configurable "Browser Kokoro" option in User Settings.
   - `openai` - Uses an OpenAI-compatible API for Text-to-Speech.
+  - `mistral` - Uses Mistral's Text-to-Speech API.
   - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech.
   - `azure` - Uses Azure Cognitive Services for Text-to-Speech.
   - `transformers` - Uses a local SentenceTransformers-based model for Text-to-Speech (runs on the backend).
@@ -4283,6 +4317,28 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Description: Additional parameters for OpenAI-compatible TTS API in JSON format. Allows customization of API-specific settings.
 - Example: `{"speed": 1.0}`
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+### Mistral Text-to-Speech
+
+#### `AUDIO_TTS_MISTRAL_API_KEY`
+
+- Type: `str`
+- Default: `None`
+- Description: Sets the API key used for Mistral Text-to-Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUDIO_TTS_MISTRAL_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.mistral.ai/v1`
+- Description: Sets the base URL used for Mistral Text-to-Speech.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `mistral-tts-latest` when `AUDIO_TTS_MODEL` is empty.
+
+:::
 
 ### Elevenlabs Text-to-Speech
 
@@ -4842,6 +4898,33 @@ curl -X POST "http://localhost:8080/api/v1/oauth/google/token/exchange" \
 - The user must already exist in Open WebUI (they must have signed in via the web interface at least once)
 - The OAuth provider must be properly configured
 - The token exchange uses the same user lookup logic as regular OAuth login (by OAuth `sub` claim first, then by email if `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is enabled)
+
+#### `ENABLE_OAUTH_BACKCHANNEL_LOGOUT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables OpenID Connect Back-Channel Logout support. When enabled, Open WebUI exposes `POST /oauth/backchannel-logout` so your identity provider can trigger server-side logout without browser redirects.
+- Usage: Set to `true` to enable the endpoint. Your identity provider should send a form-encoded `logout_token` that follows the OpenID Connect Back-Channel Logout 1.0 specification.
+
+:::warning
+
+**Redis Requirement for JWT Revocation**
+
+Back-channel logout revokes existing Open WebUI JWT sessions through Redis-based revocation keys. Without Redis, Open WebUI can still remove stored OAuth sessions, but already-issued JWTs remain valid until they naturally expire.
+
+For production SSO deployments, especially with multiple workers or replicas, configure `REDIS_URL` when enabling this feature.
+
+:::
+
+:::info
+
+**Behavior Notes**
+
+- The endpoint returns `200` with an empty body for valid requests, including cases where no matching user is found.
+- Invalid or malformed `logout_token` requests return `400` with `invalid_request` details.
+- Back-channel logout revokes users by provider + `sub` claim matching. `sid`-only logout matching is not currently supported.
+
+:::
 
 #### `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`
 
@@ -5598,6 +5681,24 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Default: `True`
 - Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory).
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables Automations access for non-admin users. When enabled, users can access `/automations` and manage their own scheduled automations.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info
+
+This setting maps to **Features > Automations** in RBAC permissions.
+
+- Non-admin users need this permission to access and use Automations.
+- Admin users are exempt from this specific permission check.
+
+See [Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for role/permission behavior.
+
+:::
 
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
 

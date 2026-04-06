@@ -1,0 +1,57 @@
+---
+sidebar_position: 12
+title: "Task Management"
+---
+
+# Task Management
+
+Task Management gives agentic models a structured way to plan and track multi-step work in a chat. Instead of keeping an implicit plan in free text, the model can maintain a live task list with explicit statuses.
+
+## Why This Matters for Agentic AI
+
+For simple Q&A, a single response is enough. For true agentic workflows (research, debugging, migrations, investigations), models need a reliable execution loop:
+
+1. break down work,
+2. execute steps,
+3. update progress,
+4. adapt the plan.
+
+Task lists make that loop visible to the user and reduce failures caused by skipped or forgotten steps.
+
+## How It Works
+
+When the model uses the built-in `update_tasks` tool:
+
+- Tasks are stored at the chat level
+- The UI shows progress in-chat (e.g., completed vs total)
+- Status changes are reflected in real time
+
+Supported statuses:
+
+- `pending`
+- `in_progress`
+- `completed`
+- `cancelled`
+
+## Enabling It
+
+Task Management is controlled per model in Builtin Tools:
+
+1. Go to **Workspace > Models > Edit**
+2. Ensure **Capabilities > Builtin Tools** is enabled
+3. Under builtin categories, keep **Task Management** enabled
+
+See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for tool details.
+
+## Best Practices
+
+- Use task lists for requests that need multiple concrete steps
+- Keep only one task in `in_progress` at a time
+- Mark tasks `completed` immediately after finishing
+- Cancel stale tasks explicitly instead of leaving them pending
+
+## Related Features
+
+- [Reasoning & Thinking Models](./reasoning-models.mdx)
+- [Automations](./automations.mdx)
+- [Tool Development / Built-in Tools](/features/extensibility/plugin/tools)

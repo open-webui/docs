@@ -21,36 +21,29 @@
 	--ifm-color-primary-light: #333;
 	--ifm-color-primary-lighter: #555;
 	--ifm-color-primary-lightest: #777;
-
 	--ifm-link-color: #111;
 	--ifm-heading-color: #111;
 	--ifm-font-color-base: #333;
-
 	--ifm-code-font-size: 90%;
 	--docusaurus-highlighted-code-line-bg: rgb(0 0 0 / 6%);
 	--ifm-hover-overlay: #fafafa;
 	--ifm-global-shadow-md: none;
-
 	--ifm-footer-background-color: #fff;
-
 	--ifm-font-family-base:
-		"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		"Helvetica Neue", Arial, sans-serif;
-
+		"Inter", -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto",
+		"Helvetica Neue", "Arial", sans-serif;
 	--ifm-font-size-base: 15px;
 	--ifm-line-height-base: 1.65;
 	--ifm-font-weight-base: 400;
 	--ifm-heading-font-weight: 600;
-
 	--ifm-navbar-shadow: none;
 	--ifm-toc-border-color: transparent;
-
 	--ifm-menu-link-padding-horizontal: 0.75rem;
 	--ifm-menu-link-padding-vertical: 0.35rem;
 }
 
 /* Mobile nav height fix */
-@media screen and (width <=996px) {
+@media screen and (width <= 996px) {
 	:root {
 		--ifm-navbar-height: 100%;
 	}
@@ -73,17 +66,14 @@
 	--ifm-color-primary-light: #eee;
 	--ifm-color-primary-lighter: #f5f5f5;
 	--ifm-color-primary-lightest: #fff;
-
 	--ifm-link-color: #ccc;
 	--ifm-heading-color: #eee;
 	--ifm-font-color-base: #bbb;
-
 	--ifm-background-color: #0a0a0a;
 	--ifm-navbar-background-color: #0a0a0a;
 	--ifm-footer-background-color: #0a0a0a;
 	--ifm-footer-color: #555;
 	--ifm-menu-color: #888;
-
 	--docusaurus-highlighted-code-line-bg: rgb(255 255 255 / 8%);
 }
 
@@ -177,14 +167,11 @@ code {
 
 [data-theme="dark"] code {
 	color: #ccc;
+	background-color: #222;
 }
 
 [data-theme="light"] code {
 	background-color: #ebebeb;
-}
-
-[data-theme="dark"] code {
-	background-color: #222;
 }
 
 .theme-code-block {
@@ -196,21 +183,6 @@ code {
 
 .theme-code-block pre {
 	border-radius: 16px !important;
-}
-
-/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
-[data-theme="light"] .shiki-code-block pre,
-[data-theme="light"] .shiki-code-block pre span {
-	color: var(--shiki-light) !important;
-}
-
-[data-theme="dark"] .shiki-code-block pre,
-[data-theme="dark"] .shiki-code-block pre span {
-	color: var(--shiki-dark) !important;
-}
-
-[data-theme="dark"] .shiki-code-block pre {
-	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
 }
 
 /* ─── Shiki code block styling ─── */
@@ -229,12 +201,23 @@ code {
 	font-weight: inherit;
 }
 
+/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
+[data-theme="light"] .shiki-code-block pre,
+[data-theme="light"] .shiki-code-block pre span {
+	color: var(--shiki-light) !important;
+}
+
 [data-theme="light"] .shiki-code-block pre {
 	background-color: #f3f3f3;
 }
 
+[data-theme="dark"] .shiki-code-block pre,
+[data-theme="dark"] .shiki-code-block pre span {
+	color: var(--shiki-dark) !important;
+}
+
 [data-theme="dark"] .shiki-code-block pre {
-	background-color: #1a1a1a;
+	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
 }
 
 .shiki-code-block-content {
@@ -254,7 +237,9 @@ code {
 	border-radius: var(--ifm-global-radius);
 	cursor: pointer;
 	opacity: 0;
-	transition: opacity 200ms ease-in-out, background-color 200ms ease-in-out;
+	transition:
+		opacity 200ms ease-in-out,
+		background-color 200ms ease-in-out;
 }
 
 [data-theme="light"] .shiki-copy-button {
@@ -267,13 +252,13 @@ code {
 	color: #ccc;
 }
 
-.shiki-code-block:hover .shiki-copy-button {
-	opacity: 0.4;
-}
-
 .shiki-copy-button:hover,
 .shiki-copy-button:focus-visible {
 	opacity: 1 !important;
+}
+
+.shiki-code-block:hover .shiki-copy-button {
+	opacity: 0.4;
 }
 
 [data-theme="light"] .theme-code-block pre {
@@ -345,6 +330,10 @@ article p a {
 	margin-bottom: 4px;
 }
 
+.notbold a {
+	font-weight: 400 !important;
+}
+
 [data-theme="light"] article p a {
 	color: #333;
 	text-decoration-color: #ccc;
@@ -381,7 +370,7 @@ article p a {
 }
 
 /* ─── Article max width ─── */
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	article {
 		max-width: 700px;
 		margin-left: auto;
@@ -391,7 +380,7 @@ article p a {
 }
 
 /* ─── Heading sizes ─── */
-@media screen and (width <=996px) {
+@media screen and (width <= 996px) {
 	h1 {
 		font-size: 1.5rem !important;
 		font-weight: 600;
@@ -407,7 +396,7 @@ article p a {
 	}
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	h1 {
 		font-size: 1.75rem !important;
 	}
@@ -659,7 +648,7 @@ a.footer__link-item:hover {
 	gap: 0.25rem;
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.header-github-link,
 	.header-discord-link {
 		font-size: 0;
@@ -701,7 +690,7 @@ a.footer__link-item:hover {
 }
 
 /* ─── Sidebar menu spacing ─── */
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.menu_node_modules-\@docusaurus-theme-classic-lib-theme-DocSidebar-Desktop-Content-styles-module {
 		padding: 0 !important;
 	}
@@ -721,10 +710,6 @@ a.footer__link-item:hover {
 }
 
 /* ─── Misc ─── */
-.notbold a {
-	font-weight: 400 !important;
-}
-
 .small-text {
 	font-size: 0.8em;
 }
@@ -760,8 +745,7 @@ a.footer__link-item:hover {
 	filter: invert(1);
 }
 
-
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.hero--container {
 		padding: 60px 200px;
 	}

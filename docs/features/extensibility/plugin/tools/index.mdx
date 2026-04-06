@@ -238,6 +238,8 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
 | `view_channel_message` | View a specific message or its details in a channel. |
 | `view_channel_thread` | View a full message thread/replies in a channel. |
+| **Task Management** | *Requires per-model "Task Management" category enabled (default: on).* |
+| `update_tasks` | Create/update a structured task list for the current chat, including status tracking (`pending`, `in_progress`, `completed`, `cancelled`). |
 | **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
 | `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
@@ -302,6 +304,8 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 | `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{channel_id, channel_name, message_id, content_snippet, is_thread_reply, parent_id, created_at}` |
 | `view_channel_message` | `message_id` (required) | `{id, content, user_name, created_at, reply_count}` |
 | `view_channel_thread` | `parent_message_id` (required) | `{channel_id, channel_name, thread_id, message_count, messages: [...]}` |
+| **Task Management** | | |
+| `update_tasks` | `tasks` (required), `overwrite` (default: true) | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | **Skills** | | |
 | `view_skill` | `name` (required) | `{name, content}` |
 | **Time Tools** | | |
@@ -403,6 +407,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
 | **Channels** | `search_channels`, `search_channel_messages`, `view_channel_message`, `view_channel_thread` | Search channels and channel messages |
+| **Task Management** | `update_tasks` | Create and maintain a structured task/todo list in the active chat |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
@@ -472,6 +477,8 @@ This is fundamentally different from a single-shot tool call. In an interleaved 
 5.  **Finalize**: Only after completing this "Deep Research" cycle does the model provide a final, grounded answer.
 
 This behavior is what transforms a standard chatbot into an **Agentic AI** capable of solving complex, multi-step problems autonomously.
+
+For long-running workflows, combine interleaved tool use with `update_tasks` so the model can plan explicitly, track progress, and keep users aligned on next actions.
 
 ---
 

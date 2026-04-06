@@ -140,7 +140,7 @@ To download new base models, go to **Settings > Connections > Ollama** or type `
 Administrators can set baseline capabilities and parameters that apply to all models via **Admin Panel > Settings > Models > ⚙️ (gear icon)**.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
-- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set.
+- **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
 
 ### Merge behavior
 
