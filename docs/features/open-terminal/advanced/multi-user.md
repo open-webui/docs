@@ -84,7 +84,7 @@ flowchart LR
 
 ## Option 2: Per-user containers with Terminals
 
-For larger deployments or when you need real isolation, [**Terminals**](./terminals/) gives each user their own container, completely separate from everyone else.
+For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, completely separate from everyone else.
 
 - **Full isolation** — each user's container is independent with its own files, processes, and resources
 - **On-demand provisioning** — containers are created when users start a session and cleaned up when idle
@@ -110,8 +110,8 @@ flowchart LR
 
 Two deployment backends are available:
 
-- **[Docker Backend](./terminals/docker-backend)** — runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
-- **[Kubernetes Operator](./terminals/kubernetes-operator)** — production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
+- **[Docker Backend](../terminals/)** — runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
+- **[Kubernetes Operator](../terminals/)** — production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
 Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
@@ -119,8 +119,8 @@ Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/ente
 
 ## Related
 
-- [Terminals overview →](./terminals/)
-- [Terminals: Docker Backend →](./terminals/docker-backend)
-- [Terminals: Kubernetes Operator →](./terminals/kubernetes-operator)
+- [Terminals overview →](../terminals/)
+- [Terminals: Docker Backend →](../terminals/)
+- [Terminals: Kubernetes Operator →](../terminals/)
 - [Security best practices →](./security)
 - [All configuration options →](./configuration)

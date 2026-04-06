@@ -5,7 +5,7 @@ title: "Policies"
 
 # Policies
 
-Policies are named environment profiles that define what a terminal container looks like — its image, resource limits, storage, environment variables, and idle timeout. They let you offer different terminal environments to different teams from a single orchestrator.
+Policies are named environment profiles that define what a terminal container looks like: its image, resource limits, storage, environment variables, and idle timeout. They let you offer different terminal environments to different teams from a single orchestrator.
 
 For example, you might create a `data-science` policy with a large image, 4 CPU cores, and 16 GiB of memory, while a `development` policy uses the default slim image with 1 CPU and 2 GiB.
 
@@ -24,7 +24,7 @@ flowchart LR
 
 1. **Admin creates policies** on the orchestrator via its REST API (see [API reference](#api-reference) below).
 2. **Admin creates terminal connections** in Open WebUI under **Settings → Connections → Open Terminal**. Each connection includes a `policy_id` field that maps it to a policy on the orchestrator.
-3. **Users open a terminal** — Open WebUI routes the request through `/p/{policy_id}/...`, and the orchestrator provisions (or reuses) a container matching that policy's spec.
+3. **Users open a terminal.** Open WebUI routes the request through `/p/{policy_id}/...`, and the orchestrator provisions (or reuses) a container matching that policy's spec.
 
 Each user gets their own isolated container per policy. If a user has access to two connections with different policies, they get two independent terminals.
 
@@ -60,9 +60,9 @@ The `storage_mode` field controls how persistent volumes are allocated on Kubern
 
 The `env` field injects arbitrary key-value pairs as environment variables in the terminal container. Common uses:
 
-- **API keys** — give users access to LLM APIs, cloud services, etc.
-- **Egress filtering** — set `OPEN_TERMINAL_ALLOWED_DOMAINS` to restrict outbound network access (e.g., `"*.pypi.org,github.com"`). When this variable is present, the Docker backend automatically adds the `NET_ADMIN` capability to the container.
-- **Custom configuration** — any setting your terminal image supports
+- **API keys:** give users access to LLM APIs, cloud services, etc.
+- **Egress filtering:** set `OPEN_TERMINAL_ALLOWED_DOMAINS` to restrict outbound network access (e.g., `"*.pypi.org,github.com"`). When this variable is present, the Docker backend automatically adds the `NET_ADMIN` capability to the container.
+- **Custom configuration:** any setting your terminal image supports
 
 :::warning
 Environment variables in a policy are visible to the terminal user (they can run `env` in the shell). Do not store secrets here that users should not see.
@@ -72,68 +72,11 @@ Environment variables in a policy are visible to the terminal user (they can run
 
 ## Managing policies
 
-Policies are managed via the orchestrator's REST API. All endpoints require authentication with the orchestrator's API key.
-
-:::tip New to REST APIs?
-The examples below use `curl`, a command-line tool for making HTTP requests. You can also use graphical tools like [Postman](https://www.postman.com/) or [HTTPie Desktop](https://httpie.io/) if you prefer. The key concepts: `PUT` creates or updates a resource, `GET` retrieves it, and `DELETE` removes it.
-:::
-
-### Create a policy
-
-```bash
-curl -X PUT http://localhost:3000/api/v1/policies/data-science \
-  -H "Authorization: Bearer $TERMINALS_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "image": "ghcr.io/open-webui/open-terminal:latest",
-    "cpu_limit": "4",
-    "memory_limit": "16Gi",
-    "storage": "20Gi",
-    "env": {
-      "OPEN_TERMINAL_ALLOWED_DOMAINS": "*.pypi.org,github.com,huggingface.co"
-    },
-    "idle_timeout_minutes": 60
-  }'
-```
-
-### List policies
-
-```bash
-curl http://localhost:3000/api/v1/policies \
-  -H "Authorization: Bearer $TERMINALS_API_KEY"
-```
-
-### Get a single policy
-
-```bash
-curl http://localhost:3000/api/v1/policies/data-science \
-  -H "Authorization: Bearer $TERMINALS_API_KEY"
-```
-
-### Update a policy
-
-Use `PUT` to upsert — it creates the policy if it doesn't exist:
-
-```bash
-curl -X PUT http://localhost:3000/api/v1/policies/data-science \
-  -H "Authorization: Bearer $TERMINALS_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cpu_limit": "8",
-    "memory_limit": "32Gi"
-  }'
-```
+Policies are managed from the Open WebUI admin panel under **Settings → Connections → Open Terminal**. From there you can create, edit, and delete policies, assign them to terminal connections, and restrict access by group.
 
 :::info
 Updating a policy does not affect running terminals. The new spec applies the next time a container is provisioned for that policy (e.g., after the old one is reaped by idle timeout or manually deleted).
 :::
-
-### Delete a policy
-
-```bash
-curl -X DELETE http://localhost:3000/api/v1/policies/data-science \
-  -H "Authorization: Bearer $TERMINALS_API_KEY"
-```
 
 ---
 
@@ -186,7 +129,7 @@ In this example, the engineering group sees only the `development` terminal, whi
 
 ---
 
-## Hard caps
+## Global Resource Limits
 
 Administrators can set global limits on the orchestrator that **clamp** policy values, preventing any policy from exceeding the allowed maximums. These are set as environment variables on the orchestrator itself:
 
@@ -197,17 +140,17 @@ Administrators can set global limits on the orchestrator that **clamp** policy v
 | `TERMINALS_MAX_STORAGE` | `100Gi` | Maximum persistent storage any policy can request |
 | `TERMINALS_ALLOWED_IMAGES` | `ghcr.io/open-webui/*,gcr.io/my-org/*` | Comma-separated glob patterns. If set, a policy's `image` must match at least one pattern or the request is rejected with HTTP 400. |
 
-Hard caps are enforced at policy creation and update time. If a policy's `cpu_limit` is `"16"` but `TERMINALS_MAX_CPU` is `"8"`, the stored value is clamped to `"8"`.
+These limits are enforced at policy creation and update time. If a policy's `cpu_limit` is `"16"` but `TERMINALS_MAX_CPU` is `"8"`, the stored value is silently clamped to `"8"`.
 
 :::tip
-Hard caps give platform administrators a safety net — they can delegate policy creation to team leads while ensuring no single policy can consume an unreasonable amount of cluster resources.
+Global resource limits give platform administrators a safety net. They can delegate policy creation to team leads while ensuring no single policy can consume an unreasonable amount of cluster resources.
 :::
 
 ---
 
 ## The "default" policy
 
-When a terminal connection in Open WebUI has no `policy_id` set (or the orchestrator receives a request without a `/p/` prefix), the orchestrator uses its **global settings** as the effective policy:
+If you haven't created any policies, you don't need to. The orchestrator works out of the box using its global environment variables as the effective default:
 
 | Setting | Environment variable |
 | :--- | :--- |
@@ -215,25 +158,26 @@ When a terminal connection in Open WebUI has no `policy_id` set (or the orchestr
 | Idle timeout | `TERMINALS_IDLE_TIMEOUT_MINUTES` |
 | Storage mode | `TERMINALS_KUBERNETES_STORAGE_MODE` |
 
-This is equivalent to a single-policy deployment. No database entry is needed.
+This zero-config fallback applies when a terminal connection in Open WebUI has no `policy_id` set (or the orchestrator receives a request without a `/p/` prefix). No database entry is needed; it's equivalent to a single-policy deployment.
 
-If you create a policy named `default` in the database, its fields are merged with the global settings (policy values take precedence).
+If you later create a policy named `default` in the database, its fields are merged with the global settings (policy values take precedence).
 
 ---
 
-## API reference
+<details>
+<summary>API reference (for programmatic access)</summary>
 
 All endpoints are prefixed with `/api/v1` on the orchestrator and require the `Authorization: Bearer {TERMINALS_API_KEY}` header.
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `GET` | `/policies` | List all policies |
-| `POST` | `/policies` | Create a new policy (body: `{ "id": "...", "data": { ... } }`) — returns 409 if it already exists |
+| `POST` | `/policies` | Create a new policy (body: `{ "id": "...", "data": { ... } }`). Returns 409 if it already exists. |
 | `GET` | `/policies/{policy_id}` | Get a single policy |
 | `PUT` | `/policies/{policy_id}` | Create or update a policy (body: `PolicyData` fields) |
 | `DELETE` | `/policies/{policy_id}` | Delete a policy |
 
-### Request body — PolicyData
+### Request body: PolicyData
 
 ```json
 {
@@ -249,7 +193,7 @@ All endpoints are prefixed with `/api/v1` on the orchestrator and require the `A
 
 All fields are optional. Omitted fields inherit from the orchestrator's global defaults.
 
-### Response body — PolicyResponse
+### Response body: PolicyResponse
 
 ```json
 {
@@ -267,32 +211,25 @@ All fields are optional. Omitted fields inherit from the orchestrator's global d
 }
 ```
 
+</details>
+
 ---
 
 ## Example: multi-team setup
 
-A company with three teams — Engineering, Data Science, and Interns — wants different terminal environments:
+A company with three teams (Engineering, Data Science, and Interns) wants different terminal environments.
 
-### 1. Create the policies
+### 1. Create policies in Open WebUI
 
-```bash
-# Engineering: default image, moderate resources, persistent storage
-curl -X PUT http://orchestrator:3000/api/v1/policies/engineering \
-  -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
-  -d '{"cpu_limit":"2","memory_limit":"4Gi","storage":"10Gi","idle_timeout_minutes":120}'
+In the admin panel under **Settings → Connections → Open Terminal**, create three policies:
 
-# Data Science: custom image, high resources, large storage
-curl -X PUT http://orchestrator:3000/api/v1/policies/data-science \
-  -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
-  -d '{"image":"ghcr.io/open-webui/open-terminal:latest","cpu_limit":"8","memory_limit":"32Gi","storage":"50Gi","env":{"OPEN_TERMINAL_ALLOWED_DOMAINS":"*.pypi.org,huggingface.co"}}'
+| Policy | Image | CPU | Memory | Storage | Idle timeout |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `engineering` | Default | 2 | 4Gi | 10Gi | 120 min |
+| `data-science` | Custom data science image | 8 | 32Gi | 50Gi | 60 min |
+| `intern` | Default | 1 | 1Gi | None | 15 min |
 
-# Interns: limited resources, no persistent storage, short idle timeout
-curl -X PUT http://orchestrator:3000/api/v1/policies/intern \
-  -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
-  -d '{"cpu_limit":"1","memory_limit":"1Gi","idle_timeout_minutes":15}'
-```
-
-### 2. Create terminal connections in Open WebUI
+### 2. Create terminal connections
 
 Add three connections, each pointing to the same orchestrator URL but with different `policy_id` values: `engineering`, `data-science`, and `intern`.
 
