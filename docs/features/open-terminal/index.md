@@ -83,4 +83,4 @@ Open Terminal requires models with **native function calling** support. Frontier
 
 ## Enterprise Multi-User
 
-Need isolated, per-user terminal containers for your team? **[Terminals](./advanced/terminals/)** provisions a dedicated Open Terminal instance for every user with automatic lifecycle management, resource controls, and policy-based environments.
+Need isolated, per-user terminal containers for your team? **[Terminals](./terminals/)** provisions a dedicated Open Terminal instance for every user with automatic lifecycle management, resource controls, and policy-based environments.
