@@ -1678,21 +1678,39 @@ When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_
 #### `WEBUI_SECRET_KEY`
 
 - Type: `str`
-- Default: `t0p-s3cr3t`
-- Docker Default: Randomly generated on first start
-- Description: Overrides the randomly generated string used for JSON Web Token and **encryption of sensitive data** (like OAuth tokens for MCP).
+- Default: Automatically generated (see below)
+- Description: The secret key used for signing JSON Web Tokens (JWTs) and **encrypting sensitive data** at rest (including OAuth tokens for MCP). Can be set via the `WEBUI_SECRET_KEY` environment variable or the legacy `WEBUI_JWT_SECRET_KEY` variable (deprecated).
 
-:::danger Critical for Docker/Production
+:::info How the secret key is generated
 
-You **MUST** set `WEBUI_SECRET_KEY` to a secure, persistent value.
+You do **not** need to manually set this variable for a secure installation — **all standard launch methods automatically generate and persist a cryptographically random key on first start:**
 
-If you do NOT set this:
-1.  It will be randomly generated each time the container restarts/recreates.
-2.  **All OAuth sessions will become invalid.**
-3.  **MCP Tools will break** (Error: `Error decrypting tokens`) because they cannot decrypt the tokens stored with the previous key.
-4.  You will be logged out.
+| Launch method | Auto-generates? | Persisted to |
+|---|---|---|
+| **Docker** (`start.sh`) | ✅ Yes | `.webui_secret_key` file inside the container |
+| **pip install** (`open-webui serve`) | ✅ Yes | `.webui_secret_key` file in the working directory |
+| **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A — uses the code-level fallback |
 
-**Do not leave this unset in production.**
+The code-level fallback value (`t0p-s3cr3t`) exists **only** for development convenience and is **never used** when Open WebUI is launched through the standard Docker or `open-webui serve` methods. Both of those methods check for the environment variable first, and if it is not set, generate a secure random key, save it to a file, and inject it into the environment — all before the application starts.
+
+:::
+
+:::danger Recommended: Set an explicit, persistent value
+
+While the auto-generated key is secure, it is tied to a file inside the container or working directory. **If the container is recreated (not just restarted) and the key file is not in a persisted volume, a new key is generated**, which causes:
+
+1. **All existing user sessions become invalid** (users are logged out).
+2. **All OAuth sessions become invalid.**
+3. **MCP Tools break** (Error: `Error decrypting tokens`) because tokens encrypted with the previous key cannot be decrypted.
+
+To avoid this, explicitly set `WEBUI_SECRET_KEY` to a secure, persistent value that survives container recreates:
+
+```bash
+# Generate a secure key
+openssl rand -hex 32
+```
+
+Then pass it as an environment variable in your Docker Compose or deployment configuration.
 
 :::
 
@@ -1700,7 +1718,7 @@ If you do NOT set this:
 
 **Required for Multi-Worker and Multi-Node Deployments AND HIGHLY RECOMMENDED IN SINGLE-WORKER ENVIRONMENTS**
 
-When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s, you **must** set this variable. Without it, the following issues will occur:
+When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker cluster with a load balancer (e.g. helm/kubectl/kubernetes/k8s), you **must** set this variable to the **same value across all replicas**. Without it, the following issues will occur:
 
 - Session management will fail across workers
 - Application state will be inconsistent between instances
