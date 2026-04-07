@@ -1,0 +1,180 @@
+---
+sidebar_position: 1
+title: "Hermes Agent"
+---
+
+# Hermes Agent
+
+**Use Open WebUI as the chat frontend for Nous Research's autonomous AI agent.**
+
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) by **Nous Research** is an autonomous AI agent with built-in tools: terminal access, file operations, web search, memory, and extensible skills. It exposes an **OpenAI-compatible API server**, so connecting it to Open WebUI takes just a few minutes.
+
+When you send a message through Open WebUI, Hermes Agent receives it, decides which tools to use (if any), executes them, and streams the final response back. You'll see inline progress indicators in real time (e.g., `💻 ls -la`, `🔍 searching...`).
+
+:::info What You'll Need
+- **Hermes Agent** installed on your machine ([quickstart guide](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart))
+- **Open WebUI** running (via Docker, pip, or desktop app)
+- **~10 minutes** to complete this setup
+:::
+
+---
+
+## Step 1: Install Hermes Agent
+
+If you haven't installed Hermes Agent yet, follow the [official quickstart](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart). Once installed, verify it's working:
+
+```bash
+hermes --version
+```
+
+---
+
+## Step 2: Enable the API Server
+
+Add the following to your Hermes Agent environment file:
+
+```bash title="~/.hermes/.env"
+API_SERVER_ENABLED=true
+API_SERVER_KEY=your-secret-key
+```
+
+Replace `your-secret-key` with any strong, random string. This becomes the API key you'll enter in Open WebUI.
+
+:::tip Optional Configuration
+You can also customize the port and host:
+
+| Variable | Default | Description |
+|---|---|---|
+| `API_SERVER_PORT` | `8642` | Port the API server listens on |
+| `API_SERVER_HOST` | `127.0.0.1` | Bind address (localhost only by default) |
+:::
+
+---
+
+## Step 3: Start the Gateway
+
+```bash
+hermes gateway
+```
+
+You should see output confirming the API server is running:
+
+```
+[API Server] API server listening on http://127.0.0.1:8642
+```
+
+:::warning Keep this running
+The gateway must stay running for Open WebUI to communicate with your agent. Consider running it in a terminal multiplexer (`tmux`, `screen`) or as a system service for persistent deployments.
+:::
+
+---
+
+## Step 4: Add the Connection in Open WebUI
+
+1. Open Open WebUI in your browser.
+2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
+3. Click ➕ **Add Connection**.
+4. Enter the following:
+
+| Setting | Value |
+|---|---|
+| **URL** | `http://localhost:8642/v1` |
+| **API Key** | The `API_SERVER_KEY` you set in Step 2 |
+
+5. Click the ✅ checkmark to verify, then **Save**.
+
+:::tip Running Open WebUI in Docker?
+Replace `localhost` with `host.docker.internal`:
+
+```
+http://host.docker.internal:8642/v1
+```
+:::
+
+---
+
+## Step 5: Start Chatting!
+
+The `hermes-agent` model should now appear in the model dropdown. Select it and start chatting. Your agent has full access to its toolset (terminal, file ops, web search, memory, skills) right through Open WebUI's interface.
+
+Streaming is enabled by default. You'll see brief inline indicators as tools execute before the agent's final response appears.
+
+---
+
+## Docker Compose Setup
+
+For a more permanent deployment, run Open WebUI pre-configured to connect to Hermes Agent:
+
+```yaml title="docker-compose.yml"
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - OPENAI_API_BASE_URL=http://host.docker.internal:8642/v1
+      - OPENAI_API_KEY=your-secret-key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+```bash
+docker compose up -d
+```
+
+Then open [http://localhost:3000](http://localhost:3000) and create your admin account.
+
+:::note
+Environment variables only take effect on Open WebUI's **first launch**. After that, connection settings are stored in its internal database. To change them later, use the Admin UI or delete the Docker volume and start fresh.
+:::
+
+---
+
+## Troubleshooting
+
+### No models appear in the dropdown
+
+- Verify the URL includes `/v1`: `http://localhost:8642/v1` (not just `:8642`)
+- Check the gateway is running: `curl http://localhost:8642/health` → `{"status": "ok"}`
+- Check model listing: `curl http://localhost:8642/v1/models` → should list `hermes-agent`
+
+### Connection test passes but no models load
+
+Almost always the missing `/v1` suffix. Open WebUI's connection test checks basic connectivity, not model discovery.
+
+### "Invalid API key" errors
+
+Make sure the **API Key** in Open WebUI matches the `API_SERVER_KEY` in `~/.hermes/.env` exactly.
+
+### Response takes a long time
+
+Hermes Agent may be executing multiple tool calls before responding. This is normal for complex queries, as the agent is actually doing work on your behalf.
+
+### Linux Docker (no Docker Desktop)
+
+`host.docker.internal` doesn't resolve by default on Linux without Docker Desktop:
+
+```bash
+# Option 1: Add host mapping
+docker run --add-host=host.docker.internal:host-gateway ...
+
+# Option 2: Use host networking
+docker run --network=host -e OPENAI_API_BASE_URL=http://localhost:8642/v1 ...
+
+# Option 3: Use Docker bridge IP
+docker run -e OPENAI_API_BASE_URL=http://172.17.0.1:8642/v1 ...
+```
+
+---
+
+## Learn More
+
+- [Hermes Agent Documentation](https://hermes-agent.nousresearch.com/docs/) - Full docs, skills, and integrations
+- [Nous Research Discord](https://discord.gg/NousResearch) - Community support
+- [GitHub](https://github.com/NousResearch/hermes-agent) - Source code and issues

@@ -1,137 +1,223 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 title: "Functions"
 ---
 
-## 🚀 What Are Functions?
-
-Functions are like **plugins** for Open WebUI. They help you **extend its capabilities**—whether it’s adding support for new AI model providers like Anthropic or Vertex AI, tweaking how messages are processed, or introducing custom buttons to the interface for better usability.
-
-Unlike external tools that may require complex integrations, **Functions are built-in and run within the Open WebUI environment.** That means they are fast, modular, and don’t rely on external dependencies.
-
-Think of Functions as **modular building blocks** that let you enhance how the WebUI works, tailored exactly to what you need. They’re lightweight, highly customizable, and written in **pure Python**, so you have the freedom to create anything—from new AI-powered workflows to integrations with anything you use, like Google Search or Home Assistant.
+# 🧩 Functions
 
 :::danger ⚠️ Critical Security Warning
 **Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
----
+Functions are **modular Python plugins** that extend the capabilities of Open WebUI itself. While [Tools](/features/extensibility/plugin/tools/) give LLMs the ability to call external APIs during inference, Functions change how the platform behaves at a deeper level. They can add entirely new "models" powered by any Python logic, intercept and transform every message flowing through the system, or place interactive buttons directly in the chat UI.
 
-## 🏗️ Types of Functions
+The possibilities are broad: connect a proprietary AI provider, build a smart home controller that responds to natural language, create a database query interface, add real-time translation to every conversation, enforce compliance policies, generate charts from data, or trigger external workflows with a button click. If you can write it in Python, you can turn it into a Function.
 
-There are **three types of Functions** in Open WebUI, each with a specific purpose. Let’s break them down and explain exactly what they do:
-
----
-
-### 1. [**Pipe Function** – Create Custom "Agents/Models"](./pipe.mdx)
-
-A **Pipe Function** is how you create **custom agents/models** or integrations, which then appear in the interface as if they were standalone models.
-
-**What does it do?**
-- Pipes let you define complex workflows. For instance, you could create a Pipe that sends data to **Model A** and **Model B**, processes their outputs, and combines the results into one finalized answer.
-- Pipes don’t even have to use AI! They can be setups for **search APIs**, **weather data**, or even systems like **Home Assistant**. Basically, anything you’d like to interact with can become part of Open WebUI.
-
-**Use case example:**
-Imagine you want to query Google Search directly from Open WebUI. You can create a Pipe Function that:
-1. Takes your message as the search query.
-2. Sends the query to Google Search’s API.
-3. Processes the response and returns it to you inside the WebUI like a normal "model" response.
-
-When enabled, **Pipe Functions show up as their own selectable model**. Use Pipes whenever you need custom functionality that works like a model in the interface.
-
-For a detailed guide, see [**Pipe Functions**](./pipe.mdx).
+Functions are stored in the database as Python source code, dynamically loaded at runtime, and executed server-side. Administrators create and manage them; regular users interact with the results.
 
 ---
 
-### 2. [**Filter Function** – Modify Inputs and Outputs](./filter.mdx)
+## Function Types
 
-A **Filter Function** is like a tool for tweaking data before it gets sent to the AI **or** after it comes back.
+Open WebUI supports three types of Functions. The type is **auto-detected** from the class name in your Python code, so you never need to configure it manually.
 
-**What does it do?**
-Filters act as "hooks" in the workflow and have two main parts:
-- **Inlet**: Adjust the input that is sent to the model. For example, adding additional instructions, keywords, or formatting tweaks.
-- **Outlet**: Modify the output that you receive from the model. For instance, cleaning up the response, adjusting tone, or formatting data into a specific style.
+| Type | Class Name | What It Does | How Users See It |
+|:-----|:-----------|:-------------|:-----------------|
+| **Pipe** | `class Pipe` | Adds a custom model or agent | Appears as a selectable model in the chat sidebar |
+| **Filter** | `class Filter` | Intercepts data flowing to/from models | Runs transparently as middleware on existing models |
+| **Action** | `class Action` | Adds interactive buttons to messages | Appears as a clickable button on chat messages |
 
-**Use case example:**
-Suppose you’re working on a project that needs precise formatting. You can use a Filter to ensure:
-1. Your input is always transformed into the required format.
-2. The output from the model is cleaned up before being displayed.
+### Pipe Functions
 
-Filters are **linked to specific models** or can be enabled for all models **globally**, depending on your needs.
+A Pipe registers itself as a new "model" in Open WebUI. When a user selects it and sends a message, the `pipe()` method handles the entire request with no LLM backend required. This makes Pipes incredibly versatile:
 
-Check out the full guide for more examples and instructions: [**Filter Functions**](./filter.mdx).
+- **Model providers**: Integrate APIs that don't follow the OpenAI protocol (Anthropic native, Google Vertex, custom inference servers).
+- **Agents & workflows**: Build multi-step agents that call tools, search the web, and reason across multiple turns.
+- **Non-LLM interfaces**: Create a smart home controller, a database query tool, a search engine, a calculator, or a code executor. Anything that takes user input and returns a response.
+- **Proxies & routers**: Route requests through your own logic, add caching, load balancing, or cost tracking.
 
----
+A single Pipe can also expose **multiple models** (called a "manifold") by defining a `pipes()` method that returns a list of model identifiers.
 
-### 3. [**Action Function** – Add Custom Buttons](./action.mdx)
+→ **[Pipe Function Guide](./pipe)**
 
-An **Action Function** is used to add **custom buttons** to the chat interface.
+### Filter Functions
 
-**What does it do?**
-Actions allow you to define **interactive shortcuts** that trigger specific functionality directly from the chat. These buttons appear underneath individual chat messages, giving you convenient, one-click access to the actions you define.
+A Filter sits between the user and the model, intercepting data at three stages:
 
-**Use case example:**
-Let’s say you often need to summarize long messages or generate specific outputs like translations. You can create an Action Function to:
-1. Add a “Summarize” button under every incoming message.
-2. When clicked, it triggers your custom function to process that message and return the summary.
+- **`inlet()`**: Modifies the request **before** it reaches the model (add context, sanitize input, detect language, enforce rate limits, estimate token costs).
+- **`stream()`**: Intercepts **streamed chunks** from the model in real time (censor content, replace terms, track token usage).
+- **`outlet()`**: Processes the completed response **after** it's generated (log to observability platforms, format citations, append disclaimers, cache responses).
 
-Buttons provide a **clean and user-friendly way** to interact with extended functionality you define.
+Filters enable powerful cross-cutting concerns like real-time translation, content moderation, prompt injection detection, A/B testing, compliance logging, and PII redaction, all without modifying the underlying model.
 
-Learn how to set them up in the [**Action Functions Guide**](./action.mdx).
+Filters can be applied globally (to all models) or attached to specific models. Toggleable filters let users enable/disable them per-chat.
 
----
+→ **[Filter Function Guide](./filter)**
 
-## 🛠️ How to Use Functions
+### Action Functions
 
-Here's how to put Functions to work in Open WebUI:
+An Action adds a custom button to the chat message toolbar. When a user clicks it, the `action()` method runs with full access to the event system for real-time UI feedback, user prompts, and confirmations.
 
-### 1. **Install Functions**
-You can install Functions via the Open WebUI interface or by importing them manually. You can find community-created functions on the [Open WebUI Community Site](https://openwebui.com/search).
+Actions can do anything Python can do: summarize or translate a message, copy formatted output, pin important messages, export conversations to external systems, trigger a CI/CD pipeline, send a Slack notification, generate a PDF report, run a code snippet, or kick off an external workflow.
 
-⚠️ **Be cautious.** Only install Functions from trusted sources. Running unknown code poses security risks.
+→ **[Action Function Guide](./action)**
 
 ---
 
-### 2. **Enable Functions**
-Functions must be explicitly enabled after installation:
-- When you enable a **Pipe Function**, it becomes available as its own **model** in the interface.
-- For **Filter** and **Action Functions**, enabling them isn’t enough—you also need to assign them to specific models or enable them globally for all models.
+## How Functions Work
+
+### Type Detection
+
+When you save a Function, Open WebUI scans the Python source code for a top-level class named `Pipe`, `Filter`, or `Action`. The first match determines the function type. You never need to manually set the type because it's inferred from the code.
+
+```
+# This is detected as a Pipe function:
+class Pipe:
+    def pipe(self, body: dict) -> str:
+        return "Hello from my custom model!"
+
+# This is detected as a Filter function:
+class Filter:
+    def inlet(self, body: dict) -> dict:
+        return body
+```
+
+### Module Loading & Caching
+
+The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Import statements in your code are automatically rewritten to resolve within the Open WebUI package namespace.
+
+### Frontmatter
+
+A triple-quoted docstring at the top of the file is parsed as YAML frontmatter for metadata:
+
+```python
+"""
+title: My Custom Function
+author: your_name
+author_url: https://github.com/your_name
+version: 1.0.0
+icon_url: https://example.com/icon.svg
+required_open_webui_version: 0.4.0
+requirements: requests, beautifulsoup4
+"""
+```
+
+| Field | Purpose |
+|:------|:--------|
+| `title` | Display name in the admin UI |
+| `author` / `author_url` | Attribution metadata |
+| `version` | Version identifier |
+| `icon_url` | Icon displayed next to the function name (use a URL, not base64) |
+| `required_open_webui_version` | Minimum compatible Open WebUI version |
+| `requirements` | Comma-separated list of pip packages to auto-install |
+
+:::tip Automatic Dependency Installation
+When `requirements` is specified in the frontmatter, Open WebUI automatically installs the listed packages via `pip` the first time the function loads. This is controlled by the `PIP_INSTALL_FRONTMATTER_REQUIREMENTS` environment variable (enabled by default).
+:::
 
 ---
 
-### 3. **Assign Filters or Actions to Models**
-- Navigate to `Workspace => Models` and assign your Filter or Action to the relevant model there.
-- Alternatively, enable Functions for **all models globally** by going to `Workspace => Functions`, selecting the "..." menu, and toggling the **Global** switch.
+## Installing Functions
+
+### From the Community Library
+
+1. Browse the [Community Function Library](https://openwebui.com/search).
+2. Click **Get** on the function you want.
+3. Enter your Open WebUI instance URL (e.g., `http://localhost:3000`).
+4. Click **Import to Open WebUI**. You'll be redirected to the Function Editor.
+5. Review the code, then click **Save**.
+
+:::warning
+Always review the source code before importing. Community functions are user-contributed and **run directly on your server**.
+:::
+
+### From a URL
+
+1. Go to **Admin Panel → Functions**.
+2. Click **Import from URL** and paste a link to the Python file.
+   - GitHub URLs are automatically converted to raw file URLs.
+3. Review and save.
+
+### Create Manually
+
+1. Go to **Admin Panel → Functions**.
+2. Click **Create**.
+3. Enter an ID (alphanumeric and underscores only), name, and description.
+4. Write your Python code in the editor.
+5. Click **Save**. The function type is auto-detected from your code.
 
 ---
 
-### Quick Summary
-- **Pipes** appear as standalone models you can interact with.
-- **Filters** modify inputs/outputs for smoother AI interactions.
-- **Actions** add clickable buttons to individual chat messages.
+## Managing Functions
 
-Once you’ve followed the setup process, Functions will seamlessly enhance your workflows.
+### Admin Controls
+
+Functions are managed from **Admin Panel → Functions**. Each function has the following controls:
+
+| Control | Description |
+|:--------|:-----------|
+| **Active toggle** | Enables or disables the function. Disabled functions are not loaded or executed. |
+| **Global toggle** | When enabled, the function applies to **all models** automatically. Available for Filters and Actions. |
+| **Valves** (⚙️ gear icon) | Opens the admin-configurable settings for this function. |
+| **Export / Delete** | Export the function as a file or remove it. |
+
+### Assigning Functions to Specific Models
+
+Instead of making a Filter or Action global, you can attach it to specific models:
+
+1. Go to **Workspace → Models**.
+2. Edit the target model.
+3. In the **Filters** or **Actions** section, select the functions you want to attach.
+
+This allows different models to use different filters. For example, you might apply a content-moderation filter only on public-facing models.
+
+### Toggleable Filters
+
+Filters can be made user-toggleable by setting `self.toggle = True` in `__init__`. When toggleable, users see an on/off switch in the chat input area and can enable or disable the filter per-conversation. Filters without `self.toggle` are always-on when active.
 
 ---
 
-## ✅ Why Use Functions?
+## Valves & UserValves
 
-Functions are designed for anyone who wants to **unlock new possibilities** with Open WebUI:
+Functions support a two-tier configuration system built on [Pydantic](https://docs.pydantic.dev/):
 
-- **Extend**: Add new models or integrate with non-AI tools like APIs, databases, or smart devices.
-- **Optimize**: Tweak inputs and outputs to fit your use case perfectly.
-- **Simplify**: Add buttons or shortcuts to make the interface intuitive and efficient.
+| Level | Class Name | Who Configures | Where |
+|:------|:-----------|:---------------|:------|
+| **Admin** | `Valves` | Administrators only | Admin Panel → Functions → ⚙️ |
+| **User** | `UserValves` | Any user | Chat interface, per-function |
 
-Whether you’re customizing workflows for specific projects, integrating external data, or just making Open WebUI easier to use, Functions are the key to taking control of your instance.
+**Valves** are ideal for API keys, model endpoints, and global behavior settings. **UserValves** let individual users customize behavior (e.g., their preferred language, output format, or personal API key).
+
+Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Filter`, or `Action` class. The admin-configured values are stored in the database and loaded automatically at runtime.
+
+→ **[Valves Development Guide](/features/extensibility/plugin/development/valves)**
 
 ---
 
-### 📝 Final Notes:
-1. Always install Functions from **trusted sources only**.
-2. Make sure you understand the difference between Pipe, Filter, and Action Functions to use them effectively.
-3. Explore the official guides:
-   - [Pipe Functions Guide](./pipe.mdx)
-   - [Filter Functions Guide](./filter.mdx)
-   - [Action Functions Guide](./action.mdx)
+## Functions vs Tools: When to Use Which
 
-By leveraging Functions, you’ll bring entirely new capabilities to your Open WebUI setup. Start experimenting today! 🚀
+| Use Case | Use a... | Why |
+|:---------|:---------|:----|
+| Give the LLM access to live data (weather, stocks, APIs) | **Tool** | Tools are called by the model during inference |
+| Add a model provider with a non-OpenAI API | **Pipe Function** | Pipes register as models in the sidebar |
+| Build a non-LLM interface (search, databases, smart home) | **Pipe Function** | Pipes handle the entire request without needing an LLM |
+| Build a multi-step agent with custom logic | **Pipe Function** | Pipes control the full request/response cycle |
+| Translate, moderate, or redact content in real time | **Filter Function** | Filters intercept every message transparently |
+| Log requests to an observability platform | **Filter Function** | Inlet/outlet filters see all traffic |
+| Rate-limit or enforce usage policies | **Filter Function** | Inlet filters can reject requests before the model |
+| Add a button to export, summarize, or share messages | **Action Function** | Actions appear on the message toolbar |
+| Trigger an external workflow from the chat UI | **Action Function** | Actions run arbitrary Python on click |
+
+---
+
+## Development Resources
+
+| Guide | Description |
+|:------|:-----------|
+| [Pipe Function Guide](./pipe) | Build custom models, agents, and non-LLM interfaces |
+| [Filter Function Guide](./filter) | Intercept, translate, moderate, and log messages |
+| [Action Function Guide](./action) | Add buttons for export, workflows, and interactive tasks |
+| [Valves](/features/extensibility/plugin/development/valves) | Configure functions with admin and user settings |
+| [Events](/features/extensibility/plugin/development/events) | Send real-time updates to the UI |
+| [Reserved Arguments](/features/extensibility/plugin/development/reserved-args) | `__user__`, `__event_emitter__`, `__metadata__`, and more |
+| [Rich UI](/features/extensibility/plugin/development/rich-ui) | Embed interactive HTML/JS content in responses |
