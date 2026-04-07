@@ -47,7 +47,7 @@ Connect Open WebUI to LLM providers, monitoring platforms, developer tools, and 
 | [iTerm2](/tutorials/integrations/dev-tools/iterm2) | Query models from your macOS terminal | 👤 Developer · ⏱️ 10 min |
 | [Firefox Sidebar](/tutorials/integrations/dev-tools/firefox-sidebar) | Pin Open WebUI in Firefox's AI sidebar | 👤 User · ⏱️ 5 min |
 | [Browser Search Engine](/tutorials/integrations/dev-tools/browser-search-engine) | Add Open WebUI as a browser search engine | 👤 User · ⏱️ 5 min |
-| [Notion (MCP)](/tutorials/integrations/mcp-notion) | Connect Notion via Model Context Protocol | 👤 User · ⏱️ 20 min |
+| [Notion (MCP)](/tutorials/integrations/mcp-notion) | Connect Notion via Model Context Protocol | 👤 User · ⏱️ 5 min |
 | [OneDrive & SharePoint](/tutorials/integrations/onedrive-sharepoint) | Pull Microsoft 365 documents into Open WebUI | 👤 Admin · ⏱️ 30 min |
 | [LibreTranslate](/tutorials/integrations/libre-translate) | Add self-hosted translation capabilities | 👤 Admin · ⏱️ 15 min |
 

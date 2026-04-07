@@ -30,6 +30,21 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 
 ---
 
+## 🤖 Connect an Agent
+
+**Go beyond simple model providers. Connect an autonomous AI agent.**
+
+AI agents like Hermes Agent and OpenClaw bring their own tools (terminal, file ops, web search, memory) and use Open WebUI as a rich chat frontend. The agent decides when to use tools, executes them, and streams results back to you.
+
+| | |
+| :--- | :--- |
+| 🧠 **Hermes Agent** | Nous Research's agent with terminal, file ops, web search, and skills |
+| 🐾 **OpenClaw** | Self-hosted agent framework with shell access, web browsing, and channel bots |
+
+[**Connect an agent →**](/getting-started/quick-start/connect-an-agent)
+
+---
+
 ## Sharing Open WebUI
 
 **Bring AI to your entire organization with a single deployment.**

@@ -1,0 +1,226 @@
+---
+sidebar_position: 2
+title: "OpenClaw"
+---
+
+# OpenClaw
+
+**Connect the OpenClaw autonomous agent framework to Open WebUI.**
+
+[OpenClaw](https://openclaw.ai) is an open-source, self-hosted autonomous AI agent framework. It gives your AI "hands": the ability to execute shell commands, read and write files, browse the web, and connect to messaging platforms like Telegram, Slack, and WhatsApp.
+
+OpenClaw provides an **OpenAI-compatible API endpoint**, making Open WebUI a natural choice for a polished chat frontend. There are two distinct ways to integrate:
+
+| Method | Best For |
+|---|---|
+| [**API Connection**](#method-1-api-connection) | Using Open WebUI as the full chat frontend for your OpenClaw agents |
+| [**Channels Plugin**](#method-2-channels-plugin) | Having an OpenClaw bot participate alongside humans in Open WebUI Channels |
+
+:::info What You'll Need
+- **OpenClaw** installed on your machine ([getting started](https://openclaw.ai))
+- **Node.js 22+** (24 recommended)
+- **An API key** from a supported LLM provider (Anthropic, OpenAI, etc.)
+- **Open WebUI** running (via Docker, pip, or desktop app)
+- **~15 minutes** to complete this setup
+:::
+
+---
+
+## Method 1: API Connection
+
+Use Open WebUI as the primary chat interface for your OpenClaw agent. This is the simplest and most common approach.
+
+### Step 1: Install OpenClaw
+
+If you haven't installed OpenClaw yet:
+
+```bash
+# macOS / Linux
+curl -fsSL https://openclaw.ai/install.sh | bash
+
+# Windows (PowerShell)
+iwr -useb https://openclaw.ai/install.ps1 | iex
+```
+
+Or install via npm:
+
+```bash
+npm install -g openclaw@latest
+```
+
+Then run the onboarding wizard to configure your LLM provider and name your agent:
+
+```bash
+openclaw onboard
+```
+
+### Step 2: Enable the OpenAI-Compatible API
+
+By default, the OpenAI-compatible endpoint is **disabled** for security. Enable it in your OpenClaw configuration file:
+
+```json title="~/.openclaw/openclaw.json (partial)"
+{
+  "gateway": {
+    "http": {
+      "endpoints": {
+        "chatCompletions": {
+          "enabled": true
+        }
+      }
+    }
+  }
+}
+```
+
+If the gateway is already running, restart it for changes to take effect.
+
+### Step 3: Start the Gateway
+
+```bash
+openclaw gateway
+```
+
+The gateway starts on port **18789** by default. Verify it's running:
+
+```bash
+openclaw gateway status
+```
+
+### Step 4: Add the Connection in Open WebUI
+
+1. Open Open WebUI in your browser.
+2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
+3. Click ➕ **Add Connection**.
+4. Enter the following:
+
+| Setting | Value |
+|---|---|
+| **URL** | `http://localhost:18789/v1` |
+| **API Key** | Your OpenClaw Gateway bearer token |
+
+5. Click the ✅ checkmark to verify, then **Save**.
+
+:::tip Running Open WebUI in Docker?
+Replace `localhost` with `host.docker.internal`:
+
+```
+http://host.docker.internal:18789/v1
+```
+:::
+
+### Step 5: Start Chatting!
+
+Your OpenClaw agent should now appear in the model dropdown. Select it and start chatting. The agent has full access to all its configured tools through Open WebUI's interface.
+
+:::tip Targeting Specific Agents
+OpenClaw uses the model field to route to different agents:
+
+| Model ID | Routes To |
+|---|---|
+| `openclaw/default` | Your configured default agent |
+| `openclaw/<agentId>` | A specific named agent |
+
+If you have multiple agents configured, they'll each appear as separate "models" in the dropdown.
+:::
+
+---
+
+## Method 2: Channels Plugin
+
+:::warning Community Plugin
+
+The Channels plugin is a **community-contributed integration** and is not maintained by the Open WebUI or OpenClaw teams. Use at your own discretion and refer to the [plugin repository](https://github.com/skyzi000/openclaw-open-webui-channels) for support.
+
+:::
+
+Want your OpenClaw agent to participate in **Open WebUI Channels** as a bot user, reading messages, replying, and interacting alongside human users? Use the community Channels plugin.
+
+### Step 1: Create a Bot Account in Open WebUI
+
+1. Log into Open WebUI as an **Administrator**.
+2. Go to **Admin Panel** → **Users**.
+3. Create a new user account for the bot (e.g., `openclaw-bot@yourdomain.com`).
+4. Add this bot user to the channels you want it to monitor.
+
+:::note
+Make sure **Channels** are enabled in your Open WebUI instance (**Admin Settings** → **General**).
+:::
+
+### Step 2: Install the Plugin
+
+In a secure chat session with your OpenClaw agent (via its built-in dashboard or terminal), say:
+
+> *"I want to use the Open WebUI Channels plugin: `https://github.com/skyzi000/openclaw-open-webui-channels`"*
+
+OpenClaw will automatically download and install the plugin.
+
+### Step 3: Configure the Connection
+
+Tell your OpenClaw agent:
+
+> *"I want to connect to Open WebUI Channels."*
+
+It will prompt you for the following:
+
+| Setting | What to Enter |
+|---|---|
+| **Base URL** | Your Open WebUI URL (e.g., `http://localhost:3000`) |
+| **Email** | The bot account email from Step 1 |
+| **Password** | The bot account password |
+| **Channel IDs** | *(Optional)* Specific channel IDs to monitor, or leave blank for all |
+
+:::warning Security
+Always configure credentials in a **private** chat environment. The plugin stores them in `~/.openclaw/openclaw.json` under the `channels.open-webui` section.
+:::
+
+### Step 4: Verify
+
+Open a connected channel in Open WebUI and mention the bot by username (e.g., `@openclaw-bot`). If it responds, you're all set!
+
+---
+
+## OpenClaw's Built-In Dashboard
+
+OpenClaw also includes its own **zero-installation** web dashboard for managing agents, viewing logs, and monitoring system resources:
+
+```bash
+openclaw dashboard
+```
+
+This opens at `http://localhost:18789` by default. It's a great companion to Open WebUI. Use the dashboard for agent management and Open WebUI for conversations.
+
+---
+
+## Troubleshooting
+
+### Connection refused
+
+- Ensure the gateway is running: `openclaw gateway status`
+- Verify the port (default is `18789`, not `8000` or `11434`)
+- Confirm you appended `/v1` to the URL
+
+### Verification fails but models don't load
+
+The URL must be exactly `http://localhost:18789/v1`. The `/v1` suffix is required for model discovery.
+
+### Docker networking issues
+
+If Open WebUI runs in Docker, `localhost` points to the container itself. Use `host.docker.internal` instead. On Linux without Docker Desktop:
+
+```bash
+docker run --add-host=host.docker.internal:host-gateway ...
+```
+
+### Channels bot not responding
+
+- Verify the bot user has been added to the target channel
+- Check that Channels are enabled in **Admin Settings** → **General**
+- Ensure the bot credentials are correct in the OpenClaw plugin config (`~/.openclaw/openclaw.json`)
+
+---
+
+## Learn More
+
+- [OpenClaw Documentation](https://openclaw.ai) - Full docs, skills, and agent configuration
+- [Channels Plugin (Community)](https://github.com/skyzi000/openclaw-open-webui-channels) - Plugin source and issues
+- [Open WebUI Channels](/features/channels) - Learn more about the Channels feature
