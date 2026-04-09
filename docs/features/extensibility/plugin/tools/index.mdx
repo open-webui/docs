@@ -269,7 +269,7 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 | Tool | Parameters | Output |
 |------|------------|--------|
 | **Search & Web** | | |
-| `search_web` | `query` (required), `count` (default: 5) | Array of `{title, link, snippet}` |
+| `search_web` | `query` (required), `count` (default: admin-configured `WEB_SEARCH_RESULT_COUNT`; capped at admin maximum when provided) | Array of `{title, link, snippet}` |
 | `fetch_url` | `url` (required) | Plain text content (max 50,000 chars) |
 | **Knowledge Base** | | |
 | `list_knowledge` | None | `{knowledge_bases: [{id, name, description, file_count, files: [{id, filename}]}], files: [{id, filename}], notes: [{id, title}]}` |

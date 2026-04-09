@@ -50,6 +50,7 @@ In **Default Mode** (non-native), the chat toggle controls whether web search is
 ### `search_web` (Snippets only)
 When the model invokes `search_web`:
 *   **Action**: It queries your search engine and receives a list of titles, links, and snippets.
+*   **Result Count Behavior**: If the model omits `count`, Open WebUI uses the admin-configured `WEB_SEARCH_RESULT_COUNT`. If the model provides `count`, the value is capped at the same admin maximum.
 *   **No RAG**: Unlike traditional search, **no data is stored in a Vector DB**. No chunking or embedding occurs.
 *   **Result**: The model sees exactly what a human sees on a search results page. If the snippet contains the answer, the model responds. If not, the model must decide to "deep dive" into a link.
 
@@ -83,7 +84,7 @@ Interleaved Thinking is the ability for models to alternate between **reasoning*
 ```
 Model calls: search_web("React security vulnerabilities 2026")
 ```
-- Receives snippets from 5-10 search results
+- Receives snippets based on the admin-configured `WEB_SEARCH_RESULT_COUNT` (or a smaller model-provided `count`)
 - Sees references to npm packages and CVE databases
 
 **Step 3: Gap Analysis 🤔**

@@ -68,6 +68,8 @@ If web search returns empty content or poor quality results, the issue is often 
 
 - **Check result count**: Adjust `WEB_SEARCH_RESULT_COUNT` to control how many results are fetched.
 
+  In Native/Agentic tool calling, if the model omits `count` for `search_web`, Open WebUI uses `WEB_SEARCH_RESULT_COUNT` by default. If the model provides `count`, it is capped at the same admin-configured maximum.
+
 - **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use `playwright` for JavaScript-heavy sites or `firecrawl`/`tavily` for better extraction.
 
 For more details on context window issues, see the [RAG Troubleshooting Guide](./rag).
@@ -103,4 +105,3 @@ Key variables:
 | `WEB_LOADER_ENGINE` | Content extraction engine |
 
 ---
-
