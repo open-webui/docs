@@ -220,7 +220,7 @@ Set `STORAGE_PROVIDER` and the corresponding credentials:
 
 | Provider | Set `STORAGE_PROVIDER` to |
 |---|---|
-| Amazon S3 (or S3-compatible like MinIO, R2) | `s3` |
+| Amazon S3 (or S3-compatible like MinIO, R2, Tigris) | `s3` |
 | Google Cloud Storage | `gcs` |
 | Microsoft Azure Blob Storage | `azure` |
 

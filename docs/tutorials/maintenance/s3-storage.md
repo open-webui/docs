@@ -100,3 +100,24 @@ Great! Looks like everything is worked as expected in Open-WebUI. Now let's veri
 Using Open-WebUI's swagger docs, we can get all the information related to this file using the `/api/v1/files/{id}` endpoint and passing in the unique ID (4405fabb-603e-4919-972b-2b39d6ad7f5b).
 
 ![Inspect the file by ID](/images/tutorials/amazon-s3/amazon-s3-get-file-by-id.png)
+
+## S3-Compatible Alternatives
+
+The same `s3` storage provider works with any S3-compatible service. Use the same environment variables as above — just swap the endpoint, region, and credentials for your provider.
+
+### Tigris
+
+[Tigris](https://www.tigrisdata.com/) is S3-compatible object storage with zero egress fees and a free tier (5 GB). To use it, set:
+
+| **Variable**         | **Value**                |
+|----------------------|--------------------------|
+| `S3_ENDPOINT_URL`    | `https://t3.storage.dev` |
+| `S3_REGION_NAME`     | `auto`                   |
+
+Create credentials from the [Tigris Dashboard](https://console.tigris.dev/). Keys are prefixed `tid_` / `tsec_`.
+
+:::info
+
+Do not set `S3_ADDRESSING_STYLE` to `path` — Tigris uses virtual-hosted-style addressing, which is the Open WebUI default.
+
+:::
