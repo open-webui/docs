@@ -3564,7 +3564,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 
 - Type: `int`
 - Default: `3`
-- Description: Maximum number of search results to crawl.
+- Description: Maximum number of web search results to crawl. In Native/Agentic tool calling, this is also the default `search_web` result count when the model omits `count`, and the maximum cap when the model provides `count`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEB_SEARCH_CONCURRENT_REQUESTS`
