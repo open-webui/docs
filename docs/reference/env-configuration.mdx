@@ -1694,6 +1694,18 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 :::
 
+#### `CONTENT_SECURITY_POLICY`
+
+- Type: `str`
+- Description: Sets the `content-security-policy` HTTP header
+- Example: `default-src 'self' 'unsafe-inline'; img-src 'self' https://* data:; child-src 'none'; font-src 'self' data:;`
+
+#### `CONTENT_SECURITY_POLICY_REPORT_ONLY`
+
+- Type: `str`
+- Description: Sets the `content-security-policy-report-only` HTTP header
+- Example: `default-src 'self' 'unsafe-inline'; img-src 'self' https://* data:; child-src 'none'; font-src 'self' data:;`
+
 #### `ENABLE_VERSION_UPDATE_CHECK`
 
 - Type: `bool`
