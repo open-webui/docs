@@ -6171,6 +6171,18 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 
 :::
 
+#### `DATABASE_ENABLE_IAM_TOKEN_AUTH`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables AWS RDS IAM Database Authentication. When set to `True`, Open WebUI fetches short-lived IAM tokens from AWS instead of using a static password to authenticate to PostgreSQL. Requires `DATABASE_CA_PATH`, `AWS_DEFAULT_REGION`, and an IAM role with `rds-db:connect` permission. The database user must also have the `rds_iam` role granted in PostgreSQL. See the [AWS RDS IAM Authentication](/getting-started/advanced-topics/rds-iam-authentication) guide for full setup instructions.
+
+#### `DATABASE_CA_PATH`
+
+- Type: `str`
+- Default: `None`
+- Description: Absolute path to the RDS CA certificate bundle (PEM file) inside the container. Required when `DATABASE_ENABLE_IAM_TOKEN_AUTH=True`. Used to verify the RDS server certificate over SSL. Download the bundle from the [AWS RDS TLS documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html).
+
 #### `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
 
 - Type: `float`
