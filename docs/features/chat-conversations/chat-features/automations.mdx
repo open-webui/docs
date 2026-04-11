@@ -32,6 +32,19 @@ To grant user access:
 
 You can also set this default via [`USER_PERMISSIONS_FEATURES_AUTOMATIONS`](/reference/env-configuration#user_permissions_features_automations).
 
+## Admin Limits
+
+Administrators can set global limits on automation usage for non-admin users. These are configured via environment variables. **Admins bypass all limits.**
+
+| Setting | Effect | Env Variable |
+|---------|--------|--------------|
+| **Max Automation Count** | Caps the number of automations a user can create | [`AUTOMATION_MAX_COUNT`](/reference/env-configuration#automation_max_count) |
+| **Min Recurrence Interval** | Rejects schedules that run more frequently than the configured interval (in seconds) | [`AUTOMATION_MIN_INTERVAL`](/reference/env-configuration#automation_min_interval) |
+
+- **Max count** is checked only on creation. Existing automations are not deleted if the limit is lowered.
+- **Min interval** is checked on both creation and update. One-time automations (`COUNT=1`) are exempt.
+- Both default to empty (no limit). Set to a positive integer to enforce.
+
 ## Create an Automation
 
 1. Open **User Menu > Automations**

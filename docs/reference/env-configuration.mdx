@@ -274,6 +274,31 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets the maximum number of files processing allowed per folder.
 - Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
+#### `AUTOMATION_MAX_COUNT`
+
+- Type: `int`
+- Default: `("") empty string` (unlimited)
+- Description: Sets the maximum number of automations a non-admin user can create. When set to a positive integer, users who reach this limit will receive a `403 Forbidden` error when attempting to create additional automations. Admins bypass this limit.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `AUTOMATION_MIN_INTERVAL`
+
+- Type: `int` (seconds)
+- Default: `("") empty string` (no minimum)
+- Description: Sets the minimum allowed interval in seconds between automation recurrences for non-admin users. When set, any automation schedule that recurs more frequently than this value will be rejected with a `400 Bad Request` error. One-time automations (`COUNT=1`) are exempt from this check. Admins bypass this limit.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip Common values for AUTOMATION_MIN_INTERVAL
+
+| Value | Meaning |
+|-------|---------|
+| `60` | Minimum 1 minute between runs |
+| `300` | Minimum 5 minutes between runs |
+| `900` | Minimum 15 minutes between runs |
+| `3600` | Minimum 1 hour between runs |
+
+:::
+
 #### `ENABLE_NOTES`
 
 - Type: `bool`
