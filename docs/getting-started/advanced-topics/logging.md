@@ -1,9 +1,9 @@
 ---
 sidebar_position: 5
-title: "Logging Configuration"
+title: "Logging Open WebUI"
 ---
 
-# Logging Configuration
+# Logging Open WebUI
 
 **Control what Open WebUI logs, where it goes, and how it's formatted, from quick debugging to production log pipelines.**
 

@@ -1,9 +1,9 @@
 ---
 sidebar_position: 10
-title: "Local Development"
+title: "Developing Open WebUI"
 ---
 
-# Local Development
+# Developing Open WebUI
 
 **Run Open WebUI from source for development and testing.**
 

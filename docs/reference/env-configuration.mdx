@@ -4868,6 +4868,11 @@ In any production environment running more than one instance of Open WebUI (e.g.
 - Default: `10`
 - Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions are pruned to make room for the new one. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
 
+#### `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Ensures the full OAuth scope is included during refresh token requests instead of relying on provider defaults. When enabled, the configured scope (e.g. `MICROSOFT_OAUTH_SCOPE`) is passed to the identity provider during token refresh. This is required for providers like Microsoft where missing scopes can cause refresh failures, especially when using custom API scopes.
 
 #### `WEBUI_AUTH_TRUSTED_EMAIL_HEADER`
 
