@@ -240,6 +240,12 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `view_channel_thread` | View a full message thread/replies in a channel. |
 | **Task Management** | *Requires per-model "Task Management" category enabled (default: on).* |
 | `update_tasks` | Create/update a structured task list for the current chat, including status tracking (`pending`, `in_progress`, `completed`, `cancelled`). |
+| **Automations** | *Requires per-model "Automations" category enabled (default: on) AND user has `features.automations` permission (admins always pass).* |
+| `create_automation` | Create a scheduled automation with a name, prompt, RRULE schedule, and optional model ID. |
+| `update_automation` | Update an existing automation's name, prompt, schedule, or model. |
+| `list_automations` | List the user's scheduled automations with status, schedule, and next runs. |
+| `toggle_automation` | Pause or resume a scheduled automation. |
+| `delete_automation` | Delete a scheduled automation and all its run history. |
 | **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
 | `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
@@ -306,6 +312,12 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 | `view_channel_thread` | `parent_message_id` (required) | `{channel_id, channel_name, thread_id, message_count, messages: [...]}` |
 | **Task Management** | | |
 | `update_tasks` | `tasks` (required), `overwrite` (default: true) | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
+| **Automations** | | |
+| `create_automation` | `name` (required), `prompt` (required), `rrule` (required), `model_id` (optional — defaults to current chat model) | `{status, id, name, model_id, is_active, next_runs}` |
+| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id` (all optional — only provided fields are changed) | `{status, id, name, model_id, is_active, next_runs}` |
+| `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
+| `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
+| `delete_automation` | `automation_id` (required) | `{status, message}` |
 | **Skills** | | |
 | `view_skill` | `name` (required) | `{name, content}` |
 | **Time Tools** | | |
@@ -408,6 +420,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
 | **Channels** | `search_channels`, `search_channel_messages`, `view_channel_message`, `view_channel_thread` | Search channels and channel messages |
 | **Task Management** | `update_tasks` | Create and maintain a structured task/todo list in the active chat |
+| **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
@@ -436,6 +449,22 @@ These per-category toggles only appear when the main **Builtin Tools** capabilit
 
 :::info Global Features Take Precedence
 Enabling a per-model category toggle does **not** override global feature flags. For example, if `ENABLE_NOTES` is disabled globally (Admin Panel), Notes tools will not be available even if the "Notes" category is enabled for the model. The per-model toggles only allow you to *further restrict* what's already available—they cannot enable features that are disabled at the global level.
+:::
+
+:::warning User-Level Permissions Also Apply
+Builtin tools that correspond to an RBAC feature permission are also gated by the user's **Features** permissions. Even if a tool category is enabled on the model and the global feature flag is on, the tool will **not** be injected if the user lacks the corresponding `features.*` permission. Admins always pass these checks.
+
+| Tool Category | Required `features.*` Permission |
+|---------------|----------------------------------|
+| Memory | `features.memories` |
+| Web Search | `features.web_search` |
+| Image Generation | `features.image_generation` |
+| Code Interpreter | `features.code_interpreter` |
+| Notes | `features.notes` |
+| Channels | `features.channels` |
+| Automations | `features.automations` |
+
+This ensures that RBAC permissions are respected end-to-end — disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
 :::
 
 :::tip Per-Chat Feature Toggles (Web Search, Image Generation, Code Interpreter)

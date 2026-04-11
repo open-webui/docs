@@ -79,3 +79,28 @@ Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are re
 - Automations run in the background worker loop on a polling interval.
 - Every run records a status (`success` or `error`) and optional error details.
 - Deleting an automation also removes its run history.
+
+## Managing Automations from Chat
+
+When using **Native Function Calling Mode** with a capable model, automations can also be created and managed directly from within a chat conversation using builtin tools. This allows you to say things like *"Schedule a daily summary report at 9am"* and the model will create the automation for you.
+
+### Available tools
+
+| Tool | What it does |
+|------|-------------|
+| `create_automation` | Create a new scheduled automation with a name, prompt, RRULE schedule, and optional model ID |
+| `update_automation` | Update an existing automation's name, prompt, schedule, or model |
+| `list_automations` | List your scheduled automations with status, schedule, and next runs |
+| `toggle_automation` | Pause or resume a scheduled automation |
+| `delete_automation` | Delete a scheduled automation and all its run history |
+
+### Requirements
+
+For chat-based automation tools to be available:
+
+1. **Native Function Calling** must be enabled for the model
+2. **Builtin Tools** capability must be enabled for the model
+3. **Automations** category must be enabled in the model's Builtin Tools settings (enabled by default)
+4. The user must have the **Features > Automations** permission (admins always pass)
+
+See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for full details on all builtin tools.
