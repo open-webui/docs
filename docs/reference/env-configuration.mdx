@@ -6534,7 +6534,7 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 - Type: `float` (seconds) or empty string for None
 - Default: None (no timeout, uses redis-py library default)
-- Description: Sets the socket connection timeout in seconds for Redis and Sentinel connections. This timeout applies to the initial TCP connection establishment. When set, it prevents indefinite blocking when attempting to connect to unreachable Redis nodes.
+- Description: Sets the socket connection timeout in seconds for all Redis client connections, including Sentinel, Cluster, and plain URL modes. This timeout applies to the initial TCP connection establishment. When set, it prevents indefinite blocking when attempting to connect to unreachable Redis nodes.
 
 :::danger
 
@@ -6559,6 +6559,23 @@ If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be 
 
 :::
 
+#### `REDIS_SOCKET_KEEPALIVE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables TCP `SO_KEEPALIVE` on all Redis client sockets (plain, cluster, and sentinel connections, both sync and async). When enabled, the operating system kernel sends TCP keepalive probes on idle connections, detecting half-closed sockets (e.g., after a silent firewall/load balancer reset or a NIC flap) before the next Redis command lands on them.
+
+:::tip When to enable
+
+Enable this setting in environments where:
+- A firewall or load balancer sits between the application and Redis and may silently drop idle connections
+- Network instability can cause connections to become half-open without notification
+- You want an additional layer of dead-connection detection alongside `REDIS_HEALTH_CHECK_INTERVAL`
+
+`REDIS_SOCKET_KEEPALIVE` operates at the TCP level (kernel-driven probes), while `REDIS_HEALTH_CHECK_INTERVAL` operates at the application level (redis-py PING commands). They are complementary and can be used together for maximum reliability.
+
+:::
+
 #### `REDIS_SENTINEL_MAX_RETRY_COUNT`
 
 - Type: `int`
@@ -6570,6 +6587,33 @@ If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be 
 - Type: `float` (milliseconds)
 - Default: None
 - Description: Optional reconnect delay in milliseconds for Redis Sentinel retry logic, applied consistently across both synchronous and asynchronous Redis operations. This improves stability during Sentinel failover by preventing tight retry loops. When unset or invalid, retry behavior remains unchanged.
+
+#### `REDIS_HEALTH_CHECK_INTERVAL`
+
+- Type: `int` (seconds)
+- Default: None (disabled)
+- Description: How often (in seconds) redis-py should PING an idle pooled connection before reusing it. When set to a positive integer, redis-py will PING any pooled connection that has been idle longer than this interval before handing it back to a caller. This detects stale/dead connections before a real command lands on them, preventing `ConnectionError: Connection reset by peer` errors. Set to `0` or leave empty to disable.
+
+:::tip Recommended for production
+
+Set `REDIS_HEALTH_CHECK_INTERVAL` to a value **shorter** than both:
+- Your Redis server's `timeout` setting (e.g., `timeout 1800`)
+- Any firewall or load balancer idle timeout on the path to Redis
+
+A typical value is `60` (seconds). This keeps actively-used pooled connections warm (the PING resets the server's idle timer) while still allowing the Redis server to reap truly orphaned connections via its `timeout` setting.
+
+:::
+
+:::info How it works
+
+When enabled, redis-py performs a lightweight `PING` on checkout for any connection that has been idle longer than the configured interval. This serves two purposes:
+
+1. **Detects dead connections** — stale sockets are identified and replaced before your application code runs a command on them
+2. **Keeps active connections alive** — the PING resets the Redis server's per-connection idle timer, preventing the server from reaping connections that are still in the pool
+
+Without this setting, if your Redis server has a `timeout` configured (recommended to prevent connection exhaustion), the first request that grabs a reaped socket from the pool will fail with a `ConnectionError`.
+
+:::
 
 #### `WEBSOCKET_REDIS_LOCK_TIMEOUT`
 
