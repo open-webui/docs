@@ -171,6 +171,12 @@ No additional configuration is required in Microsoft Entra ID. The `offline_acce
 
 :::
 
+:::tip Role Mapping with Microsoft Entra ID
+
+If you use Entra ID **app roles** to control who gets `admin` vs `user` access in Open WebUI, you also need to configure [OAuth Role Management](#oauth-role-management) below. In particular, make sure you set `OAUTH_ALLOWED_ROLES` and `OAUTH_ADMIN_ROLES` in addition to `ENABLE_OAUTH_ROLE_MANAGEMENT=true` — otherwise all users will be created with the default role regardless of their Entra ID assignment.
+
+:::
+
 ### GitHub
 
 To configure a GitHub OAuth Client, please refer to [GitHub's documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) on how to create a OAuth App or GitHub App for a **web application**.

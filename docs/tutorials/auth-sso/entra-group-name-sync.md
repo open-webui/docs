@@ -199,6 +199,28 @@ Admin users' group memberships are **not** automatically updated via OAuth group
 :::
 
 
+## Hybrid AD Groups (On-Premises Active Directory)
+
+The `cloud_displayname` approach described above works for **cloud-native** Entra ID security groups. However, if your organization syncs groups from an **on-premises Active Directory** to Entra ID, those synced groups may still appear as GUIDs in Open WebUI even after following the steps above.
+
+This happens because `cloud_displayname` only resolves names for groups that originate in Entra ID. Groups synced from on-prem AD require a different token configuration.
+
+### Fix: Use sAMAccountName for Hybrid Groups
+
+1. In the **Azure Portal**, navigate to your **App Registration**
+2. Go to **Token configuration**
+3. If you already have a groups claim, click on it to edit. Otherwise, click **Add groups claim**
+4. Under the **ID** token type, set the group identifier format to **sAMAccountName**
+5. Click **Save**
+
+This tells Entra ID to include the on-prem `sAMAccountName` attribute for AD-synced groups, which resolves to the human-readable group name.
+
+:::info Mixed Environments
+
+If you have **both** cloud-native and on-prem AD-synced groups, using `sAMAccountName` will correctly resolve names for both types.
+
+:::
+
 ## Additional Resources
 
 - [SSO (OAuth, OIDC, Trusted Header)](/features/authentication-access/auth/sso) - OAuth configuration overview
