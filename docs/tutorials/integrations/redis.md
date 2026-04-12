@@ -21,7 +21,15 @@ Redis serves two distinct purposes in Open WebUI, and understanding when it's re
 
 ### Single Instance Deployments
 
-If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (the default), Redis is **completely optional and not strictly needed**. The application will function normally without it for all operations.
+If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (the default), Redis is **not required for basic functionality**. The application will function normally without it for most operations.
+
+:::warning Security: Token Revocation Requires Redis
+
+Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+
+For production-facing deployments, either configure Redis or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See the [Hardening guide](/getting-started/advanced-topics/hardening#token-revocation) for details.
+
+:::
 
 ### Multi-Worker and Multi-Instance Deployments
 

@@ -6476,7 +6476,7 @@ Redis serves as the central state store that allows multiple Open WebUI instance
 
 **Single Instance Deployments**
 
-If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required**. The application will function normally without it.
+If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required** for basic functionality. However, without Redis, signing out and password changes do **not** invalidate existing JWT tokens — they remain valid until they expire (default: 4 weeks). For production deployments, either configure Redis or shorten [`JWT_EXPIRES_IN`](#jwt_expires_in). See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) for details.
 
 :::
 

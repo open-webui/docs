@@ -125,7 +125,20 @@ Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will 
 
 ### Token revocation
 
-With Redis configured, Open WebUI supports per-token revocation. When a user signs out, their token is added to a revocation list that auto-expires. Without Redis, tokens remain valid until they expire naturally.
+:::warning Token Revocation Requires Redis
+
+Without Redis, **signing out does not invalidate a user's token**. The token remains valid and usable until it expires naturally (default: 4 weeks). This means:
+
+- A stolen or leaked token cannot be revoked by signing out
+- Changing a user's password does not invalidate their existing sessions
+- Admin-initiated account deactivation does not immediately block access
+- OIDC back-channel logout cannot revoke tokens
+
+With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.
+
+**If you cannot deploy Redis**, shorten `JWT_EXPIRES_IN` (e.g., `1h` or `4h`) to limit the window of exposure. See the [Redis tutorial](/tutorials/integrations/redis) for setup instructions.
+
+:::
 
 ---
 
@@ -241,7 +254,7 @@ OAUTH_ALLOWED_ROLES=user,admin,superadmin
 OAUTH_MERGE_ACCOUNTS_BY_EMAIL=false
 ```
 
-When enabled, an OAuth login with an email matching an existing local account will merge the two. This is convenient but depends on your OAuth provider reliably verifying email addresses. If your provider does not guarantee email verification, a user who controls a matching email could gain access to the existing account.
+When enabled, an OAuth login with an email matching an existing local account will merge the two. **This is not recommended.** It depends on your OAuth provider reliably verifying email addresses. If your provider does not guarantee email verification, a user who controls a matching email could gain access to the existing account — effectively an account takeover. Keep this set to `false` unless you have verified that your provider enforces email verification.
 
 ### Session limits
 
@@ -257,7 +270,7 @@ ENABLE_OAUTH_BACKCHANNEL_LOGOUT=true
 
 ## Trusted Header Authentication
 
-If your reverse proxy handles authentication (Authelia, Authentik, oauth2-proxy), you can pass the authenticated identity to Open WebUI via HTTP headers:
+If your reverse proxy handles authentication (Authelia, Authentik, oauth2-proxy), you can pass the authenticated identity to Open WebUI via HTTP headers. **This is possible but risky depending on your setup** — incorrect configuration allows any client to authenticate as any user by forging the header:
 
 ```bash
 WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-Forwarded-Email
@@ -665,6 +678,7 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Disable open signup](#registration) | `ENABLE_SIGNUP=true` | `ENABLE_SIGNUP=false` |
 | [Enable password validation](#password-validation) | Disabled | `ENABLE_PASSWORD_VALIDATION=true` |
 | [Secure cookies](#cookie-settings) | `Secure=false`, `SameSite=lax` | `Secure=true`, `SameSite=strict` |
+| [Enable token revocation](#token-revocation) | No revocation (no Redis) | Configure Redis or shorten `JWT_EXPIRES_IN` |
 | [Restrict CORS](#cors) | `*` | Your specific domain(s) |
 | [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP |
 | [Restrict OAuth domains](#domain-and-group-restrictions) | All allowed | `OAUTH_ALLOWED_DOMAINS=yourdomain.com` |
@@ -675,5 +689,6 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Review direct connections](#data-sharing-and-export) | `false` | Keep disabled unless needed |
 | [Use PostgreSQL](#postgresql) | SQLite | PostgreSQL |
 | [Verify outbound TLS](#outbound-tls) | Enabled | Keep enabled |
+| [Enable offline mode](#offline-mode) | Disabled | `OFFLINE_MODE=true` for air-gapped environments |
 | [Structured logging](#structured-logging) | Text | `LOG_FORMAT=json` |
 | [Keep updated](#keeping-open-webui-updated) | N/A | Latest stable release |

@@ -147,6 +147,12 @@ More generally, **reports describing ANY attack chain that involves Tools or Fun
 
 These scenarios represent **admin negligence** or **environment compromise**, not vulnerabilities in Open WebUI itself. See [our Security Policy](https://github.com/open-webui/open-webui/security) and the [Plugin Security documentation](/features/extensibility/plugin/) for details.
 
+## Production Deployment Security
+
+Open WebUI is designed for private, trusted networks and ships with defaults optimized for ease of setup. Production deployments handling sensitive data should review the [Hardening Guide](https://docs.openwebui.com/getting-started/advanced-topics/hardening) for a comprehensive checklist.
+
+A key consideration: **without Redis, signing out and password changes do not revoke existing JWT tokens** — they remain valid until they expire (default: 4 weeks). This means compromised tokens cannot be invalidated, and admin-initiated account deactivation does not immediately block access. For production deployments, either configure [Redis](https://docs.openwebui.com/tutorials/integrations/redis) or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See [Token Revocation](https://docs.openwebui.com/getting-started/advanced-topics/hardening#token-revocation) for details.
+
 ## Product Security Process
 
 - Internal and periodic external reviews of our architecture and pipelines
