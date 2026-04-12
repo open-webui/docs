@@ -39,9 +39,9 @@ Add the following environment variables to your Open WebUI `docker-compose.yaml`
 services:
   open-webui:
     environment:
-      ENABLE_RAG_WEB_SEARCH: True
-      RAG_WEB_SEARCH_ENGINE: "mojeek"
+      ENABLE_WEB_SEARCH: True
+      WEB_SEARCH_ENGINE: "mojeek"
       MOJEEK_SEARCH_API_KEY: "YOUR_MOJEEK_API_KEY"
-      RAG_WEB_SEARCH_RESULT_COUNT: 3
-      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 1
+      WEB_SEARCH_RESULT_COUNT: 3
+      WEB_SEARCH_CONCURRENT_REQUESTS: 1
 ```

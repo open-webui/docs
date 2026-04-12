@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.8.13.
+> This documentation reflects schema changes up to Open WebUI v0.9.0.
 
 ## Open-WebUI Internal SQLite Database
 

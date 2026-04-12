@@ -37,11 +37,11 @@ Add the following environment variables to your Open WebUI `docker-compose.yaml`
 services:
   open-webui:
     environment:
-      ENABLE_RAG_WEB_SEARCH: True
-      RAG_WEB_SEARCH_ENGINE: "youcom"
+      ENABLE_WEB_SEARCH: True
+      WEB_SEARCH_ENGINE: "youcom"
       YOUCOM_API_KEY: "YOUR_API_KEY"
-      RAG_WEB_SEARCH_RESULT_COUNT: 3
-      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
+      WEB_SEARCH_RESULT_COUNT: 3
+      WEB_SEARCH_CONCURRENT_REQUESTS: 10
 ```
 
 ### Admin Panel Setup
