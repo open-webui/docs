@@ -697,6 +697,28 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 - Default: `True`
 - Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
 
+#### `AIOHTTP_POOL_CONNECTIONS`
+
+- Type: `int`
+- Default: unset (unlimited)
+- Description: Maximum number of total concurrent connections in the shared AIOHTTP client pool used for outbound requests (Ollama, OpenAI-compatible endpoints, etc.). When unset, there is no total cap. Lower this if you need to bound total upstream concurrency.
+
+#### `AIOHTTP_POOL_CONNECTIONS_PER_HOST`
+
+- Type: `int`
+- Default: unset (unlimited)
+- Description: Maximum number of concurrent connections to any single host in the shared AIOHTTP pool. When unset, there is no per-host cap. Useful for staying under provider-side rate or connection limits.
+
+#### `AIOHTTP_POOL_DNS_TTL`
+
+- Type: `int`
+- Default: `300`
+- Description: DNS cache TTL in seconds for the shared AIOHTTP pool. Negative or invalid values fall back to `300`. Increase for stable infrastructure; decrease if upstream hosts change IPs frequently.
+
+:::info
+Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP traffic, enabling TCP/TLS connection reuse, a shared DNS cache, and bounded concurrency. The three variables above tune this pool; they do not need to be set in typical deployments.
+:::
+
 #### `REQUESTS_VERIFY`
 
 - Type: `bool`
