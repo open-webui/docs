@@ -30,8 +30,8 @@
 	--ifm-global-shadow-md: none;
 	--ifm-footer-background-color: #fff;
 	--ifm-font-family-base:
-		"Inter", -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto",
-		"Helvetica Neue", "Arial", sans-serif;
+		"Inter", -apple-system, blinkmacsystemfont, "Segoe UI", roboto,
+		"Helvetica Neue", arial, sans-serif;
 	--ifm-font-size-base: 15px;
 	--ifm-line-height-base: 1.65;
 	--ifm-font-weight-base: 400;
@@ -174,6 +174,11 @@ code {
 	background-color: #ebebeb;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
+[data-theme="dark"] code {
+	background-color: #222;
+}
+
 .theme-code-block {
 	font-family: "IBM Plex Mono", monospace;
 	font-size: 0.875em;
@@ -192,6 +197,7 @@ code {
 	overflow: hidden;
 }
 
+/* stylelint-disable no-descending-specificity */
 .shiki-code-block code,
 .shiki-code-block span {
 	background-color: transparent !important;
@@ -200,6 +206,7 @@ code {
 	font-size: inherit;
 	font-weight: inherit;
 }
+/* stylelint-enable no-descending-specificity */
 
 /* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
 [data-theme="light"] .shiki-code-block pre,
@@ -211,11 +218,7 @@ code {
 	background-color: #f3f3f3;
 }
 
-[data-theme="dark"] .shiki-code-block pre,
-[data-theme="dark"] .shiki-code-block pre span {
-	color: var(--shiki-dark) !important;
-}
-
+/* stylelint-disable-next-line no-duplicate-selectors */
 [data-theme="dark"] .shiki-code-block pre {
 	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
 }
@@ -252,10 +255,16 @@ code {
 	color: #ccc;
 }
 
+.shiki-code-block:hover .shiki-copy-button {
+	opacity: 0.4;
+}
+
+/* stylelint-disable no-descending-specificity */
 .shiki-copy-button:hover,
 .shiki-copy-button:focus-visible {
 	opacity: 1 !important;
 }
+/* stylelint-enable no-descending-specificity */
 
 .shiki-code-block:hover .shiki-copy-button {
 	opacity: 0.4;
@@ -710,6 +719,11 @@ a.footer__link-item:hover {
 }
 
 /* ─── Misc ─── */
+/* stylelint-disable-next-line no-descending-specificity */
+.notbold a {
+	font-weight: 400 !important;
+}
+
 .small-text {
 	font-size: 0.8em;
 }
