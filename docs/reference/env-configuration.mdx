@@ -1153,7 +1153,15 @@ The format for the JSON response is strictly:
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of tool server connection configurations. Each connection should define the necessary parameters to connect to external tool servers that implement the OpenAPI/MCPO protocol. The JSON must be properly formatted or it will fallback to an empty array.
+- Description: Specifies a JSON array of tool server connection configurations. Each connection should define the necessary parameters to connect to external tool servers that implement the OpenAPI/MCPO protocol. For mcpo-backed routes, `path` should point at the mounted tool route. The JSON must be properly formatted or it will fallback to an empty array.
+- Field reference:
+  - `url`: the server base URL.
+  - `path`: the specific tool route exposed by the server.
+  - `auth_type`: the authentication mode for the connection.
+  - `key`: the API key or token used by the selected auth mode.
+  - `config`: per-connection configuration object, such as `{ "enable": true }`.
+  - `info`: optional metadata shown in the UI, such as the connection name and description.
+  - `spec_type` / `spec`: OpenAPI spec location details when the connection is backed by a spec URL or file.
 - Example: 
 ```json
 [

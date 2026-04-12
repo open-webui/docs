@@ -1,0 +1,210 @@
+---
+sidebar_position: 9998
+title: "Migrating to 0.9.0"
+---
+
+# 🚚 Migration Guide: Upgrading to Open WebUI 0.9.0
+
+This guide covers breaking changes and required updates for Tools, Functions, Pipes, Filters, and Actions when upgrading to **Open WebUI 0.9.0**.
+
+---
+
+## 🧐 What Has Changed and Why?
+
+Open WebUI 0.9.0 ships a large internal refactor: the backend data layer has moved from **synchronous** to **asynchronous** from top to bottom. Almost every database-backed method on every model class (Users, Chats, Files, Models, Functions, Tools, Knowledge, Memories, Groups, Folders, Messages, Feedback, …) is now an `async def` and must be awaited.
+
+At the storage layer, SQLAlchemy is now used in its async mode: sessions are `AsyncSession` instances, and queries are issued via `await db.execute(select(...))` instead of the legacy `db.query(...).first()` style. The sync session helper has been replaced by an async context manager.
+
+📌 **Why did we make this change?**
+- **Concurrency**: blocking DB calls on the event loop were the biggest bottleneck under load. Making the data layer async lets FastAPI handle many more concurrent chats without thread-pool saturation.
+- **Consistency**: request handlers were already async; the data layer being sync forced awkward `run_in_threadpool` wrappers throughout the codebase.
+- **Forward-looking**: SQLAlchemy 2.0's async API is the supported path going forward.
+
+---
+
+## ⚠️ Breaking Changes
+
+If your plugin touches the Open WebUI database or models — **or calls any helper that eventually touches them** — you will need to update it. Because almost every utility in `open_webui.utils.*` and every router function ultimately reads or writes through a model, "async reach" extends well beyond obvious `Users.`/`Chats.` calls. Specifically:
+
+1. **All model methods are now coroutines.** Any call like `Users.get_user_by_id(...)`, `Chats.get_chat_by_id(...)`, `Files.get_file_by_id(...)`, `Models.get_model_by_id(...)`, `Functions.get_function_by_id(...)`, `Tools.get_tool_by_id(...)`, `Knowledges.get_knowledge_by_id(...)` — previously synchronous — now return an awaitable. Calling them without `await` returns a coroutine object, not your data.
+2. **Anything downstream of a model call is now async too.** Utility helpers you may import from `open_webui.utils.*`, `open_webui.retrieval.*`, router helpers, access-control checks, and similar — if they touch the DB directly or indirectly, they have been promoted to `async def`. Previously-sync helpers you were calling without `await` almost certainly need `await` now. Re-check every import from `open_webui.*` in your plugin.
+3. **Database sessions are now `AsyncSession`.** The sync session helper `get_db_context` has been removed in favor of `get_async_db_context`, and any direct query code needs to be rewritten to the async SQLAlchemy style.
+4. **Any plugin helper that awaits one of the above must itself be `async def`.** Async propagates up through your call graph: once one function in the chain becomes a coroutine, every caller does too, all the way up to your plugin's entrypoint.
+
+Plugin entrypoints themselves (the `pipe`, `inlet`, `outlet`, `stream`, `action`, and Tool methods) were already asynchronous in 0.5 and later, so the signatures you declare do not change — only the bodies do.
+
+---
+
+## ✅ Step-by-Step Migration
+
+### 🔄 1. Await every model method
+
+The most common change. Anywhere your plugin reads or writes through a model class, add `await`.
+
+#### Before (0.8.x):
+```python
+from open_webui.models.users import Users
+from open_webui.models.chats import Chats
+
+def resolve_user(user_id: str):
+    user = Users.get_user_by_id(user_id)
+    chats = Chats.get_chat_list_by_user_id(user_id)
+    return user, chats
+```
+
+#### After (0.9.0):
+```python
+from open_webui.models.users import Users
+from open_webui.models.chats import Chats
+
+async def resolve_user(user_id: str):
+    user = await Users.get_user_by_id(user_id)
+    chats = await Chats.get_chat_list_by_user_id(user_id)
+    return user, chats
+```
+
+Note that the helper itself became `async def`. Its callers must now `await` it in turn — async propagates upward through your code.
+
+---
+
+### 🗄️ 2. Replace `get_db_context` with `get_async_db_context`
+
+If your plugin opens its own database session (rare, but some Tools do for custom queries), the sync helper is gone. Switch to the async variant.
+
+#### Before (0.8.x):
+```python
+from open_webui.internal.db import get_db_context
+from open_webui.models.users import User
+
+def count_active_users():
+    with get_db_context() as db:
+        return db.query(User).filter_by(is_active=True).count()
+```
+
+#### After (0.9.0):
+```python
+from sqlalchemy import select, func
+from open_webui.internal.db import get_async_db_context
+from open_webui.models.users import User
+
+async def count_active_users():
+    async with get_async_db_context() as db:
+        result = await db.execute(
+            select(func.count()).select_from(User).where(User.is_active == True)
+        )
+        return result.scalar_one()
+```
+
+Key differences:
+- `with` becomes `async with`.
+- `db.query(Model)` is no longer supported — use `select(Model)` from `sqlalchemy` and `await db.execute(...)`.
+- `.first()` / `.all()` / `.count()` become `.scalars().first()`, `.scalars().all()`, and `.scalar_one()` respectively, applied to the `Result` returned by `execute`.
+
+If you rely on type hints, the session type is now `sqlalchemy.ext.asyncio.AsyncSession`, not `sqlalchemy.orm.Session`.
+
+---
+
+### 🧩 3. Pipes, Filters, and Actions
+
+Plugin entrypoints were already async since 0.5, so their signatures are unchanged. What changes is how you interact with models inside them.
+
+#### Before (0.8.x) — a Pipe that looks up the caller:
+```python
+from pydantic import BaseModel
+from fastapi import Request
+
+from open_webui.models.users import Users
+from open_webui.utils.chat import generate_chat_completion
+
+class Pipe:
+    async def pipe(
+        self,
+        body: dict,
+        __user__: dict,
+        __request__: Request,
+    ) -> str:
+        full_user = Users.get_user_by_id(__user__["id"])
+        body["model"] = "llama3.2:latest"
+        return await generate_chat_completion(__request__, body, full_user)
+```
+
+#### After (0.9.0):
+```python
+from pydantic import BaseModel
+from fastapi import Request
+
+from open_webui.models.users import Users
+from open_webui.utils.chat import generate_chat_completion
+
+class Pipe:
+    async def pipe(
+        self,
+        body: dict,
+        __user__: dict,
+        __request__: Request,
+    ) -> str:
+        full_user = await Users.get_user_by_id(__user__["id"])
+        body["model"] = "llama3.2:latest"
+        return await generate_chat_completion(__request__, body, full_user)
+```
+
+A one-line diff in the simplest case — but every model call inside `inlet`, `outlet`, `stream`, and `action` needs the same treatment.
+
+---
+
+### 🛠️ 4. Tools
+
+Tool methods can be declared `async def` (and should be, if they touch the DB). For Tools that only call external APIs and never query Open WebUI's database, no change is required.
+
+#### Before (0.8.x) — a Tool that reads a file:
+```python
+from open_webui.models.files import Files
+
+class Tools:
+    def get_file_preview(self, file_id: str, __user__: dict) -> str:
+        file = Files.get_file_by_id_and_user_id(file_id, __user__["id"])
+        return file.data.get("content", "") if file else ""
+```
+
+#### After (0.9.0):
+```python
+from open_webui.models.files import Files
+
+class Tools:
+    async def get_file_preview(self, file_id: str, __user__: dict) -> str:
+        file = await Files.get_file_by_id_and_user_id(file_id, __user__["id"])
+        return file.data.get("content", "") if file else ""
+```
+
+---
+
+### 🔁 5. Third-party libraries that don't yet support async
+
+If you depend on a library that only exposes a sync API (for example a legacy HTTP client or a library that does its own blocking I/O), do not block the event loop. Wrap the sync call in a thread:
+
+```python
+import anyio
+
+result = await anyio.to_thread.run_sync(legacy_client.fetch, url)
+```
+
+This keeps Open WebUI's event loop free while your sync call runs on a worker thread. Prefer an async-native replacement (e.g. `httpx.AsyncClient`, `aiofiles`) where one exists.
+
+---
+
+## 🌟 Recap
+
+- Add `await` to **every** model method call — they all return coroutines now.
+- Do the same for every `open_webui.*` helper that sits on top of the DB (most of `utils`, retrieval, access control, router helpers). If it used to be sync and touched data, it is async now.
+- Any function that awaits one of the above must itself be `async def` — async propagates up through your entire call graph.
+- Replace `get_db_context` with `get_async_db_context` and rewrite raw queries in the SQLAlchemy 2.0 async style (`select(...)` + `await db.execute(...)`).
+- Session type is now `AsyncSession`, not `Session`.
+- Plugin entrypoint signatures don't change — only the code inside them.
+- Don't block the event loop; wrap unavoidable sync calls with `anyio.to_thread.run_sync`.
+
+A mechanical sweep (`await` before every `Users.`/`Chats.`/`Files.`/`Models.`/`Functions.`/`Tools.`/`Knowledges.` call, then propagate `async` up through callers) gets most plugins across the line.
+
+---
+
+💬 **Questions or Feedback?**
+If you run into any issues or have suggestions, feel free to open a [GitHub issue](https://github.com/open-webui/open-webui) or ask in the community forums!
