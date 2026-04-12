@@ -254,7 +254,9 @@ code {
 	border-radius: var(--ifm-global-radius);
 	cursor: pointer;
 	opacity: 0;
-	transition: opacity 200ms ease-in-out, background-color 200ms ease-in-out;
+	transition:
+		opacity 200ms ease-in-out,
+		background-color 200ms ease-in-out;
 }
 
 [data-theme="light"] .shiki-copy-button {
@@ -759,7 +761,6 @@ a.footer__link-item:hover {
 [data-theme="dark"] .homepage-svg path {
 	filter: invert(1);
 }
-
 
 @media screen and (width >=997px) {
 	.hero--container {
