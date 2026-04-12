@@ -8,7 +8,7 @@ title: "Mistral TTS Integration"
 This guide covers how to use Mistral's Text-to-Speech API with Open WebUI.
 
 :::tip Looking for STT?
-See the companion guide: [Using Mistral Voxtral for Speech-to-Text](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration)
+See the companion guide: [Using Mistral Voxtral for Speech-to-Text](/features/media-generation/audio/speech-to-text/mistral-voxtral-integration)
 :::
 
 ## Requirements

@@ -112,7 +112,7 @@ docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --r
 **Never share your data volume between dev and production.** Dev builds may include database migrations that are not backward-compatible. Always use a separate volume (e.g., `-v open-webui-dev:/app/backend/data`).
 :::
 
-If Docker is not your preference, follow the [Local Development Guide](/getting-started/advanced-topics/development).
+If Docker is not your preference, follow the [Developing Open WebUI](/getting-started/advanced-topics/development).
 
 ---
 

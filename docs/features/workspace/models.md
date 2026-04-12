@@ -94,7 +94,7 @@ Toggle what the model can do and bind resources:
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Image Generation** | Enable image generation |
-| **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels |
+| **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels, Task Management, Automations |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **TTS Voice** | Set a specific voice for this model's responses |
 
