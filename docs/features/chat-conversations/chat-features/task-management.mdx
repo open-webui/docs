@@ -20,7 +20,12 @@ Task lists make that loop visible to the user and reduce failures caused by skip
 
 ## How It Works
 
-When the model uses the built-in `update_tasks` tool:
+The model uses two built-in tools to manage the list:
+
+- `create_tasks` — called once at the start of multi-step work to lay out the full checklist.
+- `update_task` — called after finishing each step, to mark a single task by id as `pending`, `in_progress`, `completed`, or `cancelled`.
+
+When these tools are used:
 
 - Tasks are stored at the chat level
 - The UI shows progress in-chat (e.g., completed vs total)
