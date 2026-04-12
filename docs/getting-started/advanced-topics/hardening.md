@@ -393,6 +393,14 @@ ENABLE_ADMIN_CHAT_ACCESS=true
 BYPASS_MODEL_ACCESS_CONTROL=false
 ```
 
+### OpenAI API passthrough
+
+```bash
+ENABLE_OPENAI_API_PASSTHROUGH=false
+```
+
+The OpenAI router includes a catch-all proxy endpoint (`/{path:path}`) that forwards any request to the upstream OpenAI-compatible API using the admin-configured API key. **This is disabled by default and should be kept disabled.** When enabled, any authenticated user can reach any upstream endpoint — including endpoints not natively handled by Open WebUI — using the admin's credentials and without model-level access control. Only enable this if you explicitly need direct passthrough to upstream API endpoints and understand the security implications.
+
 ### Data sharing and export
 
 Several features control how data can be shared or exported:
@@ -684,6 +692,7 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Restrict OAuth domains](#domain-and-group-restrictions) | All allowed | `OAUTH_ALLOWED_DOMAINS=yourdomain.com` |
 | [Enable audit logging](#audit-logging) | `NONE` | `METADATA` or higher |
 | [Restrict API key endpoints](#endpoint-restrictions) | All endpoints | `ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS=true` |
+| [Keep API passthrough disabled](#openai-api-passthrough) | Disabled | Keep `ENABLE_OPENAI_API_PASSTHROUGH=false` |
 | [Disable auto pip install](#dependency-installation) | Enabled | `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` |
 | [Review community sharing](#data-sharing-and-export) | `true` | Disable if sensitive data |
 | [Review direct connections](#data-sharing-and-export) | `false` | Keep disabled unless needed |

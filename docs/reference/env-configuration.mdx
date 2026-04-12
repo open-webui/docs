@@ -885,6 +885,18 @@ Do not use provider management/master keys unless your deployment explicitly req
 - Example: `sk-124781258123;sk-4389759834759834`
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_OPENAI_API_PASSTHROUGH`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, the OpenAI proxy's catch-all endpoint (`/{path:path}`) forwards any request to the upstream OpenAI-compatible API using the admin-configured API key and without additional access control. When disabled (default), the catch-all returns `403 Forbidden`. Other routers (Ollama, Responses) do not have catch-all proxies.
+
+:::danger
+
+**Keep this disabled unless you explicitly need it.** The catch-all proxy forwards requests to the upstream API using the admin's API key with no model-level access control. Any authenticated user can reach any upstream endpoint — including endpoints not natively handled by Open WebUI — using the admin's credentials. Only enable this if you understand and accept these implications.
+
+:::
+
 ### Tasks
 
 #### `TASK_MODEL`
