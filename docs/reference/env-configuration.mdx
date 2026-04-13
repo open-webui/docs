@@ -4131,6 +4131,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 ## Audio
 
+#### `BYPASS_PYDUB_PREPROCESSING`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, skips pydub-based preprocessing (format conversion to MP3, compression, and chunked splitting by size) before audio is sent to the Speech-to-Text engine. Useful when the upstream provider already handles these steps, when ffmpeg is unavailable on the host, or when you want to pass audio through untouched. Applies to all STT engines.
+
 ### Whisper Speech-to-Text (Local)
 
 #### `WHISPER_MODEL`

@@ -19,6 +19,12 @@ Most of these settings can also be configured in the **Admin Panel → Settings 
 
 ## Speech To Text (STT) Environment Variables
 
+### Preprocessing
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `BYPASS_PYDUB_PREPROCESSING` | Skip pydub-based preprocessing (MP3 conversion, compression, chunk splitting) before sending audio to the STT engine. Applies to all engines. Useful when the upstream provider already handles these steps, or when ffmpeg is unavailable on the host. | `false` |
+
 ### Local Whisper
 
 | Variable | Description | Default |
