@@ -13,7 +13,7 @@ This guide covers breaking changes and required updates for Tools, Functions, Pi
 
 Open WebUI 0.9.0 ships a large internal refactor: the backend data layer has moved from **synchronous** to **asynchronous** from top to bottom. Almost every database-backed method on every model class (Users, Chats, Files, Models, Functions, Tools, Knowledge, Memories, Groups, Folders, Messages, Feedback, …) is now an `async def` and must be awaited.
 
-At the storage layer, SQLAlchemy is now used in its async mode: sessions are `AsyncSession` instances, and queries are issued via `await db.execute(select(...))` instead of the legacy `db.query(...).first()` style. The sync session helper has been replaced by an async context manager.
+At the storage layer, SQLAlchemy is now used in its async mode: sessions are `AsyncSession` instances, and queries are issued via `await db.execute(select(...))` instead of the legacy `db.query(...).first()` style. A sync engine still exists internally, but it is reserved for startup-only tasks (config loading, Alembic/peewee migrations, health checks) — **all runtime code, including plugins, must use the async engine**.
 
 📌 **Why did we make this change?**
 - **Concurrency**: blocking DB calls on the event loop were the biggest bottleneck under load. Making the data layer async lets FastAPI handle many more concurrent chats without thread-pool saturation.
@@ -28,10 +28,19 @@ If your plugin touches the Open WebUI database or models — **or calls any help
 
 1. **All model methods are now coroutines.** Any call like `Users.get_user_by_id(...)`, `Chats.get_chat_by_id(...)`, `Files.get_file_by_id(...)`, `Models.get_model_by_id(...)`, `Functions.get_function_by_id(...)`, `Tools.get_tool_by_id(...)`, `Knowledges.get_knowledge_by_id(...)` — previously synchronous — now return an awaitable. Calling them without `await` returns a coroutine object, not your data.
 2. **Anything downstream of a model call is now async too.** Utility helpers you may import from `open_webui.utils.*`, `open_webui.retrieval.*`, router helpers, access-control checks, and similar — if they touch the DB directly or indirectly, they have been promoted to `async def`. Previously-sync helpers you were calling without `await` almost certainly need `await` now. Re-check every import from `open_webui.*` in your plugin.
-3. **Database sessions are now `AsyncSession`.** The sync session helper `get_db_context` has been removed in favor of `get_async_db_context`, and any direct query code needs to be rewritten to the async SQLAlchemy style.
+3. **Database sessions are now `AsyncSession`.** Use `get_async_db_context` (or the no-sharing variant `get_async_db`) instead of the old `get_db_context`. The sync helpers (`get_db`, `SessionLocal`) still exist but are reserved for startup code — using them from a request handler or plugin will block the event loop and contend with the async pool. Direct query code needs to be rewritten to the SQLAlchemy 2.0 async style.
 4. **Any plugin helper that awaits one of the above must itself be `async def`.** Async propagates up through your call graph: once one function in the chain becomes a coroutine, every caller does too, all the way up to your plugin's entrypoint.
 
 Plugin entrypoints themselves (the `pipe`, `inlet`, `outlet`, `stream`, `action`, and Tool methods) were already asynchronous in 0.5 and later, so the signatures you declare do not change — only the bodies do.
+
+:::info Deployment note — database drivers
+Open WebUI now requires an async-capable driver matching your database. Standard deployments get this automatically:
+- **SQLite** uses `aiosqlite` (sync `sqlite://` URLs are rewritten to `sqlite+aiosqlite://` at runtime).
+- **PostgreSQL** uses `asyncpg` (`postgresql://`, `postgresql+psycopg2://`, and `postgres://` URLs are rewritten to `postgresql+asyncpg://`).
+- **SQLCipher** (`sqlite+sqlcipher://`) has no async driver and is **not supported** in 0.9.0. If you rely on SQLCipher for database encryption, stay on 0.8.x or migrate to standard SQLite / Postgres before upgrading.
+
+This is primarily an operator concern, but plugins that pin their own DB URL strings need to follow the same rewriting rules.
+:::
 
 ---
 
@@ -101,6 +110,10 @@ Key differences:
 - `.first()` / `.all()` / `.count()` become `.scalars().first()`, `.scalars().all()`, and `.scalar_one()` respectively, applied to the `Result` returned by `execute`.
 
 If you rely on type hints, the session type is now `sqlalchemy.ext.asyncio.AsyncSession`, not `sqlalchemy.orm.Session`.
+
+:::warning Treat the sync helpers as internal
+`SessionLocal`, `get_db`, `get_session`, and the sync `save_config` / `reset_config` paths still exist, but they are reserved for Open WebUI's startup and migration code — **do not call them from a plugin, route handler, or anything running inside the event loop**. They acquire connections from the sync pool, block the loop while running, and can deadlock against the async pool under concurrent load. Always prefer the async variants (`get_async_db`, `get_async_db_context`, `get_async_session`, `async_save_config`, `async_reset_config`) in any code that runs after startup.
+:::
 
 ---
 
@@ -178,7 +191,50 @@ class Tools:
 
 ---
 
-### 🔁 5. Third-party libraries that don't yet support async
+### 🧵 5. FastAPI dependencies and session types
+
+If your plugin exposes its own FastAPI routes (advanced Tools sometimes do this via router imports) and declares a database session dependency, switch both the dependency and the type annotation.
+
+#### Before (0.8.x):
+```python
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+from open_webui.internal.db import get_session
+
+@router.get("/my-endpoint")
+def my_endpoint(db: Session = Depends(get_session)):
+    ...
+```
+
+#### After (0.9.0):
+```python
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from open_webui.internal.db import get_async_session
+
+@router.get("/my-endpoint")
+async def my_endpoint(db: AsyncSession = Depends(get_async_session)):
+    ...
+```
+
+---
+
+### 📣 6. Event emitters are still called the same way
+
+The internal constructors `get_event_emitter` / `get_event_call` were made `async` in this release, but **plugin authors do not see this**. You still receive the already-constructed callables as `__event_emitter__` and `__event_call__` in your function signature, and you still `await` them exactly as before:
+
+```python
+await __event_emitter__({"type": "status", "data": {...}})
+response = await __event_call__({"type": "input", "data": {...}})
+```
+
+No plugin changes are required here.
+
+---
+
+### 🔁 7. Third-party libraries that don't yet support async
 
 If you depend on a library that only exposes a sync API (for example a legacy HTTP client or a library that does its own blocking I/O), do not block the event loop. Wrap the sync call in a thread:
 
@@ -197,10 +253,12 @@ This keeps Open WebUI's event loop free while your sync call runs on a worker th
 - Add `await` to **every** model method call — they all return coroutines now.
 - Do the same for every `open_webui.*` helper that sits on top of the DB (most of `utils`, retrieval, access control, router helpers). If it used to be sync and touched data, it is async now.
 - Any function that awaits one of the above must itself be `async def` — async propagates up through your entire call graph.
-- Replace `get_db_context` with `get_async_db_context` and rewrite raw queries in the SQLAlchemy 2.0 async style (`select(...)` + `await db.execute(...)`).
-- Session type is now `AsyncSession`, not `Session`.
-- Plugin entrypoint signatures don't change — only the code inside them.
+- Replace `get_db_context` with `get_async_db_context` (or `get_async_db` when you don't need session-sharing) and rewrite raw queries in the SQLAlchemy 2.0 async style (`select(...)` + `await db.execute(...)`).
+- Session type is now `AsyncSession`, not `Session`. For FastAPI routes, depend on `get_async_session` instead of `get_session`.
+- Treat the sync helpers (`SessionLocal`, `get_db`, `get_session`, sync `save_config` / `reset_config`) as internal startup-only plumbing — never call them from plugin code or anything that runs inside the event loop.
+- Plugin entrypoint signatures don't change — only the code inside them. Event emitters (`__event_emitter__`, `__event_call__`) are used exactly as before.
 - Don't block the event loop; wrap unavoidable sync calls with `anyio.to_thread.run_sync`.
+- Operators: make sure your database URL targets an async driver (`aiosqlite` / `asyncpg`). SQLCipher-encrypted SQLite is not supported in 0.9.0.
 
 A mechanical sweep (`await` before every `Users.`/`Chats.`/`Files.`/`Models.`/`Functions.`/`Tools.`/`Knowledges.` call, then propagate `async` up through callers) gets most plugins across the line.
 
