@@ -6017,6 +6017,12 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
 
+#### `STORAGE_LOCAL_CACHE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Controls whether a local copy of a file is retained after it has been uploaded to a cloud storage provider (S3, GCS, Azure). When `True` (the default), the local cache copy in `UPLOAD_DIR` is preserved — matching previous behavior. When `False`, the local copy is removed automatically once processing completes, so files live only in cloud storage. Has no effect when `STORAGE_PROVIDER=local`.
+
 #### Amazon S3 Storage
 
 #### `S3_ACCESS_KEY_ID`
