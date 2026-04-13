@@ -13,13 +13,16 @@ Open WebUI supports multiple connection protocols, including **Ollama**, **OpenA
 
 ## How It Works
 
-```
-┌──────────────┐         ┌──────────────────┐         ┌──────────────┐
-│              │  HTTP    │                  │  Inference│             │
-│  Open WebUI  │────────▶│  Provider API    │────────▶ │    Model     │
-│  (frontend)  │◀────────│  (cloud/local)   │◀──────── │  (LLM/VLM)  │
-│              │  Stream  │                  │  Tokens  │             │
-└──────────────┘         └──────────────────┘         └──────────────┘
+```mermaid
+flowchart LR
+    A["Open WebUI<br/>(frontend)"]
+    B["Provider API<br/>(cloud / local)"]
+    C["Model<br/>(LLM / VLM)"]
+
+    A -- HTTP --> B
+    B -- Inference --> C
+    C -- Tokens --> B
+    B -- Stream --> A
 ```
 
 1. **You type a message** in Open WebUI
