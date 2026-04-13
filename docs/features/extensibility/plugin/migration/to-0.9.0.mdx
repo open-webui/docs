@@ -111,6 +111,10 @@ Key differences:
 
 If you rely on type hints, the session type is now `sqlalchemy.ext.asyncio.AsyncSession`, not `sqlalchemy.orm.Session`.
 
+:::warning Treat the sync helpers as internal
+`SessionLocal`, `get_db`, `get_session`, and the sync `save_config` / `reset_config` paths still exist, but they are reserved for Open WebUI's startup and migration code — **do not call them from a plugin, route handler, or anything running inside the event loop**. They acquire connections from the sync pool, block the loop while running, and can deadlock against the async pool under concurrent load. Always prefer the async variants (`get_async_db`, `get_async_db_context`, `get_async_session`, `async_save_config`, `async_reset_config`) in any code that runs after startup.
+:::
+
 ---
 
 ### 🧩 3. Pipes, Filters, and Actions
@@ -251,6 +255,7 @@ This keeps Open WebUI's event loop free while your sync call runs on a worker th
 - Any function that awaits one of the above must itself be `async def` — async propagates up through your entire call graph.
 - Replace `get_db_context` with `get_async_db_context` (or `get_async_db` when you don't need session-sharing) and rewrite raw queries in the SQLAlchemy 2.0 async style (`select(...)` + `await db.execute(...)`).
 - Session type is now `AsyncSession`, not `Session`. For FastAPI routes, depend on `get_async_session` instead of `get_session`.
+- Treat the sync helpers (`SessionLocal`, `get_db`, `get_session`, sync `save_config` / `reset_config`) as internal startup-only plumbing — never call them from plugin code or anything that runs inside the event loop.
 - Plugin entrypoint signatures don't change — only the code inside them. Event emitters (`__event_emitter__`, `__event_call__`) are used exactly as before.
 - Don't block the event loop; wrap unavoidable sync calls with `anyio.to_thread.run_sync`.
 - Operators: make sure your database URL targets an async driver (`aiosqlite` / `asyncpg`). SQLCipher-encrypted SQLite is not supported in 0.9.0.
