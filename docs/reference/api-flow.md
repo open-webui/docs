@@ -326,23 +326,7 @@ while true; do
 done
 ```
 
-### Step 6: Complete Assistant Message
-
-Once the assistant response is ready, mark it as completed:
-
-```bash
-curl -X POST https://<host>/api/chat/completed \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "chat_id": "<chatId>",
-    "id": "assistant-msg-id",
-    "session_id": "session-id",
-    "model": "gpt-4o"
-  }'
-```
-
-### Step 7: Fetch Final Chat
+### Step 6: Fetch Final Chat
 
 Retrieve the completed conversation:
 
@@ -882,6 +866,7 @@ This cleaning process handles:
 - No frontend code changes are required for this approach
 - The `stream: true` parameter allows for real-time response streaming if needed
 - **Response Monitoring:** Use streaming for real-time processing or polling for simpler implementations that cannot handle streams
+- `outlet()` filters run inline during `/api/chat/completions`; no extra completion endpoint call is required
 - Background tasks like title generation can be controlled via the `background_tasks` object
 - Session IDs help maintain conversation context across requests
 - **Knowledge Integration:** Use the `files` array to include knowledge collections for RAG capabilities

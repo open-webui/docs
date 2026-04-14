@@ -358,7 +358,7 @@ Here's the complete flow from admin configuration to filter execution:
 
 ### 📡 Filter Behavior with API Requests
 
-When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters behave differently than when the request comes from the web interface. Understanding these differences is crucial for building effective filters.
+When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters now follow the same execution model as WebUI requests.
 
 #### Key Behavioral Differences
 
@@ -366,21 +366,21 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 |----------|--------------|-------------------|
 | `inlet()` | ✅ Always called | ✅ Always called |
 | `stream()` | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ❌ **NOT called** by default |
+| `outlet()` | ✅ Called after response | ✅ Called after response |
 | `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Runs but no UI to display |
 
-:::warning Outlet Not Called for API Requests
-The `outlet()` function is **only triggered for WebUI chat requests**, not for direct API calls to `/api/chat/completions`. This is because `outlet()` is invoked by the WebUI's `/api/chat/completed` endpoint after the chat is finished.
+:::info Outlet Runs Inline
+`outlet()` now runs inline as part of `/api/chat/completions` processing for both WebUI and direct API requests.
 
-If you need `outlet()` processing for API requests, your API client must call `/api/chat/completed` after receiving the full response.
+The legacy `/api/chat/completed` endpoint is kept for backward compatibility with older integrations, but it is no longer required for normal outlet execution.
 :::
 
-#### Triggering Outlet for API Requests
+#### Legacy Compatibility: `/api/chat/completed`
 
-To invoke `outlet()` filters for API requests, your client must make a second request to `/api/chat/completed` after receiving the complete response:
+If you maintain an older integration that still calls `/api/chat/completed`, that endpoint remains available for compatibility:
 
 ```bash
-# After receiving the full response from /api/chat/completions, call:
+# Optional legacy compatibility call:
 curl -X POST http://localhost:3000/api/chat/completed \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -396,7 +396,7 @@ curl -X POST http://localhost:3000/api/chat/completed \
 ```
 
 :::tip
-Include the full conversation in `messages`, including the assistant's response. The `chat_id` and `session_id` are optional but recommended for proper logging and state tracking.
+For new integrations, you can skip this second call and rely on inline outlet execution during `/api/chat/completions`.
 :::
 
 #### Detecting API vs WebUI Requests
@@ -971,8 +971,8 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Response caching** - Store responses for future retrieval
 - **Quality scoring** - Run automated quality checks on model outputs
 
-:::warning Outlet and API Requests
-Remember: `outlet()` is **not called** for direct API requests to `/api/chat/completions`. If you need outlet processing for API calls, see the [Filter Behavior with API Requests](#-filter-behavior-with-api-requests) section above.
+:::info Outlet and API Requests
+`outlet()` is called for direct API requests to `/api/chat/completions`.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:

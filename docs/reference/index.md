@@ -41,7 +41,7 @@ Open WebUI exposes a full REST API authenticated via Bearer tokens or JWTs. Use 
 | 🔮 **Anthropic messages** | `POST /api/v1/messages`, works with the Anthropic SDK and Claude Code |
 | 🦙 **Ollama proxy** | `/ollama/api/*`, passthrough to native Ollama endpoints |
 | 📄 **File & knowledge** | Upload files, build knowledge collections, query via RAG |
-| 🔧 **Filters & outlets** | Inlet, stream, and outlet hooks for every request |
+| 🔧 **Filters (inlet/stream/outlet)** | Inlet, stream, and outlet hooks for every request |
 
 [**Explore the API →**](/reference/api-endpoints)
 
