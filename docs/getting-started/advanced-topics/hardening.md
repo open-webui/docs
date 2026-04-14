@@ -93,6 +93,14 @@ This removes the email/password form from the UI, steering all users through you
 ENABLE_PASSWORD_AUTH=false
 ```
 
+If you want to keep login-form behavior separate from account-page password updates, you can hide the password change form in **Settings > Account**:
+
+```bash
+ENABLE_PASSWORD_CHANGE_FORM=false
+```
+
+This is useful for SSO-focused deployments where local password changes should not be presented to users.
+
 ---
 
 ## Session and Cookie Security
