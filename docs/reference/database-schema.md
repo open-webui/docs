@@ -484,6 +484,7 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | title           | Text          | nullable        | Note title                 |
 | data            | JSON          | nullable        | Note content and data      |
 | meta            | JSON          | nullable        | Note metadata              |
+| is_pinned       | Boolean       | default=False, nullable | Whether the note is pinned to the sidebar |
 
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
@@ -813,6 +814,7 @@ erDiagram
         text title
         json data
         json meta
+        boolean is_pinned
         json access_control
     }
 
