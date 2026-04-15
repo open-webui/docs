@@ -13,7 +13,7 @@ Whether you're supporting a pilot team of 15 or a global workforce of hundreds o
 
 #### Stateless, Container-First Design
 
-Open WebUI follows a **stateless, container-first architecture**, meaning you are never bottlenecked by a single server. This design philosophy enables:
+Open WebUI follows a **stateless, container-first architecture**, meaning you are not limited to a single server. This design philosophy enables:
 
 * **Horizontal Scaling:** Add more instances as demand grows, rather than upgrading to larger (and more expensive) hardware.
 * **Flexible Deployment:** Run on-premise, in private clouds, or hybrid environments without architectural changes.
