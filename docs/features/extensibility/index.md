@@ -29,7 +29,7 @@ Have an internal API? A third-party SaaS with an OpenAPI spec? An MCP server alr
 
 ### Control every message
 
-Functions let you intercept and transform messages before they reach the model (input filters) or before they reach the user (output filters). Redact PII, enforce formatting rules, log to an observability platform, inject system instructions dynamically, all without touching model configuration.
+Functions let you intercept and transform messages before they reach the model (input filters) or before they reach the user (output filters). Help redact PII, enforce formatting rules, log to an observability platform, inject system instructions dynamically, all without touching model configuration.
 
 ### Offload heavy processing
 
@@ -78,7 +78,7 @@ A sales team builds a Tool that queries their CRM API. When a rep asks *"What's 
 
 ### Enterprise compliance filters
 
-A healthcare organization deploys a Filter Function that scans every outbound message for PHI patterns (SSN, MRN, dates of birth). Matches are redacted before the response reaches the user, and the original is logged to their SIEM. No model configuration changes required. The filter runs transparently on every conversation.
+A healthcare organization deploys a Filter Function that scans outbound messages for PHI patterns (SSN, MRN, dates of birth). Matches are redacted before the response reaches the user, and the original is logged to their SIEM. No model configuration changes required. The filter runs transparently on every conversation. *(This is an illustrative example. Regex-based filtering may not catch all sensitive data patterns. Organizations with compliance requirements should validate filter coverage independently.)*
 
 ### Multi-provider model routing
 
