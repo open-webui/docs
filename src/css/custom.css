@@ -266,10 +266,6 @@ code {
 }
 /* stylelint-enable no-descending-specificity */
 
-.shiki-code-block:hover .shiki-copy-button {
-	opacity: 0.4;
-}
-
 [data-theme="light"] .theme-code-block pre {
 	background-color: #f3f3f3;
 }
@@ -719,10 +715,6 @@ a.footer__link-item:hover {
 }
 
 /* ─── Misc ─── */
-/* stylelint-disable-next-line no-descending-specificity */
-.notbold a {
-	font-weight: 400 !important;
-}
 
 .small-text {
 	font-size: 0.8em;
