@@ -173,7 +173,7 @@ const config: Config = {
 					],
 				},
 			],
-			// copyright: `Copyright © ${new Date().getFullYear()} OpenWebUI`,
+				// copyright: `Copyright © ${new Date().getFullYear()} OpenWebUI`,
 		},
 		prism: {
 			theme: {

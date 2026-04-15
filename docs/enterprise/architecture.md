@@ -63,7 +63,3 @@ Horizontal scaling means you pay for capacity as you need it. No over-provisioni
 --- 
 
 [**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
-
----
-
-*This content is for informational purposes only and does not constitute a warranty, guarantee, or contractual commitment. Open WebUI is provided "as is." See your [license](/license) for applicable terms.*

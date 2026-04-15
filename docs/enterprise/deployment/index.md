@@ -152,8 +152,3 @@ For full monitoring setup details, see [Monitoring](/reference/monitoring) and [
 **Need help planning your enterprise deployment?** Our team works with organizations worldwide to design and implement production Open WebUI environments.
 
 [**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
-
-
----
-
-*This content is for informational purposes only and does not constitute a warranty, guarantee, or contractual commitment. Open WebUI is provided "as is." See your [license](/license) for applicable terms.*

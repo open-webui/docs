@@ -32,7 +32,3 @@ Please contact us directly with:
 3. The expected number of end users (seats) to be deployed.
 
 [**Contact Sales for Immediate Client Deployment**](mailto:sales@openwebui.com)
-
----
-
-*This content is for informational purposes only and does not constitute a warranty, guarantee, or contractual commitment. Open WebUI is provided "as is." See your [license](/license) for applicable terms.*
