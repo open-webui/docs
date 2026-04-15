@@ -81,7 +81,7 @@ Choose the model that fits your hardware needs:
 Visit the [**Kokoro Web Demo**](https://voice-generator.pages.dev) to preview all voices instantly. This demo:
 
 - **Runs 100% in your browser** - No server required
-- **Free forever** - No usage limits or registration needed
+- **Free to use** - No usage limits or registration needed
 - **Zero installation** - Just visit the website and start creating
 - **All features included** - Test any voice or language immediately
 
