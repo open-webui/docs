@@ -33,7 +33,7 @@ MCP servers typically rely on raw stdio communication, which is:
 - ❌ Incompatible with most modern tools, UIs, or platforms
 - 🧩 Lacking critical features like authentication, documentation, and error handling
 
-The mcpo proxy eliminates those issues—automatically:
+The mcpo proxy addresses those issues:
 
 - ✅ Instantly compatible with existing OpenAPI tools, SDKs, and clients
 - 🛡 Wraps your tools with secure, scalable, and standards-based HTTP endpoints
@@ -47,7 +47,7 @@ So even though adding mcpo might at first seem like "just one more layer"—in r
 - Better scalability ✅
 - Happier developers & users ✅
 
-✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable—without changing a single line of tool server code.
+✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable—typically without changing your tool server code.
 
 :::tip
 **Events Supported**: While mcpo exposes MCP tools as OpenAPI endpoints, they can still emit events (status updates, notifications) via Open WebUI's [event REST endpoint](/features/extensibility/plugin/development/events#-external-tool-events). Open WebUI automatically passes the required `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to your tool. However, interactive events requiring user input are only available for native Python tools.
@@ -134,7 +134,7 @@ Assuming you started the above server command (`uvx mcp-server-time`):
 - Select a generated endpoint (e.g., `/get_current_time`) and use the provided interactive form.
 - Click "**Execute**" and instantly receive your response.
 
-No setup complexity—just instant REST APIs.
+No complex setup—just REST APIs ready to use.
 
 ## 🚀 Deploying in Production (Example)
 
@@ -199,7 +199,7 @@ Here's why leveraging MCP servers through OpenAPI via the proxy approach is sign
 - **Instant Integration**: Immediately compatible with thousands of existing REST/OpenAPI tools, SDKs, and services.
 - **Powerful & Automatic Docs**: Built-in Swagger UI documentation is automatically generated, always accurate, and maintained.
 - **No New Protocol overhead**: Eliminates the necessity to directly handle MCP-specific protocol complexities and socket communication issues.
-- **Established Security & Stability**: Inherits well-established HTTPS transport, standard auth methods (JWT, API keys), solid async libraries, and FastAPI's proven robustness.
+- **Established Security & Stability**: Inherits well-established HTTPS transport, standard auth methods (JWT, API keys), solid async libraries, and FastAPI's robust framework.
 - **Future-Proof**: MCP proxy uses existing, stable, standard REST/OpenAPI formats with broad community support and ongoing evolution.
 
 🌟 **Bottom line:** MCP-to-OpenAPI makes your powerful MCP-based AI tools broadly accessible through intuitive, reliable, and scalable REST endpoints. Open WebUI proudly supports and recommends this approach.

@@ -13,7 +13,7 @@ Open WebUI exposes health and model endpoints that make it straightforward to wi
 
 ## Why Monitor?
 
-### Catch outages instantly
+### Catch outages quickly
 
 A health check that runs every 60 seconds means you know about downtime within a minute, not when a user files a complaint.
 

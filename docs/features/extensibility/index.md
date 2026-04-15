@@ -25,7 +25,7 @@ Out of the box, an LLM can only work with what's in its training data and your c
 
 ### Connect any external service
 
-Have an internal API? A third-party SaaS with an OpenAPI spec? An MCP server already running in your stack? Open WebUI discovers endpoints automatically and exposes them as tools the model can call. No glue code, no wrappers.
+Have an internal API? A third-party SaaS with an OpenAPI spec? An MCP server already running in your stack? Point Open WebUI at the spec and it discovers endpoints automatically, exposing them as tools the model can call. No glue code, no wrappers.
 
 ### Control every message
 
