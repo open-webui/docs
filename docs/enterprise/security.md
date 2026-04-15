@@ -43,7 +43,7 @@ General best-practice guidance is available in our [hardening documentation](/ge
 
 ### Identity & Access Management
 
-Seamless integration with your existing identity infrastructure eliminates friction while maintaining security boundaries.
+Seamless integration with your existing identity infrastructure reduces friction while maintaining security boundaries.
 
 #### Enterprise Identity Integration
 
@@ -69,7 +69,7 @@ For regulated industries and security-conscious organizations, visibility into s
 
 * **Infrastructure-Level Logging** ,  Containerized architecture allows standard output streams to be piped directly to your logging infrastructure (Splunk, Datadog, ELK).
 * **Event Tracking** ,  Track API usage and system events to monitor for anomalies.
-* **Retention Controls** ,  Because you own the database, you control the data retention policies, ensuring data is purged or archived according to your compliance schedules.
+* **Retention Controls** ,  Because you own the database, you control the data retention policies, so data can be purged or archived according to your compliance schedules.
 
 #### Data Residency
 
@@ -80,7 +80,7 @@ For organizations with geographic data requirements, whether driven by GDPR, dat
 
 #### For Security Teams
 
-You are not introducing a "black box" into your environment. Open WebUI's architecture gives you visibility and control, integrating with your existing security tooling rather than creating blind spots.
+Open WebUI's publicly auditable codebase gives you visibility and control, integrating with your existing security tooling rather than creating blind spots.
 
 #### For Compliance Officers
 
@@ -88,7 +88,7 @@ The technical controls exist to support your compliance posture. Whether you are
 
 #### For IT Leadership
 
-User management doesn't become another silo. Open WebUI works with your existing identity infrastructure, reducing administrative overhead and ensuring consistent access policies across your tooling.
+User management doesn't become another silo. Open WebUI works with your existing identity infrastructure, reducing administrative overhead and helping maintain consistent access policies across your tooling.
 
 --- 
 

@@ -49,7 +49,7 @@ AI agents like Hermes Agent and OpenClaw bring their own tools (terminal, file o
 
 **Bring AI to your entire organization with a single deployment.**
 
-Open WebUI isn't just a local interface for AI. It is designed to be a centralized AI operating system for teams. Deploy it once to leverage frictionless onboarding, collaborative intelligence, resource pooling, and centralized security.
+Open WebUI isn't just a local interface for AI. It is designed to be a centralized AI operating system for teams. Deploy it once to leverage streamlined onboarding, collaborative intelligence, resource pooling, and centralized security.
 
 | | |
 | :--- | :--- |
