@@ -34,7 +34,9 @@ Many organizations evaluating AI platforms operate under regulatory frameworks s
 * **Data residency control** ,  You choose where your data physically resides.
 
 :::warning Compliance Responsibility
-Open WebUI provides technical controls that can support your compliance posture, but **compliance is determined by your deployment, your organizational policies, and your auditors, not by the software alone**. Because deployment, configuration, hosting, access controls, logging, network architecture, data handling, and operational safeguards are all managed by the customer, responsibility for securing an Open WebUI implementation sits with the organization deploying it.
+As self-hosted software, Open WebUI is deployed and operated entirely within your infrastructure. This means compliance certifications apply to **your deployment**, not to the software itself, just as they do with any self-hosted infrastructure component. The open-source distribution of Open WebUI is provided "as is" without warranty or guarantee of any kind.
+
+The software provides technical controls that can support your compliance posture, but **compliance is determined by your deployment, your organizational policies, and your auditors, not by the software alone**. Because deployment, configuration, hosting, access controls, logging, network architecture, data handling, and operational safeguards are all managed by the customer, responsibility for securing an Open WebUI implementation sits with the organization deploying it.
 
 General security best-practice guidance is available through our [documentation](/getting-started/advanced-topics/hardening). Enterprise customers on the appropriate tier receive more hands-on support to help inform deployment and configuration decisions.
 
