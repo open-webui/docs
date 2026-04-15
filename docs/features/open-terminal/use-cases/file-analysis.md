@@ -16,7 +16,7 @@ Got a pile of spreadsheets, PDFs, Word documents, or emails you need to make sen
 | **Presentations** | PowerPoint (.pptx), OpenDocument (.odp) |
 | **Other** | Email (.eml), E-books (.epub), plain text, HTML, Markdown, JSON, XML |
 
-The AI can read all of these directly — it doesn't need to upload them to any external service. Everything stays on your server.
+The AI can read all of these directly — it doesn't need to upload them to any external service. File content stays on your server and is processed locally.
 
 ---
 
@@ -72,7 +72,7 @@ The AI searches across every file — PDFs, Word docs, spreadsheets, whatever's 
 ![AI searching across files for specific content](/images/open-terminal-ai-file-listing.png)
 
 :::tip No indexing required
-Unlike traditional search or RAG systems, the AI reads files live every time you ask. That means it always sees the latest version — no re-indexing, no sync delays, no database to manage.
+Unlike traditional search or RAG systems, the AI reads files live every time you ask. That means it sees the current version on disk — no re-indexing, no sync delays, no database to manage.
 :::
 
 ---
