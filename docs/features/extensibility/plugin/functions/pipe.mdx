@@ -193,7 +193,7 @@ class Pipe:
                 },
             ]
 
-    def pipe(self, body: dict, __user__: dict):
+    async def pipe(self, body: dict, __user__: dict):
         print(f"pipe:{__name__}")
         headers = {
             "Authorization": f"Bearer {self.valves.OPENAI_API_KEY}",
@@ -295,7 +295,7 @@ class Pipe:
         __request__: Request,
     ) -> str:
         # Use the unified endpoint with the updated signature
-        user = Users.get_user_by_id(__user__["id"])
+        user = await Users.get_user_by_id(__user__["id"])
         body["model"] = "llama3.2:latest"
         return await generate_chat_completion(__request__, body, user)
 ```

@@ -55,19 +55,20 @@ class Filter:
         # Initialize valves (optional configuration for the Filter)
         self.valves = self.Valves()
 
-    def inlet(self, body: dict) -> dict:
+    async def inlet(self, body: dict) -> dict:
         # This is where you manipulate user inputs.
         print(f"inlet called: {body}")
         return body
 
-    def stream(self, event: dict) -> dict:
+    async def stream(self, event: dict) -> dict:
         # This is where you modify streamed chunks of model output.
         print(f"stream event: {event}")
         return event
 
-    def outlet(self, body: dict) -> None:
+    async def outlet(self, body: dict) -> dict:
         # This is where you manipulate model outputs.
         print(f"outlet called: {body}")
+        return body
 ```
 
 ---
@@ -264,8 +265,8 @@ class ContentModerationFilter:
     def __init__(self):
         # No toggle property - this is an always-on filter
         pass
-    
-    def inlet(self, body: dict) -> dict:
+
+    async def inlet(self, body: dict) -> dict:
         # Always scrub PII before sending to model
         last_message = body["messages"][-1]["content"]
         body["messages"][-1]["content"] = self.scrub_pii(last_message)
@@ -404,7 +405,7 @@ For new integrations, you can skip this second call and rely on inline outlet ex
 You can detect whether a request originates from the WebUI or a direct API call by checking the `__metadata__` argument:
 
 ```python
-def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
     # Check if request is from WebUI
     interface = __metadata__.get("interface") if __metadata__ else None
     
@@ -438,7 +439,7 @@ class Filter:
         self.valves = self.Valves()
         self.user_requests = {}  # Track requests per user
     
-    def inlet(self, body: dict, __user__: dict = None) -> dict:
+    async def inlet(self, body: dict, __user__: dict = None) -> dict:
         if not __user__:
             return body
         
@@ -479,7 +480,7 @@ class Filter:
         self.valves = self.Valves()
         self.logger = logging.getLogger("api_usage")
     
-    def inlet(self, body: dict, __user__: dict = None, __metadata__: dict = None) -> dict:
+    async def inlet(self, body: dict, __user__: dict = None, __metadata__: dict = None) -> dict:
         user_email = __user__.get("email", "unknown") if __user__ else "anonymous"
         model = body.get("model", "unknown")
         interface = __metadata__.get("interface", "api") if __metadata__ else "api"
@@ -518,7 +519,7 @@ class Filter:
     def __init__(self):
         self.valves = self.Valves()
     
-    def inlet(self, body: dict) -> dict:
+    async def inlet(self, body: dict) -> dict:
         # This filter's execution order depends on its priority value
         return body
 ```
@@ -579,7 +580,7 @@ OpenAI recommends sending a `safety_identifier` with each request for abuse dete
 import hashlib
 
 class Filter:
-    def inlet(self, body: dict, __user__: dict = None) -> dict:
+    async def inlet(self, body: dict, __user__: dict = None) -> dict:
         if __user__ and __user__.get("id"):
             body["safety_identifier"] = hashlib.sha256(
                 __user__["id"].encode()
@@ -601,7 +602,7 @@ When a user selects a workspace or custom model, `body["model"]` contains the cu
 
 ```python
 class Filter:
-    def inlet(self, body: dict, __model__: dict = None) -> dict:
+    async def inlet(self, body: dict, __model__: dict = None) -> dict:
         custom_model_id = body["model"]  # e.g. "my-custom-gpt5"
 
         base_model_id = None
@@ -858,7 +859,7 @@ Modify and return the `body`. The modified version of the `body` is what the LLM
 Let’s say the LLM is a chef preparing a dish for Italian cuisine, but the user hasn’t mentioned "This is for Italian cooking." You can ensure the message is clear by appending this context before sending the data to the model.
 
 ```python
-def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     # Add system message for Italian context in the conversation
     context_message = {
         "role": "system",
@@ -876,7 +877,7 @@ def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 Suppose the input from the user looks messy or includes unwanted symbols like `!!!`, making the conversation inefficient or harder for the model to parse. You can clean it up while preserving the core content.
 
 ```python
-def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     # Clean the last user input (from the end of the 'messages' list)
     last_message = body["messages"][-1]["content"]
     body["messages"][-1]["content"] = last_message.replace("!!!", "").strip()
@@ -920,7 +921,7 @@ Unlike `outlet`, which processes an entire completed response, `stream` operates
 
 Here’s how you can inspect and modify streamed LLM responses:
 ```python
-def stream(self, event: dict) -> dict:
+async def stream(self, event: dict) -> dict:
     print(event)  # Print each incoming chunk for inspection
     return event
 ```
@@ -937,7 +938,7 @@ def stream(self, event: dict) -> dict:
 
 ##### 🔄 Example: Filtering Out Emojis from Streamed Data
 ```python
-def stream(self, event: dict) -> dict:
+async def stream(self, event: dict) -> dict:
     for choice in event.get("choices", []):
         delta = choice.get("delta", {})
         if "content" in delta:
@@ -977,7 +978,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
 ```python
-def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     for message in body["messages"]:
         message["content"] = message["content"].replace("<API_KEY>", "[REDACTED]")
     return body
@@ -995,7 +996,7 @@ Want the LLM to always know it's assisting a customer in troubleshooting softwar
 
 ```python
 class Filter:
-    def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+    async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
         context_message = {
             "role": "system",
             "content": "You're a software troubleshooting assistant."
@@ -1012,7 +1013,7 @@ Returning output in Markdown or another formatted style? Use the `outlet` functi
 
 ```python
 class Filter:
-    def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+    async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
         # Add "highlight" markdown for every response
         for message in body["messages"]:
             if message["role"] == "assistant":  # Target model response
