@@ -7,7 +7,7 @@ title: "Security"
 
 For enterprise organizations, AI adoption isn't just a technology decision, it's a security decision. Every model query, every document uploaded, and every workflow automated represents data that needs protection.
 
-Open WebUI is built with security as a foundational principle. Whether you are navigating strict regulatory requirements or simply committed to protecting your organization's intellectual property, Open WebUI provides the controls necessary to deploy AI confidently.
+Open WebUI is built with security as a core priority. Whether you are navigating strict regulatory requirements or simply committed to protecting your organization's intellectual property, Open WebUI provides controls to help you deploy AI with confidence. As with any self-hosted software, the deploying organization is responsible for securing its environment, infrastructure, and configuration.
 
 ### Security Architecture
 
