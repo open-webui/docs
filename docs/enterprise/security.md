@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "Security"
 ---
 
-### Enterprise-Grade Security Without Compromise
+### Enterprise-Grade Security Architecture
 
 For enterprise organizations, AI adoption isn't just a technology decision, it's a security decision. Every model query, every document uploaded, and every workflow automated represents data that needs protection.
 
@@ -17,7 +17,7 @@ Unlike SaaS AI platforms where your data traverses third-party servers, Open Web
 
 | Deployment Model | Description |
 | :--- | :--- |
-| **On-Premise** | Run entirely within your own data centers, nothing leaves your network. |
+| **On-Premise** | Run entirely within your own data centers. Your data stays within your network by default. |
 | **Private Cloud** | Deploy in your organization's cloud tenancy (AWS, Azure, GCP) with full infrastructure control. |
 | **Air-Gapped** | Complete network isolation for environments with the strictest security requirements. |
 | **Hybrid** | Flexible configurations that balance accessibility with security boundaries. |
@@ -28,7 +28,7 @@ For organizations handling sensitive data, whether proprietary research, custome
 
 Many organizations evaluating AI platforms operate under regulatory frameworks such as SOC 2, HIPAA, GDPR, FedRAMP, or ISO 27001. Open WebUI's self-hosted, on-premise, and air-gapped architecture provides technical controls that can form **part of** a compliant deployment:
 
-* **Self-hosted data pipeline** ,  No data leaves your infrastructure unless you configure it to.
+* **Self-hosted data pipeline** ,  Your data stays within your infrastructure by default, unless you configure external model providers.
 * **Identity integration** ,  SSO, LDAP, RBAC to enforce your access policies.
 * **Audit-ready logging** ,  Container-native log streams compatible with enterprise SIEM tools.
 * **Data residency control** ,  You choose where your data physically resides.
