@@ -67,3 +67,7 @@ Enterprise support de-risks your AI investment. You have a direct relationship w
 --- 
 
 [**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+
+---
+
+*This content is for informational purposes only and does not constitute a warranty, guarantee, or contractual commitment. Open WebUI is provided "as is." See your [license](/license) for applicable terms.*

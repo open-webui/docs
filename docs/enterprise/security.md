@@ -95,3 +95,8 @@ User management doesn't become another silo. Open WebUI works with your existing
 --- 
 
 [**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+
+
+---
+
+*This content is for informational purposes only and does not constitute a warranty, guarantee, or contractual commitment. Open WebUI is provided "as is." See your [license](/license) for applicable terms.*
