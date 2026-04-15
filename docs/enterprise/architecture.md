@@ -38,7 +38,7 @@ When properly configured, Open WebUI is designed to support high availability su
 
 ### Scalability in Practice
 
-Open WebUI isn't theoretically scalable, it's **proven at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
+Open WebUI isn't theoretically scalable, it's **deployed at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
 
 * 🎓 **Universities** managing institution-wide AI access.
 * 🏢 **Multinational Enterprises** deploying across regions and business units.
