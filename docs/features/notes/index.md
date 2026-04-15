@@ -152,7 +152,7 @@ Draft something in Notes, use **Enhance** to expand bullet points into paragraph
 
 ### High-fidelity code context
 
-RAG uses vector search, which is probabilistic and might miss a crucial line. Paste specific functions into a Note and attach it to guarantee the model sees 100% of your code, exactly as arranged.
+RAG uses vector search, which is probabilistic and might miss a crucial line. Paste specific functions into a Note and attach it so the model sees 100% of your code, exactly as arranged.
 
 ### Data sanitization
 

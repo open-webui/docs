@@ -59,7 +59,7 @@ Beyond authentication, Open WebUI provides granular control over user permission
 
 * **Role-Based Access Control (RBAC)** ,  Define roles that align with your organizational structure to limit administrative access.
 * **Model-Level Permissions** ,  Control which users or groups can access specific models.
-* **Workspace Isolation** ,  Separate teams or departments to prevent unauthorized data access.
+* **Workspace Isolation** ,  Separate teams or departments to help restrict unauthorized data access.
 
 ### Data Governance
 
