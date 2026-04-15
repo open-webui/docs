@@ -359,7 +359,7 @@ Here's the complete flow from admin configuration to filter execution:
 
 ### 📡 Filter Behavior with API Requests
 
-When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters now follow the same execution model as WebUI requests.
+When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters follow the same execution model as WebUI requests — with one important caveat for `outlet()`.
 
 #### Key Behavioral Differences
 
@@ -367,13 +367,47 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 |----------|--------------|-------------------|
 | `inlet()` | ✅ Always called | ✅ Always called |
 | `stream()` | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ✅ Called after response |
+| `outlet()` | ✅ Called after response | ⚠️ Only if `chat_id` and `id` are present (see below) |
 | `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Runs but no UI to display |
 
-:::info Outlet Runs Inline
-`outlet()` now runs inline as part of `/api/chat/completions` processing for both WebUI and direct API requests.
+:::warning Outlet Requires chat_id and message id
+`outlet()` runs inline as part of `/api/chat/completions` processing. However, the outlet handler **requires both `chat_id` and `id` (message ID) to be present** in the request body. The WebUI always sends these, but pure API callers using the standard OpenAI-compatible request shape typically omit them — in which case **outlet is silently skipped**.
+
+If your filters rely on `outlet()` for API requests (logging, observability, post-processing, etc.), you need to either:
+1. Include `chat_id` and `id` in your API request body, **or**
+2. Use a filter that synthesizes these IDs automatically (see example below)
 
 The legacy `/api/chat/completed` endpoint is kept for backward compatibility with older integrations, but it is no longer required for normal outlet execution.
+:::
+
+#### Enabling Outlet for Pure API Callers
+
+If you need `outlet()` to run for API requests that don't include `chat_id` or `id`, you can create a filter that synthesizes temporary IDs in `inlet()`. Since `__metadata__` is a live dict reference shared across the request lifecycle, values written in `inlet()` are visible to `outlet()`.
+
+```python
+from uuid import uuid4
+from pydantic import BaseModel, Field
+
+class Filter:
+    class Valves(BaseModel):
+        priority: int = Field(default=0, description="Run before other filters to ensure IDs are available")
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+        if __metadata__:
+            if not __metadata__.get("chat_id"):
+                __metadata__["chat_id"] = f"local:{uuid4()}"
+            if not __metadata__.get("message_id"):
+                __metadata__["message_id"] = str(uuid4())
+        return body
+```
+
+The `local:` prefix on `chat_id` routes the request into the temp-chat code path, which builds the outlet message list from in-memory data instead of querying the database. No database rows are created, and the event emitter is already inert for API callers (no WebSocket session), so this is safe.
+
+:::tip Inlet-Outlet Correlation
+This pattern also enables **inlet/outlet correlation**: any per-request state your filter stashes in `inlet()` keyed on `__metadata__["message_id"]` can be read back in `outlet()` using the same ID, since both see the same synthesized value.
 :::
 
 #### Legacy Compatibility: `/api/chat/completed`
@@ -973,7 +1007,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring** - Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-`outlet()` is called for direct API requests to `/api/chat/completions`.
+`outlet()` is called for direct API requests to `/api/chat/completions`, but only when `chat_id` and `id` (message ID) are present in the request body. See [Enabling Outlet for Pure API Callers](#enabling-outlet-for-pure-api-callers) for details.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:

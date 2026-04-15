@@ -837,7 +837,7 @@ This cleaning process handles:
 - **Critical: Include `childrenIds`** on every message — the frontend uses this to build the message tree
 - No frontend code changes are required for this approach
 - The `stream: true` parameter allows for real-time response streaming if needed
-- `outlet()` filters run inline during `/api/chat/completions`; the separate `/api/chat/completed` endpoint is deprecated and no longer needed
+- `outlet()` filters run inline during `/api/chat/completions` when `chat_id` and `id` (message ID) are present in the request body. Pure API callers that omit these fields will have outlet silently skipped — see [Filter Functions: Enabling Outlet for Pure API Callers](/features/extensibility/plugin/functions/filter#enabling-outlet-for-pure-api-callers) for a workaround. The separate `/api/chat/completed` endpoint is deprecated and no longer needed
 - Background tasks like title generation can be controlled via the `background_tasks` object
 - Session IDs help maintain conversation context across requests
 - **Knowledge Integration:** Use the `files` array to include knowledge collections for RAG capabilities
