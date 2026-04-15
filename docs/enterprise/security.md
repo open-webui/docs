@@ -22,22 +22,23 @@ Unlike SaaS AI platforms where your data traverses third-party servers, Open Web
 | **Air-Gapped** | Complete network isolation for environments with the strictest security requirements. |
 | **Hybrid** | Flexible configurations that balance accessibility with security boundaries. |
 
-For organizations handling sensitive data, whether proprietary research, customer information, or classified materials, this architecture ensures your AI capabilities never compromise your security posture.
+For organizations handling sensitive data, whether proprietary research, customer information, or classified materials, this architecture is designed to help protect your security posture.
 
-### Compliance Frameworks
+### Regulatory & Compliance Considerations
 
-Open WebUI is designed to support organizations operating under rigorous compliance requirements. The platform's architecture and controls align with major compliance frameworks, including:
+Many organizations evaluating AI platforms operate under regulatory frameworks such as SOC 2, HIPAA, GDPR, FedRAMP, or ISO 27001. Open WebUI's self-hosted, on-premise, and air-gapped architecture provides technical controls that can form **part of** a compliant deployment:
 
-* **SOC 2** ,  Operational compliance demonstrating reliability, integrity, and security.
-* **HIPAA** ,  Healthcare data protection requirements for covered entities.
-* **GDPR** ,  European data protection and privacy regulations.
-* **FedRAMP** ,  Federal security standards for cloud services used by US government agencies.
-* **ISO 27001** ,  International standard for information security management systems.
+* **Self-hosted data pipeline** ,  No data leaves your infrastructure unless you configure it to.
+* **Identity integration** ,  SSO, LDAP, RBAC to enforce your access policies.
+* **Audit-ready logging** ,  Container-native log streams compatible with enterprise SIEM tools.
+* **Data residency control** ,  You choose where your data physically resides.
 
-:::tip Compliance is a Partnership
-Open WebUI provides the **technical controls and architecture** to support these frameworks. Achieving certification requires proper configuration, organizational policies, and often third-party audits specific to your deployment.
+:::warning Compliance Responsibility
+Open WebUI provides technical controls that can support your compliance posture, but **compliance is determined by your deployment, your organizational policies, and your auditors, not by the software alone**. Because deployment, configuration, hosting, access controls, logging, network architecture, data handling, and operational safeguards are all managed by the customer, responsibility for securing an Open WebUI implementation sits with the organization deploying it.
 
-[**Contact Enterprise Sales for Compliance Guidance**](mailto:sales@openwebui.com)
+General security best-practice guidance is available through our [documentation](/getting-started/advanced-topics/hardening). Enterprise customers on the appropriate tier receive more hands-on support to help inform deployment and configuration decisions.
+
+[**Contact Enterprise Sales for Compliance Guidance → sales@openwebui.com**](mailto:sales@openwebui.com)
 :::
 
 ### Identity & Access Management
@@ -72,7 +73,7 @@ For regulated industries and security-conscious organizations, visibility into s
 
 #### Data Residency
 
-For organizations with geographic data requirements, whether driven by GDPR, data sovereignty laws, or internal policy, Open WebUI's deployment options ensure your data stays physically located where it is legally required to be.
+For organizations with geographic data requirements, whether driven by GDPR, data sovereignty laws, or internal policy, Open WebUI's self-hosted deployment model is designed to support keeping your data physically located where your policies require.
 
 
 ### What This Means for Your Organization
@@ -83,7 +84,7 @@ You are not introducing a "black box" into your environment. Open WebUI's archit
 
 #### For Compliance Officers
 
-The technical controls exist to support your compliance posture. Whether you are preparing for an audit or responding to a security questionnaire, Open WebUI's architecture provides defensible answers.
+The technical controls exist to support your compliance posture. Whether you are preparing for an audit or responding to a security questionnaire, Open WebUI's architecture provides technical controls that can support your responses.
 
 #### For IT Leadership
 
