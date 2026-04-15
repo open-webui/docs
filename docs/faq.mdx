@@ -32,7 +32,7 @@ For more details on enterprise solutions and branding customizations, [click her
 
 ### Q: Is my data being sent anywhere?
 
-**A:** No, your data is never sent anywhere unless you explicitly choose to share it or you connect an external model provider. Everything inside Open WebUI runs and is stored locally on your machine or server, giving you full control over your data at all times. We encourage you not to simply take our word for it: our entire codebase is hosted publicly, so you can inspect exactly how everything works, and if you ever notice anything concerning, please report it to us on our repo immediately.
+**A:** Open WebUI does not send your data to external services by default. If you connect an external model provider, prompts and responses are sent to that provider as needed to generate responses. Everything else runs and is stored locally on your machine or server. Our entire codebase is hosted publicly, so you can inspect exactly how everything works, and if you ever notice anything concerning, please report it to us on our repo immediately.
 
 ### Q: How can I see a list of all the chats I've ever shared?
 
@@ -52,7 +52,7 @@ The same principles apply to harsh terrestrial settings: submarines, polar resea
 
 ### Q: Why am I asked to sign up? Where are my data being sent to?
 
-**A:** We require you to sign up to become the admin user for enhanced security. This ensures that if the Open WebUI is ever exposed to external access, your data remains secure. It's important to note that everything is kept local. We do not collect your data. When you sign up, all information stays within your server and never leaves your device. Your privacy and security are our top priorities, ensuring that your data remains under your control at all times.
+**A:** We require you to sign up to become the admin user for enhanced security. This helps protect your instance if it is ever exposed to external access. Open WebUI does not collect your data. When you sign up, all information is stored on your server and is not sent to Open WebUI or any third party.
 
 ### Q: Why can't my Docker container connect to services on the host using `localhost`?
 
@@ -107,7 +107,7 @@ On most Linux systems, your volume data is physically stored at: `/var/lib/docke
 
 By choosing the official Docker package, you benefit from consistent behavior across different environments, more reliable troubleshooting support, and access to the latest Docker advancements. The broader Docker community and resources are also more aligned with the official package, providing you with a wealth of information and support for any issues you might encounter.
 
-Everything you need to run Open WebUI, including your data, remains within your control and your server environment, emphasizing our commitment to your privacy and security. For instructions on installing the official Docker package, please refer to the [Install Docker Engine](https://docs.docker.com/engine/install/) guide on Docker's official documentation site.
+Everything you need to run Open WebUI, including your data, remains within your server environment. For instructions on installing the official Docker package, please refer to the [Install Docker Engine](https://docs.docker.com/engine/install/) guide on Docker's official documentation site.
 
 ### Q: Is GPU support available in Docker?
 
@@ -284,7 +284,7 @@ This requires provider-specific logic throughout both the backend and frontend, 
 
 #### 4. Scale and Stability Requirements
 
-Open WebUI is used by major organizations worldwide. At this scale, stability is paramount—extensive testing and backwards compatibility guarantees become exponentially harder with each added provider.
+Open WebUI is used by major organizations worldwide. At this scale, stability is paramount, and extensive testing and backwards compatibility requirements become exponentially harder with each added provider.
 
 #### 5. Pipes are the Modular Solution
 
@@ -311,7 +311,7 @@ The assumption that bundling the frontend with the backend is unscalable comes f
 
 Open WebUI’s stateless, container-first architecture means you’re never bottlenecked by a single server. Through horizontal scaling, flexible storage backends, externalized authentication and database support, and full container orchestration compatibility (for example, Kubernetes or Docker Swarm), you can build robust, high-availability clusters to meet even the most demanding enterprise requirements.
 
-With the right infrastructure configuration, Open WebUI will effortlessly scale from pilot projects to mission-critical worldwide rollouts.
+With the right infrastructure configuration, Open WebUI is designed to scale from pilot projects to large-scale rollouts.
 
 ### Q: How can I deploy Open WebUI in a highly available, large-scale production environment?
 
