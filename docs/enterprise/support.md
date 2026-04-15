@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 6
 title: "Support & SLAs"
 ---
 
@@ -14,7 +14,7 @@ Open WebUI's enterprise solutions provide mission-critical businesses with **ded
 Enterprise customers receive a **single point of contact** for guidance, onboarding, and strategy. Your dedicated account manager can provide:
 
 * **Onboarding Guidance** ,  Structured support through initial deployment and rollout.
-* **Ongoing Strategy** ,  Check-ins to ensure your deployment evolves with your needs.
+* **Ongoing Strategy** ,  Check-ins to help your deployment evolve with your needs.
 * **Internal Advocacy** ,  A direct line to the Open WebUI team who understands your requirements.
 
 #### Office Hours with Core Engineers
@@ -62,7 +62,7 @@ Enterprise support provides a formal relationship with the organization behind t
 
 #### For Executive Leadership
 
-Enterprise support de-risks your AI investment. You have a direct relationship with the team building and maintaining Open WebUI, ensuring long-term viability.
+Enterprise support de-risks your AI investment. You have a direct relationship with the team building and maintaining Open WebUI, supporting long-term viability.
 
 --- 
 

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 5
 title: "Customization"
 ---
 
@@ -29,7 +29,7 @@ Integration flexibility means Open WebUI slots into your existing architecture. 
 
 #### For Brand & Communications Teams
 
-White-labeling ensures AI tools meet the same brand standards as every other internal platform. No awkward "third-party app" aesthetic undermining your carefully maintained internal experience.
+White-labeling helps AI tools meet the same brand standards as every other internal platform. No awkward "third-party app" aesthetic undermining your carefully maintained internal experience.
 
 --- 
 
