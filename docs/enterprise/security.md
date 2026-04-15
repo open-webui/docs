@@ -13,7 +13,7 @@ Open WebUI is built with security as a foundational principle. Whether you are n
 
 #### Your Data, Your Infrastructure
 
-Unlike SaaS AI platforms where your data traverses third-party servers, Open WebUI gives you **complete control over your data pipeline**:
+Unlike SaaS AI platforms where your data traverses third-party servers, Open WebUI gives you **full control over your data pipeline**:
 
 | Deployment Model | Description |
 | :--- | :--- |
