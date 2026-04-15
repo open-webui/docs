@@ -7,7 +7,7 @@ title: "Architecture & High Availability"
 
 When AI becomes central to your organization's operations, downtime isn't just inconvenient, it's costly. Open WebUI is architected from the ground up to support enterprise-scale deployments where reliability isn't optional.
 
-Whether you're supporting a pilot team of 15 or a global workforce of hundreds of thousands of users, Open WebUI's architecture scales with you, without requiring a complete rebuild as your needs grow.
+Whether you're supporting a pilot team of 15 or a global workforce of thousands of users, Open WebUI's architecture scales with you, without requiring a complete rebuild as your needs grow.
 
 ### Architecture Overview
 

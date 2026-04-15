@@ -7,7 +7,7 @@ title: "🚀 Getting Started"
 
 **From zero to your first AI conversation in under five minutes.**
 
-Open WebUI runs anywhere (Docker, Kubernetes, pip, bare metal) and connects to any model provider out of the box. Pick an install method, connect a provider, and start chatting.
+Open WebUI runs anywhere (Docker, Kubernetes, pip, bare metal) and connects to Ollama, OpenAI-compatible, and Open Responses providers out of the box. Pick an install method, connect a provider, and start chatting.
 
 ---
 
