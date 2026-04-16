@@ -177,7 +177,7 @@ By default, Open WebUI stores uploaded files on the local filesystem under `DATA
 
 ### Do I need cloud storage (S3)?
 
-**Not necessarily.** Open WebUI stores all uploaded files with **UUID-based unique filenames**. Multiple processes and replicas only ever **create new files** or **read existing ones** — they never write to the same file simultaneously. This means a simple **shared filesystem mount** works correctly without any risk of write conflicts. Though you have to ensure, that all workers/replicas have access to the very same shared DATA_DIR directory in a shared storage.
+**Not necessarily.** Open WebUI stores all uploaded files with **UUID-based unique filenames**. Multiple processes and replicas only ever **create new files** or **read existing ones** — they never write to the same file simultaneously. This means a simple **shared filesystem mount** works correctly without write conflicts under normal operation. Though you have to ensure, that all workers/replicas have access to the very same shared DATA_DIR directory in a shared storage.
 
 **Your options:**
 

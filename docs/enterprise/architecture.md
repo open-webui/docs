@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 1
 title: "Architecture & High Availability"
 ---
 
@@ -7,13 +7,13 @@ title: "Architecture & High Availability"
 
 When AI becomes central to your organization's operations, downtime isn't just inconvenient, it's costly. Open WebUI is architected from the ground up to support enterprise-scale deployments where reliability isn't optional.
 
-Whether you're supporting a pilot team of 15 or a global workforce of hundreds of thousands of users, Open WebUI's architecture scales with you, without requiring a complete rebuild as your needs grow.
+Whether you're supporting a pilot team of 15 or a global workforce of thousands of users, Open WebUI's architecture scales with you, without requiring a complete rebuild as your needs grow.
 
 ### Architecture Overview
 
 #### Stateless, Container-First Design
 
-Open WebUI follows a **stateless, container-first architecture**, meaning you are never bottlenecked by a single server. This design philosophy enables:
+Open WebUI follows a **stateless, container-first architecture**, meaning you are not limited to a single server. This design philosophy enables:
 
 * **Horizontal Scaling:** Add more instances as demand grows, rather than upgrading to larger (and more expensive) hardware.
 * **Flexible Deployment:** Run on-premise, in private clouds, or hybrid environments without architectural changes.
@@ -38,7 +38,7 @@ When properly configured, Open WebUI is designed to support high availability su
 
 ### Scalability in Practice
 
-Open WebUI isn't theoretically scalable, it's **proven at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
+Open WebUI isn't theoretically scalable, it's **deployed at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
 
 * 🎓 **Universities** managing institution-wide AI access.
 * 🏢 **Multinational Enterprises** deploying across regions and business units.

@@ -670,7 +670,7 @@ The SCIM token is a static bearer token that grants full user management access.
 
 ## Keeping Open WebUI Updated
 
-Running the latest version of Open WebUI ensures you have the most recent security patches and fixes. Check the [changelog](https://github.com/open-webui/open-webui/releases) for security-related updates and apply them promptly.
+Running the latest version of Open WebUI helps keep your deployment up to date with the most recent security patches and fixes. Check the [changelog](https://github.com/open-webui/open-webui/releases) for security-related updates and apply them promptly.
 
 For Docker deployments, pull the latest image and recreate the container:
 

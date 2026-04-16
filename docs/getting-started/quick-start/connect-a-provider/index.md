@@ -5,7 +5,7 @@ title: "Connect a Provider"
 
 # 🔌 Connect a Provider
 
-**Connect Open WebUI to any model provider and start chatting in minutes.**
+**Connect Open WebUI to your model provider and start chatting in minutes.**
 
 Open WebUI supports multiple connection protocols, including **Ollama**, **OpenAI-compatible APIs**, and **Open Responses**. Any cloud API or local server that speaks one of these protocols works out of the box. Just add a URL and API key, and your models appear in the dropdown.
 

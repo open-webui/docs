@@ -13,7 +13,7 @@ These workflows combine multiple Open Terminal capabilities into powerful multi-
 
 A **Skill** is a reusable set of markdown instructions that you save in Open WebUI. When you invoke a skill, its instructions are injected into the AI's system prompt for that conversation, making the AI an expert at that specific task.
 
-Think of it like giving someone a detailed SOP (standard operating procedure) before asking them to do a job — except the AI follows it perfectly every time.
+Think of it like giving someone a detailed SOP (standard operating procedure) before asking them to do a job — except the AI can reference it consistently across conversations.
 
 ### Creating a Skill
 

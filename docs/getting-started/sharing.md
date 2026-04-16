@@ -13,7 +13,7 @@ Open WebUI is built to be shared. A single instance can serve your whole organiz
 
 ## Built for Teams
 
-### Frictionless Onboarding
+### Streamlined Onboarding
 
 End users don't need to install anything, manage Docker, or touch a terminal. They open a browser, navigate to your instance URL, and log in.
 
