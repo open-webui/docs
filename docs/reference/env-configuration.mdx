@@ -3327,6 +3327,13 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 - Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `RAG_RERANKING_BATCH_SIZE`
+
+- Type: `int`
+- Default: `32`
+- Description: Controls how many query–document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_SIGMOID_ACTIVATION_FUNCTION`
 
 - Type: `bool`
