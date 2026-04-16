@@ -302,6 +302,22 @@ curl -X POST http://localhost:3000/ollama/api/embed \
 When using the Ollama Proxy endpoints, you **must** include the `Content-Type: application/json` header for POST requests, or the API may fail to parse the body. Authorization headers are also required if your instance is secured.
 :::
 
+#### 🔮 Responses API (OpenAI-Compatible)
+
+Ollama supports the OpenAI Responses API format. Open WebUI proxies this through the Ollama router with the same model resolution, access control, and prefix handling used by chat completions.
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/responses \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "llama3.2",
+  "input": "Why is the sky blue?"
+}'
+```
+
+This allows API consumers (Codex, Claude Code, etc.) to use the Responses API directly with Ollama-hosted models without configuring a separate OpenAI-compatible connection.
+
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
 
 ### 🧩 Retrieval Augmented Generation (RAG)
