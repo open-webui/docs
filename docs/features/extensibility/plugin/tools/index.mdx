@@ -242,7 +242,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `create_tasks` | Create a structured task checklist for the current chat. Called once at the start of multi-step work to define all steps. |
 | `update_task` | Update the status of a single task by id (`pending`, `in_progress`, `completed`, `cancelled`). Called after finishing each step. |
 | **Automations** | *Requires per-model "Automations" category enabled (default: on) AND user has `features.automations` permission (admins always pass).* |
-| `create_automation` | Create a scheduled automation with a name, prompt, RRULE schedule, and optional model ID. |
+| `create_automation` | Create a scheduled automation with a name, prompt, and RRULE schedule. Uses the current chat model. |
 | `update_automation` | Update an existing automation's name, prompt, schedule, or model. |
 | `list_automations` | List the user's scheduled automations with status, schedule, and next runs. |
 | `toggle_automation` | Pause or resume a scheduled automation. |
@@ -315,7 +315,7 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 | `create_tasks` | `tasks` (required): list of `{content (required), status (default: pending), id (optional, auto-generated)}` | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | `update_task` | `id` (required), `status` (default: `completed`; one of `pending`, `in_progress`, `completed`, `cancelled`) | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | **Automations** | | |
-| `create_automation` | `name` (required), `prompt` (required), `rrule` (required), `model_id` (optional — defaults to current chat model) | `{status, id, name, model_id, is_active, next_runs}` |
+| `create_automation` | `name` (required), `prompt` (required), `rrule` (required) | `{status, id, name, model_id, is_active, next_runs}` |
 | `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id` (all optional — only provided fields are changed) | `{status, id, name, model_id, is_active, next_runs}` |
 | `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
 | `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
