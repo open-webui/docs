@@ -81,12 +81,13 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 25      | oauth_session    | Manages active OAuth sessions for users                      |
 | 26      | prompt           | Stores templates and configurations for AI prompts           |
 | 27      | prompt_history   | Tracks version history and snapshots for prompts             |
-| 28      | skill            | Stores reusable markdown instruction sets (Skills)           |
-| 29      | tag              | Manages tags/labels for content categorization               |
-| 30      | tool             | Stores configurations for system tools and integrations      |
-| 31      | user             | Maintains user profiles and account information              |
-| 32      | automation       | Stores user-defined scheduled automations                    |
-| 33      | automation_run   | Stores execution history for automation runs                 |
+| 28      | shared_chat      | Stores snapshots of shared chats for link sharing            |
+| 29      | skill            | Stores reusable markdown instruction sets (Skills)           |
+| 30      | tag              | Manages tags/labels for content categorization               |
+| 31      | tool             | Stores configurations for system tools and integrations      |
+| 32      | user             | Maintains user profiles and account information              |
+| 33      | automation       | Stores user-defined scheduled automations                    |
+| 34      | automation_run   | Stores execution history for automation runs                 |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -199,6 +200,26 @@ Things to know about the chat table:
 
 - `tasks` and `summary` support structured planning/status UX in chat sessions.
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
+- `share_id` references the `shared_chat.id` token when the chat has an active share link.
+
+## Shared Chat Table
+
+| **Column Name** | **Data Type** | **Constraints**                  | **Description**                    |
+| --------------- | ------------- | -------------------------------- | ---------------------------------- |
+| id              | Text          | PRIMARY KEY                      | Share token (UUID) used in `/s/{id}` URLs |
+| chat_id         | Text          | FOREIGN KEY(chat.id) CASCADE, NOT NULL | Reference to the original chat |
+| user_id         | Text          | NOT NULL                         | User who created the share         |
+| title           | Text          | nullable                         | Chat title at time of sharing      |
+| chat            | JSON          | nullable                         | Snapshot of chat content at share time |
+| created_at      | BigInteger    | nullable                         | Share creation timestamp           |
+| updated_at      | BigInteger    | nullable                         | Last re-snapshot timestamp         |
+
+Things to know about the shared_chat table:
+
+- Replaces the previous pattern of storing shared chat snapshots as phantom rows in the `chat` table with `user_id` set to `shared-{chat_id}`.
+- Each row is an immutable snapshot of the original chat at the time of sharing (or last re-share). The snapshot is updated when the user clicks "Update and Copy Link".
+- Deleting the original chat cascades to delete the shared snapshot.
+- Access control for shared chats is managed via the `access_grant` table with `resource_type = 'shared_chat'`.
 
 ## Automation Table
 
@@ -637,6 +658,7 @@ erDiagram
     %% User and Authentication
     user ||--o{ auth : "has"
     user ||--o{ chat : "owns"
+    user ||--o{ shared_chat : "shares"
     user ||--o{ channel : "owns"
     user ||--o{ message : "creates"
     user ||--o{ folder : "owns"
@@ -659,6 +681,7 @@ erDiagram
     %% Content Relationships
     message ||--o{ message_reaction : "has"
     chat ||--o{ tag : "tagged_with"
+    chat ||--o{ shared_chat : "shared_via"
     chat }|--|| folder : "organized_in"
     channel ||--o{ message : "contains"
     message ||--o{ message : "replies"
@@ -698,6 +721,16 @@ erDiagram
         boolean pinned
         json meta
         text folder_id FK
+    }
+
+    shared_chat {
+        text id PK
+        text chat_id FK
+        text user_id FK
+        text title
+        json chat
+        bigint created_at
+        bigint updated_at
     }
 
     channel {
@@ -939,6 +972,12 @@ To use SQLCipher with existing data, you must either:
 | `DATABASE_TYPE` | `None` | Set to `sqlite+sqlcipher` for encrypted SQLite |
 | `DATABASE_PASSWORD` | - | Encryption password (required for SQLCipher) |
 | `DATABASE_ENABLE_SQLITE_WAL` | `False` | Enable Write-Ahead Logging for better performance |
+| `DATABASE_SQLITE_PRAGMA_SYNCHRONOUS` | `NORMAL` | SQLite sync mode (safe with WAL, avoids fsync per txn) |
+| `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT` | `5000` | Write-lock wait time in milliseconds |
+| `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` | `-65536` | Page cache size (negative = KiB; ≈ 64 MB) |
+| `DATABASE_SQLITE_PRAGMA_TEMP_STORE` | `MEMORY` | Temp table storage (`MEMORY` keeps temps in RAM) |
+| `DATABASE_SQLITE_PRAGMA_MMAP_SIZE` | `268435456` | Memory-mapped I/O size in bytes (≈ 256 MB) |
+| `DATABASE_SQLITE_PRAGMA_JOURNAL_SIZE_LIMIT` | `67108864` | Max WAL file size after checkpoint (≈ 64 MB) |
 | `DATABASE_POOL_SIZE` | `None` | Database connection pool size |
 | `DATABASE_POOL_TIMEOUT` | `30` | Pool connection timeout in seconds |
 | `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |

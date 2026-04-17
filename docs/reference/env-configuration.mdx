@@ -6514,6 +6514,42 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `False`
 - Description: Enables or disables SQLite WAL (Write-Ahead Logging) mode. When enabled, SQLite transactions can be managed more efficiently, allowing multiple readers and one writer concurrently, which can improve database performance, especially under high concurrency. **This setting only applies to SQLite databases.**
 
+#### `DATABASE_SQLITE_PRAGMA_SYNCHRONOUS`
+
+- Type: `str`
+- Default: `NORMAL`
+- Description: Sets the SQLite `PRAGMA synchronous` value. `NORMAL` (1) is safe with WAL mode and avoids an fsync per transaction, improving write throughput. Valid values: `OFF` (0), `NORMAL` (1), `FULL` (2), `EXTRA` (3). Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT`
+
+- Type: `str`
+- Default: `5000`
+- Description: Sets the SQLite `PRAGMA busy_timeout` value in milliseconds. Controls how long a connection waits for a write lock before raising `SQLITE_BUSY`. Higher values reduce lock contention errors under concurrent writes. Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_SQLITE_PRAGMA_CACHE_SIZE`
+
+- Type: `str`
+- Default: `-65536`
+- Description: Sets the SQLite `PRAGMA cache_size` value. Negative values specify the cache size in KiB — the default `-65536` allocates approximately 64 MB of page cache. Larger caches reduce disk I/O for read-heavy workloads. Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_SQLITE_PRAGMA_TEMP_STORE`
+
+- Type: `str`
+- Default: `MEMORY`
+- Description: Sets the SQLite `PRAGMA temp_store` value. `MEMORY` (2) keeps temporary tables and indices in RAM, which improves performance for queries using temporary storage. Valid values: `DEFAULT` (0), `FILE` (1), `MEMORY` (2). Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_SQLITE_PRAGMA_MMAP_SIZE`
+
+- Type: `str`
+- Default: `268435456`
+- Description: Sets the SQLite `PRAGMA mmap_size` value in bytes. The default `268435456` enables approximately 256 MB of memory-mapped I/O, which can significantly improve read performance by avoiding syscall overhead. Set to `0` to disable mmap, or to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
+#### `DATABASE_SQLITE_PRAGMA_JOURNAL_SIZE_LIMIT`
+
+- Type: `str`
+- Default: `67108864`
+- Description: Sets the SQLite `PRAGMA journal_size_limit` value in bytes. Caps the WAL file size after checkpoint — without this, the WAL file can grow unbounded during write bursts. The default `67108864` caps it at approximately 64 MB. Set to `-1` for no limit (SQLite default), or to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
 ### Redis
 
 #### `REDIS_URL`
