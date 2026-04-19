@@ -292,7 +292,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the Automations feature globally. When disabled, the automation worker loop stops processing scheduled runs, the automation API endpoints return `403 Forbidden`, automation builtin tools are not injected, and the Automations entry is hidden from the sidebar. Requires the `features.automations` user permission (admins always pass).
+- Description: Enables or disables the Automations feature globally. When disabled, the scheduler skips automation processing, the automation API endpoints return `403 Forbidden`, automation builtin tools are not injected, and the Automations entry is hidden from the sidebar. Requires the `features.automations` user permission (admins always pass).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATION_MAX_COUNT`
@@ -319,6 +319,18 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `3600` | Minimum 1 hour between runs |
 
 :::
+
+#### `SCHEDULER_POLL_INTERVAL`
+
+- Type: `int` (seconds)
+- Default: `10`
+- Description: Sets the interval in seconds between scheduler ticks. The unified scheduler handles both automation execution and calendar event alerts. Accepts `AUTOMATION_POLL_INTERVAL` as a legacy fallback.
+
+#### `CALENDAR_ALERT_LOOKAHEAD_MINUTES`
+
+- Type: `int` (minutes)
+- Default: `10`
+- Description: Default lookahead window in minutes for calendar event alerts. Events starting within this window from the current time will trigger toast and webhook notifications. Individual events can override this via the **Reminder** setting in the event editor (`meta.alert_minutes`).
 
 #### `ENABLE_NOTES`
 

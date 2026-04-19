@@ -49,6 +49,7 @@ Organize events across multiple calendars (e.g., "Personal", "Team Meetings") wi
 | 📍 **Location & description** | Attach locations and rich descriptions to events |
 | 🎨 **Color coding** | Per-calendar and per-event color customization |
 | ✅ **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status |
+| 🔔 **Reminders** | Per-event alerts via toast, browser notification, and webhook |
 
 ---
 
@@ -204,12 +205,39 @@ Attendees can update their own RSVP status via the API. Events where a user is a
 
 ---
 
+## Reminders & Alerts
+
+Each event has a **Reminder** setting that controls when an alert fires before the event starts.
+
+| Option | Behavior |
+|--------|----------|
+| **None** | No alert |
+| **At time of event** | Alert when the event starts |
+| **5 / 10 / 15 / 30 minutes before** | Alert that many minutes ahead |
+| **1 hour before** | Alert 60 minutes ahead |
+
+The default is **10 minutes before**.
+
+### How alerts are delivered
+
+1. **Toast notification** — appears in the Open WebUI UI with the event title and time remaining. Clicking the toast navigates to the Calendar.
+2. **Browser notification** — if browser notifications are enabled in user settings, a native OS notification is shown.
+3. **Webhook** — if the user has a webhook URL configured in **Settings > Notifications**, a `calendar_alert` payload is sent.
+
+Alerts are de-duplicated server-side via `meta.alerted_at`, so each event fires at most once per start time — even across restarts and multi-instance deployments.
+
+The global alert polling window is configurable via [`CALENDAR_ALERT_LOOKAHEAD_MINUTES`](/reference/env-configuration#calendar_alert_lookahead_minutes) (default: 10 minutes).
+
+---
+
 ## Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | [`ENABLE_CALENDAR`](/reference/env-configuration#enable_calendar) | `True` | Enable or disable the Calendar feature globally |
 | [`USER_PERMISSIONS_FEATURES_CALENDAR`](/reference/env-configuration#user_permissions_features_calendar) | `True` | Enable or disable Calendar access for non-admin users by default |
+| [`SCHEDULER_POLL_INTERVAL`](/reference/env-configuration#scheduler_poll_interval) | `10` | Seconds between scheduler ticks (shared with automations) |
+| [`CALENDAR_ALERT_LOOKAHEAD_MINUTES`](/reference/env-configuration#calendar_alert_lookahead_minutes) | `10` | Default alert window in minutes for upcoming events |
 
 Calendar can also be toggled from **Admin Panel > Settings > General** under the Features section.
 
