@@ -11,8 +11,8 @@ Calendar is a built-in scheduling feature that gives every user a personal calen
 
 Active [Automations](/features/chat-conversations/chat-features/automations) are automatically surfaced on a dedicated **Scheduled Tasks** calendar, so you get a unified view of both manual events and automated workflows in one place.
 
-:::note Beta Feature
-Calendar is currently in **Beta**. It is enabled by default but can be disabled by an administrator via the `ENABLE_CALENDAR` environment variable or the Admin Panel toggle.
+:::note
+Calendar is enabled by default but can be disabled by an administrator via the [`ENABLE_CALENDAR`](/reference/env-configuration#enable_calendar) environment variable or the Admin Panel toggle.
 :::
 
 ---

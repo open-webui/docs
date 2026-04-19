@@ -264,7 +264,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations are automatically surfaced as virtual events on a dedicated \"Scheduled Tasks\" calendar. Requires the `features.calendar` user permission (admins always pass). **Beta feature.**
+- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations are automatically surfaced as virtual events on a dedicated "Scheduled Tasks" calendar. Requires the `features.calendar` user permission (admins always pass).
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_CHANNELS`
@@ -287,6 +287,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
 - Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+
+#### `ENABLE_AUTOMATIONS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the Automations feature globally. When disabled, the automation worker loop stops processing scheduled runs, the automation API endpoints return `403 Forbidden`, automation builtin tools are not injected, and the Automations entry is hidden from the sidebar. Requires the `features.automations` user permission (admins always pass).
+- Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `AUTOMATION_MAX_COUNT`
 

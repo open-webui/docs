@@ -241,7 +241,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | **Task Management** | *Requires per-model "Task Management" category enabled (default: on).* |
 | `create_tasks` | Create a structured task checklist for the current chat. Called once at the start of multi-step work to define all steps. |
 | `update_task` | Update the status of a single task by id (`pending`, `in_progress`, `completed`, `cancelled`). Called after finishing each step. |
-| **Automations** | *Requires per-model "Automations" category enabled (default: on) AND user has `features.automations` permission (admins always pass).* |
+| **Automations** | *Requires per-model "Automations" category enabled (default: on) AND `ENABLE_AUTOMATIONS` enabled AND user has `features.automations` permission (admins always pass).* |
 | `create_automation` | Create a scheduled automation with a name, prompt, and RRULE schedule. Uses the current chat model. |
 | `update_automation` | Update an existing automation's name, prompt, schedule, or model. |
 | `list_automations` | List the user's scheduled automations with status, schedule, and next runs. |
