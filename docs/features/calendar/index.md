@@ -67,6 +67,8 @@ To grant user access:
 2. Edit **Default permissions** or a specific group
 3. Enable **Features > Calendar**
 
+You can also set this default via [`USER_PERMISSIONS_FEATURES_CALENDAR`](/reference/env-configuration#user_permissions_features_calendar).
+
 ---
 
 ## Getting Started
@@ -203,8 +205,9 @@ Attendees can update their own RSVP status via the API. Events where a user is a
 | Variable | Default | Description |
 |----------|---------|-------------|
 | [`ENABLE_CALENDAR`](/reference/env-configuration#enable_calendar) | `True` | Enable or disable the Calendar feature globally |
+| [`USER_PERMISSIONS_FEATURES_CALENDAR`](/reference/env-configuration#user_permissions_features_calendar) | `True` | Enable or disable Calendar access for non-admin users by default |
 
-Calendar can also be toggled from **Admin Panel > Settings > General** under the Features section (labeled "Calendar (Beta)").
+Calendar can also be toggled from **Admin Panel > Settings > General** under the Features section.
 
 ---
 
