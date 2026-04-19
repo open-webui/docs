@@ -77,6 +77,10 @@ You can also set this default via [`USER_PERMISSIONS_FEATURES_CALENDAR`](/refere
 
 Open **User Menu > Calendar** from the sidebar. On first visit, two default calendars are created automatically:
 
+:::tip Quick Access
+Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Calendar adds a shortcut icon to the sidebar rail for one-click access.
+:::
+
 - **Personal** — your default calendar for manual events (blue)
 - **Scheduled Tasks** — read-only overlay of automation schedules and runs (purple)
 
