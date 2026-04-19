@@ -260,6 +260,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets a custom text content for the pending user overlay.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ENABLE_CALENDAR`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations are automatically surfaced as virtual events on a dedicated \"Scheduled Tasks\" calendar. Requires the `features.calendar` user permission (admins always pass). **Beta feature.**
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `ENABLE_CHANNELS`
 
 - Type: `bool`

@@ -247,6 +247,11 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 | `list_automations` | List the user's scheduled automations with status, schedule, and next runs. |
 | `toggle_automation` | Pause or resume a scheduled automation. |
 | `delete_automation` | Delete a scheduled automation and all its run history. |
+| **Calendar** | *Requires per-model "Calendar" category enabled (default: on) AND `ENABLE_CALENDAR` enabled AND user has `features.calendar` permission (admins always pass).* |
+| `search_calendar_events` | Search calendar events by text and/or date range across all accessible calendars. |
+| `create_calendar_event` | Create a new event on the user's default or specified calendar. |
+| `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
+| `delete_calendar_event` | Delete a calendar event permanently. |
 | **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
 | `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
@@ -320,6 +325,11 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 | `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
 | `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
 | `delete_automation` | `automation_id` (required) | `{status, message}` |
+| **Calendar** | | |
+| `search_calendar_events` | `query` (optional), `start` (optional datetime string, e.g. `"2026-04-20 00:00"`), `end` (optional datetime string), `count` (default: 10) | `{events: [{id, calendar_id, title, description, start, end, all_day, location, color, is_cancelled}], total}` |
+| `create_calendar_event` | `title` (required), `start` (required datetime string), `end` (optional), `description` (optional), `calendar_id` (optional — uses default calendar), `all_day` (default: false), `location` (optional) | `{status, id, calendar_id, title, start, end, ...}` |
+| `update_calendar_event` | `event_id` (required), `title`, `description`, `start`, `end`, `all_day`, `location`, `is_cancelled` (all optional — only provided fields are changed) | `{status, id, title, start, end, ...}` |
+| `delete_calendar_event` | `event_id` (required) | `{status, message}` |
 | **Skills** | | |
 | `view_skill` | `name` (required) | `{name, content}` |
 | **Time Tools** | | |
@@ -423,6 +433,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Channels** | `search_channels`, `search_channel_messages`, `view_channel_message`, `view_channel_thread` | Search channels and channel messages |
 | **Task Management** | `create_tasks`, `update_task` | Create a structured task/todo list and update individual task statuses in the active chat |
 | **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
+| **Calendar** | `search_calendar_events`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event` | Search, create, update, and delete calendar events |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
@@ -465,6 +476,7 @@ Builtin tools that correspond to an RBAC feature permission are also gated by th
 | Notes | `features.notes` |
 | Channels | `features.channels` |
 | Automations | `features.automations` |
+| Calendar | `features.calendar` |
 
 This ensures that RBAC permissions are respected end-to-end — disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
 :::
