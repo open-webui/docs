@@ -82,8 +82,8 @@ Open **User Menu > Calendar** from the sidebar. On first visit, two default cale
 Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Calendar adds a shortcut icon to the sidebar rail for one-click access.
 :::
 
-- **Personal** — your default calendar for manual events (blue)
-- **Scheduled Tasks** — read-only overlay of automation schedules and runs (purple)
+- **Personal** — your default calendar for manual events (blue, auto-created on first visit)
+- **Scheduled Tasks** — virtual read-only overlay of automation schedules and runs (purple, only visible when the user has [Automations](/features/chat-conversations/chat-features/automations) access)
 
 ### Create an Event
 
@@ -118,7 +118,7 @@ Use the **arrow buttons** to navigate forward/backward, or click **Today** to ju
 
 ## Automation Integration
 
-The **Scheduled Tasks** calendar bridges the gap between automations and the calendar view:
+The **Scheduled Tasks** calendar bridges the gap between automations and the calendar view. It is a **virtual calendar** — not stored in the database — that is synthesized at API response time whenever the user has access to the Automations feature.
 
 ### Future runs
 
@@ -130,8 +130,9 @@ Completed automation runs appear as historical events. Each shows the automation
 
 ### How it works
 
+- The virtual calendar uses a constant ID (`__scheduled_tasks__`) and is excluded from the event editor's calendar picker
 - Virtual events have IDs prefixed with `auto_` (future) or `run_` (past)
-- They appear on the Scheduled Tasks calendar only and cannot be edited from the calendar UI
+- They cannot be edited or deleted from the calendar UI
 - Clicking a future run event navigates to the automation editor
 - Clicking a past run event navigates to the run's chat
 
@@ -249,9 +250,9 @@ Calendar can also be toggled from **Admin Panel > Settings > General** under the
 
 Calendar is currently a standalone feature within Open WebUI. It does not sync with Google Calendar, Outlook, or other external calendar services via CalDAV/iCal.
 
-### Virtual automation events are read-only
+### Scheduled Tasks calendar is virtual and read-only
 
-Events generated from automations (Scheduled Tasks calendar) cannot be edited or deleted from the calendar UI. Manage the underlying automation from the Automations page instead.
+The Scheduled Tasks calendar is generated at runtime and is not stored in the database. Its events cannot be edited or deleted from the calendar UI. Manage the underlying automations from the [Automations](/features/chat-conversations/chat-features/automations) page instead.
 
 ### Recurring event expansion
 

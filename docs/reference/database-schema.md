@@ -277,8 +277,8 @@ Things to know about the automation_run table:
 Things to know about the calendar table:
 
 - Indexed on `user_id` for efficient per-user calendar listing.
-- Two default calendars ("Personal" and "Scheduled Tasks") are auto-created on first access.
-- The "Scheduled Tasks" calendar is special — automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
+- A default "Personal" calendar is auto-created on first access.
+- The "Scheduled Tasks" calendar is **virtual** — it is not stored in this table. Instead, the API synthesizes it at response time (with constant ID `__scheduled_tasks__`) for users who have Automations access. Automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
 - Access control is managed via the `access_grant` table with `resource_type = 'calendar'`, enabling calendar sharing between users and groups.
 - A user can only delete non-default calendars. Deleting a calendar cascades to all its events, attendees, and access grants.
 
