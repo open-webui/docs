@@ -200,11 +200,28 @@ PERMISSIONS_POLICY=camera=(),microphone=(),geolocation=()
 
 # Content Security Policy
 CONTENT_SECURITY_POLICY=default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'
+
+# Content Security Policy in report-only mode (logs violations without enforcing)
+CONTENT_SECURITY_POLICY_REPORT_ONLY=default-src 'self'; report-uri /csp-report
+
+# Cross-Origin isolation headers
+CROSS_ORIGIN_EMBEDDER_POLICY=require-corp    # Options: unsafe-none, require-corp, credentialless
+CROSS_ORIGIN_OPENER_POLICY=same-origin       # Options: unsafe-none, same-origin-allow-popups, same-origin
+CROSS_ORIGIN_RESOURCE_POLICY=same-origin     # Options: same-site, same-origin, cross-origin
+
+# Reporting API endpoint configuration
+REPORTING_ENDPOINTS=default="https://your-report-collector.example/reports"
 ```
 
 :::tip
 
-If you set a Content Security Policy, start permissive and tighten incrementally. An overly strict CSP will break the frontend. Browser dev tools will show you which resources are being blocked.
+If you set a Content Security Policy, start permissive and tighten incrementally. An overly strict CSP will break the frontend. Use `CONTENT_SECURITY_POLICY_REPORT_ONLY` to test a policy before enforcing it. Browser dev tools will show you which resources are being blocked.
+
+:::
+
+:::warning Cross-Origin Isolation
+
+Setting `CROSS_ORIGIN_EMBEDDER_POLICY=require-corp` and `CROSS_ORIGIN_OPENER_POLICY=same-origin` together enables cross-origin isolation. This may break resources loaded from third-party origins (e.g., external images, scripts, or iframes) unless those resources explicitly set appropriate CORS headers. Test thoroughly before deploying.
 
 :::
 
@@ -696,7 +713,7 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Secure cookies](#cookie-settings) | `Secure=false`, `SameSite=lax` | `Secure=true`, `SameSite=strict` |
 | [Enable token revocation](#token-revocation) | No revocation (no Redis) | Configure Redis or shorten `JWT_EXPIRES_IN` |
 | [Restrict CORS](#cors) | `*` | Your specific domain(s) |
-| [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP |
+| [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP, Cross-Origin policies |
 | [Restrict OAuth domains](#domain-and-group-restrictions) | All allowed | `OAUTH_ALLOWED_DOMAINS=yourdomain.com` |
 | [Enable audit logging](#audit-logging) | `NONE` | `METADATA` or higher |
 | [Restrict API key endpoints](#endpoint-restrictions) | All endpoints | `ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS=true` |
