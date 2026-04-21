@@ -367,11 +367,17 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 |----------|--------------|-------------------|
 | `inlet()` | ✅ Always called | ✅ Always called |
 | `stream()` | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ⚠️ Only if `chat_id` and `id` are present (see below) |
+| `outlet()` | ✅ Called after response | ⚠️ Non-streaming only, and only if `chat_id` and `id` are present (see below) |
 | `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Runs but no UI to display |
 
+:::warning Streaming API Requests Do Not Invoke outlet() Yet
+Inline `outlet()` execution during `/api/chat/completions` is currently only wired up for **non-streaming** direct API requests. For **streaming** (`"stream": true`) API requests, `outlet()` is not yet invoked by the backend — this is a known limitation that is being worked on. WebUI requests continue to run `outlet()` for both streaming and non-streaming responses as before.
+
+If you depend on `outlet()` for observability, logging, or post-processing of API traffic, either issue non-streaming requests or route the traffic through the WebUI until streaming support lands.
+:::
+
 :::warning Outlet Requires chat_id and message id
-`outlet()` runs inline as part of `/api/chat/completions` processing. However, the outlet handler **requires both `chat_id` and `id` (message ID) to be present** in the request body. The WebUI always sends these, but pure API callers using the standard OpenAI-compatible request shape typically omit them — in which case **outlet is silently skipped**.
+For non-streaming direct API requests, `outlet()` runs inline as part of `/api/chat/completions` processing. However, the outlet handler **requires both `chat_id` and `id` (message ID) to be present** in the request body. The WebUI always sends these, but pure API callers using the standard OpenAI-compatible request shape typically omit them — in which case **outlet is silently skipped**.
 
 If your filters rely on `outlet()` for API requests (logging, observability, post-processing, etc.), you need to either:
 1. Include `chat_id` and `id` in your API request body, **or**
@@ -1007,7 +1013,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring** - Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-`outlet()` is called for direct API requests to `/api/chat/completions`, but only when `chat_id` and `id` (message ID) are present in the request body. See [Enabling Outlet for Pure API Callers](#enabling-outlet-for-pure-api-callers) for details.
+`outlet()` is called for **non-streaming** direct API requests to `/api/chat/completions` when `chat_id` and `id` (message ID) are present in the request body. Streaming API requests do not yet invoke `outlet()` — support is in progress. See [Enabling Outlet for Pure API Callers](#enabling-outlet-for-pure-api-callers) for details.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:

@@ -292,8 +292,18 @@ If you're using **SQLite** (the default) in a cloud environment, you may be trad
 
 Cloud storage (Azure Disks, AWS EBS, GCP Persistent Disks) often has significantly higher latency and lower IOPS than local NVMe/SSD storage—especially on lower-tier storage classes. 
 
-:::warning Warning: Performance Risk with Network File Systems
-Using Network-attached File Systems like **NFS, SMB, or Azure Files** for your database storage (especially for SQLite) **may** introduce severe latency into the file locking and synchronous write operations that SQLite relies on.
+:::danger SQLite on NFS / SMB / Azure Files Is Not Supported
+Storing `webui.db` on **NFS, SMB/CIFS, or Azure Files** (including Docker bind mounts or Kubernetes PVCs backed by those filesystems) will produce pathological performance and is officially discouraged by [SQLite upstream](https://www.sqlite.org/faq.html#q5). WAL mode (the default) relies on `mmap` and `fsync` semantics that these filesystems do not implement correctly, and under some implementations concurrent writers can **corrupt the database**.
+
+Typical symptoms after upgrading to releases that use the async SQLite driver:
+
+- `/api/config` takes **10–20+ seconds** on every request
+- `/api/v1/chats/?page=1` and other list endpoints stall for **minutes** under load
+- OIDC / SSO callbacks hang or "spin" when redirecting back to Open WebUI
+- Large (multi-second) gaps in DEBUG logs between `aiosqlite` and `httpcore` lines
+- `PRAGMA journal_mode=WAL` starts but never completes in logs
+
+Older synchronous SQLAlchemy releases (≤ 0.8.12) serialized contention in-process, which masked slow storage. The async driver opens connections across threads and hammers the filesystem, so network-attached storage degradation becomes immediately visible.
 :::
 
 SQLite is particularly sensitive to disk performance because it performs synchronous writes. Moving from local SSDs to a network share can increase latency by 10x or more per operation.
@@ -302,10 +312,21 @@ SQLite is particularly sensitive to disk performance because it performs synchro
 - Performance is acceptable with a single user but degrades rapidly as concurrency increases.
 - High "I/O Wait" on the server despite low CPU usage.
 
-**Solutions:**
-1. **Use high-performance Block Storage:**
-   - Ensure you are using SSD-backed **Block Storage** classes (e.g., `Premium_LRS` on Azure Disks, `gp3` on AWS EBS, `pd-ssd` on GCP). Avoid "File" based storage classes (like `azurefile-csi`) for database workloads.
-2. **Use PostgreSQL instead:** For any medium to large production deployment, **Postgres is mandatory**. SQLite is generally not recommended at scale in cloud environments due to the inherent latency of network-attached storage and the compounding effect of file locking over the network.
+**Solutions (in order of robustness):**
+
+1. **Best — move `webui.db` off NFS onto local disk.** Bind-mount a directory on the host's local SSD/NVMe into `/app/backend/data`. SQLite was not designed for network filesystems and will always be slow on them.
+2. **If you must stay on NFS — migrate to PostgreSQL.** Set:
+   ```bash
+   DATABASE_URL=postgresql+asyncpg://user:password@host:5432/webui
+   ```
+   This removes the fsync-per-connection pathology entirely because the database process owns its own storage. PostgreSQL is recommended for any multi-user deployment regardless of storage type.
+3. **Workaround — keep SQLite on NFS with reduced concurrency.** If you cannot move storage or switch databases yet, set:
+   ```bash
+   DATABASE_POOL_SIZE=1
+   DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
+   ```
+   `DATABASE_POOL_SIZE=1` forces a single serialized async connection, trading concurrency for stability. `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000` gives SQLite 30 seconds to acquire locks, which NFS can take much longer to grant than local disk. Expect degraded throughput, and revisit after a restart — a warm pool may briefly appear fine, but the problem returns under load.
+4. **Use high-performance Block Storage (cloud):** Ensure you are using SSD-backed **Block Storage** classes (e.g., `Premium_LRS` on Azure Disks, `gp3` on AWS EBS, `pd-ssd` on GCP). Avoid "File" based storage classes (like `azurefile-csi`) for database workloads.
 
 ### Other Cloud-Specific Considerations
 
