@@ -292,13 +292,15 @@ If you're using **SQLite** (the default) in a cloud environment, you may be trad
 
 Cloud storage (Azure Disks, AWS EBS, GCP Persistent Disks) often has significantly higher latency and lower IOPS than local NVMe/SSD storage—especially on lower-tier storage classes. 
 
-:::danger SQLite on NFS / SMB / Azure Files Is Not Supported
-**Do not run SQLite — or any low-I/O / remote storage backend — with Open WebUI.** For production, the **only officially supported configurations** are:
+:::danger SQLite on NFS / SMB / Azure Files Is Not Supported — by SQLite Itself
+This restriction does **not** come from Open WebUI — it comes from **SQLite upstream**. The SQLite project [officially states](https://www.sqlite.org/faq.html#q5) that SQLite databases on network filesystems (NFS, SMB/CIFS, and similar) are **not supported**: file locking over those protocols is unreliable, and concurrent writers **can corrupt the database**. The SQLite documentation explicitly warns against it, and Open WebUI inherits that constraint because it uses SQLite.
 
-- **PostgreSQL** (strongly recommended for any multi-user deployment), **or**
-- **SQLite on directly-attached SSD / NVMe** (local disk only — single-user / small deployments).
+As a consequence, for Open WebUI the **only supported storage configurations are**:
 
-Anything else — **NFS, SMB/CIFS, Azure Files, GlusterFS, CephFS, object-storage-backed FUSE mounts, network PVCs, or any other remote / low-IOPS storage** — is **explicitly not recommended** and will produce pathological performance. SQLite over network filesystems is officially discouraged by [SQLite upstream](https://www.sqlite.org/faq.html#q5): WAL mode (the default) relies on `mmap` and `fsync` semantics that these filesystems do not implement correctly, and under some implementations concurrent writers can **corrupt the database**. This includes Docker bind mounts and Kubernetes PersistentVolumeClaims backed by those filesystems.
+- **PostgreSQL** — recommended for any multi-user deployment and required for anything not on a directly-attached local SSD. This sidesteps the SQLite-on-network-storage problem entirely. **Or**
+- **SQLite on a directly-attached SSD / NVMe** — single-user / small deployments only. Must be a **local** disk on the host; SQLite upstream's guidance applies regardless of the application.
+
+**Not supported** for SQLite (per SQLite's own documentation, not an Open WebUI policy): **NFS, SMB/CIFS, Azure Files, GlusterFS, CephFS, object-storage-backed FUSE mounts, network PVCs, any remote or low-IOPS storage.** This includes Docker bind mounts and Kubernetes PersistentVolumeClaims backed by those filesystems. Beyond the performance symptoms below, you are risking **database corruption** — again, per SQLite, not us.
 
 If your storage is anything other than a local SSD/NVMe, **use PostgreSQL**.
 
