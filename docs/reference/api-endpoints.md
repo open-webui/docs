@@ -197,19 +197,21 @@ Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** fo
 |----------------|--------------|-------------------|
 | `inlet()` | ✅ Runs | ✅ Runs |
 | `stream()` | ✅ Runs | ✅ Runs |
-| `outlet()` | ✅ Runs | ❌ **Does NOT run** |
+| `outlet()` | ✅ Runs | ✅ Runs |
 
 The `inlet()` function always executes, making it ideal for:
 - **Rate limiting** - Track and limit requests per user
 - **Request logging** - Log all API usage for monitoring
 - **Input validation** - Reject invalid requests before they reach the model
 
-#### Triggering Outlet Processing
+#### Legacy Endpoint: `/api/chat/completed`
 
-The `outlet()` function only runs when the WebUI calls `/api/chat/completed` after a chat finishes. For direct API requests, you must call this endpoint yourself if you need outlet processing:
+`outlet()` now runs inline during `/api/chat/completions` for both WebUI and direct API requests.
 
-- **Endpoint**: `POST /api/chat/completed`
-- **Description**: Triggers outlet filter processing for a completed chat
+`POST /api/chat/completed` is retained for backward compatibility with older clients that still call it as a second step:
+
+- **Endpoint**: `POST /api/chat/completed` (legacy compatibility)
+- **Description**: Backward-compatible outlet processing endpoint for older integrations
 
 - **Curl Example**:
 
@@ -235,8 +237,8 @@ The `outlet()` function only runs when the WebUI calls `/api/chat/completed` aft
 
   def complete_chat_with_outlet(token, model, messages, chat_id=None):
       """
-      Call after receiving the full response from /api/chat/completions
-      to trigger outlet filter processing.
+      Optional legacy call for older integrations.
+      For new clients, outlet processing happens inline during /api/chat/completions.
       """
       url = 'http://localhost:3000/api/chat/completed'
       headers = {
@@ -255,7 +257,7 @@ The `outlet()` function only runs when the WebUI calls `/api/chat/completed` aft
   ```
 
 :::tip
-For more details on writing filters that work with API requests, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#-filter-behavior-with-api-requests).
+For new integrations, prefer a single `/api/chat/completions` call. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#-filter-behavior-with-api-requests).
 :::
 
 ### 🦙 Ollama API Proxy Support
@@ -299,6 +301,22 @@ curl -X POST http://localhost:3000/ollama/api/embed \
 :::info
 When using the Ollama Proxy endpoints, you **must** include the `Content-Type: application/json` header for POST requests, or the API may fail to parse the body. Authorization headers are also required if your instance is secured.
 :::
+
+#### 🔮 Responses API (OpenAI-Compatible)
+
+Ollama supports the OpenAI Responses API format. Open WebUI proxies this through the Ollama router with the same model resolution, access control, and prefix handling used by chat completions.
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/responses \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "llama3.2",
+  "input": "Why is the sky blue?"
+}'
+```
+
+This allows API consumers (Codex, Claude Code, etc.) to use the Responses API directly with Ollama-hosted models without configuring a separate OpenAI-compatible connection.
 
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
 

@@ -461,4 +461,14 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 
 ---
 
-By carefully configuring both your OAuth provider and your Open WebUI environment — and keeping critical login endpoints immune from caching — you can resolve most SSO/OAuth login problems.
+By carefully configuring both your OAuth provider and your Open WebUI environment — and keeping critical login endpoints immune from caching — you can eliminate nearly all SSO/OAuth login problems.
+
+---
+
+:::warning Token Revocation Requires Redis
+
+Without Redis, **signing out does not revoke JWT tokens** — they remain valid until they expire (default: 4 weeks). This is especially relevant for SSO/OAuth deployments where you may need to revoke access quickly (e.g., when an employee leaves the organization). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+
+For production SSO deployments, configure Redis or shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) and the [Redis tutorial](/tutorials/integrations/redis) for details.
+
+:::

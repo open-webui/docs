@@ -71,7 +71,7 @@ ENABLE_WEBSOCKET_SUPPORT=true
 
 **Key things to know:**
 
-- Redis is **not needed** for single-instance deployments.
+- Redis is **not needed** for single-instance deployments for basic functionality. However, **without Redis, signing out does not revoke tokens** — they remain valid until they expire (default: 4 weeks). If your deployment is production-facing or handles sensitive data, Redis is strongly recommended even for a single instance, or alternatively shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) in the Hardening guide for details.
 - If you're using Redis Sentinel for high availability, also set `REDIS_SENTINEL_HOSTS` and consider setting `REDIS_SOCKET_CONNECT_TIMEOUT=5` to prevent hangs during failover.
 - For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
 - Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
@@ -357,15 +357,17 @@ ENABLE_DB_MIGRATIONS=false
 | Scenario | PostgreSQL | Redis | External Vector DB | Ext. Content Extraction | Ext. Embeddings | Shared Storage |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Single user / evaluation | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| Small team (< 50 users, single instance) | Recommended | ✗ | ✗ | Recommended | ✗ | ✗ |
+| Small team (< 50 users, single instance) | Recommended | Recommended† | ✗ | Recommended | ✗ | ✗ |
 | Multiple Uvicorn workers | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | ✗ (same filesystem) |
 | Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
 | Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
+
+†Without Redis, signing out and password changes do **not** revoke tokens — they remain valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). For production deployments handling sensitive data, Redis is recommended for proper token revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
 
 :::note About "External Vector DB"
 The default ChromaDB uses a local SQLite backend that crashes under multi-process access. "External Vector DB" means either a client-server database (PGVector, Milvus, Qdrant, Pinecone) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4--switch-to-an-external-vector-database) for details.
 :::
 
 :::note About "Shared Storage"
-For multiple instances, all replicas need access to the same uploaded files. A **shared filesystem mount** (local drive, NFS, EFS, CephFS) is sufficient — cloud object storage (S3/GCS/Azure) is a scalable alternative, butt not a requirement. Files use UUID-based unique names, so there are no write conflicts. See [Step 5](#step-5--share-file-storage-across-instances) for details.
+For multiple instances, all replicas need access to the same uploaded files. A **shared filesystem mount** (local drive, NFS, EFS, CephFS) is sufficient — cloud object storage (S3/GCS/Azure) is a scalable alternative, but not a requirement. Files use UUID-based unique names, so there are no write conflicts. See [Step 5](#step-5--share-file-storage-across-instances) for details.
 :::

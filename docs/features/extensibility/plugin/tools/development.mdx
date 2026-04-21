@@ -46,7 +46,7 @@ class Tools:
     class Valves(BaseModel):
         api_key: str = Field("", description="Your API key here")
 
-    def reverse_string(self, string: str) -> str:
+    async def reverse_string(self, string: str) -> str:
         """
         Reverses the input string.
         :param string: The string to reverse

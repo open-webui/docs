@@ -21,7 +21,15 @@ Redis serves two distinct purposes in Open WebUI, and understanding when it's re
 
 ### Single Instance Deployments
 
-If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (the default), Redis is **completely optional and not strictly needed**. The application will function normally without it for all operations.
+If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (the default), Redis is **not required for basic functionality**. The application will function normally without it for most operations.
+
+:::warning Security: Token Revocation Requires Redis
+
+Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+
+For production-facing deployments, either configure Redis or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See the [Hardening guide](/getting-started/advanced-topics/hardening#token-revocation) for details.
+
+:::
 
 ### Multi-Worker and Multi-Instance Deployments
 
@@ -288,6 +296,29 @@ To enhance resilience during Sentinel failover—the window when a new master is
 - **`REDIS_SENTINEL_MAX_RETRY_COUNT`**: Sets the maximum number of retries for Redis operations when using Sentinel (Default: `2`).
 - **`REDIS_RECONNECT_DELAY`**: Adds an optional delay in **milliseconds** between retry attempts (e.g., `REDIS_RECONNECT_DELAY=500`). This prevents tight retry loops that may otherwise overwhelm the event loop or block the application before a new master is ready.
 
+#### Connection Health Checks
+
+If your Redis server has a `timeout` configured (recommended — see above), pooled connections that sit idle longer than that timeout will be reaped server-side. Without health checks, the next request that grabs one of those dead sockets will fail with `ConnectionError: Connection reset by peer`.
+
+- **`REDIS_HEALTH_CHECK_INTERVAL`**: How often (in seconds) redis-py should PING an idle pooled connection before reusing it (e.g., `REDIS_HEALTH_CHECK_INTERVAL=60`). The value must be **shorter** than your Redis server's `timeout` and any firewall/load balancer idle timeout on the path to Redis. Set to `0` or leave empty to disable.
+- **`REDIS_SOCKET_KEEPALIVE`**: Enables TCP `SO_KEEPALIVE` on all Redis client sockets (e.g., `REDIS_SOCKET_KEEPALIVE=True`). When enabled, the OS kernel sends TCP keepalive probes on idle connections, detecting half-closed sockets caused by silent firewall/load balancer resets or network flaps at the TCP level.
+
+These two mechanisms are complementary:
+- `REDIS_HEALTH_CHECK_INTERVAL` works at the **application level** — redis-py PINGs idle connections on checkout, validating the socket and resetting the server's idle timer.
+- `REDIS_SOCKET_KEEPALIVE` works at the **TCP level** — the kernel detects dead peers even when no application-level traffic is flowing.
+
+:::tip Recommended pairing
+
+For robust production deployments, configure all three layers together:
+
+| Mechanism | Level | Covers | Example |
+|-----------|-------|--------|---------|
+| `timeout 1800` (redis.conf) | Server | Reaps leaked/orphaned connections the app forgot about | Safety net |
+| `REDIS_HEALTH_CHECK_INTERVAL=60` | Application | Detects dead sockets before real commands use them; keeps pooled connections alive | Active protection |
+| `REDIS_SOCKET_KEEPALIVE=True` | TCP/Kernel | Detects half-closed sockets from silent network resets (firewalls, LBs, NIC flaps) | Network-level protection |
+
+:::
+
 ### Redis Cluster Mode
 
 For deployments using Redis Cluster (including managed services like **AWS Elasticache Serverless**), enable cluster mode with the following configuration:
@@ -339,6 +370,12 @@ WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
 REDIS_SOCKET_CONNECT_TIMEOUT=5
 REDIS_SENTINEL_MAX_RETRY_COUNT=5
 REDIS_RECONNECT_DELAY=1000
+
+# Recommended: detect stale pooled connections (must be < Redis server timeout)
+REDIS_HEALTH_CHECK_INTERVAL=60
+
+# Recommended: enable TCP keepalive for dead-peer detection at the kernel level
+REDIS_SOCKET_KEEPALIVE=True
 
 # Optional
 REDIS_KEY_PREFIX="open-webui"
@@ -631,8 +668,42 @@ REDIS_KEY_PREFIX="openwebui-dev"
    
    # For Docker
    docker restart redis-valkey
+   ```
 
-**Prevention:** Always configure `timeout` to a reasonable value (e.g., 1800 seconds). The timeout only affects idle TCP connections, not user sessions — it's safe and recommended.
+**Prevention:** Always configure `timeout` to a reasonable value (e.g., 1800 seconds). The timeout only affects idle TCP connections, not user sessions — it's safe and recommended. Pair this with `REDIS_HEALTH_CHECK_INTERVAL` on the client side (see below).
+
+#### Issue: "Connection reset by peer" errors on first request after idle period
+
+**Symptoms:**
+
+- Sporadic `redis.exceptions.ConnectionError: Connection reset by peer` in logs
+- Errors tend to appear after periods of low activity (nights, weekends)
+- The request that triggers the error fails with a 500 Internal Server Error, but subsequent requests succeed
+- More common when Redis server `timeout` is configured (which it should be — see above)
+
+**Cause:** The Redis server reaped an idle connection (via its `timeout` setting), but the pooled socket in redis-py was not aware it was dead. The next request that grabbed that socket from the pool sent a command to a closed connection.
+
+**Solution:**
+
+Set the `REDIS_HEALTH_CHECK_INTERVAL` environment variable to a value **shorter** than your Redis server's `timeout`:
+
+```bash
+# Redis server timeout is 1800s (30 min), so check every 60s
+REDIS_HEALTH_CHECK_INTERVAL=60
+```
+
+This tells redis-py to PING any pooled connection that has been idle for more than 60 seconds before reusing it. If the connection is dead, it is replaced transparently. The PING also resets the server's idle timer, keeping actively-used connections alive.
+
+**How to choose the right value:**
+
+| Your Redis `timeout` | Suggested `REDIS_HEALTH_CHECK_INTERVAL` |
+|-----------------------|-----------------------------------------|
+| 300 (5 min)           | 30                                      |
+| 900 (15 min)          | 60                                      |
+| 1800 (30 min)         | 60                                      |
+| 3600 (1 hour)         | 120                                     |
+
+The health check interval should also be shorter than any firewall or load balancer idle timeout between the application and Redis.
 
 ### Additional Resources
 

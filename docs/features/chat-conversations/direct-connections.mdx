@@ -29,6 +29,12 @@ With **Direct Connections**, the browser communicates directly with the API prov
 2.  **CORS Configuration**: Since the browser is making the request, the API provider must have **Cross-Origin Resource Sharing (CORS)** configured to allow requests from your Open WebUI domain.
     *   *Note: Many strict providers (like official OpenAI) might block direct browser requests due to CORS policies. This feature is often best used with flexible providers or internal API gateways.*
 
+:::warning Security Recommendation: Provider Key Scope
+Use least-privilege provider credentials for Direct Connections.
+
+If your provider supports scoped keys, prefer inference-only keys for regular usage. Avoid using management/master keys for day-to-day user traffic.
+:::
+
 ## User Configuration
 
 Once enabled by the admin, users can configure their own connections:

@@ -55,19 +55,20 @@ class Filter:
         # Initialize valves (optional configuration for the Filter)
         self.valves = self.Valves()
 
-    def inlet(self, body: dict) -> dict:
+    async def inlet(self, body: dict) -> dict:
         # This is where you manipulate user inputs.
         print(f"inlet called: {body}")
         return body
 
-    def stream(self, event: dict) -> dict:
+    async def stream(self, event: dict) -> dict:
         # This is where you modify streamed chunks of model output.
         print(f"stream event: {event}")
         return event
 
-    def outlet(self, body: dict) -> None:
+    async def outlet(self, body: dict) -> dict:
         # This is where you manipulate model outputs.
         print(f"outlet called: {body}")
+        return body
 ```
 
 ---
@@ -264,8 +265,8 @@ class ContentModerationFilter:
     def __init__(self):
         # No toggle property - this is an always-on filter
         pass
-    
-    def inlet(self, body: dict) -> dict:
+
+    async def inlet(self, body: dict) -> dict:
         # Always scrub PII before sending to model
         last_message = body["messages"][-1]["content"]
         body["messages"][-1]["content"] = self.scrub_pii(last_message)
@@ -358,7 +359,7 @@ Here's the complete flow from admin configuration to filter execution:
 
 ### 📡 Filter Behavior with API Requests
 
-When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters behave differently than when the request comes from the web interface. Understanding these differences is crucial for building effective filters.
+When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters follow the same execution model as WebUI requests — with one important caveat for `outlet()`.
 
 #### Key Behavioral Differences
 
@@ -366,21 +367,55 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 |----------|--------------|-------------------|
 | `inlet()` | ✅ Always called | ✅ Always called |
 | `stream()` | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ❌ **NOT called** by default |
+| `outlet()` | ✅ Called after response | ⚠️ Only if `chat_id` and `id` are present (see below) |
 | `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Runs but no UI to display |
 
-:::warning Outlet Not Called for API Requests
-The `outlet()` function is **only triggered for WebUI chat requests**, not for direct API calls to `/api/chat/completions`. This is because `outlet()` is invoked by the WebUI's `/api/chat/completed` endpoint after the chat is finished.
+:::warning Outlet Requires chat_id and message id
+`outlet()` runs inline as part of `/api/chat/completions` processing. However, the outlet handler **requires both `chat_id` and `id` (message ID) to be present** in the request body. The WebUI always sends these, but pure API callers using the standard OpenAI-compatible request shape typically omit them — in which case **outlet is silently skipped**.
 
-If you need `outlet()` processing for API requests, your API client must call `/api/chat/completed` after receiving the full response.
+If your filters rely on `outlet()` for API requests (logging, observability, post-processing, etc.), you need to either:
+1. Include `chat_id` and `id` in your API request body, **or**
+2. Use a filter that synthesizes these IDs automatically (see example below)
+
+The legacy `/api/chat/completed` endpoint is kept for backward compatibility with older integrations, but it is no longer required for normal outlet execution.
 :::
 
-#### Triggering Outlet for API Requests
+#### Enabling Outlet for Pure API Callers
 
-To invoke `outlet()` filters for API requests, your client must make a second request to `/api/chat/completed` after receiving the complete response:
+If you need `outlet()` to run for API requests that don't include `chat_id` or `id`, you can create a filter that synthesizes temporary IDs in `inlet()`. Since `__metadata__` is a live dict reference shared across the request lifecycle, values written in `inlet()` are visible to `outlet()`.
+
+```python
+from uuid import uuid4
+from pydantic import BaseModel, Field
+
+class Filter:
+    class Valves(BaseModel):
+        priority: int = Field(default=0, description="Run before other filters to ensure IDs are available")
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+        if __metadata__:
+            if not __metadata__.get("chat_id"):
+                __metadata__["chat_id"] = f"local:{uuid4()}"
+            if not __metadata__.get("message_id"):
+                __metadata__["message_id"] = str(uuid4())
+        return body
+```
+
+The `local:` prefix on `chat_id` routes the request into the temp-chat code path, which builds the outlet message list from in-memory data instead of querying the database. No database rows are created, and the event emitter is already inert for API callers (no WebSocket session), so this is safe.
+
+:::tip Inlet-Outlet Correlation
+This pattern also enables **inlet/outlet correlation**: any per-request state your filter stashes in `inlet()` keyed on `__metadata__["message_id"]` can be read back in `outlet()` using the same ID, since both see the same synthesized value.
+:::
+
+#### Legacy Compatibility: `/api/chat/completed`
+
+If you maintain an older integration that still calls `/api/chat/completed`, that endpoint remains available for compatibility:
 
 ```bash
-# After receiving the full response from /api/chat/completions, call:
+# Optional legacy compatibility call:
 curl -X POST http://localhost:3000/api/chat/completed \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -396,7 +431,7 @@ curl -X POST http://localhost:3000/api/chat/completed \
 ```
 
 :::tip
-Include the full conversation in `messages`, including the assistant's response. The `chat_id` and `session_id` are optional but recommended for proper logging and state tracking.
+For new integrations, you can skip this second call and rely on inline outlet execution during `/api/chat/completions`.
 :::
 
 #### Detecting API vs WebUI Requests
@@ -404,7 +439,7 @@ Include the full conversation in `messages`, including the assistant's response.
 You can detect whether a request originates from the WebUI or a direct API call by checking the `__metadata__` argument:
 
 ```python
-def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
     # Check if request is from WebUI
     interface = __metadata__.get("interface") if __metadata__ else None
     
@@ -438,7 +473,7 @@ class Filter:
         self.valves = self.Valves()
         self.user_requests = {}  # Track requests per user
     
-    def inlet(self, body: dict, __user__: dict = None) -> dict:
+    async def inlet(self, body: dict, __user__: dict = None) -> dict:
         if not __user__:
             return body
         
@@ -479,7 +514,7 @@ class Filter:
         self.valves = self.Valves()
         self.logger = logging.getLogger("api_usage")
     
-    def inlet(self, body: dict, __user__: dict = None, __metadata__: dict = None) -> dict:
+    async def inlet(self, body: dict, __user__: dict = None, __metadata__: dict = None) -> dict:
         user_email = __user__.get("email", "unknown") if __user__ else "anonymous"
         model = body.get("model", "unknown")
         interface = __metadata__.get("interface", "api") if __metadata__ else "api"
@@ -518,7 +553,7 @@ class Filter:
     def __init__(self):
         self.valves = self.Valves()
     
-    def inlet(self, body: dict) -> dict:
+    async def inlet(self, body: dict) -> dict:
         # This filter's execution order depends on its priority value
         return body
 ```
@@ -579,7 +614,7 @@ OpenAI recommends sending a `safety_identifier` with each request for abuse dete
 import hashlib
 
 class Filter:
-    def inlet(self, body: dict, __user__: dict = None) -> dict:
+    async def inlet(self, body: dict, __user__: dict = None) -> dict:
         if __user__ and __user__.get("id"):
             body["safety_identifier"] = hashlib.sha256(
                 __user__["id"].encode()
@@ -601,7 +636,7 @@ When a user selects a workspace or custom model, `body["model"]` contains the cu
 
 ```python
 class Filter:
-    def inlet(self, body: dict, __model__: dict = None) -> dict:
+    async def inlet(self, body: dict, __model__: dict = None) -> dict:
         custom_model_id = body["model"]  # e.g. "my-custom-gpt5"
 
         base_model_id = None
@@ -858,7 +893,7 @@ Modify and return the `body`. The modified version of the `body` is what the LLM
 Let’s say the LLM is a chef preparing a dish for Italian cuisine, but the user hasn’t mentioned "This is for Italian cooking." You can ensure the message is clear by appending this context before sending the data to the model.
 
 ```python
-def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     # Add system message for Italian context in the conversation
     context_message = {
         "role": "system",
@@ -876,7 +911,7 @@ def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 Suppose the input from the user looks messy or includes unwanted symbols like `!!!`, making the conversation inefficient or harder for the model to parse. You can clean it up while preserving the core content.
 
 ```python
-def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     # Clean the last user input (from the end of the 'messages' list)
     last_message = body["messages"][-1]["content"]
     body["messages"][-1]["content"] = last_message.replace("!!!", "").strip()
@@ -920,7 +955,7 @@ Unlike `outlet`, which processes an entire completed response, `stream` operates
 
 Here’s how you can inspect and modify streamed LLM responses:
 ```python
-def stream(self, event: dict) -> dict:
+async def stream(self, event: dict) -> dict:
     print(event)  # Print each incoming chunk for inspection
     return event
 ```
@@ -937,7 +972,7 @@ def stream(self, event: dict) -> dict:
 
 ##### 🔄 Example: Filtering Out Emojis from Streamed Data
 ```python
-def stream(self, event: dict) -> dict:
+async def stream(self, event: dict) -> dict:
     for choice in event.get("choices", []):
         delta = choice.get("delta", {})
         if "content" in delta:
@@ -971,13 +1006,13 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Response caching** - Store responses for future retrieval
 - **Quality scoring** - Run automated quality checks on model outputs
 
-:::warning Outlet and API Requests
-Remember: `outlet()` is **not called** for direct API requests to `/api/chat/completions`. If you need outlet processing for API calls, see the [Filter Behavior with API Requests](#-filter-behavior-with-api-requests) section above.
+:::info Outlet and API Requests
+`outlet()` is called for direct API requests to `/api/chat/completions`, but only when `chat_id` and `id` (message ID) are present in the request body. See [Enabling Outlet for Pure API Callers](#enabling-outlet-for-pure-api-callers) for details.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
 ```python
-def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     for message in body["messages"]:
         message["content"] = message["content"].replace("<API_KEY>", "[REDACTED]")
     return body
@@ -995,7 +1030,7 @@ Want the LLM to always know it's assisting a customer in troubleshooting softwar
 
 ```python
 class Filter:
-    def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+    async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
         context_message = {
             "role": "system",
             "content": "You're a software troubleshooting assistant."
@@ -1012,7 +1047,7 @@ Returning output in Markdown or another formatted style? Use the `outlet` functi
 
 ```python
 class Filter:
-    def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
+    async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
         # Add "highlight" markdown for every response
         for message in body["messages"]:
             if message["role"] == "assistant":  # Target model response

@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation was created/updated based on version 0.8.6 and updated for recent migrations.
+> This documentation reflects schema changes up to Open WebUI v0.9.0.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -56,35 +56,41 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | ------- | ---------------- | ------------------------------------------------------------ |
 | 01      | access_grant     | Stores normalized access control grants for all resources    |
 | 02      | auth             | Stores user authentication credentials and login information |
-| 03      | channel          | Manages chat channels and their configurations               |
-| 04      | channel_file     | Links files to channels and messages                         |
-| 05      | channel_member   | Tracks user membership and permissions within channels       |
-| 06      | chat             | Stores chat sessions and their metadata                      |
-| 07      | chat_file        | Links files to chats and messages                            |
-| 08      | chatidtag        | Maps relationships between chats and their associated tags   |
-| 09      | config           | Maintains system-wide configuration settings                 |
-| 10      | document         | Stores documents and their metadata for knowledge management |
-| 11      | feedback         | Captures user feedback and ratings                           |
-| 12      | file             | Manages uploaded files and their metadata                    |
-| 13      | folder           | Organizes files and content into hierarchical structures     |
-| 14      | function         | Stores custom functions and their configurations             |
-| 15      | group            | Manages user groups and their permissions                    |
-| 16      | group_member     | Tracks user membership within groups                         |
-| 17      | knowledge        | Stores knowledge base entries and related information        |
-| 18      | knowledge_file   | Links files to knowledge bases                               |
-| 19      | memory           | Maintains chat history and context memory                    |
-| 20      | message          | Stores individual chat messages and their content            |
-| 21      | message_reaction | Records user reactions (emojis/responses) to messages        |
-| 22      | migrate_history  | Tracks database schema version and migration records         |
-| 23      | model            | Manages AI model configurations and settings                 |
-| 24      | note             | Stores user-created notes and annotations                    |
-| 25      | oauth_session    | Manages active OAuth sessions for users                      |
-| 26      | prompt           | Stores templates and configurations for AI prompts           |
-| 27      | prompt_history   | Tracks version history and snapshots for prompts             |
-| 28      | skill            | Stores reusable markdown instruction sets (Skills)           |
-| 29      | tag              | Manages tags/labels for content categorization               |
-| 30      | tool             | Stores configurations for system tools and integrations      |
-| 31      | user             | Maintains user profiles and account information              |
+| 03      | calendar         | Stores user-owned calendars with access control              |
+| 04      | calendar_event   | Stores calendar events with recurrence (RRULE) support       |
+| 05      | calendar_event_attendee | Tracks attendee RSVPs for shared calendar events      |
+| 06      | channel          | Manages chat channels and their configurations               |
+| 07      | channel_file     | Links files to channels and messages                         |
+| 08      | channel_member   | Tracks user membership and permissions within channels       |
+| 09      | chat             | Stores chat sessions and their metadata                      |
+| 10      | chat_file        | Links files to chats and messages                            |
+| 11      | chatidtag        | Maps relationships between chats and their associated tags   |
+| 12      | config           | Maintains system-wide configuration settings                 |
+| 13      | document         | Stores documents and their metadata for knowledge management |
+| 14      | feedback         | Captures user feedback and ratings                           |
+| 15      | file             | Manages uploaded files and their metadata                    |
+| 16      | folder           | Organizes files and content into hierarchical structures     |
+| 17      | function         | Stores custom functions and their configurations             |
+| 18      | group            | Manages user groups and their permissions                    |
+| 19      | group_member     | Tracks user membership within groups                         |
+| 20      | knowledge        | Stores knowledge base entries and related information        |
+| 21      | knowledge_file   | Links files to knowledge bases                               |
+| 22      | memory           | Maintains chat history and context memory                    |
+| 23      | message          | Stores individual chat messages and their content            |
+| 24      | message_reaction | Records user reactions (emojis/responses) to messages        |
+| 25      | migrate_history  | Tracks database schema version and migration records         |
+| 26      | model            | Manages AI model configurations and settings                 |
+| 27      | note             | Stores user-created notes and annotations                    |
+| 28      | oauth_session    | Manages active OAuth sessions for users                      |
+| 29      | prompt           | Stores templates and configurations for AI prompts           |
+| 30      | prompt_history   | Tracks version history and snapshots for prompts             |
+| 31      | shared_chat      | Stores snapshots of shared chats for link sharing            |
+| 32      | skill            | Stores reusable markdown instruction sets (Skills)           |
+| 33      | tag              | Manages tags/labels for content categorization               |
+| 34      | tool             | Stores configurations for system tools and integrations      |
+| 35      | user             | Maintains user profiles and account information              |
+| 36      | automation       | Stores user-defined scheduled automations                    |
+| 37      | automation_run   | Stores execution history for automation runs                 |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -189,6 +195,139 @@ Things to know about the channel_file table:
 | pinned          | Boolean       | default=False, nullable | Pin status               |
 | meta            | JSON          | server_default="{}"     | Metadata including tags  |
 | folder_id       | Text          | nullable                | Parent folder ID         |
+| tasks           | JSON          | nullable                | Chat-level task/todo list used by agentic workflows |
+| summary         | Text          | nullable                | Optional chat summary text |
+| last_read_at    | BigInteger    | nullable                | Last read timestamp used for unread indicators |
+
+Things to know about the chat table:
+
+- `tasks` and `summary` support structured planning/status UX in chat sessions.
+- `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
+- `share_id` references the `shared_chat.id` token when the chat has an active share link.
+
+## Shared Chat Table
+
+| **Column Name** | **Data Type** | **Constraints**                  | **Description**                    |
+| --------------- | ------------- | -------------------------------- | ---------------------------------- |
+| id              | Text          | PRIMARY KEY                      | Share token (UUID) used in `/s/{id}` URLs |
+| chat_id         | Text          | FOREIGN KEY(chat.id) CASCADE, NOT NULL | Reference to the original chat |
+| user_id         | Text          | NOT NULL                         | User who created the share         |
+| title           | Text          | nullable                         | Chat title at time of sharing      |
+| chat            | JSON          | nullable                         | Snapshot of chat content at share time |
+| created_at      | BigInteger    | nullable                         | Share creation timestamp           |
+| updated_at      | BigInteger    | nullable                         | Last re-snapshot timestamp         |
+
+Things to know about the shared_chat table:
+
+- Replaces the previous pattern of storing shared chat snapshots as phantom rows in the `chat` table with `user_id` set to `shared-{chat_id}`.
+- Each row is an immutable snapshot of the original chat at the time of sharing (or last re-share). The snapshot is updated when the user clicks "Update and Copy Link".
+- Deleting the original chat cascades to delete the shared snapshot.
+- Access control for shared chats is managed via the `access_grant` table with `resource_type = 'shared_chat'`.
+
+## Automation Table
+
+| **Column Name** | **Data Type** | **Constraints**         | **Description** |
+| --------------- | ------------- | ----------------------- | --------------- |
+| id              | Text          | PRIMARY KEY             | Unique identifier (UUID) |
+| user_id         | Text          | NOT NULL                | Owner of the automation |
+| name            | Text          | NOT NULL                | Automation display name |
+| data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional terminal config) |
+| meta            | JSON          | nullable                | Optional metadata |
+| is_active       | Boolean       | NOT NULL, default=True  | Active/paused state |
+| last_run_at     | BigInteger    | nullable                | Last execution time |
+| next_run_at     | BigInteger    | nullable                | Next scheduled execution time |
+| created_at      | BigInteger    | NOT NULL                | Creation timestamp |
+| updated_at      | BigInteger    | NOT NULL                | Last update timestamp |
+
+Things to know about the automation table:
+
+- `next_run_at` is indexed for efficient due-run polling.
+- `data.rrule` defines recurrence and drives scheduler calculations.
+
+## Automation Run Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description** |
+| --------------- | ------------- | --------------- | --------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID) |
+| automation_id   | Text          | NOT NULL        | Reference to automation |
+| chat_id         | Text          | nullable        | Chat created by this run (if available) |
+| status          | Text          | NOT NULL        | Run status (`success` / `error`) |
+| error           | Text          | nullable        | Error details when status is `error` |
+| created_at      | BigInteger    | NOT NULL        | Execution record timestamp |
+
+Things to know about the automation_run table:
+
+- Indexed by `automation_id` for fast per-automation run history queries.
+- Rows are deleted when an automation is deleted.
+
+## Calendar Table
+
+| **Column Name** | **Data Type** | **Constraints**         | **Description**                    |
+| --------------- | ------------- | ----------------------- | ---------------------------------- |
+| id              | Text          | PRIMARY KEY             | Unique identifier (UUID)           |
+| user_id         | Text          | NOT NULL                | Owner of the calendar              |
+| name            | Text          | NOT NULL                | Calendar display name              |
+| color           | Text          | nullable                | Display color (hex, e.g. `#3b82f6`) |
+| is_default      | Boolean       | NOT NULL, default=False | Whether this is the user's default calendar |
+| data            | JSON          | nullable                | Extensible data payload            |
+| meta            | JSON          | nullable                | Optional metadata                  |
+| created_at      | BigInteger    | NOT NULL                | Creation timestamp                 |
+| updated_at      | BigInteger    | NOT NULL                | Last update timestamp              |
+
+Things to know about the calendar table:
+
+- Indexed on `user_id` for efficient per-user calendar listing.
+- A default "Personal" calendar is auto-created on first access.
+- The "Scheduled Tasks" calendar is **virtual** — it is not stored in this table. Instead, the API synthesizes it at response time (with constant ID `__scheduled_tasks__`) for users who have Automations access. Automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
+- Access control is managed via the `access_grant` table with `resource_type = 'calendar'`, enabling calendar sharing between users and groups.
+- A user can only delete non-default calendars. Deleting a calendar cascades to all its events, attendees, and access grants.
+
+## Calendar Event Table
+
+| **Column Name** | **Data Type** | **Constraints**         | **Description**                    |
+| --------------- | ------------- | ----------------------- | ---------------------------------- |
+| id              | Text          | PRIMARY KEY             | Unique identifier (UUID)           |
+| calendar_id     | Text          | NOT NULL                | Reference to parent calendar       |
+| user_id         | Text          | NOT NULL                | User who created the event         |
+| title           | Text          | NOT NULL                | Event title                        |
+| description     | Text          | nullable                | Event description                  |
+| start_at        | BigInteger    | NOT NULL                | Start time (epoch nanoseconds)     |
+| end_at          | BigInteger    | nullable                | End time (epoch nanoseconds)       |
+| all_day         | Boolean       | NOT NULL, default=False | Whether this is an all-day event   |
+| rrule           | Text          | nullable                | iCalendar RRULE for recurrence     |
+| color           | Text          | nullable                | Per-event color override           |
+| location        | Text          | nullable                | Event location                     |
+| data            | JSON          | nullable                | Extensible data payload            |
+| meta            | JSON          | nullable                | Optional metadata (e.g. `automation_id`) |
+| is_cancelled    | Boolean       | NOT NULL, default=False | Soft-cancel flag                   |
+| created_at      | BigInteger    | NOT NULL                | Creation timestamp                 |
+| updated_at      | BigInteger    | NOT NULL                | Last update timestamp              |
+
+Things to know about the calendar_event table:
+
+- Composite index on (`calendar_id`, `start_at`) for efficient range queries within a calendar.
+- Composite index on (`user_id`, `start_at`) for efficient per-user date range queries.
+- Recurring events store an `rrule` string and are expanded into individual instances at query time (server-side Python expansion using `dateutil`).
+- Cancelled events (`is_cancelled = True`) are excluded from range queries but retained in the database.
+
+## Calendar Event Attendee Table
+
+| **Column Name** | **Data Type** | **Constraints**                    | **Description**                    |
+| --------------- | ------------- | ---------------------------------- | ---------------------------------- |
+| id              | Text          | PRIMARY KEY                        | Unique identifier (UUID)           |
+| event_id        | Text          | NOT NULL                           | Reference to the calendar event    |
+| user_id         | Text          | NOT NULL                           | User invited to the event          |
+| status          | Text          | NOT NULL, default='pending'        | RSVP status: `pending`, `accepted`, `declined`, `tentative` |
+| meta            | JSON          | nullable                           | Optional metadata                  |
+| created_at      | BigInteger    | NOT NULL                           | Creation timestamp                 |
+| updated_at      | BigInteger    | NOT NULL                           | Last update timestamp              |
+
+Things to know about the calendar_event_attendee table:
+
+- Unique constraint on (`event_id`, `user_id`) to prevent duplicate attendee entries.
+- Indexed on (`user_id`, `status`) for efficient lookups of events a user is invited to.
+- Attendees are replaced in bulk when an event is updated with a new attendee list.
+- Deleting an event cascades to delete all attendee records.
 
 ## Chat File Table
 
@@ -438,6 +577,7 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | title           | Text          | nullable        | Note title                 |
 | data            | JSON          | nullable        | Note content and data      |
 | meta            | JSON          | nullable        | Note metadata              |
+| is_pinned       | Boolean       | default=False, nullable | Whether the note is pinned to the sidebar |
 
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
@@ -590,6 +730,9 @@ erDiagram
     %% User and Authentication
     user ||--o{ auth : "has"
     user ||--o{ chat : "owns"
+    user ||--o{ shared_chat : "shares"
+    user ||--o{ calendar : "owns"
+    user ||--o{ calendar_event : "creates"
     user ||--o{ channel : "owns"
     user ||--o{ message : "creates"
     user ||--o{ folder : "owns"
@@ -612,7 +755,10 @@ erDiagram
     %% Content Relationships
     message ||--o{ message_reaction : "has"
     chat ||--o{ tag : "tagged_with"
+    chat ||--o{ shared_chat : "shared_via"
     chat }|--|| folder : "organized_in"
+    calendar ||--o{ calendar_event : "contains"
+    calendar_event ||--o{ calendar_event_attendee : "has"
     channel ||--o{ message : "contains"
     message ||--o{ message : "replies"
 
@@ -651,6 +797,51 @@ erDiagram
         boolean pinned
         json meta
         text folder_id FK
+    }
+
+    shared_chat {
+        text id PK
+        text chat_id FK
+        text user_id FK
+        text title
+        json chat
+        bigint created_at
+        bigint updated_at
+    }
+
+    calendar {
+        text id PK
+        text user_id FK
+        text name
+        text color
+        boolean is_default
+        json data
+        json meta
+    }
+
+    calendar_event {
+        text id PK
+        text calendar_id FK
+        text user_id FK
+        text title
+        text description
+        bigint start_at
+        bigint end_at
+        boolean all_day
+        text rrule
+        text color
+        text location
+        json data
+        json meta
+        boolean is_cancelled
+    }
+
+    calendar_event_attendee {
+        text id PK
+        text event_id FK
+        text user_id FK
+        text status
+        json meta
     }
 
     channel {
@@ -767,6 +958,7 @@ erDiagram
         text title
         json data
         json meta
+        boolean is_pinned
         json access_control
     }
 
@@ -891,9 +1083,14 @@ To use SQLCipher with existing data, you must either:
 | `DATABASE_TYPE` | `None` | Set to `sqlite+sqlcipher` for encrypted SQLite |
 | `DATABASE_PASSWORD` | - | Encryption password (required for SQLCipher) |
 | `DATABASE_ENABLE_SQLITE_WAL` | `False` | Enable Write-Ahead Logging for better performance |
+| `DATABASE_SQLITE_PRAGMA_SYNCHRONOUS` | `NORMAL` | SQLite sync mode (safe with WAL, avoids fsync per txn) |
+| `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT` | `5000` | Write-lock wait time in milliseconds |
+| `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` | `-65536` | Page cache size (negative = KiB; ≈ 64 MB) |
+| `DATABASE_SQLITE_PRAGMA_TEMP_STORE` | `MEMORY` | Temp table storage (`MEMORY` keeps temps in RAM) |
+| `DATABASE_SQLITE_PRAGMA_MMAP_SIZE` | `268435456` | Memory-mapped I/O size in bytes (≈ 256 MB) |
+| `DATABASE_SQLITE_PRAGMA_JOURNAL_SIZE_LIMIT` | `67108864` | Max WAL file size after checkpoint (≈ 64 MB) |
 | `DATABASE_POOL_SIZE` | `None` | Database connection pool size |
 | `DATABASE_POOL_TIMEOUT` | `30` | Pool connection timeout in seconds |
 | `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |
 
 For more details, see the [Environment Variable Configuration](/reference/env-configuration) documentation.
-

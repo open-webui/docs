@@ -7,6 +7,10 @@ title: "Mistral Voxtral STT"
 
 This guide covers how to use Mistral's Voxtral model for Speech-to-Text with Open WebUI. Voxtral is Mistral's speech-to-text model that provides accurate transcription.
 
+:::tip Looking for TTS?
+See the companion guide: [Using Mistral for Text-to-Speech](/features/chat-conversations/audio/text-to-speech/mistral-tts-integration)
+:::
+
 ## Requirements
 
 - A Mistral API key
