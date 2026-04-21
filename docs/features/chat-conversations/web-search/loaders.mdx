@@ -1,0 +1,97 @@
+---
+sidebar_position: 2
+title: "Web Loader Engines"
+---
+
+# Web Loader Engines
+
+After your search engine returns URLs, Open WebUI still needs to fetch the page content. The **Web Loader Engine** controls how that content is retrieved for traditional web search, URL fetching, and features like [Save Search Results to Knowledge](./save-to-knowledge).
+
+You can configure the loader in **Admin Panel → Settings → Web Search → Loader** or with [`WEB_LOADER_ENGINE`](/reference/env-configuration#web_loader_engine).
+
+## Which loader should you use?
+
+| Loader | Best for | JavaScript support | Extra setup | Speed / cost profile |
+| --- | --- | --- | --- | --- |
+| `safe_web` | Static docs, blogs, and simple HTML pages | No browser rendering | None | Fastest and lightest |
+| `playwright` | Single-page apps and JavaScript-heavy sites | Yes | Browser install or remote Playwright endpoint | Slower and heavier than `safe_web` |
+| `firecrawl` | Cleaner extracted content from difficult or noisy pages | Usually yes, via Firecrawl service | Firecrawl API key and service access | External service, may add cost and network dependency |
+
+## `safe_web`
+
+`safe_web` is the default loader. It fetches the raw page HTML directly, retries failed requests, and extracts plain text from the page.
+
+Use it when:
+
+- You want the simplest setup with no external service.
+- The target site already renders most content in the initial HTML.
+- You care about speed and low overhead.
+
+Tradeoffs:
+
+- It does not run page JavaScript, so SPAs and client-rendered sites may return incomplete or empty content.
+- Extraction is based on the page HTML, so the result can be noisier than a dedicated extraction service.
+
+Useful settings:
+
+- [`WEB_LOADER_TIMEOUT`](/reference/env-configuration#web_loader_timeout) to prevent slow pages from hanging too long.
+- [`WEB_SEARCH_TRUST_ENV`](/reference/env-configuration#web_search_trust_env) if Open WebUI must honor `http_proxy` or `https_proxy`.
+
+## `playwright`
+
+`playwright` opens the page in a real browser, waits for it to render, and then extracts the content. This makes it the best built-in choice for modern web apps that depend on JavaScript.
+
+Use it when:
+
+- `safe_web` returns partial content, placeholders, or empty pages.
+- The site requires client-side rendering before the content exists.
+- You need browser-like fetching without relying on an external extraction API.
+
+Tradeoffs:
+
+- It is slower and uses more CPU and memory than `safe_web`.
+- If you do not provide a remote browser, Open WebUI installs Chromium dependencies on startup.
+- Browser navigation timeouts matter more here than with the default loader.
+
+Useful settings:
+
+- [`PLAYWRIGHT_WS_URL`](/reference/env-configuration#playwright_ws_url) to connect to a remote Playwright browser.
+- [`PLAYWRIGHT_TIMEOUT`](/reference/env-configuration#playwright_timeout) to control how long page navigation can take.
+
+## `firecrawl`
+
+`firecrawl` sends the URL list to a Firecrawl service, which scrapes the pages and returns extracted markdown back to Open WebUI.
+
+Use it when:
+
+- You want cleaner extracted content than plain HTML-to-text conversion.
+- You are scraping pages that are difficult, noisy, or inconsistent with the default loader.
+- You are comfortable depending on an external service for extraction.
+
+Tradeoffs:
+
+- It requires Firecrawl connectivity and usually an API key.
+- Availability, latency, and cost depend on the Firecrawl service you use.
+- Because extraction happens outside Open WebUI, it adds an external network dependency.
+
+Useful settings:
+
+- [`FIRECRAWL_API_BASE_URL`](/reference/env-configuration#firecrawl_api_base_url)
+- [`FIRECRAWL_API_KEY`](/reference/env-configuration#firecrawl_api_key)
+- [`FIRECRAWL_TIMEOUT`](/reference/env-configuration#firecrawl_timeout)
+
+## Quick recommendations
+
+- Start with `safe_web` for general-purpose web search.
+- Switch to `playwright` when pages depend on JavaScript rendering.
+- Switch to `firecrawl` when you want cleaner extraction and do not mind using an external service.
+
+## Troubleshooting loader choice
+
+If web search quality is poor:
+
+- Empty or incomplete pages usually mean the site needs `playwright` or `firecrawl`.
+- Slow or hanging fetches with `safe_web` usually mean you should set `WEB_LOADER_TIMEOUT`.
+- Proxy-based deployments should enable `WEB_SEARCH_TRUST_ENV`.
+
+For broader debugging steps, see the [Web Search Troubleshooting Guide](/troubleshooting/web-search).
