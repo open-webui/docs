@@ -359,69 +359,70 @@ Here's the complete flow from admin configuration to filter execution:
 
 ### 📡 Filter Behavior with API Requests
 
-When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), filters follow the same execution model as WebUI requests — with one important caveat for `outlet()`.
+When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), `inlet()` and `stream()` follow the same execution model as WebUI requests. `outlet()` is the one that behaves very differently for direct API callers and is covered in detail below.
 
 #### Key Behavioral Differences
 
-| Function | WebUI Request | Direct API Request |
-|----------|--------------|-------------------|
-| `inlet()` | ✅ Always called | ✅ Always called |
-| `stream()` | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ⚠️ Non-streaming only, and only if `chat_id` and `id` are present (see below) |
-| `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Runs but no UI to display |
+| Function | WebUI Request | Direct API — stable (`main`) | Direct API — pre-release (`dev`) |
+|----------|--------------|------------------------------|-----------------------------------|
+| `inlet()` | ✅ Always called | ✅ Always called | ✅ Always called |
+| `stream()` | ✅ Called during streaming | ✅ Called during streaming | ✅ Called during streaming |
+| `outlet()` | ✅ Called after response | ❌ Not called by `/api/chat/completions` — only by `/api/chat/completed` | ⚠️ Runs inline only under narrow conditions (see below) |
+| `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Inert for pure API callers | ⚠️ Inert for pure API callers |
 
-:::warning Streaming API Requests Do Not Invoke outlet() Yet
-Inline `outlet()` execution during `/api/chat/completions` is currently only wired up for **non-streaming** direct API requests. For **streaming** (`"stream": true`) API requests, `outlet()` is not yet invoked by the backend — this is a known limitation that is being worked on. WebUI requests continue to run `outlet()` for both streaming and non-streaming responses as before.
+:::danger outlet() on Direct API Calls — Accurate Picture
+Earlier versions of this page claimed `outlet()` runs inline during `/api/chat/completions` for non-streaming direct API requests. That was only partially accurate and only on `dev`. Verified against the backend source, the real behavior is:
 
-If you depend on `outlet()` for observability, logging, or post-processing of API traffic, either issue non-streaming requests or route the traffic through the WebUI until streaming support lands.
+**On tagged releases / `main`:** `outlet()` is **never** invoked by `/api/chat/completions`. It runs only when the caller performs the second POST to `/api/chat/completed`. API integrations that need `outlet()` must make both calls.
+
+**On `dev` / pre-release builds:** `outlet()` can fire inline after `/api/chat/completions`, but only when **all** of the following hold:
+
+1. The request body includes **both** `chat_id` **and** `id` (the assistant message id). If either is missing, the backend sees `event_emitter = None` and silently skips the outlet block.
+2. The `chat_id` is a chat the authenticated user already owns; otherwise the request 404s before the outlet path runs. (Alternatively, send `parent_id: null` without a `chat_id` to have the server create a new chat.)
+3. The request is **non-streaming**. On the streaming path the server consumes the stream itself and routes content to the user's WebSocket — an HTTP streaming API caller receives effectively nothing. `outlet()` still runs DB-side, but the streaming client does not see it.
+
+Even on the non-streaming path, **`outlet()` does not rewrite the HTTP response body**. The handler updates the persisted chat message row and emits a `chat:outlet` WebSocket event; the JSON returned to your HTTP client is the pre-outlet content. To observe `outlet()`'s output you must either read the chat record back, subscribe to the WebSocket, or use `/api/chat/completed`.
+
+**Bottom line for filter authors:** if your filter's `outlet()` needs to be visible to pure API consumers (Continue.dev, Claude Code, Langfuse traces, custom scripts), assume `/api/chat/completed` is the supported surface today. Relying on inline `outlet()` during `/api/chat/completions` currently works only for clients shaped like the WebUI.
 :::
 
-:::warning Outlet Requires chat_id and message id
-For non-streaming direct API requests, `outlet()` runs inline as part of `/api/chat/completions` processing. However, the outlet handler **requires both `chat_id` and `id` (message ID) to be present** in the request body. The WebUI always sends these, but pure API callers using the standard OpenAI-compatible request shape typically omit them — in which case **outlet is silently skipped**.
+#### Inlet ↔ Outlet Correlation via `__metadata__`
 
-If your filters rely on `outlet()` for API requests (logging, observability, post-processing, etc.), you need to either:
-1. Include `chat_id` and `id` in your API request body, **or**
-2. Use a filter that synthesizes these IDs automatically (see example below)
-
-The legacy `/api/chat/completed` endpoint is kept for backward compatibility with older integrations, but it is no longer required for normal outlet execution.
-:::
-
-#### Enabling Outlet for Pure API Callers
-
-If you need `outlet()` to run for API requests that don't include `chat_id` or `id`, you can create a filter that synthesizes temporary IDs in `inlet()`. Since `__metadata__` is a live dict reference shared across the request lifecycle, values written in `inlet()` are visible to `outlet()`.
+`__metadata__` is a live dict passed through the request lifecycle, so anything your filter stashes in `inlet()` is visible in `outlet()` on the *same request* — this is useful for things like start-time tracking, correlation IDs, or per-call valves, *when `outlet()` actually runs*. Given the constraints above, this pattern is primarily useful in WebUI requests and in the `/api/chat/completed` handler.
 
 ```python
-from uuid import uuid4
+import time
 from pydantic import BaseModel, Field
 
 class Filter:
     class Valves(BaseModel):
-        priority: int = Field(default=0, description="Run before other filters to ensure IDs are available")
+        priority: int = Field(default=0)
 
     def __init__(self):
         self.valves = self.Valves()
 
     async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
-        if __metadata__:
-            if not __metadata__.get("chat_id"):
-                __metadata__["chat_id"] = f"local:{uuid4()}"
-            if not __metadata__.get("message_id"):
-                __metadata__["message_id"] = str(uuid4())
+        if __metadata__ is not None:
+            __metadata__["_my_started_at"] = time.monotonic()
+        return body
+
+    async def outlet(self, body: dict, __metadata__: dict = None) -> dict:
+        if __metadata__ is not None and "_my_started_at" in __metadata__:
+            duration = time.monotonic() - __metadata__["_my_started_at"]
+            print(f"request took {duration:.3f}s")
         return body
 ```
 
-The `local:` prefix on `chat_id` routes the request into the temp-chat code path, which builds the outlet message list from in-memory data instead of querying the database. No database rows are created, and the event emitter is already inert for API callers (no WebSocket session), so this is safe.
-
-:::tip Inlet-Outlet Correlation
-This pattern also enables **inlet/outlet correlation**: any per-request state your filter stashes in `inlet()` keyed on `__metadata__["message_id"]` can be read back in `outlet()` using the same ID, since both see the same synthesized value.
+:::warning Synthesizing `chat_id` / `message_id` in `inlet()` Is Not a Reliable Workaround
+Older versions of this page suggested synthesizing a `local:<uuid>` `chat_id` and a random `message_id` inside `inlet()` to force `outlet()` to run for pure API callers. Do not rely on that pattern — in current backend code the chat ownership check runs before the filter pipeline, and the inline outlet handler does not rewrite the HTTP response body even when it does run. If you need `outlet()` output over HTTP for an API caller, use `/api/chat/completed` instead.
 :::
 
-#### Legacy Compatibility: `/api/chat/completed`
+#### Running outlet() for API Callers: `/api/chat/completed`
 
-If you maintain an older integration that still calls `/api/chat/completed`, that endpoint remains available for compatibility:
+The reliable, supported way to run `outlet()` for a direct API integration is to follow up `/api/chat/completions` with `POST /api/chat/completed`, passing the full conversation (including the assistant response) in `messages`. The endpoint runs pipeline outlet filters and Function `outlet()` handlers unconditionally and returns the filtered payload.
 
 ```bash
-# Optional legacy compatibility call:
+# Step 2: run outlet() after /api/chat/completions returned a response.
 curl -X POST http://localhost:3000/api/chat/completed \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -436,8 +437,8 @@ curl -X POST http://localhost:3000/api/chat/completed \
   }'
 ```
 
-:::tip
-For new integrations, you can skip this second call and rely on inline outlet execution during `/api/chat/completions`.
+:::info
+On `dev` this endpoint is labeled deprecated in favor of inline execution, but because inline execution does not return the filtered payload over HTTP to pure API callers, `/api/chat/completed` is still the correct choice for most API integrations today.
 :::
 
 #### Detecting API vs WebUI Requests
@@ -1013,7 +1014,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring** - Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-`outlet()` is called for **non-streaming** direct API requests to `/api/chat/completions` when `chat_id` and `id` (message ID) are present in the request body. Streaming API requests do not yet invoke `outlet()` — support is in progress. See [Enabling Outlet for Pure API Callers](#enabling-outlet-for-pure-api-callers) for details.
+`outlet()` does **not** run reliably for direct `/api/chat/completions` calls. On tagged releases it is never invoked by that endpoint. On `dev` it can run inline, but only when the caller supplies `chat_id` + `id`, owns the chat, and uses a non-streaming request — and even then the filtered content is not returned in the HTTP response. For direct API integrations that need `outlet()`, follow `/api/chat/completions` with `POST /api/chat/completed`. See [Filter Behavior with API Requests](#-filter-behavior-with-api-requests) for the full picture.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
