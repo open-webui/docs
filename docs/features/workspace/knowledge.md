@@ -37,7 +37,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 
 | | |
 | :--- | :--- |
-| 📄 **9 vector databases** | ChromaDB, PGVector, Qdrant, Milvus, OpenSearch, Elasticsearch, and more |
+| 📄 **9 vector databases** | ChromaDB and PGVector (officially maintained), plus community options: Qdrant, Milvus, OpenSearch, Elasticsearch, and more |
 | 🔍 **Hybrid search** | BM25 keyword search + vector search with cross-encoder reranking |
 | 📑 **5 extraction engines** | Tika, Docling, Azure, Mistral OCR, custom loaders |
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
