@@ -292,8 +292,27 @@ If you're using **SQLite** (the default) in a cloud environment, you may be trad
 
 Cloud storage (Azure Disks, AWS EBS, GCP Persistent Disks) often has significantly higher latency and lower IOPS than local NVMe/SSD storage—especially on lower-tier storage classes. 
 
-:::warning Warning: Performance Risk with Network File Systems
-Using Network-attached File Systems like **NFS, SMB, or Azure Files** for your database storage (especially for SQLite) **may** introduce severe latency into the file locking and synchronous write operations that SQLite relies on.
+:::danger SQLite on NFS / SMB / Azure Files Is Not Supported — by SQLite Itself
+This restriction does **not** come from Open WebUI — it comes from **SQLite upstream**. The SQLite project [officially states](https://www.sqlite.org/faq.html#q5) that SQLite databases on network filesystems (NFS, SMB/CIFS, and similar) are **not supported**: file locking over those protocols is unreliable, and concurrent writers **can corrupt the database**. The SQLite documentation explicitly warns against it, and Open WebUI inherits that constraint because it uses SQLite.
+
+As a consequence, for Open WebUI the **only supported storage configurations are**:
+
+- **PostgreSQL** — recommended for any multi-user deployment and required for anything not on a directly-attached local SSD. This sidesteps the SQLite-on-network-storage problem entirely. **Or**
+- **SQLite on a directly-attached SSD / NVMe** — single-user / small deployments only. Must be a **local** disk on the host; SQLite upstream's guidance applies regardless of the application.
+
+**Not supported** for SQLite (per SQLite's own documentation, not an Open WebUI policy): **NFS, SMB/CIFS, Azure Files, GlusterFS, CephFS, object-storage-backed FUSE mounts, network PVCs, any remote or low-IOPS storage.** This includes Docker bind mounts and Kubernetes PersistentVolumeClaims backed by those filesystems. Beyond the performance symptoms below, you are risking **database corruption** — again, per SQLite, not us.
+
+If your storage is anything other than a local SSD/NVMe, **use PostgreSQL**.
+
+Typical symptoms after upgrading to releases that use the async SQLite driver:
+
+- `/api/config` takes **10–20+ seconds** on every request
+- `/api/v1/chats/?page=1` and other list endpoints stall for **minutes** under load
+- OIDC / SSO callbacks hang or "spin" when redirecting back to Open WebUI
+- Large (multi-second) gaps in DEBUG logs between `aiosqlite` and `httpcore` lines
+- `PRAGMA journal_mode=WAL` starts but never completes in logs
+
+Older synchronous SQLAlchemy releases (≤ 0.8.12) serialized contention in-process, which masked slow storage. The async driver opens connections across threads and hammers the filesystem, so network-attached storage degradation becomes immediately visible.
 :::
 
 SQLite is particularly sensitive to disk performance because it performs synchronous writes. Moving from local SSDs to a network share can increase latency by 10x or more per operation.
@@ -302,10 +321,21 @@ SQLite is particularly sensitive to disk performance because it performs synchro
 - Performance is acceptable with a single user but degrades rapidly as concurrency increases.
 - High "I/O Wait" on the server despite low CPU usage.
 
-**Solutions:**
-1. **Use high-performance Block Storage:**
-   - Ensure you are using SSD-backed **Block Storage** classes (e.g., `Premium_LRS` on Azure Disks, `gp3` on AWS EBS, `pd-ssd` on GCP). Avoid "File" based storage classes (like `azurefile-csi`) for database workloads.
-2. **Use PostgreSQL instead:** For any medium to large production deployment, **Postgres is mandatory**. SQLite is generally not recommended at scale in cloud environments due to the inherent latency of network-attached storage and the compounding effect of file locking over the network.
+**Solutions (in order of robustness):**
+
+1. **Best — migrate to PostgreSQL.** This is the recommended fix for any deployment that is not strictly single-user on a local disk, and it is required for any deployment on remote / network / low-IOPS storage. Set:
+   ```bash
+   DATABASE_URL=postgresql+asyncpg://user:password@host:5432/webui
+   ```
+   PostgreSQL removes the fsync-per-connection pathology entirely because the database process owns its own storage, and it is the only supported option for multi-user workloads.
+2. **Acceptable — move `webui.db` onto directly-attached local SSD/NVMe.** Only appropriate for single-user or very small deployments. Bind-mount a directory on the host's **local** SSD/NVMe into `/app/backend/data`. Do **not** use NFS, SMB, Azure Files, or any network-backed storage class — not even "high-performance" network block storage. SQLite was not designed for network filesystems and will always be slow on them.
+3. **Temporary workaround only — keep SQLite on NFS with reduced concurrency.** If you cannot immediately move storage or switch databases, set:
+   ```bash
+   DATABASE_POOL_SIZE=1
+   DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
+   ```
+   `DATABASE_POOL_SIZE=1` forces a single serialized async connection, trading concurrency for stability. `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000` gives SQLite 30 seconds to acquire locks, which NFS can take much longer to grant than local disk. This is **not a supported long-term configuration** — expect degraded throughput, intermittent stalls, and potential corruption. Plan to migrate to PostgreSQL or local SSD as soon as possible. A warm pool may briefly appear fine after restart, but the problem returns under load.
+4. **Cloud block storage:** When using cloud block storage for the Open WebUI data volume (for PostgreSQL or the application itself), use SSD-backed **Block Storage** classes (e.g., `Premium_LRS` on Azure Disks, `gp3` on AWS EBS, `pd-ssd` on GCP). Avoid "File" based storage classes (like `azurefile-csi`) for any database workload — including SQLite.
 
 ### Other Cloud-Specific Considerations
 

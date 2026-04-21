@@ -197,16 +197,22 @@ Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** fo
 |----------------|--------------|-------------------|
 | `inlet()` | ✅ Runs | ✅ Runs |
 | `stream()` | ✅ Runs | ✅ Runs |
-| `outlet()` | ✅ Runs | ✅ Runs |
+| `outlet()` | ✅ Runs | ⚠️ Non-streaming only (see note) |
 
 The `inlet()` function always executes, making it ideal for:
 - **Rate limiting** - Track and limit requests per user
 - **Request logging** - Log all API usage for monitoring
 - **Input validation** - Reject invalid requests before they reach the model
 
+:::warning Streaming Requests
+Inline `outlet()` execution during `/api/chat/completions` is currently only wired up for **non-streaming** direct API requests. For **streaming** (`"stream": true`) API requests, `outlet()` is not yet invoked by the backend — this is a known limitation that is being worked on. WebUI requests continue to run `outlet()` for both streaming and non-streaming responses as before.
+
+If you rely on `outlet()` for observability, logging, or post-processing of streamed API responses, use non-streaming requests or consume the response via the WebUI until streaming support lands.
+:::
+
 #### Legacy Endpoint: `/api/chat/completed`
 
-`outlet()` now runs inline during `/api/chat/completions` for both WebUI and direct API requests.
+`outlet()` now runs inline during `/api/chat/completions` for WebUI requests and for non-streaming direct API requests (see caveat above).
 
 `POST /api/chat/completed` is retained for backward compatibility with older clients that still call it as a second step:
 
