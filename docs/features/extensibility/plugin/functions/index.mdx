@@ -73,12 +73,12 @@ When you save a Function, Open WebUI scans the Python source code for a top-leve
 ```
 # This is detected as a Pipe function:
 class Pipe:
-    def pipe(self, body: dict) -> str:
+    async def pipe(self, body: dict) -> str:
         return "Hello from my custom model!"
 
 # This is detected as a Filter function:
 class Filter:
-    def inlet(self, body: dict) -> dict:
+    async def inlet(self, body: dict) -> dict:
         return body
 ```
 

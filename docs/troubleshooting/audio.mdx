@@ -22,7 +22,7 @@ Admins can configure server-wide audio defaults:
 Here you can configure:
 - **Speech-to-Text Engine** — Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
 - **Whisper Model** — Select model size for local STT (tiny, base, small, medium, large)
-- **Text-to-Speech Engine** — Choose between OpenAI-compatible, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
+- **Text-to-Speech Engine** — Choose between OpenAI-compatible, Mistral, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
 - **TTS Voice** — Select the default voice
 - **API Keys and Base URLs** — Configure external service connections
 
@@ -70,6 +70,27 @@ environment:
 ```
 
 → See full guides: [Speech-to-Text](/category/speech-to-text) | [Text-to-Speech](/category/text-to-speech)
+
+### Fast Setup: Mistral STT + TTS (Paid)
+
+If you prefer Mistral's audio stack:
+
+**In Admin Panel → Settings → Audio:**
+- **STT Engine:** `MistralAI` | **Model:** `voxtral-mini-latest` (or leave empty)
+- **TTS Engine:** `MistralAI` | **Model:** `mistral-tts-latest` (or leave empty) | **Voice:** choose from list
+- Enter your Mistral API key in both sections
+
+Or via environment variables:
+```yaml
+environment:
+  - AUDIO_STT_ENGINE=mistral
+  - AUDIO_STT_MISTRAL_API_KEY=...
+  - AUDIO_TTS_ENGINE=mistral
+  - AUDIO_TTS_MISTRAL_API_KEY=...
+  - AUDIO_TTS_MODEL=mistral-tts-latest
+```
+
+→ See guides: [Mistral Voxtral STT](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) | [Mistral TTS](/features/chat-conversations/audio/text-to-speech/mistral-tts-integration)
 
 ### Free Setup: Local Whisper + Edge TTS
 
@@ -400,12 +421,14 @@ curl http://your-tts-service:port/health
 
 | Variable | Description |
 |----------|-------------|
-| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS - uses browser), `openai`, `elevenlabs`, `azure`, `transformers` |
+| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS - uses browser), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` |
 | `AUDIO_TTS_MODEL` | TTS model to use (default: `tts-1`) |
 | `AUDIO_TTS_VOICE` | Default voice for TTS (default: `alloy`) |
 | `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS |
 | `AUDIO_TTS_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible TTS |
 | `AUDIO_TTS_OPENAI_API_KEY` | API key for OpenAI-compatible TTS |
+| `AUDIO_TTS_MISTRAL_API_KEY` | API key for Mistral TTS |
+| `AUDIO_TTS_MISTRAL_API_BASE_URL` | Base URL for Mistral TTS |
 
 ### STT Environment Variables
 

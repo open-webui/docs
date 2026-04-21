@@ -33,8 +33,8 @@ Add the following environment variables to your Open WebUI `docker-compose.yaml`
 services:
   open-webui:
     environment:
-      ENABLE_RAG_WEB_SEARCH: True
-      RAG_WEB_SEARCH_ENGINE: "yandex"
+      ENABLE_WEB_SEARCH: True
+      WEB_SEARCH_ENGINE: "yandex"
       YANDEX_WEB_SEARCH_API_KEY: "YOUR_YANDEX_CLOUD_API_KEY"
       # Optional: Override default search URL
       # YANDEX_WEB_SEARCH_URL: "https://searchapi.api.cloud.yandex.net/v2/web/search"

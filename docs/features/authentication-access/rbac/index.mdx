@@ -13,6 +13,14 @@ Open WebUI implements a flexible and secure **Role-Based Access Control (RBAC)**
 The security model is **Additive**. Users start with their default rights, and Group memberships **add** capabilities. A user effectively has the *union* of all rights granted by their Roles and Groups.
 :::
 
+:::warning Scope of RBAC vs Provider Credentials
+RBAC controls what users can do **inside Open WebUI** (features, resources, and UI/API actions).
+
+RBAC does **not** replace least-privilege configuration for external providers. If you connect an OpenAI-compatible proxy/provider (for example LiteLLM, OpenRouter, or custom gateways), use provider credentials that are scoped for inference usage in your deployment.
+
+Avoid configuring management/master keys for general user traffic unless your deployment explicitly requires that level of trust.
+:::
+
 ## Documentation Guide
 
 *   [‍🔑 **Roles**](./roles.md)

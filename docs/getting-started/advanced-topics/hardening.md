@@ -94,6 +94,14 @@ This removes the email/password form from the UI, steering all users through you
 ENABLE_PASSWORD_AUTH=false
 ```
 
+If you want to keep login-form behavior separate from account-page password updates, you can hide the password change form in **Settings > Account**:
+
+```bash
+ENABLE_PASSWORD_CHANGE_FORM=false
+```
+
+This is useful for SSO-focused deployments where local password changes should not be presented to users.
+
 ---
 
 ## Session and Cookie Security
@@ -126,7 +134,20 @@ Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will 
 
 ### Token revocation
 
-With Redis configured, Open WebUI supports per-token revocation. When a user signs out, their token is added to a revocation list that auto-expires. Without Redis, tokens remain valid until they expire naturally.
+:::warning Token Revocation Requires Redis
+
+Without Redis, **signing out does not invalidate a user's token**. The token remains valid and usable until it expires naturally (default: 4 weeks). This means:
+
+- A stolen or leaked token cannot be revoked by signing out
+- Changing a user's password does not invalidate their existing sessions
+- Admin-initiated account deactivation does not immediately block access
+- OIDC back-channel logout cannot revoke tokens
+
+With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.
+
+**If you cannot deploy Redis**, shorten `JWT_EXPIRES_IN` (e.g., `1h` or `4h`) to limit the window of exposure. See the [Redis tutorial](/tutorials/integrations/redis) for setup instructions.
+
+:::
 
 ---
 
@@ -180,11 +201,28 @@ PERMISSIONS_POLICY=camera=(),microphone=(),geolocation=()
 
 # Content Security Policy
 CONTENT_SECURITY_POLICY=default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'
+
+# Content Security Policy in report-only mode (logs violations without enforcing)
+CONTENT_SECURITY_POLICY_REPORT_ONLY=default-src 'self'; report-uri /csp-report
+
+# Cross-Origin isolation headers
+CROSS_ORIGIN_EMBEDDER_POLICY=require-corp    # Options: unsafe-none, require-corp, credentialless
+CROSS_ORIGIN_OPENER_POLICY=same-origin       # Options: unsafe-none, same-origin-allow-popups, same-origin
+CROSS_ORIGIN_RESOURCE_POLICY=same-origin     # Options: same-site, same-origin, cross-origin
+
+# Reporting API endpoint configuration
+REPORTING_ENDPOINTS=default="https://your-report-collector.example/reports"
 ```
 
 :::tip
 
-If you set a Content Security Policy, start permissive and tighten incrementally. An overly strict CSP will break the frontend. Browser dev tools will show you which resources are being blocked.
+If you set a Content Security Policy, start permissive and tighten incrementally. An overly strict CSP will break the frontend. Use `CONTENT_SECURITY_POLICY_REPORT_ONLY` to test a policy before enforcing it. Browser dev tools will show you which resources are being blocked.
+
+:::
+
+:::warning Cross-Origin Isolation
+
+Setting `CROSS_ORIGIN_EMBEDDER_POLICY=require-corp` and `CROSS_ORIGIN_OPENER_POLICY=same-origin` together enables cross-origin isolation. This may break resources loaded from third-party origins (e.g., external images, scripts, or iframes) unless those resources explicitly set appropriate CORS headers. Test thoroughly before deploying.
 
 :::
 
@@ -242,7 +280,7 @@ OAUTH_ALLOWED_ROLES=user,admin,superadmin
 OAUTH_MERGE_ACCOUNTS_BY_EMAIL=false
 ```
 
-When enabled, an OAuth login with an email matching an existing local account will merge the two. This is convenient but depends on your OAuth provider reliably verifying email addresses. If your provider does not guarantee email verification, a user who controls a matching email could gain access to the existing account.
+When enabled, an OAuth login with an email matching an existing local account will merge the two. **This is not recommended.** It depends on your OAuth provider reliably verifying email addresses. If your provider does not guarantee email verification, a user who controls a matching email could gain access to the existing account — effectively an account takeover. Keep this set to `false` unless you have verified that your provider enforces email verification.
 
 ### Session limits
 
@@ -258,7 +296,7 @@ ENABLE_OAUTH_BACKCHANNEL_LOGOUT=true
 
 ## Trusted Header Authentication
 
-If your reverse proxy handles authentication (Authelia, Authentik, oauth2-proxy), you can pass the authenticated identity to Open WebUI via HTTP headers:
+If your reverse proxy handles authentication (Authelia, Authentik, oauth2-proxy), you can pass the authenticated identity to Open WebUI via HTTP headers. **This is possible but risky depending on your setup** — incorrect configuration allows any client to authenticate as any user by forging the header:
 
 ```bash
 WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-Forwarded-Email
@@ -380,6 +418,14 @@ ENABLE_ADMIN_CHAT_ACCESS=true
 # Whether all users can access all models regardless of group restrictions (default: false)
 BYPASS_MODEL_ACCESS_CONTROL=false
 ```
+
+### OpenAI API passthrough
+
+```bash
+ENABLE_OPENAI_API_PASSTHROUGH=false
+```
+
+The OpenAI router includes a catch-all proxy endpoint (`/{path:path}`) that forwards any request to the upstream OpenAI-compatible API using the admin-configured API key. **This is disabled by default and should be kept disabled.** When enabled, any authenticated user can reach any upstream endpoint — including endpoints not natively handled by Open WebUI — using the admin's credentials and without model-level access control. Only enable this if you explicitly need direct passthrough to upstream API endpoints and understand the security implications.
 
 ### Data sharing and export
 
@@ -672,16 +718,19 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Review signup policy](#registration) | Disabled after first user | Keep disabled or use `pending` role |
 | [Enable password validation](#password-validation) | Disabled | `ENABLE_PASSWORD_VALIDATION=true` |
 | [Secure cookies](#cookie-settings) | `Secure=false`, `SameSite=lax` | `Secure=true`, `SameSite=strict` |
+| [Enable token revocation](#token-revocation) | No revocation (no Redis) | Configure Redis or shorten `JWT_EXPIRES_IN` |
 | [Restrict CORS](#cors) | `*` | Your specific domain(s) |
-| [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP |
+| [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP, Cross-Origin policies |
 | [Restrict OAuth domains](#domain-and-group-restrictions) | All allowed | `OAUTH_ALLOWED_DOMAINS=yourdomain.com` |
 | [Enable audit logging](#audit-logging) | `NONE` | `METADATA` or higher |
 | [Restrict API key endpoints](#endpoint-restrictions) | All endpoints | `ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS=true` |
+| [Keep API passthrough disabled](#openai-api-passthrough) | Disabled | Keep `ENABLE_OPENAI_API_PASSTHROUGH=false` |
 | [Disable auto pip install](#dependency-installation) | Enabled | `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` |
 | [Review community sharing](#data-sharing-and-export) | `true` | Disable if sensitive data |
 | [Review direct connections](#data-sharing-and-export) | `false` | Keep disabled unless needed |
 | [Use PostgreSQL](#postgresql) | SQLite | PostgreSQL |
 | [Verify outbound TLS](#outbound-tls) | Enabled | Keep enabled |
+| [Enable offline mode](#offline-mode) | Disabled | `OFFLINE_MODE=true` for air-gapped environments |
 | [Structured logging](#structured-logging) | Text | `LOG_FORMAT=json` |
 | [Keep updated](#keeping-open-webui-updated) | N/A | Latest stable release |
 

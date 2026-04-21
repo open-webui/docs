@@ -1,0 +1,126 @@
+---
+sidebar_position: 11
+title: "Automations"
+---
+
+# Automations
+
+Automations let you schedule prompts to run automatically at recurring times. Each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
+
+Automations can be enabled or disabled globally by an administrator via the [`ENABLE_AUTOMATIONS`](/reference/env-configuration#enable_automations) environment variable or the **Admin Panel > Settings > General** toggle. When disabled, the automation worker stops processing, API endpoints return `403`, and the sidebar entry is hidden.
+
+## What You Can Automate
+
+- Run a prompt on a schedule (hourly, daily, weekly, monthly, custom RRULE)
+- Trigger a run manually with **Run Now**
+- Pause/resume automations without deleting them
+- Review execution history for each automation
+- Optionally attach a terminal server and working directory for runs that need terminal context
+
+## Access Control
+
+Automations are permission-gated for non-admin users.
+
+- **Admins**: always have access to Automations
+- **Users**: require the **Features > Automations** permission
+
+See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
+
+To grant user access:
+
+1. Open **Admin Panel > Users > Groups**
+2. Edit **Default permissions** or a specific group
+3. Enable **Features > Automations**
+
+You can also set this default via [`USER_PERMISSIONS_FEATURES_AUTOMATIONS`](/reference/env-configuration#user_permissions_features_automations).
+
+:::tip Quick Access
+Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Automations adds a shortcut icon to the sidebar rail for one-click access.
+:::
+
+## Admin Limits
+
+Administrators can set global limits on automation usage for non-admin users. These are configured via environment variables. **Admins bypass all limits.**
+
+| Setting | Effect | Env Variable |
+|---------|--------|--------------|
+| **Max Automation Count** | Caps the number of automations a user can create | [`AUTOMATION_MAX_COUNT`](/reference/env-configuration#automation_max_count) |
+| **Min Recurrence Interval** | Rejects schedules that run more frequently than the configured interval (in seconds) | [`AUTOMATION_MIN_INTERVAL`](/reference/env-configuration#automation_min_interval) |
+
+- **Max count** is checked only on creation. Existing automations are not deleted if the limit is lowered.
+- **Min interval** is checked on both creation and update. One-time automations (`COUNT=1`) are exempt.
+- Both default to empty (no limit). Set to a positive integer to enforce.
+
+## Create an Automation
+
+1. Open **User Menu > Automations**
+2. Click **New Automation**
+3. Set:
+   - **Title**
+   - **Instructions** (prompt)
+   - **Model**
+   - **Schedule**
+4. (Optional) Select a **Terminal** server and **Working Directory**
+5. Click **Create**
+
+After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
+
+## Edit and Manage
+
+From the Automations list, click an automation to open its dedicated editor page.
+
+On the editor page, you can:
+
+- Update title, instructions, model, schedule, and terminal settings
+- Save changes
+- Run immediately with **Run now**
+- Pause/resume automation state
+- Delete the automation
+- Review execution logs and open run chats
+
+Execution logs are paginated with infinite scroll in the editor, so large run histories load incrementally.
+
+## Scheduling
+
+Supported schedule modes:
+
+- **Once**
+- **Hourly**
+- **Daily**
+- **Weekly**
+- **Monthly**
+- **Custom** (`RRULE`)
+
+Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
+
+## Notes
+
+- Automations run in the background worker loop on a polling interval.
+- Every run records a status (`success` or `error`) and optional error details.
+- Deleting an automation also removes its run history.
+
+## Managing Automations from Chat
+
+When using **Native Function Calling Mode** with a capable model, automations can also be created and managed directly from within a chat conversation using builtin tools. This allows you to say things like *"Schedule a daily summary report at 9am"* and the model will create the automation for you.
+
+### Available tools
+
+| Tool | What it does |
+|------|-------------|
+| `create_automation` | Create a new scheduled automation with a name, prompt, and RRULE schedule. Uses the current chat model. |
+| `update_automation` | Update an existing automation's name, prompt, schedule, or model |
+| `list_automations` | List your scheduled automations with status, schedule, and next runs |
+| `toggle_automation` | Pause or resume a scheduled automation |
+| `delete_automation` | Delete a scheduled automation and all its run history |
+
+### Requirements
+
+For chat-based automation tools to be available:
+
+1. **Native Function Calling** must be enabled for the model
+2. **Builtin Tools** capability must be enabled for the model
+3. **Automations** category must be enabled in the model's Builtin Tools settings (enabled by default)
+4. **`ENABLE_AUTOMATIONS`** must be enabled globally (enabled by default)
+5. The user must have the **Features > Automations** permission (admins always pass)
+
+See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for full details on all builtin tools.

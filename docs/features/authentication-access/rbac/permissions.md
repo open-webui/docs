@@ -12,6 +12,12 @@ Administrators can manage permissions in two primary ways:
 
 Users with the `Pending` role have no access until approved, `Admin` users have full administrative access, and `User` accounts are subject to the permission system described below.
 
+:::warning RBAC Scope Boundary
+RBAC permissions control what users can do inside Open WebUI.
+
+RBAC does not replace provider-side least-privilege design. For OpenAI-compatible providers/proxies (including LiteLLM), configure credentials with the minimum required scope for your deployment.
+:::
+
 :::info Permission Logic
 Permissions in Open WebUI are **additive**.
 *   A user's effective permissions are the combination of **Global Defaults** and all their **Group Memberships**.
@@ -111,6 +117,30 @@ Controls access to broad platform capabilities.
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
 | **Memories** | Access to the Memories feature for persistent user context. |
+| **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
+| **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
+
+:::info Automations Permission Scope
+
+For Automations access:
+
+1. **Permission Check for Non-Admins**: Users with the `user` role need **Features > Automations** (`features.automations`).
+2. **Admins Are Exempt from `features.automations`**: Users with the `admin` role can access Automations without that specific permission.
+
+Default permission can be configured via [`USER_PERMISSIONS_FEATURES_AUTOMATIONS`](/reference/env-configuration#user_permissions_features_automations).
+
+:::
+
+:::info Calendar Permission Scope
+
+For Calendar access:
+
+1. **Permission Check for Non-Admins**: Users with the `user` role need **Features > Calendar** (`features.calendar`).
+2. **Admins Are Exempt from `features.calendar`**: Users with the `admin` role can access Calendar without that specific permission.
+
+Default permission can be configured via [`USER_PERMISSIONS_FEATURES_CALENDAR`](/reference/env-configuration#user_permissions_features_calendar).
+
+:::
 
 ### 5. Settings Permissions
 Controls access to user settings areas.

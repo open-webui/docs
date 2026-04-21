@@ -40,6 +40,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server - used for OAuth 2.1 authentication for MCP servers. |
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. |
 | `ENABLE_OAUTH_TOKEN_EXCHANGE`         | `false`            | Enables the token exchange endpoint for external apps to exchange OAuth tokens for Open WebUI JWTs. |
+| `ENABLE_OAUTH_BACKCHANNEL_LOGOUT`     | `false`            | Enables OIDC Back-Channel Logout endpoint (`POST /oauth/backchannel-logout`) for IdP-initiated logout. Requires Redis for JWT revocation. |
 | `OAUTH_MAX_SESSIONS_PER_USER`         | `10`               | Maximum concurrent OAuth sessions per user per provider. Prevents unbounded growth while allowing multi-device usage. |
 
 :::warning
@@ -79,6 +80,29 @@ Open WebUI also supports **OAuth Token Exchange**, allowing external application
 **Example use case:** A CLI tool that has obtained an OAuth access token from your identity provider can exchange it for an Open WebUI token to make API calls to Open WebUI.
 
 To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
+
+### OIDC Back-Channel Logout
+
+Open WebUI supports **OIDC Back-Channel Logout**, which allows your identity provider (IdP) to notify Open WebUI of user logout events directly server-to-server, without requiring a browser redirect.
+
+To enable this feature, set `ENABLE_OAUTH_BACKCHANNEL_LOGOUT=true`.
+
+When enabled, Open WebUI exposes:
+
+- `POST /oauth/backchannel-logout`
+
+The endpoint expects a form-encoded `logout_token` issued by your IdP and validates it against your configured OAuth/OIDC provider metadata and JWKS.
+
+:::warning
+
+Redis is strongly recommended and effectively required for full logout enforcement.
+
+- With Redis configured, Open WebUI revokes existing JWTs for affected users and removes stored OAuth sessions.
+- Without Redis, Open WebUI can delete stored OAuth sessions, but already issued JWTs remain valid until expiration.
+
+:::
+
+See [`ENABLE_OAUTH_BACKCHANNEL_LOGOUT`](/reference/env-configuration#enable_oauth_backchannel_logout) for implementation details and behavior notes.
 
 ### Google
 
@@ -144,6 +168,12 @@ Basic chat functionality (which uses Open WebUI's JWT) is **not** affected, but 
 :::tip
 
 No additional configuration is required in Microsoft Entra ID. The `offline_access` scope is [available by default](https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#openid-connect-scopes) for web applications with client secrets.
+
+:::
+
+:::tip Role Mapping with Microsoft Entra ID
+
+If you use Entra ID **app roles** to control who gets `admin` vs `user` access in Open WebUI, you also need to configure [OAuth Role Management](#oauth-role-management) below. In particular, make sure you set `OAUTH_ALLOWED_ROLES` and `OAUTH_ADMIN_ROLES` in addition to `ENABLE_OAUTH_ROLE_MANAGEMENT=true` — otherwise all users will be created with the default role regardless of their Entra ID assignment.
 
 :::
 

@@ -42,6 +42,10 @@ flowchart LR
 4. **Permissions are additive**: each group membership adds capabilities, never removes them.
 5. **API keys** inherit the creating user's full permissions for programmatic access.
 
+:::tip SSO-Focused UX
+In SSO-only environments, you can disable local password auth with `ENABLE_PASSWORD_AUTH=false` and hide account-page password update controls with `ENABLE_PASSWORD_CHANGE_FORM=false`.
+:::
+
 ---
 
 ## Quick Start

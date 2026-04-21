@@ -43,7 +43,7 @@
 }
 
 /* Mobile nav height fix */
-@media screen and (width <=996px) {
+@media screen and (width <= 996px) {
 	:root {
 		--ifm-navbar-height: 100%;
 	}
@@ -167,6 +167,7 @@ code {
 
 [data-theme="dark"] code {
 	color: #ccc;
+	background-color: #222;
 }
 
 [data-theme="light"] code {
@@ -189,21 +190,6 @@ code {
 	border-radius: 16px !important;
 }
 
-/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
-[data-theme="light"] .shiki-code-block pre,
-[data-theme="light"] .shiki-code-block pre span {
-	color: var(--shiki-light) !important;
-}
-
-[data-theme="dark"] .shiki-code-block pre,
-[data-theme="dark"] .shiki-code-block pre span {
-	color: var(--shiki-dark) !important;
-}
-
-[data-theme="dark"] .shiki-code-block pre {
-	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
-}
-
 /* ─── Shiki code block styling ─── */
 .shiki-code-block {
 	margin-bottom: var(--ifm-leading);
@@ -222,13 +208,19 @@ code {
 }
 /* stylelint-enable no-descending-specificity */
 
+/* ─── Shiki light/dark mode toggle (CSS variables strategy) ─── */
+[data-theme="light"] .shiki-code-block pre,
+[data-theme="light"] .shiki-code-block pre span {
+	color: var(--shiki-light) !important;
+}
+
 [data-theme="light"] .shiki-code-block pre {
 	background-color: #f3f3f3;
 }
 
 /* stylelint-disable-next-line no-duplicate-selectors */
 [data-theme="dark"] .shiki-code-block pre {
-	background-color: #1a1a1a;
+	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
 }
 
 .shiki-code-block-content {
@@ -343,6 +335,10 @@ article p a {
 	margin-bottom: 4px;
 }
 
+.notbold a {
+	font-weight: 400 !important;
+}
+
 [data-theme="light"] article p a {
 	color: #333;
 	text-decoration-color: #ccc;
@@ -379,7 +375,7 @@ article p a {
 }
 
 /* ─── Article max width ─── */
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	article {
 		max-width: 700px;
 		margin-left: auto;
@@ -389,7 +385,7 @@ article p a {
 }
 
 /* ─── Heading sizes ─── */
-@media screen and (width <=996px) {
+@media screen and (width <= 996px) {
 	h1 {
 		font-size: 1.5rem !important;
 		font-weight: 600;
@@ -405,7 +401,7 @@ article p a {
 	}
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	h1 {
 		font-size: 1.75rem !important;
 	}
@@ -657,7 +653,7 @@ a.footer__link-item:hover {
 	gap: 0.25rem;
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.header-github-link,
 	.header-discord-link {
 		font-size: 0;
@@ -699,7 +695,7 @@ a.footer__link-item:hover {
 }
 
 /* ─── Sidebar menu spacing ─── */
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.menu_node_modules-\@docusaurus-theme-classic-lib-theme-DocSidebar-Desktop-Content-styles-module {
 		padding: 0 !important;
 	}
@@ -719,10 +715,6 @@ a.footer__link-item:hover {
 }
 
 /* ─── Misc ─── */
-/* stylelint-disable-next-line no-descending-specificity */
-.notbold a {
-	font-weight: 400 !important;
-}
 
 .small-text {
 	font-size: 0.8em;
@@ -759,7 +751,7 @@ a.footer__link-item:hover {
 	filter: invert(1);
 }
 
-@media screen and (width >=997px) {
+@media screen and (width >= 997px) {
 	.hero--container {
 		padding: 60px 200px;
 	}

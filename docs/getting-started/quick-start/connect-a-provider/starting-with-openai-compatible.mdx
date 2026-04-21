@@ -485,6 +485,15 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   Azure OpenAI uses **deployment names** as model IDs, not standard OpenAI model names. You must add your deployment names to the Model IDs allowlist.
   :::
 
+  :::tip Two Azure URL Formats
+  Azure offers two URL formats:
+
+  - **Legacy (deployment-based):** `https://my-resource.openai.azure.com` — Open WebUI rewrites the URL to `/openai/deployments/{model}/...` and adds the `api-version` query parameter automatically.
+  - **v1 format:** `https://my-resource.openai.azure.com/openai/v1` — the model stays in the request body (like standard OpenAI) and no `api-version` parameter is needed.
+
+  If your base URL ends with `/openai/v1`, Open WebUI skips the deployment URL rewriting and routes requests directly. Use whichever format your Azure resource supports.
+  :::
+
   For advanced keyless authentication using Azure Entra ID (RBAC, Workload Identity, Managed Identity), see the [Azure OpenAI with EntraID](/tutorials/integrations/llm-providers/azure-openai) tutorial.
 
   </TabItem>
@@ -509,6 +518,12 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::tip
   LiteLLM is useful as a **universal bridge** when you want to use a provider that doesn't natively support the OpenAI API standard, or when you want to load-balance across multiple providers.
+  :::
+
+  :::warning Security Recommendation: Key Scope
+  For multi-user deployments, avoid using provider management/master keys for your main Open WebUI connection.
+
+  Prefer least-privilege provider credentials (inference-scoped keys where supported). This reduces blast radius if users invoke provider-specific endpoints through OpenAI-compatible integrations.
   :::
 
   </TabItem>

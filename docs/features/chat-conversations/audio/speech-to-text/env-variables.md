@@ -19,6 +19,12 @@ Most of these settings can also be configured in the **Admin Panel → Settings 
 
 ## Speech To Text (STT) Environment Variables
 
+### Preprocessing
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `BYPASS_PYDUB_PREPROCESSING` | Skip pydub-based preprocessing (MP3 conversion, compression, chunk splitting) before sending audio to the STT engine. Applies to all engines. Useful when the upstream provider already handles these steps, or when ffmpeg is unavailable on the host. | `false` |
+
 ### Local Whisper
 
 | Variable | Description | Default |
@@ -80,10 +86,10 @@ If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=f
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `elevenlabs`, `azure`, `transformers` | empty |
+| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` | empty |
 | `AUDIO_TTS_MODEL` | TTS model | `tts-1` |
 | `AUDIO_TTS_VOICE` | Default voice | `alloy` |
-| `AUDIO_TTS_SPLIT_ON` | Split text on: `punctuation` or `none` | `punctuation` |
+| `AUDIO_TTS_SPLIT_ON` | Split text on: `punctuation`, `paragraphs`, or `none` | `punctuation` |
 | `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS | empty |
 
 ### OpenAI-Compatible TTS
@@ -93,6 +99,17 @@ If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=f
 | `AUDIO_TTS_OPENAI_API_BASE_URL` | OpenAI-compatible TTS API base URL | `https://api.openai.com/v1` |
 | `AUDIO_TTS_OPENAI_API_KEY` | OpenAI TTS API key | empty |
 | `AUDIO_TTS_OPENAI_PARAMS` | Additional JSON params for OpenAI TTS | empty |
+
+### Mistral TTS
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `AUDIO_TTS_MISTRAL_API_KEY` | Mistral TTS API key | empty |
+| `AUDIO_TTS_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
+
+:::info
+When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `mistral-tts-latest` when `AUDIO_TTS_MODEL` is empty.
+:::
 
 ### Azure TTS
 
