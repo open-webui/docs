@@ -7,7 +7,7 @@ Open WebUI offers powerful code execution capabilities directly within your chat
 
 ## Key Features
 
-- **Code Interpreter Capability**: Enable models to autonomously write and execute Python code as part of their responses. Works with both Default Mode (XML-based) and Native Mode (tool calling via `execute_code`).
+- **Code Interpreter Capability**: Enable models to autonomously write and execute Python code as part of their responses. Runs via the `execute_code` tool in Native (Agentic) Mode — the only supported tool-calling mode. An older XML-based integration exists for legacy Default Mode but is unsupported; new deployments should use Native Mode.
 
 - **Python Code Execution**: Run Python scripts directly in your browser using Pyodide, or on a server using Jupyter. Supports popular libraries like pandas and matplotlib with no setup required.
 

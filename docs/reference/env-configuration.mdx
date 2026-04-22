@@ -3642,7 +3642,7 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 
 - Type: `bool`
 - Default: `True`
-- Description: Only used in Default Function Calling mode - If True: An LLM generates optimized, distilled search queries from the conversation context. If False: The user's last message is used verbatim as the web search query
+- Description: Only applies to Default Function Calling mode, which is legacy and no longer supported. If True: an LLM generates optimized, distilled search queries from the conversation context. If False: the user's last message is used verbatim as the web search query. Native Mode (the supported mode) uses the model's own `search_web` tool call and does not consult this setting.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEB_SEARCH_TRUST_ENV`

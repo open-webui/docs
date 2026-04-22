@@ -37,9 +37,9 @@ To unlock these features, your model must support native tool calling and have s
 5.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
 
 :::tip Model Capability, Default Features, and Chat Toggle
-In **Native Mode**, the `search_web` and `fetch_url` tools require both the **Web Search** capability to be enabled *and* **Web Search** to be checked under **Default Features** in the model settings (or toggled on in the chat). If either is missing, the tools will not be injected — even though other builtin tools may still appear.
+In **Native Mode** (the supported mode), the `search_web` and `fetch_url` tools require both the **Web Search** capability to be enabled *and* **Web Search** to be checked under **Default Features** in the model settings (or toggled on in the chat). If either is missing, the tools will not be injected — even though other builtin tools may still appear.
 
-In **Default Mode** (non-native), the chat toggle controls whether web search is performed via RAG-style injection.
+Default Mode's RAG-style injection behavior is documented here only for legacy deployments. Default Mode is no longer supported; all models should be configured for Native Mode.
 
 **Important**: If you disable the `web_search` capability on a model but use Native Mode, the tools won't be available even if you manually toggle Web Search on in the chat.
 :::

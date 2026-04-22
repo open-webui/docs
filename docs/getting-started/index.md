@@ -30,6 +30,24 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 
 ---
 
+## ✨ Essentials for New Users
+
+**Installed and chatting — now what?**
+
+Five short sections that cover the things every new user eventually wishes they'd known on day one: what plugins are and how to install them, why long chats eventually error out (and how to fix it with a filter), the "invisible" Task Model that powers titles/autocomplete, getting started with RAG over your own documents, and turning on Native tool calling.
+
+| | |
+| :--- | :--- |
+| 🧩 **Plugins** | Tools, Pipes, Filters, Actions — the extensibility story |
+| 🧠 **Context management** | Why long chats hit a wall and how to handle it |
+| 🤖 **Task models** | Keep titles, tags, and autocomplete off your main model |
+| 📚 **Basic RAG** | Chatting with your own documents |
+| 🔧 **Tool calling** | Native mode + first Tools to install |
+
+[**Read the essentials →**](/getting-started/essentials)
+
+---
+
 ## 🤖 Connect an Agent
 
 **Go beyond simple model providers. Connect an autonomous AI agent.**

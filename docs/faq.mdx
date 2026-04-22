@@ -42,6 +42,16 @@ For more details on enterprise solutions and branding customizations, [click her
 
 **A:** You can access the **File Manager** by going to **Settings > Data Controls > Manage Files > Manage**. This dashboard allows you to search through all your uploaded documents, view their details, and delete them. Deleting a file here also automatically cleans up any associated Knowledge Base entries and vector embeddings.
 
+### Q: I get "The prompt is too long" / "context length exceeded" after a while in a chat. How do I fix it?
+
+**A:** This error comes from the **model provider**, not from Open WebUI — the provider counts the tokens of everything you sent (system prompt + the *entire* chat history + attached files + tool calls + your new message) and rejects the request once it exceeds the model's context window. The "prompt" the model sees is the whole conversation, not just your latest message.
+
+Open WebUI intentionally does **not** ship a built-in context trimmer. Every model has a different tokenizer and a different context window, and every deployment wants a different truncation policy (by tokens, by turns, by message count, file-attachments-first, summarize-and-replace, per-model budgets, and so on). There is no single policy that is correct for every user, so we expose the hook instead of choosing one for you.
+
+Context management is done with [filter Functions](/features/extensibility/plugin/functions/filter): `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.). Many community-maintained context filters are already available one-click on [openwebui.com](https://openwebui.com/) — browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel → Functions** and edit it.
+
+For the full write-up with examples, see [Context Window / Prompt Too Long](/troubleshooting/context-window).
+
 ### Q: Can I use Open WebUI offline, in air-gapped networks, or in extreme environments like outer space?
 
 **A:** **Yes.** Open WebUI is a self-hosted, **internet-independent AI platform** designed to work in **air-gapped networks**, **remote deployments**, and any environment where cloud-based systems are impractical or impossible. Whether you need to **run an LLM without internet**, deploy a **private AI with no cloud dependency**, or operate a **local AI chatbot offline**, Open WebUI supports all of these out of the box. It runs entirely on local hardware and does not make external calls by default.

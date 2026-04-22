@@ -426,7 +426,7 @@ If resource usage is critical, disable automated features that constantly trigge
 1.  **Database**: **PostgreSQL** (Mandatory).
 2.  **Content Extraction**: **Tika** or **Docling** (Mandatory — default pypdf leaks memory). See [Content Extraction Engine](#content-extraction-engine).
 3.  **Embeddings**: **External** — `RAG_EMBEDDING_ENGINE=openai` or `ollama` (Mandatory — default SentenceTransformers consumes too much RAM at scale). See [Embedding Engine](#embedding-engine).
-4.  **Tool Calling**: **Native Mode** (strongly recommended — Default Mode is legacy and breaks KV cache). See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+4.  **Tool Calling**: **Native Mode** (mandatory — Default Mode is legacy, no longer supported, and breaks KV cache). All models should be configured for Native Mode. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 5.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
 6.  **Streaming**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7` (Reduce CPU/Net/DB writes).
 7.  **Chat Saving**: `ENABLE_REALTIME_CHAT_SAVE=False`.
@@ -459,7 +459,7 @@ These are real-world mistakes that cause organizations to massively over-provisi
 | **Running SentenceTransformers at scale** | Each worker loads ~500MB embedding model → RAM usage explodes → you add more machines | Use external embeddings (`RAG_EMBEDDING_ENGINE=openai` or `ollama`) |
 | **Redis Cluster when single Redis suffices** | Too many replicas → too many connections → Redis can't handle them → you deploy Redis Cluster to compensate | Fix the root cause (fewer replicas, `timeout 1800`, `maxclients 10000`) |
 | **Scaling replicas to mask memory leaks** | Leaky processes → OOM kills → auto-scaler adds more pods → more Redis connections → Redis overwhelmed | Fix the leaks first (content extraction, embedding engine), then right-size |
-| **Using Default (prompt-based) tool calling** | Injected prompts may break KV cache → higher latency → more resources needed per request | Switch to Native Mode for all capable models |
+| **Using Default (prompt-based) tool calling** | Legacy / no longer supported; injected prompts break KV cache → higher latency → more resources needed per request; cannot access built-in system tools | Switch every model to Native Mode |
 | **Not configuring Redis stale connection timeout** | Connections accumulate forever → Redis OOM → you deploy Redis Cluster | Add `timeout 1800` to redis.conf |
 | **Using base64-encoded icons in Actions/Filters** | Icon data is embedded in `/api/models` responses sent to the frontend on every page load for every model. A 500 KB base64 icon on 3 actions across 20 models = **30 MB of payload bloat** per request → slow frontend loads, high bandwidth usage, unnecessary backend memory pressure | Host icons as static files and reference them by URL in `icon_url` / `self.icon`. See [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example---specifying-action-frontmatter) |
 
