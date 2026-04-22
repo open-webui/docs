@@ -339,3 +339,12 @@ Files uploaded via API are processed asynchronously. Attempting to use a file be
 ### Native function calling changes behavior
 
 Native function calling is now the default, and it changes how knowledge bases work: attached KBs are no longer auto-injected, so the model must call the knowledge tools to retrieve them. See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for details.
+
+### Knowledge base upload limits
+
+Administrators can cap how many files a single knowledge base may hold and how large each file may be, in **Admin Panel > Settings > Documents > Max Knowledge Base Files / Max Knowledge Base File Size**, alongside the general upload settings.
+
+- `0` or empty means unlimited.
+- These are global settings that apply to every knowledge base and every user, including admins — there is no per-user or per-group override.
+
+These limits are enforced server-side for every way of adding files to a knowledge base — the manual upload button, the one-shot **Upload Directory** import, incremental directory sync, and the API — not just the primary upload form, so a user can't work around them by switching upload methods. If a limit is hit you'll see an error before any file processing begins.
