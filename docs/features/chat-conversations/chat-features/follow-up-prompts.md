@@ -44,4 +44,4 @@ Controls what happens when you click a follow-up prompt.
 
 ## Regenerating Follow-Ups
 
-If you want to regenerate follow-up suggestions for a specific response, you can use the [Regenerate Followups](https://openwebui.com/f/silentoplayz/regenerate_followups) action button from the community.
+If you want to regenerate follow-up suggestions for a specific response, you can use the [Regenerate Follow-ups](https://openwebui.com/posts/9b5ac6d6-dfd6-4cad-bc1d-5518b138f22d) action button from the community.

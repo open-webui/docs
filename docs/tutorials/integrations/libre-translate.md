@@ -78,9 +78,9 @@ This will start the LibreTranslate service in detached mode.
 
 Once you have LibreTranslate up and running in Docker, you can configure the integration within Open WebUI. There are several community integrations available, including:
 
-- [LibreTranslate Filter Function](https://openwebui.com/f/iamg30/libretranslate_filter)
-- [LibreTranslate Action Function](https://openwebui.com/f/jthesse/libretranslate_action)
-- [MultiLanguage LibreTranslate Action Function](https://openwebui.com/f/iamg30/multilanguage_libretranslate_action)
+- [LibreTranslate Filter Function](https://openwebui.com/posts/4993ae7e-bd2a-41dc-9e88-9941854495cc)
+- [LibreTranslate Action Function](https://openwebui.com/posts/103a14c1-174a-4445-bb9b-d48640e43b07)
+- [MultiLanguage LibreTranslate Action Function](https://openwebui.com/posts/f250971e-8163-4a0b-a30c-45fdfb2ba4f8)
 - [LibreTranslate Filter Pipeline](https://github.com/open-webui/pipelines/blob/main/examples/filters/libretranslate_filter_pipeline.py)
 
 Choose the integration that best suits your needs and follow the instructions to configure it within Open WebUI.

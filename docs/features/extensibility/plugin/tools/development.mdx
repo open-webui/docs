@@ -123,24 +123,16 @@ class Tools:
 
 Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
 
-**⚠️ CRITICAL: Function Calling Mode Compatibility**
+:::danger Author tools for Native Mode
+Default Mode is **legacy and no longer supported** — see the [Tool Calling Modes guide](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for the full policy. Write your tools to work correctly under **Native (Agentic) Mode**, which is the only supported mode going forward. The event-emitter compatibility matrix below still documents Default Mode behavior for historical reference and for maintainers of pre-existing tools that haven't been migrated yet — but new tools should not depend on Default-Mode-only event types. If your tool's UX fundamentally requires an event type that only works in Default Mode (`message`, `chat:message:delta`, `chat:message`, `replace` mid-stream), redesign the UX around Native-compatible events (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`) rather than requiring users to switch their model to legacy mode.
+:::
 
-Event Emitter behavior is **significantly different** depending on your function calling mode. The function calling mode is controlled by the `function_calling` parameter:
+Event Emitter behavior differs between the two function calling modes. The function calling mode is controlled by the `function_calling` parameter:
 
-- **Default Mode**: Uses traditional function calling approach with wider model compatibility
-- **Native Mode (Agentic Mode)**: Leverages model's built-in tool-calling capabilities for reduced latency and autonomous behavior
+- **Native Mode (Agentic Mode)** (`function_calling = "native"`) — the only supported mode. Uses the model's structured tool-call API. **Limited event-emitter surface** — see the matrix below for exactly which event types are supported.
+- **Default Mode** (`function_calling = "default"`) — legacy, prompt-injection-based. Full event-emitter surface, but the mode itself is unsupported and should not be selected for new deployments.
 
-Before using event emitters, you must understand these critical limitations:
-
-- **Default Mode** (`function_calling = "default"`): Full event emitter support with all event types working as expected
-- **Native Mode (Agentic Mode)** (`function_calling = "native"`): **Limited event emitter support** - many event types don't work properly due to native function calling bypassing Open WebUI's custom tool processing pipeline
-
-**When to Use Each Mode:**
-For a comprehensive guide on choosing a function calling mode, including model requirements and administrator setup, refer to the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
-
-In general:
-- **Use Default Mode** when you need full event emitter functionality, complex tool interactions, or real-time UI updates.
-- **Use Native Mode (Agentic Mode)** when you have a quality model and need reduced latency, autonomous tool selection, and system-level tools (Agentic Research, Knowledge Base exploration, Memory) without complex custom emitter requirements.
+For the full mode policy, model requirements, and configuration, see the [**Tool Calling Modes guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native). In short: **use Native Mode**; the matrix below tells you which event types work there.
 
 #### Function Calling Mode Configuration
 
@@ -1185,58 +1177,43 @@ await __event_emitter__({
 
 #### Comprehensive Function Calling Mode Guide
 
-Choosing the right function calling mode is crucial for your tool's functionality. This guide helps you make an informed decision based on your specific requirements.
+:::danger Write tools for Native Mode — Default Mode is unsupported
+Default Mode is **legacy and no longer supported**. New tools should be written to work under Native Mode. The mode-comparison details below are retained so that maintainers of legacy Default-Mode tools understand the gap they need to close when migrating — they are **not** a recommendation to choose Default Mode for new work.
 
-**Mode Comparison Overview:**
+If your tool design depends on a Default-Mode-only event type, redesign the UX around the Native-compatible surface (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`, plus returning a final content block from the tool method). Requiring users to switch their model to legacy mode to run your tool is not acceptable going forward.
+:::
 
-| Aspect | Default Mode | Native Mode |
+**Mode Comparison Overview** *(for migration reference only — Native is the only supported target)*:
+
+| Aspect | Default Mode (Legacy / Unsupported) | Native Mode (Supported) |
 |--------|-------------|-------------|
-| **Latency** | Higher - processes through Open WebUI pipeline | Lower - direct model handling |
-| **Event Support** | ✅ Full - all event types work perfectly | ⚠️ Limited - many event types broken |
-| **Complexity** | Handles complex tool interactions well | Best for simple tool calls |
-| **Compatibility** | Works with all models | Requires models with native tool calling |
-| **Streaming** | Perfect for real-time updates | Poor - content gets overwritten |
-| **Citations** | ✅ Full support | ✅ Full support |
-| **Status Updates** | ✅ Full support | ✅ Full support |
-| **Message Events** | ✅ Full support | ❌ Broken - content disappears |
+| **Status** | ❌ Legacy, no longer supported | ✅ Required for new tools |
+| **Latency** | Higher — full prompt-injection pipeline | Lower — direct tool-call API |
+| **KV Cache** | ❌ Broken every turn | ✅ Preserved |
+| **Event Support** | Full event-type surface | Limited surface (see matrix above) |
+| **Streaming** | Mid-stream content rewrites work | Mid-stream rewrites are overwritten by completion snapshots |
+| **Status / Notifications / Citations** | ✅ | ✅ |
+| **Message content events (`message`, `chat:message`, `replace`)** | ✅ | ❌ Overwritten |
+| **Built-in system tools (Memory, Notes, Knowledge, Web Search, Image Gen, Code Interpreter)** | ❌ | ✅ |
 
-**Decision Framework:**
+**How to design for Native Mode:**
 
-1. **Do you need real-time content streaming, live updates, or dynamic message modification?**
-   - **Yes** → Use **Default Mode** (Native mode will break these features)
-   - **No** → Either mode works
-
-2. **Is your tool primarily for simple data retrieval or computation?**
-   - **Yes** → **Native Mode** is fine (lower latency)
-   - **No** → Consider **Default Mode** for complex interactions
-
-3. **Do you need maximum performance and minimal latency?**
-   - **Yes** → **Native Mode** (if compatible with your features)
-   - **No** → **Default Mode** provides more features
-
-4. **Are you building interactive experiences, dashboards, or multi-step workflows?**
-   - **Yes** → **Default Mode** required
-   - **No** → Either mode works
-
-**Recommended Usage Patterns:**
+- Deliver your tool's primary output as the **return value** of the tool method. That content is emitted by the model as part of its response and is not subject to the event-overwrite issue.
+- Use `status` and `notification` for progress and user-facing alerts — they are fully supported in Native Mode.
+- Use `citation` / `source` events for references — fully supported in Native Mode.
+- Use `confirmation` / `input` via `__event_call__` for interactive flows — fully supported in Native Mode.
+- Attach files via the `chat:message:files` event — fully supported in Native Mode.
+- Avoid depending on `message`, `chat:message:delta`, `chat:message`, or `replace` mid-stream — these are the four events that break under Native Mode. If you need progressive output, emit a series of `status` updates and return the final content from the tool.
 
 <details>
-<summary>🏆 Best Practices for Mode Selection</summary>
+<summary>Migrating a Default-Mode tool to Native Mode</summary>
 
-**Choose Default Mode For:**
-- Tools with progressive content updates
-- Interactive dashboards or live data displays
-- Multi-step workflows with visual feedback
-- Complex tool chains with intermediate results
-- Educational tools that show step-by-step processes
-- Any tool that needs `message`, `replace`, or `chat:message` events
+Common rewrites when moving a Default-Mode tool to Native:
 
-**Choose Native Mode For:**
-- Simple API calls or database queries
-- Basic calculations or data transformations
-- Tools that only need status updates and citations
-- Performance-critical applications where latency matters
-- Simple retrieval tools without complex UI requirements
+- Replace mid-stream `message` events that append content with a single final return value containing the assembled content.
+- Replace `replace`-based progress bars with a sequence of `status` events (`"description": "Step 3 of 5 — fetching..."`).
+- Replace `chat:message`-based dashboards with a return value containing the rendered dashboard (Markdown / HTML is fine).
+- Keep `citation`, `notification`, `confirmation`, and file attachments as-is — they work identically in both modes.
 
 **Universal Compatibility Pattern:**
 ```python
@@ -1315,8 +1292,8 @@ async def mode_adaptive_tool(
 **Common Issues and Solutions:**
 
 **Issue: Content appears then disappears**
-- **Cause**: Using message events in Native mode
-- **Solution**: Switch to Default mode or use status events instead
+- **Cause**: Using `message` / `chat:message` / `replace` events in Native Mode — completion snapshots overwrite them.
+- **Solution**: Return the content from the tool method and use `status` events for progress instead. Do **not** switch to Default Mode — Default Mode is legacy and no longer supported.
 
 **Issue: Tool seems unresponsive**
 - **Cause**: Function calling not enabled for model

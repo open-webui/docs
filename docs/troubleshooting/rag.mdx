@@ -406,7 +406,7 @@ If you have **Native Function Calling enabled**, the model needs both the **abil
 | **Default Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG — user must manually add a knowledge base to the chat via `#` |
 | **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** — must actively call them | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled) — must actively call them |
 
-Key takeaway: in default mode, attaching a KB enables automatic RAG scoped to those KBs. In native mode, the model must use its tools regardless — attaching a KB only restricts *which* KBs are searchable.
+Key takeaway: in Native Mode (the supported mode), the model must use its knowledge tools regardless — attaching a KB only restricts *which* KBs are searchable. Default Mode's auto-injection behavior is documented here for legacy deployments only; Default Mode is no longer supported and all models should be on Native Mode.
 
 :::tip Preventing Knowledge Base Access in Native Mode
 If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Workspace > Models > Edit > Builtin Tools**. This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.

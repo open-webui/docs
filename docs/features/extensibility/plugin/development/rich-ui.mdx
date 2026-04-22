@@ -247,6 +247,19 @@ If your Rich UI embed needs to trigger downloads, interact with Open WebUI's fro
 As an alternative for ephemeral interactions that need full page access, consider using the [`execute` event](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__) instead, which runs unsandboxed in the main page context.
 :::
 
+:::tip Community Showcase: Streaming Rich UI with same-origin
+If you want to see how far Rich UI can go when same-origin is enabled, take a look at the community **[Inline Visualizer v2](https://github.com/Classic298/open-webui-plugins)** tool (also on the community site via the [Show-and-tell discussion](https://github.com/open-webui/open-webui/discussions/23901)).
+
+It demonstrates patterns that aren't in the basic docs:
+
+- **Live streaming HTML/SVG.** The tool returns an empty wrapper; the model then emits markup inline between plain-text `@@@VIZ-START / @@@VIZ-END` markers in its normal response. A same-origin observer inside the iframe tails the parent chat's DOM, extracts the growing block, and reconciles new nodes into the iframe as tokens arrive — so dashboards and diagrams paint live, token-by-token, instead of popping in at the end of the stream.
+- **Bidirectional bridges.** `sendPrompt(text)` turns any clickable node into a follow-up user message. `saveState(k, v)` / `loadState(k, fallback)` proxies parent `localStorage` scoped per-message so sliders and toggles survive reloads. `copyText`, `toast(msg, kind)`, and `openLink` round it out.
+- **A shipped design system.** Theme-aware CSS variables, a 9-ramp color palette, SVG utility classes, auto light/dark adaptation, and 230 localized strings across 46 languages — all delivered from a single tool with no core changes.
+- **Incremental DOM reconciliation.** A safe-cut HTML parser flushes the longest valid prefix on every tick; the reconciler only appends new nodes so existing elements never re-mount and animations never re-trigger during the stream.
+
+This is a useful reference when you're trying to decide whether a generative-UI / streaming-UI feature needs a core change or can live purely in plugin-land. (Spoiler: almost always the latter.)
+:::
+
 ## Rendering Position
 
 - **Tool embeds** inside a tool call result render **inline** at the tool call indicator (the "View Result from..." line)
