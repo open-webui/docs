@@ -110,8 +110,8 @@ Open WebUI has two tool-calling modes in the UI: **Native** and **Default**. **D
 
 Every mainstream model supports it — OpenAI, Anthropic, Gemini, Llama 3.1+, Qwen 2.5+, DeepSeek, GLM, and essentially any other current model. Turn it on:
 
-- **Best — once, for every model:** in **Admin Panel → Settings → Models**, click the ⚙️ gear at the **top right** of the models list. That opens **global model parameters** — set **Function Calling = Native** there, save, and every current *and future* model in your instance inherits it. No per-model click-through required.
-- Per-model override: **Admin Panel → Settings → Models → [your model] → Advanced Params → Function Calling = Native**
+- **Best — once, for every model:** in **Admin Panel → Settings → Models**, click the **Settings** button at the **top right** of the models list. That opens **global model parameters** — set **Function Calling = Native** there, save, and every current *and future* model in your instance inherits it. No per-model click-through required.
+- Per-model override: **Admin Panel → Settings → Models → [your model] → Model Parameters → Function Calling = Native**
 - Per-chat override: in a chat's **Chat Controls** (right sidebar)
 
 If a tool "isn't being called" on a capable model, 90% of the time Native Mode just needs flipping on. If a specific small model struggles with Native Mode, the fix is to use a stronger model for tool-using conversations — not to fall back to Default Mode.
