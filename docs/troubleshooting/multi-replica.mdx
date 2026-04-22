@@ -95,16 +95,34 @@ REDIS_URL=redis://your-redis-host:6379/0
 **Symptoms:**
 - Logs show `database is locked` or severe SQL errors.
 - Data saved on one instance disappears on another.
+- `sqlalchemy.exc.TimeoutError: QueuePool limit of size N overflow M reached, connection timed out, timeout 30.00` on **every** request after a short warm-up — not just at peak load.
+- `/api/config`, `/api/v1/chats/?page=1`, OIDC callbacks all stall for 10 s to multiple minutes.
+- `PRAGMA journal_mode=WAL` logged as starting but never completing.
+- Problems appeared suddenly after the 0.8.x → 0.9.x upgrade without any other change in the deployment.
 
 **Cause:**
-Using **SQLite** with multiple replicas. SQLite is a file-based database and does not support concurrent network writes from multiple containers.
+Using **SQLite** with multiple replicas — or with a single replica whose `webui.db` lives on a network filesystem. SQLite is a file-based database; its file locking [does not work reliably over NFS / CIFS / CephFS / Azure Files / any network PVC](https://www.sqlite.org/faq.html#q5) (this is SQLite upstream's own position, not an Open WebUI policy). With the async backend introduced in 0.9.0, this turns from "slow and occasionally locked" into a hard failure mode because slow network `fsync`s hold each pool connection hostage long enough to saturate the connection pool on every request.
 
-**Solution:**
-Migrate to **PostgreSQL**. Update your connection string:
+For the full mechanism (fsync latency + async concurrency + pool saturation + WAL-on-mmap-on-NFS), see [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage).
 
-```bash
-DATABASE_URL=postgresql://user:password@postgres-host:5432/openwebui
-```
+**Solution — in order of correctness:**
+
+1. **Migrate to PostgreSQL (strongly recommended, required for multi-replica):**
+   ```bash
+   DATABASE_URL=postgresql+asyncpg://user:password@postgres-host:5432/openwebui
+   ```
+   For Kubernetes / Docker Swarm this is effectively mandatory. Postgres manages its own I/O against its own local storage, so the network-`fsync` pathology disappears entirely. See [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for the full migration steps.
+
+2. **If you're on a single instance and can move the DB:** put `webui.db` on a locally-attached SSD/NVMe (host bind mount, node-local volume, ephemeral disk) — not on the same NFS/Ceph/EFS mount you use for uploads and RAG files. Your shared storage for `/app/backend/data` is fine; SQLite specifically is the problem.
+
+3. **Do NOT just increase `DATABASE_POOL_SIZE`.** A bigger pool doesn't fix slow `fsync`; it just schedules more concurrent slow `fsync`s against the same slow storage and moves the breaking point by a few seconds. This is a symptom-whack, not a fix.
+
+4. **Temporary damage-control only** (for a deployment you're about to migrate):
+   ```bash
+   DATABASE_POOL_SIZE=1
+   DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
+   ```
+   Serializes to a single async connection, trading concurrency for stability. **Not supported long-term.** Also consider `ENABLE_AUTOMATIONS=false` if the background scheduler's periodic poll is the specific thing tipping you over the edge.
 
 ### 5. Uploaded Files or RAG Knowledge Inaccessible
 

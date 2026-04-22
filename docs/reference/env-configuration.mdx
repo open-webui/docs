@@ -6359,6 +6359,26 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 
 :::
 
+:::tip Single-user / single-replica on local disk? The default is fine.
+The default `sqlite:///${DATA_DIR}/webui.db` is a perfectly good choice for personal use, evaluation, home-lab setups, and small single-replica deployments — **as long as `DATA_DIR` lives on a locally-attached SSD/NVMe**. No migration needed. The rest of this callout is for operators running on network storage or scaling out.
+:::
+
+:::danger SQLite is only supported on locally-attached SSD/NVMe
+Running SQLite on **NFS, CIFS/SMB, Azure Files, GlusterFS, CephFS, or any Kubernetes PersistentVolumeClaim backed by network storage is not supported** — this is SQLite upstream's own position ([SQLite FAQ #5](https://www.sqlite.org/faq.html#q5)), and under the async backend (0.9.0+) it will produce pool-timeout errors (`QueuePool limit of size N overflow M reached`), multi-minute stalls, WAL deadlocks, and potential database corruption.
+
+**For multi-replica, multi-worker, Kubernetes, Docker Swarm, or any deployment where `DATA_DIR` is on shared/network storage, set `DATABASE_URL` to a PostgreSQL URL:**
+
+```
+DATABASE_URL=postgresql+asyncpg://user:password@host:5432/openwebui
+```
+
+See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the full mechanism (fsync + async pool saturation) and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for migration guidance.
+:::
+
+:::warning Multi-replica / multi-worker deployments REQUIRE PostgreSQL
+For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), you **must** use an external database (PostgreSQL) instead of SQLite. SQLite does not support concurrent writes from multiple instances and will result in database corruption or data inconsistency. A shared SQLite file on NFS does not count as "supported" — it will still corrupt or deadlock. See the scaling guide linked above.
+:::
+
 #### `ENABLE_DB_MIGRATIONS`
 
 - Type: `bool`
@@ -6520,6 +6540,17 @@ For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, and 
 
 When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation—connection pools cannot be shared across separate processes or containers.
 
+:::
+
+:::warning SQLite on NFS / network storage — increasing the pool does not help
+If you are seeing `QueuePool limit of size N overflow M reached, connection timed out` errors on SQLite and the database file lives on NFS, CephFS, Azure Files, an SMB mount, or any network-backed Kubernetes PVC, **increasing this value will not fix it**. The root cause is slow `fsync` on the network filesystem, which keeps each connection checked out far longer than on local disk; more pool slots just means more concurrent slow `fsync`s against the same slow storage. The async backend saturates any size pool you give it.
+
+The only real fixes are:
+1. Migrate to PostgreSQL (`DATABASE_URL=postgresql+asyncpg://...`) — strongly recommended.
+2. Move `webui.db` to a locally-attached SSD/NVMe.
+3. Temporary workaround: `DATABASE_POOL_SIZE=1` + `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000` — serializes DB access, not a supported long-term config.
+
+See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the mechanism, and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for migration guidance.
 :::
 
 #### `DATABASE_POOL_MAX_OVERFLOW`

@@ -315,6 +315,39 @@ Typical symptoms after upgrading to releases that use the async SQLite driver:
 Older synchronous SQLAlchemy releases (≤ 0.8.12) serialized contention in-process, which masked slow storage. The async driver opens connections across threads and hammers the filesystem, so network-attached storage degradation becomes immediately visible.
 :::
 
+#### Why the async backend makes network-storage SQLite fail suddenly
+
+If you upgraded from 0.8.x to 0.9.x and nothing else changed in your deployment, the mechanism below is why things broke. Worth understanding because `DATABASE_POOL_SIZE` and friends are symptom-adjacent, not cures.
+
+**The core thing is `fsync()`.** SQLite's durability guarantee is a synchronous flush on every commit. `fsync` latency depends entirely on where the file lives:
+
+| Storage | Typical `fsync` latency |
+| :--- | :--- |
+| Local NVMe | ~100 μs |
+| Local SATA SSD | 100 μs – a few ms |
+| Local HDD | ~10 ms |
+| NFS / CephFS / Azure Files (SSD-backed) | 50–500 ms |
+| NFS (HDD-backed or high-latency) | hundreds of ms to multiple seconds |
+
+The latency is identical in sync and async code. What changes is **how many concurrent `fsync`s are in flight at once**.
+
+**Old world — sync SQLAlchemy (0.8.x):** DB calls ran on FastAPI's ~40-thread worker pool. That pool was a natural throttle — you could never have more than ~40 concurrent SQLite operations. Slow storage made individual requests slow, but the thread pool created backpressure before anything collapsed. Users saw "the app is slow," not "the app is dead."
+
+**New world — async `aiosqlite` (0.9.x):** No thread-pool ceiling. The asyncio loop schedules thousands of DB coroutines in parallel, each trying to check out a connection from the **SQLAlchemy async pool** (default `pool_size=5` + `max_overflow=10` = 15 connections). On local SSD, a connection checks out, `fsync`s in ~1 ms, returns to the pool — churn is fast, 15 slots is plenty. On NFS/CephFS, the same connection blocks for hundreds of ms on `fsync`, stays checked out the whole time, and the pool saturates almost instantly. Every subsequent request waits `pool_timeout` (30 s) and then fails with:
+
+```
+sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached,
+connection timed out, timeout 30.00
+```
+
+Increasing `DATABASE_POOL_SIZE` just moves the breaking point. More connections means more concurrent slow `fsync`s against the same slow storage — the filesystem is still the bottleneck, and you can't pool your way past it.
+
+**And WAL over NFS is specifically broken.** SQLite's WAL mode uses an `mmap`-backed `-shm` file for cross-process coordination. [SQLite upstream says plainly](https://www.sqlite.org/faq.html#q5) that `mmap` on NFS is unreliable — some NFS versions don't support it at all. Under low concurrency it was merely slow; under async concurrency you can hit actual locking pathologies (deadlocks, `PRAGMA journal_mode=WAL` that starts and never completes, multi-minute stalls on trivial queries).
+
+**Why Postgres is the fix, not a bigger pool:** the Postgres server manages its own I/O concurrency against its own local storage. Your app hits it over a network socket, but that hop is orders of magnitude cheaper than NFS `fsync`, and Postgres was designed from day one for concurrent writers — no file-level locking, no cross-process `mmap` coordination, no WAL-on-network-FS caveats. A dedicated async driver (`asyncpg`) talks to it directly. That's the only database shape that actually composes with async concurrency when the storage isn't guaranteed-fast-local.
+
+The one-line summary: sync backends throttled concurrency through thread pools, so slow storage just made things *slow*. Async backends allow massive concurrency, which means slow `fsync`s stack up, connections stay checked out longer, the pool saturates, and the whole thing wedges. The same storage was tolerable before because the app wasn't asking it to do 20 concurrent `fsync`s.
+
 SQLite is particularly sensitive to disk performance because it performs synchronous writes. Moving from local SSDs to a network share can increase latency by 10x or more per operation.
 
 **Symptoms:**
