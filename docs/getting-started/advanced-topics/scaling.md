@@ -28,7 +28,11 @@ This is perfect for personal use, small teams, or evaluation. The scaling journe
 
 ## Step 1 — Switch to PostgreSQL
 
-**When:** You plan to run more than one Open WebUI instance, or you want better performance and reliability for your database.
+**When:** You plan to run more than one Open WebUI instance, or you want better performance and reliability for your database. **You should also switch if your SQLite file lives on anything other than a locally-attached SSD/NVMe** — see the callout below.
+
+:::tip You don't need this step if you're a single-replica deployment on local disk
+**Staying on SQLite is fine for:** single-replica deployments, personal use, evaluation, home lab setups, and small teams — **as long as the database file lives on a locally-attached SSD/NVMe and you're not running multiple replicas or workers.** The 0.8 → 0.9 async-backend story only bites when `webui.db` is on network storage; on local disk, SQLite is fast, supported, and a perfectly reasonable default. No migration needed. Skip this step and move on to whichever later step you actually need.
+:::
 
 SQLite stores everything in a single file and doesn't handle concurrent writes from multiple processes well. PostgreSQL is a production-grade database that supports many simultaneous connections.
 
@@ -50,6 +54,34 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 :::tip
 A good starting point for tuning is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`. Keep the combined total per instance well below your PostgreSQL `max_connections` limit (default is 100).
 :::
+
+### Why SQLite on network storage fails the moment you scale (or upgrade)
+
+Since 0.9.0 the backend data layer is **fully async** (async SQLAlchemy + `aiosqlite`). That change made Open WebUI dramatically more concurrent — and, as a side effect, made every pre-existing "SQLite is slow on NFS/CephFS/Azure Files" problem go from *tolerable* to *fatal* overnight. Many operators hit this right after upgrading from 0.8.x without changing anything else in their deployment.
+
+The mechanism in one paragraph: SQLite's durability guarantee is `fsync()` on every commit. On local SSD that's ~100 μs. On NFS / CephFS / Azure Files / Kubernetes PVCs backed by network storage that's 50–500 ms, sometimes seconds. In the old sync backend, FastAPI's ~40-thread worker pool acted as a natural throttle, so slow storage meant "slow app." In the async backend there's no thread-pool ceiling — the asyncio loop schedules thousands of DB coroutines in parallel, every slow `fsync` keeps a connection checked out for the full duration, and the SQLAlchemy async pool (default `pool_size=5` + `max_overflow=10` = 15 connections) saturates almost instantly. You then see:
+
+```
+sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached,
+connection timed out, timeout 30.00
+```
+
+Making the pool bigger just moves the breaking point. More connections means more concurrent slow `fsync`s hitting the same slow storage; the filesystem is still the bottleneck.
+
+On top of that, SQLite's WAL mode relies on a memory-mapped `-shm` file for cross-process coordination, and `mmap` over NFS is [officially unreliable per SQLite upstream](https://www.sqlite.org/faq.html#q5) — with high async concurrency it can produce actual locking pathologies (deadlocks, `PRAGMA journal_mode=WAL` that starts but never completes, multi-minute stalls on trivial queries).
+
+**There is no setting that fixes this while SQLite stays on network storage.** The three options are:
+
+1. **Best — switch to PostgreSQL (this step).** The DB server manages its own I/O against its own local storage. Your app reaches it over a network socket, but that hop is orders of magnitude cheaper than NFS `fsync`, and Postgres was designed from day one for concurrent writers. This is the only supported configuration for multi-replica, multi-user, or Kubernetes/Swarm deployments.
+2. **Move `webui.db` off network storage onto a local SSD/NVMe.** Only appropriate for single-node, low-user deployments. Your RAG files and uploads on NFS are fine — SQLite specifically is the problem, not the shared filesystem in general.
+3. **Temporary workaround if you cannot do either yet:**
+   ```bash
+   DATABASE_POOL_SIZE=1
+   DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
+   ```
+   Serializes to a single async connection, trading concurrency for stability. **Not supported long-term** — plan the real migration.
+
+The short version: sync backends throttled concurrency through thread pools, so slow storage just made things *slow*. Async backends allow massive concurrency, which means slow `fsync`s stack up, connections stay checked out longer, the pool saturates, and the whole thing wedges. The same storage was tolerable before because the app wasn't asking it to do 20 concurrent `fsync`s.
 
 ---
 
