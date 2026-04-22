@@ -46,7 +46,9 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Models Access** | **(Parent)** Access the **Models** workspace to create or edit custom models. |
 | **Models Import** | *(Requires Models Access)* Ability to import models from JSON/files. |
 | **Models Export** | *(Requires Models Access)* Ability to export models to files. |
-| **Knowledge Access** | Access the **Knowledge** workspace to manage knowledge bases. |
+| **Knowledge Access** | **(Parent)** Access the **Knowledge** workspace to manage knowledge bases. |
+| **Knowledge Max Files** | *(Requires Knowledge Access)* Maximum number of files allowed per knowledge base. `0` or empty means unlimited. Uses most-permissive merging across groups: if any group grants unlimited, the user has no limit; otherwise the highest value wins. Admins always bypass this limit. |
+| **Knowledge Max File Size** | *(Requires Knowledge Access)* Maximum upload size per file, in MB. `0` or empty means unlimited. Same merging semantics as **Knowledge Max Files**. Admins always bypass this limit. |
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
 | **Prompts Import** | *(Requires Prompts Access)* Ability to import prompts. |
 | **Prompts Export** | *(Requires Prompts Access)* Ability to export prompts. |

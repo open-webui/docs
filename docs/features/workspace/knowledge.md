@@ -146,6 +146,16 @@ Add dozens of papers to a knowledge base. The AI searches across all of them to 
 
 Files uploaded via API are processed asynchronously. Attempting to use a file before processing completes will fail silently or return empty results.
 
+### Per-group upload limits
+
+Administrators can cap how many files a user may add to a knowledge base and how large each file may be. These limits are configured per group in **Admin Panel > Users > Groups > Permissions > Knowledge Max Files / Knowledge Max File Size**.
+
+- `0` or empty means unlimited.
+- When a user belongs to multiple groups, the most-permissive value wins: if any group grants unlimited, the user has no cap; otherwise the highest limit across groups applies.
+- Admins always bypass both limits.
+
+If a user hits a limit they will see an error before any file processing begins.
+
 ### Native function calling changes behavior
 
 Enabling native function calling changes how knowledge bases work. If your KB suddenly stops producing results, check whether `function_calling: native` was set in global model defaults. See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for details.
