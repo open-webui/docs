@@ -278,6 +278,12 @@ If you must use a synchronous third-party library in an async handler, wrap the 
 
 You can modify this proxy Pipe to support additional service providers like Anthropic, Perplexity, and more by adjusting the API endpoints, headers, and logic within the `pipes` and `pipe` functions.
 
+:::caution Building a self-contained agent? Don't emit `delta.tool_calls`.
+If your Pipe wraps an agent (LangChain, LlamaIndex, a custom planner, …) that executes tools **internally** and then streams the final answer back to the chat, emitting `delta.tool_calls` in the stream will trigger Open WebUI's tool-execution retry loop — the middleware treats `delta.tool_calls` as "please execute this for me, client" and loops back through your pipe, duplicating the response up to `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (~30) times.
+
+For self-contained agents, render tool executions as `<details type="tool_calls">` content blocks instead — the same shape Open WebUI itself emits after internal tool execution. See the [Pipes → Self-contained agents and `delta.tool_calls`](/features/extensibility/pipelines/pipes#self-contained-agents-and-deltatool_calls) section for the full pattern, a LangChain example, and the rule of thumb for which path to take.
+:::
+
 ---
 
 ## Using Internal Open WebUI Functions
