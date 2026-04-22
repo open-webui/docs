@@ -142,19 +142,19 @@ Native Mode can be enabled at two levels:
 
 1.  **Universal Default for Every Model (Fastest — Recommended)**:
     *   Navigate to **Admin Panel → Settings → Models**.
-    *   Click the **gear icon** (⚙️) at the **top right** of the models list — this opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
-    *   Under **Advanced Parameters**, set **Function Calling** to `Native`.
+    *   Click the **Settings** button at the **top right** of the models list — this opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
+    *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. All existing models that haven't explicitly set their own value, and all models you add later, inherit `Native`. You do **not** need to edit them one by one.
 2.  **Per-Model Override**:
     *   In **Admin Panel → Settings → Models**, pick a specific model and click its edit button.
-    *   Under **Advanced Parameters**, set **Function Calling** to `Native`. This value overrides the global default for that model only.
+    *   Under **Model Parameters**, set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters — otherwise prefer the global setting.
 3.  **Per-Chat Override**:
-    *   Inside a chat, click the ⚙️ **Chat Controls** icon.
+    *   Inside a chat, open **Chat Controls** (right sidebar).
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set Function Calling Globally — Once, For All Models
-Tired of switching every model to Native one at a time? The **global model parameters** menu (the gear icon at the top right of **Admin Panel → Settings → Models**) lets you configure any advanced parameter — `function_calling`, temperature, top_p, max_tokens, etc. — **once, for every model in your Open WebUI instance**. Values set there become the default for every existing model that hasn't overridden them *and* every model you add later. Set `Function Calling = Native` there, save, done.
+Tired of switching every model to Native one at a time? The **global model parameters** panel (the **Settings** button at the top right of **Admin Panel → Settings → Models**) lets you configure any model parameter — `function_calling`, temperature, top_p, max_tokens, etc. — **once, for every model in your Open WebUI instance**. Values set there become the default for every existing model that hasn't overridden them *and* every model you add later. Set `Function Calling = Native` there, save, done.
 :::
 
 ![Chat Controls](/images/features/plugin/tools/chat-controls.png)
