@@ -137,7 +137,8 @@ Let's dive into a practical example where we'll create a Pipe that proxies reque
 
 ```python
 from pydantic import BaseModel, Field
-import requests
+import httpx
+
 
 class Pipe:
     class Valves(BaseModel):
@@ -157,40 +158,37 @@ class Pipe:
     def __init__(self):
         self.valves = self.Valves()
 
-    def pipes(self):
-        if self.valves.OPENAI_API_KEY:
-            try:
-                headers = {
-                    "Authorization": f"Bearer {self.valves.OPENAI_API_KEY}",
-                    "Content-Type": "application/json",
-                }
+    async def pipes(self):
+        if not self.valves.OPENAI_API_KEY:
+            return [{"id": "error", "name": "API Key not provided."}]
 
-                r = requests.get(
+        headers = {
+            "Authorization": f"Bearer {self.valves.OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            async with httpx.AsyncClient() as client:
+                r = await client.get(
                     f"{self.valves.OPENAI_API_BASE_URL}/models", headers=headers
                 )
+                r.raise_for_status()
                 models = r.json()
-                return [
-                    {
-                        "id": model["id"],
-                        "name": f'{self.valves.NAME_PREFIX}{model.get("name", model["id"])}',
-                    }
-                    for model in models["data"]
-                    if "gpt" in model["id"]
-                ]
 
-            except Exception as e:
-                return [
-                    {
-                        "id": "error",
-                        "name": "Error fetching models. Please check your API Key.",
-                    },
-                ]
-        else:
+            return [
+                {
+                    "id": model["id"],
+                    "name": f'{self.valves.NAME_PREFIX}{model.get("name", model["id"])}',
+                }
+                for model in models["data"]
+                if "gpt" in model["id"]
+            ]
+        except Exception:
             return [
                 {
                     "id": "error",
-                    "name": "API Key not provided.",
-                },
+                    "name": "Error fetching models. Please check your API Key.",
+                }
             ]
 
     async def pipe(self, body: dict, __user__: dict):
@@ -205,23 +203,34 @@ class Pipe:
 
         # Update the model id in the body
         payload = {**body, "model": model_id}
+        url = f"{self.valves.OPENAI_API_BASE_URL}/chat/completions"
+
         try:
-            r = requests.post(
-                url=f"{self.valves.OPENAI_API_BASE_URL}/chat/completions",
-                json=payload,
-                headers=headers,
-                stream=True,
-            )
-
-            r.raise_for_status()
-
             if body.get("stream", False):
-                return r.iter_lines()
-            else:
+                async def event_stream():
+                    async with httpx.AsyncClient(timeout=None) as client:
+                        async with client.stream(
+                            "POST", url, json=payload, headers=headers
+                        ) as r:
+                            r.raise_for_status()
+                            async for line in r.aiter_lines():
+                                yield line
+
+                return event_stream()
+
+            async with httpx.AsyncClient(timeout=None) as client:
+                r = await client.post(url, json=payload, headers=headers)
+                r.raise_for_status()
                 return r.json()
         except Exception as e:
             return f"Error: {e}"
 ```
+
+:::tip Use an async HTTP client
+This example uses [`httpx.AsyncClient`](https://www.python-httpx.org/async/) instead of `requests` because both `pipes()` and `pipe()` run inside Open WebUI's async event loop. Calling the synchronous `requests` library from an `async def` method blocks the loop for the full duration of the HTTP request (and, for streaming, the entire stream), which starves every other concurrent request on the instance. `httpx` is async-native, already a dependency, and a drop-in replacement for the common patterns.
+
+If you must use a synchronous third-party library in an async handler, wrap the blocking call with `await anyio.to_thread.run_sync(...)` so it runs on a worker thread instead of the event loop.
+:::
 
 ### Detailed Breakdown
 
@@ -261,8 +270,8 @@ class Pipe:
   1. **Prepare Headers**: Sets up the headers with the API key and content type.
   2. **Extract Model ID**: Extracts the actual model ID from the selected model name.
   3. **Prepare Payload**: Updates the body with the correct model ID.
-  4. **Make API Request**: Sends a POST request to the OpenAI API's chat completions endpoint.
-  5. **Handle Streaming**: If `stream` is `True`, returns an iterable of lines.
+  4. **Make API Request**: Sends a POST request to the OpenAI API's chat completions endpoint via an `httpx.AsyncClient`.
+  5. **Handle Streaming**: If `stream` is `True`, returns an async generator that yields SSE lines from the upstream response.
   6. **Error Handling**: Catches exceptions and returns an error message.
 
 ### Extending the Proxy Pipe

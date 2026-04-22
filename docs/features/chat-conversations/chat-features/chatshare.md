@@ -46,8 +46,6 @@ Note: You can change the permission level of your shared chats on the community 
 
 :::
 
-Example of a shared chat to the community platform website: https://openwebui.com/c/iamg30/5e3c569f-905e-4d68-a96d-8a99cc65c90f
-
 #### Copying a Share Link
 
 When you select `Copy Link`, a unique share link is generated that can be shared with others.

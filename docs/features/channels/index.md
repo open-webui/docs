@@ -94,6 +94,10 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 
 This removes the need to manually bridge information between private chats and shared channels. The AI does it for you.
 
+:::tip Community action: Forward to Channel
+If you want a one-click path from a chat message into a channel, the community **[Forward to Channel](https://openwebui.com/posts/b60c1f03-e29c-47c0-862c-3741a382616e)** action adds a button to each assistant message that posts the reply (or a selection) into a channel of your choice. Useful for promoting good answers from private chats into team-visible spaces without copy-paste.
+:::
+
 ---
 
 ## Getting Started
