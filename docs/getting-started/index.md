@@ -30,7 +30,7 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 
 ---
 
-## Open WebUI 101
+## Essentials for Open WebUI
 
 **Installed and chatting — now what?**
 
@@ -44,7 +44,7 @@ Five short sections that cover the things every new user eventually wishes they'
 | 📚 **Basic RAG** | Chatting with your own documents |
 | 🔧 **Tool calling** | Native mode + first Tools to install |
 
-[**Read Open WebUI 101 →**](/getting-started/essentials)
+[**Read the essentials →**](/getting-started/essentials)
 
 ---
 
