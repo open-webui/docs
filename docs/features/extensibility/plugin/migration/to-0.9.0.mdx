@@ -33,15 +33,6 @@ If your plugin touches the Open WebUI database or models — **or calls any help
 
 Plugin entrypoints themselves (the `pipe`, `inlet`, `outlet`, `stream`, `action`, and Tool methods) were already asynchronous in 0.5 and later, so the signatures you declare do not change — only the bodies do.
 
-:::info Deployment note — database drivers
-Open WebUI now requires an async-capable driver matching your database. Standard deployments get this automatically:
-- **SQLite** uses `aiosqlite` (sync `sqlite://` URLs are rewritten to `sqlite+aiosqlite://` at runtime).
-- **PostgreSQL** uses `asyncpg` (`postgresql://`, `postgresql+psycopg2://`, and `postgres://` URLs are rewritten to `postgresql+asyncpg://`).
-- **SQLCipher** (`sqlite+sqlcipher://`) has no async driver and is **not supported** in 0.9.0. If you rely on SQLCipher for database encryption, stay on 0.8.x or migrate to standard SQLite / Postgres before upgrading.
-
-This is primarily an operator concern, but plugins that pin their own DB URL strings need to follow the same rewriting rules.
-:::
-
 ---
 
 ## ✅ Step-by-Step Migration
