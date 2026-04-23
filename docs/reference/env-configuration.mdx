@@ -6369,7 +6369,7 @@ Running SQLite on **NFS, CIFS/SMB, Azure Files, GlusterFS, CephFS, or any Kubern
 **For multi-replica, multi-worker, Kubernetes, Docker Swarm, or any deployment where `DATA_DIR` is on shared/network storage, set `DATABASE_URL` to a PostgreSQL URL:**
 
 ```
-DATABASE_URL=postgresql+asyncpg://user:password@host:5432/openwebui
+DATABASE_URL=postgresql://user:password@host:5432/openwebui
 ```
 
 See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the full mechanism (fsync + async pool saturation) and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for migration guidance.
