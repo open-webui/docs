@@ -24,13 +24,14 @@ Open WebUI ships with a lot out of the box, but its real power is that it is des
 
 There are two plugin families: **Tools** and **Functions**.
 
-**Tools** give the model abilities it can call during a response. Open WebUI supports three kinds:
+**Tools** give the model abilities it can call during a response:
 
 | Source | What it does | Examples |
 | :--- | :--- | :--- |
-| **Built-in** | System tools integrated into Open WebUI's core. | Web Search, Code Interpreter, Image Generation, Memory, Notes, Knowledge retrieval |
-| **Custom** | Tools you write yourself or install from the [community site](https://openwebui.com/). Manage in **Workspace > Tools**. | Langfuse / OpenLit observability, Home Assistant, arXiv / PubMed lookups, Wolfram Alpha, Jira / Linear, SQL queries |
-| **External servers** | Remote tool servers connected via **MCP** or **OpenAPI** specs. No plugin code required. Configure in **Admin Panel > Settings > Tools**. | Your own microservices, third-party APIs, existing MCP servers |
+| **Built-in** | System tools that ship with Open WebUI. Enable in the admin panel, no install needed. | Web Search, Code Interpreter, Image Generation, Memory, Notes, Knowledge retrieval |
+| **Custom** | | |
+| &nbsp;&nbsp;↳ Tool | Code you write yourself or install from the [community site](https://openwebui.com/). Manage in **Workspace > Tools**. | Langfuse / OpenLit observability, Home Assistant, arXiv / PubMed lookups, Wolfram Alpha, Jira / Linear, SQL queries |
+| &nbsp;&nbsp;↳ Tool server | External services connected via **MCP** or **OpenAPI**. Configure in **Admin Panel > Settings > Tools**. | Your own microservices, third-party APIs, existing MCP servers |
 
 **Functions** run at the platform level and modify how Open WebUI itself behaves. There are three types:
 
