@@ -116,6 +116,22 @@ print(response.json())
 
 For the full endpoint reference - chat completions, Ollama proxy, RAG, file management, and more - see [API Endpoints](/reference/api-endpoints).
 
+### Behind a reverse proxy that consumes `Authorization`?
+
+If Open WebUI sits behind a gateway that uses the `Authorization` header for its own auth (basic auth, SSO sidecar, corporate API gateway, mutual-TLS adapter, etc.), clients can deliver the API key via a dedicated header instead. The middleware checks, in order: `Authorization: Bearer`, the `token` cookie, and a configurable custom header.
+
+The custom header defaults to `x-api-key`, and admins can rename it via the [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header) environment variable to avoid collisions with anything else in the request chain.
+
+```bash
+curl -H "X-OpenWebUI-Key: YOUR_API_KEY" \
+  http://openwebui.internal/api/models
+```
+
+```
+# Open WebUI container env
+CUSTOM_API_KEY_HEADER=X-OpenWebUI-Key
+```
+
 ---
 
 ## Best Practices

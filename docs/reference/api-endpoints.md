@@ -9,6 +9,10 @@ This guide provides essential information on how to interact with the API endpoi
 
 To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication. For full instructions on enabling and generating API keys - including the admin toggle and group permissions required for non-admin users - see [API Keys](/features/authentication-access/api-keys).
 
+:::tip Alternate credential header for proxy-heavy setups
+When Open WebUI is behind a reverse proxy that already uses the `Authorization` header for its own auth, you can deliver the API key via a custom header instead (`x-api-key` by default). Admins can rename the header via the [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header) environment variable to avoid collisions — see [Behind a reverse proxy that consumes `Authorization`?](/features/authentication-access/api-keys#behind-a-reverse-proxy-that-consumes-authorization) for the full pattern.
+:::
+
 ## Swagger Documentation Links
 
 :::important
