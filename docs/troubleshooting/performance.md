@@ -147,6 +147,7 @@ This is the **#1 cause of unexplained memory growth** in production deployments.
 |---|---|---|
 | **Apache Tika** | General-purpose, widely used, handles most document types | `CONTENT_EXTRACTION_ENGINE=tika` + `TIKA_SERVER_URL=http://tika:9998` |
 | **Docling** | High-quality extraction with layout-aware parsing | `CONTENT_EXTRACTION_ENGINE=docling` |
+| **PaddleOCR-vl** | OCR-heavy workloads (scanned PDFs, images, mixed layouts); self-hosted vision-language OCR | `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` + `PADDLEOCR_VL_BASE_URL=http://paddleocr-vl:8080` + `PADDLEOCR_VL_TOKEN=...` |
 | **External Loader** | Recommended for production and custom extraction pipelines | `CONTENT_EXTRACTION_ENGINE=external` + `EXTERNAL_DOCUMENT_LOADER_URL=...` |
 
 Using an external extractor moves the memory-intensive parsing out of the Open WebUI process entirely, eliminating this class of memory leaks.

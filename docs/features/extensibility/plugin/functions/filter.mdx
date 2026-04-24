@@ -73,11 +73,11 @@ class Filter:
 
 ---
 
-### 🆕 🧲 Toggle Filter Example: Adding Interactivity and Icons (New in Open WebUI 0.6.10)
+### 🧲 Toggleable Filters: Making Filters User-Controllable (`self.toggle`)
 
-Filters can do more than simply modify text—they can expose UI toggles and display custom icons. For instance, you might want a filter that can be turned on/off with a user interface button, and displays a special icon in Open WebUI’s message input UI.
+By default a filter that's **active and in scope** (global, or attached to the model) runs on every request — the user has no say in it. That's often what you want (PII scrubbing, logging, mandatory guardrails). Sometimes you want the opposite: let the user decide whether the filter runs for a given conversation.
 
-Here’s how you could create such a toggle filter:
+Set `self.toggle = True` to make the filter **user-controllable**. The filter then shows up in the chat UI with a clickable chip + an entry in the Integrations menu, and only runs on requests where the user has it selected.
 
 ```python
 from pydantic import BaseModel, Field
@@ -89,36 +89,58 @@ class Filter:
 
     def __init__(self):
         self.valves = self.Valves()
-        self.toggle = True # IMPORTANT: This creates a switch UI in Open WebUI
+        self.toggle = True   # Make this filter user-controllable (see notes below)
         # TIP: Use a hosted URL for your icon instead of base64 to avoid API payload bloat.
         # See the Action Function docs for details on why base64 icons are not recommended.
         self.icon = "https://example.com/icons/lightbulb.svg"
-        pass
 
     async def inlet(
         self, body: dict, __event_emitter__, __user__: Optional[dict] = None
     ) -> dict:
+        # This method ONLY runs when the filter is currently selected by the user.
+        # You do NOT need to branch on self.toggle inside here — see the note below.
         await __event_emitter__(
             {
                 "type": "status",
-                "data": {
-                    "description": "Toggled!",
-                    "done": True,
-                    "hidden": False,
-                },
+                "data": {"description": "Running!", "done": True, "hidden": False},
             }
         )
         return body
 ```
 
-#### 🖼️ What’s happening?
--   **toggle = True** creates a switch UI in Open WebUI—users can manually enable or disable the filter in real time.
--   **icon** will show up as a little image next to the filter’s name. You can use a URL pointing to any image (SVG, PNG, JPEG, etc.). While base64 data URIs are technically supported, **using a hosted URL is strongly recommended** to avoid bloating the `/api/models` payload — see the [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example---specifying-action-frontmatter) for details.
--   **The `inlet` function** uses the `__event_emitter__` special argument to broadcast feedback/status to the UI, such as a little toast/notification that reads "Toggled!"
+#### What `self.toggle = True` actually does
+
+It is a **visibility / gating flag**, read once at request-dispatch time — **not** a runtime state the UI flips on your Python object. Specifically:
+
+- **Visibility:** the filter only appears in the chat UI (inline chip + Integrations menu entry) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface — users can't turn it off.
+- **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
+- **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__` — which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
+
+:::warning Upgrading from pre-0.9.0 filters
+Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally — the user controls whether `inlet()` runs by selecting/deselecting the chip. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#⚙%EF%B8%8F-filter-administration--configuration) instead; clicking the chip opens the user's valves modal automatically.
+:::
+
+#### How users interact with a toggleable filter
+
+When a toggleable filter is in scope for the current chat, two UI surfaces show up:
+
+- **Inline chip in the chat input bar.** Shows the filter's `self.icon` + name. Clicking it:
+  - **opens the user-valves modal** if the filter defines a `UserValves` class (so the user can tune per-chat settings), **otherwise**
+  - **removes the filter from the current selection** for this chat session (the chip disappears from the inline row).
+- **Integrations menu (⚙️ icon).** Lists every toggleable filter in scope, each with a proper on/off **Switch**. This is where users re-enable a filter they removed from the chip row, or switch one off that was selected by default.
+
+The chip being present = the filter is enabled for the next request. The chip being absent (but the filter is in the Integrations menu) = the user has turned it off.
+
+#### Where the selection lives
+
+- Stored in the browser as **sessionStorage draft state**, keyed per chat.
+- Survives page reloads in the same browser session but is **not persisted to the chat record on the server**.
+- Initial state comes from the model's `defaultFilterIds` (Admin Panel → Model Settings → Default Filters) — admins decide which toggleable filters start **on** vs **off** per model.
+- Resets when the user switches to a different model.
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
 
-You can use these mechanisms to make your filters dynamic, interactive, and visually unique within Open WebUI’s plugin ecosystem.
+`self.icon` continues to work as before: pass a URL (strongly preferred) or a base64 data URI, and it renders in both the inline chip and the Integrations menu entry. See the [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example---specifying-action-frontmatter) for why hosted URLs are recommended over base64.
 
 ---
 
@@ -276,10 +298,11 @@ class ContentModerationFilter:
 #### Toggleable Filters (`toggle=True`)
 
 **Characteristics:**
-- Appear as **switches in the chat UI** (in the integrations menu - ⚙️ icon)
-- Users can **enable/disable** them per chat session
-- **Do** appear in the "Default Filters" section
-- `defaultFilterIds` controls their initial state (ON or OFF)
+- Appear in the **chat input bar as a clickable chip** and in the **Integrations menu (⚙️ icon) as a Switch**.
+- Users can add or remove them from the active selection on a per-chat, per-session basis. Selection is stored in browser sessionStorage — not persisted to the chat record on the server.
+- **Do** appear in the model's "Default Filters" configuration.
+- `defaultFilterIds` on the model controls the **initial selection** (which toggleable filters start on when a new chat begins with that model).
+- `self.toggle` itself is **never mutated at runtime** — it's a visibility/gating flag read once at request dispatch. `inlet()` only runs when the filter is currently selected; there is no "else" branch to write inside the filter. See [the detailed note above](#what-selftoggle--true-actually-does).
 
 **Use Cases:**
 - **Web search integration** - User decides when to search the web for context
@@ -287,7 +310,7 @@ class ContentModerationFilter:
 - **Verbose/detailed mode** - User toggles between concise and detailed responses
 - **Translation filters** - User enables translation to/from specific languages
 - **Code formatting** - User chooses when to apply syntax highlighting or linting
-- **Thinking/reasoning toggle** - Show or hide model's chain-of-thought reasoning
+- **Thinking/reasoning toggle** - User switches the underlying model's thinking mode on/off by enabling the filter (do the work unconditionally in `inlet()`; the user disables it by removing the chip)
 - **Markdown rendering** - Toggle between raw text and formatted output
 - **Anonymization mode** - User enables when discussing sensitive topics
 - **Expert mode** - Inject domain-specific context (legal, medical, technical)
@@ -297,11 +320,12 @@ class ContentModerationFilter:
 ```python
 class WebSearchFilter:
     def __init__(self):
-        self.toggle = True  # User can turn on/off
-        self.icon = "https://example.com/icons/web-search.svg"  # Shows in UI
-    
+        self.toggle = True  # Make user-controllable
+        self.icon = "https://example.com/icons/web-search.svg"
+
     async def inlet(self, body: dict, __event_emitter__) -> dict:
-        # Only runs when user has enabled this filter
+        # This only runs when the user has this filter selected.
+        # Do NOT branch on self.toggle here — it's always True when this runs.
         await __event_emitter__({
             "type": "status",
             "data": {"description": "Searching the web...", "done": False}
@@ -312,12 +336,15 @@ class WebSearchFilter:
 
 **Where Toggleable Filters Appear:**
 
-1.  **Model Settings → Default Filters Section**
-    -   Configure which filters start enabled
-2.  **Chat UI → Integrations Menu (⚙️ icon)**
-    -   Users can toggle filters on/off per chat
-    -   Shows custom icons if provided
-    -   Realtime enable/disable
+1.  **Model Settings → Default Filters**
+    - Admin picks which toggleable filters start in the selection on new chats with that model.
+2.  **Chat input bar → Inline chip**
+    - Shown for every toggleable filter currently in the user's selection for this chat.
+    - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection** (it moves back to the Integrations menu where the user can re-enable it).
+    - `self.icon` renders as the chip's image.
+3.  **Chat UI → Integrations Menu (⚙️ icon)**
+    - Lists every toggleable filter in scope for the current model, each with a proper on/off **Switch**.
+    - Used to re-enable a filter removed from the chip row, or to turn off a filter selected by default.
 
 ---
 
@@ -337,16 +364,18 @@ Here's the complete flow from admin configuration to filter execution:
 - DefaultFiltersSelector: Set default enabled state (only for toggleable filters)
 
 **3. CHAT UI (User Interaction - Toggleable Filters Only)**
-- Chat → Integrations Menu (⚙️) → Toggle Filters
-- Users can enable/disable toggleable filters
-- Always-on filters run automatically (no UI control)
+- Chat input bar → Inline chip (add/remove via click; click opens UserValves modal if defined)
+- Chat → Integrations Menu (⚙️) → Switch per toggleable filter
+- Frontend tracks `selectedFilterIds` in sessionStorage (per chat, per session)
+- Initial selection seeded from the model's `defaultFilterIds`
+- Always-on filters (no `self.toggle`) run automatically with no UI control
 
 **4. REQUEST PROCESSING (Filter Compilation)**
-- Backend: get_sorted_filter_ids()
-- Fetch global filters (is_global=True, is_active=True)
-- Add model-specific filters from model.meta.filterIds
-- Filter by is_active status
-- For toggleable filters: Check user's enabled state
+- Frontend ships the current `selectedFilterIds` with the request
+- Backend: `get_sorted_filter_ids(request, model, filter_ids)`
+- Fetch global filters (`is_global=True`, `is_active=True`) + model-specific filters from `model.meta.filterIds`
+- Filter by `is_active` status
+- **For toggleable filters:** keep only the ones whose ID is in the request's `filter_ids` — others are dropped entirely (never invoked, `self.toggle` never read)
 - Sort by priority (from valves)
 
 **5. FILTER EXECUTION**
