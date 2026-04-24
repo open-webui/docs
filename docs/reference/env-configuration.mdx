@@ -1514,6 +1514,37 @@ This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment va
 
 :::
 
+#### `CUSTOM_API_KEY_HEADER`
+
+- Type: `str`
+- Default: `x-api-key`
+- Description: Name of the HTTP header the auth middleware checks for API-key credentials. Useful when Open WebUI sits behind a reverse proxy or API gateway that consumes the `Authorization` header for its own authentication — set this to a distinct header (for example `X-OpenWebUI-Key`) so clients can deliver their Open WebUI API key without colliding with the proxy's own auth.
+- Read at startup from the process environment (not a `PersistentConfig`).
+
+**How the auth middleware picks up a credential**, in order:
+
+1. `Authorization: Bearer <token>` (most common — API key or JWT)
+2. `token` cookie (Bearer — used by the WebUI itself)
+3. The header named by `CUSTOM_API_KEY_HEADER` (default `x-api-key`)
+
+If none of the three is present, the request falls through as anonymous.
+
+:::tip Behind a proxy that eats `Authorization`?
+Many corporate gateways (basic auth, mutual TLS adapters, SSO sidecars) consume the `Authorization` header and never forward it upstream. In that case, point your clients at the custom header instead:
+
+```bash
+curl -H "X-OpenWebUI-Key: sk-..." http://openwebui.internal/api/models
+```
+
+And set on the Open WebUI container:
+
+```
+CUSTOM_API_KEY_HEADER=X-OpenWebUI-Key
+```
+
+The header name is matched case-insensitively by the ASGI layer, so pick whatever fits your naming convention.
+:::
+
 ### Model Caching
 
 #### `ENABLE_BASE_MODELS_CACHE`
@@ -2839,7 +2870,9 @@ Note: this configuration assumes that AWS credentials will be available to your 
   - `docling` - Use Docling engine
   - `document_intelligence` - Use Document Intelligence engine
   - `mistral_ocr` - Use Mistral OCR engine
-  - `mineru`
+  - `datalab_marker` - Use Datalab Marker engine
+  - `mineru` - Use MinerU engine
+  - `paddleocr_vl` - Use a PaddleOCR-vl server (requires `PADDLEOCR_VL_TOKEN`; see below)
 - Description: Sets the content extraction engine to use for document ingestion.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
@@ -2982,6 +3015,24 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Default: `300`
 - Description: Sets the timeout in seconds for MinerU API requests during document processing.
 - Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PADDLEOCR_VL_BASE_URL`
+
+- Type: `str`
+- Default: `http://localhost:8080`
+- Description: Base URL of the PaddleOCR-vl server used when `CONTENT_EXTRACTION_ENGINE=paddleocr_vl`. Documents and images are POSTed to `{base_url}/layout-parsing` and the response's `layoutParsingResults[].markdown.text` is ingested page-by-page.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `PADDLEOCR_VL_TOKEN`
+
+- Type: `str`
+- Default: `""` (empty)
+- Description: Authentication token for the PaddleOCR-vl server. Sent as `Authorization: token <value>` on every layout-parsing request. **The PaddleOCR-vl engine is skipped at runtime if this value is empty** — the loader falls back to the default PyPDFLoader for the current document even when `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` is set. Set this to activate the engine.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::info Supported file types
+PaddleOCR-vl handles both documents and images. Extensions treated as images and dispatched with `fileType=1`: `png`, `jpg`, `jpeg`, `bmp`, `tiff`, `webp`. Everything else is dispatched with `fileType=0` (document, e.g. PDFs). Output is per-page Markdown, so downstream chunking behaves the same as other engines.
+:::
 
 ## Retrieval Augmented Generation (RAG)
 
