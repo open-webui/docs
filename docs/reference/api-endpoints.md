@@ -281,6 +281,63 @@ Even in the non-streaming case, **`outlet()` does not rewrite the HTTP response 
 If you need `outlet()` output over HTTP today, call `/api/chat/completions` followed by `/api/chat/completed`. Inline execution on `dev` is primarily for WebUI-shaped clients that read from the WebSocket. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#-filter-behavior-with-api-requests).
 :::
 
+### 🛠️ Using Tools and External Connections in Direct API Calls
+
+Yes. Direct API requests can use Open WebUI-managed tools, but the exact behavior depends on **which tool type** you want and **how the target model is configured**.
+
+#### Direct API Tooling Rules
+
+| Tool Type | Works in direct API calls? | What must be true |
+|-----------|----------------------------|-------------------|
+| **Built-in system tools** (knowledge, notes, memory, channels, web search, code interpreter, image generation) | ✅ Yes | The target model must use **Native Mode / function calling**, **Builtin Tools** must stay enabled for that model, and any required global feature flags must already be enabled. |
+| **Workspace Tools / OpenAPI tools / MCP tools** | ✅ Yes | The request must target a model or request context that exposes those tools, and the authenticated user must have access to them. |
+| **OAuth 2.1 MCP tools that still need browser consent** | ⚠️ Only after prior authorization | Pure API calls cannot complete an interactive browser redirect. If the MCP tool has not already been authorized, the request will fail until a user finishes the OAuth flow in the UI first. |
+
+#### Native Mode Is Required for Tool Calling
+
+For direct API requests, tool calling is a **Native Mode** feature. If the model is using legacy/default prompt-based function calling, Open WebUI will not inject the built-in tool surface described in the [Tools guide](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
+
+#### Built-in Tool Toggles for Direct API Clients
+
+The WebUI normally controls **Web Search**, **Image Generation**, **Code Interpreter**, and similar capabilities with per-chat toggles. Direct API clients can express the same intent by sending a `features` object in the chat completion request body:
+
+```json
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Search the web for the latest Open WebUI release notes."
+    }
+  ],
+  "features": {
+    "web_search": true,
+    "code_interpreter": false,
+    "image_generation": false,
+    "memory": false
+  }
+}
+```
+
+These request-level flags do **not** override admin or model restrictions. They only enable features that are already allowed globally and for the selected model.
+
+#### Selecting Workspace / External Tools
+
+When you need specific Open WebUI-managed tools (including external OpenAPI or MCP connections), include the relevant tool selection in the request context, typically via `tool_ids`. Those selected tool IDs are then visible to filters and other internal processing as `__metadata__.tool_ids`.
+
+Direct API requests still follow the same access-control rules as the WebUI:
+
+- the user must be allowed to use the selected tool
+- model-level capability settings still apply
+- tool-specific limits and provider requirements still apply
+
+#### Practical Guidance
+
+- Use `POST /api/chat/completions` when you want Open WebUI to orchestrate tool calling, file context, filters, and attached knowledge.
+- Use `POST /api/v1/messages` if you prefer Anthropic-compatible clients but still want Open WebUI's routing layer.
+- Use attached `files` / `collections` when you want deterministic RAG context injection instead of autonomous tool use.
+- Pre-authorize OAuth-based MCP tools in the UI before relying on them from unattended API clients.
+
 ### 🦙 Ollama API Proxy Support
 
 If you want to interact directly with Ollama models—including for embedding generation or raw prompt streaming—Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
