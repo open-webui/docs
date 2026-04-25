@@ -5947,6 +5947,20 @@ For API Key creation (and the API keys themselves):
 - Description: Enables or disables user permission to access workspace knowledge.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_MAX_COUNT`
+
+- Type: `int`
+- Default: `None` (unlimited)
+- Description: Sets the default maximum number of files allowed per knowledge base for non-admin users. `0` also means unlimited. When a user belongs to multiple groups, the most permissive value wins: if any group grants unlimited (`0` or unset), the user has no cap; otherwise the highest limit across groups applies. Admins always bypass this limit. Can be overridden per group in **Admin Panel → Users → Groups → Permissions → Knowledge Max Files**.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_MAX_SIZE`
+
+- Type: `int`
+- Default: `None` (unlimited)
+- Description: Sets the default maximum file size in MB for knowledge base uploads for non-admin users. `0` also means unlimited. Uses the same most-permissive merging semantics as `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_MAX_COUNT`. Admins always bypass this limit. Can be overridden per group in **Admin Panel → Users → Groups → Permissions → Knowledge Max File Size**.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ACCESS`
 
 - Type: `bool`
