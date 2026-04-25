@@ -1975,6 +1975,11 @@ When configured, these custom schemes will be validated alongside `http` and `ht
 - Default: `False`
 - Description: Determines whether to allow custom models defined on the Hub in their own modeling files.
 
+#### `RAG_TOKENIZER_MODEL_TRUST_REMOTE_CODE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Determines whether to allow custom models defined on the Hub in their own modeling files.
 
 #### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
 
@@ -1988,6 +1993,12 @@ modeling files for reranking.
 - Type: `bool`
 - Default: `True`
 - Description: Toggles automatic update of the Sentence-Transformer model.
+
+#### `RAG_TOKENIZER_MODEL_AUTO_UPDATE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Toggles automatic update of the tokenizer model.
 
 #### `RAG_RERANKING_MODEL_AUTO_UPDATE`
 
@@ -3175,8 +3186,16 @@ Provide a clear and direct response to the user's query, including inline citati
 - Options:
   - `character`
   - `token`
+  - `token_transformers`
 - Default: `character`
-- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter (Tiktoken-based).
+- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter (Tiktoken-based). `token_transformers` uses RecursiveCharacterTextSplitter with length function of a specified tokenizer which requires `RAG_TOKENIZER_MODEL` if not using local embedding model.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `RAG_TOKENIZER_MODEL`
+
+- Type: `str`
+- Default: empty
+- Description: HuggingFace repo name or local model path of the tokenizer to use with the `token_transformers` text splitter. Leave empty when using a local embedding model — the embedding model's built-in tokenizer is used automatically. Required when using an external embedding API (e.g. Ollama, OpenAI-compatible) with `RAG_TEXT_SPLITTER=token_transformers`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
