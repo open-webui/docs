@@ -162,18 +162,33 @@ If the GPU version isn't using your GPU:
 
 ### Connection Issues from Open WebUI
 
-If Open WebUI can't reach Kokoro:
+If Open WebUI can't reach Kokoro, this is usually a Docker 
+networking issue. Choose the method that matches your setup:
 
-- Use `host.docker.internal:8880` instead of `localhost:8880` (Docker Desktop)
-- If both are in Docker Compose, use `http://kokoro-fastapi-gpu:8880/v1`
+**Option 1 — Docker Desktop (Windows/Mac):**
+
+Use `host.docker.internal` instead of `localhost`:http://host.docker.internal:8880/v1
+
+**Option 2 — Docker Compose (same network):**
+
+Use the service name directly:http://kokoro-fastapi-gpu:8880/v1
+
+**Option 3 — Docker Network (recommended for Linux):**
+
+If `host.docker.internal` doesn't work, create a shared Docker network:
+
+```bash
+# Create a Docker network
+docker network create local-llm
+
+# Connect both containers to the network
+docker network connect local-llm open-webui
+docker network connect local-llm kokoro-fastapi
+
+# Restart both containers
+docker restart open-webui kokoro-fastapi
+```
+
+Then set your API Base URL to `http://kokoro-fastapi:8880/v1`
+
 - Verify the service is running: `curl http://localhost:8880/health`
-
-### CPU Version Performance
-
-The CPU version uses ONNX optimization and performs well for most use cases. If speed is a concern:
-
-- Consider upgrading to the GPU version
-- Ensure no other heavy processes are running on the CPU
-- The CPU version is recommended for systems without compatible NVIDIA GPUs
-
-For more troubleshooting tips, see the [Audio Troubleshooting Guide](/troubleshooting/audio).
