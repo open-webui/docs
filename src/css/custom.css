@@ -838,6 +838,7 @@ a.footer__link-item:hover {
 	color: #999;
 }
 
+/* stylelint-disable no-descending-specificity */
 [data-theme="light"] .disclaimer-bar a {
 	color: #777;
 	text-decoration: underline;
@@ -853,3 +854,4 @@ a.footer__link-item:hover {
 	text-decoration: underline;
 	text-decoration-color: #333;
 }
+/* stylelint-enable no-descending-specificity */
