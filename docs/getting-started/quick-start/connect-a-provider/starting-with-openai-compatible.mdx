@@ -208,6 +208,25 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   ![MiniMax Chat interface](/images/tutorials/minimax/minimax-chat.png)
 
   </TabItem>
+  <TabItem value="ofoxai" label="OfoxAI">
+
+  **OfoxAI** is a unified LLM API gateway that provides access to 100+ models — including OpenAI, Anthropic Claude, Google Gemini, DeepSeek, Qwen, Mistral, and Llama — through a single OpenAI-compatible endpoint.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.ofox.ai/v1` |
+  | **API Key** | Your API key from [app.ofox.ai](https://app.ofox.ai) |
+  | **Model IDs** | Auto-detected via `/models` |
+
+  :::tip
+  OfoxAI also exposes native **Anthropic** and **Gemini** protocol endpoints (`https://api.ofox.ai/anthropic` and `https://api.ofox.ai/gemini`) using the same API key. The OpenAI-compatible endpoint works for the vast majority of use cases — switch to a native protocol only if you need a feature that the OpenAI wire format doesn't expose.
+  :::
+
+  :::info
+  China users get optimized routing via Hong Kong express by default. Free tier available; pay-per-token thereafter. See [docs.ofox.ai](https://docs.ofox.ai) for the full model catalog and pricing.
+  :::
+
+  </TabItem>
   <TabItem value="openrouter" label="OpenRouter">
 
   **OpenRouter** aggregates hundreds of models from multiple providers behind a single API.
