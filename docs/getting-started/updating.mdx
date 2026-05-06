@@ -185,21 +185,20 @@ If the version you updated to ran a database migration, rolling back the contain
 
 ## Stay Notified About Updates
 
-Instead of checking manually, use a tool to monitor for new releases. Options are listed from safest to most hands-on.
+Instead of checking manually, use a tool to monitor for new releases.
 
 :::tip Recommendation
 - **Production / critical systems:** Diun (notification-only) + manual updates
 - **Managed environments:** WUD (visual dashboard + manual trigger)
-- **Homelabs / personal use:** Watchtower (fully automated)
 :::
 
-| Feature | Diun | WUD | Watchtower |
-|---------|:---:|:---:|:---:|
-| **Auto-updates containers** | ❌ | ❌ (manual via UI) | ✅ |
-| **Web interface** | ❌ | ✅ | ❌ |
-| **Notifications** | ✅ | ✅ | ✅ |
-| **Docker 29+** | ✅ | ✅ | ✅ (forks) |
-| **Resource usage** | Very Low | Medium | Low |
+| Feature | Diun | WUD |
+|---------|:---:|:---:|
+| **Auto-updates containers** | ❌ | ❌ (manual via UI) |
+| **Web interface** | ❌ | ✅ |
+| **Notifications** | ✅ | ✅ |
+| **Docker 29+** | ✅ | ✅ |
+| **Resource usage** | Very Low | Medium |
 
 ### Diun
 
@@ -233,34 +232,6 @@ See [Diun documentation](https://crazymax.dev/diun/) for full setup and notifica
 ### What's Up Docker (WUD)
 
 Web UI for monitoring container updates and triggering them manually. See [WUD documentation](https://getwud.github.io/wud/) for setup.
-
-### Watchtower
-
-Fully automated. Pulls new images and recreates containers without intervention.
-
-:::warning
-The original `containrrr/watchtower` is **no longer maintained** and fails with Docker 29+. Use the [nicholas-fedor/watchtower](https://watchtower.nickfedor.com/) fork instead.
-:::
-
-:::warning
-Automated updates can break your deployment if a release includes breaking changes or database migrations. Review release notes before auto-updating production systems, and always have a backup.
-:::
-
-**One-time update:**
-```bash
-docker run --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  nickfedor/watchtower --run-once open-webui
-```
-
-**Continuous (check every 6 hours):**
-```bash
-docker run -d --name watchtower --restart unless-stopped \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  nickfedor/watchtower --interval 21600 open-webui
-```
-
-Set `WATCHTOWER_CLEANUP=true` to auto-remove old images. See [Watchtower docs](https://watchtower.nickfedor.com/) for scheduling, notifications, and monitor-only mode.
 
 ---
 

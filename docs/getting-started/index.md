@@ -100,12 +100,12 @@ Go beyond the basics. Configure environment variables, connect external database
 
 **Stay current with the latest features and security patches.**
 
-Update manually with a single Docker or pip command, or automate with Watchtower, WUD, or Diun. Includes backup/restore procedures and version pinning for production.
+Update manually with a single Docker or pip command, or set up notifications with WUD or Diun. Includes backup/restore procedures and version pinning for production.
 
 | | |
 | :--- | :--- |
 | 🔄 **Manual update** | Docker pull + recreate, or pip upgrade |
-| 🤖 **Automated updates** | Watchtower, WUD, or Diun |
+| 🤖 **Update notifications** | WUD or Diun |
 | 📌 **Version pinning** | Lock to a specific release for stability |
 | 💾 **Backup & restore** | One-command volume backup and recovery |
 

@@ -1,18 +1,6 @@
 ## Updating
 
-To update your local Docker installation to the latest version, you can either use **Watchtower** or manually update the container.
-
-### Option 1: Using Watchtower
-
-With [Watchtower](https://github.com/nicholas-fedor/watchtower), you can automate the update process:
-
-```bash
-docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
-```
-
-*(Replace `open-webui` with your container's name if it's different.)*
-
-### Option 2: Manual Update
+To update your local Docker installation to the latest version, manually update the container:
 
 1. Stop and remove the current container:
 
