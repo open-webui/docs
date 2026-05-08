@@ -82,8 +82,9 @@ Use this when you already have a client ID/client secret from your identity prov
 4. Enter your MCP server **URL**.
 5. In **Auth**, select **OAuth 2.1 (Static)**.
 6. Enter **Client ID** and **Client Secret**.
-7. Click **Register Client**.
-8. Click **Save**.
+7. *(Optional)* Enter an **OAuth Server URL** if your identity provider lives on a different host than the MCP resource server. When empty, Open WebUI fetches the OAuth discovery document from the MCP **URL**; when set, discovery and the static-credentials registration both run against this URL instead. Useful for setups where the MCP server proxies a corporate IdP at a separate origin.
+8. Click **Register Client**.
+9. Click **Save**.
 
 After saving:
 
@@ -110,6 +111,19 @@ If an OAuth 2.1 tool is set as a default and the user hasn't previously authenti
 
 If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
 *   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/sse`) instead of `localhost`.
+
+### Custom Headers
+
+Both MCP and OpenAPI tool-server connections accept a free-form **Headers** field (JSON object) that is merged into every outbound request. Header values support a small set of template tokens, expanded server-side at request time so you can route a single connection to per-user, per-chat, or per-message backend logic without provisioning separate connections:
+
+| Token | Replaced with |
+| :--- | :--- |
+| `{{USER_ID}}` | The calling user's ID. |
+| `{{USER_NAME}}` | The calling user's display name. |
+| `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |
+| `{{MESSAGE_ID}}` | The current message ID (empty in non-chat contexts). |
+
+Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 
 ### Function Name Filter List
 
