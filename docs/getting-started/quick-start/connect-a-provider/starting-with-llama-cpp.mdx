@@ -105,6 +105,7 @@ To control and query your locally running model directly from Open WebUI:
    - **URL**: `http://127.0.0.1:10000/v1`
      (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker. **Note the `/v1` at the end!**)
    - **API Key**: `none` (leave blank or type specific key if configured)
+   - **Provider**: pick `llama.cpp` from the **Provider** dropdown. This unlocks the loaded-model indicator and the admin **Eject** button in the model selector — see [Unloading Loaded Models](#unloading-loaded-models) below. Leave at `Default` if you do not need that feature.
 
 💡 Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
 
@@ -122,6 +123,14 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 :::
 
 ![Llama.cpp Connection in Open WebUI](/images/tutorials/deepseek/connection.png)
+
+---
+
+## Unloading Loaded Models
+
+Once a model is held in memory by your `llama-server` instance, Open WebUI marks it with a green "Loaded" indicator in the model selector. Admins also see an **Eject** button on the row that unloads the model without restarting the server — it calls `POST /api/models/unload`, which in turn hits llama.cpp's `POST /models/unload` endpoint on the OpenAI-compatible connection's root URL.
+
+For this to work, the matching connection in **Admin Settings → Connections → OpenAI** must have its **Provider** set to `llama.cpp` (Open WebUI uses that hint to pick the correct unload mechanism). Connections left at the default OpenAI-compatible provider type return an error when an admin attempts to unload a model.
 
 ---
 

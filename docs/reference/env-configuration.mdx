@@ -205,6 +205,16 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline — per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
 - Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `models.default_metadata`.
 
+:::info
+
+`DEFAULT_MODEL_METADATA` is read from the environment as a JSON string at startup.
+
+- Use valid JSON (for example: `{"capabilities":{"vision":true,"web_search":true}}`)
+- If parsing fails, Open WebUI logs the error and falls back to `{}`
+- The parsed value is then applied even when persistent config is disabled, so configured defaults are honored at startup.
+
+:::
+
 #### `DEFAULT_MODEL_PARAMS`
 
 - Type: `dict` (JSON object)
@@ -3619,14 +3629,14 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the "Personal OneDrive" option appears in the attachment menu. Requires `ONEDRIVE_PERSONAL_CLIENT_ID` to be configured.
+- Description: Controls whether the "Personal OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_PERSONAL` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured — without a client ID, the option stays hidden even if this variable is `True`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ENABLE_ONEDRIVE_BUSINESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the "Work/School OneDrive" option appears in the attachment menu. Requires `ONEDRIVE_CLIENT_ID` to be configured.
+- Description: Controls whether the "Work/School OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_BUSINESS` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured — without a client ID, the option stays hidden even if this variable is `True`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `ONEDRIVE_CLIENT_ID`
@@ -4392,6 +4402,13 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Description: Comma-separated list of supported audio MIME types for Speech-to-Text (e.g., `audio/wav,audio/mpeg,video/*`). Leave empty to use defaults.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `AUDIO_STT_ALLOWED_EXTENSIONS`
+
+- Type: `str`
+- Default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`
+- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). Configurable via **Admin Settings → Audio → STT**.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Text-to-Speech
 
 #### `AUDIO_TTS_API_KEY`
@@ -4458,10 +4475,17 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 ### Voice Mode
 
+#### `ENABLE_VOICE_MODE_PROMPT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected — the model uses only the regular system prompt and chat history. Configurable in **Admin Settings → Interface → Voice Mode Custom Prompt** (toggle).
+- Persistence: This environment variable is a `PersistentConfig` variable. Stored at config key `task.voice.prompt.enable`.
+
 #### `VOICE_MODE_PROMPT_TEMPLATE`
 - Type: `str`
 - Default: The value of `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE` environment variable.
-- Description: Configures a custom system prompt for voice mode interactions. Allows administrators to control how the AI responds in voice conversations (style, length, tone). Leave empty to use the default prompt optimized for voice conversations, or provide custom instructions to tailor the voice assistant's behavior.
+- Description: Configures a custom system prompt for voice mode interactions. Allows administrators to control how the AI responds in voice conversations (style, length, tone). Leave empty to use the default prompt optimized for voice conversations, or provide custom instructions to tailor the voice assistant's behavior. Only applied when `ENABLE_VOICE_MODE_PROMPT` is `True`.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### OpenAI Text-to-Speech
@@ -6058,6 +6082,13 @@ These settings control whether users can share workspace items **publicly**.
 - Type: `str`
 - Default: `True`
 - Description: Enables or disables **public sharing** of notes.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+#### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables **public sharing** of chat conversations. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users — they can still create share links scoped to specific users or groups, but cannot make a chat reachable by anyone with the link. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 ### Access Grants

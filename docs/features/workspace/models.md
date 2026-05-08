@@ -73,11 +73,16 @@ The system prompt defines the behavior and persona. Use dynamic variables for co
 | `{{ CURRENT_DATE }}` | `2024-10-27` |
 | `{{ CURRENT_TIME }}` | `14:30:05` |
 | `{{ USER_NAME }}` | `Admin` |
+| `{{ USER_GROUPS }}` | `Engineering, Beta Testers` (comma-separated; empty if the user is in no groups) |
 
 ```
 You are a helpful assistant for {{ USER_NAME }}.
 The current date is {{ CURRENT_DATE }}.
 ```
+
+:::tip Group-aware system prompts
+`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups — e.g. *"You may discuss internal roadmap items only when {{ USER_GROUPS }} contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
+:::
 
 ### Capabilities and bindings
 
