@@ -31,6 +31,17 @@ While OpenAPI tools are powerful for extending Open WebUI with external services
 
 If you need interactive UI feedback (confirmations, user input prompts), consider implementing your tool as a [native Python Tool](/features/extensibility/plugin/tools/development) instead.
 
+## ✅ Supported Spec Shapes
+
+Open WebUI parses tool-server specs against the OpenAPI 3.x path-item model. The parser:
+
+- Recognizes only the eight standard HTTP method keys (`get`, `put`, `post`, `delete`, `options`, `head`, `patch`, `trace`) as operations. Any other key under a path — including extension keys (`x-codeSamples`, `x-internal`, etc.), `summary`, `description`, `servers`, and `parameters` — is skipped during operation discovery so it never causes a parse error.
+- Honors **path-level `parameters`**: parameters declared once at the path level apply to every operation under that path. Operation-level parameters with the same `(name, in)` pair override path-level parameters, matching the OpenAPI specification.
+- URL-encodes path parameter values (`{id}` substitution) and query parameter values, so values containing spaces, `/`, `&`, `?`, or other reserved characters are transmitted correctly.
+- Falls back gracefully between JSON and YAML when fetching the spec — `.yaml`/`.yml` URLs are parsed as YAML; everything else is tried as JSON first and as YAML on failure.
+
+Specs that put `parameters` at the path level, expose extension keys, or rely on path-item metadata fields work without changes.
+
 ## 🚀 Quickstart
 
 Get started quickly with our reference FastAPI-based implementations provided in the `servers/` directory. (You can adapt these examples into your preferred stack as needed, such as using [FastAPI](https://fastapi.tiangolo.com/), [FastOpenAPI](https://github.com/mr-fatalyst/fastopenapi) or any other OpenAPI-compatible library):
