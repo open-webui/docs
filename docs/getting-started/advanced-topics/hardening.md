@@ -547,6 +547,18 @@ WEB_FETCH_FILTER_LIST=!internal.yourcompany.com,!10.0.0.0/8
 
 Prefix entries with `!` to block them.
 
+### Profile image URL forwarding
+
+The user and model profile-image endpoints can issue a `302 Found` redirect to whatever origin is stored in `profile_image_url` so that externally-hosted avatars (e.g. Gravatar via an upstream identity provider) display in the UI. That redirect causes the user's browser to make a request directly to the external origin, leaking client IP, User-Agent, and Referer headers — and an account whose `profile_image_url` was set to an attacker-controlled host can use that to deanonymize anyone who renders their avatar.
+
+To suppress the redirect entirely and serve the bundled default image instead:
+
+```bash
+ENABLE_PROFILE_IMAGE_URL_FORWARDING=false
+```
+
+Default is `true` so existing deployments relying on external avatars keep working. Data URIs and same-origin/static images are unaffected by this flag — they continue to render normally.
+
 ### File upload limits
 
 By default, there are no size or count limits on uploaded files. To prevent storage exhaustion:
