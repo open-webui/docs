@@ -23,6 +23,15 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 ## Brave API
 
+Open WebUI ships with two Brave-backed search engines that share the same API key (`BRAVE_SEARCH_API_KEY`) and the same rate limits, but hit different endpoints:
+
+| Engine | Endpoint | Behavior |
+| :--- | :--- | :--- |
+| `brave` | `/res/v1/web/search` | Classic web search. Returns short snippets; Open WebUI then scrapes each result URL to build the LLM context. |
+| `brave_llm_context` | `/res/v1/llm/context` | LLM-optimized search. Returns full pre-extracted, relevance-scored page passages directly. Skips the post-search scrape entirely. Pull size is bounded by [`BRAVE_SEARCH_CONTEXT_TOKENS`](/reference/env-configuration#brave_search_context_tokens) (default `8192`, range `1024`–`32768`). |
+
+Pick `brave_llm_context` when you want fewer round-trips and higher-fidelity passages without the scraping step; pick `brave` when you need the classic snippet-then-scrape flow (e.g. when scraping is doing useful normalization in your pipeline). Both engines automatically retry once after HTTP 429 with a 1-second backoff.
+
 ### Docker Compose Setup
 
 Add the following environment variables to your Open WebUI `docker-compose.yaml` file:
@@ -32,8 +41,9 @@ services:
   open-webui:
     environment:
       ENABLE_WEB_SEARCH: True
-      WEB_SEARCH_ENGINE: "brave"
+      WEB_SEARCH_ENGINE: "brave"             # or "brave_llm_context"
       BRAVE_SEARCH_API_KEY: "YOUR_API_KEY"
+      # BRAVE_SEARCH_CONTEXT_TOKENS: 8192    # only for brave_llm_context
       WEB_SEARCH_RESULT_COUNT: 3
       WEB_SEARCH_CONCURRENT_REQUESTS: 1
 ```

@@ -33,6 +33,12 @@ To configure a speech to text provider:
 
 ![alt text](/images/tutorials/stt/stt-config.png)
 
+### Restricting Accepted Audio Extensions
+
+Open WebUI ships with an **Allowed Extensions** list under **Admin Settings → Audio → STT** that controls which audio file extensions the upload endpoint will accept (default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`). Uploads with any other extension are rejected with `400 Invalid audio file extension` before transcription runs.
+
+This is enforced server-side in addition to the MIME-type check (`AUDIO_STT_SUPPORTED_CONTENT_TYPES`), so tightening it is a low-cost way to harden the STT endpoint against unexpected file types. Set the matching `AUDIO_STT_ALLOWED_EXTENSIONS` environment variable to seed the list at startup, or clear it in the UI to skip the extension check entirely.
+
 ## User-Level Settings
 
 In addition the instance settings provisioned in the admin panel, there are also a couple of user-level settings that can provide additional functionality.

@@ -86,6 +86,7 @@ Automatically replaced with their value at runtime:
 | `{{USER_AGE}}` | Age calculated from birth date (unreplaced if not set) |
 | `{{USER_LANGUAGE}}` | Your selected language |
 | `{{USER_LOCATION}}` | Your location (requires HTTPS + Settings > Interface toggle) |
+| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to (empty if none). Resolved from the database only when the placeholder is present. |
 
 ### Custom input variables
 

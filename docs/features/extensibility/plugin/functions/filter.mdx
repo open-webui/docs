@@ -117,7 +117,7 @@ It is a **visibility / gating flag**, read once at request-dispatch time — **n
 - **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__` — which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
 
 :::warning Upgrading from pre-0.9.0 filters
-Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally — the user controls whether `inlet()` runs by selecting/deselecting the chip. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#⚙%EF%B8%8F-filter-administration--configuration) instead; clicking the chip opens the user's valves modal automatically.
+Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally — the user controls whether `inlet()` runs by selecting/deselecting the chip. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; clicking the chip opens the user's valves modal automatically.
 :::
 
 #### How users interact with a toggleable filter
@@ -663,6 +663,36 @@ The hashed user UUID is added as a top-level body parameter and forwarded direct
 :::warning Cannot Inject HTTP Headers
 Filters can only modify the **request body** (`form_data`). Outbound HTTP headers are constructed separately and cannot be influenced from a filter. To add custom headers to API requests, use the **Admin Panel → Settings → Connections → OpenAI API** headers configuration.
 :::
+
+#### Injecting OpenAI-Style `tools` From a Filter
+
+A filter inlet can also append OpenAI-style function-calling tools to `body["tools"]`. These are **merged with** the tools Open WebUI resolves server-side from `tool_ids`, MCP servers, and the model's built-in tools — they don't replace them.
+
+```python
+class Filter:
+    async def inlet(self, body: dict) -> dict:
+        body.setdefault("tools", []).append({
+            "type": "function",
+            "function": {
+                "name": "lookup_user_tier",
+                "description": "Return the caller's billing tier.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"user_id": {"type": "string"}},
+                    "required": ["user_id"],
+                },
+            },
+        })
+        return body
+```
+
+Behavior:
+
+- **Native function calling** (the default). Filter-injected tools are appended to the server-resolved tool list before the chat completion is sent. Both sets of tools are visible to the model on the same request.
+- **Tools provided by the original API caller.** If the request that *entered* the filter pipeline already had `body["tools"]` (e.g. an external client called `/api/chat/completions` with its own `tools` array), those caller-provided tools take precedence and Open WebUI **skips server-side tool resolution entirely**. Filter inlets should additively append in that case too — the caller's tools and yours both go to the LLM.
+- **Non-native function calling.** Server-side tool resolution still runs through Open WebUI's prompt-driven tool handler; filter-injected tools are forwarded to the LLM but the runtime executor for them is up to whatever you wired into the upstream call.
+
+Use this for tools that don't have a corresponding registered Tool in the workspace — for example, transient per-request capabilities you want the model to know about on a specific user's chats only.
 
 ---
 
