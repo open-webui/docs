@@ -400,6 +400,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets a custom text that will be included when you copy a message in the chat. e.g., `"This text is AI generated"` -> will add "This text is AI generated" to every message, when copied.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `ARTIFACT_CONTENT_SECURITY_POLICY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets a dedicated Content Security Policy that Open WebUI injects into artifact iframe previews. If the generated artifact HTML already contains a CSP meta tag, Open WebUI replaces it with this configured value before rendering.
+- Persistence: This environment variable is a `PersistentConfig` variable. It can be configured in the **Admin Panel > Settings > General > Artifacts Content Security Policy**.
+
 #### `THREAD_POOL_SIZE`
 
 - Type: `int`

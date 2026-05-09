@@ -218,6 +218,12 @@ If you set a Content Security Policy, start permissive and tighten incrementally
 
 :::
 
+:::note Artifact previews can use a separate CSP
+
+`CONTENT_SECURITY_POLICY` applies to the main Open WebUI app. Artifact HTML previews can be restricted separately with [`ARTIFACT_CONTENT_SECURITY_POLICY`](/reference/env-configuration#artifact_content_security_policy), which injects a CSP directly into artifact iframes. See [Artifacts](/features/chat-conversations/chat-features/code-execution/artifacts#securing-artifact-previews-with-csp).
+
+:::
+
 :::warning Cross-Origin Isolation
 
 Setting `CROSS_ORIGIN_EMBEDDER_POLICY=require-corp` and `CROSS_ORIGIN_OPENER_POLICY=same-origin` together enables cross-origin isolation. This may break resources loaded from third-party origins (e.g., external images, scripts, or iframes) unless those resources explicitly set appropriate CORS headers. Test thoroughly before deploying.

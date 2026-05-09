@@ -32,6 +32,28 @@ When Open WebUI creates an Artifact, you'll see the content displayed in a dedic
 - **Updates**: Open WebUI may update an existing Artifact based on your messages. The Artifact window will display the latest content.
 - **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen, located in the lower right corner of the Artifact.
 
+## Securing Artifact previews with CSP
+
+Artifact HTML previews are rendered inside an iframe. You can now apply a dedicated Content Security Policy (CSP) to those artifact iframes without changing the CSP used by the rest of Open WebUI.
+
+- **Admin setting**: **Admin Panel > Settings > General > Artifacts Content Security Policy**
+- **Environment variable**: [`ARTIFACT_CONTENT_SECURITY_POLICY`](/reference/env-configuration#artifact_content_security_policy)
+- **Default**: Empty, which leaves artifact previews on the browser default policy
+
+When this setting is populated, Open WebUI injects the configured policy into the artifact document before it is rendered. If the artifact already contains a `Content-Security-Policy` meta tag, Open WebUI replaces it with the configured value so the instance-wide artifact policy wins consistently.
+
+Use this when you want to limit what generated artifact HTML can load or execute, for example:
+
+- Block external scripts and network calls for untrusted generated content
+- Allow only the specific image, font, or API origins your artifacts need
+- Apply stricter restrictions to artifacts without tightening the main app's CSP
+
+:::tip
+
+Start permissive and tighten incrementally. Many generated artifacts rely on inline `<script>` and `<style>` tags, so an overly strict policy can make the preview appear blank or partially broken.
+
+:::
+
 ## Editing Artifacts
 
 1. **Targeted Updates**: Describe what you want changed and where. For example:
@@ -112,3 +134,15 @@ If you encounter an issue where the code preview in the chat interface does not 
 1. Go to **Settings > Interface**.
 2. Toggle on **Allow Iframe Sandbox Same-Origin Access**.
 3. Save your settings.
+
+### Artifact Preview Is Blank After Setting a CSP
+
+If artifact previews stop rendering after you configure **Artifacts Content Security Policy**, the policy is likely blocking a resource the generated HTML needs.
+
+**What to check:**
+
+1. Open your browser developer tools.
+2. Look for CSP violation messages in the console.
+3. Relax the policy only for the blocked resource types or origins that the artifact requires.
+
+If you want to remove the restriction temporarily, clear **Admin Panel > Settings > General > Artifacts Content Security Policy** or unset `ARTIFACT_CONTENT_SECURITY_POLICY`.
