@@ -6105,6 +6105,13 @@ These settings control whether users can share workspace items **publicly**.
 - Description: Enables or disables **public sharing** of chat conversations. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users — they can still create share links scoped to specific users or groups, but cannot make a chat reachable by anyone with the link. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+#### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update — public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Calendars Public Sharing**.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
 ### Access Grants
 
 #### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`
