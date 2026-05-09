@@ -362,23 +362,44 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets a webhook for integration with Discord/Slack/Microsoft Teams.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
+:::note Admin posture toggles vs. security boundaries
+
+The `ENABLE_ADMIN_*` and `BYPASS_ADMIN_ACCESS_CONTROL` toggles in this section control what the admin sees and does **through Open WebUI's admin product surfaces** (admin panel pages, the chat model selector, workspace lists, the export action). They do **not** establish a security boundary against the admin themselves.
+
+Open WebUI is single-tenant by architecture and the `admin` role is root-equivalent on the deployment by deliberate design. Admins inherently retain unconstrained access to all data via direct database access, environment-variable inspection, server access, admin-only **Functions** (which execute arbitrary Python at module-import inside the application process), and **Tools** with the `workspace.tools` permission (which the admin can grant to themselves and which run `exec()` on the server).
+
+These toggles are appropriate for:
+
+- **Performance** — keeping admin-facing list/selector surfaces fast on large multi-user deployments where loading every user's items is a hard performance problem.
+- **UI clutter reduction** — keeping those same surfaces usable when populated with thousands of items from other users.
+- **Compliance posture** — meeting requirements (especially in jurisdictions with stronger labour-protection law, e.g. DE / AT / EU) that admins not be *casually* presented with other users' data, even though they remain technically able to reach it via the routes above.
+
+These toggles are **not** appropriate for:
+
+- Cross-tenant data isolation between admins. There is no cryptographic per-tenant isolation, no multi-database split, and no per-admin scope on the underlying data store. For genuine tenant separation, the supported pattern is **separate Open WebUI instances per tenant**.
+- A security boundary against an admin who is determined to read data they aren't shown in their UI surfaces.
+
+Treat anything in this cluster as *what the admin sees and does in the product UI and API*, not *what the admin technically can reach on the deployment*.
+
+:::
+
 #### `ENABLE_ADMIN_EXPORT`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admins can export data, chats and the database in the admin panel. Database exports only work for SQLite databases for now.
+- Description: Controls whether the admin-panel **export** action is available (data, chats, and database export). When disabled, the export endpoints reject requests. Database exports only work for SQLite databases for now. Note that admin retains the underlying ability to dump the database directly via deployment access — this toggle controls the in-product export surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables admin users to directly access the chats of other users. When disabled, admins can no longer accesss user's chats in the admin panel. If you disable this, consider disabling `ENABLE_ADMIN_EXPORT` too, if you are using SQLite, as the exports also contain user chats.
+- Description: Controls whether the admin-panel **other-users-chats** access surface is available. When disabled, admins can no longer access other users' chats in the admin panel and the corresponding endpoints reject the request. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats and would re-open the same data on a different surface. Note that admin retains underlying database access regardless — this toggle controls the in-product surface, see the admin-posture-toggles note above.
 
 #### `ENABLE_ADMIN_ANALYTICS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the **Analytics** tab is visible and accessible in the admin panel. When set to `False`, the analytics API router is not mounted and the tab is hidden from the admin navigation. Useful for deployments where analytics data collection or display is not desired. Requires a restart to take effect.
+- Description: Controls whether the admin-panel **Analytics** tab is visible and the analytics API router is mounted. When set to `False`, the tab is hidden and the corresponding endpoints are not registered. Disabling does not stop the underlying data being collected, and admin retains the ability to query that data directly from the database — this toggle controls the in-product surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
@@ -386,26 +407,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `True`
 - Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the file browser list, etc.). When set to `True` (default), those surfaces show every item from every user — convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see.
 
-  **Why this exists.** Three converging reasons, all UX/posture, none of them tenant isolation:
-
-  1. **Performance.** On large multi-user deployments (think 5,000 users, 50,000 user-created items), loading every user's items into the admin's selector and workspace lists is a hard performance problem before any UI even renders. Enterprise admins typically use their admin account as their day-to-day account — they don't have a separate user account to switch into — so this gate keeps their normal product surfaces fast.
-  2. **UI clutter reduction.** Even if loading were free, an admin's selector and workspace lists become unusable when populated with everyone else's items.
-  3. **Compliance posture.** Many enterprise deployments — especially in jurisdictions with stronger labour-protection law (Germany, Austria, the broader EU) — require that admins not have *easy* access to other users' data even when they technically *could* reach it via direct database access. This flag is part of that posture: the admin is not casually presented with other users' content in their normal product surfaces.
-
-  **What this is *not*.** This flag is **not** a hard access-control enforcement across every API endpoint, and it is **not** a tenant-isolation primitive. Specifically:
-
-  - Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}`, the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag. They were never designed to be — gating them would protect against nothing (see below) while breaking legitimate flows where an admin operates on a known item ID.
-  - The flag controls the admin's **casual surface area** on the data, not the data's underlying access semantics. The same pattern applies to other admin-facing UI toggles in the product (e.g. the analytics-page visibility toggle hides the page from the admin's UI but does not stop analytics from being collected).
-
-  **Admin is root-equivalent on the deployment.** Open WebUI is single-tenant by architecture. There is no cryptographic per-tenant isolation, no multi-database split, no per-admin scope on the underlying data store. Admins inherently retain full access to all data via:
-
-  - Direct database access on the deployment.
-  - Environment-variable inspection and the ability to rotate this flag back on.
-  - Server access (filesystem, processes, secrets).
-  - Admin-only **Functions** (execute arbitrary Python at module-import time inside the application process).
-  - **Tools** with the `workspace.tools` permission, which the admin can grant to themselves (treat as root-equivalent — see [Plugin Security documentation](/features/extensibility/plugin)).
-
-  This flag changes none of that, and it is not advertised to. **For genuine cross-tenant data isolation between admins, the supported deployment pattern is separate Open WebUI instances per tenant.**
+  Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be — gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
   This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`, switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
