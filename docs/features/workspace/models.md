@@ -81,7 +81,7 @@ The current date is {{ CURRENT_DATE }}.
 ```
 
 :::tip Group-aware system prompts
-`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups — e.g. *"You may discuss internal roadmap items only when {{ USER_GROUPS }} contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
+`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups — e.g. *"You may discuss internal roadmap items only when `{{ USER_GROUPS }}` contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
 :::
 
 ### Capabilities and bindings
