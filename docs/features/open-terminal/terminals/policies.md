@@ -22,7 +22,7 @@ flowchart LR
     E --> F["Orchestrator provisions<br/>container with policy spec"]
 ```
 
-1. **Admin creates policies** on the orchestrator via its REST API (see [API reference](#api-reference) below).
+1. **Admin creates policies** on the orchestrator via its REST API (see the API reference at the end of this page).
 2. **Admin creates terminal connections** in Open WebUI under **Settings → Connections → Open Terminal**. Each connection includes a `policy_id` field that maps it to a policy on the orchestrator.
 3. **Users open a terminal.** Open WebUI routes the request through `/p/{policy_id}/...`, and the orchestrator provisions (or reuses) a container matching that policy's spec.
 

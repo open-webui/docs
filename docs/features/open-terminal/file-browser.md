@@ -17,6 +17,10 @@ Click folders to navigate, and click files to preview them. A breadcrumb bar at 
 
 ![Browsing a project directory with breadcrumb navigation](/images/open-terminal-file-browser-project.png)
 
+### Sorting
+
+Use the toolbar above the file list to sort by **Name** or **Date Modified**, ascending or descending. Folders always group ahead of files, so the sort order only reorders entries within each group. Each row shows its modified time next to the size, making it easier to find the latest output the AI just dropped into a working directory.
+
 ---
 
 ## Previewing files

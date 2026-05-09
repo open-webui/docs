@@ -77,6 +77,14 @@ This method is perfect if you want to skip navigating through the Admin Settings
 
 ---
 
+## Unloading Loaded Models
+
+Open WebUI shows a green "Loaded" indicator next to any Ollama model that is currently kept warm by the runtime, and admins see an **Eject** button on the model row to unload it without restarting the server. Behind the scenes, Open WebUI calls `POST /api/models/unload` (admin-only), which forwards a `keep_alive=0` generate call to every Ollama node serving that model.
+
+This is useful for freeing GPU/VRAM when juggling multiple large models, or for forcing a fresh load after pulling a new revision. Trying to unload a model that the connected provider does not support unloading returns an error rather than silently failing.
+
+---
+
 ## Using Reasoning / Thinking Models
 
 If you're using reasoning models like **DeepSeek-R1** or **Qwen3** that output thinking/reasoning content in `<think>...</think>` tags, you'll need to configure Ollama with a **reasoning parser** for proper display.

@@ -382,6 +382,17 @@ UVICORN_WORKERS=1
 ENABLE_DB_MIGRATIONS=false
 ```
 
+### Security defaults to revisit at scale
+
+A few defaults that are reasonable for single-user evaluation become less so once you put the deployment behind SSO and serve real users. The full discussion lives in the [Hardening guide](/getting-started/advanced-topics/hardening); the items most often missed in enterprise rollouts:
+
+- **Disable external profile image redirects** — `ENABLE_PROFILE_IMAGE_URL_FORWARDING=false`. By default the user/model profile-image endpoints `302` to whatever external URL `profile_image_url` holds, which makes every browser viewing an avatar leak its IP, User-Agent, and Referer to that origin. Set this to `false` for shared deployments **unless** your IdP supplies avatars only as `data:` URIs (which Open WebUI persists locally and is unaffected) or you have a deliberate reason to keep IdP-hosted avatars rendering — e.g. your `OAUTH_PICTURE_CLAIM` returns Google/Gravatar URLs and you want them to display. See [SSO configuration](/features/authentication-access/auth/sso) for the matching OAuth picture-claim settings.
+- **Set `WEBUI_SECRET_KEY` and `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`** to the same value across every replica. Without this, sessions break on rolling restart and OAuth tokens written by one pod cannot be decrypted by another.
+- **Lower `JWT_EXPIRES_IN`** from the four-week default if your deployment carries sensitive data, especially if Redis is not yet in place to revoke tokens on signout. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+- **Disable `ENABLE_OAUTH_ID_TOKEN_COOKIE`** (`false`) once all clients are on the new server-side session model. The legacy cookie carried the raw IdP id_token to the browser; the new model keeps it server-side.
+
+These are configuration defaults, not new features — the existing knobs simply matter more once a deployment has multiple users and a real identity provider in front of it.
+
 ---
 
 ## Quick Reference: When Do I Need What?

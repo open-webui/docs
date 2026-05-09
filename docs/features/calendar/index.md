@@ -87,6 +87,10 @@ Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Calendar ad
 - **Personal**: your default calendar for manual events (blue, auto-created on first visit)
 - **Scheduled Tasks**: virtual read-only overlay of automation schedules and runs (purple, only visible when the user has [Automations](/features/chat-conversations/chat-features/automations) access)
 
+### Create a Calendar
+
+Click the small **+** button next to the **Calendars** heading in the calendar sidebar to open the **New Calendar** modal. Enter a name and pick a color from the preset palette (blue, red, green, amber, violet, pink, cyan, orange) and click **Create**. The new calendar appears in the sidebar immediately and shows up in the calendar picker when creating or editing events. Each calendar belongs to its creator and can be shared via [Sharing Calendars](#sharing-calendars).
+
 ### Create an Event
 
 1. Click **New Event** (sidebar or top bar) or click any day/hour cell on the calendar grid

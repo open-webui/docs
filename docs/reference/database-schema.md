@@ -91,6 +91,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 35      | user             | Maintains user profiles and account information              |
 | 36      | automation       | Stores user-defined scheduled automations                    |
 | 37      | automation_run   | Stores execution history for automation runs                 |
+| 38      | pinned_note      | Tracks per-user note pins (each row = one user pinning one note) |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -577,10 +578,23 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | title           | Text          | nullable        | Note title                 |
 | data            | JSON          | nullable        | Note content and data      |
 | meta            | JSON          | nullable        | Note metadata              |
-| is_pinned       | Boolean       | default=False, nullable | Whether the note is pinned to the sidebar |
-
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
+
+Pin state is no longer stored on this table — the legacy `is_pinned` column was removed in migration `4de81c2a3af1` and replaced by a per-user [Pinned Note Table](#pinned-note-table). Pre-existing pins were backfilled to the note owner; the API surfaces `is_pinned` as a per-request join against the calling user's rows.
+
+## Pinned Note Table
+
+Per-user note pins. Each row records that one user has pinned one note for their own sidebar — pinning is private and does not affect any other user with access to the same note.
+
+| **Column Name** | **Data Type** | **Constraints**                                      | **Description**                                  |
+| --------------- | ------------- | ---------------------------------------------------- | ------------------------------------------------ |
+| id              | Text          | PRIMARY KEY                                          | Unique identifier (UUID)                         |
+| user_id         | Text          | NOT NULL                                             | The user who pinned the note                     |
+| note_id         | Text          | NOT NULL, FOREIGN KEY(note.id) ON DELETE CASCADE     | The pinned note                                  |
+| created_at      | BigInteger    | NOT NULL                                             | Pin creation timestamp (used for ordering)       |
+
+A `UNIQUE(user_id, note_id)` constraint prevents duplicate pins for the same user/note pair. The pinned-note list is ordered by `created_at DESC` per user, so the most recently pinned note appears first. Deleting a note cascades through this table; toggling a pin does **not** modify `note.updated_at`.
 
 ## OAuth Session Table
 
@@ -750,6 +764,8 @@ erDiagram
     user ||--o{ skill : "manages"
     user ||--o{ tool : "manages"
     user ||--o{ note : "owns"
+    user ||--o{ pinned_note : "pins"
+    note ||--o{ pinned_note : "pinned_by"
     user ||--|| oauth_session : "has"
 
     %% Content Relationships
@@ -958,8 +974,14 @@ erDiagram
         text title
         json data
         json meta
-        boolean is_pinned
         json access_control
+    }
+
+    pinned_note {
+        text id PK
+        text user_id FK
+        text note_id FK
+        bigint created_at
     }
 
     oauth_session {

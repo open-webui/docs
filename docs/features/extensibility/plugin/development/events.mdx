@@ -248,6 +248,108 @@ await __event_emitter__(
 
 ---
 
+### `embeds` or `chat:message:embeds`
+
+Attach Rich UI iframes to the assistant message. Each entry in the `embeds` list is a **string** that is fed directly to the embed iframe's `src`/`srcdoc`:
+
+- A `http://`, `https://`, or `//`-prefixed value is loaded as a URL.
+- Anything else is treated as **raw HTML** and rendered inline (Open WebUI auto-detects the two cases).
+
+The full payload shape is:
+
+```python
+await __event_emitter__(
+    {
+        "type": "embeds",  # short name; persists to the DB
+        "data": {
+            "embeds": ["<html>…</html>", "https://example.com/widget"],
+            "replace": False,  # optional, default False
+        },
+    }
+)
+```
+
+#### Append vs. replace
+
+By default the new entries are **appended** to whatever is already on the message — repeated emits stack up. For a single live widget you want to update in place, set `data.replace: True`; the entire `embeds` array on the message is overwritten with the payload's array. (Pass an empty list with `replace: True` to clear all embeds for the message.)
+
+| Mode | Behavior | Typical use |
+| :--- | :--- | :--- |
+| `replace` omitted / `False` | Each new payload's items are appended to `message.embeds`. | One-shot tools / actions that emit a single embed at the end. |
+| `replace: True` | The message's `embeds` array is replaced with the payload's array. | Long-running pipes that keep refreshing one widget (progress bar, live dashboard, polling status card). |
+
+The `replace` flag was added so that re-emitting an embed doesn't leave stale copies stacked in the conversation when the user reloads — only the latest version is persisted.
+
+#### Example: append a single embed at the end of a tool
+
+```python
+async def get_weather_dashboard(self, city: str, __event_emitter__) -> str:
+    html = build_dashboard_html(city)  # your renderer
+    await __event_emitter__(
+        {
+            "type": "embeds",
+            "data": {"embeds": [html]},
+        }
+    )
+    return f"Rendered weather dashboard for {city}."
+```
+
+This is equivalent to returning an `HTMLResponse` from a tool — the [Rich UI Embedding](/features/extensibility/plugin/development/rich-ui) doc covers that path and is the recommended option whenever a single embed is enough.
+
+#### Example: replace a live progress widget from a pipe
+
+```python
+async def pipe(self, body: dict, __event_emitter__):
+    for step in range(1, 6):
+        progress_html = f"""
+            <div style="font-family:system-ui;padding:1rem;">
+              <h3>Indexing your library</h3>
+              <progress value="{step}" max="5" style="width:100%;"></progress>
+              <p>Step {step} of 5…</p>
+            </div>
+        """
+        await __event_emitter__(
+            {
+                "type": "embeds",
+                "data": {
+                    "embeds": [progress_html],
+                    "replace": True,  # overwrite, don't stack
+                },
+            }
+        )
+        await asyncio.sleep(2)
+
+    # Final state — also replaces, leaving exactly one embed on the message
+    await __event_emitter__(
+        {
+            "type": "embeds",
+            "data": {"embeds": ["<div>✅ Library indexed.</div>"], "replace": True},
+        }
+    )
+    yield "Indexing complete."
+```
+
+When the user reloads the chat, `message.embeds` contains exactly one entry — the most recent one — instead of five stacked progress cards.
+
+#### Example: clear all embeds
+
+```python
+await __event_emitter__(
+    {
+        "type": "embeds",
+        "data": {"embeds": [], "replace": True},
+    }
+)
+```
+
+#### Notes
+
+- **Persistence requires the short name.** Emit `"embeds"` (or `"chat:message:embeds"`) but be aware only the short name `"embeds"` is persisted to the database — see the [persistence table](#which-event-types-are-persisted-to-the-database) below. The `replace` flag has no effect on the unpersisted alias.
+- **Sandbox and sizing.** Each embed is rendered inside a sandboxed iframe with `allow-scripts`, `allow-popups`, and `allow-downloads` enabled by default. Same-origin and form submissions are user-toggled. For auto-resize behavior, height reporting, and the Chart.js / Alpine auto-injection details, see [Rich UI Embedding → Sandbox and Security](/features/extensibility/plugin/development/rich-ui#sandbox-and-security).
+- **External tools.** External-tool callers can post the same `embeds` payload (including `replace: true`) to `/api/v1/chats/{chatId}/messages/{messageId}/event` — see [External Tools below](#external-tools-openapi--mcp).
+
+---
+
 ### `chat:title`
 
 **Update the chat's title:**
@@ -713,6 +815,7 @@ External tools can emit the same event types as native tools:
 - `chat:message:delta` / `message` – Append content to the message
 - `chat:message` / `replace` – Replace message content
 - `files` / `chat:message:files` – Attach files
+- `embeds` / `chat:message:embeds` – Attach Rich UI iframes; pass `data.replace: true` to overwrite the existing embeds array (see [`embeds`](#embeds-or-chatmessageembeds))
 - `source` / `citation` – Add citations
 
 :::note
@@ -818,7 +921,7 @@ The event emitter writes certain event types directly to the database **regardle
 | `status` | Appended to the message's `statusHistory` array |
 | `message` | Appended to the message's `content` field |
 | `replace` | Overwrites the message's `content` field |
-| `embeds` | Appended to the message's `embeds` array (Rich UI HTML) |
+| `embeds` | Appended to the message's `embeds` array (Rich UI HTML), or replaced when `data.replace: true` is set. See [`embeds`](#embeds-or-chatmessageembeds) for the full payload shape and a live-progress example. |
 | `files` | Appended to the message's `files` array |
 | `source` / `citation` | Appended to the message's `sources` array |
 

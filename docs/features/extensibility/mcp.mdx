@@ -82,8 +82,9 @@ Use this when you already have a client ID/client secret from your identity prov
 4. Enter your MCP server **URL**.
 5. In **Auth**, select **OAuth 2.1 (Static)**.
 6. Enter **Client ID** and **Client Secret**.
-7. Click **Register Client**.
-8. Click **Save**.
+7. *(Optional)* Enter an **OAuth Server URL** if your identity provider lives on a different host than the MCP resource server. When empty, Open WebUI fetches the OAuth discovery document from the MCP **URL**; when set, discovery and the static-credentials registration both run against this URL instead. Useful for setups where the MCP server proxies a corporate IdP at a separate origin.
+8. Click **Register Client**.
+9. Click **Save**.
 
 After saving:
 
@@ -95,6 +96,14 @@ After saving:
 :::info
 
 `Register Client` is required for both `oauth_2.1` and `oauth_2.1_static`. With static auth, Open WebUI uses your provided credentials and server metadata discovery (no dynamic client registration).
+
+:::
+
+:::info Resource Indicators (RFC 8707)
+
+If the MCP server publishes a `resource` field in its [RFC 9728 Protected Resource Metadata document](https://datatracker.ietf.org/doc/html/rfc9728) (`/.well-known/oauth-protected-resource`), Open WebUI captures it during discovery and forwards it as the `resource` parameter on the **authorization redirect**, on the **token exchange**, and on every **refresh-token call**. This sets the `aud` claim correctly on issued tokens and is required by identity providers that validate audiences strictly per [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707).
+
+No configuration is needed on the Open WebUI side — the resource indicator is discovered automatically. If your IdP rejects MCP tool calls with `invalid_audience` or similar errors, confirm that your MCP server's protected-resource metadata document advertises the correct `resource` URL.
 
 :::
 
@@ -110,6 +119,19 @@ If an OAuth 2.1 tool is set as a default and the user hasn't previously authenti
 
 If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
 *   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/sse`) instead of `localhost`.
+
+### Custom Headers
+
+Both MCP and OpenAPI tool-server connections accept a free-form **Headers** field (JSON object) that is merged into every outbound request. Header values support a small set of template tokens, expanded server-side at request time so you can route a single connection to per-user, per-chat, or per-message backend logic without provisioning separate connections:
+
+| Token | Replaced with |
+| :--- | :--- |
+| `{{USER_ID}}` | The calling user's ID. |
+| `{{USER_NAME}}` | The calling user's display name. |
+| `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |
+| `{{MESSAGE_ID}}` | The current message ID (empty in non-chat contexts). |
+
+Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 
 ### Function Name Filter List
 
