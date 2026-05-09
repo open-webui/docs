@@ -22,7 +22,7 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 | 🐳 **Docker** | One-command deploy, the officially recommended path |
 | 📦 **Python (pip / uv)** | Lightweight install for low-resource or manual setups |
 | ☸️ **Kubernetes (Helm)** | Production-ready orchestration with scaling |
-| 🖥️ **Desktop app** | Native app (experimental), no Docker required |
+| 🖥️ **Desktop app** | Native app, no Docker required |
 | 🔌 **Connect a provider** | Ollama, OpenAI, Anthropic, llama.cpp, vLLM, and more |
 | ⚙️ **Understanding settings** | Learn how Admin Settings and User Settings work together |
 
