@@ -99,6 +99,14 @@ After saving:
 
 :::
 
+:::info Resource Indicators (RFC 8707)
+
+If the MCP server publishes a `resource` field in its [RFC 9728 Protected Resource Metadata document](https://datatracker.ietf.org/doc/html/rfc9728) (`/.well-known/oauth-protected-resource`), Open WebUI captures it during discovery and forwards it as the `resource` parameter on the **authorization redirect**, on the **token exchange**, and on every **refresh-token call**. This sets the `aud` claim correctly on issued tokens and is required by identity providers that validate audiences strictly per [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707).
+
+No configuration is needed on the Open WebUI side — the resource indicator is discovered automatically. If your IdP rejects MCP tool calls with `invalid_audience` or similar errors, confirm that your MCP server's protected-resource metadata document advertises the correct `resource` URL.
+
+:::
+
 :::warning OAuth 2.1 Tools Cannot Be Set as Default Tools
 **Do not set OAuth 2.1 MCP tools as default/pre-enabled tools on a model.** The OAuth 2.1 authorization flow requires an interactive browser redirect (user consent, callback) that cannot happen transparently during a chat completion request.
 
