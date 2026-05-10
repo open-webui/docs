@@ -1365,7 +1365,15 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
 
 - Type: `str` (JSON object)
 - Default: `{}`
-- Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward and take precedence on conflicts, so admins can set deployment-specific headers (e.g. sandbox CSP, framing controls, custom referrer policy) on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added. Example value: `{"Content-Security-Policy": "sandbox allow-scripts allow-same-origin", "Referrer-Policy": "no-referrer"}`.
+- Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward and take precedence on conflicts, so admins can set deployment-specific headers on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added.
+
+  **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional — many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
+
+  ```bash
+  TERMINAL_PROXY_HEADERS='{"Content-Security-Policy": "sandbox allow-scripts; default-src '\''none'\''; img-src '\''self'\'' data:; style-src '\''unsafe-inline'\''", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"}'
+  ```
+
+  Note: do **not** add `allow-same-origin` to the `sandbox` directive. That keyword nullifies the origin-isolation that makes the sandbox effective against `localStorage` exfiltration. The example above intentionally omits it.
 
 ### Autocomplete
 

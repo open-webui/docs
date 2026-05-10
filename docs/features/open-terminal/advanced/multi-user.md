@@ -15,6 +15,12 @@ When multiple people on your team need terminal access through Open WebUI, you h
 | **Best for** | Small teams you trust | Production, larger teams, untrusted users |
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
 
+:::danger Required for multi-user Open WebUI deployments
+If your Open WebUI instance has **more than one user account** and the same terminal-server connection is shared across users, you **must** use one of the two isolation modes below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace — which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
+
+For deployments with **untrusted users** (open signup, public-facing portals, mixed-tenant setups), Option 1 is also insufficient on its own — file isolation does not extend to network namespace, so users can still reach each other through bound ports on the shared container. Use **Option 2 (per-user containers via Terminals)** for these deployments, or layer `TERMINAL_PROXY_HEADERS` on top of Option 1 to restrict what proxied responses can do in the user's browser.
+:::
+
 ---
 
 ## Option 1: Built-in multi-user mode
@@ -55,7 +61,9 @@ Each user sees only their own files in the file browser.
 | Network access | | ✔ |
 
 :::warning Good for small teams, not production
-This mode gives everyone their own workspace, but they're all running inside the same container. If one user runs a script that uses too much memory, it can slow things down for everyone. Use this for small, trusted groups — not for wide-open deployments.
+This mode gives everyone their own workspace, but they're all running inside the same container. Resource pressure (memory, CPU) is shared, **and so is the network namespace** — a user who binds a port (e.g. `python -m http.server 8080`) is reachable from any other user's terminal-server proxy URL on that port. Per-user file isolation does **not** extend to per-user network isolation in this mode.
+
+Use this for small, trusted groups — not for wide-open deployments. For untrusted multi-user deployments, use **Option 2 (per-user containers)** below, or layer the [`TERMINAL_PROXY_HEADERS`](/getting-started/advanced-topics/env-configuration#terminal_proxy_headers) configuration on top to lock proxied responses into a sandbox CSP.
 :::
 
 ```mermaid
