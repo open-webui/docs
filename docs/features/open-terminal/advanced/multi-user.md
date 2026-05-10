@@ -63,7 +63,7 @@ Each user sees only their own files in the file browser.
 :::warning Good for small teams, not production
 This mode gives everyone their own workspace, but they're all running inside the same container. Resource pressure (memory, CPU) is shared, **and so is the network namespace** — a user who binds a port (e.g. `python -m http.server 8080`) is reachable from any other user's terminal-server proxy URL on that port. Per-user file isolation does **not** extend to per-user network isolation in this mode.
 
-Use this for small, trusted groups — not for wide-open deployments. For untrusted multi-user deployments, use **Option 2 (per-user containers)** below, or layer the [`TERMINAL_PROXY_HEADERS`](/getting-started/advanced-topics/env-configuration#terminal_proxy_headers) configuration on top to lock proxied responses into a sandbox CSP.
+Use this for small, trusted groups — not for wide-open deployments. For untrusted multi-user deployments, use **Option 2 (per-user containers)** below, or layer the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top to lock proxied responses into a sandbox CSP.
 :::
 
 ```mermaid
