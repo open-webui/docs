@@ -545,6 +545,12 @@ WEB_FETCH_FILTER_LIST=!internal.yourcompany.com,!10.0.0.0/8
 
 Prefix entries with `!` to block them.
 
+Outbound HTTP requests also do not follow `3xx` redirects by default. Without this gate, an attacker-supplied URL can pass the allowlist check on the originally-submitted host and then `302`-redirect to an internal address (RFC 1918, `127.0.0.1`, the cloud-metadata IP) that is reached without re-validation. The default closes that bypass across the RAG web loader, image loading, OAuth pre-flight, code-interpreter login, and tool-server execution. Keep the default unless you have a specific need (e.g. shortlink URLs) and other SSRF protections are in place:
+
+```bash
+AIOHTTP_CLIENT_ALLOW_REDIRECTS=false
+```
+
 ### Profile image URL forwarding
 
 The user and model profile-image endpoints can issue a `302 Found` redirect to whatever origin is stored in `profile_image_url` so that externally-hosted avatars (e.g. Gravatar via an upstream identity provider) display in the UI. That redirect causes the user's browser to make a request directly to the external origin, leaking client IP, User-Agent, and Referer headers — and an account whose `profile_image_url` was set to an attacker-controlled host can use that to deanonymize anyone who renders their avatar.
@@ -556,6 +562,22 @@ ENABLE_PROFILE_IMAGE_URL_FORWARDING=false
 ```
 
 Default is `true` so existing deployments relying on external avatars keep working. Data URIs and same-origin/static images are unaffected by this flag — they continue to render normally.
+
+Profile images stored as base64 `data:` URIs are also constrained to a MIME-type allowlist. The default is `image/png,image/jpeg,image/gif,image/webp`; SVG is intentionally excluded because it can carry inline `<script>`. Responses also set `X-Content-Type-Options: nosniff` so the browser cannot sniff a non-image payload into an executable type. To narrow further (e.g. PNG/JPEG only), set:
+
+```bash
+PROFILE_IMAGE_ALLOWED_MIME_TYPES=image/png,image/jpeg
+```
+
+### Iframe content-security-policy
+
+Open WebUI renders LLM-generated and user-uploaded HTML inside `srcdoc` iframes for Artifacts, code/HTML previews, file previews, and citation modals. The `sandbox` attribute on those iframes provides the baseline isolation. For deployments that want a stronger limit on what the rendered HTML can do — particularly outbound network requests — set a CSP that is injected into every iframe document:
+
+```bash
+IFRAME_CSP=default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'
+```
+
+The example above lets inline scripts run inside the sandbox (needed for most artifacts) but blocks all `fetch`/`XMLHttpRequest`/`WebSocket` traffic — useful when you do not want a model to be able to exfiltrate session data through a generated artifact. Tighten or relax as appropriate; an overly strict policy will break legitimate artifacts.
 
 ### File upload limits
 
