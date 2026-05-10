@@ -1123,6 +1123,32 @@ class Filter:
 
 ---
 
+### 📚 Example #3: Streaming observability metrics (sample filter)
+
+Want **lightweight timing and throughput hints** while a model streams, without custom frontend work? This sample uses the **`stream`** hook earlier on this page plus built-in UI **`status`** events (`__event_emitter__`) so updates show in the assistant message status area. When the provider sends **`usage`** on the final chunk, the filter can also emit a **`chat:completion`** payload so usage metadata stays in sync with the normal completion flow.
+
+**Behavior (summary):**
+
+- **First model text:** emits a `status` line with approximate time-to-first-token (measured on the Open WebUI server while processing stream chunks—not browser paint time).
+- **Stream end:** emits a final `status` with total stream time, optional TTFT recap, and approximate tokens per second (uses streamed `completion_tokens` when available, otherwise a coarse character-based estimate).
+- **Usage:** if the chunk includes `usage`, mirrors it with `type: "chat:completion"` so the standard usage affordances can update when present.
+
+**Install:**
+
+1. Download **[observability_metrics_filter.py](/samples/functions/observability_metrics_filter.py)**.
+2. Open **Admin → Functions → Create**, set **Type** to **Filter**, paste the file contents, save.
+3. Enable the filter globally or attach it to specific models.
+
+:::tip Community library
+You can also publish the same Filter on **[openwebui.com](https://openwebui.com/)** so others can import it in one click—review the code first, and only install from sources you trust (see the **Critical Security Warning** at the top of this page).
+:::
+
+:::note Provider differences
+Throughput and latency numbers depend on how the upstream API chunks output and whether it sends **`usage`** during streaming. Treat figures as indicative, not as a substitute for full observability stacks (OpenTelemetry, APM, etc.).
+:::
+
+---
+
 ## 🚧 Potential Confusion: Clear FAQ 🛑
 
 ### **Q: How Are Filters Different From Pipe Functions?**
