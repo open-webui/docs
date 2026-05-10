@@ -70,6 +70,20 @@ Channels are **passive by default**. AI doesn't jump into every conversation. Wh
 
 This means your team can discuss freely without AI interrupting, and call on exactly the right model when it's needed.
 
+### Full chat-completion pipeline
+
+Mentioning a model in a channel runs through the same chat-completion pipeline as a standard chat. The reply is **streamed in real time** as the model generates it, and the model has access to the full set of capabilities its configuration grants:
+
+| Capability | What it enables in a channel |
+|------------|------------------------------|
+| **Native and default function calling** | Tool calls resolve and execute mid-message |
+| **Built-in tools** | Web search, image generation, code interpreter, calendar |
+| **User tools and MCP tools** | Whatever the model is configured to call, it can call |
+| **Filters** | Inlet/outlet/stream filters apply just like in chats |
+| **Knowledge (RAG)** | Knowledge bases attached to the model are queried and injected |
+
+In other words, a channel-summoned model is a fully-equipped agent — not a one-shot completion.
+
 ### Tagging people and linking channels
 
 Use `@username` to notify teammates. Use `#channel-name` to create clickable cross-references between conversations.
