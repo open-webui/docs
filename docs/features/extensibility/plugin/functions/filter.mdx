@@ -1123,28 +1123,60 @@ class Filter:
 
 ---
 
-### 📚 Example #3: Streaming observability metrics (sample filter)
+### 📚 Example #3: Streaming observability hints (conceptual pattern)
 
-Want **lightweight timing and throughput hints** while a model streams, without custom frontend work? This sample uses the **`stream`** hook earlier on this page plus built-in UI **`status`** events (`__event_emitter__`) so updates show in the assistant message status area. When the provider sends **`usage`** on the final chunk, the filter can also emit a **`chat:completion`** payload so usage metadata stays in sync with the normal completion flow.
+Administrators sometimes want **lightweight, in-UI clues** while a model is streaming—approximate **time-to-first-token**, **total stream duration**, or a **rough tokens-per-second** figure—without building a separate dashboard or patching the frontend. A Filter can do this entirely from the **`stream`** hook documented earlier on this page.
 
-**Behavior (summary):**
+This section describes **behavior and caveats**, not a full drop-in program. Filters run **arbitrary Python**; treat any snippet you assemble as **privileged server code**. Review carefully before deploying, share only via trusted paths, and see the **Critical Security Warning** at the top of this page.
 
-- **First model text:** emits a `status` line with approximate time-to-first-token (measured on the Open WebUI server while processing stream chunks—not browser paint time).
-- **Stream end:** emits a final `status` with total stream time, optional TTFT recap, and approximate tokens per second (uses streamed `completion_tokens` when available, otherwise a coarse character-based estimate).
-- **Usage:** if the chunk includes `usage`, mirrors it with `type: "chat:completion"` so the standard usage affordances can update when present.
+#### What such a Filter would observe
 
-**Install:**
+Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`**, **`usage`** (often on the terminal chunk only), or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values)—exact shapes vary by connector and protocol.
 
-1. Download **[observability_metrics_filter.py](/samples/functions/observability_metrics_filter.py)**.
-2. Open **Admin → Functions → Create**, set **Type** to **Filter**, paste the file contents, save.
-3. Enable the filter globally or attach it to specific models.
+Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python): record when you first see a stream fragment for an assistant reply, bump counters when deltas contain printable model text (including reasoning / audio transcript fields some APIs expose), and compare timestamps when you decide the stream **ended**.
 
-:::tip Community library
-You can also publish the same Filter on **[openwebui.com](https://openwebui.com/)** so others can import it in one click—review the code first, and only install from sources you trust (see the **Critical Security Warning** at the top of this page).
+#### Correlating one stream (“which message is this?”)
+
+Per-request **`__metadata__`** (reserved argument on `stream`) usually includes identifiers such as **`chat_id`** and **`message_id`**. Use a **composite key** in an in-memory map so concurrent chats do not collide. When you finish a stream for that key, drop the saved state so the map does not grow without bound.
+
+#### Surfacing hints in the Web UI (`status`)
+
+The UI already knows how to show short progress lines tied to assistant messages via **`status`** payloads. Your Filter receives **`__event_emitter__`**: emit a dictionary with **`type`: `"status"`** and **`data`** containing at least **`description`** (human-readable text) and **`done`** (whether this status line is finalized). Optionally set a stable **`data.action`** string if you want to identify your plugin in tooling.
+
+Rough pattern for a mid-stream hint:
+
+```python
+await __event_emitter__(
+    {"type": "status", "data": {"done": False, "description": "First model text observed.", "hidden": False}}
+)
+```
+
+Emit another **`done: True`** status when summarizing totals at the **true** end of generation so the spinner does not stick.
+
+#### Knowing when the stream really ended
+
+Be conservative: **`usage`-only chunks** may appear mid-stream on some backends. Prefer treating the reply as terminal when you see **`finish_reason`**, an explicit **`stop`**, **`event["done"]`**, or a protocol-specific **DONE** marker—then emit your final **`status`** and clear saved state.
+
+#### Rough throughput
+
+If **`usage.completion_tokens`** (or equivalent) arrives on the last chunk with a sane value, you can derive **tokens ÷ elapsed seconds** since first body text.
+
+If **`usage`** is absent until the end—or never—for that provider, a **fallback** many Filters use is to estimate tokens from streamed character counts (rule-of-thumb divides; crude and model-dependent). **Do not treat** heuristic numbers as billing-grade or scientific benchmarks.
+
+#### Optional: keeping usage metadata in sync
+
+When the streaming stack hands you a **`usage`** object on the closing chunk, some deployments also emit **`type`: `"chat:completion"`** with **`data.usage`** and **`done`: true** so the client can refresh the usual completion metadata affordances. Whether that is desirable depends on your Open WebUI version and provider; prototype with your stack.
+
+#### Installing your own variant
+
+Use **Admin → Functions → Create**, set **Type** to **Filter**, paste **your reviewed code**, enable globally or per model—as with any Filter on this page.
+
+:::tip Sharing with the community
+Publishing a curated package on **[openwebui.com](https://openwebui.com/)** lets others import it in fewer steps. Only publish **code you have audited** from an account you control.
 :::
 
-:::note Provider differences
-Throughput and latency numbers depend on how the upstream API chunks output and whether it sends **`usage`** during streaming. Treat figures as indicative, not as a substitute for full observability stacks (OpenTelemetry, APM, etc.).
+:::note Operational reality
+Measured latency mixes **backend scheduling**, **model inference**, **network**, **chunk buffering**, and **provider quirks**. Comparisons across models or connectors are directional at best—not a substitute for OpenTelemetry traces, centralized logging, or APM if you operate at scale.
 :::
 
 ---
