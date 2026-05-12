@@ -1,0 +1,115 @@
+---
+sidebar_position: 31
+title: "Self-Hosted Claude Alternative"
+sidebar_label: "Open WebUI & Claude"
+description: "Looking for a self-hosted Claude alternative? Use Claude models through Open WebUI on your own infrastructure."
+keywords: ["Open WebUI vs Claude", "Claude alternative", "self-hosted Claude", "Claude alternative self-hosted", "use Claude on own server"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I self-host Claude?", "acceptedAnswer": {"@type": "Answer", "text": "Not Claude itself, but you can use Claude models through Open WebUI via the Anthropic API. Open WebUI itself runs on your infrastructure, though API calls still go to Anthropic."}}, {"@type": "Question", "name": "Can I use Claude in Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Add your Anthropic API key in Settings and Claude models appear in the model selector."}}, {"@type": "Question", "name": "Can I use Claude and ChatGPT together?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, Open WebUI supports connecting to multiple providers at once."}}, {"@type": "Question", "name": "Does Open WebUI support Claude's extended thinking?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Extended thinking is supported for models that offer it, including Claude via the Anthropic API."}}]})}</script>
+</Head>
+
+
+# Open WebUI & Claude
+
+*Last updated: May 2026*
+
+[Claude](https://claude.ai/) by Anthropic has earned a loyal following for its strength in writing, reasoning, and long-context analysis, and we count ourselves among those fans. We use Claude daily. The extended thinking capabilities, massive context windows (up to 200k tokens), and Anthropic's focus on safety and helpfulness make it genuinely one of the best AI experiences available.
+
+Commercial · Free tier available
+
+---
+
+## What Claude Does Well
+
+- **Writing and reasoning** with thoughtful, nuanced responses and careful analysis
+- **Extended thinking** that shows step-by-step reasoning for complex problems in real time
+- **Large context windows** up to 200k tokens for working with large documents and codebases
+- **Artifacts** for interactive outputs (code, documents, visualizations) alongside the conversation
+- **Claude Code** for agentic coding directly in your terminal
+- **Computer use** that lets Claude interact with desktop applications and web interfaces
+- **MCP (Model Context Protocol)** which Anthropic created to standardize how AI tools connect to data sources
+- **Safety-first design** through Anthropic's constitutional AI approach
+- **Strong at code** with excellent code generation, review, and debugging
+- **Projects** for organizing conversations with persistent context and instructions
+
+---
+
+## What Open WebUI Does Well
+
+- **Any model, one interface** so you can use Claude *alongside* GPT-5.5, Gemini, Llama, and local models
+- **Self-hosted** so the platform itself runs on your infrastructure
+- **Knowledge & RAG** for persistent knowledge bases with advanced retrieval
+- **Python extensibility** with custom tools, MCP servers, pipelines, and community extensions
+- **Team platform** with Channels, Notes, Automations, RBAC, SSO/OIDC/LDAP, and SCIM 2.0
+- **Open Terminal** providing a full sandboxed computing environment
+- **Free community edition** for unlimited users on your own infrastructure
+
+---
+
+## At a Glance
+
+| | Open WebUI | Claude |
+| :--- | :--- | :--- |
+| **Models** | Any model from any provider | Anthropic's Claude model family |
+| **Extended thinking** | Supported for models that offer it (including Claude via API) | Native extended thinking |
+| **Context window** | Depends on the model you connect | Up to 200k tokens |
+| **Knowledge & RAG** | 9 vector DBs, 5 extraction engines, hybrid search | Projects with persistent context |
+| **Code execution** | Python in-browser + Open Terminal | Artifacts with interactive code |
+| **Data** | Self-hosted, your infrastructure | Cloud-hosted by Anthropic |
+| **Pricing** | Free community edition; Enterprise plans available | Free tier, Pro, Team, and Enterprise plans |
+
+---
+
+## When to Use Each
+
+**Choose Claude if** you want the best writing and reasoning experience available, especially for long-context work, code review, or nuanced analysis. The extended thinking mode is particularly strong for complex problems. Claude Code and computer use push the boundaries of what AI can do autonomously.
+
+**Choose Open WebUI if** you want to use Claude alongside other models in one interface, build persistent knowledge bases, or need team collaboration features. Open WebUI also supports Claude's extended thinking via the API.
+
+**Use both.** Connect Open WebUI to the Anthropic API and use Claude for deep analysis alongside GPT-5.5 for other tasks and local models for privacy-sensitive work. Use claude.ai directly when you want Artifacts, Projects, or computer use.
+
+---
+
+## Use Claude Through Open WebUI
+
+Claude models are available through Open WebUI via the Anthropic API. Many Open WebUI users run Claude as their primary model, getting Claude's reasoning alongside Open WebUI's knowledge bases, tools, and team features.
+
+**How to connect:**
+
+1. Get an API key from [console.anthropic.com](https://console.anthropic.com/)
+2. In Open WebUI, go to **Admin → Settings → Connections**
+3. Add a new connection with your Anthropic API key and the base URL `https://api.anthropic.com/v1`
+4. Claude models will appear in your model selector
+
+You can use Claude for complex analysis and writing while routing simpler tasks to local models via Ollama, all in the same interface.
+
+---
+
+*Claude is exceptional AI. Open WebUI is one way to use those same models on your own infrastructure, alongside other models you rely on.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+---
+
+## Frequently Asked Questions
+
+**Can I self-host Claude?**
+Not Claude itself, but you can use Claude models through Open WebUI via the Anthropic API. Open WebUI itself runs on your infrastructure, though API calls still go to Anthropic.
+
+**Can I use Claude in Open WebUI?**
+Yes. Add your Anthropic API key in Settings and Claude models appear in the model selector.
+
+**Can I use Claude and ChatGPT together?**
+Yes, Open WebUI supports connecting to multiple providers at once.
+
+**Does Open WebUI support Claude's extended thinking?**
+Yes. Extended thinking is supported for models that offer it, including Claude via the Anthropic API.
+
+
+---
+
+**Related:** [Open WebUI & ChatGPT](./chatgpt) · [Open WebUI & Gemini](./gemini) · [Open WebUI & Ollama](./ollama)

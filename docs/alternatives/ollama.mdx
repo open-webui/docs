@@ -1,0 +1,118 @@
+---
+sidebar_position: 1
+title: "Open WebUI & Ollama"
+sidebar_label: "Open WebUI & Ollama"
+description: "How Open WebUI and Ollama work together. The most popular local AI pairing, with setup guide and honest comparison."
+keywords: ["Open WebUI vs Ollama", "Ollama alternative", "Ollama frontend", "best Ollama UI", "Ollama web interface"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Can I use Ollama with Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Open WebUI has native Ollama integration and auto-detects it when running on the same machine. No configuration needed."}},
+    {"@type": "Question", "name": "Is Ollama free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Ollama is MIT licensed and free for personal and commercial use."}},
+    {"@type": "Question", "name": "How do Ollama and Open WebUI work together?", "acceptedAnswer": {"@type": "Answer", "text": "Ollama handles running and managing models. Open WebUI can serve as the web interface and also has things like knowledge bases, team features, and extensibility. Most people use them together."}},
+    {"@type": "Question", "name": "Do I need Ollama to use Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "No. Open WebUI works with any OpenAI-compatible API, including llama.cpp, LM Studio, OpenAI, Anthropic, Google, and more. Ollama is a popular option, but not required."}}
+  ]
+})}</script>
+</Head>
+
+# Open WebUI & Ollama
+
+*Last updated: May 2026*
+
+[Ollama](https://ollama.com/) is the project that made local AI click for millions of people, and Open WebUI wouldn't be where it is without them. One command to install, one command to run, and you're chatting with a model. The desktop app includes a built-in chat interface, the CLI is fast and intuitive, and the team behind it consistently ships. We're big fans.
+
+[GitHub](https://github.com/ollama/ollama) · [MIT License](https://github.com/ollama/ollama/blob/main/LICENSE)
+
+---
+
+## What Ollama Does Well
+
+- **Dead simple** to install and run a model in seconds
+- **Desktop app with built-in chat** for a complete standalone experience
+- **Huge model library** with hundreds of models ready to download from the Ollama registry
+- **Modelfiles** for customizing models with system prompts, parameters, and adapters
+- **Great performance** optimized for consumer hardware (Metal, CUDA, CPU) with automatic GPU layer splitting
+- **OpenAI-compatible API** that works as a backend for many tools and applications
+- **Concurrent model loading** for running multiple models simultaneously
+- **Cross-platform** on macOS, Linux, Windows, and Docker
+- **Actively developed** with fast iteration and a responsive team
+- **MIT licensed**
+
+---
+
+## What Open WebUI Does Well
+
+- **Rich web interface** with full chat, conversations, history, search, and organization
+- **Knowledge & RAG** with 9 vector DBs, 5 extraction engines, and hybrid search
+- **Python extensibility** including custom tools, MCP servers, pipelines, and OpenAPI integration
+- **Multi-provider support** so you can use Ollama alongside OpenAI, Anthropic, Google, and others
+- **Team platform** with Channels, Notes, Automations, RBAC, SSO/OIDC/LDAP, and SCIM 2.0
+- **Open Terminal** providing a full sandboxed computing environment for code execution
+- **Model agents** with custom instructions, bound tools, and knowledge per model
+
+---
+
+## Better Together
+
+Ollama and Open WebUI are the most popular pairing in the local AI ecosystem. Ollama manages and serves your models; Open WebUI adds a web-based platform with knowledge management, team features, and extensibility on top.
+
+```bash
+# The most common Open WebUI setup
+ollama pull llama3
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data --name open-webui \
+  ghcr.io/open-webui/open-webui:main
+```
+
+Open WebUI auto-detects Ollama when running on the same machine. All your Ollama models show up in the model selector immediately, no configuration needed.
+
+---
+
+## When to Use Each
+
+**Use Ollama if** you want the fastest path to running a model locally. The CLI and desktop app work great on their own for quick interactions, scripting, and development.
+
+**Add Open WebUI if** you want a web-based interface with knowledge bases, team features, persistent conversations, or the ability to connect cloud providers alongside your local models.
+
+**Most people use both.** Ollama handles the model layer. Open WebUI handles the platform layer. They auto-detect each other and just work.
+
+---
+
+## Other Great Ollama Frontends
+
+Ollama's OpenAI-compatible API means it works with many tools. If Open WebUI isn't your style, other projects that pair well with Ollama include:
+
+- [**LibreChat**](./librechat) for multi-provider chat with model comparison
+- [**AnythingLLM**](./anythingllm) for workspace-based document Q&A
+
+---
+
+*Ollama made local AI simple. Open WebUI builds on that foundation. Together, they've helped millions of people run AI on their own hardware.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+---
+
+## Frequently Asked Questions
+
+**Can I use Ollama with Open WebUI?**
+Yes. Open WebUI has native Ollama integration and auto-detects it when running on the same machine. No configuration needed.
+
+**Is Ollama free?**
+Yes. Ollama is MIT licensed and free for personal and commercial use.
+
+**How do Ollama and Open WebUI work together?**
+Ollama handles running and managing models. Open WebUI can serve as the web interface and also has things like knowledge bases, team features, and extensibility. Most people use them together.
+
+**Do I need Ollama to use Open WebUI?**
+No. Open WebUI works with any OpenAI-compatible API, including llama.cpp, LM Studio, OpenAI, Anthropic, Google, and more. Ollama is a popular option, but not required.
+
+---
+
+**Related:** [Open WebUI & llama.cpp](./llama-cpp) · [Open WebUI & LM Studio](./lm-studio) · [Open WebUI & Jan](./jan)

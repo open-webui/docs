@@ -1,0 +1,112 @@
+---
+sidebar_position: 3
+title: "Open WebUI & LM Studio"
+sidebar_label: "Open WebUI & LM Studio"
+description: "How Open WebUI and LM Studio work together. Two approaches to local AI that pair well."
+keywords: ["Open WebUI vs LM Studio", "LM Studio alternative", "local AI interface"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I use LM Studio with Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Start LM Studio's local API server and add `http://localhost:1234/v1` as a connection in Open WebUI."}}, {"@type": "Question", "name": "How do LM Studio and Open WebUI work together?", "acceptedAnswer": {"@type": "Answer", "text": "LM Studio handles model management and local inference on your desktop. Open WebUI can add web-based multi-user access, knowledge bases, and team features. A lot of people use LM Studio as the backend and Open WebUI as the frontend."}}]})}</script>
+</Head>
+
+
+# Open WebUI & LM Studio
+
+*Last updated: May 2026*
+
+[LM Studio](https://lmstudio.ai/) has nailed the desktop experience for local AI. The built-in model browser makes discovering and downloading models from Hugging Face effortless, the inference performance is solid, and the UI is clean and intuitive. For anyone who wants to run local models without touching a terminal, LM Studio is a strong option.
+
+Proprietary · Free for personal and commercial use
+
+---
+
+## What LM Studio Does Well
+
+- **Model browser** for discovering, downloading, and managing models from Hugging Face with a GUI
+- **Model search and filtering** to find exactly the right model by size, architecture, or quantization
+- **Quantization preview** so you can see how different quantization levels affect model quality before downloading
+- **Strong performance** with solid hardware utilization (Metal, CUDA) for fast local inference
+- **OpenAI-compatible API server** that serves your local models to any application that speaks the OpenAI API
+- **MCP support** for connecting to Model Context Protocol servers for extended tool use
+- **RAG capabilities** with built-in document-based chat for local files
+- **Prompt templates** with a library of pre-configured prompts for common tasks
+- **Free for everyone** for both personal and commercial use
+- **Cross-platform** on macOS, Windows, and Linux
+- **Developer-friendly** local API server for integrating local models into your projects
+
+---
+
+## What Open WebUI Does Well
+
+- **Full web platform** with multi-user chat, Notes, Channels, Automations, Open Terminal, and more
+- **Any provider** so you can use LM Studio's local models alongside OpenAI, Anthropic, Google, and others
+- **Deep RAG & Knowledge** with 9 vector databases, 5 extraction engines, and hybrid search with reranking
+- **Python extensibility** with custom tools, pipelines, MCP, and OpenAPI integration
+- **Team features** including RBAC, SSO/OIDC/LDAP, SCIM 2.0, analytics, and evaluation arena
+- **Scales from one to thousands** via Docker, Kubernetes, and pip
+
+---
+
+## At a Glance
+
+| | Open WebUI | LM Studio |
+| :--- | :--- | :--- |
+| **Approach** | Self-hosted web platform for teams and individuals | Desktop app for local model management and chat |
+| **Model management** | Connects to model runners (Ollama, etc.) | Built-in model browser with Hugging Face integration |
+| **Multi-provider** | Local + cloud models in one interface | Focused on local models |
+| **Knowledge & RAG** | 9 vector DBs, 5 extraction engines, hybrid search | Built-in document chat |
+| **Multi-user** | SSO, RBAC, SCIM, teams | Personal desktop use |
+| **Extensibility** | Python tools, MCP, OpenAPI, pipelines | MCP support |
+| **API server** | Full API | OpenAI-compatible local server |
+| **Pricing** | Free community edition; Enterprise plans available | Free for personal and commercial use |
+
+---
+
+## When to Use Each
+
+**Choose LM Studio if** you want the best desktop experience for discovering and running local models. The model browser makes it easy to explore what's available on Hugging Face, compare quantizations, and get running quickly.
+
+**Choose Open WebUI if** you want a web-based platform with team access, persistent knowledge bases, or the ability to use local models alongside cloud providers like OpenAI, Anthropic, and Google.
+
+**Use both.** LM Studio's model browser and management are excellent for finding and running models. Open WebUI can connect to LM Studio's API server to add web access, knowledge bases, and team features on top.
+
+---
+
+## Use Them Together
+
+LM Studio's OpenAI-compatible API server works well as a backend for Open WebUI. You can use LM Studio to manage and serve your local models, then connect Open WebUI to LM Studio's API.
+
+**How to connect:**
+
+1. In LM Studio, start the local API server (default port 1234)
+2. In Open WebUI, go to **Admin → Settings → Connections**
+3. Add a new OpenAI-compatible connection with URL `http://localhost:1234/v1`
+4. Your LM Studio models will appear in the model selector
+
+---
+
+*LM Studio makes local models accessible on the desktop. Open WebUI adds a web-based platform layer. Both are making local AI more useful.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+
+
+---
+
+## Frequently Asked Questions
+
+**Can I use LM Studio with Open WebUI?**
+Yes. Start LM Studio's local API server and add `http://localhost:1234/v1` as a connection in Open WebUI.
+
+**How do LM Studio and Open WebUI work together?**
+LM Studio handles model management and local inference on your desktop. Open WebUI can add web-based multi-user access, knowledge bases, and team features. A lot of people use LM Studio as the backend and Open WebUI as the frontend.
+
+**Is LM Studio free?**
+Yes. LM Studio is free for personal and commercial use, though it is proprietary software.
+
+---
+
+**Related:** [Open WebUI & Ollama](./ollama) · [Open WebUI & llama.cpp](./llama-cpp) · [Open WebUI & Jan](./jan)
