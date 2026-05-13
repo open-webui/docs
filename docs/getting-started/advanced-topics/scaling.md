@@ -55,6 +55,8 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 A good starting point for tuning is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`. Keep the combined total per instance well below your PostgreSQL `max_connections` limit (default is 100).
 :::
 
+For credential handling and the SQLCipher-encrypted SQLite option, see the [Database section of the Hardening guide](/getting-started/advanced-topics/hardening#database).
+
 ### Why SQLite on network storage fails the moment you scale (or upgrade)
 
 Since 0.9.0 the backend data layer is **fully async** (async SQLAlchemy + `aiosqlite`). That change made Open WebUI dramatically more concurrent — and, as a side effect, made every pre-existing "SQLite is slow on NFS/CephFS/Azure Files" problem go from *tolerable* to *fatal* overnight. Many operators hit this right after upgrading from 0.8.x without changing anything else in their deployment.
@@ -121,7 +123,7 @@ For a complete step-by-step Redis setup (Docker Compose, Sentinel, Cluster mode,
 Open WebUI is stateless, so you can run as many instances as needed behind a **load balancer**. Each instance is identical and interchangeable.
 
 :::warning
-Before running multiple instances, ensure you have completed **Steps 1 and 2** (PostgreSQL and Redis). You also need a shared `WEBUI_SECRET_KEY` across all replicas — without it, users will experience [login loops and 401 errors](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors). For a full pre-flight checklist, see the [Core Requirements Checklist](/troubleshooting/multi-replica#core-requirements-checklist).
+Before running multiple instances, ensure you have completed **Steps 1 and 2** (PostgreSQL and Redis). You also need a shared `WEBUI_SECRET_KEY` across all replicas — without it, users will experience [login loops and 401 errors](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors). For how to generate, store, and rotate that key (plus the matching `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`), see [Secret Key](/getting-started/advanced-topics/hardening#secret-key) in the Hardening guide. For a full pre-flight checklist, see the [Core Requirements Checklist](/troubleshooting/multi-replica#core-requirements-checklist).
 :::
 
 ### Option A: Container Orchestration (Recommended)
@@ -244,6 +246,8 @@ volumes:
 Do **not** store the SQLite database on a network filesystem. SQLite's file locking does not work reliably over NFS. This is another reason to switch to PostgreSQL (Step 1) before scaling to multiple instances.
 :::
 
+Once your data directory is shared, lock down what can land in it: see [File upload limits](/getting-started/advanced-topics/hardening#file-upload-limits) for size, count, and extension caps, and [Data directory](/getting-started/advanced-topics/hardening#data-directory) for filesystem-permission and backup guidance.
+
 ### Option B: Cloud Object Storage
 
 Set `STORAGE_PROVIDER` and the corresponding credentials:
@@ -296,6 +300,7 @@ RAG_EMBEDDING_ENGINE=ollama
 - The default content extractor (pypdf) has unavoidable **known memory leaks** that cause your Open WebUI process to grow in memory continuously. An external extractor (Tika, Docling) runs in its own process/container, isolating these leaks.
 - The default SentenceTransformers embedding model loads ~500MB per worker process. With 8 workers, that's 4GB of RAM just for embeddings. External embedding eliminates this.
 - For detailed guidance and configuration options, see [Content Extraction Engine](/troubleshooting/performance#content-extraction-engine) and [Embedding Engine](/troubleshooting/performance#embedding-engine) in the Performance guide.
+- External Tika, Docling, or embedding endpoints become a new outbound destination from Open WebUI. Reach them over the internal network only, and review the [Network and outbound requests](/getting-started/advanced-topics/hardening#network-and-outbound-requests) section of the Hardening guide for SSRF defaults (`AIOHTTP_CLIENT_ALLOW_REDIRECTS=false`, `WEB_FETCH_FILTER_LIST`) so a misconfigured extractor URL cannot be redirected onto an internal address.
 
 ---
 
@@ -312,7 +317,7 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
 
 This gives you visibility into request latency, database query performance, error rates, and more.
 
-For the full setup guide, see [OpenTelemetry Monitoring](/reference/monitoring/otel). For application-level log configuration (log levels, debug output), see [Logging Open WebUI](/getting-started/advanced-topics/logging).
+For the full setup guide, see [OpenTelemetry Monitoring](/reference/monitoring/otel). For application-level log configuration (log levels, debug output), see [Logging Open WebUI](/getting-started/advanced-topics/logging). For structured-logging defaults aimed at log aggregators, plus the dedicated audit log that records auth events, admin actions, and data access, see [Observability](/getting-started/advanced-topics/hardening#observability) and [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging) in the Hardening guide.
 
 ---
 
@@ -392,6 +397,8 @@ A few defaults that are reasonable for single-user evaluation become less so onc
 - **Disable `ENABLE_OAUTH_ID_TOKEN_COOKIE`** (`false`) once all clients are on the new server-side session model. The legacy cookie carried the raw IdP id_token to the browser; the new model keeps it server-side.
 
 These are configuration defaults, not new features — the existing knobs simply matter more once a deployment has multiple users and a real identity provider in front of it.
+
+Beyond this short list, the Hardening guide groups the same concerns by topic so you can work through them step by step: [Network Placement](/getting-started/advanced-topics/hardening#network-placement), [Authentication and Signup](/getting-started/advanced-topics/hardening#authentication-and-signup), [Session and Cookie Security](/getting-started/advanced-topics/hardening#session-and-cookie-security), [Security Headers](/getting-started/advanced-topics/hardening#security-headers), [Access Control](/getting-started/advanced-topics/hardening#access-control), [Tools, Functions, and Pipelines](/getting-started/advanced-topics/hardening#tools-functions-and-pipelines), and the [Security-First Deployment](/getting-started/advanced-topics/hardening#security-first-deployment) checklist at the end.
 
 ---
 

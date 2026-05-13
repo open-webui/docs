@@ -1,0 +1,104 @@
+---
+sidebar_position: 4
+title: "Open WebUI & Jan"
+sidebar_label: "Open WebUI & Jan"
+description: "How Open WebUI and Jan work together. Two local-first AI tools with different strengths."
+keywords: ["Open WebUI vs Jan", "Jan AI alternative", "local AI desktop app", "open webui alternative", "open webui comparison"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I use Jan with Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Jan can serve models via a local API endpoint. Connect Open WebUI to Jan's API for web-based access with team features."}}, {"@type": "Question", "name": "How do Jan and Open WebUI work together?", "acceptedAnswer": {"@type": "Answer", "text": "Jan handles running models locally on your desktop. Open WebUI can add web-based access, knowledge bases, and team features. You can connect Open WebUI to Jan's API and use them together."}}]})}</script>
+</Head>
+
+
+# Open WebUI & Jan
+
+*Last updated: May 2026*
+
+[Jan](https://jan.ai/) by Homebrew (Menlo Research) is built on a clear vision: AI should run on your device, offline, completely under your control. The desktop app is clean, the model hub makes it easy to get started, and the commitment to privacy is genuine.
+
+[GitHub](https://github.com/janhq/jan) · [Apache 2.0 License](https://github.com/janhq/jan/blob/main/LICENSE)
+
+---
+
+## What Jan Does Well
+
+- **Local-first** with everything running on your machine, 100% offline
+- **Simple and focused** with a clean interface that avoids unnecessary complexity
+- **Built-in model hub** for browsing and downloading models with one click
+- **Cortex engine** powering the runtime with support for GGUF and TensorRT-LLM
+- **Thread-based conversations** for organizing chats by topic
+- **Extensions system** for adding capabilities through community plugins
+- **Open source** under the Apache 2.0 license
+- **Privacy by design** so your data never leaves your device
+- **Lightweight** and runs well on modest hardware
+- **Cross-platform** on macOS, Windows, and Linux
+
+---
+
+## What Open WebUI Does Well
+
+- **Web-based platform** with multi-user access from any browser
+- **Any model, any provider** using local models alongside OpenAI, Anthropic, Google, and others
+- **Knowledge & RAG** with persistent knowledge bases and advanced retrieval
+- **Python extensibility** with custom tools, MCP servers, pipelines, and community extensions
+- **Team features** including Channels, Notes, Automations, RBAC, SSO/OIDC/LDAP, and SCIM 2.0
+- **Open Terminal** providing a full computing environment for code execution
+- **Scales up** from one person to thousands, Docker to Kubernetes
+
+---
+
+## At a Glance
+
+| | Open WebUI | Jan |
+| :--- | :--- | :--- |
+| **Approach** | Self-hosted web platform for individuals and teams | Desktop app for private, local AI |
+| **Model management** | Connects to model runners and APIs | Built-in model hub with one-click downloads |
+| **Multi-provider** | Local + cloud models | Focused on local models |
+| **Knowledge & RAG** | 9 vector DBs, 5 extraction engines, hybrid search | Focused on chat |
+| **Multi-user** | SSO, RBAC, SCIM, teams | Personal desktop use |
+| **Offline** | Fully offline with local models | 100% offline |
+| **License** | Open WebUI License | Apache 2.0 |
+
+---
+
+## When to Use Each
+
+**Choose Jan if** you want the simplest, most private way to run AI locally on your desktop. No servers, no configuration, no accounts. Just download, pick a model, and start chatting.
+
+**Choose Open WebUI if** you need web-based access, team collaboration, knowledge bases, or want to combine local models with cloud providers. Open WebUI runs as a web server that your whole team can use.
+
+**Use both.** Jan can serve models via its local API. Connect Open WebUI to Jan's API for web-based team access while keeping Jan as your model runner.
+
+---
+
+## Works With Open WebUI
+
+Jan can serve models via a local API endpoint. If you're using Jan to manage your local models, you can connect Open WebUI to Jan's API for a web-based experience with multi-user support, knowledge bases, and tools.
+
+---
+
+*Jan keeps local AI simple and private. Open WebUI adds a platform layer on top. Different approaches, same belief that AI should run on your hardware.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+
+
+---
+
+## Frequently Asked Questions
+
+**Can I use Jan with Open WebUI?**
+Yes. Jan can serve models via a local API endpoint. Connect Open WebUI to Jan's API for web-based access with team features.
+
+**How do Jan and Open WebUI work together?**
+Jan handles running models locally on your desktop. Open WebUI can add web-based access, knowledge bases, and team features. You can connect Open WebUI to Jan's API and use them together.
+
+**Is Jan free?**
+Yes. Jan is open source under the Apache 2.0 license.
+
+---
+
+**Related:** [Open WebUI & Ollama](/alternatives/ollama) · [Open WebUI & LM Studio](/alternatives/lm-studio) · [Open WebUI & llama.cpp](/alternatives/llama-cpp)

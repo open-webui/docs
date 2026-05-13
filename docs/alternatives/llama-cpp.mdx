@@ -1,0 +1,101 @@
+---
+sidebar_position: 2
+title: "Open WebUI & llama.cpp"
+sidebar_label: "Open WebUI & llama.cpp"
+description: "How to connect llama-server to Open WebUI. Integration guide for two essential local AI tools."
+keywords: ["Open WebUI vs llama.cpp", "llama.cpp frontend", "llama-server alternative", "llama.cpp web UI", "llama-server web interface", "open webui alternative", "open webui comparison"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I connect llama-server to Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. llama-server exposes an OpenAI-compatible API. Add `http://localhost:8081/v1` as a connection in Open WebUI and your models appear automatically."}}, {"@type": "Question", "name": "Does Open WebUI support llama-server's multi-model routing?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. If you're running llama-server in router mode with multiple models, Open WebUI will detect and list all available models through the API."}}]})}</script>
+</Head>
+
+
+# Open WebUI & llama.cpp
+
+*Last updated: May 2026*
+
+[llama.cpp](https://github.com/ggml-org/llama.cpp) by Georgi Gerganov is one of the most important projects in the AI ecosystem, and we mean that. Without llama.cpp, the local AI movement as we know it wouldn't exist. It proved that you could run serious models on consumer hardware, introduced the GGUF format that became the industry standard, and inspired an entire generation of tools. And with `llama-server`, it's not just an engine anymore: it has its own built-in web interface and OpenAI-compatible API ready to go.
+
+[GitHub](https://github.com/ggml-org/llama.cpp) · [MIT License](https://github.com/ggml-org/llama.cpp/blob/main/LICENSE)
+
+---
+
+## What llama.cpp Does Well
+
+- **State-of-the-art inference performance** on consumer hardware, consistently pushing what's possible
+- **Built-in web interface** via `llama-server`, ready to use out of the box
+- **Broad hardware support** including CPU, CUDA, Metal, Vulkan, and SYCL
+- **GGUF format** that became the quantized model standard for the entire industry
+- **Quantization options** from Q2 to Q8 with multiple strategies for different quality/speed tradeoffs
+- **Speculative decoding** for faster generation using draft models
+- **Flash Attention** and other advanced inference optimizations
+- **Grammar-constrained generation** for structured outputs (JSON, code, etc.)
+- **OpenAI-compatible API** via `llama-server` so any tool can connect to it
+- **Multi-model router mode** for serving multiple models from one endpoint
+- **One of the most actively developed projects in AI** with a pace of commits that's hard to match
+- **MIT licensed** and genuinely community-driven
+
+---
+
+## What Open WebUI Does Well
+
+- **Rich web platform** with full chat, conversations, history, organization, and search
+- **Knowledge & RAG** with 9 vector databases, 5 extraction engines, and hybrid search with reranking
+- **Python extensibility** including custom tools, MCP servers, pipelines, and community extensions
+- **Multi-provider support** to use llama.cpp models alongside OpenAI, Anthropic, Google, and others
+- **Team platform** with Channels, Notes, Automations, RBAC, SSO/OIDC/LDAP, and SCIM 2.0
+- **Open Terminal** providing a full computing environment for code execution
+- **Multi-user support** from one person to thousands
+
+---
+
+## When to Use Each
+
+**Use llama.cpp directly if** you want maximum control over inference. It gives you fine-grained tuning of quantization, context sizes, batch processing, and hardware utilization that no wrapper can match. The built-in web UI works well for solo use.
+
+**Add Open WebUI if** you want a richer interface, knowledge bases, team access, or the ability to connect other providers alongside llama.cpp. Open WebUI talks to `llama-server` via its OpenAI-compatible API.
+
+**Use both.** llama.cpp handles inference with maximum performance. Open WebUI handles the platform layer with knowledge, tools, and collaboration.
+
+---
+
+## Use Them Together
+
+llama.cpp's `llama-server` exposes an OpenAI-compatible API, which means Open WebUI can connect to it directly. Use llama.cpp for high-performance inference, Open WebUI for the platform layer.
+
+```bash
+# Start llama-server
+llama-server -m your-model.gguf --port 8081
+
+# Point Open WebUI at it
+# In Admin → Settings → Connections, add:
+# URL: http://localhost:8081/v1
+```
+
+---
+
+*llama.cpp made local AI possible. Open WebUI builds a platform layer on top. They work well together.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+
+
+---
+
+## Frequently Asked Questions
+
+**Can I connect llama-server to Open WebUI?**
+Yes. llama-server exposes an OpenAI-compatible API. Add `http://localhost:8081/v1` as a connection in Open WebUI and your models appear automatically.
+
+**Does Open WebUI support llama-server's multi-model routing?**
+Yes. If you're running llama-server in router mode with multiple models, Open WebUI will detect and list all available models through the API.
+
+**Is llama.cpp free?**
+Yes. llama.cpp is MIT licensed and free for any use.
+
+---
+
+**Related:** [Open WebUI & Ollama](/alternatives/ollama) · [Open WebUI & LM Studio](/alternatives/lm-studio) · [Open WebUI & Jan](/alternatives/jan)
