@@ -1,0 +1,100 @@
+---
+sidebar_position: 15
+title: "Open WebUI vs Onyx"
+sidebar_label: "Open WebUI & Onyx"
+description: "Open WebUI vs Onyx compared. A general-purpose AI platform and an enterprise search tool."
+keywords: ["Open WebUI vs Onyx", "Onyx alternative", "Danswer alternative", "Onyx vs Open WebUI", "enterprise AI platform", "open webui alternative", "open webui comparison"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do Onyx and Open WebUI compare?", "acceptedAnswer": {"@type": "Answer", "text": "Onyx leans into enterprise search with 40+ connectors and permission-aware retrieval. Open WebUI comes at it from a more general angle with chat, knowledge bases, team collaboration, and extensibility. Different tools for different needs."}}, {"@type": "Question", "name": "Is Onyx open source?", "acceptedAnswer": {"@type": "Answer", "text": "Onyx's core is MIT licensed. Enterprise features like SAML SSO and advanced permissions are in `ee/` directories under a separate Onyx Enterprise License."}}, {"@type": "Question", "name": "Is Onyx free?", "acceptedAnswer": {"@type": "Answer", "text": "The community edition is free to self-host. Onyx Cloud and Enterprise plans are available for teams that want managed hosting or additional features."}}, {"@type": "Question", "name": "Can I use both Onyx and Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. They solve different problems. Onyx connects AI to your existing enterprise tools. Open WebUI also has knowledge management, team features, and extensibility built in."}}]})}</script>
+</Head>
+
+
+# Open WebUI & Onyx
+
+*Last updated: May 2026*
+
+[Onyx](https://onyx.app/) (formerly Danswer) focuses on a specific and important problem: connecting AI to your organization's internal knowledge across Slack, Google Drive, Confluence, Jira, GitHub, and dozens of other tools, with permission-aware retrieval. If your team's knowledge is scattered across 40+ tools and you need AI to search across all of them while respecting access controls, that's Onyx's sweet spot.
+
+[GitHub](https://github.com/onyx-dot-app/onyx) · [Source Available](https://github.com/onyx-dot-app/onyx/blob/main/LICENSE) (MIT core + Onyx Enterprise License for `ee/` directories) · [Self-Host Terms](https://onyx.app/legal/self-host)
+
+---
+
+## What Onyx Does Well
+
+- **40+ enterprise connectors** with native integrations for Slack, Google Drive, Confluence, Jira, GitHub, Notion, and more
+- **Automatic syncing** that keeps connected sources up to date without manual re-ingestion
+- **Permission-aware retrieval** that respects source system access controls when returning search results
+- **Enterprise search** purpose-built for searching across your organization's internal knowledge
+- **Multi-surface access** via web app, Slack bot, Discord bot, Chrome extension, and CLI
+- **Managed cloud option** for teams that don't want to self-host
+- **Custom agents with actions** for building AI assistants that can take actions across connected tools
+- **Active development** with frequent releases and community responsiveness
+
+---
+
+## What Open WebUI Does Well
+
+- **Full AI platform** with Chat, Notes, Channels, Automations, Open Terminal, voice/video calls, and image generation
+- **Deploy anywhere** on your own infrastructure, fully air-gapped if needed
+- **Free community edition** with unlimited users, SSO/OIDC/LDAP, RBAC, and SCIM 2.0 included
+- **Any model, any provider** including Ollama, OpenAI, Anthropic, Google, Azure, Bedrock, and any OpenAI-compatible API
+- **Knowledge & RAG** with 9 vector databases, 5 extraction engines, and hybrid BM25 + vector search with cross-encoder reranking
+- **Python extensibility** with custom tools, MCP servers, OpenAPI integration, pipelines, and a community marketplace
+
+---
+
+## At a Glance
+
+| | Open WebUI | Onyx |
+| :--- | :--- | :--- |
+| **Primary focus** | General-purpose AI platform | Enterprise search and knowledge discovery |
+| **Knowledge approach** | Document upload, knowledge bases, 9 vector DBs, 5 extraction engines | 40+ enterprise connectors with automatic syncing |
+| **Permission handling** | RBAC, groups, per-resource access controls | Permission-aware retrieval from source systems |
+| **Multi-provider** | Any OpenAI-compatible API + Ollama | Multiple LLM provider support |
+| **Extensibility** | Python tools, MCP, OpenAPI, pipelines | Focused on connector and search ecosystem |
+| **Collaboration** | Channels, Notes, shared conversations | AI-powered search and Q&A |
+| **License** | Open WebUI License | Source Available (MIT core + Onyx Enterprise License for `ee/`); see [self-host terms](https://onyx.app/legal/self-host) |
+| **Pricing** | Free community edition; Enterprise plans available | Free (self-hosted community), Cloud, and Enterprise plans |
+
+---
+
+## When to Use Each
+
+**Choose Onyx if** you want to connect AI to your organization's existing tools. If your team's knowledge lives in Slack, Confluence, Jira, Google Drive, and GitHub, Onyx's 40+ connectors with automatic syncing and permission-aware retrieval were built for that.
+
+**Choose Open WebUI if** you need a general-purpose AI platform with chat, knowledge bases, team collaboration, Python extensibility, and support for any model provider. Open WebUI includes SSO, RBAC, and SCIM in the free community edition.
+
+**They solve different problems.** Onyx excels at enterprise search and connecting AI to your existing tools. Open WebUI excels as a general AI platform. Many organizations could use both.
+
+---
+
+*Onyx connects AI to your enterprise knowledge. Open WebUI comes at it from a more general angle. They solve different problems, and many organizations could benefit from both.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+---
+
+## Frequently Asked Questions
+
+**How do Onyx and Open WebUI compare?**
+Onyx leans into enterprise search with 40+ connectors and permission-aware retrieval. Open WebUI comes at it from a more general angle with chat, knowledge bases, team collaboration, and extensibility. Different tools for different needs.
+
+**Is Onyx open source?**
+Onyx's core is MIT licensed. Enterprise features are under a separate Onyx Enterprise License. Additional [self-host terms](https://onyx.app/legal/self-host) may also apply.
+
+**Is Onyx free?**
+The community edition is free to self-host. Additional [self-host terms](https://onyx.app/legal/self-host) may apply. Onyx Cloud and Enterprise plans are available for teams that want managed hosting or additional features.
+
+**Can I use both Onyx and Open WebUI?**
+Yes. They solve different problems. Onyx connects AI to your existing enterprise tools. Open WebUI also has knowledge management, team features, and extensibility built in.
+
+**Which is better for enterprise AI deployment?**
+It depends on your needs. If your priority is searching across internal tools with permission-aware retrieval, Onyx was built for that. If you need more of a general-purpose AI platform that you can deploy on your own infrastructure, with SSO, RBAC, and SCIM included in the free edition, that is more where Open WebUI fits.
+
+---
+
+**Related:** [Open WebUI & Dify](/alternatives/dify) · [Open WebUI & AnythingLLM](/alternatives/anythingllm) · [Open WebUI & LibreChat](/alternatives/librechat)

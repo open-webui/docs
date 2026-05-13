@@ -1,0 +1,114 @@
+---
+sidebar_position: 20
+title: "Open WebUI vs Dify"
+sidebar_label: "Open WebUI & Dify"
+description: "Open WebUI vs Dify compared. An AI chat platform and a visual workflow builder for different use cases."
+keywords: ["Open WebUI vs Dify", "Dify alternative", "AI workflow builder", "AI workflow builder comparison", "open webui alternative", "open webui comparison"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do Dify and Open WebUI compare?", "acceptedAnswer": {"@type": "Answer", "text": "Dify takes a visual, workflow-first approach to building AI applications. Open WebUI leans more toward conversation and daily AI use. They come at AI from different angles, and many teams could use both."}}, {"@type": "Question", "name": "Can I use Dify with Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dify exposes an OpenAI-compatible API. Connect Open WebUI to Dify's API to use your Dify workflows as models inside Open WebUI."}}]})}</script>
+</Head>
+
+
+# Open WebUI & Dify
+
+*Last updated: May 2026*
+
+[Dify](https://dify.ai/) by LangGenius takes a fundamentally different approach to AI tooling. Where most tools on this page focus on conversation, Dify focuses on *building*: visual workflow design, agent orchestration, prompt engineering, and deploying AI-powered applications. If you think of AI as a platform for building things rather than just chatting, Dify is worth a serious look.
+
+[GitHub](https://github.com/langgenius/dify) · [Source Available (modified Apache 2.0)](https://github.com/langgenius/dify/blob/main/LICENSE)
+
+---
+
+## What Dify Does Well
+
+- **Visual workflow builder** with drag-and-drop interface for designing complex AI pipelines and logic
+- **Agent framework** for building autonomous agents that reason, use tools, and take actions
+- **Prompt engineering IDE** for crafting, versioning, testing, and comparing prompts in a dedicated environment
+- **Workflow marketplace** for sharing and importing community-built workflows and templates
+- **Model routing** with smart routing across multiple providers for cost and capability optimization
+- **RAG pipeline** with document ingestion, processing, and retrieval built in
+- **Batch processing** for running prompts and workflows against large datasets
+- **Annotation and feedback** for collecting human feedback to improve AI outputs over time
+- **Observability** including integrated monitoring, logging, and cost tracking for production use
+- **Backend-as-a-Service** for deploying AI apps as APIs instantly
+- **Embeddable widget** for adding AI chat to any website or application
+- **Strong community** with a large and active contributor and user base
+
+---
+
+## What Open WebUI Does Well
+
+- **Conversational AI platform** with Chat, Notes, Channels, Automations, voice/video calls, and more
+- **Any model, any provider** including Ollama, OpenAI, Anthropic, Google, Azure, and Bedrock in one interface
+- **Knowledge & RAG** with 9 vector databases, 5 extraction engines, and hybrid search with reranking
+- **Python extensibility** with custom tools, MCP servers, pipelines, and community extensions
+- **Team collaboration** including Channels, model agents, RBAC, SSO/OIDC/LDAP, and SCIM 2.0
+- **Open Terminal** providing a full sandboxed computing environment for code execution
+- **Simpler deployment** with a single Docker container to get started
+
+---
+
+## At a Glance
+
+| | Open WebUI | Dify |
+| :--- | :--- | :--- |
+| **Primary focus** | AI chat platform with knowledge, tools, and team features | AI application builder with visual workflows |
+| **Approach** | Conversation-first | Build-first |
+| **Workflow building** | Python tools and pipelines | Visual drag-and-drop workflow designer |
+| **RAG** | 9 vector DBs, 5 extraction engines, hybrid search | Built-in RAG pipeline |
+| **Agent capabilities** | Model agents with bound tools and knowledge | Agent framework with reasoning and tool use |
+| **Multi-provider** | Any OpenAI-compatible API + Ollama | Multi-provider with model routing |
+| **Observability** | OpenTelemetry, analytics dashboards | Built-in monitoring, logging, and cost tracking |
+| **License** | Open WebUI License | Source Available (modified Apache 2.0 with commercial restrictions) |
+
+---
+
+## When to Use Each
+
+**Choose Dify if** you want to build AI-powered applications with visual workflows. The drag-and-drop builder, prompt IDE, and agent framework are designed for developers and product teams who are creating AI features, not just chatting.
+
+**Choose Open WebUI if** your team needs a daily AI workspace for chat, knowledge management, and collaboration. Open WebUI focuses on using AI rather than building AI applications.
+
+**Use both.** Dify exposes an OpenAI-compatible API. Connect Open WebUI to Dify's API and your Dify workflows appear as models in Open WebUI. Build in Dify, use in Open WebUI.
+
+---
+
+## Use Them Together
+
+Dify exposes an OpenAI-compatible API for any workflow or app you build. You can connect Open WebUI to Dify's API endpoint to use your Dify-built AI applications as models inside Open WebUI, combining Dify's workflow orchestration with Open WebUI's chat interface, knowledge management, and team features.
+
+**How to connect:**
+
+1. In Dify, publish your app and copy the API endpoint and key
+2. In Open WebUI, go to **Admin → Settings → Connections**
+3. Add a new OpenAI-compatible connection with Dify's API URL and key
+4. Your Dify apps will appear as models in Open WebUI
+
+---
+
+*Dify is for building AI applications. Open WebUI is for using AI daily. The AI ecosystem needs both builders and users.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+
+
+---
+
+## Frequently Asked Questions
+
+**How do Dify and Open WebUI compare?**
+Dify takes a visual, workflow-first approach to building AI applications. Open WebUI leans more toward conversation and daily AI use. They come at AI from different angles, and many teams could use both.
+
+**Can I use Dify with Open WebUI?**
+Yes. Dify exposes an OpenAI-compatible API. Connect Open WebUI to Dify's API to use your Dify workflows as models inside Open WebUI.
+
+**Is Dify free?**
+The community edition is free to self-host. Dify is source available under a modified Apache 2.0 license.
+
+---
+
+**Related:** [Open WebUI & Onyx](/alternatives/onyx) · [Open WebUI & LibreChat](/alternatives/librechat) · [Open WebUI & AnythingLLM](/alternatives/anythingllm)
