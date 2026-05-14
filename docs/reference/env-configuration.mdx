@@ -3167,7 +3167,14 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, swaps the per-tool knowledge interface (`list_knowledge`, `search_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `view_note`, etc.) for a single unified `kb_exec` tool that lets the model interact with knowledge bases using shell-style commands (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`) with pipe support (e.g. `grep "auth" | head -5`). Directory-aware: `ls docs/` lists a subdirectory, `tree` renders a recursive view, `grep "text" docs/` scopes the search, and files can be referenced by path (`docs/api/auth.md`), filename, or file ID. `query_knowledge_files` remains available, and `query_knowledge_bases` is added when no knowledge is attached to the model. Experimental — best paired with capable frontier models. See [Agentic Knowledge Tools](/features/workspace/knowledge#agentic-knowledge-tools).
+- Description: When enabled, adds a `kb_exec` tool that lets the model interact with knowledge bases through shell-style commands (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`) with pipe support (e.g. `grep "auth" | head -5`). Directory-aware: `ls docs/` lists a subdirectory, `tree` renders a recursive view, `grep "text" docs/` scopes the search, and files can be referenced by path (`docs/api/auth.md`), filename, or file ID.
+
+  Turning this on **replaces** the file-oriented per-purpose tools (`list_knowledge`, `search_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`) — they would overlap with the equivalent `kb_exec` commands. Tools that do something `kb_exec` can't are **kept** alongside it:
+  - `query_knowledge_files` (semantic / RAG search) — always
+  - `view_note` — when notes are attached to the model
+  - `query_knowledge_bases` and `search_knowledge_bases` — when no knowledge is attached, so the model can still discover KBs by name/description
+
+  Experimental — best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 
 #### `RAG_HYBRID_BM25_WEIGHT`
 

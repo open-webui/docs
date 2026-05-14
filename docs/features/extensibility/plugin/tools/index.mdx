@@ -297,7 +297,7 @@ Use this quick matrix instead of memorizing per-row caveats.
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
 :::info `kb_exec` replaces the matrix when enabled
-When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI injects a single `kb_exec` tool (plus `query_knowledge_files`, and `query_knowledge_bases` when no KB is attached) instead of the discovery/read tools listed above. The model interacts with the knowledge base through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#agentic-knowledge-tools) for details.
+When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI injects `kb_exec` instead of the file-oriented tools listed above. Still injected alongside it: `query_knowledge_files` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
 :::
 
 #### Tool Reference
@@ -452,7 +452,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `add_memory`, `replace_memory_content`, `delete_memory`, `list_memories` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file` (or just `kb_exec` + `query_knowledge_files` when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file` (or `kb_exec` + `query_knowledge_files` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |

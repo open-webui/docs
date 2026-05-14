@@ -109,7 +109,20 @@ The line-range response includes `total_lines`, `showing_lines`, and `next_start
 
 ### Filesystem-style access (`kb_exec`)
 
-When [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI replaces the per-purpose knowledge tools (`list_knowledge`, `search_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `view_note`) with a single unified `kb_exec` tool. `query_knowledge_files` stays available (and `query_knowledge_bases` is added when no KB is attached), but everything else collapses into shell-style commands.
+When [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI exposes a `kb_exec` tool that gives the model a filesystem-style interface over knowledge bases.
+
+**Tools that go away**, because their function is now covered by `kb_exec` commands:
+
+- `list_knowledge` — replaced by `ls`
+- `search_knowledge_files` — replaced by `find "<glob>"`
+- `grep_knowledge_files` — replaced by `grep "<pattern>"`
+- `view_file` and `view_knowledge_file` — replaced by `cat`, `head`, `tail`, `sed -n '<a>,<b>p'`
+
+**Tools that stay injected alongside `kb_exec`**, because they do something `kb_exec` can't:
+
+- **`query_knowledge_files`** — semantic / RAG search (always)
+- **`view_note`** — when notes are attached to the model (`kb_exec` is file-only, so notes need a dedicated reader)
+- **`query_knowledge_bases`** and **`search_knowledge_bases`** — when no KB is attached to the model, so the model can still discover and search across knowledge bases by name/description
 
 This is experimental and **off by default**. It targets frontier models that already "think in shell" — they tend to chain `ls`, `grep`, and `cat` more reliably than they orchestrate a fan-out of specialized tools.
 
