@@ -88,21 +88,37 @@ To ensure constructive, actionable reports that genuinely improve security, all 
 
 10. **Tools & Functions Code Execution Is Intended Behavior**: Open WebUI's Tools and Functions feature is **designed** to execute user-provided Python code on the server. This is core, intentional functionality — not a vulnerability. Function creation is restricted to administrators only. Tool creation is controlled by the `workspace.tools` permission, which is **disabled by default** for non-admin users and should only be granted to fully trusted users who are equivalent to system administrators in terms of trust. **Granting a user the ability to create Tools is equivalent to giving them shell access to the server.** More generally, **reports describing ANY attack chain that involves Tools or Functions — including but not limited to code execution, file access, network requests, or environment variable access — will be closed as not a vulnerability / intended behavior.** This applies to both direct code execution and frontmatter-based package installation (`pip install`).
 
-11. **AI Report Transparency**: Due to an extreme spike in AI-aided vulnerability reports, you must disclose if AI was used in any capacity — whether for writing the report, generating the PoC, or identifying the vulnerability. AI-aided vulnerability reports will not be rejected by default. However, if we suspect you used AI but did not disclose it to us, we will be asking tough follow-up questions to validate your understanding of the reported vulnerability and Open WebUI itself. If we suspect you used AI but you did not disclose it and your report ends up being invalid, not a vulnerability, or not reproducible, then you may be banned from reporting future vulnerabilities. This measure was necessary due to the extreme rise in clearly AI-written vulnerability reports where the vast majority were not vulnerabilities, were faulty configurations rather than real vulnerabilities, did not provide a PoC, violated the rules outlined here, had a clear lack of understanding of Open WebUI, wrote comments with conflicting information, or used illogical arguments.
+11. **Legacy Code Paths Are Out of Scope**: Open WebUI maintains some code paths that are explicitly marked as **legacy** in the official documentation. Legacy paths remain available — sometimes still the default — purely for backwards-compatibility reasons, not because they are the supported or maintained surface. Security and functional work happens on the supported replacement, not the legacy path. Reports describing a security boundary issue **on a legacy code path that does not also reproduce on the supported replacement** are out of scope under this rule. We still want to hear about it if the issue reproduces on both the legacy path **and** the supported modern replacement, or if the legacy path is the only documented way to achieve a given function (no migration target exists yet).
 
-12. **Self-Affecting Issues Are Not Vulnerabilities**: A vulnerability requires crossing a security boundary that affects **a party other than the reporter**. Crossing one of the five recognized security boundaries only against the reporter's own data, account, session, or environment is not a vulnerability — it is a bug, and belongs in the [Issue Tracker](https://github.com/open-webui/open-webui/issues), not in a security report. If the same action also affects another user, the operator, the host system, or shared resources, identify that second party clearly in the PoC.
+12. **AI Report Transparency**: Due to an extreme spike in AI-aided vulnerability reports, you must disclose if AI was used in any capacity — whether for writing the report, generating the PoC, or identifying the vulnerability. AI-aided vulnerability reports will not be rejected by default. However, if we suspect you used AI but did not disclose it to us, we will be asking tough follow-up questions to validate your understanding of the reported vulnerability and Open WebUI itself. If we suspect you used AI but you did not disclose it and your report ends up being invalid, not a vulnerability, or not reproducible, then you may be banned from reporting future vulnerabilities. This measure was necessary due to the extreme rise in clearly AI-written vulnerability reports where the vast majority were not vulnerabilities, were faulty configurations rather than real vulnerabilities, did not provide a PoC, violated the rules outlined here, had a clear lack of understanding of Open WebUI, wrote comments with conflicting information, or used illogical arguments.
+
+13. **Self-Affecting Issues Are Not Vulnerabilities**: A vulnerability requires crossing a security boundary that affects **a party other than the reporter**. Crossing one of the five recognized security boundaries only against the reporter's own data, account, session, or environment is not a vulnerability — it is a bug, and belongs in the [Issue Tracker](https://github.com/open-webui/open-webui/issues), not in a security report. If the same action also affects another user, the operator, the host system, or shared resources, identify that second party clearly in the PoC.
 
 Non-compliant submissions will be closed, and repeat extreme violators may be banned. Our goal is to foster a constructive reporting environment where quality submissions promote better security for all users. Contributors who not only identify a vulnerability but also present a robust, ready-to-merge fix help accelerate our response and strengthen the community.
 
 If you feel like you are not able to follow all outlined requirements for vulnerability-specific reasons, still do report it — we will check every report either way.
 
-## Expected Response Timeframe
+## Expected Timeframe
 
-Open WebUI receives a high volume of security reports. Each report goes through a multi-stage review process that includes reproduction, root cause analysis, fix development, and verification before an advisory is published. This process is thorough by design, and most reports progress from submission to published advisory within a few weeks. You will receive an acknowledgement once your report has been reviewed, followed by updates as the investigation progresses. If your report has been open without a response and you would like a status update, you are welcome to leave a comment on the advisory.
+Open WebUI receives a very high volume of vulnerability reports, issues, discussions, and pull requests — lately compounded by an unbelievably high number of AI-generated reports (see [AI Report Transparency](#reporting-guidelines)). The project is maintained by a small team, and security reports are handled alongside all other project responsibilities.
+
+**Please expect several weeks** for your report to be triaged, investigated, fixed, and published. Periods of silence lasting weeks are normal and **do not mean your report has been ignored** — only that we have not yet had the capacity to address it. You will receive an acknowledgement once your report has been reviewed, followed by updates as the investigation progresses. If your report has been open without a response and you would like a status update, you are welcome to leave a comment on the advisory.
+
+For findings we judge to have **broad or severe real-world impact** — regardless of CVSS score — we may hold off on publishing for **1–2 weeks** after the patched version is released, to give administrators time to update their instances.
 
 ## Report Handling
 
-If you report a valid vulnerability that somebody else reported before you, we will close your report as a duplicate. The earliest filing of the vulnerability is the one we will handle going forward. We will not publish multiple reports for the same vulnerability.
+If you report a valid vulnerability that somebody else reported before you, we will close your report as a duplicate. The earliest filing of the vulnerability is the one we will handle going forward. We will not publish multiple advisories for the same vulnerability.
+
+When multiple independent reporters describe the same vulnerability class but each demonstrates a **distinct and separate exploitation vector** — for example, the same missing authorization check reached through different endpoints — we will consolidate them into the earliest filing and credit every reporter who demonstrated a distinct path. Only one CVE will be issued for the consolidated advisory.
+
+### Why duplicate reports don't receive credit
+
+We credit only the earliest filer of a given vulnerability:
+
+1. **The first report did the work.** By the time a later report arrives, triage and fix are already in motion. Later reports don't change the outcome or timeline; crediting them would misrepresent what moved the fix.
+2. **Credit-for-duplicates incentivizes flooding.** If similar-but-later filings earn credit, the rational play is to skim open advisories and file variations. We already see this pressure — the first-filer rule is what limits it.
+3. **Co-discovery is different from duplication.** Multiple reporters **are credited** on one advisory **when each contributes a _distinct_ finding** — different vector, different affected component, different sub-path the earlier filing does not cover. That is the consolidation rule above. Filing a duplicate of an existing report is not co-discovery.
 
 ## Confidential Disclosure
 
@@ -114,7 +130,7 @@ This prohibition applies to **all channels**, including but not limited to:
 - Social media, blogs, forums, or any other website
 - Discord, Reddit, or any other platform, website or service
 
-Premature disclosure undermines the security of all Open WebUI users and **violates the trust** inherent in the responsible disclosure process. **Reporters who publicly disclose vulnerability details before official publication <ins>may be permanently banned from future reporting.</ins>**
+Premature disclosure undermines the security of all Open WebUI users and **violates the trust** inherent in the responsible disclosure process. **Reporters who prematurely publicly disclose vulnerability details before official publication <ins>WILL BE PERMANENTLY BANNED from future reporting.</ins>**
 
 ## For Non-Vulnerability Related Security Concerns
 
