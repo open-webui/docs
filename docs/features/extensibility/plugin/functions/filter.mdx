@@ -570,7 +570,7 @@ Filters that use `__event_emitter__` will still execute for API requests, but si
 
 ---
 
-### ⚡ Filter Priority & Execution Order
+### Filter Priority & Execution Order
 
 When multiple filters are active, they execute in a specific order determined by their **priority** value. Understanding this is crucial when building filter chains where one filter depends on another's changes.
 
@@ -696,7 +696,7 @@ Use this for tools that don't have a corresponding registered Tool in the worksp
 
 ---
 
-### 🔍 Resolving the Base Model (`__model__`)
+### Resolving the Base Model (`__model__`)
 
 When a user selects a workspace or custom model, `body["model"]` contains the custom model ID (e.g. `"my-custom-gpt5"`), not the underlying base model. To discover the actual base model, use the `__model__` dunder parameter:
 
@@ -737,7 +737,7 @@ Only parameters you declare in your function signature are injected — Open Web
 
 ---
 
-### 🎨 UI Indicators & Visual Feedback
+### UI Indicators & Visual Feedback
 
 #### In the Admin Functions Panel
 
@@ -767,7 +767,7 @@ Only parameters you declare in your function signature are injected — Open Web
 
 ---
 
-### 💡 Best Practices for Filter Configuration
+### Best Practices for Filter Configuration
 
 #### 1. When to Use Global Filters
 
@@ -820,9 +820,9 @@ Toggleable Filters (User Choice):
 
 ---
 
-### 🎯 Key Components Explained
+### Key Components Explained
 
-#### 1️⃣ **`Valves` Class (Optional Settings)**
+#### **`Valves` Class (Optional Settings)**
 
 Think of **Valves** as the knobs and sliders for your filter. If you want to give users configurable options to adjust your Filter’s behavior, you define those here.
 
@@ -920,7 +920,7 @@ Using `enum` for your `Valves` options makes your filters more user-friendly and
 
 ---
 
-#### 2️⃣ **`inlet` Function (Input Pre-Processing)**
+#### **`inlet` Function (Input Pre-Processing)**
 
 The `inlet` function is like **prepping food before cooking**. Imagine you’re a chef: before the ingredients go into the recipe (the LLM in this case), you might wash vegetables, chop onions, or season the meat. Without this step, your final dish could lack flavor, have unwashed produce, or simply be inconsistent.
 
@@ -932,7 +932,7 @@ In the world of Open WebUI, the `inlet` function does this important prep work o
 🚀 **Your Task**:
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
-##### 🍳 Why Would You Use the `inlet`?
+##### Why Would You Use the `inlet`?
 1. **Adding Context**: Automatically append crucial information to the user’s input, especially if their text is vague or incomplete. For example, you might add "You are a friendly assistant" or "Help this user troubleshoot a software bug."
 
 2. **Formatting Data**: If the input requires a specific format, like JSON or Markdown, you can transform it before sending it to the model.
@@ -973,7 +973,7 @@ async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 📖 **What Happens?**
 - Any user input like "What are some good dinner ideas?" now carries the Italian theme because we’ve set the system context! Cheesecake might not show up as an answer, but pasta sure will.
 
-###### 🔪 Example 2: Cleaning Input (Remove Odd Characters)
+###### Example 2: Cleaning Input (Remove Odd Characters)
 Suppose the input from the user looks messy or includes unwanted symbols like `!!!`, making the conversation inefficient or harder for the model to parse. You can clean it up while preserving the core content.
 
 ```python
@@ -993,7 +993,7 @@ Note: The user feels the same, but the model processes a cleaner and easier-to-u
 
 :::
 
-##### 📊 How `inlet` Helps Optimize Input for the LLM:
+##### How `inlet` Helps Optimize Input for the LLM:
 - Improves **accuracy** by clarifying ambiguous queries.
 - Makes the AI **more efficient** by removing unnecessary noise like emojis, HTML tags, or extra punctuation.
 - Ensures **consistency** by formatting user input to match the model’s expected patterns or schemas (like, say, JSON for a specific use case).
@@ -1002,9 +1002,9 @@ Note: The user feels the same, but the model processes a cleaner and easier-to-u
 
 ---
 
-#### 🆕 3️⃣ **`stream` Hook (New in Open WebUI 0.5.17)**
+#### **`stream` Hook (New in Open WebUI 0.5.17)**
 
-##### 🔄 What is the `stream` Hook?
+##### What is the `stream` Hook?
 The **`stream` function** is a new feature introduced in Open WebUI **0.5.17** that allows you to **intercept and modify streamed model responses** in real time.
 
 Unlike `outlet`, which processes an entire completed response, `stream` operates on **individual chunks** as they are received from the model.
@@ -1017,7 +1017,7 @@ Unlike `outlet`, which processes an entire completed response, `stream` operates
 - **Debugging** - Log each chunk for troubleshooting streaming issues
 - **Format correction** - Fix common formatting issues as they appear
 
-##### 📜 Example: Logging Streaming Chunks
+##### Example: Logging Streaming Chunks
 
 Here’s how you can inspect and modify streamed LLM responses:
 ```python
@@ -1050,7 +1050,7 @@ async def stream(self, event: dict) -> dict:
 
 ---
 
-#### 4️⃣ **`outlet` Function (Output Post-Processing)**
+#### **`outlet` Function (Output Post-Processing)**
 
 The `outlet` function is like a **proofreader**: tidy up the AI's response (or make final changes) *after it’s processed by the LLM.*
 
@@ -1063,7 +1063,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - Prefer logging over direct edits in the outlet (e.g., for debugging or analytics).
 - If heavy modifications are needed (like formatting outputs), consider using the **pipe function** instead.
 
-##### 🛠️ Use Cases for `outlet`:
+##### Use Cases for `outlet`:
 - **Response logging** - Track all model outputs for analytics or compliance
 - **Token usage tracking** - Count output tokens after completion for billing
 - **Langfuse/observability integration** - Send traces to monitoring platforms
@@ -1086,11 +1086,11 @@ async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
 
 ---
 
-## 🌟 Filters in Action: Building Practical Examples
+## Filters in Action: Building Practical Examples
 
 Let’s build some real-world examples to see how you’d use Filters!
 
-### 📚 Example #1: Add Context to Every User Input
+### Example #1: Add Context to Every User Input
 
 Want the LLM to always know it's assisting a customer in troubleshooting software bugs? You can add instructions like **"You're a software troubleshooting assistant"** to every user query.
 
@@ -1107,7 +1107,7 @@ class Filter:
 
 ---
 
-### 📚 Example #2: Highlight Outputs for Easy Reading
+### Example #2: Highlight Outputs for Easy Reading
 
 Returning output in Markdown or another formatted style? Use the `outlet` function!
 
@@ -1123,7 +1123,7 @@ class Filter:
 
 ---
 
-### 📚 Example #3: Streaming observability hints (conceptual pattern)
+### Example #3: Streaming observability hints (conceptual pattern)
 
 Administrators sometimes want **lightweight, in-UI clues** while a model is streaming—approximate **time-to-first-token**, **total stream duration**, or a **rough tokens-per-second** figure—without building a separate dashboard or patching the frontend. A Filter can do this entirely from the **`stream`** hook documented earlier on this page.
 
@@ -1137,7 +1137,7 @@ Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python):
 
 #### Correlating one stream (“which message is this?”)
 
-Per-request **`__metadata__`** (reserved argument on `stream`) usually includes identifiers such as **`chat_id`** and **`message_id`**. Use a **composite key** in an in-memory map so concurrent chats do not collide. When you finish a stream for that key, drop the saved state so the map does not grow without bound.
+Per-request **`__metadata__`** (reserved argument on `stream`) includes identifiers such as **`chat_id`** and **`message_id`**. Use a **composite key** in an in-memory map so concurrent chats do not collide. When you finish a stream for that key, drop the saved state so the map does not grow without bound.
 
 #### Surfacing hints in the Web UI (`status`)
 
@@ -1155,7 +1155,7 @@ Emit another **`done: True`** status when summarizing totals at the **true** end
 
 #### Knowing when the stream really ended
 
-Be conservative: **`usage`-only chunks** may appear mid-stream on some backends. Prefer treating the reply as terminal when you see **`finish_reason`**, an explicit **`stop`**, **`event["done"]`**, or a protocol-specific **DONE** marker—then emit your final **`status`** and clear saved state.
+Be conservative: **`usage`-only chunks** may appear mid-stream. Prefer treating the reply as terminal when you see **`finish_reason`**, an explicit **`stop`**, **`event["done"]`**, or a protocol-specific **DONE** marker—then emit your final **`status`** and clear saved state.
 
 #### Rough throughput
 
@@ -1163,20 +1163,8 @@ If **`usage.completion_tokens`** (or equivalent) arrives on the last chunk with 
 
 If **`usage`** is absent until the end—or never—for that provider, a **fallback** many Filters use is to estimate tokens from streamed character counts (rule-of-thumb divides; crude and model-dependent). **Do not treat** heuristic numbers as billing-grade or scientific benchmarks.
 
-#### Optional: keeping usage metadata in sync
-
-When the streaming stack hands you a **`usage`** object on the closing chunk, some deployments also emit **`type`: `"chat:completion"`** with **`data.usage`** and **`done`: true** so the client can refresh the usual completion metadata affordances. Whether that is desirable depends on your Open WebUI version and provider; prototype with your stack.
-
-#### Installing your own variant
-
-Use **Admin → Functions → Create**, set **Type** to **Filter**, paste **your reviewed code**, enable globally or per model—as with any Filter on this page.
-
 :::tip Sharing with the community
 Publishing a curated package on **[openwebui.com](https://openwebui.com/)** lets others import it in fewer steps. Only publish **code you have audited** from an account you control.
-:::
-
-:::note Operational reality
-Measured latency mixes **backend scheduling**, **model inference**, **network**, **chunk buffering**, and **provider quirks**. Comparisons across models or connectors are directional at best—not a substitute for OpenTelemetry traces, centralized logging, or APM if you operate at scale.
 :::
 
 ---
