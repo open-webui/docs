@@ -431,6 +431,32 @@ If resource usage is critical, disable automated features that constantly trigge
     *   Admin: `Settings > Interface > Chat Title`
 4.  **Tag Generation**: `ENABLE_TAGS_GENERATION=False`
 
+### 4. SQLite Memory Footprint on Constrained Containers
+
+This one applies **even on fast local SSD/NVMe**. It is a RAM problem, not a storage-latency one (for the latency/corruption problem on network storage, see [Disk I/O Latency](#disk-io-latency-sqlite--storage) instead). It is the most common cause of "the container gets OOM-killed when I edit model or knowledge-base permissions" on small deployments.
+
+On SQLite, when `DATABASE_POOL_SIZE` is left unset, current releases (0.9.x, async DB backend) do **not** fall back to SQLAlchemy's small default pool. They fall back to a large internal pool (currently **512** connections). Each pooled connection independently:
+
+- lazily grows its **own** SQLite page cache up to the `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` cap. The default `-65536` is roughly **64 MB of committed RAM per connection**.
+- memory-maps the database file up to `DATABASE_SQLITE_PRAGMA_MMAP_SIZE`, default **256 MB per connection**. This is mostly virtual and file-backed rather than committed anonymous RAM, but it inflates `total-vm` enormously and the resident portion still counts against a cgroup memory limit.
+- runs on its **own OS thread** (the async SQLite driver is one thread per connection), adding thread-stack address space.
+
+Peak memory therefore scales with the number of **simultaneously active connections**, not with the size of any single query. A workflow that fans out many short-lived connections, for example editing model or knowledge-base access control and then reloading a long model list, can briefly drive dozens of connections live. On a small container the page caches alone (active connections times up to 64 MB) exceed the limit and the OOM killer terminates the process. A profiler (py-spy, memray) will attribute almost everything to `aiosqlite/core.py`, because that is the frame where each connection allocates its cache and materialises rows. That is the signature of many connections, not a leak inside the driver, and it is unrelated to the size of any remote vector database.
+
+:::tip Constrained / Low-Spec Containers (SQLite)
+On any deployment with a tight memory limit (small VPS, Raspberry Pi, a Docker `mem_limit` of 1 to 2 GB), set these explicitly instead of relying on the defaults:
+
+```bash
+DATABASE_POOL_SIZE=8                       # cap the SQLite pool (unset falls back to 512)
+DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000    # ~2 MB page cache per connection instead of ~64 MB
+DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0         # disable the per-connection mmap window
+```
+
+Also give the container realistic headroom. **1 GB is very low** for anything doing RAG or embeddings; aim for **2 GB or more**. Keep `DATABASE_ENABLE_SESSION_SHARING=False` (the default) on low-spec hardware; turning it on is the wrong lever here and degrades SQLite on weak hardware (see [Database Session Sharing](#database-session-sharing)).
+
+For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQLite tuning.
+:::
+
 ---
 
 ## 🚀 Recommended Configuration Profiles
@@ -443,7 +469,7 @@ If resource usage is critical, disable automated features that constantly trigge
 3.  **Task Model**: Disable or use tiny model (`llama3.2:1b`).
 4.  **Scaling**: Keep default `THREAD_POOL_SIZE` (40).
 5.  **Disable**: Image Gen, Code Interpreter, Autocomplete, Follow-ups.
-6.  **Database**: SQLite is fine.
+6.  **Database**: SQLite is fine, but cap its memory: `DATABASE_POOL_SIZE=8`, `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000`, `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`. The unset SQLite pool default is large (512); see [SQLite Memory Footprint on Constrained Containers](#4-sqlite-memory-footprint-on-constrained-containers).
 
 ### Profile 2: Single User Enthusiast
 *Target: Max Quality & Speed, Local + External APIs.*
@@ -496,6 +522,7 @@ These are real-world mistakes that cause organizations to massively over-provisi
 | **Using Default (prompt-based) tool calling** | Legacy / no longer supported; injected prompts break KV cache → higher latency → more resources needed per request; cannot access built-in system tools | Switch every model to Native Mode |
 | **Not configuring Redis stale connection timeout** | Connections accumulate forever → Redis OOM → you deploy Redis Cluster | Add `timeout 1800` to redis.conf |
 | **Using base64-encoded icons in Actions/Filters** | Icon data is embedded in `/api/models` responses sent to the frontend on every page load for every model. A 500 KB base64 icon on 3 actions across 20 models = **30 MB of payload bloat** per request → slow frontend loads, high bandwidth usage, unnecessary backend memory pressure | Host icons as static files and reference them by URL in `icon_url` / `self.icon`. See [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example---specifying-action-frontmatter) |
+| **Running SQLite with the default pool on a tiny container** | Unset `DATABASE_POOL_SIZE` falls back to a 512-connection pool; each connection grows its own ~64 MB page cache plus a 256 MB mmap window, so a connection-fanning workflow (editing model/KB permissions, reloading a long model list) OOM-kills a 1 GB container | Cap `DATABASE_POOL_SIZE` (e.g. `8`), set `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000` and `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`, give the container ≥ 2 GB. See [SQLite Memory Footprint](#4-sqlite-memory-footprint-on-constrained-containers) |
 
 ---
 
@@ -522,3 +549,6 @@ For detailed information on all available variables, see the [Environment Config
 | `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/reference/env-configuration#enable_autocomplete_generation) |
 | `RAG_SYSTEM_CONTEXT` | [RAG System Context](/reference/env-configuration#rag_system_context) |
 | `DATABASE_ENABLE_SESSION_SHARING` | [Database Session Sharing](/reference/env-configuration#database_enable_session_sharing) |
+| `DATABASE_POOL_SIZE` | [Connection Pool Size](/reference/env-configuration#database_pool_size) |
+| `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` | [SQLite Page Cache Size](/reference/env-configuration#database_sqlite_pragma_cache_size) |
+| `DATABASE_SQLITE_PRAGMA_MMAP_SIZE` | [SQLite mmap Size](/reference/env-configuration#database_sqlite_pragma_mmap_size) |

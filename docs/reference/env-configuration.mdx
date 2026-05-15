@@ -6697,6 +6697,10 @@ To use SQLCipher with existing data, you must either start fresh (with users exp
 - Default: `None`
 - Description: Specifies the pooling strategy and size of the database pool. By default SQLAlchemy will automatically chose the proper pooling strategy for the selected database connection. A value of `0` disables pooling. A value larger `0` will set the pooling strategy to `QueuePool` and the pool size accordingly.
 
+:::warning SQLite: unset does not mean "small". It falls back to 512
+The documented default (`None`) only means "not set by you". On **SQLite**, current releases (0.9.x, async DB backend) substitute a large internal pool (currently **512** connections) when this is unset, not SQLAlchemy's small default. Each SQLite connection carries its own page cache (`DATABASE_SQLITE_PRAGMA_CACHE_SIZE`, ~64 MB by default) and mmap window (`DATABASE_SQLITE_PRAGMA_MMAP_SIZE`, ~256 MB by default), so peak memory scales with the number of simultaneously active connections. On a memory-constrained container this can OOM-kill the process during connection-heavy workflows (for example editing model or knowledge-base permissions and reloading a long model list). On small / low-spec deployments set this explicitly to a small value (e.g. `DATABASE_POOL_SIZE=8`) and lower the two PRAGMAs below. See [Performance → SQLite Memory Footprint on Constrained Containers](/troubleshooting/performance#4-sqlite-memory-footprint-on-constrained-containers).
+:::
+
 :::tip High-Concurrency Deployments
 
 For deployments with many concurrent users, consider increasing both `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW`. A good starting point is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`.
@@ -6792,6 +6796,10 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Default: `-65536`
 - Description: Sets the SQLite `PRAGMA cache_size` value. Negative values specify the cache size in KiB — the default `-65536` allocates approximately 64 MB of page cache. Larger caches reduce disk I/O for read-heavy workloads. Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
 
+:::warning This cache is per connection, not global
+SQLite's page cache is allocated **per connection**, so the real worst case is `cache_size` times the number of simultaneously active pooled connections, not a single 64 MB allocation. With the default SQLite pool fallback (`DATABASE_POOL_SIZE` unset, see above) that multiplier can be large enough to OOM a memory-constrained container. On small / low-spec deployments lower this (e.g. `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000` for ~2 MB per connection) and cap `DATABASE_POOL_SIZE`. See [Performance → SQLite Memory Footprint on Constrained Containers](/troubleshooting/performance#4-sqlite-memory-footprint-on-constrained-containers).
+:::
+
 #### `DATABASE_SQLITE_PRAGMA_TEMP_STORE`
 
 - Type: `str`
@@ -6803,6 +6811,10 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 - Type: `str`
 - Default: `268435456`
 - Description: Sets the SQLite `PRAGMA mmap_size` value in bytes. The default `268435456` enables approximately 256 MB of memory-mapped I/O, which can significantly improve read performance by avoiding syscall overhead. Set to `0` to disable mmap, or to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+
+:::note Also per connection
+Like the page cache above, the mmap window is established **per connection**. It is mostly virtual / file-backed rather than committed anonymous RAM, but it inflates the process `total-vm` substantially and the resident portion still counts toward a cgroup memory limit. On memory-constrained containers set `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0` and cap `DATABASE_POOL_SIZE`. See [Performance → SQLite Memory Footprint on Constrained Containers](/troubleshooting/performance#4-sqlite-memory-footprint-on-constrained-containers).
+:::
 
 #### `DATABASE_SQLITE_PRAGMA_JOURNAL_SIZE_LIMIT`
 
