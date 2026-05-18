@@ -35,7 +35,7 @@ This approach ensures that new users don't accidentally get access to sensitive 
 
 ## Permission Categories
 
-Permissions are organized into five main categories: **Workspace**, **Sharing**, **Chat**, **Features**, and **Settings**.
+Permissions are organized into six main categories: **Workspace**, **Sharing**, **Chat**, **Features**, **Settings**, and **Admin**.
 
 ### 1. Workspace Permissions
 Controls access to the "Workspace" section where users create and manage resources.
@@ -150,6 +150,25 @@ Controls access to user settings areas.
 | Permission | Description |
 | :--- | :--- |
 | **Interface Settings Access** | Ability to access and modify interface settings in user settings. |
+
+### 6. Admin Permissions
+Controls access to admin-panel surfaces without granting full administrator role.
+
+| Permission | Key | Description |
+| :--- | :--- | :--- |
+| **Analytics Access** | `admin.analytics` | Access the **Analytics** dashboard and `/api/v1/analytics/*` endpoints. User sees **Analytics** in the profile menu (not the full Admin Panel) and only the Analytics tab. Other admin areas (Users, Settings, Functions, etc.) remain inaccessible. |
+
+:::info Analytics Permission Scope
+
+For Analytics access:
+
+1. **Feature toggle**: The Analytics API and UI must be enabled via [`ENABLE_ADMIN_ANALYTICS`](/reference/env-configuration#enable_admin_analytics) (default `True`).
+2. **Permission check for non-admins**: Users with the `user` role need **`admin.analytics`** from global defaults, a group, and/or per-user permissions.
+3. **Admins are exempt from `admin.analytics`**: Users with the `admin` role always have analytics access when the feature is enabled.
+
+Default permission can be configured via [`USER_PERMISSIONS_ADMIN_ANALYTICS`](/reference/env-configuration#user_permissions_admin_analytics).
+
+:::
 
 :::info API Keys Permission Scope
 

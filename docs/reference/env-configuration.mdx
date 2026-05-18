@@ -401,6 +401,12 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 - Default: `True`
 - Description: Controls whether the admin-panel **Analytics** tab is visible and the analytics API router is mounted. When set to `False`, the tab is hidden and the corresponding endpoints are not registered. Disabling does not stop the underlying data being collected, and admin retains the ability to query that data directly from the database — this toggle controls the in-product surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
+#### `USER_PERMISSIONS_ADMIN_ANALYTICS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Default value for the **`admin.analytics`** RBAC permission applied to all users (combined with group and per-user overrides). When `True`, regular users can open the Analytics dashboard without full admin role, subject to `ENABLE_ADMIN_ANALYTICS`. Administrators always have analytics access when the feature is enabled. Configure per-user via **Admin Panel → Users → Edit user → Analytics Access**, or per-group in group permissions. See [Permissions — Admin Permissions](/features/authentication-access/rbac/permissions#6-admin-permissions).
+
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`

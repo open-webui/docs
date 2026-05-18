@@ -7,8 +7,10 @@ title: "Analytics"
 
 The **Analytics** feature in Open WebUI provides administrators with comprehensive insights into usage patterns, token consumption, and model performance across their instance. This powerful tool helps you understand how your users are interacting with AI models and make data-driven decisions about resource allocation and model selection.
 
-:::info Admin-Only Feature
-Analytics is only accessible to users with **admin** role. Access it via **Admin Panel > Analytics**.
+:::info Who Can Access Analytics
+Full **admin** users always have access via **Admin Panel > Analytics**.
+
+Users with the regular **user** role can also access Analytics when granted the **`admin.analytics`** permission (see [Permissions — Admin Permissions](/features/authentication-access/rbac/permissions#6-admin-permissions)). Those users see **Analytics** in the profile menu instead of the full Admin Panel and only the Analytics tab in the admin area.
 :::
 
 :::tip Disabling Analytics
@@ -32,9 +34,27 @@ All analytics data is derived from the message history stored in your instance's
 
 ## Accessing Analytics
 
+### Administrators
+
 1. Log in with an **admin** account
-2. Navigate to **Admin Panel** (click your profile icon → Admin Panel)
-3. Click on the **Analytics** tab in the admin navigation
+2. Navigate to **Admin Panel** (profile menu → **Admin Panel**)
+3. Open the **Analytics** tab
+
+### Analytics-only users
+
+1. Log in with a **user** account that has **`admin.analytics`** enabled
+2. Open the profile menu and choose **Analytics**
+3. You are taken directly to the Analytics dashboard (other admin tabs are not shown)
+
+### Granting analytics access
+
+| Scope | Where to configure |
+| :--- | :--- |
+| **All new users (default)** | **Admin Panel → Users → Groups → Default Permissions** → **Admin Permissions → Analytics Access** |
+| **A group** | Edit the group → **Permissions** → **Admin Permissions → Analytics Access** |
+| **One user** | **Admin Panel → Users** → edit user → **Analytics Access** toggle |
+
+Permissions are **additive**: access is granted if the global default, **any** group, or the user's individual override enables it. See [Permissions](/features/authentication-access/rbac/permissions) for details.
 
 ---
 
