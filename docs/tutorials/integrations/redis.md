@@ -140,7 +140,6 @@ With proper `timeout` configuration, this number should fluctuate naturally (ris
 To set up Redis for websocket support, you will need to create a `docker-compose.yml` file with the following contents:
 
 ```yml
-version: '3.9'
 services:
   redis:
     image: docker.io/valkey/valkey:8.0.1-alpine
