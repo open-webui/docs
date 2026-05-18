@@ -28,7 +28,7 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 3. **Enable GitHub Pages**
 
    - Go to **Settings** > **Pages** in your forked repository.
-   - Under **Source**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
+   - Under **Branch**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
    - Click **Save** to enable GitHub Pages.
 
 4. **Configure GitHub Environment Variables**
