@@ -43,6 +43,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
+| 🔄 **Incremental directory sync** | Mirror a local folder into the KB — only new and modified files upload, deletions are removed, mirroring folder structure |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
 ---
@@ -221,6 +222,19 @@ Deleting a non-empty directory prompts for the action to take with its contents:
 
 Individual files can be renamed in place from the workspace via the file's item menu — no need to re-upload. The new name is reflected everywhere the file is referenced (knowledge listings, agentic tool output, citations).
 
+### Syncing a local directory
+
+The **Add Content → Sync Directory** action mirrors a local folder into the knowledge base **incrementally**: the client hashes each local file (SHA-256), the server compares hashes and paths against what is already stored, and only **new**, **modified**, and **deleted** files are touched. Unmodified files (the typical majority) are left alone — no re-upload, no re-embedding. The local folder's subdirectory structure is mirrored in the KB; missing subdirectories are created, and subdirectories that no longer exist locally are removed.
+
+Behavior to be aware of:
+
+- Hidden files and folders (anything beginning with `.`) are skipped.
+- Files modified locally upload with a new content hash; the old file entry is removed from the KB and replaced.
+- Files removed locally are deleted from the KB during the cleanup step.
+- The action is **non-destructive** for unchanged files. Earlier versions of the same menu action used to wipe and re-upload everything — that is no longer the case as of v0.9.6.
+
+For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
+
 ### Exporting
 
 Admins can export an entire knowledge base as a zip file via the item menu (three dots) > **Export**. Files are converted to `.txt` for universal compatibility. Regular users will not see the Export option.
@@ -231,7 +245,7 @@ Knowledge bases can be managed programmatically:
 
 **Files**
 
-- `POST /api/v1/files/` — Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side** — equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing).
+- `POST /api/v1/files/` — Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side** — equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing). The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
 - `GET /api/v1/files/{id}/process/status` — Check processing status
 - `POST /api/v1/files/{id}/rename` — Rename a file
 - `POST /api/v1/knowledge/{id}/file/add` — Add files to a knowledge base
@@ -242,6 +256,12 @@ Knowledge bases can be managed programmatically:
 - `POST /api/v1/knowledge/{id}/dirs/create` — Create a directory (body: `name`, optional `parent_id`)
 - `POST /api/v1/knowledge/{id}/dirs/{dir_id}/update` — Rename or re-parent a directory (body: `name` and/or `parent_id`)
 - `DELETE /api/v1/knowledge/{id}/dirs/{dir_id}/delete?move_files=true` — Delete a directory. With `move_files=true` (default), contained files are re-parented; with `move_files=false`, they're deleted along with the directory.
+
+**Incremental directory sync** (added in v0.9.6)
+
+- `POST /api/v1/knowledge/{id}/sync/diff` — Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete, and which directories to create/remove. Read-only — does not mutate the KB.
+- After acting on the diff (create `mkdir` paths, upload `added` + `modified` files with their hashes via `POST /api/v1/files/`), call:
+- `POST /api/v1/knowledge/{id}/sync/cleanup` — Body: `{file_ids: [...], dir_ids: [...]}`. Removes the stale files (from the KB, vector store, and per-file collections) and the now-empty directories returned by `sync/diff`. Run this last so deletions don't outrun uploads.
 
 File processing happens asynchronously. You must poll the status endpoint until processing completes before adding files to a knowledge base, or you'll get an "empty content" error. See [API Endpoints](/reference/api-endpoints#-retrieval-augmented-generation-rag) for workflow examples.
 
