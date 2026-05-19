@@ -3772,8 +3772,8 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 #### `WEB_SEARCH_TRUST_ENV`
 
 - Type: `bool`
-- Default: `False`
-- Description: Enables proxy set by `http_proxy` and `https_proxy` during web search content fetching.
+- Default: `True`
+- Description: Routes the web-page content fetcher (the stage that scrapes result pages after a web search, and the general website/URL loader) through the proxy defined by the http_proxy / https_proxy environment variables, also honoring no_proxy and .netrc. Needed because the default fetcher uses aiohttp, which — unlike requests — ignores these proxy variables unless told to trust the environment. This does not affect the search-engine query request itself (that already respects proxy env vars), and it never overrides an explicitly configured proxy; for the Firecrawl/Tavily/Playwright loaders it only acts as a fallback when no proxy is otherwise set.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `WEB_FETCH_FILTER_LIST`
