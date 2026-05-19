@@ -42,7 +42,6 @@ docker run --gpus all -p 5001:5001 \
 **Recommended production deployment with Docker Compose:**
 
 ```yaml
-version: "3.8"
 services:
   docling-serve:
     image: quay.io/docling-project/docling-serve-cu128:latest

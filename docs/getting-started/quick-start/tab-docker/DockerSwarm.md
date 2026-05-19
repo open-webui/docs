@@ -34,8 +34,6 @@ Choose the appropriate command based on your hardware setup:
 #### Docker-stack.yaml
 
     ```yaml
-    version: '3.9'
-
     services:
       openWebUI:
         image: ghcr.io/open-webui/open-webui:main
