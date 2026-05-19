@@ -130,6 +130,12 @@ Enable this filter globally or attach it to specific models in **Admin Panel →
 With tool calling on, an `assistant` message that invokes tools is paired with one or more `tool` messages carrying results that share the same `tool_call_id`. If `max_turns` happens to slice the conversation in the middle of that pair — keeping the orphan half — the upstream provider returns a 400 because the tool call / result structure is invalid. The repair block drops the orphans so the window always starts on a clean boundary. This matches what production community filters for context management do; the rest of the filter is the generic trimming logic.
 :::
 
+:::note Server-side reconciliation (v0.9.6+) — error: `tool_use ids were found without tool_result blocks`
+A second source of the same 400 is **stored** output that is already incomplete — a tool result never got written (the call was interrupted, or a knowledge base changed mid-chat), or a tool call is missing while its result survived. Strict providers (Anthropic, AWS Bedrock Converse) reject this with `400 ... tool_use ids were found without tool_result blocks` (or the mirror case, a `tool_result` with no matching `tool_use`).
+
+As of v0.9.6 Open WebUI reconciles these when it reconstructs a conversation: unpaired `tool_use` / `tool_result` entries are dropped before the request is sent, so resuming a chat with an interrupted tool call no longer hard-fails. Well-formed history is untouched. This is independent of the filter above — the filter still matters because *trimming* can create fresh orphans after reconstruction, which the server-side pass (run earlier, on the stored output) does not see. If you still hit this error, confirm you are on v0.9.6 or later.
+:::
+
 ### Slightly more involved: per-model token budget
 
 Counting turns is easy to reason about but wrong in practice — 40 turns of one-liners fit in 8k tokens, five turns with a 200-page PDF attachment do not. The more useful policy is "keep everything until we're about to bust the model's context window, then drop the oldest non-system messages until we fit."

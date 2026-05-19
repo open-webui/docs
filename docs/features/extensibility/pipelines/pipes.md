@@ -46,7 +46,7 @@ yield {"choices": [{"delta": {}, "finish_reason": "stop"}]}
 
 This is the single biggest gotcha when building an agent pipeline (LangChain, LlamaIndex, a custom planner, anything that executes its own tools and streams the result back).
 
-`delta.tool_calls` in a chunk means **"please execute this tool call for me, client"**. When Open WebUI's middleware sees it, the tool executor picks up the call, runs it, appends a `role: "tool"` message, and fires a continuation request back at the same pipeline. It does this in a loop capped by `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (≈30).
+`delta.tool_calls` in a chunk means **"please execute this tool call for me, client"**. When Open WebUI's middleware sees it, the tool executor picks up the call, runs it, appends a `role: "tool"` message, and fires a continuation request back at the same pipeline. It does this in a loop capped by [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) (default 256; `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES`, default 30, on versions before v0.9.6).
 
 If your pipeline already executed the tool internally, emitting `delta.tool_calls` makes Open WebUI try to execute it *again* — and since the pipeline keeps emitting the same call on every retry, you get 30 copies of the response stacked on top of each other before the retry cap trips. Same thing happens if you set `finish_reason: "tool_calls"` mid-stream.
 

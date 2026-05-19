@@ -92,6 +92,14 @@ By default, Open WebUI saves chats **after generation is complete**. While savin
 -   **Effect**: Chats are saved only when the generation is complete (or periodically).
 -   **Recommendation**: **DO NOT ENABLE `ENABLE_REALTIME_CHAT_SAVE` in production.** It is highly recommended to keep this `False` to prevent database connection exhaustion and severe performance degradation under concurrent load. See the [Environment Variable Configuration](/reference/env-configuration#enable_realtime_chat_save) for details.
 
+### User Active-Status Write Throttling (set this on every deployment)
+
+Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. **By default this write is unthrottled** — essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`. On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit (presence only needs ~minute granularity).
+
+-   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`
+-   **Default**: unset (**unthrottled — writes on every request**)
+-   **Recommendation**: Set a positive interval in seconds — `300`–`500` is a good range. This collapses thousands of writes into at most one per user per interval. It is **free performance for any setup** and is effectively **mandatory for large/production deployments**; leaving it unset is a common, avoidable database bottleneck. There is no downside on weak hardware either — it only *reduces* writes. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+
 ### Database Session Sharing
 
 Starting with v0.7.1, Open WebUI includes a database session sharing feature that can improve performance under high concurrency by reusing database sessions instead of creating new ones for each request.
@@ -206,12 +214,16 @@ Increasing the chunk size buffers these updates, sending them to the client in l
   *   *Recommendation*: Set to **5-10** for high-concurrency instances.
 
 #### Thread Pool Size
-Defines the number of worker threads available for handling requests.
-*   **Default**: 40
-*   **High-Traffic Recommendation**: **2000+**
-*   **Warning**: **NEVER decrease this value.** Even on low-spec hardware, an idle thread pool does not consume significant resources. Setting this too low (e.g., 10) **WILL cause application freezes** and request timeouts.
+Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count — threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
+*   **Default**: 40 (the AnyIO default — far too low for production)
+*   **Normal servers / production**: **2000+**. `2000` is a *lower* bound for very large instances; going higher is fine and is **not** a CPU/contention risk.
+*   **Symptom if too low**: when more than `THREAD_POOL_SIZE` blocking ops are needed at once (many users at the same time, or a few users each triggering several blocking calls), further requests queue and the **whole app appears to hang/freeze** even though CPU and RAM look fine. This is pool starvation, not resource exhaustion.
+*   **Warning**: **NEVER decrease below the default.** An idle high ceiling costs effectively nothing.
+*   **Exception — weak hardware** (Raspberry Pi, tiny VPS, containers capped at ~250m CPU / very low RAM): do **not** set `2000`. Each genuinely concurrent blocking op still uses a real OS thread (stack memory), so on a tiny device a huge ceiling lets a traffic burst exhaust RAM. Leave it at the default or a modest few-hundred value matched to the device. Any normal server should use `2000+`.
 
 - **Env Var**: `THREAD_POOL_SIZE=2000`
+
+See [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size) for the full explanation.
 
 #### AIOHTTP Client Timeouts
 Long LLM completions can exceed default HTTP client timeouts. Configure these to prevent requests being cut off mid-response:
@@ -549,6 +561,7 @@ For detailed information on all available variables, see the [Environment Config
 | `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/reference/env-configuration#enable_autocomplete_generation) |
 | `RAG_SYSTEM_CONTEXT` | [RAG System Context](/reference/env-configuration#rag_system_context) |
 | `DATABASE_ENABLE_SESSION_SHARING` | [Database Session Sharing](/reference/env-configuration#database_enable_session_sharing) |
+| `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL` | [Presence Write Throttling](/reference/env-configuration#database_user_active_status_update_interval) |
 | `DATABASE_POOL_SIZE` | [Connection Pool Size](/reference/env-configuration#database_pool_size) |
 | `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` | [SQLite Page Cache Size](/reference/env-configuration#database_sqlite_pragma_cache_size) |
 | `DATABASE_SQLITE_PRAGMA_MMAP_SIZE` | [SQLite mmap Size](/reference/env-configuration#database_sqlite_pragma_mmap_size) |

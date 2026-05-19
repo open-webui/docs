@@ -385,7 +385,18 @@ UVICORN_WORKERS=1
 
 # Migrations (set to false on all but one instance)
 ENABLE_DB_MIGRATIONS=false
+
+# Concurrency & DB write throttling (REQUIRED at scale — see note below)
+THREAD_POOL_SIZE=2000
+DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300
 ```
+
+:::warning Two settings people forget — and then their scaled deployment stalls
+- **`THREAD_POOL_SIZE=2000`** — Open WebUI offloads blocking work (DB calls, file I/O, sync handlers) to a thread pool whose default concurrency ceiling is only **40**. At scale, once 40 blocking operations are in flight every further request **queues**, and the whole app appears to freeze even though CPU/RAM look fine. `2000` is a *lower* bound for large instances; it is a concurrency ceiling, **not** a CPU/thread count, so a high value is not a contention risk. Never lower it. (The only exception is genuinely tiny hardware, which is not a "scaled deployment".)
+- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`** — presence tracking writes each user's `last_active_at` to the database. **Unset (the default) means this write is unthrottled — roughly one `UPDATE` + `COMMIT` per authenticated request.** At scale that is a continuous flood of tiny write transactions that saturates the connection pool for no functional gain. Set it to `300`–`500` seconds; it is mandatory for large/production deployments and free performance everywhere else.
+
+Both are read once at startup and are not configurable from the Admin UI. See [Performance → Database Optimization](/troubleshooting/performance#-database-optimization) and [Performance → High-Concurrency](/troubleshooting/performance#-high-concurrency--network-optimization).
+:::
 
 ### Security defaults to revisit at scale
 

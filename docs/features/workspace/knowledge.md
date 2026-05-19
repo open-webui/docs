@@ -217,6 +217,10 @@ Deleting a non-empty directory prompts for the action to take with its contents:
   - `kb_exec` (when enabled) treats subdirectories like a filesystem: `ls docs/`, `tree`, `grep "x" docs/`, and path-style refs (`docs/api/auth.md`) all work — see [Filesystem-Style Access (`kb_exec`)](#filesystem-style-access-kb_exec) below.
   - The other knowledge tools (`query_knowledge_files`, `grep_knowledge_files`, `search_knowledge_files`) ignore directory boundaries and return matches from the whole KB.
 
+### Renaming files
+
+Individual files can be renamed in place from the workspace via the file's item menu — no need to re-upload. The new name is reflected everywhere the file is referenced (knowledge listings, agentic tool output, citations).
+
 ### Exporting
 
 Admins can export an entire knowledge base as a zip file via the item menu (three dots) > **Export**. Files are converted to `.txt` for universal compatibility. Regular users will not see the Export option.
@@ -227,7 +231,7 @@ Knowledge bases can be managed programmatically:
 
 **Files**
 
-- `POST /api/v1/files/` — Upload files
+- `POST /api/v1/files/` — Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side** — equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing).
 - `GET /api/v1/files/{id}/process/status` — Check processing status
 - `POST /api/v1/files/{id}/rename` — Rename a file
 - `POST /api/v1/knowledge/{id}/file/add` — Add files to a knowledge base
@@ -267,7 +271,7 @@ Add dozens of papers to a knowledge base. The AI searches across all of them to 
 
 ### Processing delay for API uploads
 
-Files uploaded via API are processed asynchronously. Attempting to use a file before processing completes will fail silently or return empty results.
+Files uploaded via API are processed asynchronously. Attempting to use a file before processing completes will fail silently or return empty results. Note that uploading with a `knowledge_id` (above) makes linking server-side and robust to client disconnects, but it does **not** make the content instantly queryable — extraction/embedding still runs in the background, so poll `GET /api/v1/files/{id}/process/status` before relying on retrieval.
 
 ### Native function calling changes behavior
 

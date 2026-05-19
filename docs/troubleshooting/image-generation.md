@@ -27,6 +27,11 @@ title: "Image Generation"
     - If you are using Image Editing or Image+Image generation, your custom workflow **must** have nodes configured to accept an input image (usually a `LoadImage` node replaced/linked effectively).
     - Check the default "Image Editing" workflow in the Open WebUI settings for the required node structure to ensure compatibility.
 
+- **Generation/editing fails when ComfyUI is on a private/internal address** (e.g. `10.x`, `192.168.x`, `172.16–31.x`, or `localhost`), often only after the workflow runs:
+    - Open WebUI applies SSRF protection to outbound fetches, which previously blocked retrieving the rendered image back from a ComfyUI instance on a private network.
+    - **Fixed in v0.9.6**: image URLs are now trusted when they are same-origin with the admin-configured `COMFYUI_BASE_URL` (a strict scheme + host + port match, not a string prefix), so a private-network ComfyUI works without weakening SSRF protection globally.
+    - Ensure `COMFYUI_BASE_URL` is set to the **exact** origin ComfyUI serves images from (matching scheme, host, and port). If ComfyUI returns image URLs on a different host/port than `COMFYUI_BASE_URL`, those fetches are still SSRF-validated and may be blocked. On older versions, upgrade rather than disabling SSRF protection.
+
 ### Automatic1111 Issues
 
 - **Connection Refused / "Api Not Found"** (Automatic1111 is running, but Open WebUI reports connection errors):

@@ -33,6 +33,10 @@ licence: MIT
 """
 ```
 
+:::tip Metadata auto-fill (v0.9.6+)
+When you create a **new** tool (also applies to functions and skills), the editor reads the frontmatter as you paste or type code and auto-fills the **Name**, **ID**, and **Description** fields from `title` and `description` if you haven't already filled them in. It never overwrites a value you've entered, and it does not re-derive fields when editing an existing item — so you no longer need to retype metadata that's already declared in the source.
+:::
+
 ### Tools Class
 
 Tools have to be defined as methods within a class called `Tools`, with optional subclasses called `Valves` and `UserValves`, for example:
