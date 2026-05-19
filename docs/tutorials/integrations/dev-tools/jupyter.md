@@ -38,8 +38,6 @@ Here is the target configuration we're going to set-up through this tutorial.
 To accomplish this, I used `docker-compose` to launch a stack that includes both services, along with my LLMs, but this should also work if run each docker container separately.
 
 ```yaml title="docker-compose.yml"
-version: "3.8"
-
 services:
 open-webui:
 image: ghcr.io/open-webui/open-webui:latest

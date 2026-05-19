@@ -12,7 +12,6 @@ This guide provides a comprehensive walkthrough for setting up OpenLDAP authenti
 The easiest way to get a test OpenLDAP server running is by using Docker. This `docker-compose.yml` file will create an OpenLDAP container and an optional phpLDAPadmin container for a web-based GUI.
 
 ```yaml title="docker-compose.yml"
-version: "3.9"
 services:
   ldap:
     image: osixia/openldap:1.5.0
