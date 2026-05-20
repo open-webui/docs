@@ -5050,6 +5050,19 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 :::
 
+#### `OAUTH_AUTO_REDIRECT`
+
+- Type: `bool`
+- Default: `False`
+- Description: When `True` and the deployment is configured for SSO-only sign-in — exactly one OAuth provider configured, `ENABLE_LOGIN_FORM=false`, and `ENABLE_LDAP=false` — an unauthenticated visit to the `/auth` page is redirected straight to that provider's login, skipping the intermediate `Continue with <provider>` button. The redirect is suppressed when the local login form is explicitly requested (`/auth?form=true`), after a failed sign-in (`/auth?error=...`), for an already-authenticated session, during initial onboarding, and when trusted-header authentication is enabled. Has no effect when zero or multiple OAuth providers are configured, when the local login form or LDAP is enabled, or when the variable is set in a deployment that doesn't satisfy all of the above.
+- Persistence: This environment variable is a `PersistentConfig` variable.
+
+:::tip
+
+Visit `/auth?form=true` to reach the local login form when `OAUTH_AUTO_REDIRECT` is enabled — useful for administrators who need password access if the OAuth provider is unavailable.
+
+:::
+
 #### `ENABLE_OAUTH_PERSISTENT_CONFIG`
 
 - Type: `bool`
