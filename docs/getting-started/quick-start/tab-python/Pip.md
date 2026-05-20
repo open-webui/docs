@@ -2,6 +2,8 @@
 
 The simplest way to install Open WebUI with Python.
 
+Open WebUI supports Python 3.11 and 3.12. Use one of these versions before installing with pip.
+
 #### 1. Install Open WebUI
 
 ```bash

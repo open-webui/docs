@@ -20,7 +20,7 @@ Pick the appropriate installation command for your operating system:
 
 #### 2. Run Open WebUI
 
-Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
+Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Open WebUI supports Python 3.11 and 3.12; the examples below pin Python 3.11, but you can use Python 3.12 as well. Example paths are provided for each platform:
 
 - **macOS/Linux**:
 
