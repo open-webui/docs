@@ -53,6 +53,27 @@ Use the **Chunk Min Size Target** setting (found in **Admin Panel > Settings > D
 
 :::
 
+## Text Splitter Options
+
+Open WebUI supports three text splitter modes, selectable via **Admin Panel > Settings > Documents > Text Splitter**:
+
+- **Character (default)**: Splits at natural text boundaries (paragraphs, sentences, whitespace) and measures chunk size in characters. Works well for most setups. Note that characters and tokens are not equivalent — for non-Latin scripts (e.g. Chinese, Japanese, Korean) the character-to-token ratio can approach 1:1, so a large character-based chunk size can silently exceed your embedding model's token limit, causing truncated embeddings or API errors.
+- **Token (Tiktoken)**: Measures chunk size in tokens using OpenAI's Tiktoken encoding. Produces accurate token counts for OpenAI embedding models, but can be inaccurate for non-OpenAI models.
+- **Token (Transformers)**: Measures chunk size using the exact tokenizer of your embedding model. This is the recommended choice when using a non-OpenAI embedding model (e.g. BGE, GTE, Qwen via Ollama or an external API). Tiktoken produces incorrect token counts for these models, which can cause chunks to silently exceed the model's maximum sequence length, resulting in truncated embeddings or API errors.
+
+### Token (Transformers) — Tokenizer Model
+
+When **Token (Transformers)** is selected, a **Tokenizer Model** field appears in the UI:
+
+- **Local embedding model**: leave the field empty. Open WebUI automatically uses the tokenizer bundled with the local embedding model.
+- **External embedding API** (Ollama, OpenAI-compatible, etc.): the field is required. Enter the HuggingFace repo name of the model whose tokenizer you want to use (e.g. `BAAI/bge-large-en`). Click the download button next to the field to fetch the tokenizer. A local model snapshot path is also accepted.
+
+:::tip
+
+Set **Chunk Size** to at most the embedding model's maximum sequence length minus its special tokens (e.g. 510 for a 512-token BERT-family model). Open WebUI will log a warning at startup and during ingestion if `CHUNK_SIZE` exceeds this effective limit.
+
+:::
+
 ## Chunking Configuration
 
 Open WebUI allows you to fine-tune how documents are split into chunks for embedding. This is crucial for optimal retrieval performance.
