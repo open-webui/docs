@@ -22,7 +22,7 @@ Open WebUI is built around **Standard Protocols**. Instead of building specific 
 This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
 
 - **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
-- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a [pipe](/features/extensibility/plugin/functions/pipe) or a middleware proxy like LiteLLM or OpenRouter to bridge them.
+- **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a [pipe](/features/extensibility/plugin/functions/pipe) or a middleware proxy like LiteLLM, OpenRouter, or Tuning Engines to bridge them.
 
 For a detailed explanation of this architectural decision, see our **[FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**.
 
@@ -45,6 +45,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Perplexity | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | MiniMax | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes — but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| Tuning Engines | Yes — returns models available to the configured inference key | Add a filtered allowlist for the tenant model aliases you want users to see |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
@@ -524,6 +525,29 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   For multi-user deployments, avoid using provider management/master keys for your main Open WebUI connection.
 
   Prefer least-privilege provider credentials (inference-scoped keys where supported). This reduces blast radius if users invoke provider-specific endpoints through OpenAI-compatible integrations.
+  :::
+
+  </TabItem>
+  <TabItem value="tuning-engines" label="Tuning Engines">
+
+  **Tuning Engines** is an OpenAI-compatible gateway for governed model routing, tenant-scoped inference keys, usage tracking, and agent/tool registry workflows.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.tuningengines.com/v1` |
+  | **API Key** | Your Tuning Engines inference key |
+  | **Model IDs** | Auto-detected from the models available to the key; filtering to approved tenant aliases is recommended |
+
+  **Example model IDs:**
+
+  Use the model aliases configured in your Tuning Engines tenant catalog, for example `fast-support-model`, `high-quality-model`, or any alias your tenant admin has exposed to the inference key.
+
+  :::tip
+  Tuning Engines is useful when you want Open WebUI to call a governed gateway that can enforce routing, access policy, cost tracking, and provider abstraction behind one OpenAI-compatible endpoint.
+  :::
+
+  :::warning Security Recommendation: Key Scope
+  For shared Open WebUI deployments, use a scoped Tuning Engines inference key that exposes only the models and tools intended for that Open WebUI workspace.
   :::
 
   </TabItem>
