@@ -45,6 +45,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Perplexity | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | MiniMax | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes — but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| OrcaRouter | Yes | Auto-detection works |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
@@ -222,6 +223,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
   1. **Use an allowlist** — add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
   2. **Enable model caching** via `Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
+  :::
+
+  </TabItem>
+  <TabItem value="orcarouter" label="OrcaRouter">
+
+  **OrcaRouter** is an OpenAI-compatible LLM router that exposes models from multiple upstream providers through a single endpoint. It also offers an `orcarouter/auto` router that selects an upstream per request based on price, latency, and quality signals.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.orcarouter.ai/v1` |
+  | **API Key** | Your API key from [www.orcarouter.ai/console](https://www.orcarouter.ai/console) |
+  | **Model IDs** | Auto-detected — leave empty to load the full catalog, or filter to specific IDs |
+
+  :::tip
+  OrcaRouter currently exposes around 150 models across chat, embedding, TTS, and image generation. Auto-detection works, so leaving **Model IDs** empty is fine. If you prefer a shorter list, you can filter to specific IDs (e.g., `orcarouter/auto`, `openai/gpt-5.5`, `anthropic/claude-opus-4.7`). Enabling **Cache Base Model List** is recommended to speed up admin-panel loads.
   :::
 
   </TabItem>

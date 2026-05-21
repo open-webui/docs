@@ -43,7 +43,7 @@ Hosted APIs that require an account and API key. No hardware needed.
 | **Ollama** | Llama, Mistral, Gemma, Phi, and thousands more (local) | [Starting with Ollama →](./starting-with-ollama) |
 | **OpenAI** | GPT-4o, GPT-4.1, o3, o4-mini | [Starting with OpenAI →](./starting-with-openai) |
 | **Anthropic** | Claude Opus, Sonnet, Haiku | [Starting with Anthropic →](./starting-with-anthropic) |
-| **OpenAI-Compatible** | Google Gemini, DeepSeek, Mistral, Groq, OpenRouter, Amazon Bedrock, Azure, and more | [OpenAI-Compatible Providers →](./starting-with-openai-compatible) |
+| **OpenAI-Compatible** | Google Gemini, DeepSeek, Mistral, Groq, OpenRouter, OrcaRouter, Amazon Bedrock, Azure, and more | [OpenAI-Compatible Providers →](./starting-with-openai-compatible) |
 
 ---
 
