@@ -1,0 +1,126 @@
+---
+title: "Azure AI Foundry v1 with Entra ID"
+---
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+# Azure AI Foundry v1 with Entra ID
+
+Azure AI Foundry can expose OpenAI-compatible v1 endpoints that use the `/openai/v1` route shape. These endpoints behave more like the public OpenAI API than the classic Azure OpenAI deployment API: the model is sent in the request body, model discovery uses `/models`, and the connection does not require the classic Azure `api-version` query parameter.
+
+Use this guide when your Foundry endpoint looks like:
+
+```text
+https://<resource-name>.openai.azure.com/openai/v1
+```
+
+If your endpoint uses a deployment route such as `/openai/deployments/<deployment-name>`, use the classic Azure OpenAI connection flow instead.
+
+## Prerequisites
+
+- An Azure AI Foundry or Azure OpenAI resource exposing an OpenAI-compatible v1 endpoint
+- Open WebUI with Azure OpenAI v1 connection support
+- An identity that can request Azure OpenAI tokens through Entra ID
+- Azure RBAC assignment for `Cognitive Services OpenAI User` on the Azure OpenAI resource
+- A supported `DefaultAzureCredential` method, such as Azure CLI, workload identity, managed identity, or environment credentials
+
+## Configure Entra ID Authentication
+
+Open WebUI uses Azure's `DefaultAzureCredential` chain for Entra ID authentication. Choose the credential type that matches your deployment:
+
+- Local Docker or development: [Azure CLI Authentication](./azure-cli-auth.mdx)
+- AKS production: [Workload Identity Authentication](./workload-identity-auth.mdx)
+- Azure-hosted runtime: managed identity
+- CI/CD or controlled service account: environment credentials
+
+For predictable production behavior, set `AZURE_TOKEN_CREDENTIALS` to the credential type you expect Open WebUI to use. For example:
+
+```bash
+AZURE_TOKEN_CREDENTIALS=ManagedIdentityCredential
+```
+
+or:
+
+```bash
+AZURE_TOKEN_CREDENTIALS=WorkloadIdentityCredential
+```
+
+This prevents `DefaultAzureCredential` from trying unrelated credential sources on every request.
+
+## Add the Connection
+
+1. Open **Admin Panel** -> **Settings** -> **Connections**
+2. Click **Add Connection**
+3. Select **Azure OpenAI** as the provider
+4. Set **URL** to the Foundry v1 base URL:
+
+   ```text
+   https://<resource-name>.openai.azure.com/openai/v1
+   ```
+
+5. Set **Authentication** to **Entra ID**
+6. Leave **API Version** empty for `/openai/v1` endpoints
+7. Leave **Model IDs** empty if you want Open WebUI to discover models from `/models`
+8. Save the connection
+
+## Model Discovery
+
+For Foundry v1 endpoints, Open WebUI should verify the connection with:
+
+```http
+GET /models
+```
+
+Classic Azure OpenAI endpoints use a different deployment model-listing API and require `api-version`. Do not mix the two formats:
+
+| Endpoint type | Base URL example | API version required | Model source |
+| --- | --- | --- | --- |
+| Azure AI Foundry v1 | `https://<resource>.openai.azure.com/openai/v1` | No | `/models` |
+| Classic Azure OpenAI | `https://<resource>.openai.azure.com` | Yes | Deployment names |
+
+## Common Issues
+
+### Open WebUI asks for an API version
+
+Confirm the URL ends with `/openai/v1`. If the URL is the classic Azure resource root, Open WebUI treats it as a classic Azure OpenAI connection and requires an API version.
+
+### No models are discovered
+
+Check the RBAC assignment for the identity that Open WebUI is using. The identity needs `Cognitive Services OpenAI User` on the Azure OpenAI resource.
+
+Also confirm the credential source is the one you expect:
+
+```bash
+AZURE_TOKEN_CREDENTIALS=AzureCliCredential
+```
+
+or:
+
+```bash
+AZURE_TOKEN_CREDENTIALS=ManagedIdentityCredential
+```
+
+### Entra ID authentication fails in a container
+
+For local Docker testing with Azure CLI auth, mount the Azure CLI config directory and set `AZURE_CONFIG_DIR`. See [Azure CLI Authentication](./azure-cli-auth.mdx) for the full Docker Compose example.
+
+For AKS, confirm the service account annotation and workload identity pod label are present. See [Workload Identity Authentication](./workload-identity-auth.mdx).
+
+## When to Use Classic Azure OpenAI Instead
+
+Use the classic Azure OpenAI setup when:
+
+- Your endpoint is based on deployment names
+- Your organization requires a specific Azure OpenAI `api-version`
+- Your model identifiers in Open WebUI should match Azure deployment names
+
+Use this Foundry v1 setup when:
+
+- Your endpoint ends in `/openai/v1`
+- Your API clients send the model name in the request body
+- You want OpenAI-compatible `/models` discovery
+- You want to authenticate with Entra ID instead of an API key

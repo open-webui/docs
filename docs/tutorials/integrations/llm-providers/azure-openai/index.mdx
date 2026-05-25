@@ -70,7 +70,21 @@ This is the simplest method for getting started and works well for development e
 
 [**→ Learn how to set up Azure CLI Authentication**](./azure-cli-auth.mdx)
 
-### 2. Workload Identity Authentication
+### Azure AI Foundry v1 with Entra ID
+
+**Best for:** Azure AI Foundry deployments that expose OpenAI-compatible v1 endpoints
+
+Azure AI Foundry can expose endpoints that end in `/openai/v1`. These endpoints use OpenAI-compatible model discovery and request routing, so they do not require the classic Azure OpenAI `api-version` or deployment-name setup.
+
+**Key Features:**
+- Uses Entra ID authentication through `DefaultAzureCredential`
+- Supports OpenAI-compatible `/models` discovery
+- Uses the model name from the request body instead of the classic deployment route
+- Avoids static API keys for enterprise deployments
+
+[**→ Learn how to set up Azure AI Foundry v1 with Entra ID**](./foundry-v1-entra-id.mdx)
+
+### Workload Identity Authentication
 
 **Best for:** Azure Kubernetes Service (AKS) production deployments and multi-tenant environments
 
@@ -109,6 +123,7 @@ Regardless of which authentication method you choose, you'll need:
 Choose the authentication method that best fits your deployment environment:
 
 - **For local development or Docker deployments**: Start with [Azure CLI Authentication](./azure-cli-auth.mdx)
+- **For Azure AI Foundry OpenAI-compatible v1 endpoints**: Use [Azure AI Foundry v1 with Entra ID](./foundry-v1-entra-id.mdx)
 - **For production AKS deployments**: Use [Workload Identity Authentication](./workload-identity-auth.mdx)
 
 Both methods provide secure, keyless authentication to Azure OpenAI and can be configured through the Open WebUI admin interface once the infrastructure is set up.
