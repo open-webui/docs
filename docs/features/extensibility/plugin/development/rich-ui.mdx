@@ -16,28 +16,28 @@ To embed HTML content, your tool should return an `HTMLResponse` with the `Conte
 ```python
 from fastapi.responses import HTMLResponse
 
-def create_visualization_tool(self, data: str) -> HTMLResponse:
+def render_checklist(self, items: list[str]) -> HTMLResponse:
     """
-    Creates an interactive data visualization that embeds in the chat.
+    Renders an interactive checklist that embeds in the chat.
 
-    :param data: The data to visualize
+    :param items: The items to show in the checklist
     """
-    html_content = """
+    items_html = "".join(
+        f'<li><label><input type="checkbox"> {item}</label></li>' for item in items
+    )
+    html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Data Visualization</title>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <title>Checklist</title>
+        <style>
+            body {{ font-family: system-ui, sans-serif; padding: 1rem; }}
+            ul {{ list-style: none; padding: 0; }}
+            li {{ padding: 0.25rem 0; }}
+        </style>
     </head>
     <body>
-        <div id="chart" style="width:100%;height:400px;"></div>
-        <script>
-            // Your interactive chart code here
-            Plotly.newPlot('chart', [{
-                y: [1, 2, 3, 4],
-                type: 'scatter'
-            }]);
-        </script>
+        <ul>{items_html}</ul>
     </body>
     </html>
     """
@@ -55,11 +55,11 @@ To provide the LLM with actionable context about the embed, return a **tuple** o
 ```python
 from fastapi.responses import HTMLResponse
 
-def create_chart(self, data: str) -> tuple:
+def render_feedback_form(self, prompt: str) -> tuple:
     """
-    Creates an interactive chart and returns context to the LLM.
+    Renders an interactive feedback form and returns context to the LLM.
 
-    :param data: The data to chart
+    :param prompt: The question to show the user above the form
     """
     html_content = "<html>...</html>"
     headers = {"Content-Disposition": "inline"}
@@ -67,16 +67,16 @@ def create_chart(self, data: str) -> tuple:
     # The LLM receives this context instead of the generic message
     result_context = {
         "status": "success",
-        "chart_type": "scatter",
-        "data_points": 42,
-        "description": "Scatter plot showing correlation between X and Y"
+        "form_type": "feedback",
+        "fields": ["rating", "comment"],
+        "description": f"Rendered a feedback form asking: {prompt!r}"
     }
 
     return HTMLResponse(content=html_content, headers=headers), result_context
 ```
 
 The context can be:
-- A **string** — sent as-is to the LLM (e.g., `"Generated a bar chart with 5 categories"`)
+- A **string** — sent as-is to the LLM (e.g., `"Rendered a 5-item checklist"`)
 - A **dict** — serialized as JSON for structured context
 - A **list** — serialized as JSON for multiple items
 
