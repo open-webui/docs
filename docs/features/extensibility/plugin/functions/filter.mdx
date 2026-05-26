@@ -1012,7 +1012,7 @@ In the world of Open WebUI, the `inlet` function does this important prep work o
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
 :::info Want to transform RAG chunks? `inlet()` runs **before** retrieval
-At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file/collection *references* — the actual chunk text is fetched and injected later, after every inlet filter has returned. If you need to inspect or transform the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs), see [Owning Retrieval With `file_handler`](#file-handler-custom-rag) for the supported opt-in.
+At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file/collection *references* — the actual chunk text is fetched and injected later, after every inlet filter has returned. If you need to inspect or transform the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs), see [Owning Retrieval With `file_handler`](#owning-retrieval-with-file_handler) for the supported opt-in.
 :::
 
 ##### Why Would You Use the `inlet`?
@@ -1156,7 +1156,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring** - Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-`outlet()` does **not** run reliably for direct `/api/chat/completions` calls. On tagged releases it is never invoked by that endpoint. On `dev` it can run inline, but only when the caller supplies `chat_id` + `id`, owns the chat, and uses a non-streaming request — and even then the filtered content is not returned in the HTTP response. For direct API integrations that need `outlet()`, follow `/api/chat/completions` with `POST /api/chat/completed`. See [Filter Behavior with API Requests](#-filter-behavior-with-api-requests) for the full picture.
+`outlet()` does **not** run reliably for direct `/api/chat/completions` calls. On tagged releases it is never invoked by that endpoint. On `dev` it can run inline, but only when the caller supplies `chat_id` + `id`, owns the chat, and uses a non-streaming request — and even then the filtered content is not returned in the HTTP response. For direct API integrations that need `outlet()`, follow `/api/chat/completions` with `POST /api/chat/completed`. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
