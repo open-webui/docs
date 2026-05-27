@@ -19,9 +19,16 @@ You can test the latest changes by running the [dev Docker image](/getting-start
 
 | Requirement | Version |
 |-------------|---------|
-| **Python** | 3.11+ |
+| **Python** | 3.11 or 3.12 (see note below; 3.13 not supported yet) |
 | **Node.js** | 22.10+ |
 | **Git** | Any recent version |
+
+:::info Python version compatibility
+Open WebUI supports **Python 3.11 and 3.12**. **3.13 is not supported yet** — a few of our dependencies still need to ship 3.13-compatible releases, and until they do, installs on 3.13 will fail or break at runtime.
+
+- **For production**, use the [Docker image](/getting-started/quick-start) or the **latest Python 3.11**. This is the combination we test against most heavily.
+- **3.12 also works**, but we have seen very rare reports of odd behaviour on 3.12 that we have not reproduced on 3.11. If you are running into something inexplicable on 3.12, dropping to the latest 3.11 is the first thing to try.
+:::
 
 :::warning Separate your data
 Never share your database or data directory between dev and production. Dev builds may include database migrations that are not backward-compatible.
