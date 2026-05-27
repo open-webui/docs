@@ -219,14 +219,14 @@ If you just want RAG to work well out of the box, these settings are a solid gen
 
 Set these in **Admin Panel > Settings > Documents**:
 
-| Setting | Recommended value | Default | Why |
-|---------|-------------------|---------|-----|
-| **Text Splitter** | `token` | `character` | Token-based splitting produces more consistent chunk sizes across document types |
-| **Markdown Header Splitting** | **On** | On | Respects document structure by splitting at headings, keeping sections coherent |
-| **Chunk Size** | `2000` | `1000` | Larger chunks preserve more surrounding context per retrieval hit |
-| **Chunk Overlap** | `200` | `100` | More overlap means less chance of cutting a key sentence in half |
-| **Top K** | `15` | `3` | Retrieves more candidate chunks, giving the model a wider pool of relevant context. If you are working with local models that have constrained context sizes, lower this to `5` to avoid filling the context window with retrieved chunks |
-| **Embedding Model** | External (OpenAI or Ollama) | `all-MiniLM-L6-v2` (local CPU) | The default works for a single user but consumes ~500 MB RAM per worker. For any multi-user setup, use an external embedding API instead |
+| Setting | Default | Recommended value | Why |
+|---------|---------|-------------------|-----|
+| **Text Splitter** | `character` | `token` | Token-based splitting produces more consistent chunk sizes across document types |
+| **Markdown Header Splitting** | On | **On** | Respects document structure by splitting at headings, keeping sections coherent |
+| **Chunk Size** | `1000` | `2000` | Larger chunks preserve more surrounding context per retrieval hit |
+| **Chunk Overlap** | `100` | `200` | More overlap means less chance of cutting a key sentence in half |
+| **Top K** | `3` | `15` | Retrieves more candidate chunks, giving the model a wider pool of relevant context. If you are working with local models that have constrained context sizes, lower this to `5` to avoid filling the context window with retrieved chunks |
+| **Embedding Model** | `all-MiniLM-L6-v2` (local CPU) | External (OpenAI or Ollama) | The default works for a single user but consumes ~500 MB RAM per worker. For any multi-user setup, use an external embedding API instead |
 
 :::tip Embedding model
 The default SentenceTransformers model runs locally on CPU and is fine for a single user getting started. For anything beyond that, point at an external embeddings API: set `RAG_EMBEDDING_ENGINE=openai` with an OpenAI API key, or `RAG_EMBEDDING_ENGINE=ollama` with any Ollama embedding model (e.g., `nomic-embed-text`). This offloads the work and frees significant RAM.
