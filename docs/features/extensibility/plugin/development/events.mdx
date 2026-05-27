@@ -795,6 +795,17 @@ When Open WebUI calls your external tool (with header forwarding enabled), it in
 
 **Authentication:** Requires a valid Open WebUI API key or session token.
 
+:::warning Open WebUI does **not** forward user credentials to external tools
+The `X-OpenWebUI-User-*` and `X-Open-WebUI-Chat-Id` / `X-Open-WebUI-Message-Id` headers forwarded to your tool are **identification only** — they carry no API key or session token. The same applies to MCP custom-header template tokens (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{CHAT_ID}}`, `{{MESSAGE_ID}}`): there is no `{{API_KEY}}` or `{{TOKEN}}` placeholder, and the user's own API key / session is never sent to the tool server.
+
+So an external tool **must hold its own statically-configured Open WebUI API key** to call this endpoint. The endpoint's authorization check requires the caller to be the chat's owner **or an admin**, which gives you two practical options:
+
+- **Per-user key (uncommon)** — the tool server holds the specific user's API key. Only works for a single-user setup; impractical for a shared MCP server.
+- **Admin / service-account key (recommended)** — provision a dedicated admin (or service-account) user in Open WebUI, generate an API key for it, and use that key from the tool server. An admin key works for any user's chat, so a single key serves all callers; the forwarded `X-Open-WebUI-Chat-Id` + `X-Open-WebUI-Message-Id` headers tell your tool *which* chat/message to post to.
+
+Store the key as a secret on the tool server (env var, secrets manager, etc.); do not expect Open WebUI to push it for you.
+:::
+
 **Request Body:**
 
 ```json
