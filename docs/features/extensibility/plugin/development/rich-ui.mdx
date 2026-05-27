@@ -293,22 +293,32 @@ The parent responds with `{ type: 'payload', requestId: ..., payload: ... }` con
 
 ### Tool Args Injection (Tools Only)
 
-When a **Tool** returns a Rich UI embed, the tool call arguments (the parameters the model passed to the tool) are automatically injected into the iframe's `window.args`. This allows your embedded HTML to access the tool's input:
+When a **Tool** method returns a Rich UI embed inline at the tool-call display (i.e. you return an `HTMLResponse`, or a `(HTMLResponse, context)` tuple, from the tool method itself), the arguments the model passed are exposed on the iframe as `window.args` — **as a JSON string**, not a parsed object. Parse it before use:
 
 ```html
 <script>
   window.addEventListener('load', () => {
-    // window.args contains the JSON arguments the model passed to this tool
-    const args = window.args;
-    if (args) {
+    const raw = window.args;             // JSON string, or undefined
+    if (raw) {
+      const args = JSON.parse(raw);      // parse to object
       document.getElementById('output').textContent = JSON.stringify(args, null, 2);
+    } else {
+      console.warn('window.args not set — see Requirements below.');
     }
   });
 </script>
 ```
 
-:::note
-This only works for Tool embeds rendered via the tool call display. Action embeds do not have `window.args` since they are triggered by the user, not the model.
+:::warning Requires `allowSameOrigin` — otherwise `window.args` is silently `undefined`
+The args are injected from the parent page via `iframe.contentWindow.args = ...`, which the browser blocks under same-origin policy unless the iframe sandbox carries `allow-same-origin`. That is gated by the per-user **Settings → Interface → "iframe Sandbox Allow Same Origin"** toggle, which is **off by default**. If `window.args` comes back undefined and you have not changed this setting, that is the cause: turn it on and reload. See [allowSameOrigin](#allowsameorigin) above for the security trade-off.
+:::
+
+:::note Where `window.args` is set, and where it is not
+- ✅ **Tool method returning `HTMLResponse` or `(HTMLResponse, context)` tuple** — rendered inline at the "View Result from..." tool call indicator. `window.args` is injected (subject to the `allowSameOrigin` requirement above).
+- ❌ **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`** — rendered through the chat-controls Embeds panel, which does not wire `args` at all. `window.args` will always be undefined here, regardless of sandbox settings. This is by design: the embeds-event path has no tool call attached, so there are no args to inject.
+- ❌ **Action embeds** — triggered by the user, not the model, so there are no model-supplied args to inject.
+
+If you need to pass dynamic data into an embed rendered via either of the ❌ paths, use the [Payload Requests](#payload-requests) pattern above instead.
 :::
 
 ### Auto-Injected Libraries
