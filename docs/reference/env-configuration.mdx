@@ -3154,7 +3154,7 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the use of ensemble search with `BM25` + `ChromaDB`, with reranking using `sentence_transformers` models. When enabled, this applies to both the standard RAG retrieval pipeline and the native knowledge tools used in agentic mode.
+- Description: Enables hybrid search (`BM25` + vector retrieval), with optional reranking if a reranking model is configured. Applies to both the standard RAG retrieval pipeline and the native knowledge tools used in agentic mode.
 - Persistence: This environment variable is a `PersistentConfig` variable.
 
 #### `RAG_HYBRID_BM25_WEIGHT`

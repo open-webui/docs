@@ -101,6 +101,14 @@ A `dict` with wide ranging information about the chat, model, files, etc.
   "chat_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "session_id": "xxxxxxxxxxxxxxxxxxxx",
+  "user_prompt": "What is in this picture?",
+  # the user's most recent message, captured before any source citation wrap.
+  # this is what the native tool call loop and Pipes should read.
+  "system_prompt": "You are a helpful assistant.",
+  # the chat's system message, captured at the same point.
+  "sources": [],
+  # resolved sources for this turn (e.g. file context).
+  # Empty when no sources are attached.
   "tool_ids": null,
   # tool_ids is a list of str.
   "tool_servers": [],
@@ -150,6 +158,28 @@ def inlet(self, body: dict, __metadata__: dict = None) -> dict:
         pass
     return body
 ```
+
+:::
+
+:::tip Reading the user's message before the wrap
+
+When sources are attached, the chat-completions middleware wraps the user's most recent message with the default citation template. The wrap happens before a Pipe or `pipe()` call sees the body. It only fires when sources are attached. A Pipe that reads `body["messages"][-1]["content"]` directly will see the wrapped form.
+
+`__metadata__["user_prompt"]` holds the user's message before the wrap fires. Native tool call loops and Pipes both read from it, so it's safe whether sources are attached or not. Use it for any Pipe that hands the user's turn to a downstream model.
+
+```python
+async def pipe(self, body: dict, __metadata__: dict, __user__: dict) -> str:
+    user_prompt = __metadata__.get("user_prompt") or ""
+    system_prompt = __metadata__.get("system_prompt")
+
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": user_prompt})
+    # pass messages to your downstream model
+```
+
+If your Pipe runs through a path that skips the standard preprocessing (direct API callers, some test fixtures), `__metadata__` may be absent. In that case, scan `body["messages"]` for the last user message.
 
 :::
 
@@ -260,7 +290,27 @@ See the `__metadata__["message_id"]` value above.
 
 ### `__event_emitter__`
 
-A `Callable` used to display event information to the user.
+A `Callable` that delivers an event for the active chat turn through socket.io to any subscribed clients (the WebUI is the standard subscriber). The same `message_id` Open WebUI tracks for the active assistant turn is included automatically.
+
+The most familiar event is the status pill:
+
+```python
+await __event_emitter__({
+    "type": "status",
+    "data": {"description": "Working...", "done": False},
+})
+```
+
+The `type` field isn't restricted to the rendered ones. Events with arbitrary `type` strings are forwarded through socket.io with the original `type` preserved. It's useful when a Pipe needs to send a control signal or a custom UI marker that a frontend listener (e.g. a userscript) reacts to without rendering as content in the streamed message:
+
+```python
+await __event_emitter__({
+    "type": "my-pipe:phase-changed",
+    "data": {"phase": "reasoning"},
+})
+```
+
+`status` events render natively in the chat, so use them for progress the user should see. Custom event types are for frontend listeners that react to events during a Pipe run without changing the visible message.
 
 ### `__event_call__`
 
