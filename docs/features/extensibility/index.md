@@ -17,6 +17,28 @@ There are three layers, and most teams end up using at least two:
 
 ---
 
+## Which Extension Do I Need?
+
+The names don't always map obviously to what they do. Start from what you're trying to accomplish:
+
+| I want to... | Use | Why this one |
+|---|---|---|
+| Let the model **call an API or perform an action** (and keep a secret/API key the user and model can never read) | **[Tool](plugin/tools)** | The key lives inside the tool, server-side. The model only sees the *result*, never the credential. |
+| **Add a new model or provider** to the model selector | **[Pipe Function](plugin/functions/pipe)** | A Pipe appears as a selectable "model" and handles the request however you like. |
+| **Modify messages** going in or out (redact PII, inject system text, log, translate) | **[Filter Function](plugin/functions/filter)** | Filters run on every message via `inlet`/`outlet`/`stream` without touching model config. |
+| Add a **button on a message** that runs custom code | **[Action Function](plugin/functions/action)** | Actions are user-triggered, per-message operations. |
+| Teach the model **how to approach a task** (methodology, steps, house style) | **[Skill](/features/workspace/skills)** | Skills are instructions, not code. The model reads them; they don't execute anything. |
+| Give the model **documents to retrieve from** | **[Knowledge](/features/workspace/knowledge)** | RAG over your files, attached to a model or referenced with `#`. |
+| Save a **reusable prompt** behind a slash command | **[Prompt](/features/workspace/prompts)** | Templated text with typed variables; expands when you type `/name`. |
+| Connect an **existing external service** that already speaks HTTP | **[OpenAPI / MCP server](mcp)** | Point Open WebUI at the spec; endpoints become callable tools. No glue code. |
+| Run something **heavy, GPU-bound, or sandboxed** off the main instance | **[Pipeline](pipelines)** | A separate worker container; keeps the main app lean. |
+
+:::tip "Pipe" vs "Pipeline" — not the same thing
+This is the single most common naming mix-up. A **Pipe** is a type of **Function** (in-process Python, adds a provider to the model list). A **Pipeline** is a **separate external worker container**. They share a prefix and nothing else. If you want to add a model provider, you almost always want a **Pipe Function**, not a Pipeline.
+:::
+
+---
+
 ## Why Extensibility?
 
 ### Give models real-world abilities
