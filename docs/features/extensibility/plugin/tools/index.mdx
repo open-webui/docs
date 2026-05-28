@@ -21,12 +21,13 @@ Because there are several ways to integrate "Tools" in Open WebUI, it's importan
 
 | Type | Location in UI | Best For... | Source |
 | :--- | :--- | :--- | :--- |
-| **Native Features** | Admin/Settings | Core platform functionality | Built-in to Open WebUI |
-| **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts | [Community Library](https://openwebui.com/search) |
-| **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External MCP Servers |
-| **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | [MCPO Adapter](https://github.com/open-webui/mcpo) |
-| **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External Web APIs |
-| **Open Terminal** | `Settings > Integrations` | Full shell access in an isolated Docker container (always-on) | [Open Terminal](https://github.com/open-webui/open-terminal) |
+| **Native Features** | Admin/Settings | Core platform functionality (these are the [built-in system tools](#built-in-system-tools-nativeagentic-mode)) | Built-in to Open WebUI |
+| **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts — **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
+| **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External tool server |
+| **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
+| **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External tool server |
+
+The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool servers**: the tool code runs on a separate process or machine and Open WebUI calls it over HTTP. **Native Features** are the built-in system tools that ship with Open WebUI. **Workspace Tools** are Python that runs in-process — for the most demanding use cases they are by far the most capable option with the fewest limitations (see below).
 
 ### 1. Native Features (Built-in)
 These are deeply integrated into Open WebUI and generally don't require external scripts.
@@ -39,8 +40,8 @@ These are deeply integrated into Open WebUI and generally don't require external
 In [**Native Mode**](#built-in-system-tools-nativeagentic-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
-These are **Python scripts** that run directly within the Open WebUI environment.
-- **Capability**: Can do anything Python can do (web scraping, complex math, API calls).
+These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations** — they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](../development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
+- **Capability**: Can do anything Python can do (web scraping, complex math, API calls), and hold secrets (API keys) entirely server-side so neither the user nor the model can read them.
 - **Access**: Managed via the `Workspace` menu. 
 - **Safety**: Always review code before importing, as these run on your server.
 - **⚠️ Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
@@ -53,6 +54,10 @@ These are **Python scripts** that run directly within the Open WebUI environment
 
 ### 4. OpenAPI / Function Calling Servers
 Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification. Open WebUI can ingest these specs and treat every endpoint as a tool.
+
+:::info Open Terminal — a separate code-execution integration
+Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/features/open-terminal)**: an always-on, isolated Docker container that gives a model a real shell and filesystem. Once connected, it exposes its own set of **built-in tools** (`run_command`, `read_file`, `write_file`, `grep_search`, `glob_search`, process management, and more) that the model can call directly — effectively a sandboxed code-execution and file-handling environment, distinct from the per-message [Code Interpreter](#built-in-system-tools-nativeagentic-mode) tool. See the [Open Terminal documentation](/features/open-terminal) for setup, multi-user, and security considerations.
+:::
 
 ---
 
