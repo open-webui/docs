@@ -154,7 +154,84 @@ Inline styles are supported on allowed tags:
 <span style="background: linear-gradient(90deg,#e0f2fe,#fef9c3);">Gradient background</span>
 ```
 
-> Keep styling minimal. Overly large padding, font sizes, or complex layouts can cause banners to become tall or visually inconsistent across themes.
+You can also style a full message area by wrapping the content in a block element:
+
+```html
+<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:10px 14px;line-height:1.3;display:block;width:100%;box-sizing:border-box;">
+  <b>Notice title</b><br>
+  Short supporting message.
+</div>
+```
+
+> Keep styling purposeful. Large padding, large font sizes, or deeply nested layouts can make banners too tall and visually inconsistent across themes.
+
+---
+
+## Designing effective banners
+
+Banners work best when they are easy to scan, visually distinct, and short enough not to interrupt normal work.
+
+### Structure the message
+
+Use a predictable structure:
+
+- Start with the event type or status: `Maintenance`, `Incident`, `Policy update`, `New feature`.
+- Put the most important detail first: date, time, impact, or required action.
+- Keep the body to one or two short sentences.
+- Add one link only if users need more details.
+
+For longer notices, use short sections instead of one long paragraph. For multilingual notices, separate languages with a subtle `<hr>` or use a collapsible `<details>` section.
+
+### Make severity visible
+
+Use the banner `type` consistently:
+
+- `info`: neutral announcements and product updates.
+- `success`: resolved incidents or completed changes.
+- `warning`: planned maintenance, degraded service, or upcoming action needed.
+- `error`: active incidents or urgent action required.
+
+Avoid using `error` for non-urgent announcements. Users learn to ignore alerts when every message looks critical.
+
+### Use color carefully
+
+Color should support the banner type, not compete with it:
+
+- Use soft backgrounds for the full message area.
+- Use stronger colors for small accents, labels, or left borders.
+- Keep text contrast high enough to read in bright rooms and on dim screens.
+- Avoid mixing many unrelated colors in one banner.
+
+A useful pattern is a pale background plus a stronger left border:
+
+```html
+<div style="background:#f8fafc;color:#334155;border:1px solid #cbd5e1;border-left:6px solid #64748b;border-radius:12px;padding:10px 14px;line-height:1.3;display:block;width:100%;box-sizing:border-box;">
+  <b>Notice title</b><br>
+  Short supporting message.
+</div>
+```
+
+### Keep layouts responsive
+
+Banners are shown inside the application layout and must still work on narrow screens.
+
+- Prefer `display:flex;flex-wrap:wrap` for rows containing labels, dates, or badges.
+- Avoid fixed widths.
+- Use `width:100%;box-sizing:border-box` for full-width styled blocks.
+- Keep icons and badges small so they do not increase banner height.
+- Test the banner with a narrow browser window before using it broadly.
+
+### Avoid accidental extra height
+
+Banner content treats literal newlines as line breaks. If you use explicit `<br>` tags, keep the raw HTML compact and avoid adding extra blank lines or indentation in the banner content field.
+
+This compact style:
+
+```html
+<b>Notice</b><br>One short sentence.<br>Another short sentence.
+```
+
+renders more predictably than heavily formatted HTML with many line breaks.
 
 ---
 
@@ -254,6 +331,22 @@ Service updates: <a href="https://example.com/status" target="_blank"><u>Status 
   Scheduled
 </span>
 ```
+
+### Pattern: Styled notice block
+
+Use a full-width styled block when the whole message should read as one announcement area. Keep this HTML compact when pasting it into the banner content field, especially if it also contains `<br>` tags.
+
+```html
+<div style="background:#f8fafc;color:#334155;border:1px solid #cbd5e1;border-left:6px solid #64748b;border-radius:12px;padding:10px 14px;line-height:1.3;display:block;width:100%;box-sizing:border-box;"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;background:#64748b;color:#fff;padding:1px 7px;border-radius:999px;line-height:1.25;font-size:10px;font-weight:700;letter-spacing:.04em;">NOTICE</span><b>Notice title</b><span style="display:inline-flex;align-items:center;background:#fff;color:#334155;padding:1px 8px;border-radius:999px;line-height:1.25;border:1px solid #cbd5e1;">Key detail</span></div><div>Short supporting message.</div></div>
+```
+
+This pattern uses:
+
+- A pale background for the full message area.
+- A stronger left border for fast visual recognition.
+- A small uppercase label for the event type.
+- A compact date/time chip for the most important metadata.
+- `flex-wrap` so the header row still works on narrow screens.
 
 ### Pattern: Collapsible details (keep banners short)
 
