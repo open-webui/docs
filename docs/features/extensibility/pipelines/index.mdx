@@ -12,12 +12,14 @@ title: "Pipelines"
 
 # Pipelines: UI-Agnostic OpenAI API Plugin Framework
 
-:::warning
+:::danger Pipelines are legacy — do not use for new deployments
+**Pipelines are legacy and are no longer recommended.** They predate the in-process [Functions](/features/extensibility/plugin/functions/) (Pipes, Filters, Actions) and [Tools](/features/extensibility/plugin/tools/) system, which now covers the same use cases without running a separate worker container.
 
-**DO NOT USE PIPELINES IF!**
+- Custom provider / RAG / request routing (a Pipeline **pipe**) → use a [Pipe Function](/features/extensibility/plugin/functions/pipe).
+- Message pre/post-processing (a Pipeline **filter**) → use a [Filter Function](/features/extensibility/plugin/functions/filter).
+- Connecting an external HTTP service → use an [OpenAPI or MCP tool server](/features/extensibility/mcp).
 
-If your goal is simply to add support for additional providers like Anthropic or basic filters, you likely don't need Pipelines . For those cases, Open WebUI Functions are a better fit—it's built-in, much more convenient, and easier to configure. Pipelines, however, comes into play when you're dealing with computationally heavy tasks (e.g., running large models or complex logic) that you want to offload from your main Open WebUI instance for better performance and scalability.
-
+These pages are kept for reference and for existing deployments only. New work should target Functions, Tools, or external tool servers instead.
 :::
 
 Welcome to **Pipelines**, an [Open WebUI](https://github.com/open-webui) initiative. Pipelines bring modular, customizable workflows to any UI client supporting OpenAI API specs – and much more! Easily extend functionalities, integrate unique logic, and create dynamic workflows with just a few lines of code.

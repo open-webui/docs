@@ -5,6 +5,10 @@ title: "Tutorials"
 
 ## Pipeline Tutorials
 
+:::danger Pipelines are legacy — do not use for new deployments
+**Pipelines are legacy and are no longer recommended.** New work should target in-process [Functions](/features/extensibility/plugin/functions/) (Pipes, Filters, Actions), [Tools](/features/extensibility/plugin/tools/), or external [OpenAPI / MCP tool servers](/features/extensibility/mcp). These tutorials are kept for reference and existing deployments only.
+:::
+
 ## Tutorials Welcome
 
 Are you a content creator with a blog post or YouTube video about your pipeline setup? Get in touch

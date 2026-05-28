@@ -5,6 +5,10 @@ title: "Valves"
 
 ## Valves
 
+:::danger Pipelines are legacy — do not use for new deployments
+**Pipelines are legacy and are no longer recommended.** Use in-process [Functions](/features/extensibility/plugin/functions/) (Pipes, Filters, Actions) or [Tools](/features/extensibility/plugin/tools/) instead — they support [Valves](/features/extensibility/plugin/development/valves) too. This page is kept for reference and existing deployments only.
+:::
+
 `Valves` (see the dedicated [Valves & UserValves](/features/extensibility/plugin/development/valves) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.
 
 `Valves` are set as a subclass of the `Pipeline` class, and initialized as part of the `__init__` method of the `Pipeline` class.

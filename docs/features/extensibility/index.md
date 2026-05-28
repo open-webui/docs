@@ -31,7 +31,6 @@ The names don't always map obviously to what they do. Start from what you're try
 | Give the model **documents to retrieve from** | **[Knowledge](/features/workspace/knowledge)** | RAG over your files, attached to a model or referenced with `#`. |
 | Save a **reusable prompt** behind a slash command | **[Prompt](/features/workspace/prompts)** | Templated text with typed variables; expands when you type `/name`. |
 | Connect an **existing external service** that already speaks HTTP | **[OpenAPI / MCP server](mcp)** | Point Open WebUI at the spec; endpoints become callable tools. No glue code. |
-| Run something **heavy, GPU-bound, or sandboxed** off the main instance | **[Pipeline](pipelines)** | A separate worker container; keeps the main app lean. |
 
 :::tip "Pipe" vs "Pipeline" — not the same thing
 This is the single most common naming mix-up. A **Pipe** is a type of **Function** (in-process Python, adds a provider to the model list). A **Pipeline** is a **separate external worker container**. They share a prefix and nothing else. If you want to add a model provider, you almost always want a **Pipe Function**, not a Pipeline.
