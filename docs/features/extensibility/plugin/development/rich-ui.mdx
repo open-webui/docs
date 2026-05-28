@@ -271,11 +271,11 @@ The iframe and parent window can communicate beyond just height reporting. The f
 
 ### Payload Requests
 
-The iframe can request a data payload from the parent. This is useful for passing dynamic data into the embed after it loads:
+The iframe can ask the parent for a data payload after it loads:
 
 ```html
 <script>
-  // Request payload from parent
+  // Listen for the response
   window.addEventListener('message', (e) => {
     if (e.data?.type === 'payload') {
       const data = e.data.payload;
@@ -289,7 +289,17 @@ The iframe can request a data payload from the parent. This is useful for passin
 </script>
 ```
 
-The parent responds with `{ type: 'payload', requestId: ..., payload: ... }` containing the configured payload data.
+The parent responds with `{ type: 'payload', requestId: ..., payload: ... }`.
+
+:::info Where the payload comes from
+There is no separate "set the payload" call. The payload is whatever the parent component had configured when it instantiated the iframe — and today only one path actually configures one:
+
+- ✅ **Citation-opened embeds in the chat-controls Embeds panel** — when the user clicks a citation badge whose source has an embed URL, the side panel opens and exposes **the full citation/source object** (the same dict you sent in your `source` / `citation` event via `__event_emitter__`) as the payload. To set it, emit a [`source` event](./events#source-or-citation-and-code-execution) whose `data` includes whatever you want the iframe to be able to fetch. The iframe then asks for it via the postMessage above and receives the citation object back.
+- ❌ **Inline tool-call embeds** (from a tool method returning `HTMLResponse` or `(HTMLResponse, context)`) — the parent does not configure a payload on this path, so a payload request returns `{ type: 'payload', requestId: ..., payload: null }`. Use [Tool Args Injection](#tool-args-injection-tools-only) (subject to `allowSameOrigin`) to pass data into a tool-call embed instead.
+- ❌ **`__event_emitter__({"type": "embeds", ...})` and Action embeds** — also configured without a payload; the response is `null`.
+
+In short: payload-request is the side-panel-citation channel, not a generic iframe-data channel. Pick the right rendering path for the data flow you need.
+:::
 
 ### Tool Args Injection (Tools Only)
 
