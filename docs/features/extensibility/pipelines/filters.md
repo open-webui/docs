@@ -6,7 +6,12 @@ title: "Filters"
 ## Filters
 
 :::danger Pipelines are legacy — do not use for new deployments
-**Pipelines are legacy and are no longer recommended.** For message pre/post-processing use an in-process [Filter Function](/features/extensibility/plugin/functions/filter) instead — it is built in, easier to configure, and needs no separate worker container. This page is kept for reference and existing deployments only.
+**Pipelines are outdated and legacy, and are no longer recommended.** A Pipeline can run as a **pipe** or as a **filter**; both forms now have in-process replacements that are built in, easier to configure, and need no separate worker container:
+
+- Pipeline **pipe** (custom provider, RAG, request routing) → [Pipe Function](/features/extensibility/plugin/functions/pipe)
+- Pipeline **filter** (message pre/post-processing) → [Filter Function](/features/extensibility/plugin/functions/filter)
+
+This page is kept for reference and existing deployments only.
 :::
 
 Filters are used to perform actions against incoming user messages and outgoing assistant (LLM) messages. Potential actions that can be taken in a filter include sending messages to monitoring platforms (such as Langfuse or DataDog), modifying message contents, blocking toxic messages, translating messages to another language, or rate limiting messages from certain users. A list of examples is maintained in the [Pipelines repo](https://github.com/open-webui/pipelines/tree/main/examples/filters). Filters can be executed as a Function or on a Pipelines server. The general workflow can be seen in the image below.

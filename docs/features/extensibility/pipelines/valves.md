@@ -6,7 +6,12 @@ title: "Valves"
 ## Valves
 
 :::danger Pipelines are legacy — do not use for new deployments
-**Pipelines are legacy and are no longer recommended.** Use in-process [Functions](/features/extensibility/plugin/functions/) (Pipes, Filters, Actions) or [Tools](/features/extensibility/plugin/tools/) instead — they support [Valves](/features/extensibility/plugin/development/valves) too. This page is kept for reference and existing deployments only.
+**Pipelines are outdated and legacy, and are no longer recommended.** A Pipeline can run as a **pipe** or as a **filter**; both forms now have in-process replacements that support [Valves](/features/extensibility/plugin/development/valves) too, are built in, and need no separate worker container:
+
+- Pipeline **pipe** (custom provider, RAG, request routing) → [Pipe Function](/features/extensibility/plugin/functions/pipe)
+- Pipeline **filter** (message pre/post-processing) → [Filter Function](/features/extensibility/plugin/functions/filter)
+
+This page is kept for reference and existing deployments only.
 :::
 
 `Valves` (see the dedicated [Valves & UserValves](/features/extensibility/plugin/development/valves) page) can also be set for `Pipeline`. In short, `Valves` are input variables that are set per pipeline.

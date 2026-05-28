@@ -6,7 +6,12 @@ title: "Tutorials"
 ## Pipeline Tutorials
 
 :::danger Pipelines are legacy — do not use for new deployments
-**Pipelines are legacy and are no longer recommended.** New work should target in-process [Functions](/features/extensibility/plugin/functions/) (Pipes, Filters, Actions), [Tools](/features/extensibility/plugin/tools/), or external [OpenAPI / MCP tool servers](/features/extensibility/mcp). These tutorials are kept for reference and existing deployments only.
+**Pipelines are outdated and legacy, and are no longer recommended.** A Pipeline can run as a **pipe** or as a **filter**; both forms now have in-process replacements that are built in, easier to configure, and need no separate worker container:
+
+- Pipeline **pipe** (custom provider, RAG, request routing) → [Pipe Function](/features/extensibility/plugin/functions/pipe)
+- Pipeline **filter** (message pre/post-processing) → [Filter Function](/features/extensibility/plugin/functions/filter)
+
+These tutorials are kept for reference and existing deployments only.
 :::
 
 ## Tutorials Welcome
