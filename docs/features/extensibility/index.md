@@ -9,11 +9,14 @@ title: "Extensibility"
 
 Open WebUI ships with powerful defaults, but your workflows aren't default. Extensibility is how you close the gap: give models real-time data, enforce compliance rules, add new AI providers, or connect to any external service. Write a few lines of Python, point at an OpenAPI endpoint, or browse the community library. The platform adapts to you, not the other way around.
 
-There are three layers, and most teams end up using at least two:
+There are two layers, and most teams end up using both:
 
 - **In-process Python** (Tools & Functions) runs inside Open WebUI itself with zero infrastructure and instant iteration.
 - **External HTTP** (OpenAPI & MCP servers) connects to services running anywhere, from a sidecar container to a third-party SaaS.
-- **Pipeline workers** (Pipelines) offload heavy or sensitive processing to a separate container, keeping your main instance fast and clean.
+
+:::warning Pipelines are legacy
+You may still see **Pipelines** referenced as a third layer. It is **legacy and no longer recommended** — the heavy-processing problem it solved no longer exists (see [Run heavy or long-running work](#run-heavy-or-long-running-work) below). Use Functions, Tools, or an external tool server instead. See the [Pipelines pages](pipelines) for the full deprecation notice.
+:::
 
 ---
 
@@ -52,9 +55,11 @@ Have an internal API? A third-party SaaS with an OpenAPI spec? An MCP server alr
 
 Functions let you intercept and transform messages before they reach the model (input filters) or before they reach the user (output filters). Help redact PII, enforce formatting rules, log to an observability platform, inject system instructions dynamically, all without touching model configuration.
 
-### Offload heavy processing
+### Run heavy or long-running work
 
-When a plugin needs GPU access, large dependencies, or isolated execution, run it as a Pipeline on a separate machine. Open WebUI talks to it over a standard API. Your main instance stays lean.
+Open WebUI's backend is **fully async**. Long-running Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users, and synchronous/CPU-bound plugin code is offloaded to a worker thread pool (see [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size)) — so it doesn't stall the event loop either. In practice you can run heavy work **in-process** without the latency problems that older synchronous releases had.
+
+The historical reason to push heavy pipes/filters onto a separate **Pipelines** worker — keeping the single synchronous event loop unblocked — no longer applies. If you genuinely need **GPU access, large or conflicting dependencies, hard isolation, or independent scaling**, run that work as an **external service behind an [OpenAPI or MCP tool server](mcp)**, not a Pipeline.
 
 ### Import from the community
 
@@ -70,7 +75,6 @@ Browse hundreds of community-built Tools and Functions from the Open WebUI Commu
 | ⚙️ **Functions** | Platform extensions that add model providers (Pipes), message processing (Filters), or UI actions (Actions) |
 | 🔗 **MCP support** | Native Streamable HTTP for Model Context Protocol servers |
 | 🌐 **OpenAPI servers** | Auto-discover and expose tools from any OpenAPI-compatible endpoint |
-| 🔧 **Pipelines** | Modular plugin framework running on a separate worker for heavy or sensitive processing |
 | 📝 **Skills** | Markdown instruction sets that teach models how to approach specific tasks |
 | ⚡ **Prompts** | Slash-command templates with typed input variables and versioning |
 | 🏪 **Community library** | One-click import of community-built Tools and Functions |
@@ -83,11 +87,10 @@ Understanding which layer to use saves time:
 
 | Layer | Runs where | Best for | Trade-off |
 |-------|-----------|----------|-----------|
-| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers | Shares resources with the main server |
-| **OpenAPI / MCP** | Any HTTP endpoint | Connecting existing services, third-party APIs | Requires a running external server |
-| **Pipelines** | Separate Docker container | GPU workloads, heavy dependencies, sandboxed execution | Additional infrastructure to manage |
+| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers — including heavy/long-running work (the async backend keeps it from blocking) | Shares CPU/RAM with the main server |
+| **OpenAPI / MCP** | Any HTTP endpoint | Connecting existing services, third-party APIs, and GPU / heavy-dependency / isolated workloads | Requires a running external server |
 
-Most users start with **Tools & Functions**. They require no extra setup, have a built-in code editor, and cover the majority of use cases.
+Most users start with **Tools & Functions**. They require no extra setup, have a built-in code editor, and cover the majority of use cases. (**Pipelines** is a legacy third option, no longer recommended — see the note above.)
 
 ---
 
@@ -105,9 +108,9 @@ A healthcare organization deploys a Filter Function that scans outbound messages
 
 An engineering team uses Pipe Functions to add Anthropic, Google Vertex AI, and a self-hosted vLLM instance alongside their existing Ollama models. Users see all providers in a single model selector with no separate logins and no API key juggling.
 
-### Heavy-compute pipelines
+### GPU-bound external processing
 
-A research group runs a Retrieval-Augmented Generation pipeline that re-ranks with a cross-encoder model requiring GPU. They deploy it as a Pipeline on a dedicated GPU node. Open WebUI routes relevant queries to the pipeline automatically while keeping the main instance on commodity hardware.
+A research group needs to re-rank retrieval results with a cross-encoder model that requires a GPU. They run it as a small service on a dedicated GPU node and expose it to Open WebUI as an **[OpenAPI tool server](mcp)**. The model calls it like any other tool while the main instance stays on commodity hardware. (The async backend means lighter custom logic can simply run in-process as a Function — only the GPU dependency pushes this particular workload to a separate service.)
 
 ---
 
@@ -115,11 +118,11 @@ A research group runs a Retrieval-Augmented Generation pipeline that re-ranks wi
 
 ### Security
 
-Tools, Functions, and Pipelines execute **arbitrary Python code** on your server. Only install extensions from trusted sources, review code before importing, and restrict Workspace access to administrators. See the [Security Policy](/security) for details.
+Tools and Functions execute **arbitrary Python code** on your server. Only install extensions from trusted sources, review code before importing, and restrict Workspace access to administrators. See the [Security Policy](/security) for details.
 
 ### Resource sharing
 
-In-process Tools and Functions share CPU and memory with Open WebUI. Computationally expensive plugins should be moved to Pipelines or external services.
+In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running and blocking work from stalling other requests, but it does not create more hardware — genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
 
 ### MCP transport
 
@@ -133,4 +136,4 @@ Native MCP support is **Streamable HTTP only**. For stdio or SSE-based MCP serve
 |-------|-------------------|
 | [**Tools & Functions**](plugin) | Writing Python Tools, Functions (Pipes, Filters, Actions), and the development API |
 | [**MCP**](mcp) | Connecting Model Context Protocol servers, OAuth setup, troubleshooting |
-| [**Pipelines**](pipelines) | Deploying the pipeline worker, building custom pipelines, directory structure |
+| [**Pipelines**](pipelines) *(legacy)* | Reference only — the deprecated separate-worker framework, superseded by Functions and Tools |
