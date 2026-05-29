@@ -6913,6 +6913,22 @@ maxclients 10000
 timeout 1800
 ```
 
+For high-concurrency websocket deployments, also review Redis Pub/Sub output buffer limits. Open WebUI uses Socket.IO over Redis Pub/Sub when `WEBSOCKET_MANAGER=redis` is enabled, and streaming responses can produce large websocket events. If Redis disconnects Pub/Sub clients under large streaming payloads, you may see `Cannot publish to redis... giving up`, Redis timeout errors, or stalled live updates. Check:
+
+```bash
+redis-cli INFO stats | grep client_output_buffer_limit_disconnections
+redis-cli SLOWLOG GET 50
+redis-cli CONFIG GET client-output-buffer-limit
+```
+
+If `client_output_buffer_limit_disconnections` increases and the slow log shows large `PUBLISH socketio ...` entries, raise the Pub/Sub buffer limit in `redis.conf`. Example:
+
+```conf
+client-output-buffer-limit normal 0 0 0 replica 268435456 67108864 60 pubsub 1073741824 268435456 180
+```
+
+This leaves normal clients unchanged and allows Pub/Sub clients to buffer up to 1 GB hard / 256 MB soft for 180 seconds. Tune these values to your available Redis memory and expected websocket payload size.
+
 **Symptoms of this misconfiguration:**
 - Works fine for days/weeks, then suddenly all logins fail with 500 errors
 - `redis.exceptions.ConnectionError: max number of clients reached` in logs
