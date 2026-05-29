@@ -109,6 +109,7 @@ ENABLE_WEBSOCKET_SUPPORT=true
 - If you're using Redis Sentinel for high availability, also set `REDIS_SENTINEL_HOSTS` and consider setting `REDIS_SOCKET_CONNECT_TIMEOUT=5` to prevent hangs during failover.
 - For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
 - Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
+- For high-concurrency websocket streaming, review Redis Pub/Sub output buffer limits. Large Socket.IO events can disconnect Pub/Sub clients if Redis uses small default buffers; see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
 - A **single Redis instance** is sufficient for the vast majority of deployments, even with thousands of users. You almost certainly do not need Redis Cluster unless you have specific HA/bandwidth requirements. If you think you need Redis Cluster, first check whether your connection count and memory usage are caused by fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
 - Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
 
