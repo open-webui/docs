@@ -518,6 +518,23 @@ Common Redis configuration issues that cause unnecessary scaling:
 | **Stale connections** | Redis runs out of connections or memory grows indefinitely | Set `timeout 1800` in redis.conf (kills idle connections after 30 minutes) |
 | **Low maxclients** | `max number of clients reached` errors | Set `maxclients 10000` or higher |
 | **No connection limits** | Open WebUI pods may accumulate connections that never close | Combine `timeout` with connection pool limits in your Redis client config |
+| **Low Pub/Sub output buffer limits** | WebSocket streams stall, `Cannot publish to redis... giving up`, or Redis logs client output buffer disconnections when large Socket.IO events are published | Increase the Redis `client-output-buffer-limit ... pubsub ...` setting, sized for your websocket payloads and available Redis memory |
+
+For Redis-backed websockets, Open WebUI uses Socket.IO over Redis Pub/Sub. Large streaming responses and tool events can create multi-MB `PUBLISH socketio ...` payloads. If Redis disconnects slow Pub/Sub clients, inspect:
+
+```bash
+redis-cli INFO stats | grep client_output_buffer_limit_disconnections
+redis-cli SLOWLOG GET 50
+redis-cli CONFIG GET client-output-buffer-limit
+```
+
+Example Redis configuration for deployments that need to tolerate large websocket bursts:
+
+```conf
+client-output-buffer-limit normal 0 0 0 replica 268435456 67108864 60 pubsub 1073741824 268435456 180
+```
+
+This keeps normal client limits disabled and raises Pub/Sub clients to a 1 GB hard limit and 256 MB soft limit for 180 seconds. Tune downward or upward based on Redis memory headroom and observed payload sizes.
 
 ---
 
