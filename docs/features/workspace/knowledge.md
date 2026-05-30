@@ -233,7 +233,7 @@ Behavior to be aware of:
 - Files removed locally are deleted from the KB during the cleanup step.
 - The action is **non-destructive** for unchanged files. Earlier versions of the same menu action used to wipe and re-upload everything — that is no longer the case as of v0.9.6.
 
-For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
+For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below. To sync from a remote source (GitHub, Confluence, S3 and dozens more) or on a schedule, use the official [oikb](/features/workspace/oikb) tool, which drives these endpoints for you.
 
 ### Exporting
 
