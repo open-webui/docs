@@ -3108,6 +3108,13 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Description: Sets the timeout in seconds for MinerU API requests during document processing.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `MINERU_FILE_EXTENSIONS`
+
+- Type: `str` (comma-separated)
+- Default: `pdf`
+- Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. MinerU was previously hardcoded to PDF only, so only add extensions your MinerU deployment actually supports.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `PADDLEOCR_VL_BASE_URL`
 
 - Type: `str`
