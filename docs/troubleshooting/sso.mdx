@@ -140,12 +140,18 @@ OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.w
 
 ### 4. Persistent Configuration Conflicts
 
-**Important:** Open WebUI has **two** persistence settings that affect OAuth:
+**Important:** Open WebUI has **two** persistence settings that affect OAuth. The default values below match the [environment configuration reference](/reference/env-configuration#enable_oauth_persistent_config) and the [SSO configuration guide](/features/authentication-access/auth/sso):
 
-1. **`ENABLE_PERSISTENT_CONFIG`** (defaults to **`true`**) — Controls whether *all* settings (including OAuth) are loaded from the database rather than environment variables, once they've been saved to the DB.
-2. **`ENABLE_OAUTH_PERSISTENT_CONFIG`** (defaults to **`false`**) — An *additional* gate specifically for OAuth settings. When set to `false`, OAuth settings with a config path starting with `oauth.` are **not** loaded from the database, even if `ENABLE_PERSISTENT_CONFIG` is `true`.
+1. **`ENABLE_PERSISTENT_CONFIG`** (defaults to **`true`**) — Controls whether *all* settings (including OAuth) can be loaded from the database rather than environment variables, once they've been saved to the DB.
+2. **`ENABLE_OAUTH_PERSISTENT_CONFIG`** (defaults to **`true`**) — An additional OAuth-specific gate. When set to `false`, OAuth settings with a config path starting with `oauth.` are **not** loaded from the database, even if `ENABLE_PERSISTENT_CONFIG` is `true`.
 
-By default, OAuth env vars **will** take priority over database values because `ENABLE_OAUTH_PERSISTENT_CONFIG` defaults to `false`. However, if you previously configured OAuth through the Admin Panel, those DB values may have been saved, and they will be loaded if `ENABLE_OAUTH_PERSISTENT_CONFIG` is later set to `true`.
+By default, OAuth values can therefore come from the database after they have been configured through the Admin Panel. If you want environment variables to remain the source of truth for OAuth settings, set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` explicitly.
+
+| `ENABLE_PERSISTENT_CONFIG` | `ENABLE_OAUTH_PERSISTENT_CONFIG` | OAuth config source |
+| --- | --- | --- |
+| `true` | `true` (default) | Database values may override env vars after OAuth settings are saved in the Admin Panel |
+| `true` | `false` | OAuth env vars stay authoritative |
+| `false` | either value | Environment variables stay authoritative and UI changes are not persisted |
 
 #### Symptoms:
 - Changes to environment variables don't take effect after restart
@@ -153,16 +159,16 @@ By default, OAuth env vars **will** take priority over database values because `
 - "No token found in localStorage" errors after reconfiguration
 
 **Solutions:**
-1. **For Development/Testing:** Ensure `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (this is already the default) to always read from environment variables
+1. **For Development/Testing:** Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` when you want OAuth settings to always come from environment variables.
 2. **For Production:** Either:
-   - Configure settings through Admin Panel instead of environment variables, OR
-   - Keep `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (default) so that env vars always take priority for OAuth settings
+   - Configure settings through the Admin Panel and keep the default `ENABLE_OAUTH_PERSISTENT_CONFIG=true`, OR
+   - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` explicitly when your deployment manages OAuth exclusively through environment variables.
 3. **Fresh Start:** Delete the database volume and restart with correct configuration
 
 📌 **Example for Docker Compose:**
 ```yaml
 environment:
-  - ENABLE_OAUTH_PERSISTENT_CONFIG=false  # Forces reading from env vars (this is the default)
+  - ENABLE_OAUTH_PERSISTENT_CONFIG=false  # Forces OAuth settings to be read from env vars
   - OAUTH_CLIENT_ID=your_client_id
   - OAUTH_CLIENT_SECRET=your_secret
   - OPENID_PROVIDER_URL=your_provider_url
@@ -450,7 +456,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | 🔗 WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
 | 📝 Env var typo or missing    | Double-check against official docs - avoid non-existent vars like `OIDC_CONFIG` |
 | 🚨 Missing OPENID_PROVIDER_URL | Always required for OIDC - set to provider's `.well-known/openid-configuration` |
-| 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` or use admin panel |
+| 🔄 Persistent config conflicts | Use the Admin Panel with the default `ENABLE_OAUTH_PERSISTENT_CONFIG=true`, or set it to `false` when env vars should stay authoritative |
 | 🏢 Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
 | 🧊 Proxy caching interfering  | Exclude OAuth endpoints from all server-side caches         |
 | 🍪 Cookie configuration issues | Check reverse proxy cookie settings and env vars          |
