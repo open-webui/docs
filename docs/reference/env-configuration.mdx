@@ -7205,13 +7205,13 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 
 - Type: `int`
 - Default: `20`
-- Description: The timeout for a ping to Redis in seconds.
+- Description: The number of seconds the Socket.IO/Engine.IO server waits for a client pong before considering the websocket connection dead. Increase this for slow networks, browser tabs that may pause briefly, or deployments that send large websocket events.
 
 #### `WEBSOCKET_SERVER_PING_INTERVAL`
 
 - Type: `int`
 - Default: `25`
-- Description: The frequency for a ping to Redis in seconds.
+- Description: The interval in seconds at which the Socket.IO/Engine.IO server sends heartbeat pings to connected websocket clients.
 
 #### `WEBSOCKET_EVENT_CALLER_TIMEOUT`
 
