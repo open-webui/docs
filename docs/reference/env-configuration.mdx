@@ -5100,12 +5100,14 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 #### `ENABLE_OAUTH_PERSISTENT_CONFIG`
 
 - Type: `bool`
-- Default: `True`
-- Description: Controls whether OAuth-related settings are persisted in the database after the first launch.
+- Default: `False`
+- Description: When [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is enabled, controls whether OAuth-related settings (config paths starting with `oauth.`) are also loaded from the database. When `False`, OAuth settings are always read from the environment variables instead.
 
 :::info
 
-By default, OAuth configurations are stored in the database and managed via the Admin Panel after the initial setup. Set this variable to `False` to force Open WebUI to **always** read OAuth settings from the environment variables on every restart. This is ideal for environments using GitOps or immutable infrastructure where configuration is managed exclusively through external files (e.g., Docker Compose, Kubernetes ConfigMaps).
+By default (`False`), OAuth settings are read from your environment variables on every restart and are **not** loaded from the database, even if you previously changed them in the Admin Panel and even when `ENABLE_PERSISTENT_CONFIG` is `True`. This keeps environment variables authoritative for OAuth, which suits GitOps or immutable infrastructure where configuration lives in external files (e.g. Docker Compose, Kubernetes ConfigMaps).
+
+Set this variable to `True` to persist OAuth settings in the database and manage them through the Admin Panel after initial setup, the same way other persistent settings behave.
 
 :::
 
