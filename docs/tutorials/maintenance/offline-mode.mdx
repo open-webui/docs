@@ -13,7 +13,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 If you want to run Open WebUI in offline mode, you have to consider your installation approach and adjust your desired features accordingly. In this guide, we will go over the different ways of achieving a mostly similar setup to the online version.
 
-## What means offline mode?
+## What does offline mode mean?
 
 The offline mode of Open WebUI lets you run the application without the need for an active internet connection. This allows you to create an 'air-gapped' environment for your LLMs and tools (a fully 'air-gapped' environment requires isolating the instance from the internet).
 
@@ -47,7 +47,7 @@ Offline mode requires setting multiple environment variables to fully disconnect
 **Optional but Recommended:**
 
 - `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of embedding models
-- `RAG_RERANKING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of reranking models  
+- `RAG_RERANKING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of reranking models
 - `WHISPER_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of Whisper models
 
 Apply these environment variables depending on your deployment method.
@@ -73,7 +73,7 @@ Consider if you need to start the application offline from the beginning of your
 
 ### I: Speech-To-Text
 
-The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/chat-conversations/audio/speech-to-text/stt-config) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Huggingface - Systran](https://huggingface.co/Systran)).
+The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/chat-conversations/audio/speech-to-text/stt-config) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Hugging Face - Systran](https://huggingface.co/Systran)).
 
 ```python
 from faster_whisper import WhisperModel
@@ -96,7 +96,7 @@ The default local transformer can already handle the text-to-speech function. If
 
 ### I: Embedding Model
 
-For various purposes, you will need an embedding model (e.g. [RAG](/features/chat-conversations/rag)). You will first have to download such a model of your choice (e.g. [Huggingface - sentence-transformers](https://huggingface.co/sentence-transformers)).
+For various purposes, you will need an embedding model (e.g. [RAG](/features/chat-conversations/rag)). You will first have to download such a model of your choice (e.g. [Hugging Face - sentence-transformers](https://huggingface.co/sentence-transformers)).
 
 ```python
 from huggingface_hub import snapshot_download

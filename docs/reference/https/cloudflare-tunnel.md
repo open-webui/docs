@@ -31,7 +31,7 @@ The simplest path. Everything configured through the Cloudflare dashboard.
 
 ### 1. Create the tunnel
 
-1. Go to [**Zero Trust → Networks → Tunnels**](https://one.dash.cloudflare.com/networks/tunnels)
+1. Go to [**Zero Trust → Networks → Connectors**](https://dash.cloudflare.com/?to=/:account/one/networks/connectors)
 2. Click **Create a tunnel** → select **Cloudflared**
 3. Name it (e.g., `open-webui`)
 4. Follow the install instructions to run the connector on your machine
@@ -189,7 +189,7 @@ volumes:
   open-webui:
 ```
 
-Get your tunnel token from the [Cloudflare dashboard](https://one.dash.cloudflare.com/networks/tunnels) → select your tunnel → **Configure** → copy the token from the install command.
+Get your tunnel token from the [Cloudflare dashboard](https://dash.cloudflare.com/) → Go to [**Networking → Tunnels**] → Select your tunnel → Select **Add a replica** → Copy the install command. The token starts with `eyJ...`.
 
 :::tip
 No `ports` needed on the `open-webui` service. `cloudflared` connects to it via Docker's internal network. To use this, change the service URL in your tunnel config to `http://open-webui:8080`.
@@ -201,9 +201,9 @@ No `ports` needed on the `open-webui` service. `cloudflared` connects to it via 
 
 Cloudflare Zero Trust lets you gate access behind authentication without touching Open WebUI:
 
-1. Go to [**Zero Trust → Access → Applications**](https://one.dash.cloudflare.com/access/apps)
-2. **Add an application** → Self-hosted
-3. Set the domain to `chat.your-domain.com`
+1. Go to [**Zero Trust → Access controls → Applications**](https://dash.cloudflare.com/?to=/:account/one/access-controls/apps)
+2. **Create new application** → Self-hosted and private
+3. Set the public hostname to `chat.your-domain.com`
 4. Create an **Access Policy** (e.g., allow only `@your-company.com` emails)
 
 Users see a Cloudflare login page before reaching Open WebUI.
@@ -218,5 +218,5 @@ Users see a Cloudflare login page before reaching Open WebUI.
 | Start tunnel | `cloudflared tunnel run open-webui` |
 | Add DNS | `cloudflared tunnel route dns open-webui chat.your-domain.com` |
 | Install as service | `sudo cloudflared service install` |
-| Dashboard | [one.dash.cloudflare.com/networks/tunnels](https://one.dash.cloudflare.com/networks/tunnels) |
+| Dashboard | [https://dash.cloudflare.com/?to=/:account/one/networks/connectors](https://dash.cloudflare.com/?to=/:account/one/networks/connectors) |
 | Set CORS origin | `CORS_ALLOW_ORIGIN=https://chat.your-domain.com` |
