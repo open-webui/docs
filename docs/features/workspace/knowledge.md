@@ -72,7 +72,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 
 | Tool | Attached KB | No KB attached | Description |
 |------|:-----------:|:--------------:|-------------|
-| `list_knowledge` | ✅ | ❌ | List all KBs, files, and notes attached to the model |
+| `list_knowledge` | ✅ | ❌ | List attached KBs (with file counts), standalone files, and notes; pass `knowledge_id` (with `skip`/`count`, max 200) to page one KB's files |
 | `list_knowledge_bases` | ❌ | ✅ | Browse available knowledge bases with file counts |
 | `search_knowledge_bases` | ❌ | ✅ | Find knowledge bases by name or description |
 | `query_knowledge_bases` | ❌ | ✅ | Search KB names/descriptions by semantic similarity |
