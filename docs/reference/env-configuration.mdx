@@ -623,6 +623,12 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 - Default: `False`
 - Description: Bypasses model access control. When set to `true`, all users (and admins alike) will have access to all models, regardless of the model's privacy setting (Private, Public, Shared with certain groups). This is useful for smaller or individual Open WebUI installations where model access restrictions may not be needed.
 
+#### `BYPASS_RETRIEVAL_ACCESS_CONTROL`
+
+- Type: `bool`
+- Default: `False`
+- Description: Bypasses access control during RAG retrieval. By default (`false`), Open WebUI checks that the requesting user can read a file or knowledge collection before searching its vectors, so a crafted request cannot pull chunks from files or collections the user does not own. This never blocks legitimate retrieval (you can still retrieve anything you already have access to), so the default is right for essentially every deployment and you should not need to change it. Set `true` only to restore the old permissive behavior (per-file read checks skipped and client-supplied collection references trusted, including legacy knowledge-base `collection_names`), on a fully trusted single-tenant instance that relied on it.
+
 #### `WEBUI_BUILD_HASH`
 
 - Type: `str`
