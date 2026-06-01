@@ -415,7 +415,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables user webhooks.
+- Description: Enables or disables user webhooks (each user can set a URL their notifications are POSTed to). For SSRF safety, webhook URLs that resolve to private or reserved IPs are blocked unless [`ENABLE_RAG_LOCAL_WEB_FETCH`](#enable_rag_local_web_fetch) is `true`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RESPONSE_WATERMARK`
@@ -635,6 +635,12 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 - Default: `False`
 - Description: Bypasses access control during RAG retrieval. By default (`false`), Open WebUI checks that the requesting user can read a file or knowledge collection before searching its vectors, so a crafted request cannot pull chunks from files or collections the user does not own. This never blocks legitimate retrieval (you can still retrieve anything you already have access to), so the default is right for essentially every deployment and you should not need to change it. Set `true` only to restore the old permissive behavior (per-file read checks skipped and client-supplied collection references trusted, including legacy knowledge-base `collection_names`), on a fully trusted single-tenant instance that relied on it.
 
+#### `ENABLE_RETRIEVAL_UNSCOPED_COLLECTIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*`, `web-search-*`, or an existing knowledge base). By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
+
 #### `WEBUI_BUILD_HASH`
 
 - Type: `str`
@@ -825,6 +831,12 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 - Type: `bool`
 - Default: `True`
 - Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
+
+#### `MCP_INITIALIZE_TIMEOUT`
+
+- Type: `int`
+- Default: `10`
+- Description: Timeout in seconds for the MCP `session.initialize()` handshake, which performs a list-tools round-trip. Raise it if your MCP server cold-starts slowly or exposes many tools and connections fail with a timeout during initialization; a server advertising dozens of tools can need 30 to 60 seconds.
 
 #### `AIOHTTP_POOL_CONNECTIONS`
 
@@ -1786,6 +1798,24 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 ```
 :::
 
+#### `FORWARD_USER_INFO_HEADER_JWT_SECRET`
+
+- Type: `str`
+- Default: unset
+- Description: When set (and `ENABLE_FORWARD_USER_INFO_HEADERS` is `true`), Open WebUI forwards user identity to upstream backends as a **single HS256-signed JWT** in one header instead of the plain `X-OpenWebUI-User-*` headers. The upstream can verify the signature with this shared secret and therefore *trust* the identity, rather than relying on plaintext headers that anything on the network path could spoof. Leave it unset to keep the legacy individual headers. The token carries the claims `sub` (user id), `email`, `name`, `role`, `iss` (`open-webui`), `iat` and `exp`.
+
+#### `FORWARD_USER_INFO_HEADER_JWT`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Jwt`
+- Description: Name of the header that carries the signed JWT when `FORWARD_USER_INFO_HEADER_JWT_SECRET` is set.
+
+#### `FORWARD_USER_INFO_HEADER_JWT_EXPIRES_SECONDS`
+
+- Type: `int`
+- Default: `300`
+- Description: Lifetime in seconds of the forwarded-identity JWT (its `exp` claim). A fresh token is minted on every request, so this only needs to cover clock skew between Open WebUI and the upstream verifier.
+
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
 - Type: `bool`
@@ -2105,7 +2135,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`
+- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`, `valkey`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -2962,6 +2992,60 @@ Note: this configuration assumes that AWS credentials will be available to your 
 - Type: `str`
 - Description: Specifies the AWS region where the S3 Vector Bucket is hosted.
 
+### Valkey
+
+Use [Valkey](https://valkey.io/) with the [valkey-search](https://github.com/valkey-io/valkey-search) module as the vector store by setting `VECTOR_DB=valkey`. Indexing, KNN search and metadata filtering all run server-side in Valkey.
+
+:::warning Community-supported
+The Valkey backend is community-contributed and maintained on a best-effort basis.
+:::
+
+:::info Requirements
+Valkey is **opt-in and not bundled**. Install the client manually (`pip install valkey-glide-sync==2.3.1`) and run **Valkey core 9.0.1+ with the valkey-search module 1.2.0+ loaded**. Open WebUI verifies both versions at startup and refuses to start against an older server.
+:::
+
+#### `VALKEY_URL`
+
+- Type: `str`
+- Default: `''` (empty)
+- Description: Connection URL of the Valkey server, e.g. `valkey://localhost:6379` (an optional `/<db>` suffix selects the database number). **Required** when `VECTOR_DB=valkey`.
+
+#### `VALKEY_COLLECTION_PREFIX`
+
+- Type: `str`
+- Default: `open_webui`
+- Description: Prefix applied to every index and key Open WebUI creates in Valkey, so multiple instances can share one server without colliding.
+
+#### `VALKEY_INDEX_TYPE`
+
+- Type: `str`
+- Default: `HNSW`
+- Description: Vector index algorithm: `HNSW` (approximate, scales better) or `FLAT` (exact brute-force). Case-insensitive.
+
+#### `VALKEY_DISTANCE_METRIC`
+
+- Type: `str`
+- Default: `COSINE`
+- Description: Similarity metric: `COSINE`, `L2` or `IP` (inner product). Case-insensitive; an invalid value fails fast at startup.
+
+#### `VALKEY_HNSW_M`
+
+- Type: `int`
+- Default: `16`
+- Description: HNSW graph connectivity (edges per node). Higher improves recall at the cost of memory and build time. Used only when `VALKEY_INDEX_TYPE=HNSW`.
+
+#### `VALKEY_HNSW_EF_CONSTRUCTION`
+
+- Type: `int`
+- Default: `200`
+- Description: Candidate-list size during index construction. Higher builds a better graph (higher recall) but slows indexing. Used only when `VALKEY_INDEX_TYPE=HNSW`.
+
+#### `VALKEY_HNSW_EF_RUNTIME`
+
+- Type: `int`
+- Default: `10`
+- Description: Candidate-list size at query time. Higher improves recall at the cost of query latency. Used only when `VALKEY_INDEX_TYPE=HNSW`.
+
 ## RAG Content Extraction Engine
 
 #### `CONTENT_EXTRACTION_ENGINE`
@@ -3674,7 +3758,7 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether RAG web fetch operations can access URLs that resolve to private/local network IP addresses.
+- Description: Controls whether outbound fetches can access URLs that resolve to private/local network IP addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading and OAuth profile-picture fetches.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to private IP addresses, including:
@@ -5108,6 +5192,13 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 - Type: `bool`
 - Default: `False`
 - Description: Enables account creation when signing up via OAuth. Distinct from `ENABLE_SIGNUP`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `OAUTH_AUTO_REDIRECT`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, an unauthenticated visitor to `/auth` is redirected straight to the OAuth provider's login page, skipping the "Continue with SSO" screen. It only fires on an unambiguously SSO-only deployment: exactly one OAuth provider configured, [`ENABLE_LOGIN_FORM`](#enable_login_form) set to `False` and no LDAP or trusted-header auth. The redirect is suppressed during onboarding, after a failed sign-in and for an existing session. Visit `/auth?form=true` to reach the local login form anyway (an escape hatch for admins).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::danger
