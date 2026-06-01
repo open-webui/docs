@@ -44,7 +44,7 @@ Open WebUI intentionally does **not** ship a built-in context trimmer. This is a
    - Trim **tool-call results** first, keep everything else.
    - Set a **hard ceiling** on chat length (block further messages beyond N turns).
    - Summarize older messages instead of dropping them, and replace the dropped block with the summary.
-   - Per-model policies (keep 1M tokens for Gemini, 128k for GPT-4, 32k for smaller local models).
+   - Per-model policies (keep 1M tokens for Gemini, 400k for GPT-5, 32k for smaller local models).
 
 There is no single policy that is correct for every deployment, every user, and every model. A built-in implementation would be wrong for most users by definition, and would hide the much better option: give the user the hook and let them pick.
 
@@ -142,7 +142,8 @@ Counting turns is easy to reason about but wrong in practice — 40 turns of one
 
 This second example does that. It:
 
-- Estimates tokens from character length (cheap heuristic, no dependencies; swap in `tiktoken` or a real tokenizer if you want strict counts).
+- Counts tokens with [`tiktoken`](https://github.com/openai/tiktoken), which ships with Open WebUI so there is no extra dependency to install. It falls back to a char/4 estimate only if the encoding can't be loaded.
+- Adds a worst-case token allowance for every uploaded image, so a chat full of 4K screenshots still gets trimmed before it busts the window.
 - Reads per-model budgets from a valve, so a single instance of the filter works for your 8k local model and your 1M Gemini at the same time.
 - Leaves a configurable headroom for the response.
 - Re-applies the tool-call repair from the first example after trimming.
@@ -152,7 +153,13 @@ This second example does that. It:
 
 ```python
 import json
+import os
 from pydantic import BaseModel, Field
+
+try:
+    import tiktoken  # ships with Open WebUI, no extra install needed
+except ImportError:
+    tiktoken = None
 
 
 class Filter:
@@ -169,14 +176,31 @@ class Filter:
             default=2000,
             description="Tokens to reserve for the model's reply. Trimmed from the budget before fitting.",
         )
+        tiktoken_encoding: str = Field(
+            default=os.getenv("TIKTOKEN_ENCODING_NAME", "cl100k_base"),
+            description=(
+                "Fallback tiktoken encoding when the model's own is unknown. "
+                "cl100k_base ships pre-cached with Open WebUI and works offline; "
+                "o200k_base covers recent OpenAI models but is fetched on first use."
+            ),
+        )
+        tokens_per_image: int = Field(
+            default=1600,
+            description=(
+                "Worst-case tokens charged per image part (assume a 4K, high-detail "
+                "upload). OpenAI high-detail tops out near 1445, Claude near 1590; "
+                "raise it for Gemini high-resolution tiling, lower it for low-detail."
+            ),
+        )
         model_budgets_json: str = Field(
             default=(
                 '{\n'
-                '  "gpt-4o": 120000,\n'
-                '  "gpt-4o-mini": 120000,\n'
-                '  "claude-3-5-sonnet": 180000,\n'
-                '  "gemini-1.5-pro": 900000,\n'
-                '  "llama3.1:8b": 6000\n'
+                '  "gpt-5.5": 1000000,\n'
+                '  "claude-opus-4-8": 1000000,\n'
+                '  "claude-sonnet-4-6": 1000000,\n'
+                '  "gemini-3.5-flash": 1000000,\n'
+                '  "qwen3.6": 262144,\n'
+                '  "deepseek-v4": 1000000\n'
                 '}'
             ),
             description="JSON mapping of model id (or prefix) to input-token budget.",
@@ -184,32 +208,56 @@ class Filter:
 
     def __init__(self):
         self.valves = self.Valves()
+        self._encoders = {}  # cache loaded tiktoken encoders
 
     # ---- helpers -----------------------------------------------------------
 
-    @staticmethod
-    def _estimate_tokens(content) -> int:
-        """~4 chars per token is close enough for a trim budget.
-        For strict counts, replace with tiktoken or a provider tokenizer."""
+    def _encoder(self, model_id: str):
+        # Cached per-model encoder; None if tiktoken or the vocab can't load.
+        if tiktoken is None:
+            return None
+        key = model_id or self.valves.tiktoken_encoding
+        if key not in self._encoders:
+            enc = None
+            try:
+                enc = tiktoken.encoding_for_model(model_id)
+            except Exception:
+                try:
+                    enc = tiktoken.get_encoding(self.valves.tiktoken_encoding)
+                except Exception:
+                    enc = None
+            self._encoders[key] = enc
+        return self._encoders[key]
+
+    def _estimate_tokens(self, content, model_id: str = "") -> int:
         if content is None:
             return 0
         if isinstance(content, str):
-            return max(1, len(content) // 4)
+            enc = self._encoder(model_id)
+            if enc is not None:
+                # disallowed_special=() so literal "<|endoftext|>" text can't raise.
+                return len(enc.encode(content, disallowed_special=()))
+            return max(1, len(content) // 4)  # fallback if tiktoken can't load
         # Some providers deliver multimodal content as a list of parts.
         if isinstance(content, list):
-            return sum(
-                Filter._estimate_tokens(part.get("text", "")) if isinstance(part, dict) else 0
-                for part in content
-            )
+            total = 0
+            for part in content:
+                if not isinstance(part, dict):
+                    continue
+                if part.get("type") == "image_url" or "image_url" in part:
+                    total += self.valves.tokens_per_image  # worst-case per image
+                else:
+                    total += self._estimate_tokens(part.get("text", ""), model_id)
+            return total
         return 0
 
-    def _message_tokens(self, msg: dict) -> int:
+    def _message_tokens(self, msg: dict, model_id: str = "") -> int:
         # Content + a small per-message overhead for role/formatting.
-        tokens = self._estimate_tokens(msg.get("content"))
+        tokens = self._estimate_tokens(msg.get("content"), model_id)
         # Tool calls carry arguments in JSON; count them too.
         for tc in msg.get("tool_calls") or []:
             args = tc.get("function", {}).get("arguments", "")
-            tokens += self._estimate_tokens(args)
+            tokens += self._estimate_tokens(args, model_id)
         return tokens + 4
 
     def _budget_for(self, model_id: str) -> int:
@@ -219,9 +267,8 @@ class Filter:
             budgets = {}
         if model_id in budgets:
             return int(budgets[model_id])
-        # Allow prefix match — "gpt-4o-2024-11-20" uses the "gpt-4o" budget.
-        # Sort by key length descending so more specific prefixes win:
-        # "gpt-4o-mini" must match before "gpt-4o".
+        # Prefix match: "claude-sonnet-4-6-20260514" uses the "claude-sonnet-4-6"
+        # budget. Longest key first so "gpt-5.5-mini" beats "gpt-5.5".
         for key, value in sorted(budgets.items(), key=lambda kv: -len(kv[0])):
             if model_id.startswith(key):
                 return int(value)
@@ -261,7 +308,7 @@ class Filter:
         system_msgs = [m for m in messages if m.get("role") == "system"]
         other_msgs = [m for m in messages if m.get("role") != "system"]
 
-        used = sum(self._message_tokens(m) for m in system_msgs + other_msgs)
+        used = sum(self._message_tokens(m, model_id) for m in system_msgs + other_msgs)
 
         # Drop oldest non-system messages one at a time until we're under budget
         # or nothing is left to drop. System messages stay put; if they alone
@@ -269,7 +316,7 @@ class Filter:
         # that's the right signal (the admin needs to shrink the system prompt).
         while used > budget and other_msgs:
             dropped = other_msgs.pop(0)
-            used -= self._message_tokens(dropped)
+            used -= self._message_tokens(dropped, model_id)
 
         other_msgs = self._repair_tool_calls(other_msgs)
 
@@ -282,13 +329,14 @@ class Filter:
 A few things worth noticing:
 
 - **Configure once, run everywhere.** Set this filter as a **global** filter in Admin Panel → Functions. The `model_budgets_json` valve lets you enumerate every model you care about; anything else falls back to `default_budget_tokens`. Admins can tune budgets at runtime without touching code.
-- **Prefix match on model id, longest-first.** `gpt-4o-2024-11-20` transparently uses the `gpt-4o` budget, and `gpt-4o-mini-2024-07-18` correctly uses the `gpt-4o-mini` budget (more specific wins). The `_budget_for` helper sorts keys by length descending before the prefix loop — otherwise dict insertion order would decide, and `"gpt-4o"` would shadow `"gpt-4o-mini"` for anyone who listed it first.
-- **Multimodal content is partially counted.** The estimator walks list-of-parts content and sums text parts. **Image / audio / file parts count as zero.** For a char/4 heuristic that's fine for a trim budget, but if you rely heavily on image inputs with small providers (e.g. a local 8k vision model), add a per-image allowance inside `_estimate_tokens` (something like 255 tokens per image is a reasonable start).
+- **Prefix match on model id, longest-first.** `claude-sonnet-4-6-20260514` transparently uses the `claude-sonnet-4-6` budget. If you list nested ids like `gpt-5.5` and `gpt-5.5-mini`, `_budget_for` sorts keys by length descending before the prefix loop so the more specific one wins; otherwise dict insertion order would decide and `gpt-5.5` could shadow `gpt-5.5-mini` for anyone who listed it first.
+- **One tokenizer, every model.** Counts come from `tiktoken`, loaded once and cached. `encoding_for_model(model_id)` returns the model's own encoding when the installed tiktoken recognizes the id, otherwise it falls back to `tiktoken_encoding` (default `cl100k_base`). tiktoken only ships OpenAI encodings, and only for models older than its release, so Claude, Gemini, Qwen, DeepSeek and any brand-new OpenAI model all use the fallback. That is an approximation, which is more than good enough for a trim budget with headroom. `cl100k_base` is the one Open WebUI pre-caches, so it works offline; the newer `o200k_base` is **not** pre-cached and is fetched on first use, so an air-gapped box either needs it in `TIKTOKEN_CACHE_DIR` or falls back to `cl100k_base` automatically.
+- **Images get a worst-case allowance; audio and files do not.** Open WebUI hands images to the model as `image_url` content parts, and the filter can't see their resolution without decoding the base64, so it charges a flat `tokens_per_image` (default **1600**) for each one rather than undercounting and busting the window. That default is sized for a 4K, high-detail upload: OpenAI high-detail tops out near 1445 tokens (85 + 170 per 512px tile), Claude near 1590 (about width × height / 750 after its resize). Gemini high-resolution tiling can run higher, so raise the valve if you lean on Gemini with many images. **Audio and file parts still count as zero**; add their own allowance the same way if you need it.
 - **Same tool-call repair.** Reused from the first example. This is the block that keeps the request valid after trimming.
 - **Fail-open when misconfigured.** If you somehow set the headroom larger than the budget, the filter passes the request through untouched rather than wiping the conversation. The provider's error is better than a silent delete.
 
 :::warning Check your model ids
-Open WebUI doesn't always present the raw provider id to `body["model"]`. If an admin sets a connection `prefix_id`, every model is wrapped as `{prefix}.{raw_id}` (e.g. `openai.gpt-4o`). Pipe-function manifolds wrap their sub-models as `{pipe.id}.{sub_id}` (e.g. `anthropic.claude-3-5-sonnet-20241022`). Custom Workspace models can have arbitrary ids, often UUIDs.
+Open WebUI doesn't always present the raw provider id to `body["model"]`. If an admin sets a connection `prefix_id`, every model is wrapped as `{prefix}.{raw_id}` (e.g. `openai.gpt-5.5`). Pipe-function manifolds wrap their sub-models as `{pipe.id}.{sub_id}` (e.g. `anthropic.claude-sonnet-4-6-20260514`). Custom Workspace models can have arbitrary ids, often UUIDs.
 
 **Copy the exact id shown in the model picker** into `model_budgets_json` — not the upstream provider's id. If you get the format wrong, requests silently land on `default_budget_tokens` and you won't notice until a chat that fits a real budget fails to fit the fallback.
 :::
@@ -297,7 +345,7 @@ Open WebUI doesn't always present the raw provider id to `body["model"]`. If an 
 This filter runs in `inlet()`, which is before Open WebUI's RAG retrieval (`chat_completion_files_handler`) and before native-tool definitions are attached to the payload. Both can add non-trivial bytes to the request **after** the filter has trimmed. If you rely on Knowledge bases or if your models have heavy built-in tool specs (web search + memory + code interpreter + MCP servers + …), **reserve extra headroom** by bumping `response_headroom_tokens` — it doubles as a general "leave room for post-filter additions" budget.
 :::
 
-If you need higher-fidelity token counting, swap `_estimate_tokens` for `tiktoken.encoding_for_model(model_id).encode(text)` (OpenAI-family) or your provider's own tokenizer. For everything else — Anthropic, Gemini, local models — the char/4 heuristic is close enough to keep you safely under the limit, *as long as you've left enough headroom for the RAG / tool additions above*.
+This example already counts with `tiktoken` (via `encoding_for_model(model_id)` and a cached fallback encoding), which is exact for the OpenAI models tiktoken recognizes and a solid approximation for everything else. If you need higher-fidelity counts for a non-OpenAI provider, swap `_estimate_tokens` for that provider's own tokenizer (Anthropic's, Gemini's, or a `transformers` tokenizer for a local model). For a trim budget the tiktoken approximation stays close enough to keep you safely under the limit, *as long as you've left enough headroom for the RAG / tool additions above*.
 
 ## You almost certainly want a community filter, not this one
 
@@ -305,8 +353,8 @@ The two examples on this page are deliberately minimal — they exist to show th
 
 Production-grade community filters typically handle things the minimal examples above skip:
 
-- **Real tokenizers per provider** — `tiktoken` for OpenAI, Anthropic's tokenizer for Claude, Gemini's for Google, `transformers` tokenizers for local models. Not char/4 heuristics.
-- **Proper image / audio / file token accounting** — provider-specific allowances for every content-part type, not "zero."
+- **Real tokenizers per provider** — `tiktoken` for OpenAI, Anthropic's tokenizer for Claude, Gemini's for Google, `transformers` tokenizers for local models. The example on this page uses one tiktoken encoding for every model (exact for OpenAI, approximate elsewhere); a production filter uses each provider's own tokenizer.
+- **Proper image / audio / file token accounting** — exact per-provider, per-resolution counts for every content-part type, instead of one worst-case constant for images and zero for audio and files.
 - **Summarize-and-replace strategies** — when the window is about to overflow, call a cheap model to summarize the oldest block and replace it with one summary message, preserving long-running context instead of silently forgetting.
 - **Per-user / per-role policies** — power users get larger budgets than free users; service accounts get different defaults than humans.
 - **Per-model-family policies** — more intelligent than a prefix match (e.g. recognize all Claude 3.x Sonnet variants via a regex or metadata).
