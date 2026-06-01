@@ -140,6 +140,10 @@ After deploying Open WebUI you can follow these steps to configure your Azure Op
 5. Configure your Azure OpenAI endpoint and deployment details
 6. Save the connection
 
+:::note Custom / private endpoint hostnames
+If you front Azure OpenAI with a private endpoint, API gateway, or other custom domain (i.e. the base URL is **not** a standard `*.openai.azure.com` / `*.cognitiveservices.azure.com` host — common in AKS/enterprise setups), selecting the **Azure OpenAI** provider is sufficient: Open WebUI applies Azure request handling based on the chosen provider, not on hostname pattern matching. Older versions only recognized Azure connections by the `azure.*` hostname, so a custom-hostname Azure connection would fail **Verify Connection** and model listing — if you hit that, upgrade to v0.9.6 or later.
+:::
+
 ## Key Components Explained
 
 ### Service Account Annotations

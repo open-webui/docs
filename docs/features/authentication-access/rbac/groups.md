@@ -84,3 +84,18 @@ For example, granting the "Marketing" group read access and a specific editor us
 
 *   **Read**: Users can view and use the resource.
 *   **Write**: Users can update or delete the resource.
+
+### Previewing Access (Audit)
+
+When access grants span many groups and resources, it's easy to lose track of who can see what. Open WebUI ships an admin-only **Preview Access** view that resolves every access grant for a specific user or group and lists the result in one place — no need to crawl through individual resource pages.
+
+**For a user** — In **Admin Panel > Users**, hover over a non-admin user row and click the eye-style **Preview Access** button. The modal shows every model, knowledge base, and tool the user can read, aggregated across all of their group memberships and any direct user grants.
+
+**For a group** — In **Admin Panel > Users > Groups**, open the group editor and use the **Preview Group Access** panel. The output is the same shape (models, knowledge, tools), scoped to just that group's grants.
+
+Both views are admin-only and read-only — they reflect what the access-grant table currently says without modifying it. Use them after a permission change to confirm the result matches intent, or as part of a periodic RBAC audit.
+
+Programmatic equivalents:
+
+- `GET /api/v1/users/{user_id}/preview` — user view (admin auth required)
+- `GET /api/v1/groups/id/{id}/preview` — group view (admin auth required)

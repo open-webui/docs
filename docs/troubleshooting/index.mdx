@@ -20,6 +20,7 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | `database is locked`, data disappearing across instances | [Scaling & HA → Database](./multi-replica#4-database-corruption--locked-errors) |
 | Worker crash: `Child process [pid] died` during upload | [RAG → Worker Crashes](./rag#12-worker-dies-during-document-upload) |
 | Model ignores attached knowledge base | [RAG → Knowledge Base Not Working](./rag#13-knowledge-base-attached-to-model-not-working) |
+| Agent stops mid-task after many tool calls / `Tool-call limit reached (N iterations).` | [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) |
 | `NoneType object has no attribute 'encode'` | [RAG → Embedding Error](./rag#5-400-nonetype-object-has-no-attribute-encode) |
 | CUDA out of memory during embedding | [RAG → CUDA OOM](./rag#10-cuda-out-of-memory-during-embedding) |
 | OAuth redirect loops, CSRF state mismatch | [SSO & OAuth](./sso) |
@@ -30,6 +31,7 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | Image not generating, ComfyUI workflow errors | [Image Generation](./image-generation) |
 | Web search returns empty content or proxy errors | [Web Search](./web-search) |
 | Slow performance, high RAM, OOM crashes | [Performance & RAM](./performance) |
+| Container OOM-killed when editing model/knowledge permissions (SQLite) | [Performance & RAM → SQLite Memory Footprint](./performance#4-sqlite-memory-footprint-on-constrained-containers) |
 | "The prompt is too long" / context length exceeded | [Context Window / Prompt Too Long](./context-window) |
 | Forgot admin password | [Reset Admin Password](./password-reset) |
 | `no such table` or `table already exists` on startup | [Database Migration](./manual-database-migration) |
@@ -53,7 +55,7 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 ## Before You Start
 
 - **Update first.** Many issues are fixed in newer releases. Make sure you're on the latest version.
-- **Check PersistentConfig.** Open WebUI stores some settings in its database, which take priority over environment variables. If an env var change seems ignored, see the [Environment Variable Configuration](/reference/env-configuration#important-note-on-persistentconfig-environment-variables) page.
+- **Check ConfigVar.** Open WebUI stores some settings in its database, which take priority over environment variables. If an env var change seems ignored, see the [Environment Variable Configuration](/reference/env-configuration#important-note-on-configvar-environment-variables) page.
 
 ## Browser Compatibility
 

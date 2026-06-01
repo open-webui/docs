@@ -140,7 +140,6 @@ With proper `timeout` configuration, this number should fluctuate naturally (ris
 To set up Redis for websocket support, you will need to create a `docker-compose.yml` file with the following contents:
 
 ```yml
-version: '3.9'
 services:
   redis:
     image: docker.io/valkey/valkey:8.0.1-alpine
@@ -188,6 +187,39 @@ The above configuration sets up a Redis container named `redis-valkey` and mount
 **Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion. See the "Critical: Redis Server Configuration" section above for details.
 
 :::
+
+### WebSocket Pub/Sub Buffer Limits
+
+Open WebUI uses Socket.IO over Redis Pub/Sub when `WEBSOCKET_MANAGER=redis` is enabled. Streaming responses and tool events can generate large websocket events because some updates include accumulated message state, not only the newest token delta. If Redis disconnects Pub/Sub clients while delivering these events, users can see stalled streams, missing live updates, or log messages such as:
+
+```text
+Cannot publish to redis... retrying
+Cannot publish to redis... giving up
+redis.exceptions.TimeoutError: Timeout connecting to server
+```
+
+Check whether Redis is disconnecting Pub/Sub clients because of output buffer limits:
+
+```bash
+redis-cli INFO stats | grep client_output_buffer_limit_disconnections
+redis-cli SLOWLOG GET 50
+redis-cli CONFIG GET client-output-buffer-limit
+```
+
+If the slow log shows large `PUBLISH socketio ...` payloads and `client_output_buffer_limit_disconnections` increases, raise the Redis Pub/Sub output buffer limit. For example:
+
+```conf
+# Keep normal clients unchanged; allow larger websocket Pub/Sub bursts.
+client-output-buffer-limit normal 0 0 0 replica 268435456 67108864 60 pubsub 1073741824 268435456 180
+```
+
+This sets the Pub/Sub hard limit to 1 GB and the soft limit to 256 MB for 180 seconds. Tune these values for your available Redis memory and expected websocket payload size. Higher limits make Redis more tolerant of temporary slow subscribers, but they also allow each slow Pub/Sub client to buffer more memory before Redis disconnects it.
+
+If you changed Redis configuration at runtime, verify the active value:
+
+```bash
+redis-cli CONFIG GET client-output-buffer-limit
+```
 
 To create a Docker network for communication between Open WebUI and Redis, run the following command:
 

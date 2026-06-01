@@ -56,9 +56,15 @@ To start your services, run the following command:
 docker compose up -d
 ```
 
-## Helper Script
+## Helper Scripts
 
-A useful helper script called `run-compose.sh` is included with the codebase. This script assists in choosing which Docker Compose files to include in your deployment, streamlining the setup process.
+A set of helper scripts is included with the codebase to streamline common Docker workflows:
+
+- `docker-compose-launcher.sh` — Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, host data mounts, and optional Playwright support. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project.
+- `docker-cleanup.sh` — Stops the Compose project and **deletes all volumes**, including persistent data. Prompts for confirmation before destroying data.
+- `docker-run.sh` — Builds the Open WebUI image and runs a single container, exposing it on `OPEN_WEBUI_PORT` (default `3000`).
+- `docker-ollama.sh` — Pulls and runs the official Ollama container with optional GPU passthrough, exposing it on `OLLAMA_PORT` (default `11434`).
+- `docker-update-models.sh` — Iterates through every model installed in the Ollama container and pulls the latest version.
 
 ---
 

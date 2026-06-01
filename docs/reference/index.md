@@ -15,7 +15,7 @@ Open WebUI is highly configurable. This section is the canonical source of truth
 
 **Every flag, path, and secret Open WebUI reads at startup, in one place.**
 
-Over 200 environment variables control authentication, model routing, storage, logging, and more. Understand `PersistentConfig` behavior, troubleshoot ignored settings, and find the exact variable you need.
+Over 200 environment variables control authentication, model routing, storage, logging, and more. Understand `ConfigVar` behavior, troubleshoot ignored settings, and find the exact variable you need.
 
 | | |
 | :--- | :--- |

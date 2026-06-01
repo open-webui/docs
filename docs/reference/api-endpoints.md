@@ -44,6 +44,31 @@ Access detailed API documentation for different services provided by Open WebUI:
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 
+#### Using Open WebUI tools, including MCP, from the API
+
+The chat completions endpoint can run server-side tools when you pass Open WebUI tool IDs in the request body. This includes native Python tools, OpenAPI tool servers, and MCP tool servers that are already configured and enabled in Open WebUI.
+
+1. Configure the tool server in Open WebUI first. For MCP, see [Model Context Protocol (MCP)](/features/extensibility/mcp).
+2. Get the tool ID from the tools list endpoint or the browser network request when enabling the tool in chat. MCP tool server IDs use the `server:mcp:<server-id>` form.
+3. Include the ID in `tool_ids` when calling `/api/chat/completions`:
+
+```bash
+curl -X POST http://localhost:3000/api/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3.1",
+    "messages": [
+      {"role": "user", "content": "Use the configured MCP tool if it helps."}
+    ],
+    "tool_ids": ["server:mcp:YOUR_MCP_SERVER_ID"]
+  }'
+```
+
+Open WebUI checks the caller's access to each selected tool server before resolving the tools. For OAuth-protected MCP servers, the user associated with the API key must have already completed the OAuth authorization flow in the web UI; otherwise the tool connection can fail during the API request.
+
+If your external client sends its own OpenAI-style `tools` array, Open WebUI forwards those caller-provided tool definitions to the model instead of resolving `tool_ids` server-side.
+
 - **Curl Example**:
 
   ```bash
@@ -278,7 +303,7 @@ Even in the non-streaming case, **`outlet()` does not rewrite the HTTP response 
   ```
 
 :::tip
-If you need `outlet()` output over HTTP today, call `/api/chat/completions` followed by `/api/chat/completed`. Inline execution on `dev` is primarily for WebUI-shaped clients that read from the WebSocket. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#-filter-behavior-with-api-requests).
+If you need `outlet()` output over HTTP today, call `/api/chat/completions` followed by `/api/chat/completed`. Inline execution on `dev` is primarily for WebUI-shaped clients that read from the WebSocket. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#filter-behavior-with-api-requests).
 :::
 
 ### 🦙 Ollama API Proxy Support

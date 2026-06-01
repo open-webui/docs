@@ -92,6 +92,14 @@ By default, Open WebUI saves chats **after generation is complete**. While savin
 -   **Effect**: Chats are saved only when the generation is complete (or periodically).
 -   **Recommendation**: **DO NOT ENABLE `ENABLE_REALTIME_CHAT_SAVE` in production.** It is highly recommended to keep this `False` to prevent database connection exhaustion and severe performance degradation under concurrent load. See the [Environment Variable Configuration](/reference/env-configuration#enable_realtime_chat_save) for details.
 
+### User Active-Status Write Throttling (set this on every deployment)
+
+Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. **By default this write is unthrottled** — essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`. On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit (presence only needs ~minute granularity).
+
+-   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`
+-   **Default**: unset (**unthrottled — writes on every request**)
+-   **Recommendation**: Set a positive interval in seconds — `300`–`500` is a good range. This collapses thousands of writes into at most one per user per interval. It is **free performance for any setup** and is effectively **mandatory for large/production deployments**; leaving it unset is a common, avoidable database bottleneck. There is no downside on weak hardware either — it only *reduces* writes. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+
 ### Database Session Sharing
 
 Starting with v0.7.1, Open WebUI includes a database session sharing feature that can improve performance under high concurrency by reusing database sessions instead of creating new ones for each request.
@@ -206,12 +214,16 @@ Increasing the chunk size buffers these updates, sending them to the client in l
   *   *Recommendation*: Set to **5-10** for high-concurrency instances.
 
 #### Thread Pool Size
-Defines the number of worker threads available for handling requests.
-*   **Default**: 40
-*   **High-Traffic Recommendation**: **2000+**
-*   **Warning**: **NEVER decrease this value.** Even on low-spec hardware, an idle thread pool does not consume significant resources. Setting this too low (e.g., 10) **WILL cause application freezes** and request timeouts.
+Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count — threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
+*   **Default**: 40 (the AnyIO default — far too low for production)
+*   **Normal servers / production**: **2000+**. `2000` is a *lower* bound for very large instances; going higher is fine and is **not** a CPU/contention risk.
+*   **Symptom if too low**: when more than `THREAD_POOL_SIZE` blocking ops are needed at once (many users at the same time, or a few users each triggering several blocking calls), further requests queue and the **whole app appears to hang/freeze** even though CPU and RAM look fine. This is pool starvation, not resource exhaustion.
+*   **Warning**: **NEVER decrease below the default.** An idle high ceiling costs effectively nothing.
+*   **Exception — weak hardware** (Raspberry Pi, tiny VPS, containers capped at ~250m CPU / very low RAM): do **not** set `2000`. Each genuinely concurrent blocking op still uses a real OS thread (stack memory), so on a tiny device a huge ceiling lets a traffic burst exhaust RAM. Leave it at the default or a modest few-hundred value matched to the device. Any normal server should use `2000+`.
 
 - **Env Var**: `THREAD_POOL_SIZE=2000`
+
+See [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size) for the full explanation.
 
 #### AIOHTTP Client Timeouts
 Long LLM completions can exceed default HTTP client timeouts. Configure these to prevent requests being cut off mid-response:
@@ -431,6 +443,32 @@ If resource usage is critical, disable automated features that constantly trigge
     *   Admin: `Settings > Interface > Chat Title`
 4.  **Tag Generation**: `ENABLE_TAGS_GENERATION=False`
 
+### 4. SQLite Memory Footprint on Constrained Containers
+
+This one applies **even on fast local SSD/NVMe**. It is a RAM problem, not a storage-latency one (for the latency/corruption problem on network storage, see [Disk I/O Latency](#disk-io-latency-sqlite--storage) instead). It is the most common cause of "the container gets OOM-killed when I edit model or knowledge-base permissions" on small deployments.
+
+On SQLite, when `DATABASE_POOL_SIZE` is left unset, current releases (0.9.x, async DB backend) do **not** fall back to SQLAlchemy's small default pool. They fall back to a large internal pool (currently **512** connections). Each pooled connection independently:
+
+- lazily grows its **own** SQLite page cache up to the `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` cap. The default `-65536` is roughly **64 MB of committed RAM per connection**.
+- memory-maps the database file up to `DATABASE_SQLITE_PRAGMA_MMAP_SIZE`, default **256 MB per connection**. This is mostly virtual and file-backed rather than committed anonymous RAM, but it inflates `total-vm` enormously and the resident portion still counts against a cgroup memory limit.
+- runs on its **own OS thread** (the async SQLite driver is one thread per connection), adding thread-stack address space.
+
+Peak memory therefore scales with the number of **simultaneously active connections**, not with the size of any single query. A workflow that fans out many short-lived connections, for example editing model or knowledge-base access control and then reloading a long model list, can briefly drive dozens of connections live. On a small container the page caches alone (active connections times up to 64 MB) exceed the limit and the OOM killer terminates the process. A profiler (py-spy, memray) will attribute almost everything to `aiosqlite/core.py`, because that is the frame where each connection allocates its cache and materialises rows. That is the signature of many connections, not a leak inside the driver, and it is unrelated to the size of any remote vector database.
+
+:::tip Constrained / Low-Spec Containers (SQLite)
+On any deployment with a tight memory limit (small VPS, Raspberry Pi, a Docker `mem_limit` of 1 to 2 GB), set these explicitly instead of relying on the defaults:
+
+```bash
+DATABASE_POOL_SIZE=8                       # cap the SQLite pool (unset falls back to 512)
+DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000    # ~2 MB page cache per connection instead of ~64 MB
+DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0         # disable the per-connection mmap window
+```
+
+Also give the container realistic headroom. **1 GB is very low** for anything doing RAG or embeddings; aim for **2 GB or more**. Keep `DATABASE_ENABLE_SESSION_SHARING=False` (the default) on low-spec hardware; turning it on is the wrong lever here and degrades SQLite on weak hardware (see [Database Session Sharing](#database-session-sharing)).
+
+For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQLite tuning.
+:::
+
 ---
 
 ## 🚀 Recommended Configuration Profiles
@@ -443,7 +481,7 @@ If resource usage is critical, disable automated features that constantly trigge
 3.  **Task Model**: Disable or use tiny model (`llama3.2:1b`).
 4.  **Scaling**: Keep default `THREAD_POOL_SIZE` (40).
 5.  **Disable**: Image Gen, Code Interpreter, Autocomplete, Follow-ups.
-6.  **Database**: SQLite is fine.
+6.  **Database**: SQLite is fine, but cap its memory: `DATABASE_POOL_SIZE=8`, `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000`, `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`. The unset SQLite pool default is large (512); see [SQLite Memory Footprint on Constrained Containers](#4-sqlite-memory-footprint-on-constrained-containers).
 
 ### Profile 2: Single User Enthusiast
 *Target: Max Quality & Speed, Local + External APIs.*
@@ -480,6 +518,23 @@ Common Redis configuration issues that cause unnecessary scaling:
 | **Stale connections** | Redis runs out of connections or memory grows indefinitely | Set `timeout 1800` in redis.conf (kills idle connections after 30 minutes) |
 | **Low maxclients** | `max number of clients reached` errors | Set `maxclients 10000` or higher |
 | **No connection limits** | Open WebUI pods may accumulate connections that never close | Combine `timeout` with connection pool limits in your Redis client config |
+| **Low Pub/Sub output buffer limits** | WebSocket streams stall, `Cannot publish to redis... giving up`, or Redis logs client output buffer disconnections when large Socket.IO events are published | Increase the Redis `client-output-buffer-limit ... pubsub ...` setting, sized for your websocket payloads and available Redis memory |
+
+For Redis-backed websockets, Open WebUI uses Socket.IO over Redis Pub/Sub. Large streaming responses and tool events can create multi-MB `PUBLISH socketio ...` payloads. If Redis disconnects slow Pub/Sub clients, inspect:
+
+```bash
+redis-cli INFO stats | grep client_output_buffer_limit_disconnections
+redis-cli SLOWLOG GET 50
+redis-cli CONFIG GET client-output-buffer-limit
+```
+
+Example Redis configuration for deployments that need to tolerate large websocket bursts:
+
+```conf
+client-output-buffer-limit normal 0 0 0 replica 268435456 67108864 60 pubsub 1073741824 268435456 180
+```
+
+This keeps normal client limits disabled and raises Pub/Sub clients to a 1 GB hard limit and 256 MB soft limit for 180 seconds. Tune downward or upward based on Redis memory headroom and observed payload sizes.
 
 ---
 
@@ -496,6 +551,7 @@ These are real-world mistakes that cause organizations to massively over-provisi
 | **Using Default (prompt-based) tool calling** | Legacy / no longer supported; injected prompts break KV cache → higher latency → more resources needed per request; cannot access built-in system tools | Switch every model to Native Mode |
 | **Not configuring Redis stale connection timeout** | Connections accumulate forever → Redis OOM → you deploy Redis Cluster | Add `timeout 1800` to redis.conf |
 | **Using base64-encoded icons in Actions/Filters** | Icon data is embedded in `/api/models` responses sent to the frontend on every page load for every model. A 500 KB base64 icon on 3 actions across 20 models = **30 MB of payload bloat** per request → slow frontend loads, high bandwidth usage, unnecessary backend memory pressure | Host icons as static files and reference them by URL in `icon_url` / `self.icon`. See [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example---specifying-action-frontmatter) |
+| **Running SQLite with the default pool on a tiny container** | Unset `DATABASE_POOL_SIZE` falls back to a 512-connection pool; each connection grows its own ~64 MB page cache plus a 256 MB mmap window, so a connection-fanning workflow (editing model/KB permissions, reloading a long model list) OOM-kills a 1 GB container | Cap `DATABASE_POOL_SIZE` (e.g. `8`), set `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000` and `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`, give the container ≥ 2 GB. See [SQLite Memory Footprint](#4-sqlite-memory-footprint-on-constrained-containers) |
 
 ---
 
@@ -522,3 +578,7 @@ For detailed information on all available variables, see the [Environment Config
 | `ENABLE_AUTOCOMPLETE_GENERATION` | [Autocomplete](/reference/env-configuration#enable_autocomplete_generation) |
 | `RAG_SYSTEM_CONTEXT` | [RAG System Context](/reference/env-configuration#rag_system_context) |
 | `DATABASE_ENABLE_SESSION_SHARING` | [Database Session Sharing](/reference/env-configuration#database_enable_session_sharing) |
+| `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL` | [Presence Write Throttling](/reference/env-configuration#database_user_active_status_update_interval) |
+| `DATABASE_POOL_SIZE` | [Connection Pool Size](/reference/env-configuration#database_pool_size) |
+| `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` | [SQLite Page Cache Size](/reference/env-configuration#database_sqlite_pragma_cache_size) |
+| `DATABASE_SQLITE_PRAGMA_MMAP_SIZE` | [SQLite mmap Size](/reference/env-configuration#database_sqlite_pragma_mmap_size) |

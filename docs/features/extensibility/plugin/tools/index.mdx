@@ -21,12 +21,13 @@ Because there are several ways to integrate "Tools" in Open WebUI, it's importan
 
 | Type | Location in UI | Best For... | Source |
 | :--- | :--- | :--- | :--- |
-| **Native Features** | Admin/Settings | Core platform functionality | Built-in to Open WebUI |
-| **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts | [Community Library](https://openwebui.com/search) |
-| **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External MCP Servers |
-| **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | [MCPO Adapter](https://github.com/open-webui/mcpo) |
-| **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External Web APIs |
-| **Open Terminal** | `Settings > Integrations` | Full shell access in an isolated Docker container (always-on) | [Open Terminal](https://github.com/open-webui/open-terminal) |
+| **Native Features** | Admin/Settings | Core platform functionality (these are the [built-in system tools](#built-in-system-tools-nativeagentic-mode)) | Built-in to Open WebUI |
+| **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts — **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
+| **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External tool server |
+| **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
+| **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External tool server |
+
+The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool servers**: the tool code runs on a separate process or machine and Open WebUI calls it over HTTP. **Native Features** are the built-in system tools that ship with Open WebUI. **Workspace Tools** are Python that runs in-process — for the most demanding use cases they are by far the most capable option with the fewest limitations (see below).
 
 ### 1. Native Features (Built-in)
 These are deeply integrated into Open WebUI and generally don't require external scripts.
@@ -39,8 +40,8 @@ These are deeply integrated into Open WebUI and generally don't require external
 In [**Native Mode**](#built-in-system-tools-nativeagentic-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
-These are **Python scripts** that run directly within the Open WebUI environment.
-- **Capability**: Can do anything Python can do (web scraping, complex math, API calls).
+These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations** — they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](../development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
+- **Capability**: Can do anything Python can do (web scraping, complex math, API calls), and hold secrets (API keys) entirely server-side so neither the user nor the model can read them.
 - **Access**: Managed via the `Workspace` menu. 
 - **Safety**: Always review code before importing, as these run on your server.
 - **⚠️ Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
@@ -53,6 +54,10 @@ These are **Python scripts** that run directly within the Open WebUI environment
 
 ### 4. OpenAPI / Function Calling Servers
 Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification. Open WebUI can ingest these specs and treat every endpoint as a tool.
+
+:::info Open Terminal — a separate code-execution integration
+Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/features/open-terminal)**: an always-on, isolated Docker container that gives a model a real shell and filesystem. Once connected, it exposes its own set of **built-in tools** (`run_command`, `read_file`, `write_file`, `grep_search`, `glob_search`, process management, and more) that the model can call directly — effectively a sandboxed code-execution and file-handling environment, distinct from the per-message [Code Interpreter](#built-in-system-tools-nativeagentic-mode) tool. See the [Open Terminal documentation](/features/open-terminal) for setup, multi-user, and security considerations.
+:::
 
 ---
 
@@ -229,8 +234,10 @@ Default Mode is **not** a supported workaround even for DeepSeek — it is legac
 | `search_knowledge_bases` | Text search over KB names/descriptions. |
 | `query_knowledge_files` | Search file contents via the RAG retrieval pipeline (hybrid + rerank when enabled). Main tool for finding answers in docs. |
 | `search_knowledge_files` | Search files by filename. |
-| `view_file` | Read a user-accessible file by ID with pagination (`offset`, `max_chars`). |
+| `grep_knowledge_files` | Exact text / regex search across knowledge file content. Returns matching lines with line numbers. Complements `query_knowledge_files` (semantic) when you need literal matches. |
+| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, optional `line_numbers`). |
 | `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
+| `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
@@ -287,11 +294,16 @@ Use this quick matrix instead of memorizing per-row caveats.
 | `query_knowledge_bases` | ❌ | ✅ |
 | `search_knowledge_files` | ✅ (auto-scoped) | ✅ (all accessible KBs) |
 | `query_knowledge_files` | ✅ (auto-scoped) | ✅ |
+| `grep_knowledge_files` | ✅ (auto-scoped) | ✅ |
 | `view_file` | ✅ (when attached items include files/collections) | ❌ |
 | `view_knowledge_file` | ✅ (when attached items include files/collections) | ✅ |
 | `view_note` | ✅ (when attached items include notes) | ❌ |
 
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
+
+:::info `kb_exec` replaces the matrix when enabled
+When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI injects `kb_exec` instead of the file-oriented tools listed above. Still injected alongside it: `query_knowledge_files` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
+:::
 
 #### Tool Reference
 
@@ -307,8 +319,10 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
-| `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, updated_at, created_at}` — includes `truncated`, `total_chars`, `next_offset` when paginated |
+| `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional — single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches) |
+| `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000), `line_numbers` (default: false), `start_line` / `end_line` (optional — line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}` — includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
 | `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, knowledge_id, knowledge_name}` — includes pagination metadata when truncated |
+| `kb_exec` | `command` (required) — filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
 | `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}` — auto-displayed |
@@ -443,7 +457,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `add_memory`, `replace_memory_content`, `delete_memory`, `list_memories` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file` | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file` (or `kb_exec` + `query_knowledge_files` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
