@@ -464,6 +464,10 @@ or similar errors for other tables (e.g., `access_grant`).
 
 **Cause:** A previous migration **partially completed** — the table was created in the database, but Alembic's version tracking was not updated (typically because the migration was interrupted during the data backfill step that runs after table creation). Alembic still thinks the migration hasn't been applied, so it tries to create the table again.
 
+:::tip Migrations are idempotent as of v0.9.6
+v0.9.6 reworked the bundled Alembic migrations to introspect the live schema and **skip tables, indexes, and columns that already exist** (and to add missing primary keys to legacy peewee-era tables). Many partially-applied-schema upgrades that used to fail with this error now complete cleanly on a straight `alembic upgrade head`. If you are hitting "table already exists" on an older version, upgrading to v0.9.6+ before manual intervention is often the simplest fix. The recovery steps below remain valid for databases mutated in other ways.
+:::
+
 **Diagnosis:**
 
 ```bash title="Terminal - Identify the Stuck Migration"

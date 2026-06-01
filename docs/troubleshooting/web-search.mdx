@@ -31,7 +31,7 @@ WEB_SEARCH_TRUST_ENV=True
 
 :::info
 
-This is a **PersistentConfig** variable, meaning it can be set via environment variable on startup OR configured through the Admin Panel UI. Once set in the UI, the database value takes precedence over the environment variable.
+This is a **ConfigVar** variable, meaning it can be set via environment variable on startup OR configured through the Admin Panel UI. Once set in the UI, the database value takes precedence over the environment variable.
 
 This setting tells Open WebUI's web content loader to respect the proxy settings from your environment variables (`http_proxy`, `https_proxy`). Without this, even if your search engine works through the proxy, fetching content from the returned URLs will fail.
 
@@ -71,6 +71,8 @@ If web search returns empty content or poor quality results, the issue is often 
   In Native/Agentic tool calling, if the model omits `count` for `search_web`, Open WebUI uses `WEB_SEARCH_RESULT_COUNT` by default. If the model provides `count`, it is capped at the same admin-configured maximum.
 
 - **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use `playwright` for JavaScript-heavy sites or `firecrawl`/`tavily` for better extraction.
+
+- **Set a real User-Agent**: If results from Wikipedia, Cloudflare-protected sites, or other large publishers come back empty (or as 403s in logs), the default Python `requests`/`aiohttp` UA is being filtered by bot detection. Set [`USER_AGENT`](/reference/env-configuration#user_agent) to a real browser-like string (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`). This affects both web search result fetching and the `fetch_url` tool.
 
 For more details on context window issues, see the [RAG Troubleshooting Guide](./rag).
 

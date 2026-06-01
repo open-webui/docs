@@ -5,6 +5,15 @@ title: "Pipes"
 
 ## Pipes
 
+:::danger Pipelines are legacy — do not use for new deployments
+**Pipelines are outdated and legacy, and are no longer recommended.** A Pipeline can run as a **pipe** or as a **filter**; both forms now have in-process replacements that are built in, easier to configure, and need no separate worker container:
+
+- Pipeline **pipe** (custom provider, RAG, request routing) → [Pipe Function](/features/extensibility/plugin/functions/pipe)
+- Pipeline **filter** (message pre/post-processing) → [Filter Function](/features/extensibility/plugin/functions/filter)
+
+This page is kept for reference and existing deployments only.
+:::
+
 Pipes are standalone functions that process inputs and generate responses, possibly by invoking one or more LLMs or external services before returning results to the user. Examples of potential actions you can take with Pipes are Retrieval Augmented Generation (RAG), sending requests to non-OpenAI LLM providers (such as Anthropic, Azure OpenAI, or Google), or executing functions right in your web UI. Pipes can be hosted as a Function or on a Pipelines server. A list of examples is maintained in the [Pipelines repo](https://github.com/open-webui/pipelines/tree/main/examples/pipelines). The general workflow can be seen in the image below.
 
 <div align="center">
@@ -46,7 +55,7 @@ yield {"choices": [{"delta": {}, "finish_reason": "stop"}]}
 
 This is the single biggest gotcha when building an agent pipeline (LangChain, LlamaIndex, a custom planner, anything that executes its own tools and streams the result back).
 
-`delta.tool_calls` in a chunk means **"please execute this tool call for me, client"**. When Open WebUI's middleware sees it, the tool executor picks up the call, runs it, appends a `role: "tool"` message, and fires a continuation request back at the same pipeline. It does this in a loop capped by `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (≈30).
+`delta.tool_calls` in a chunk means **"please execute this tool call for me, client"**. When Open WebUI's middleware sees it, the tool executor picks up the call, runs it, appends a `role: "tool"` message, and fires a continuation request back at the same pipeline. It does this in a loop capped by [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) (default 256; `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES`, default 30, on versions before v0.9.6).
 
 If your pipeline already executed the tool internally, emitting `delta.tool_calls` makes Open WebUI try to execute it *again* — and since the pipeline keeps emitting the same call on every retry, you get 30 copies of the response stacked on top of each other before the retry cap trips. Same thing happens if you set `finish_reason: "tool_calls"` mid-stream.
 

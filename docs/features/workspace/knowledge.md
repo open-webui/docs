@@ -42,6 +42,8 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 📑 **5 extraction engines** | Tika, Docling, Azure, Mistral OCR, custom loaders |
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
+| 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
+| 🔄 **Incremental directory sync** | Mirror a local folder into the KB — only new and modified files upload, deletions are removed, mirroring folder structure |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
 ---
@@ -70,17 +72,98 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 
 | Tool | Attached KB | No KB attached | Description |
 |------|:-----------:|:--------------:|-------------|
-| `list_knowledge` | ✅ | ❌ | List all KBs, files, and notes attached to the model |
+| `list_knowledge` | ✅ | ❌ | List attached KBs (with file counts), standalone files, and notes; pass `knowledge_id` (with `skip`/`count`, max 200) to page one KB's files |
 | `list_knowledge_bases` | ❌ | ✅ | Browse available knowledge bases with file counts |
 | `search_knowledge_bases` | ❌ | ✅ | Find knowledge bases by name or description |
 | `query_knowledge_bases` | ❌ | ✅ | Search KB names/descriptions by semantic similarity |
 | `search_knowledge_files` | ✅ (scoped) | ✅ (all) | Search files by filename |
 | `query_knowledge_files` | ✅ (scoped) | ✅ | Search file contents using the RAG pipeline |
-| `view_file` | ✅ | ❌ | Read file content with pagination (default 10K chars, cap 100K) |
+| `grep_knowledge_files` | ✅ (scoped) | ✅ | Exact text / regex search across knowledge files (returns matching lines with line numbers; auto-detects regex like `error|warn`) |
+| `view_file` | ✅ | ❌ | Read file content with pagination (`offset`/`max_chars`) or by line range (`start_line`/`end_line`, optional `line_numbers`) |
 | `view_knowledge_file` | ✅ | ✅ | Read file content from any accessible KB |
 | `view_note` | ✅ | ❌ | Read attached notes |
 
 The key split: `list_knowledge` and `list_knowledge_bases` are mutually exclusive. Attaching a KB scopes the model to only those documents. Leaving it unscoped lets the model discover everything the user has access to.
+
+#### When to prefer `grep_knowledge_files` over `query_knowledge_files`
+
+The two search tools complement each other:
+
+| | `query_knowledge_files` | `grep_knowledge_files` |
+|---|---|---|
+| **How it matches** | Semantic / vector retrieval (with optional BM25 + rerank when [`ENABLE_RAG_HYBRID_SEARCH`](/reference/env-configuration#enable_rag_hybrid_search) is on) | Exact string match — regex auto-detected (e.g. `error\|warn`, `version \d+`) |
+| **Returns** | Relevant chunks of content | Matching lines with file ID, filename, and 1-indexed line number |
+| **Use when** | "What does the documentation say about X?" — paraphrased questions, conceptual lookups | "Find every place we mention `OPENAI_API_KEY`" — literal identifiers, error strings, version numbers |
+| **Result cap** | Top K (default 5) | 50 matches |
+| **Flags** | — | `case_insensitive`, `count_only`, `file_id` (single-file mode) |
+
+In agentic flows, a typical pattern is: `query_knowledge_files` to locate the relevant document, then `grep_knowledge_files` to pinpoint exact lines, then `view_file` (line-range mode below) to read the surrounding context.
+
+#### Reading with `view_file`
+
+`view_file` supports two addressing modes:
+
+- **Character pagination** — `offset` + `max_chars` (default `10000`, hard cap `100000`). Best for streaming through a long document; the response includes `next_offset` when the file is truncated.
+- **Line range** — `start_line` + optional `end_line` (1-indexed, inclusive). Overrides `offset`/`max_chars` when set; pairs naturally with `grep_knowledge_files`' line numbers. Pass `line_numbers: true` to also get a `<n>: <line>` prefix on each returned line.
+
+The line-range response includes `total_lines`, `showing_lines`, and `next_start_line` for follow-up reads.
+
+### Filesystem-style access (`kb_exec`)
+
+When [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI exposes a `kb_exec` tool that gives the model a filesystem-style interface over knowledge bases.
+
+**Tools that go away**, because their function is now covered by `kb_exec` commands:
+
+- `list_knowledge` — replaced by `ls`
+- `search_knowledge_files` — replaced by `find "<glob>"`
+- `grep_knowledge_files` — replaced by `grep "<pattern>"`
+- `view_file` and `view_knowledge_file` — replaced by `cat`, `head`, `tail`, `sed -n '<a>,<b>p'`
+
+**Tools that stay injected alongside `kb_exec`**, because they do something `kb_exec` can't:
+
+- **`query_knowledge_files`** — semantic / RAG search (always)
+- **`view_note`** — when notes are attached to the model (`kb_exec` is file-only, so notes need a dedicated reader)
+- **`query_knowledge_bases`** and **`search_knowledge_bases`** — when no KB is attached to the model, so the model can still discover and search across knowledge bases by name/description
+
+This is experimental and **off by default**. It targets frontier models that already "think in shell" — they tend to chain `ls`, `grep`, and `cat` more reliably than they orchestrate a fan-out of specialized tools.
+
+**Supported commands**
+
+| Command | Purpose |
+|---------|---------|
+| `ls`, `ls <dir>/`, `ls -a` | List the current level / a subdirectory / a flat view of every file with full paths |
+| `tree`, `tree <dir>/` | Recursive directory tree |
+| `cat -n <file>` | Read a file (optionally with line numbers) |
+| `head -N <file>` / `tail -N <file>` | First or last N lines |
+| `sed -n '<a>,<b>p' <file>` | Print lines `<a>` through `<b>` |
+| `grep "<pattern>" [<dir>/\|<file>\|*.ext]` | Exact / regex search; flags `-i` (case-insensitive), `-l` (filenames only), `-c` (counts) |
+| `find [<dir>/] "<glob>"` | Find files by glob |
+| `wc <file>` | Line / word / char counts |
+| `stat <file>` | File metadata |
+
+**Pipes**
+
+`kb_exec` parses a single pipeline, so commands compose:
+
+```text
+grep "auth" | head -5
+grep -l "TODO" docs/
+find docs/ "*.md" | head -10
+```
+
+**File references**
+
+Files can be addressed three ways — pick whichever is unambiguous:
+
+- **Path** — `docs/api/auth.md` (relative to the knowledge base root; resolves through the directory tree)
+- **Filename** — `auth.md` (errors with an "ambiguous filename" hint when the same name exists in multiple directories or KBs)
+- **File ID** — the UUID returned by `ls`, `find`, or `grep`
+
+**Behavior notes**
+
+- `kb_exec` respects the same access control as the other knowledge tools — files the user can't read are silently excluded from results.
+- The model still has `query_knowledge_files` for semantic search; reach for it when literal commands won't find a paraphrased concept.
+- Built on top of the directory model — `kb_exec` is the only tool that fully reflects the directory structure created in the UI.
 
 Autonomous exploration works best with frontier models that can intelligently chain search, browse, and synthesize. Smaller models may struggle with multi-step retrieval. Administrators can disable the **Knowledge Base** tool category per-model in **Workspace > Models > Edit > Builtin Tools**.
 
@@ -104,6 +187,54 @@ When native function calling is enabled, attached knowledge is **not automatical
 3. Upload files or add existing documents.
 4. Attach the knowledge base to a model in **Workspace > Models > Edit**, or reference it in chat with `#`.
 
+### Organizing into directories
+
+Knowledge bases support nested **directories** so larger document sets stay navigable. Create them from the **Add Content** menu (**+ New Directory**), then reorganize freely.
+
+**Creating and navigating**
+
+- **+ New Directory** lives next to file upload in the **Add Content** menu. Name uniqueness is enforced per parent — two siblings can't share a name, but you can reuse names in different parents.
+- Click a directory to descend into it; the **breadcrumb trail** at the top of the view always reflects the current path and lets you jump back to any ancestor in one click.
+- Directories can be **renamed** or **moved to a different parent** without affecting the files inside them.
+
+**Drag-and-drop**
+
+You can move items by dragging:
+
+- **Files** onto a directory row, into the empty area of an open directory, or onto any breadcrumb crumb (including the root crumb to send a file back to the top level).
+- **Directories** onto another directory to nest them, or onto a breadcrumb crumb to move them up the tree. Moving a directory into itself or one of its descendants is blocked server-side.
+
+**Deletion semantics**
+
+Deleting a non-empty directory prompts for the action to take with its contents:
+
+- **Move files to parent** (default) — the directory is removed but its files and subdirectories are re-parented one level up.
+- **Delete everything** — the directory and all files/subdirectories underneath it are permanently removed.
+
+**Effect on retrieval and tools**
+
+- **Retrieval and standard RAG** still span the entire knowledge base. Directories don't shard the vector index; chunks from any subdirectory remain reachable in a single search.
+- **Agentic tools** are directory-aware:
+  - `kb_exec` (when enabled) treats subdirectories like a filesystem: `ls docs/`, `tree`, `grep "x" docs/`, and path-style refs (`docs/api/auth.md`) all work — see [Filesystem-Style Access (`kb_exec`)](#filesystem-style-access-kb_exec) below.
+  - The other knowledge tools (`query_knowledge_files`, `grep_knowledge_files`, `search_knowledge_files`) ignore directory boundaries and return matches from the whole KB.
+
+### Renaming files
+
+Individual files can be renamed in place from the workspace via the file's item menu — no need to re-upload. The new name is reflected everywhere the file is referenced (knowledge listings, agentic tool output, citations).
+
+### Syncing a local directory
+
+The **Add Content → Sync Directory** action mirrors a local folder into the knowledge base **incrementally**: the client hashes each local file (SHA-256), the server compares hashes and paths against what is already stored, and only **new**, **modified**, and **deleted** files are touched. Unmodified files (the typical majority) are left alone — no re-upload, no re-embedding. The local folder's subdirectory structure is mirrored in the KB; missing subdirectories are created, and subdirectories that no longer exist locally are removed.
+
+Behavior to be aware of:
+
+- Hidden files and folders (anything beginning with `.`) are skipped.
+- Files modified locally upload with a new content hash; the old file entry is removed from the KB and replaced.
+- Files removed locally are deleted from the KB during the cleanup step.
+- The action is **non-destructive** for unchanged files. Earlier versions of the same menu action used to wipe and re-upload everything — that is no longer the case as of v0.9.6.
+
+For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below. To sync from a remote source (GitHub, Confluence, S3 and dozens more) or on a schedule, use the official [oikb](/features/workspace/oikb) tool, which drives these endpoints for you.
+
 ### Exporting
 
 Admins can export an entire knowledge base as a zip file via the item menu (three dots) > **Export**. Files are converted to `.txt` for universal compatibility. Regular users will not see the Export option.
@@ -112,9 +243,25 @@ Admins can export an entire knowledge base as a zip file via the item menu (thre
 
 Knowledge bases can be managed programmatically:
 
-- `POST /api/v1/files/` - Upload files
-- `GET /api/v1/files/{id}/process/status` - Check processing status
-- `POST /api/v1/knowledge/{id}/file/add` - Add files to a knowledge base
+**Files**
+
+- `POST /api/v1/files/` — Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side** — equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing). The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
+- `GET /api/v1/files/{id}/process/status` — Check processing status
+- `POST /api/v1/files/{id}/rename` — Rename a file
+- `POST /api/v1/knowledge/{id}/file/add` — Add files to a knowledge base
+- `POST /api/v1/knowledge/{id}/file/move` — Move a file between directories within the same KB (body: `file_id`, `directory_id` — `null` moves to the KB root)
+
+**Directories**
+
+- `POST /api/v1/knowledge/{id}/dirs/create` — Create a directory (body: `name`, optional `parent_id`)
+- `POST /api/v1/knowledge/{id}/dirs/{dir_id}/update` — Rename or re-parent a directory (body: `name` and/or `parent_id`)
+- `DELETE /api/v1/knowledge/{id}/dirs/{dir_id}/delete?move_files=true` — Delete a directory. With `move_files=true` (default), contained files are re-parented; with `move_files=false`, they're deleted along with the directory.
+
+**Incremental directory sync** (added in v0.9.6)
+
+- `POST /api/v1/knowledge/{id}/sync/diff` — Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete, and which directories to create/remove. Read-only — does not mutate the KB.
+- After acting on the diff (create `mkdir` paths, upload `added` + `modified` files with their hashes via `POST /api/v1/files/`), call:
+- `POST /api/v1/knowledge/{id}/sync/cleanup` — Body: `{file_ids: [...], dir_ids: [...]}`. Removes the stale files (from the KB, vector store, and per-file collections) and the now-empty directories returned by `sync/diff`. Run this last so deletions don't outrun uploads.
 
 File processing happens asynchronously. You must poll the status endpoint until processing completes before adding files to a knowledge base, or you'll get an "empty content" error. See [API Endpoints](/reference/api-endpoints#-retrieval-augmented-generation-rag) for workflow examples.
 
@@ -144,7 +291,7 @@ Add dozens of papers to a knowledge base. The AI searches across all of them to 
 
 ### Processing delay for API uploads
 
-Files uploaded via API are processed asynchronously. Attempting to use a file before processing completes will fail silently or return empty results.
+Files uploaded via API are processed asynchronously. Attempting to use a file before processing completes will fail silently or return empty results. Note that uploading with a `knowledge_id` (above) makes linking server-side and robust to client disconnects, but it does **not** make the content instantly queryable — extraction/embedding still runs in the background, so poll `GET /api/v1/files/{id}/process/status` before relying on retrieval.
 
 ### Native function calling changes behavior
 

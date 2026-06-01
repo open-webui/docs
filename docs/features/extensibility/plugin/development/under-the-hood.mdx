@@ -1,0 +1,190 @@
+---
+sidebar_position: 5
+title: "Under the Hood"
+---
+
+# 🔧 Under the Hood: What the Plugin Loader Actually Does
+
+:::danger ⚠️ Critical Security Warning
+**Tools, Functions, Pipes, Filters, and Actions execute arbitrary Python code on your server.** Function creation is restricted to administrators only, and Workspace Tool creation is gated by the `workspace.tools` permission — granting that permission is equivalent to giving the user shell access to the server. Only install from trusted sources, review code before importing, and restrict creation to trusted administrators. A malicious plugin could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
+:::
+
+Open WebUI's plugins (Tools, Functions = Filters / Pipes / Actions) are not sandboxed scripts running in some restricted runtime. They are **Python modules executed inside your Open WebUI process**, with full access to the standard library, any pip package, the entire `open_webui` codebase, the live FastAPI app, and the database. The documented hooks (`inlet`, `outlet`, `stream`, `pipe`, `action`) are *one* way to use that access. They are not the only way.
+
+This page documents what the loader really does and what that opens up, so you can build (or audit) plugins beyond the patterns shown on the per-type pages. It also lists the footguns that come with the territory.
+
+---
+
+## How a plugin is loaded
+
+A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/plugin.py) handles every plugin type:
+
+1. The plugin's Python source is read from the database.
+2. A fresh `types.ModuleType` is created and registered in `sys.modules` as `function_{id}` (or `tool_{id}`).
+3. The source is fed to `exec(content, module.__dict__)`. Anything at module top level runs at this point.
+4. The loader looks for **one** entry-point class: `Tools`, `Pipe`, `Filter`, or `Action`. That class becomes the handle Open WebUI calls into.
+5. The module stays in `sys.modules` for the life of the process. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
+
+The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
+
+### When the module is re-executed
+
+Inlet/outlet hooks pass `load_from_db=True`. The loader still serves from cache if the source has not changed, but it consults the database on every call to decide that. Stream hooks pass `load_from_db=False` and read straight from cache.
+
+| Hook | DB check per call? | Module re-exec'd when? |
+|---|---|---|
+| `inlet` / `outlet` (Filter) | yes | source change between calls |
+| `stream` (Filter) | no | only when another hook re-loads it |
+| Tools, Pipes, Actions | yes on dispatch | source change between calls |
+
+Practical consequences:
+
+- **Editing a Filter via the editor takes effect on the next chat for `inlet`/`outlet`.** Stream picks it up the next time an `inlet` or `outlet` triggers a reload.
+- **Re-execution is not per-request**, so module-top-level work is paid for once per content version, not once per chat. Top-level imports, patches, and singletons are fine.
+- **Disabling or deleting a plugin** removes it from the active set. It does **not** undo anything its module top level did. The module stays in `sys.modules` and any monkey-patches it installed in other modules stay applied until the process restarts.
+
+---
+
+## What you actually have access to
+
+From any hook (and from module top level):
+
+- The full `open_webui.*` package. Examples: `from open_webui.models.chats import Chats`, `from open_webui.utils.middleware import process_chat_payload`, `from open_webui.config import ConfigVar`.
+- The live FastAPI `Request` via `__request__`, which carries `__request__.app` (the FastAPI app), `__request__.app.state` (config, caches, handlers), and `__request__.state` (per-request scratch).
+- The reserved dunder args documented in [Reserved Arguments](./reserved-args): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
+- Events documented in [Events](./events): emit anything to the frontend, or solicit a response from the user with `event_call`.
+- Any pip package via `requirements:` frontmatter, installed at load time (gated by [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)).
+- The Python stdlib, plus everything pip-installed in the container.
+
+There is no sandbox, no allowlist, no capability system. The execution model is **"this is Python, you are inside the server process"**.
+
+---
+
+## Patterns
+
+### 1. Mutate the per-request model dict from `inlet`
+
+The `__model__` you receive is **the same dict object** the rest of the request reads. Changing its keys from `inlet` changes how the rest of the pipeline behaves on this request. Example (the reasoning-content fix for DeepSeek / Kimi / MiMo):
+
+```python
+class Filter:
+    async def inlet(self, body: dict, __model__: dict = None) -> dict:
+        # Flip the per-request model to the code path that emits
+        # reasoning_content as a top-level field on assistant messages
+        # during the native tool-call loop.
+        if __model__ and __model__.get("provider") not in ("ollama", "llama.cpp"):
+            __model__["provider"] = "llama.cpp"
+        return body
+```
+
+Same trick works for any other field the middleware reads from the model dict: `params`, `meta`, custom keys you put there yourself and then read from another hook.
+
+### 2. Monkey-patch a backend function
+
+Because the plugin module can `import open_webui.*` and rebind module attributes:
+
+```python
+import open_webui.utils.middleware as _mw
+
+_original = _mw.process_chat_payload
+
+async def _patched(request, form_data, user, metadata, model):
+    # ...your wrapping logic, then delegate...
+    return await _original(request, form_data, user, metadata, model)
+
+_mw.process_chat_payload = _patched
+```
+
+Runs at module load (once per source version). The patch persists in `sys.modules` for the life of the process. Deleting or disabling the plugin **does not** revert the patch. The only clean rollback is a process restart.
+
+Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
+
+### 3. Add a new HTTP route at load
+
+```python
+def _ensure_route(app):
+    if any(getattr(r, "path", None) == "/my/route" for r in app.routes):
+        return
+    app.add_api_route("/my/route", my_handler, methods=["GET"])
+```
+
+Call from the first hook with access to `__request__.app`. The idempotency guard is important: the loader may re-execute on edits, and `add_api_route` will happily register the same path twice.
+
+### 4. Spawn a background task
+
+```python
+import asyncio
+
+async def _loop(app):
+    while True:
+        # ...periodic work...
+        await asyncio.sleep(60)
+
+def _start_once(app):
+    if getattr(app.state, "_my_plugin_started", False):
+        return
+    app.state._my_plugin_started = True
+    asyncio.create_task(_loop(app))
+```
+
+The `app.state` flag makes it "once per process" rather than "once per source version". On a clean restart it starts fresh.
+
+### 5. Stash state in `app.state`
+
+```python
+async def inlet(self, body, __request__):
+    cache = __request__.app.state.__dict__.setdefault("my_cache", {})
+    # ...read/write cache...
+    return body
+```
+
+Shared across requests and **across plugins** in the same process. There is no namespacing: pick a unique key.
+
+### 6. Use `event_emitter` for arbitrary side effects in the UI
+
+`event_emitter` accepts any event shape the frontend handles: status banners, source citations, file attachments, chat-message updates, toasts. You are not restricted to the events documented on the per-type pages. See [Events](./events) for the full catalogue.
+
+### 7. Prompt the user mid-handler with `event_call`
+
+`event_call` is `event_emitter` that **awaits a response**. Show a form, a confirmation, an input dialog, and block until the user answers. Useful inside Tool methods that need a human in the loop, or Action handlers that confirm before executing.
+
+### 8. Pipes as full provider replacements
+
+A `Pipe` replaces the entire LLM call. Open WebUI hands you the request and asks for a response back. Nothing in the middleware constrains what you put in that response, so:
+
+- wrap an external API (any provider, any protocol),
+- route between providers based on request shape,
+- run an entire agent inside `pipe()` and stream the agent's output back,
+- skip any model entirely and return canned content.
+
+A Pipe is the most powerful entry point precisely because the middleware steps out of the way.
+
+### 9. Tools that do more than their docstring says
+
+A `Tools` class's methods are exposed to the model as callable tools (their docstrings become JSON schema). The method body can do **anything**: call external APIs, emit UI events with `__event_emitter__`, stash data in `app.state`, monkey-patch on first call. The docstring is purely how the tool advertises itself to the model. The implementation is unconstrained.
+
+### 10. Actions as arbitrary one-shot operations
+
+`Action` renders a button on an assistant message. The handler runs server-side with the same dunder surface as Filters and Tools, against the chat that the message belongs to. Use for "approve this", "re-run with...", "send to external system", or any one-off operation a user should be able to trigger from a specific message.
+
+---
+
+## Footguns
+
+- **No sandboxing.** Tools and Functions execute Python in your backend process as the backend user. The security policy ([Rule 10](/security/security-policy#reporting-guidelines)) treats this as intended behaviour: granting Tool or Function creation permission is equivalent to granting shell access on the host. Treat plugin authors as administrators.
+- **Stream hooks use a stale cache.** Edits to a `stream` method only take effect after another hook (or a process restart) refreshes the module. If you edit a stream filter and the change does not seem to apply, trigger an `inlet`/`outlet` reload or restart.
+- **Cross-plugin interference is not detected.** Two plugins patching the same function, registering the same route, or writing to the same `app.state` key will collide. Load order is not deterministic. Prefer additive patterns (your own namespaces, wrappers that delegate) over destructive ones.
+- **Disabling does not unload.** The module stays in `sys.modules` and any module-level side effects stay installed. Restart the process to fully revert.
+- **`requirements:` runs `pip install` on every replica at load.** In multi-replica deployments set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and pre-install dependencies in your image; runtime installs race across workers and crash. See [Scaling → Function/Tool Dependency Installation Crashes](/troubleshooting/multi-replica#9-functiontool-dependency-installation-crashes).
+- **Internal APIs are not a stable public surface.** `open_webui.utils.*`, the internal model classes, middleware helpers, and pretty much everything outside the documented dunder args and event types can rename, move, or change signatures between releases. If your monkey-patch breaks after an upgrade, that is on you to repair.
+- **The Pipelines server is out of scope here.** This page is about in-process plugins (Tools / Functions). The separate [Pipelines](/features/extensibility/pipelines/) server runs out-of-process and does not share `sys.modules` with Open WebUI: it cannot monkey-patch the main app, but it also is not constrained by it.
+
+---
+
+## When this is the wrong tool
+
+For anything you can express through the documented hooks (filters that mutate `body`, tools that call APIs and return results, actions that emit events), **stay in the documented hooks**. The patterns above are powerful, but their durability is shallow: cross-plugin interaction, upgrade compatibility, and rollback all degrade the moment you start patching module internals.
+
+If your plugin needs an interface that does not exist yet, an upstream PR is more durable than a monkey-patch.
+
+If you file a bug report against a code path that your plugin is monkey-patching, expect it to be closed. Reports must reproduce against an unmodified Open WebUI ([Rule 6](/security/security-policy#reporting-guidelines)).

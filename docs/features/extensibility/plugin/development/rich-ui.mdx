@@ -16,28 +16,28 @@ To embed HTML content, your tool should return an `HTMLResponse` with the `Conte
 ```python
 from fastapi.responses import HTMLResponse
 
-def create_visualization_tool(self, data: str) -> HTMLResponse:
+def render_checklist(self, items: list[str]) -> HTMLResponse:
     """
-    Creates an interactive data visualization that embeds in the chat.
+    Renders an interactive checklist that embeds in the chat.
 
-    :param data: The data to visualize
+    :param items: The items to show in the checklist
     """
-    html_content = """
+    items_html = "".join(
+        f'<li><label><input type="checkbox"> {item}</label></li>' for item in items
+    )
+    html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Data Visualization</title>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <title>Checklist</title>
+        <style>
+            body {{ font-family: system-ui, sans-serif; padding: 1rem; }}
+            ul {{ list-style: none; padding: 0; }}
+            li {{ padding: 0.25rem 0; }}
+        </style>
     </head>
     <body>
-        <div id="chart" style="width:100%;height:400px;"></div>
-        <script>
-            // Your interactive chart code here
-            Plotly.newPlot('chart', [{
-                y: [1, 2, 3, 4],
-                type: 'scatter'
-            }]);
-        </script>
+        <ul>{items_html}</ul>
     </body>
     </html>
     """
@@ -55,11 +55,11 @@ To provide the LLM with actionable context about the embed, return a **tuple** o
 ```python
 from fastapi.responses import HTMLResponse
 
-def create_chart(self, data: str) -> tuple:
+def render_feedback_form(self, prompt: str) -> tuple:
     """
-    Creates an interactive chart and returns context to the LLM.
+    Renders an interactive feedback form and returns context to the LLM.
 
-    :param data: The data to chart
+    :param prompt: The question to show the user above the form
     """
     html_content = "<html>...</html>"
     headers = {"Content-Disposition": "inline"}
@@ -67,16 +67,16 @@ def create_chart(self, data: str) -> tuple:
     # The LLM receives this context instead of the generic message
     result_context = {
         "status": "success",
-        "chart_type": "scatter",
-        "data_points": 42,
-        "description": "Scatter plot showing correlation between X and Y"
+        "form_type": "feedback",
+        "fields": ["rating", "comment"],
+        "description": f"Rendered a feedback form asking: {prompt!r}"
     }
 
     return HTMLResponse(content=html_content, headers=headers), result_context
 ```
 
 The context can be:
-- A **string** — sent as-is to the LLM (e.g., `"Generated a bar chart with 5 categories"`)
+- A **string** — sent as-is to the LLM (e.g., `"Rendered a 5-item checklist"`)
 - A **dict** — serialized as JSON for structured context
 - A **list** — serialized as JSON for multiple items
 
@@ -271,11 +271,11 @@ The iframe and parent window can communicate beyond just height reporting. The f
 
 ### Payload Requests
 
-The iframe can request a data payload from the parent. This is useful for passing dynamic data into the embed after it loads:
+The iframe can ask the parent for a data payload after it loads:
 
 ```html
 <script>
-  // Request payload from parent
+  // Listen for the response
   window.addEventListener('message', (e) => {
     if (e.data?.type === 'payload') {
       const data = e.data.payload;
@@ -289,26 +289,46 @@ The iframe can request a data payload from the parent. This is useful for passin
 </script>
 ```
 
-The parent responds with `{ type: 'payload', requestId: ..., payload: ... }` containing the configured payload data.
+The parent responds with `{ type: 'payload', requestId: ..., payload: ... }`.
+
+:::info Where the payload comes from
+There is no separate "set the payload" call. The payload is whatever the parent component had configured when it instantiated the iframe — and today only one path actually configures one:
+
+- ✅ **Citation-opened embeds in the chat-controls Embeds panel** — when the user clicks a citation badge whose source has an embed URL, the side panel opens and exposes **the full citation/source object** (the same dict you sent in your `source` / `citation` event via `__event_emitter__`) as the payload. To set it, emit a [`source` event](./events#source-or-citation-and-code-execution) whose `data` includes whatever you want the iframe to be able to fetch. The iframe then asks for it via the postMessage above and receives the citation object back.
+- ❌ **Inline tool-call embeds** (from a tool method returning `HTMLResponse` or `(HTMLResponse, context)`) — the parent does not configure a payload on this path, so a payload request returns `{ type: 'payload', requestId: ..., payload: null }`. Use [Tool Args Injection](#tool-args-injection-tools-only) (subject to `allowSameOrigin`) to pass data into a tool-call embed instead.
+- ❌ **`__event_emitter__({"type": "embeds", ...})` and Action embeds** — also configured without a payload; the response is `null`.
+
+In short: payload-request is the side-panel-citation channel, not a generic iframe-data channel. Pick the right rendering path for the data flow you need.
+:::
 
 ### Tool Args Injection (Tools Only)
 
-When a **Tool** returns a Rich UI embed, the tool call arguments (the parameters the model passed to the tool) are automatically injected into the iframe's `window.args`. This allows your embedded HTML to access the tool's input:
+When a **Tool** method returns a Rich UI embed inline at the tool-call display (i.e. you return an `HTMLResponse`, or a `(HTMLResponse, context)` tuple, from the tool method itself), the arguments the model passed are exposed on the iframe as `window.args` — **as a JSON string**, not a parsed object. Parse it before use:
 
 ```html
 <script>
   window.addEventListener('load', () => {
-    // window.args contains the JSON arguments the model passed to this tool
-    const args = window.args;
-    if (args) {
+    const raw = window.args;             // JSON string, or undefined
+    if (raw) {
+      const args = JSON.parse(raw);      // parse to object
       document.getElementById('output').textContent = JSON.stringify(args, null, 2);
+    } else {
+      console.warn('window.args not set — see Requirements below.');
     }
   });
 </script>
 ```
 
-:::note
-This only works for Tool embeds rendered via the tool call display. Action embeds do not have `window.args` since they are triggered by the user, not the model.
+:::warning Requires `allowSameOrigin` — otherwise `window.args` is silently `undefined`
+The args are injected from the parent page via `iframe.contentWindow.args = ...`, which the browser blocks under same-origin policy unless the iframe sandbox carries `allow-same-origin`. That is gated by the per-user **Settings → Interface → "iframe Sandbox Allow Same Origin"** toggle, which is **off by default**. If `window.args` comes back undefined and you have not changed this setting, that is the cause: turn it on and reload. See [allowSameOrigin](#allowsameorigin) above for the security trade-off.
+:::
+
+:::note Where `window.args` is set, and where it is not
+- ✅ **Tool method returning `HTMLResponse` or `(HTMLResponse, context)` tuple** — rendered inline at the "View Result from..." tool call indicator. `window.args` is injected (subject to the `allowSameOrigin` requirement above).
+- ❌ **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`** — rendered through the chat-controls Embeds panel, which does not wire `args` at all. `window.args` will always be undefined here, regardless of sandbox settings. This is by design: the embeds-event path has no tool call attached, so there are no args to inject.
+- ❌ **Action embeds** — triggered by the user, not the model, so there are no model-supplied args to inject.
+
+If you need to pass dynamic data into an embed rendered via either of the ❌ paths, use the [Payload Requests](#payload-requests) pattern above instead.
 :::
 
 ### Auto-Injected Libraries

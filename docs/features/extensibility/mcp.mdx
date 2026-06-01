@@ -32,6 +32,16 @@ Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI con
 2. Re-add it with the correct **Type** set to **MCP**
 :::
 
+## 🔒 MCP servers are admin-only {#mcp-servers-are-admin-only}
+
+MCP servers can only be added by **administrators**, under **Admin Settings → External Tools**. Regular users cannot register their own, by design.
+
+This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings → Tools**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
+
+The difference is capability. A user-supplied OpenAPI server is a stateless HTTP URL exposing a fixed set of declared endpoints. An MCP server is far more powerful: it is stateful and capability-rich (sampling, elicitation, persistent sessions and arbitrary host command execution over stdio transports), and it runs inside Open WebUI's trust boundary with the connecting user's full scope. In practice a malicious or compromised MCP server could execute code and read or exfiltrate data with that user's access, so the capability stays admin-gated. Open WebUI's own MCP support is Streamable HTTP only, but the protocol's privileged nature is why adding one is reserved for admins.
+
+To give users an MCP-backed capability without server-configuration rights, an admin adds the server once and scopes it with **Access Control** to the right users or groups.
+
 ## 🧭 When to use MCP vs OpenAPI
 
 :::tip 
@@ -128,10 +138,16 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 | :--- | :--- |
 | `{{USER_ID}}` | The calling user's ID. |
 | `{{USER_NAME}}` | The calling user's display name. |
+| `{{USER_EMAIL}}` | The calling user's email address. |
+| `{{USER_ROLE}}` | The calling user's role (e.g. `admin`, `user`). |
 | `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |
 | `{{MESSAGE_ID}}` | The current message ID (empty in non-chat contexts). |
 
 Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
+
+:::note
+`{{USER_EMAIL}}` and `{{USER_ROLE}}` were added in v0.9.6. The same release also fixed MCP server connections, where custom-header templates were previously stored but **not** interpolated at request time — they now expand the same way they always have for direct connections and OpenAPI tool servers.
+:::
 
 ### Function Name Filter List
 
@@ -150,6 +166,7 @@ The chat shows "Failed to connect to MCP server" when using a tool, even if the 
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
+4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, the `session.initialize()` handshake can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds).
 
 ### Infinite loading screen after adding External Tool
 
@@ -182,3 +199,7 @@ Supported and improving. The broader ecosystem is still evolving; expect occasio
 **Can I mix OpenAPI and MCP tools?**
 
 Yes. Many deployments do both.
+
+**Can users add their own MCP servers?**
+
+No. Adding MCP servers is admin-only (**Admin Settings → External Tools**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.

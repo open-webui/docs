@@ -40,6 +40,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | :--- | :--- |
 | 📝 **Markdown content** | Write instructions in plain Markdown |
 | ⚡ **$ mention in chat** | Type `$` to inject a skill's full content into the current message |
+| 🧩 **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
 | 🤖 **Model binding** | Attach skills to models so they're always available |
 | 📦 **Lazy loading** | Model-attached skills inject only a manifest; full content loads on-demand |
 | 📥 **Import/Export** | Import `.md` files with YAML frontmatter; export as JSON |
@@ -53,6 +54,10 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 ### User-selected skills ($ mention)
 
 Type `$` in the chat input to open the skill picker. Select a skill, and its **full content is injected directly** into the system prompt. The model has immediate access to the complete instructions.
+
+### Per-chat skills (Integrations menu)
+
+Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message, and like `$` mention the toggled skill's **full content is injected** into the system prompt. The difference is that a `$` mention applies to a single message, whereas a toggle stays on for the whole conversation. It needs no model-edit permission, so it is the easiest way for a user to add a skill to one conversation.
 
 ### Model-attached skills
 

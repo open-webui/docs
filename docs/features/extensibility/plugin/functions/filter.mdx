@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "Filter Function"
 ---
 
-# 🪄 Filter Function: Modify Inputs and Outputs
+# Filter Function: Modify Inputs and Outputs
 
 :::danger ⚠️ Critical Security Warning
 **Filter Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
@@ -15,7 +15,7 @@ This guide will break down **what Filters are**, how they work, their structure,
 
 ---
 
-## 🌊 What Are Filters in Open WebUI?
+## What Are Filters in Open WebUI?
 
 Imagine Open WebUI as a **stream of water** flowing through pipes:
 
@@ -36,11 +36,11 @@ Filters are like **translators or editors** in the AI workflow: you can intercep
 
 ---
 
-## 🗺️ Structure of a Filter Function: The Skeleton
+## Structure of a Filter Function: The Skeleton
 
 Let's start with the simplest representation of a Filter Function. Don't worry if some parts feel technical at first—we’ll break it all down step by step!
 
-### 🦴 Basic Skeleton of a Filter
+### Basic Skeleton of a Filter
 
 ```python
 from pydantic import BaseModel
@@ -73,7 +73,7 @@ class Filter:
 
 ---
 
-### 🧲 Toggleable Filters: Making Filters User-Controllable (`self.toggle`)
+### Toggleable Filters: Making Filters User-Controllable (`self.toggle`)
 
 By default a filter that's **active and in scope** (global, or attached to the model) runs on every request — the user has no say in it. That's often what you want (PII scrubbing, logging, mandatory guardrails). Sometimes you want the opposite: let the user decide whether the filter runs for a given conversation.
 
@@ -144,9 +144,88 @@ The chip being present = the filter is enabled for the next request. The chip be
 
 ---
 
-## ⚙️ Filter Administration & Configuration
+### Owning Retrieval With file_handler
 
-### 🌐 Global Filters vs. Model-Specific Filters
+By default, when a user attaches a knowledge collection or uploads a file to a chat, Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
+
+This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file/collection *references* (IDs, names, types). **The chunk text doesn't exist yet** — retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough — the data you want isn't there yet.
+
+**`file_handler = True`** is the opt-in escape hatch for exactly this case. Declared as a **module-level attribute** at the top of your filter file, it tells Open WebUI "I am handling retrieval and chunk injection myself — skip the built-in RAG step." When set, the backend strips `body["metadata"]["files"]` and `body["files"]` after your `inlet()` returns, so the chat-completion handler finds no files to retrieve over and goes straight to the LLM with whatever you injected.
+
+```python
+from pydantic import BaseModel
+from typing import Optional
+
+# Module-level attribute — sits OUTSIDE the Filter class, alongside imports.
+file_handler = True
+
+class Filter:
+    class Valves(BaseModel):
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def inlet(
+        self,
+        body: dict,
+        __request__=None,
+        __user__: Optional[dict] = None,
+        __model__: Optional[dict] = None,
+    ) -> dict:
+        # body["metadata"]["files"] still contains the file/collection REFERENCES here.
+        # After this method returns, Open WebUI strips them and does NOT run its own RAG.
+        # Therefore: it is YOUR job to retrieve, transform, and inject chunks below.
+        return body
+```
+
+:::warning Module attribute, not `self.file_handler`
+Open WebUI reads `file_handler` from the **module object** (the file your filter lives in), not from the `Filter` instance. Setting `self.file_handler = True` inside `__init__` is silently ignored. Put the assignment at the top of the file, alongside your imports — exactly as shown above.
+:::
+
+#### When to use it
+
+- **Per-model redaction.** Apply PII / PHI scrubbing only when the request targets a remote model, while letting a self-hosted model see raw chunks. Branch on `__model__["owned_by"]` (or another signal) inside the inlet and transform chunks accordingly.
+- **Custom retrieval logic.** Hybrid BM25 + dense scoring, query rewriting, multi-collection routing, reranking with a different model than the one Open WebUI uses, result caching keyed on the rewritten query.
+- **Pre-injection transformation.** Translation, summarization, deduplication, or any transform that needs the *actual chunk text* rather than just the references.
+- **Chunk-level access control.** Filter out chunks the current user shouldn't see based on metadata attached to the source documents.
+
+#### The recipe
+
+1. Set `file_handler = True` at the top of your filter module.
+2. In `inlet()`, read the file references from `body["metadata"]["files"]` (and `body["files"]` for ad-hoc attachments).
+3. Retrieve chunks yourself. Two options:
+   - **HTTP**: call `POST /api/v1/retrieval/query/doc` (single collection) or `POST /api/v1/retrieval/query/collection` (multiple), passing the user's last message as the query string and the inbound request's bearer token so permissions stay scoped to the user.
+   - **In-process**: `from open_webui.retrieval.utils import get_sources_from_items` and call it directly with the same arguments the core code uses. This avoids the network hop and returns a cleaner shape (list of dicts each containing a `document` array of chunks and a parallel `metadata` array).
+4. Transform the chunks however you need. Branch on `__model__` / `__user__` if the transform is conditional (e.g. "redact only when the model is remote").
+5. Inject the transformed chunks back into `body["messages"]`. To preserve clickable citations in the UI, mirror the format Open WebUI uses internally:
+
+   ```html
+   <source id="1" name="filename.pdf" resource-id="<collection_id>" resource-type="collection">
+   ...chunk text...
+   </source>
+   ```
+
+   Plain Markdown also works if you don't care about citations being clickable in the UI — only the structured `<source>` form wires up the citation popovers.
+6. Return `body`. The built-in RAG step is skipped (because `file_handler` caused the file references to be stripped), and the LLM call goes out with your sanitized chunks already in the prompt.
+
+#### Caveat: it's static, all-or-nothing per filter
+
+`file_handler` is read **once per filter, at the module level**. It is not a per-request signal and cannot be flipped based on the model, user, or chat from inside `inlet()`. When set, the built-in RAG is **always** skipped for any request where this filter is invoked — regardless of whether your `inlet()` actually called any retrieval logic on that particular request.
+
+In practice this means: if you use `file_handler = True`, your filter must handle retrieval for **every** scenario where files would normally be retrieved by the built-in path, including the cases where you'd have been happy with the default behavior. The retrieval call itself is identical in both cases; only any conditional *transformation* (e.g. "only redact for remote models") branches on context.
+
+If you genuinely need per-request switching between built-in and custom retrieval (e.g. "use built-in RAG for some users, custom for others on the same model"), the cleanest approach is to gate the custom-RAG filter on `self.toggle = True` so it only runs when the user has it selected — when the filter isn't selected, it doesn't run, its `file_handler` doesn't apply, and the built-in RAG handles the request normally. Don't try to dynamically mutate `file_handler` from inside `inlet()`; the flag is read off the module object before your method is called.
+
+#### Why this matters compared to mutating `body["files"]` in inlet
+
+A naive alternative is to clear `body["metadata"]["files"] = []` and `body["files"] = []` inside `inlet()` to suppress the built-in RAG dynamically. This works in practice but is brittle: future Open WebUI versions can add new file/collection plumbing under additional keys, and the official "I'm handling this myself" contract is `file_handler`. Prefer the documented opt-in.
+
+---
+
+## Filter Administration & Configuration
+
+### Global Filters vs. Model-Specific Filters
 
 Open WebUI provides a flexible multi-level filter system that allows you to control which filters are active, how they're enabled, and who can toggle them. Understanding this system is crucial for effective filter management.
 
@@ -191,7 +270,7 @@ POST /functions/id/{filter_id}/toggle/global
 
 ---
 
-### 🎛️ The Two-Tier Filter System
+### The Two-Tier Filter System
 
 Open WebUI uses a sophisticated two-tier system for managing filters on a per-model basis. This can be confusing at first, but it's designed to support both **always-on filters** and **user-toggleable filters**.
 
@@ -258,7 +337,7 @@ class Filter:
 
 ---
 
-### 🔄 Toggleable Filters vs. Always-On Filters
+### Toggleable Filters vs. Always-On Filters
 
 Understanding the difference between these two types is key to using the filter system effectively.
 
@@ -348,7 +427,7 @@ class WebSearchFilter:
 
 ---
 
-### 📊 Filter Execution Flow
+### Filter Execution Flow
 
 Here's the complete flow from admin configuration to filter execution:
 
@@ -386,7 +465,7 @@ Here's the complete flow from admin configuration to filter execution:
 
 ---
 
-### 📡 Filter Behavior with API Requests
+### Filter Behavior with API Requests
 
 When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), `inlet()` and `stream()` follow the same execution model as WebUI requests. `outlet()` is the one that behaves very differently for direct API callers and is covered in detail below.
 
@@ -608,7 +687,7 @@ Filters are sorted in **ascending** order by priority. A filter with `priority=0
 
 ---
 
-### 🔗 Data Passing Between Filters
+### Data Passing Between Filters
 
 When multiple filters are active, each filter in the chain receives the **modified data from the previous filter**. The returned value from one filter becomes the input to the next filter in the priority order.
 
@@ -932,6 +1011,10 @@ In the world of Open WebUI, the `inlet` function does this important prep work o
 🚀 **Your Task**:
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
+:::info Want to transform RAG chunks? `inlet()` runs **before** retrieval
+At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file/collection *references* — the actual chunk text is fetched and injected later, after every inlet filter has returned. If you need to inspect or transform the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs), see [Owning Retrieval With `file_handler`](#owning-retrieval-with-file_handler) for the supported opt-in.
+:::
+
 ##### Why Would You Use the `inlet`?
 1. **Adding Context**: Automatically append crucial information to the user’s input, especially if their text is vague or incomplete. For example, you might add "You are a friendly assistant" or "Help this user troubleshoot a software bug."
 
@@ -1036,7 +1119,7 @@ async def stream(self, event: dict) -> dict:
 - Each line represents a **small fragment** of the model's streamed response.
 - The **`delta.content` field** contains the progressively generated text.
 
-##### 🔄 Example: Filtering Out Emojis from Streamed Data
+##### Example: Filtering Out Emojis from Streamed Data
 ```python
 async def stream(self, event: dict) -> dict:
     for choice in event.get("choices", []):
@@ -1073,7 +1156,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring** - Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-`outlet()` does **not** run reliably for direct `/api/chat/completions` calls. On tagged releases it is never invoked by that endpoint. On `dev` it can run inline, but only when the caller supplies `chat_id` + `id`, owns the chat, and uses a non-streaming request — and even then the filtered content is not returned in the HTTP response. For direct API integrations that need `outlet()`, follow `/api/chat/completions` with `POST /api/chat/completed`. See [Filter Behavior with API Requests](#-filter-behavior-with-api-requests) for the full picture.
+`outlet()` does **not** run reliably for direct `/api/chat/completions` calls. On tagged releases it is never invoked by that endpoint. On `dev` it can run inline, but only when the caller supplies `chat_id` + `id`, owns the chat, and uses a non-streaming request — and even then the filtered content is not returned in the HTTP response. For direct API integrations that need `outlet()`, follow `/api/chat/completions` with `POST /api/chat/completed`. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
@@ -1169,7 +1252,7 @@ Publishing a curated package on **[openwebui.com](https://openwebui.com/)** lets
 
 ---
 
-## 🚧 Potential Confusion: Clear FAQ 🛑
+## Potential Confusion: Clear FAQ
 
 ### **Q: How Are Filters Different From Pipe Functions?**
 
