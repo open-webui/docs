@@ -5635,7 +5635,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: `user,admin`
-- Description: Sets the roles that are allowed access to the platform.
+- Description: Sets the roles that are allowed access to the platform. A value of `*` in the list acts as a wildcard that matches any role, so any user presenting a roles claim is allowed.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_ADMIN_ROLES`
