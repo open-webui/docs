@@ -156,7 +156,7 @@ This is the **#1 cause of unexplained memory growth** in production deployments.
 | **Apache Tika** | General-purpose, widely used, handles most document types | `CONTENT_EXTRACTION_ENGINE=tika` + `TIKA_SERVER_URL=http://tika:9998` |
 | **Docling** | High-quality extraction with layout-aware parsing | `CONTENT_EXTRACTION_ENGINE=docling` |
 | **PaddleOCR-vl** | OCR-heavy workloads (scanned PDFs, images, mixed layouts); self-hosted vision-language OCR | `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` + `PADDLEOCR_VL_BASE_URL=http://paddleocr-vl:8080` + `PADDLEOCR_VL_TOKEN=...` |
-| **External Loader** | Recommended for production and custom extraction pipelines | `CONTENT_EXTRACTION_ENGINE=external` + `EXTERNAL_DOCUMENT_LOADER_URL=...` |
+| **Any other External Loader** | Recommended for production and custom extraction pipelines | `CONTENT_EXTRACTION_ENGINE=external` + `EXTERNAL_DOCUMENT_LOADER_URL=...` |
 
 Using an external extractor moves the memory-intensive parsing out of the Open WebUI process entirely, eliminating this class of memory leaks.
 
@@ -496,7 +496,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 *Target: Many concurrent users, Stability > Persistence.*
 
 1.  **Database**: **PostgreSQL** (Mandatory).
-2.  **Content Extraction**: **Tika** or **Docling** (Mandatory — default pypdf leaks memory). See [Content Extraction Engine](#content-extraction-engine).
+2.  **Content Extraction**: **Tika**, **Docling**, **or any other external document loader** (Mandatory — default pypdf leaks memory). See [Content Extraction Engine](#content-extraction-engine).
 3.  **Embeddings**: **External** — `RAG_EMBEDDING_ENGINE=openai` or `ollama` (Mandatory — default SentenceTransformers consumes too much RAM at scale). See [Embedding Engine](#embedding-engine).
 4.  **Tool Calling**: **Native Mode** (mandatory — Default Mode is legacy, no longer supported, and breaks KV cache). All models should be configured for Native Mode. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 5.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
