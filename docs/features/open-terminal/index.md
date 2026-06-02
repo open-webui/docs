@@ -81,6 +81,15 @@ Open Terminal requires models with **native function calling** support. Frontier
 
 ---
 
+## UI Configuration
+
+### Auto-Open Terminal Sidebar
+By default, Open WebUI automatically opens the right sidebar (containing the File Browser and Controls) when a new chat is started with an active terminal.
+
+To change this behavior, go to **Settings > Interface** and toggle off **Auto-Open Terminal Sidebar**. When disabled, the sidebar will remain hidden until you manually open it.
+
+---
+
 ## Enterprise Multi-User
 
 Need isolated, per-user terminal containers for your team? **[Terminals](./terminals/)** provisions a dedicated Open Terminal instance for every user with automatic lifecycle management, resource controls, and policy-based environments.
