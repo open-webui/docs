@@ -51,7 +51,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 
 1. **WEBUI_URL Must Be Set First**: Configure `WEBUI_URL` in the Admin Panel before enabling OAuth, as it's used for redirect URIs.
 
-2. **Persistent Config Behavior**: When `ENABLE_OAUTH_PERSISTENT_CONFIG=true` (default), OAuth settings are stored in the database after first launch. To change environment variables after initial setup, either:
+2. **Persistent Config Behavior**: When `ENABLE_OAUTH_PERSISTENT_CONFIG=true`, OAuth settings are stored in the database after first launch. To change environment variables after initial setup, either:
    - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
    - Update settings through the Admin Panel instead of environment variables
 
