@@ -3290,7 +3290,7 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
   - `view_note` — when notes are attached to the model
   - `query_knowledge_bases` and `search_knowledge_bases` — when no knowledge is attached, so the model can still discover KBs by name/description
 
-  Experimental — best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+  **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** enabled (it is a native-mode builtin tool); in Default Mode it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 
 #### `RAG_HYBRID_BM25_WEIGHT`
 
@@ -3752,7 +3752,7 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, injects RAG context into the **system message** instead of the user message. This is highly recommended for optimizing performance when using models that support **KV prefix caching** or **Prompt Caching**. This includes local engines (like Ollama, llama.cpp, or vLLM) and cloud providers / Model-as-a-Service providers (like OpenAI and Vertex AI). By placing the context in the system message, it remains at a stable position at the start of the conversation, allowing the cache to persist across multiple turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
+- Description: When enabled, injects RAG context into the **system message** instead of the user message. For models that support **KV prefix caching** or **Prompt Caching** (local engines like Ollama, llama.cpp or vLLM, and cloud providers like OpenAI and Vertex AI), this keeps the context at a stable position at the start of the conversation, so the cache can persist across turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
 
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 

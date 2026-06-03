@@ -13,6 +13,10 @@ This page covers the most common RAG problems and their solutions.
 
 RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Admin Panel > Settings > Documents**.
 
+:::tip Agentic retrieval: enable kb_exec
+If your models use **native function calling**, set [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) for a noticeably better knowledge-base experience. It gives the model a filesystem-style interface (`ls`, `tree`, `grep`, `cat`, read-by-line) over your knowledge that capable models chain more reliably than the individual search tools. It has no effect in Default Mode. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+:::
+
 ### Local models with constrained context (≤ 8K tokens)
 
 Typical for Ollama models on consumer hardware (Llama 3.1 8B, Qwen 2.5 7B, Gemma 3 4B, Phi-3 Mini, etc.) where context windows are limited.
