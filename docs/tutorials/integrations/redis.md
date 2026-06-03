@@ -66,7 +66,7 @@ Without Redis in multi-worker or multi-instance scenarios, you will experience:
 ### Prerequisites
 
 - A valid Open WebUI instance (running version 1.0 or higher)
-- A Redis container (we will use `docker.io/valkey/valkey:8.0.1-alpine` in this example, which is based on the latest Redis 7.x release)
+- A Redis container (we will use `redis:7-alpine` in this example)
 - Docker Composer (version 2.0 or higher) installed on your system
 - A Docker network for communication between Open WebUI and Redis
 - Basic understanding of Docker, Redis, and Open WebUI
@@ -112,8 +112,8 @@ timeout 1800
 ```yml
 services:
   redis:
-    image: docker.io/valkey/valkey:8.0.1-alpine
-    command: "valkey-server --save 30 1 --maxclients 10000 --timeout 1800"
+    image: redis:7-alpine
+    command: "redis-server --save 30 1 --maxclients 10000 --timeout 1800"
     # ... rest of config
 ```
 
@@ -142,13 +142,13 @@ To set up Redis for websocket support, you will need to create a `docker-compose
 ```yml
 services:
   redis:
-    image: docker.io/valkey/valkey:8.0.1-alpine
-    container_name: redis-valkey
+    image: redis:7-alpine
+    container_name: redis
     volumes:
       - redis-data:/data
-    command: "valkey-server --save 30 1 --maxclients 10000 --timeout 1800"
+    command: "redis-server --save 30 1 --maxclients 10000 --timeout 1800"
     healthcheck:
-      test: "[ $$(valkey-cli ping) = 'PONG' ]"
+      test: "[ $$(redis-cli ping) = 'PONG' ]"
       start_period: 5s
       interval: 1s
       timeout: 3s
@@ -182,7 +182,7 @@ Notes
 
 The `ports` directive is not included in this configuration, as it is not necessary in most cases. The Redis service will still be accessible from within the Docker network by the Open WebUI service. However, if you need to access the Redis instance from outside the Docker network (e.g., for debugging or monitoring purposes), you can add the `ports` directive to expose the Redis port (e.g., `6379:6379`).
 
-The above configuration sets up a Redis container named `redis-valkey` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option saves the Redis database to disk every 30 minutes if at least 1 key has changed.
+The above configuration sets up a Redis container named `redis` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option saves the Redis database to disk every 30 minutes if at least 1 key has changed.
 
 **Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion. See the "Critical: Redis Server Configuration" section above for details.
 
@@ -236,7 +236,7 @@ To enable Redis support in Open WebUI, you need to configure different environme
 For **all deployments** using Redis (single or multi-instance), set the following base environment variable:
 
 ```bash
-REDIS_URL="redis://redis-valkey:6379/0"
+REDIS_URL="redis://redis:6379/0"
 ```
 
 This variable configures the primary Redis connection for application state management, session storage, and coordination between instances.
@@ -248,7 +248,7 @@ To enable websocket support specifically, add these additional environment varia
 ```bash
 ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
-WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
+WEBSOCKET_REDIS_URL="redis://redis:6379/1"
 ```
 
 :::danger Critical: Configure CORS for WebSocket Connections
@@ -391,12 +391,12 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 Here's a complete example showing all Redis-related environment variables:
 ```bash
 # Required for multi-worker/multi-instance deployments
-REDIS_URL="redis://redis-valkey:6379/0"
+REDIS_URL="redis://redis:6379/0"
 
 # Required for websocket support
 ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
-WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"
+WEBSOCKET_REDIS_URL="redis://redis:6379/1"
 
 # Recommended for Sentinel deployments (prevents failover hangs)
 REDIS_SOCKET_CONNECT_TIMEOUT=5
@@ -444,10 +444,10 @@ docker run -d \
   --network openwebui-network \
   -v open-webui:/app/backend/data \
   -p 3000:8080 \
-  -e REDIS_URL="redis://redis-valkey:6379/0" \
+  -e REDIS_URL="redis://redis:6379/0" \
   -e ENABLE_WEBSOCKET_SUPPORT="true" \
   -e WEBSOCKET_MANAGER="redis" \
-  -e WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1" \
+  -e WEBSOCKET_REDIS_URL="redis://redis:6379/1" \
   -e REDIS_KEY_PREFIX="open-webui" \
   ghcr.io/open-webui/open-webui:main
 ```
@@ -456,9 +456,9 @@ docker run -d \
 
 **Important Note on Service Names**
 
-In the examples above, we use `redis://redis-valkey:6379` because:
+In the examples above, we use `redis://redis:6379` because:
 
-- `redis-valkey` is the container name defined in the docker-compose.yml
+- `redis` is the container name defined in the docker-compose.yml
 - Docker's internal DNS resolves this name to the correct IP address within the network
 - This is the recommended approach for Docker deployments
 
@@ -472,7 +472,7 @@ If you're running multiple Uvicorn workers on a single host, add this variable:
 
 ```bash
 UVICORN_WORKERS="4"  # Adjust based on your CPU cores
-REDIS_URL="redis://redis-valkey:6379/0"  # Required when UVICORN_WORKERS > 1
+REDIS_URL="redis://redis:6379/0"  # Required when UVICORN_WORKERS > 1
 ```
 
 :::danger
@@ -509,7 +509,7 @@ See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-dur
 First, confirm that your Redis instance is running and accepting connections:
 
 ```bash
-docker exec -it redis-valkey valkey-cli -p 6379 ping
+docker exec -it redis redis-cli -p 6379 ping
 ```
 
 This command should output `PONG` if the Redis instance is running correctly.
@@ -545,11 +545,7 @@ docker logs open-webui 2>&1 | grep "Using Redis to manage websockets"
 You can also verify that Open WebUI is actually writing data to Redis:
 
 ```bash
-# List all Open WebUI keys
-docker exec -it redis-valkey valkey-cli --scan --pattern "open-webui*"
-
-# Or with the default Redis CLI
-docker exec -it redis-valkey redis-cli --scan --pattern "open-webui*"
+docker exec -it redis redis-cli --scan --pattern "open-webui*"
 ```
 
 If Redis is configured correctly, you should see keys with your configured prefix (e.g., `open-webui:session:*`, `open-webui:config:*`).
@@ -579,7 +575,7 @@ If you're logged out randomly or see authentication errors, Redis is likely not 
 **Solutions:**
 
 1. Verify Redis container is running: `docker ps | grep redis`
-2. Check Redis is healthy: `docker exec -it redis-valkey valkey-cli ping`
+2. Check Redis is healthy: `docker exec -it redis redis-cli ping`
 3. Verify network connectivity: `docker network inspect openwebui-network`
 4. Ensure the `REDIS_URL` uses the correct container name, not `127.0.0.1` or `localhost`
 5. Check that both containers are on the same Docker network
@@ -598,7 +594,7 @@ If you're logged out randomly or see authentication errors, Redis is likely not 
 Add the `REDIS_URL` environment variable:
 
 ```bash
-REDIS_URL="redis://redis-valkey:6379/0"
+REDIS_URL="redis://redis:6379/0"
 ```
 
 #### Issue: "Websockets not working"
@@ -614,7 +610,7 @@ REDIS_URL="redis://redis-valkey:6379/0"
 1. Verify all websocket environment variables are set:
    - `ENABLE_WEBSOCKET_SUPPORT="true"`
    - `WEBSOCKET_MANAGER="redis"`
-   - `WEBSOCKET_REDIS_URL="redis://redis-valkey:6379/1"`
+   - `WEBSOCKET_REDIS_URL="redis://redis:6379/1"`
 2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.`
 3. Verify Redis is accessible from Open WebUI container
 
@@ -649,11 +645,11 @@ REDIS_KEY_PREFIX="openwebui-dev"
 1. Configure Redis maxmemory policy:
 
 ```yml
-   command: "valkey-server --save 30 1 --maxmemory 256mb --maxmemory-policy allkeys-lru"
+   command: "redis-server --save 30 1 --maxmemory 256mb --maxmemory-policy allkeys-lru"
 ```
 
-2. Monitor Redis memory: `docker exec -it redis-valkey valkey-cli info memory`
-3. Clear old keys if needed: `docker exec -it redis-valkey valkey-cli FLUSHDB`
+2. Monitor Redis memory: `docker exec -it redis redis-cli info memory`
+3. Clear old keys if needed: `docker exec -it redis redis-cli FLUSHDB`
 
 #### Issue: "max number of clients reached" after days/weeks of operation
 
@@ -699,7 +695,7 @@ REDIS_KEY_PREFIX="openwebui-dev"
    sudo systemctl restart redis
    
    # For Docker
-   docker restart redis-valkey
+   docker restart redis
    ```
 
 **Prevention:** Always configure `timeout` to a reasonable value (e.g., 1800 seconds). The timeout only affects idle TCP connections, not user sessions — it's safe and recommended. Pair this with `REDIS_HEALTH_CHECK_INTERVAL` on the client side (see below).
@@ -740,7 +736,7 @@ The health check interval should also be shorter than any firewall or load balan
 ### Additional Resources
 
 - [Redis Documentation](https://redis.io/docs)
-- [Valkey Documentation](https://valkey.io/docs/)
+- [Using Valkey](/tutorials/integrations/valkey): the open-source, drop-in Redis-compatible alternative
 - [Docker Compose Documentation](https://docs.docker.com/compose/overview/)
 - [Open WebUI Environment Variables](https://docs.openwebui.com/reference/env-configuration/)
 - [sysctl Documentation](https://man7.org/linux/man-pages/man8/sysctl.8.html)

@@ -189,6 +189,59 @@ Set global defaults to disable code interpreter across all models, enforce a con
 
 ---
 
+## Curated-Interface Deployments
+
+A common deployment pattern is to present regular users with a curated model — a preconfigured agent with a specific name, icon, system prompt, and tools — while keeping the underlying base model visible only to power users or admins who need direct access.
+
+### The recommended pattern: two base model entries
+
+The correct way to achieve differential visibility is to create **two separate base model entries** that point to the same underlying LLM:
+
+| Entry | Access | Hidden | Who sees it | Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| **Base model** (e.g. "GPT-4o") | Restricted to power users | No | Power users only | Direct exploration and testing |
+| **Curated model** (e.g. "Company Assistant") | Public | No | Everyone | The sanctioned product for regular users |
+
+The curated model is a first-class base model entry — not a workspace model wrapping the restricted one. Configure it with its own name, avatar, system prompt, knowledge bases, tools, and parameter overrides. It connects to the same upstream LLM but is an independent configuration entry.
+
+**Step-by-step setup:**
+
+1. In **Admin Panel > Models**, locate your base model (e.g. "GPT-4o").
+2. Set its access control to **Private** and grant access only to your power users / admin group.
+3. Click the ellipsis (**...**) on the base model and select **Clone**. This creates a copy with all settings.
+4. Rename the clone to your curated product name (e.g. "Company Assistant"). Update the avatar, system prompt, knowledge, and tools as needed.
+5. Set the curated model's access to **Public** (or restrict it to the groups that should see it).
+
+Now power users see and use the original base model directly, while regular users see only the curated model. Both entries point to the same upstream LLM but are configured independently.
+
+:::tip Upgrading the upstream model
+When you switch to a newer LLM (e.g. Qwen 3 → Qwen 3.5), update the base model selection on both entries. You can also use **Export** and **Import** to keep settings synchronized across entries.
+:::
+
+### Why not a workspace model on a restricted base?
+
+Workspace models inherit the access requirements of their base model. If a user does not have access to the base model, they cannot use any workspace model built on top of it — even if the workspace model itself is shared with them.
+
+This is by design. Without this requirement, anyone could bypass base model access restrictions by creating a workspace model on a restricted base and sharing it publicly. That would be broken access control.
+
+:::warning
+If you previously relied on workspace models to give users access to base models they couldn't see directly, that pattern depended on an access-control gap that has been patched. The two-base-model pattern described above achieves the same outcome without the security issue.
+:::
+
+### Alternative: hidden base model
+
+If you don't need differential visibility — meaning no group needs to see the raw base model in the picker — you can use a simpler approach:
+
+1. Set the base model to **Public** (so everyone has access).
+2. **Hide** the base model (ellipsis > Hide) so it doesn't appear in the model selector.
+3. Create a workspace model on top of the (now hidden) base model and share it with your users.
+
+Users see only the workspace model. The hidden base model is accessible under the hood but invisible in the UI. Admins can still access hidden models via direct URL parameters.
+
+This approach works when every user should have the same experience. It does **not** work when some groups need direct access to the base model in their picker.
+
+---
+
 ## Limitations
 
 ### Preset, not fine-tune

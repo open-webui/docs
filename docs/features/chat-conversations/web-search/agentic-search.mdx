@@ -36,6 +36,10 @@ To unlock these features, your model must support native tool calling and have s
     *   In the same model settings, under **Advanced Parameters**, set **Function Calling** to `Native`.
 5.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
 
+:::info Configuring via environment variables instead
+The steps above use the Admin Panel, which is the recommended route. If you manage your instance through env vars, set the global default with `DEFAULT_MODEL_PARAMS: '{"function_calling": "native"}'` — there is **no** separate `FUNCTION_CALLING_MODE` variable. See the [central tools guide](/features/extensibility/plugin/tools#how-to-enable-native-mode-agentic-mode) for details.
+:::
+
 :::tip Model Capability, Default Features, and Chat Toggle
 In **Native Mode** (the supported mode), the `search_web` and `fetch_url` tools require both the **Web Search** capability to be enabled *and* **Web Search** to be checked under **Default Features** in the model settings (or toggled on in the chat). If either is missing, the tools will not be injected — even though other builtin tools may still appear.
 

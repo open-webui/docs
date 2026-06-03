@@ -43,7 +43,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
-| 🔄 **Incremental directory sync** | Mirror a local folder into the KB — only new and modified files upload, deletions are removed, mirroring folder structure |
+| 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/features/knowledge-base-sync) |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
 ---
@@ -125,7 +125,7 @@ When [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) is set
 - **`view_note`** — when notes are attached to the model (`kb_exec` is file-only, so notes need a dedicated reader)
 - **`query_knowledge_bases`** and **`search_knowledge_bases`** — when no KB is attached to the model, so the model can still discover and search across knowledge bases by name/description
 
-This is experimental and **off by default**. It targets frontier models that already "think in shell" — they tend to chain `ls`, `grep`, and `cat` more reliably than they orchestrate a fan-out of specialized tools.
+It is **off by default** and still experimental, but for an enhanced agentic RAG experience we recommend enabling it (`ENABLE_KB_EXEC=True`) for capable models running native function calling. It targets frontier models that already "think in shell": they tend to chain `ls`, `grep` and `cat` more reliably than they orchestrate a fan-out of specialized tools. It only works with native function calling on; in Default Mode it has no effect.
 
 **Supported commands**
 
@@ -166,6 +166,19 @@ Files can be addressed three ways — pick whichever is unambiguous:
 - Built on top of the directory model — `kb_exec` is the only tool that fully reflects the directory structure created in the UI.
 
 Autonomous exploration works best with frontier models that can intelligently chain search, browse, and synthesize. Smaller models may struggle with multi-step retrieval. Administrators can disable the **Knowledge Base** tool category per-model in **Workspace > Models > Edit > Builtin Tools**.
+
+#### Guiding tool choice across mixed knowledge bases
+
+With `kb_exec` enabled, the model picks between two complementary tools, and the simplest way to make it reach for the right one per knowledge base is a short **system prompt** that names the bases and the tool to favour:
+
+- **Prose and PDFs** suit `query_knowledge_files` (semantic search). It matches on meaning, so it handles paraphrased questions over documents well and does not depend on clean text extraction.
+- **Text files, code, configs and logs** suit `kb_exec` (`ls`, `tree`, `grep`, `cat`, read-by-line). The model can walk the tree and pull exact lines, which beats semantic search for literal identifiers, error strings and structure.
+
+A prompt that spells this out per base biases the model correctly while still letting it decide each call:
+
+> Two knowledge bases are attached. **Handbook** is PDF documentation: use `query_knowledge_files` for questions about it. **Codebase** is source files: use `kb_exec` (`grep`, `cat`, `ls`) to find and read exact code. In general, prefer `kb_exec` for exact strings, identifiers and file structure, and `query_knowledge_files` for conceptual questions.
+
+Without `kb_exec`, the same split applies between [`grep_knowledge_files` and `query_knowledge_files`](#when-to-prefer-grep_knowledge_files-over-query_knowledge_files).
 
 For the full list of built-in agentic tools, see the [Native/Agentic Mode Tools Guide](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 
@@ -226,6 +239,10 @@ Individual files can be renamed in place from the workspace via the file's item 
 
 The **Add Content → Sync Directory** action mirrors a local folder into the knowledge base **incrementally**: the client hashes each local file (SHA-256), the server compares hashes and paths against what is already stored, and only **new**, **modified**, and **deleted** files are touched. Unmodified files (the typical majority) are left alone — no re-upload, no re-embedding. The local folder's subdirectory structure is mirrored in the KB; missing subdirectories are created, and subdirectories that no longer exist locally are removed.
 
+:::tip Syncing a lot of files? Use oikb instead
+The in-app **Sync Directory** runs in your browser: it enumerates, hashes and uploads every file client-side. That is fine for a modest folder, but on a **large** set (thousands of files or a multi-gigabyte vault) it gets slow and gives little progress feedback, often sitting for a long time before it even reports the file count. For large or frequently-changing libraries we **strongly recommend** the official [**Knowledge Base Sync (oikb)**](/features/knowledge-base-sync) tool instead: it runs natively with progress bars, parallel uploads and retries, built for exactly this. Point it at the top of your folder and it syncs the entire tree (every subdirectory, recursively) into one Knowledge Base.
+:::
+
 Behavior to be aware of:
 
 - Hidden files and folders (anything beginning with `.`) are skipped.
@@ -233,7 +250,11 @@ Behavior to be aware of:
 - Files removed locally are deleted from the KB during the cleanup step.
 - The action is **non-destructive** for unchanged files. Earlier versions of the same menu action used to wipe and re-upload everything — that is no longer the case as of v0.9.6.
 
-For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below. To sync from a remote source (GitHub, Confluence, S3 and dozens more) or on a schedule, use the official [oikb](/features/workspace/oikb) tool, which drives these endpoints for you.
+For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
+
+:::tip Sync remote sources, or on a schedule
+The in-app **Sync Directory** action handles a local folder on your machine. To mirror a **remote** source instead (a GitHub repo, a Confluence space, an S3 bucket and [dozens more](/features/knowledge-base-sync#sources-and-connectors)), or to keep a Knowledge Base current **automatically** on a schedule or on every push, use the official [**Knowledge Base Sync (oikb)**](/features/knowledge-base-sync) companion tool. It drives these same endpoints for you.
+:::
 
 ### Exporting
 
