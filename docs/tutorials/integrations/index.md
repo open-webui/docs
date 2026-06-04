@@ -49,3 +49,4 @@ These community-contributed guides cover specific integration scenarios with ste
 | [Notion (MCP)](./mcp-notion) | Connect Notion via Model Context Protocol | 👤 User · ⏱️ 5 min |
 | [OneDrive & SharePoint](./onedrive-sharepoint) | Pull Microsoft 365 documents into Open WebUI | 👤 Admin · ⏱️ 30 min |
 | [LibreTranslate](./libre-translate) | Add self-hosted translation capabilities | 👤 Admin · ⏱️ 15 min |
+| [Traefik Reverse Proxy](./traefik) | Deploy Open WebUI behind a production-grade reverse proxy | 👤 Admin · ⏱️ 15 min |
