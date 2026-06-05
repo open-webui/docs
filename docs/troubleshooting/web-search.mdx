@@ -70,7 +70,16 @@ If web search returns empty content or poor quality results, the issue is often 
 
   In Native/Agentic tool calling, if the model omits `count` for `search_web`, Open WebUI uses `WEB_SEARCH_RESULT_COUNT` by default. If the model provides `count`, it is capped at the same admin-configured maximum.
 
-- **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use `playwright` for JavaScript-heavy sites or `firecrawl`/`tavily` for better extraction.
+- **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use a loader that matches the pages you need to fetch.
+
+  | Loader engine | Best fit | Notes |
+  |---------------|----------|-------|
+  | `safe_web` | Static pages and simple HTML | This is the default internal loader. It is lightweight and supports `WEB_LOADER_TIMEOUT`, but it does not render JavaScript-heavy pages. |
+  | `playwright` | Pages that require browser rendering | Use this when content is populated by client-side JavaScript. Tune `PLAYWRIGHT_TIMEOUT` if pages need more time to render. |
+  | `firecrawl` | Hosted or self-hosted extraction workflows | Use this when you want Firecrawl to handle crawling/extraction. Configure `FIRECRAWL_API_BASE_URL`, `FIRECRAWL_API_KEY`, and `FIRECRAWL_TIMEOUT` as needed. |
+  | `tavily` | Tavily-backed extraction workflows | Use this when your deployment already relies on Tavily for web content retrieval. |
+
+  If page fetching hangs or returns empty content, start with `safe_web` plus a finite [`WEB_LOADER_TIMEOUT`](/reference/env-configuration#web_loader_timeout). Switch to `playwright` only when the target page needs browser rendering, or to a hosted extraction service when you prefer that service's crawling behavior.
 
 - **Set a real User-Agent**: If results from Wikipedia, Cloudflare-protected sites, or other large publishers come back empty (or as 403s in logs), the default Python `requests`/`aiohttp` UA is being filtered by bot detection. Set [`USER_AGENT`](/reference/env-configuration#user_agent) to a real browser-like string (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`). This affects both web search result fetching and the `fetch_url` tool.
 
