@@ -77,6 +77,38 @@ pip install mcpo
 mcpo --port 8000 -- your_mcp_server_command
 ```
 
+Or run the published container without installing Python packages on the host:
+
+```bash
+docker run --rm -p 8000:8000 ghcr.io/open-webui/mcpo:main \
+  --api-key "top-secret" \
+  -- your_mcp_server_command
+```
+
+For a disposable Compose setup, create a `docker-compose.yml` next to your MCP proxy configuration:
+
+```yaml
+services:
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    ports:
+      - "8000:8000"
+    command:
+      - --api-key
+      - top-secret
+      - --
+      - your_mcp_server_command
+```
+
+Replace `your_mcp_server_command` with your server command and add each argument as its own `command` list item.
+
+Then start and remove the proxy with:
+
+```bash
+docker compose up
+docker compose down
+```
+
 3. 🚀 **Run the Proxy Server**
 
 To start your MCP-to-OpenAPI proxy server, you need an MCP-compatible tool server. If you don't have one yet, the MCP community provides various ready-to-use MCP server implementations.
