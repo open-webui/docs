@@ -59,7 +59,7 @@ Start the server and it opens in your browser:
 cptr run
 ```
 
-To reach it from other devices on your network, bind to all interfaces:
+By default `cptr run` listens on `127.0.0.1`, so it is reachable only from the machine it runs on. To open it to other devices on your network, bind to all interfaces:
 
 ```bash
 cptr run --host 0.0.0.0
@@ -93,7 +93,7 @@ cptr is designed as "your computer, served to you", so that level of access is t
 - you are the only user, and
 - you control the network it is exposed on.
 
-It is **not** safe if untrusted users share the instance, it is reachable from the public internet, or a reverse proxy in front of it forwards spoofable authentication headers. If you want to reach cptr from outside your machine, put it behind a VPN or a tunnel rather than opening a public port, the same way you would treat SSH.
+It is **not** safe if untrusted users share the instance, it is reachable from the public internet, or a reverse proxy in front of it forwards spoofable authentication headers. By default cptr binds to localhost only, so reaching it from another machine is an explicit opt-in (`cptr run --host 0.0.0.0`, or publishing the Docker port). When you do open it up, put it behind a VPN or a tunnel rather than a public port, the same way you would treat SSH.
 
 ## License
 
