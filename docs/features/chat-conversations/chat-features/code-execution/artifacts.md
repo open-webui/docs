@@ -32,6 +32,22 @@ When Open WebUI creates an Artifact, you'll see the content displayed in a dedic
 - **Updates**: Open WebUI may update an existing Artifact based on your messages. The Artifact window will display the latest content.
 - **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen, located in the lower right corner of the Artifact.
 
+## Securing artifact previews with a CSP
+
+Artifact previews render inside a sandboxed `srcdoc` iframe. For tighter control over what that generated HTML can do (outbound network calls, scripts, styles), inject a dedicated Content Security Policy into the preview with the [`IFRAME_CSP`](/reference/env-configuration#iframe_csp) environment variable, separate from the main app's `CONTENT_SECURITY_POLICY`.
+
+It is empty by default (the iframe `sandbox` already provides baseline isolation) and applies to **every** `srcdoc` iframe in the UI: Artifacts, code/HTML previews, file previews and citation modals. When set, Open WebUI prepends a `<meta http-equiv="Content-Security-Policy">` tag to the iframe document, and per the CSP spec the first policy wins, so it overrides any CSP the generated HTML already declares. A reasonable starting point:
+
+```bash
+IFRAME_CSP=default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'
+```
+
+That keeps inline scripts and styles working (most artifacts need them) while blocking `fetch` / `XMLHttpRequest` / `WebSocket`, so an artifact cannot quietly call out to the network.
+
+:::tip Start permissive, then tighten
+An overly strict policy can make a preview appear blank, since many artifacts rely on inline `<script>` and `<style>`. Start permissive and narrow from there. `IFRAME_CSP` is a startup environment variable (not an Admin Panel setting), so changing it requires a restart. For the security-focused walkthrough, see [Hardening → Iframe content-security-policy](/getting-started/advanced-topics/hardening#iframe-content-security-policy).
+:::
+
 ## Editing Artifacts
 
 1. **Targeted Updates**: Describe what you want changed and where. For example:
@@ -112,3 +128,11 @@ If you encounter an issue where the code preview in the chat interface does not 
 1. Go to **Settings > Interface**.
 2. Toggle on **Allow Iframe Sandbox Same-Origin Access**.
 3. Save your settings.
+
+### Artifact Preview Is Blank After Setting a CSP
+
+If previews stop rendering after you set [`IFRAME_CSP`](/reference/env-configuration#iframe_csp), the policy is blocking something the generated HTML needs.
+
+1. Open your browser developer tools and look for **CSP violation** messages in the console.
+2. Relax the policy for just the blocked resource type or origin (commonly inline `script` / `style`, `eval`, or a specific image, font or `connect` origin).
+3. To rule the CSP out entirely, temporarily unset `IFRAME_CSP` and restart; the preview falls back to sandbox-only isolation.
