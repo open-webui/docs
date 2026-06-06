@@ -128,13 +128,13 @@ class Tools:
 Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
 
 :::danger Author tools for Native Mode
-Default Mode is **legacy and no longer supported** — see the [Tool Calling Modes guide](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for the full policy. Write your tools to work correctly under **Native (Agentic) Mode**, which is the only supported mode going forward. The event-emitter compatibility matrix below still documents Default Mode behavior for historical reference and for maintainers of pre-existing tools that haven't been migrated yet — but new tools should not depend on Default-Mode-only event types. If your tool's UX fundamentally requires an event type that only works in Default Mode (`message`, `chat:message:delta`, `chat:message`, `replace` mid-stream), redesign the UX around Native-compatible events (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`) rather than requiring users to switch their model to legacy mode.
+Legacy Mode is **legacy and no longer supported** — see the [Tool Calling Modes guide](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for the full policy. Write your tools to work correctly under **Native (Agentic) Mode**, which is the only supported mode going forward. The event-emitter compatibility matrix below still documents Legacy Mode behavior for historical reference and for maintainers of pre-existing tools that haven't been migrated yet — but new tools should not depend on Default-Mode-only event types. If your tool's UX fundamentally requires an event type that only works in Legacy Mode (`message`, `chat:message:delta`, `chat:message`, `replace` mid-stream), redesign the UX around Native-compatible events (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`) rather than requiring users to switch their model to legacy mode.
 :::
 
 Event Emitter behavior differs between the two function calling modes. The function calling mode is controlled by the `function_calling` parameter:
 
 - **Native Mode (Agentic Mode)** (`function_calling = "native"`) — the only supported mode. Uses the model's structured tool-call API. **Limited event-emitter surface** — see the matrix below for exactly which event types are supported.
-- **Default Mode** (`function_calling = "default"`) — legacy, prompt-injection-based. Full event-emitter surface, but the mode itself is unsupported and should not be selected for new deployments.
+- **Legacy Mode** (`function_calling = "legacy"`) — the prompt-injection mode. Full event-emitter surface, but the mode itself is unsupported and should not be selected for new deployments.
 
 For the full mode policy, model requirements, and configuration, see the [**Tool Calling Modes guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native). In short: **use Native Mode**; the matrix below tells you which event types work there.
 
@@ -142,8 +142,8 @@ For the full mode policy, model requirements, and configuration, see the [**Tool
 
 You can configure the function calling mode in two places:
 
-1. **Administrator Level**: Go to **Admin Panel > Settings > Models > Model Specific Settings > Advanced Parameters > Function Calling** (set to "Default" or "Native").
-2. **Per-request basis**: Set `params.function_calling = "native"` or `"default"` in Chat Controls > Advanced Params.
+1. **Administrator Level**: Go to **Admin Panel > Settings > Models > Model Specific Settings > Advanced Parameters > Function Calling** (set to "Native" or "Legacy").
+2. **Per-request basis**: Set `params.function_calling = "native"` or `"legacy"` in Chat Controls > Advanced Params.
 
 If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field).
 
@@ -156,7 +156,7 @@ When writing custom tools, be aware that Open WebUI also provides **built-in sys
 
 Here's the comprehensive breakdown of how each event type behaves across function calling modes:
 
-| Event Type | Default Mode Functionality | Native Mode Functionality | Status |
+| Event Type | Legacy Mode Functionality | Native Mode Functionality | Status |
 |------------|---------------------------|--------------------------|--------|
 | `status` | ✅ Full support - Updates status history during tool execution | ✅ **Identical** - Tracks function execution status | **COMPATIBLE** |
 | `message` | ✅ Full support - Appends incremental content during streaming | ❌ **BROKEN** - Gets overwritten by native completion snapshots | **INCOMPATIBLE** |
@@ -197,7 +197,7 @@ class Tools:
 
     async def interactive_tool(self, prompt: str, __event_emitter__=None) -> str:
         """
-        ⚠️ This tool requires function_calling = "default" for proper event emission
+        ⚠️ This tool requires function_calling = "legacy" for proper event emission
         """
         if not __event_emitter__:
             return "Event emitter not available - ensure Default function calling mode is enabled"
@@ -253,7 +253,7 @@ async def universal_tool(self, prompt: str, __event_emitter__=None, __metadata__
 - Status updates work but content updates don't persist
 
 **Solutions:**
-1. **Switch to Default Mode**: Change `function_calling` from `"native"` to `"default"` in model settings
+1. **Switch to Legacy Mode**: Change `function_calling` from `"native"` to `"legacy"` in model settings
 2. **Use Compatible Event Types**: Stick to `status`, `citation`, `notification`, and other compatible event types in native mode
 3. **Implement Mode Detection**: Add logic to detect function calling mode and adjust event usage accordingly
 4. **Consider Hybrid Approaches**: Use compatible events for core functionality and degrade gracefully
@@ -497,13 +497,13 @@ async def batch_processor_tool(
 Message events (`message`, `chat:message`, `chat:message:delta`, `replace`) allow you to append or modify message content at any stage during tool execution. This enables embedding images, rendering web pages, streaming content updates, and creating rich interactive experiences.
 
 **However, these event types have major compatibility issues:**
-- ✅ **Default Mode**: Full functionality - content persists and displays properly
+- ✅ **Legacy Mode**: Full functionality - content persists and displays properly
 - ❌ **Native Mode**: BROKEN - content gets overwritten by completion snapshots and disappears
 
 **Why Message Events Break in Native Mode:**
 Native function calling emits repeated `chat:completion` events with full content snapshots that completely replace message content, causing any tool-emitted message updates to flicker and disappear.
 
-**Safe Message Event Structure (Default Mode Only):**
+**Safe Message Event Structure (Legacy Mode Only):**
 ```python
 await __event_emitter__({
     "type": "message",  # Also: "chat:message", "chat:message:delta", "replace"
@@ -518,7 +518,7 @@ await __event_emitter__({
 - Both types will be overwritten in Native mode
 
 <details>
-<summary>Safe Message Streaming (Default Mode)</summary>
+<summary>Safe Message Streaming (Legacy Mode)</summary>
 
 ```python
 async def streaming_content_tool(
@@ -526,7 +526,7 @@ async def streaming_content_tool(
     ) -> str:
         """
         Streams content updates during processing
-        ⚠️ REQUIRES function_calling = "default" - Will not work in Native mode!
+        ⚠️ REQUIRES function_calling = "legacy" - Will not work in Native mode!
         """
 
         # Check function calling mode (rough detection)
@@ -582,7 +582,7 @@ async def streaming_content_tool(
 </details>
 
 <details>
-<summary>Dynamic Content Replacement (Default Mode)</summary>
+<summary>Dynamic Content Replacement (Legacy Mode)</summary>
 
 ```python
 async def live_dashboard_tool(
@@ -1185,15 +1185,15 @@ await __event_emitter__({
 
 #### Comprehensive Function Calling Mode Guide
 
-:::danger Write tools for Native Mode — Default Mode is unsupported
-Default Mode is **legacy and no longer supported**. New tools should be written to work under Native Mode. The mode-comparison details below are retained so that maintainers of legacy Default-Mode tools understand the gap they need to close when migrating — they are **not** a recommendation to choose Default Mode for new work.
+:::danger Write tools for Native Mode — Legacy Mode is unsupported
+Legacy Mode is **legacy and no longer supported**. New tools should be written to work under Native Mode. The mode-comparison details below are retained so that maintainers of legacy Default-Mode tools understand the gap they need to close when migrating — they are **not** a recommendation to choose Legacy Mode for new work.
 
 If your tool design depends on a Default-Mode-only event type, redesign the UX around the Native-compatible surface (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`, plus returning a final content block from the tool method). Requiring users to switch their model to legacy mode to run your tool is not acceptable going forward.
 :::
 
 **Mode Comparison Overview** *(for migration reference only — Native is the only supported target)*:
 
-| Aspect | Default Mode (Legacy / Unsupported) | Native Mode (Supported) |
+| Aspect | Legacy Mode (Legacy / Unsupported) | Native Mode (Supported) |
 |--------|-------------|-------------|
 | **Status** | ❌ Legacy, no longer supported | ✅ Required for new tools |
 | **Latency** | Higher — full prompt-injection pipeline | Lower — direct tool-call API |
@@ -1301,7 +1301,7 @@ async def mode_adaptive_tool(
 
 **Issue: Content appears then disappears**
 - **Cause**: Using `message` / `chat:message` / `replace` events in Native Mode — completion snapshots overwrite them.
-- **Solution**: Return the content from the tool method and use `status` events for progress instead. Do **not** switch to Default Mode — Default Mode is legacy and no longer supported.
+- **Solution**: Return the content from the tool method and use `status` events for progress instead. Do **not** switch to Legacy Mode — Legacy Mode is no longer supported.
 
 **Issue: Tool seems unresponsive**
 - **Cause**: Function calling not enabled for model
@@ -1398,7 +1398,7 @@ async def event_diagnostics_tool(
 """)
         elif mode == "default":
             report.append("""
-✅ **Default Mode Detected**: Full event support available
+✅ **Legacy Mode Detected**: Full event support available
 - All event types should work perfectly
 - Optimal for interactive and streaming tools
 """)
@@ -1441,7 +1441,7 @@ await __event_emitter__({
 })
 ```
 
-**Default Mode Only (Broken in Native):**
+**Legacy Mode Only (Broken in Native):**
 ```python
 
 # ⚠️ These will flicker/disappear in Native mode

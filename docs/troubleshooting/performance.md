@@ -490,7 +490,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 1.  **Database**: **PostgreSQL** (Mandatory).
 2.  **Content Extraction**: **Tika**, **Docling**, **or any other external document loader** (Mandatory — default pypdf leaks memory). See [Content Extraction Engine](#content-extraction-engine).
 3.  **Embeddings**: **External** — `RAG_EMBEDDING_ENGINE=openai` or `ollama` (Mandatory — default SentenceTransformers consumes too much RAM at scale). See [Embedding Engine](#embedding-engine).
-4.  **Tool Calling**: **Native Mode** (mandatory — Default Mode is legacy, no longer supported, and breaks KV cache). All models should be configured for Native Mode. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+4.  **Tool Calling**: **Native Mode** (the default; Legacy Mode is unsupported and breaks KV cache). All models should be configured for Native Mode. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 5.  **Workers**: `THREAD_POOL_SIZE=2000` (Prevent timeouts).
 6.  **Streaming**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7` (Reduce CPU/Net/DB writes).
 7.  **Chat Saving**: `ENABLE_REALTIME_CHAT_SAVE=False`.

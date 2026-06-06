@@ -43,7 +43,7 @@ The steps above use the Admin Panel, which is the recommended route. If you mana
 :::tip Model Capability, Default Features, and Chat Toggle
 In **Native Mode** (the supported mode), the `search_web` and `fetch_url` tools require both the **Web Search** capability to be enabled *and* **Web Search** to be checked under **Default Features** in the model settings (or toggled on in the chat). If either is missing, the tools will not be injected — even though other builtin tools may still appear.
 
-Default Mode's RAG-style injection behavior is documented here only for legacy deployments. Default Mode is no longer supported; all models should be configured for Native Mode.
+Legacy Mode's RAG-style injection behavior is documented here only for legacy deployments. Native Mode is the default; Legacy Mode is the unsupported opt-out.
 
 **Important**: If you disable the `web_search` capability on a model but use Native Mode, the tools won't be available even if you manually toggle Web Search on in the chat.
 :::

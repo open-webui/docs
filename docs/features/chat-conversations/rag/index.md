@@ -254,7 +254,7 @@ These capabilities work independently, giving you fine-grained control:
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
 :::tip Filesystem-style knowledge access (`kb_exec`)
-For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode builtin tool) and is off by default; in Default Mode it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode builtin tool) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
 
 ## YouTube RAG Pipeline

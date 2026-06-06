@@ -125,7 +125,7 @@ When [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) is set
 - **`view_note`** — when notes are attached to the model (`kb_exec` is file-only, so notes need a dedicated reader)
 - **`query_knowledge_bases`** and **`search_knowledge_bases`** — when no KB is attached to the model, so the model can still discover and search across knowledge bases by name/description
 
-It is **off by default** and still experimental, but for an enhanced agentic RAG experience we recommend enabling it (`ENABLE_KB_EXEC=True`) for capable models running native function calling. It targets frontier models that already "think in shell": they tend to chain `ls`, `grep` and `cat` more reliably than they orchestrate a fan-out of specialized tools. It only works with native function calling on; in Default Mode it has no effect.
+It is **off by default** and still experimental, but for an enhanced agentic RAG experience we recommend enabling it (`ENABLE_KB_EXEC=True`) for capable models running native function calling. It targets frontier models that already "think in shell": they tend to chain `ls`, `grep` and `cat` more reliably than they orchestrate a fan-out of specialized tools. It only works with native function calling on; for models set to Legacy it has no effect.
 
 **Supported commands**
 
@@ -316,4 +316,4 @@ Files uploaded via API are processed asynchronously. Attempting to use a file be
 
 ### Native function calling changes behavior
 
-Enabling native function calling changes how knowledge bases work. If your KB suddenly stops producing results, check whether `function_calling: native` was set in global model defaults. See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for details.
+Native function calling is now the default, and it changes how knowledge bases work: attached KBs are no longer auto-injected, so the model must call the knowledge tools to retrieve them. See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for details.

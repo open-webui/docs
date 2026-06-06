@@ -3290,7 +3290,7 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
   - `view_note` — when notes are attached to the model
   - `query_knowledge_bases` and `search_knowledge_bases` — when no knowledge is attached, so the model can still discover KBs by name/description
 
-  **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** enabled (it is a native-mode builtin tool); in Default Mode it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+  **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** (the default; it is a native-mode builtin tool); for models set to Legacy it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 
 #### `RAG_HYBRID_BM25_WEIGHT`
 

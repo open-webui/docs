@@ -5,87 +5,20 @@ title: "Essentials for Open WebUI"
 
 # Essentials for Open WebUI
 
-You have installed Open WebUI, connected a provider, and had your first conversation. This page covers the six things that turn a basic chat UI into a setup that works well day-to-day. None of them are required, but most users end up reaching for all of them within the first week.
+You have installed Open WebUI, connected a provider, and had your first conversation. This page covers the key things that turn a basic chat UI into a setup that works well day-to-day. None of them are required, but most users end up reaching for all of them within the first week.
 
 Work through in order, or jump to the section you need:
 
-1. [**Tool calling**](#tool-calling)
-2. [**Plugins**](#plugins)
-3. [**Task models**](#task-models)
-4. [**Context management**](#context-management)
-5. [**Basic RAG**](#basic-rag)
-6. [**Open Terminal**](#open-terminal)
-7. [**Troubleshooting**](#troubleshooting)
+1. [**Plugins**](#plugins)
+2. [**Task models**](#task-models)
+3. [**Context management**](#context-management)
+4. [**Basic RAG**](#basic-rag)
+5. [**Open Terminal**](#open-terminal)
+6. [**Troubleshooting**](#troubleshooting)
 
 :::tip Deploying for a team?
 If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive — work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
 :::
-
----
-
-## Tool calling
-
-Without tools, an LLM can only generate text. With tools, it can look things up, run code, and take actions on your behalf. You attach a **Tool** to a chat (or to a model), and the model decides during its response when to call it and with what arguments. Open WebUI executes the call, feeds the result back, and the model continues with that new information.
-
-:::info Why this is first
-Tool calling is what turns a chat model into an agent. Getting this set up unlocks most of the advanced features covered in the rest of this page.
-:::
-
-There are two things worth understanding early on.
-
-### Understanding tool-calling modes
-
-Open WebUI has two ways of connecting a model to its tools, and **as of v0.9.7 the better one, Native, is the default**. You mostly only need to think about this setting if a particular model lacks a function-calling API.
-
-:::tip Native is the default; Legacy is the opt-out
-**Native Mode** is what every chat and model uses unless you change it. **Legacy Mode** (renamed from **Default** in v0.9.7) is the old prompt-based approach, kept only for models that cannot do native function calling. If you were relying on the old behavior, switch those models back to **Legacy**.
-:::
-
-When Open WebUI first introduced tool calling, most models did not have built-in function-calling APIs. The only way to give a model tools was to describe them in the system prompt as plain text and then parse the model's response to figure out which tool it was trying to call. This prompt-based approach was originally called **Default**, and it is now renamed **Legacy**: it is the lowest common denominator (any model that can follow a system prompt can use it) but it is slow, breaks KV cache, and cannot reach the built-in system tools.
-
-Most model providers have since added native function-calling support. Open WebUI calls this **Native Mode**: the model receives tool definitions as a structured part of its API request and returns structured tool calls in its response. It is faster, more reliable, preserves KV cache, and is required for all of Open WebUI's built-in system tools (Memory, Notes, Knowledge, Web Search, Image Gen, Code Interpreter). Every major current model supports it (OpenAI, Anthropic, Gemini, Llama 3.1+, Qwen 2.5+, DeepSeek, GLM and others), which is why it is now the default.
-
-You normally do not need to touch this setting. If you do want to pin Native explicitly, or move a model to Legacy, you can set it once for your whole instance:
-
-:::tip Set Function Calling globally in one step
-**Admin Panel > Settings > Models** → click the **Settings** button at the **top right** of the models list → set **Function Calling** → save. Every current and future model inherits the setting unless it overrides it.
-:::
-
-- **Per model:** **Admin Panel > Settings > Models > [your model] > Model Parameters > Function Calling**
-- **Per chat:** In the chat's **Chat Controls** (right sidebar)
-
-If you run an older local model or a fine-tune that does not expose a function-calling API, set that specific model to **Legacy**. For everything else, leave it on Native.
-
-### Choosing tools to enable
-
-Many of the tools people look for are already built into Open WebUI and just need to be turned on: **web search**, **code execution**, **image generation**, **memory**, and **knowledge-base retrieval** are all available without installing any plugins. Once enabled, these appear automatically as system tools when using Native Mode.
-
-Most of these need a small amount of setup (choosing a provider, adding an API key, or enabling a toggle). Setup guides for the most popular ones:
-
-- [**Web Search**](/category/web-search) — connect a search provider (Google, Brave, DuckDuckGo, SearXNG and many more) so the model can look things up
-- [**Image Generation**](/features/chat-conversations/image-generation-and-editing/usage) — connect an image provider (OpenAI DALL-E, ComfyUI, Automatic1111, etc.) for in-chat image creation
-- [**Code Execution**](/features/chat-conversations/chat-features/code-execution/) — run code blocks directly in chat (Pyodide runs in-browser by default, or connect Jupyter for server-side execution)
-- [**Memory**](/features/chat-conversations/memory) — let the model remember facts about you across conversations
-
-For anything not built in, the [**Open WebUI Community site**](https://openwebui.com/) is worth browsing. A few categories to give a sense of what is available:
-
-- **Observability / cost tracking**: Langfuse, OpenLit, Portkey. Log every chat turn, token usage, and latency to your own stack.
-- **Smart-home / automation**: Home Assistant tools that let the model control devices, routines, and scenes.
-- **Research**: arXiv, PubMed, Semantic Scholar, Wolfram Alpha. Structured results with real citations.
-- **Issue tracking / messaging**: Jira, Linear, GitHub Issues, Slack, Discord, email.
-- **Databases / APIs**: read-only SQL against your own database, or calls to your internal API.
-- **Domain-specific**: weather, stocks, crypto, shipping tracking, recipes, and many more.
-
-Tools appear in the `+` menu in the chat input. The model only sees the tools you have enabled for that conversation.
-
-:::tip The community site is worth a look
-The [**Open WebUI Community**](https://openwebui.com/) hosts thousands of community-built plugins. Before writing anything yourself, browse what is already there: sort by popularity, filter by category, and skim a few pages. Most of the time, someone has already built what you need (or something close enough to fork).
-:::
-
-More detail:
-- [Tools reference](/features/extensibility/plugin/tools)
-- [Tool-calling modes (Default vs Native)](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)
-- [Open WebUI Community: Tools, Functions, Models](https://openwebui.com/)
 
 ---
 
@@ -233,7 +166,7 @@ The default SentenceTransformers model runs locally on CPU and is fine for a sin
 :::
 
 :::tip Enhanced agentic RAG: enable kb_exec
-If your models use [Native Mode](#tool-calling) (recommended above), set `ENABLE_KB_EXEC=True` for a noticeably better knowledge-base experience. It gives the model a filesystem-style interface over your knowledge (`ls`, `tree`, `grep`, `cat`, read-by-line) that capable models chain more reliably than the individual search tools, so they find the right passage more often. It only works with native function calling; in Default Mode it has no effect. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+Native function calling is the default, so for a noticeably better knowledge-base experience set `ENABLE_KB_EXEC=True`. It gives the model a filesystem-style interface over your knowledge (`ls`, `tree`, `grep`, `cat`, read-by-line) that capable models chain more reliably than the individual search tools, so they find the right passage more often. It has no effect for models set to Legacy. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
 
 More detail:
@@ -265,7 +198,7 @@ You do not need all of the above on day one. A reasonable order for a new instal
 
 1. **Day one:** Pick a good default model, have a few conversations, get a feel for the UI.
 2. **First thing after that:** Set a Task Model and decide which background chores you actually want enabled. This is the single biggest "feels better" change you can make, and it directly addresses hidden per-chat costs.
-3. **Within the first week:** Turn on Native Mode globally and install one or two Tools that match your work.
+3. **Within the first week:** Enable the built-in tools you want (web search, image generation, code execution, memory) and install one or two community Tools that match your work.
 4. **When you hit it:** Install a context filter the first time you see "prompt is too long."
 5. **When you need it:** Set up a Knowledge base the first time you want to ask questions across multiple documents.
 6. **When you are ready to go big:** Point the model at Open Terminal and let it actually build things for you.
