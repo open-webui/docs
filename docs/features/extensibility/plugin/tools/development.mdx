@@ -1151,7 +1151,11 @@ await __event_emitter__({
 ```python
 await __event_emitter__({
     "type": "chat:message:error",
-    "data": {"content": "Error message to display"}
+    "data": {
+        "error": {
+            "content": "Error message to display"
+        }
+    }
 })
 ```
 
