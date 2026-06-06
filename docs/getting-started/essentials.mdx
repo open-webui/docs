@@ -35,26 +35,26 @@ There are two things worth understanding early on.
 
 ### Understanding tool-calling modes
 
-Open WebUI has two ways of connecting a model to its tools, and a common source of confusion is that the one labeled "Default" is not the one most people should be using. The naming makes more sense once you understand the history and Open WebUI's design philosophy.
+Open WebUI has two ways of connecting a model to its tools, and **as of v0.9.7 the better one, Native, is the default**. You mostly only need to think about this setting if a particular model lacks a function-calling API.
 
-:::tip Native Mode is recommended for most users
-**Default Mode** is the legacy approach and exists for broad compatibility. If your model supports function calling (most modern models do), **Native Mode** is the better choice. See below for how to switch.
+:::tip Native is the default; Legacy is the opt-out
+**Native Mode** is what every chat and model uses unless you change it. **Legacy Mode** (renamed from **Default** in v0.9.7) is the old prompt-based approach, kept only for models that cannot do native function calling. If you were relying on the old behavior, switch those models back to **Legacy**.
 :::
 
-A core goal of Open WebUI is to support the widest possible range of models, from cutting-edge frontier APIs to tiny quantized models running on a Raspberry Pi. When Open WebUI first introduced tool calling, most models did not have built-in function-calling APIs. The only way to give a model tools was to describe them in the system prompt as plain text and then parse the model's response to figure out which tool it was trying to call. This prompt-based approach is what Open WebUI calls **Default Mode**. It was the original (and at the time, only) implementation, and it is now considered legacy handling. It remains the system default because it is the lowest common denominator: any model that can follow instructions in a system prompt can use it, no special API support required.
+When Open WebUI first introduced tool calling, most models did not have built-in function-calling APIs. The only way to give a model tools was to describe them in the system prompt as plain text and then parse the model's response to figure out which tool it was trying to call. This prompt-based approach was originally called **Default**, and it is now renamed **Legacy**: it is the lowest common denominator (any model that can follow a system prompt can use it) but it is slow, breaks KV cache, and cannot reach the built-in system tools.
 
-Since then, most model providers have added native function-calling support. Open WebUI calls this **Native Mode**. The model receives tool definitions as a structured part of its API request and returns structured tool calls in its response. It is faster, more reliable, preserves KV cache, and is required for all of Open WebUI's built-in system tools (Memory, Notes, Knowledge, Web Search, Image Gen, Code Interpreter). All new tool-calling features are built for Native Mode. But it only works with models that actually expose a function-calling API, which is why it cannot be the universal default.
+Most model providers have since added native function-calling support. Open WebUI calls this **Native Mode**: the model receives tool definitions as a structured part of its API request and returns structured tool calls in its response. It is faster, more reliable, preserves KV cache, and is required for all of Open WebUI's built-in system tools (Memory, Notes, Knowledge, Web Search, Image Gen, Code Interpreter). Every major current model supports it (OpenAI, Anthropic, Gemini, Llama 3.1+, Qwen 2.5+, DeepSeek, GLM and others), which is why it is now the default.
 
-In practice, most users should enable Native Mode. Every major current model supports it (OpenAI, Anthropic, Gemini, Llama 3.1+, Qwen 2.5+, DeepSeek, GLM, and others). You can set it once for your entire instance:
+You normally do not need to touch this setting. If you do want to pin Native explicitly, or move a model to Legacy, you can set it once for your whole instance:
 
-:::tip Set Native Mode globally in one step
-**Admin Panel > Settings > Models** → click the **Settings** button at the **top right** of the models list → set **Function Calling = Native** → save. Every current and future model inherits the setting.
+:::tip Set Function Calling globally in one step
+**Admin Panel > Settings > Models** → click the **Settings** button at the **top right** of the models list → set **Function Calling** → save. Every current and future model inherits the setting unless it overrides it.
 :::
 
-- **Per model:** **Admin Panel > Settings > Models > [your model] > Model Parameters > Function Calling = Native**
+- **Per model:** **Admin Panel > Settings > Models > [your model] > Model Parameters > Function Calling**
 - **Per chat:** In the chat's **Chat Controls** (right sidebar)
 
-If you are running an older local model or a fine-tune that does not expose a function-calling API, keep that specific model on Default Mode. For everything else, Native Mode is the better choice.
+If you run an older local model or a fine-tune that does not expose a function-calling API, set that specific model to **Legacy**. For everything else, leave it on Native.
 
 ### Choosing tools to enable
 
