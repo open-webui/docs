@@ -64,7 +64,7 @@ Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage di
 **[Installation →](./setup/installation)** · **[Connect to Open WebUI →](./setup/connecting)**
 
 :::info Model requirements
-Open Terminal requires models with **native function calling** support. Frontier models (GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro) handle complex multi-step tasks well. Smaller models may work for simple commands but can struggle with longer workflows. [Enable native function calling](./setup/connecting#8-enable-native-function-calling) on your model.
+Open Terminal needs a model that actually supports tool calling. Native is the default tool-calling mode as of v0.9.7, so it works out of the box unless the model was switched to Legacy. Frontier models (GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro) handle complex multi-step tasks well. Smaller models may work for simple commands but can struggle with longer workflows. [Check the model's tool-calling mode](./setup/connecting#8-enable-native-function-calling) if tools are not firing.
 :::
 
 ---
