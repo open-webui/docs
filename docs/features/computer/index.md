@@ -41,7 +41,7 @@ If you want the model to build software for you inside a chat, that is Open Term
 - **Workspaces.** Manage several project directories from one instance and switch between them without losing your place.
 - **Quick open and shortcuts.** `Cmd+K` to jump to files and commands, plus a customisable keybinding system.
 - **Port preview.** A built-in reverse proxy detects ports your processes open, so you can preview a running app in another tab.
-- **Optional AI agent.** A chat panel with multi-provider support (Anthropic, OpenAI, Ollama and OpenAI-compatible endpoints). With a key it can read, search and edit files, run shell commands, search the web and read URLs. Mention files with `@`, queue follow-up messages, and review or edit the AI's changes before they apply.
+- **Optional AI agent.** A chat panel with multi-provider support (Anthropic, OpenAI, Ollama and OpenAI-compatible endpoints). With a key it reads, searches and edits files, runs shell commands, searches the web and reads URLs. For bigger tasks it can draft an implementation plan to approve before it starts (plan mode). Every edit or command waits for your approval, and its file tools refuse to read or write `.env` files. Mention files with `@` and queue follow-up messages while it works.
 
 Chats are stored as files too, so your AI conversations are searchable, editable and commit-able alongside your code.
 
