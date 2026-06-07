@@ -1964,8 +1964,6 @@ You do **not** need to manually set this variable for a secure installation — 
 
 The standard Docker and `open-webui serve` methods check for the environment variable first, and if it is not set, they generate a secure random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
 
-As of v0.9.6 there is **no hardcoded fallback key**. If you start the backend in a way that skips this step (`open-webui dev`, or invoking `uvicorn` directly, which is unsupported) and authentication is enabled, Open WebUI **refuses to start** and asks you to set `WEBUI_SECRET_KEY` explicitly, instead of silently using an insecure shared default as older versions did.
-
 :::
 
 :::danger Recommended: Set an explicit, persistent value
