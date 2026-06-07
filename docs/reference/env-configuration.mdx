@@ -1960,9 +1960,11 @@ You do **not** need to manually set this variable for a secure installation — 
 |---|---|---|
 | **Docker** (`start.sh`) | ✅ Yes | `.webui_secret_key` file inside the container |
 | **pip install** (`open-webui serve`) | ✅ Yes | `.webui_secret_key` file in the working directory |
-| **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A — uses the code-level fallback |
+| **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A (set `WEBUI_SECRET_KEY` yourself) |
 
-The code-level fallback value (`t0p-s3cr3t`) exists **only** for development convenience and is **never used** when Open WebUI is launched through the standard Docker or `open-webui serve` methods. Both of those methods check for the environment variable first, and if it is not set, generate a secure random key, save it to a file, and inject it into the environment — all before the application starts.
+The standard Docker and `open-webui serve` methods check for the environment variable first, and if it is not set, they generate a secure random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
+
+As of v0.9.6 there is **no hardcoded fallback key**. If you start the backend in a way that skips this step (`open-webui dev`, or invoking `uvicorn` directly, which is unsupported) and authentication is enabled, Open WebUI **refuses to start** and asks you to set `WEBUI_SECRET_KEY` explicitly, instead of silently using an insecure shared default as older versions did.
 
 :::
 
