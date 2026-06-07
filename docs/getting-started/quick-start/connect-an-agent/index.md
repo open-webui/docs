@@ -45,7 +45,7 @@ Regardless of which agent you connect, the architecture is the same:
 flowchart LR
     A["Open WebUI<br/>(frontend)"]
     B["Agent Gateway<br/>(API server)"]
-    C["Termainal,<br/>Files, Web"]
+    C["Terminal,<br/>Files, Web"]
 
     A -- HTTP --> B
     B -- Tools --> C
