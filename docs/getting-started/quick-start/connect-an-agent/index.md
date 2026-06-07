@@ -41,13 +41,16 @@ The agent decides when and how to use these tools based on your message, and Ope
 
 Regardless of which agent you connect, the architecture is the same:
 
-```
-┌──────────────┐         ┌──────────────────┐         ┌──────────────┐
-│              │  HTTP    │                  │  Tools  │              │
-│  Open WebUI  │────────▶│   Agent Gateway  │────────▶│  Terminal,   │
-│  (frontend)  │◀────────│   (API server)   │◀────────│  Files, Web  │
-│              │  Stream  │                  │  Results│              │
-└──────────────┘         └──────────────────┘         └──────────────┘
+```mermaid
+flowchart LR
+    A["Open WebUI<br/>(frontend)"]
+    B["Agent Gateway<br/>(API server)"]
+    C["Terminal,<br/>Files, Web"]
+
+    A -- HTTP --> B
+    B -- Tools --> C
+    C -- Results --> B
+    B -- Stream --> A
 ```
 
 1. **You type a message** in Open WebUI
