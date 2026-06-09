@@ -1738,17 +1738,17 @@ If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change 
 
 - type: `bool`
 - Default: `False`
-- Description: When `true`, Open WebUI forwards the signed-in user's identity (and, for some destinations, the chat and message IDs) as HTTP headers on its outbound requests.
+- Description: When `true`, Open WebUI attaches the signed-in user's identity to its outbound requests, plus the chat and message session IDs where applicable. This enables per-user authorization, auditing, rate limiting and request tracing on external services.
 
-**Not every header goes to every destination**, which is a common source of confusion. The four user-info headers are forwarded broadly; the two session headers are not:
+The four **user-info** headers are forwarded to nearly every outbound backend. The two **session** headers are narrower:
 
 | Header | Forwarded to |
 |---|---|
-| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | All outbound backends: OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio and image services |
-| `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers. Not Anthropic |
-| `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP). **Not** OpenAI, Ollama, Anthropic or Pipelines connections |
+| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio and image services |
+| `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers (not Anthropic) |
+| `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP) |
 
-In practice, a plain OpenAI, Ollama or Pipelines request receives the user headers and `X-OpenWebUI-Chat-Id` but **not** `X-OpenWebUI-Message-Id`. This enables per-user authorization, auditing, rate limiting and request tracing on external services. The chat and message IDs that do reach tool servers are what power [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
+So an OpenAI, Ollama or Pipelines request receives **five** of the six headers (the four user headers plus `X-OpenWebUI-Chat-Id`); only `X-OpenWebUI-Message-Id` is tool-server-specific, since it is what powers [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
 
 If you set `FORWARD_USER_INFO_HEADER_JWT_SECRET`, the four `X-OpenWebUI-User-*` headers are replaced by a single signed JWT (see [`FORWARD_USER_INFO_HEADER_JWT_SECRET`](#forward_user_info_header_jwt_secret) below).
 
