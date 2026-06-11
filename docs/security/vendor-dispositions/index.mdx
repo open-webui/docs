@@ -23,7 +23,7 @@ A **vendor disposition** is the software vendor's official, public response to a
 
 ## Threat Model
 
-Open WebUI is a **self-hosted, authenticated, role-based** application. It can be deployed publicly, but requires proper configuration (TLS termination, reverse proxy, appropriate access controls). Our threat model assumes:
+Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** application. It can be deployed publicly, but requires proper configuration (TLS termination, reverse proxy, appropriate access controls). Our threat model assumes:
 
 - All users are **authenticated** before accessing any functionality.
 - **Administrators** are trusted actors with full system control.

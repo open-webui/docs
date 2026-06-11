@@ -28,7 +28,7 @@ This is the standard way mature projects handle micro-architectural and timing s
 
 ## Threat Model
 
-Open WebUI is a **self-hosted, authenticated, role-based** application. The risks listed here are evaluated inside that model:
+Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** application. The risks listed here are evaluated inside that model:
 
 - All users are **authenticated** before reaching the affected functionality.
 - **Administrators** are trusted actors with full system control.

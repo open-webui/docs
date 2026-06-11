@@ -38,7 +38,7 @@ The residual signal is sub-millisecond and dominated by network and scheduling n
 
 ## Threat-model coverage
 
-Open WebUI is a self-hosted, authenticated, role-based application (see the [Security Policy](../security-policy)). The residual is further constrained by defence in depth that is already present:
+Open WebUI is a self-hosted, single-tenant, authenticated, role-based application (see the [Security Policy](../security-policy)). The residual is further constrained by defence in depth that is already present:
 
 - sign-in **rate limiting** raises the cost of the many timed requests an enumeration attack needs,
 - **multi-factor authentication** can be enabled, which blunts the value of any account an attacker does manage to enumerate.
