@@ -1,0 +1,49 @@
+---
+title: "Authentication Timing Side-Channel (CWE-208)"
+---
+
+# Authentication Timing Side-Channel
+
+|  |  |
+| :--- | :--- |
+| **Class** | CWE-208, Observable Timing Discrepancy |
+| **Status** | Exploitable signal mitigated; sub-millisecond residual accepted |
+| **Tracked as** | GHSA-7rw5-9f7q-xj36 |
+
+---
+
+## Summary
+
+The sign-in endpoint took measurably longer for an existing account than for a non-existent one, because the password hash was only verified when the account existed. The difference (roughly 150&nbsp;ms versus 5&nbsp;ms) let an attacker enumerate valid accounts by response time, which can seed a later password-spraying attack.
+
+## What we mitigated
+
+Authentication now performs a bcrypt comparison against a fixed dummy hash on the paths where no user, or no active credential, is found. Every sign-in attempt therefore pays the same bcrypt cost regardless of whether the account exists.
+
+Measured, this collapses the difference from roughly 20-40x down to about 1.03x (bcrypt against bcrypt), which is indistinguishable from ordinary run-to-run variance. The practically exploitable enumeration oracle is removed.
+
+## What remains, and why it is not fixable
+
+Perfectly constant-time authentication is not achievable in application-level code. Once the dominant bcrypt cost is equalised, the remaining differences are sub-millisecond and are produced by layers Open WebUI does not control:
+
+- the **database lookup** (an index hit for an existing email versus a miss for a non-existent one),
+- the **Python interpreter and garbage collector**,
+- **CPU behaviour**: cache state, branch prediction, speculative execution,
+- **operating-system scheduling**,
+- **network jitter**.
+
+None of these can be driven to exactly zero from Python. Fixed-time padding ("always respond within a set window") does not close it either: the window has to be padded to the worst case, which penalises every legitimate login, and a sufficiently precise attacker can still observe the work done before the padding begins. It trades a real, permanent cost for a false sense of completeness.
+
+The residual signal is sub-millisecond and dominated by network and scheduling noise, so it is not reliably measurable across a network. We therefore accept it as a known limitation rather than a remediable defect.
+
+## Threat-model coverage
+
+Open WebUI is a self-hosted, authenticated, role-based application (see the [Security Policy](../security-policy)). The residual is further constrained by defence in depth that is already present:
+
+- sign-in **rate limiting** raises the cost of the many timed requests an enumeration attack needs,
+- **multi-factor authentication** can be enabled, which blunts the value of any account an attacker does manage to enumerate.
+
+## References
+
+- [CWE-208: Observable Timing Discrepancy](https://cwe.mitre.org/data/definitions/208.html)
+- [Open WebUI Security Policy](../security-policy)
