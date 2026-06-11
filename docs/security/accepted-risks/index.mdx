@@ -15,14 +15,14 @@ Each entry records what the risk is, what we changed to shrink it, why the remai
 
 ## Why we accept these
 
-Accepting a residual risk is a deliberate engineering decision, not an oversight. A weakness is listed here only when all of the following hold:
+Accepting a residual risk is a deliberate engineering decision, not an oversight. A weakness is listed here only when both of the following hold:
 
-- The **exploitable portion has been mitigated** as far as application-level code allows.
-- The **residual is bounded** and not reliably exploitable in practice.
-- The residual is **not technically fixable by us**. It stems from the language, runtime, operating system, CPU or network rather than from Open WebUI's own logic.
-- Pushing further would impose a real cost in performance, correctness or usability for marginal or illusory benefit.
+- The **exploitable portion has been mitigated** as far as application-level code allows, and the **residual that remains is bounded** and not reliably exploitable in practice.
+- **Eliminating that residual is not warranted**, for at least one of the following reasons:
+  - it is **not technically fixable** by us, arising from the language, runtime, operating system, CPU or network rather than from Open WebUI's own logic; or
+  - a further fix would carry a **real and disproportionate cost**, degrading or removing functionality that users legitimately depend on, or harming performance or correctness, in exchange for a marginal or illusory security benefit.
 
-This is the standard way mature projects handle micro-architectural and timing side-channels: reduce the signal until it is lost in noise, document the limit, and be explicit about it rather than implying a guarantee that cannot be made.
+In either case we document the residual and its limit explicitly, rather than implying a guarantee that cannot, or should not, be made.
 
 ---
 

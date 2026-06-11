@@ -36,13 +36,6 @@ None of these can be driven to exactly zero from Python. Fixed-time padding ("al
 
 The residual signal is sub-millisecond and dominated by network and scheduling noise, so it is not reliably measurable across a network. We therefore accept it as a known limitation rather than a remediable defect.
 
-## Threat-model coverage
-
-Open WebUI is a self-hosted, single-tenant, authenticated, role-based application (see the [Security Policy](../security-policy)). The residual is further constrained by defence in depth that is already present:
-
-- sign-in **rate limiting** raises the cost of the many timed requests an enumeration attack needs,
-- **multi-factor authentication** can be enabled, which blunts the value of any account an attacker does manage to enumerate.
-
 ## References
 
 - [CWE-208: Observable Timing Discrepancy](https://cwe.mitre.org/data/definitions/208.html)
