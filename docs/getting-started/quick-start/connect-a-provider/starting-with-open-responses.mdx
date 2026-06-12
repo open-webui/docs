@@ -57,6 +57,45 @@ Enter the connection details for a provider that supports the Open Responses for
 
 ---
 
+## Step 4 (Optional): Enable Native Server-Side Tools
+
+Some providers — most notably **OpenAI** — expose **server-side tools** through the Responses API. The headline example is **native web search**: the model runs the search itself, then returns a grounded answer with source citations. Open WebUI forwards these tools to the provider and renders their results natively, so nothing else needs to be wired up.
+
+:::info This is separate from Open WebUI's Web Search
+Native server-side tools run entirely on the provider's side and only work on **API Type: Responses** connections (Steps 1–2 above). They are **independent** of Open WebUI's own [Web Search](/features/chat-conversations/web-search/) providers (Tavily, SearXNG, etc.) — you don't need to configure or enable those. Leave the model's **Web Search** capability **off**; the native tool replaces it, and enabling both is redundant.
+:::
+
+To turn on native web search for a model:
+
+1. Go to **Workspace → Models** and edit (✏️) a model that uses your Responses connection.
+2. Expand **Advanced Params**.
+3. At the bottom, click **➕ Add Custom Parameter** and set:
+   - **Name**: `tools`
+   - **Value**: `[{"type": "web_search"}]`
+4. Save the model.
+
+When you chat with that model, the provider performs web searches server-side, and Open WebUI streams:
+
+- A **"Web Search"** status block showing the queries the model ran.
+- **Clickable source citations** drawn from the results.
+- The model's grounded answer.
+
+:::tip Multiple tools and tool options
+The `tools` custom parameter accepts any tool your provider supports in the Responses API. Pass several by adding them to the array:
+
+```json
+[{"type": "web_search"}, {"type": "code_interpreter"}]
+```
+
+You can also include provider-specific options on a tool object (for web search, e.g. `search_context_size` or `user_location`) — see your provider's Responses API documentation. Older OpenAI model snapshots may require `{"type": "web_search_preview"}` instead of `web_search`.
+:::
+
+:::warning Admin only
+The **Add Custom Parameter** button is shown to administrators in the model editor. Custom parameters are forwarded to the provider as-is, so only use valid Responses API tool definitions.
+:::
+
+---
+
 ## Supported Providers
 
 Open Responses is a new specification, so provider support is still growing. Check the [Open Responses website](https://www.openresponses.org/) for the latest list of compliant providers and implementations.
