@@ -62,7 +62,7 @@ Enter the connection details for a provider that supports the Open Responses for
 Some providers — most notably **OpenAI** — expose **server-side tools** through the Responses API. The headline example is **native web search**: the model runs the search itself, then returns a grounded answer with source citations. Open WebUI forwards these tools to the provider and renders their results natively, so nothing else needs to be wired up.
 
 :::info This is separate from Open WebUI's Web Search
-Native server-side tools run entirely on the provider's side and only work on **API Type: Responses** connections (Steps 1–2 above). They are **independent** of Open WebUI's own [Web Search](/category/web-search/) providers (Tavily, SearXNG, etc.), you don't need to configure or enable those. Leave the model's **Web Search** capability **off**; the native tool replaces it, and enabling both is redundant.
+Native server-side tools run entirely on the provider's side and only work on **API Type: Responses** connections (Steps 1–2 above). They are **independent** of Open WebUI's own [Web Search](/features/chat-conversations/web-search) providers (Tavily, SearXNG, etc.), you don't need to configure or enable those. Leave the model's **Web Search** capability **off**; the native tool replaces it, and enabling both is redundant.
 :::
 
 To turn on native web search for a model:
