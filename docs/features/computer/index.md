@@ -14,7 +14,7 @@ AI is built in but optional. Bring your own key and it becomes an agent that can
 [**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
 
 :::info New, and moving fast
-cptr is a young project (currently v0.2.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
+cptr is a young project (currently v0.3.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
 :::
 
 ## cptr vs Open Terminal
@@ -45,6 +45,7 @@ If you want the model to build software for you inside a chat, that is Open Term
 - **Skills.** Drop reusable `SKILL.md` instruction sets in a workspace or globally. The AI discovers them and loads them on demand, and you can pull one in with `$` in the chat input.
 - **Model configuration.** Set parameters and a system prompt per model or as a global default. System prompts take `{{VARIABLE}}` placeholders (workspace name, file tree, OS, date, skills), and a workspace `.cptr/system.md` file overrides the prompt for that project.
 - **Optional AI agent.** A chat panel with multi-provider support (Anthropic, OpenAI, Ollama and OpenAI-compatible endpoints). With a key it reads, searches and edits files, runs shell commands, searches the web and reads URLs. Web search runs through Exa, Tavily, Brave, DuckDuckGo, Perplexity or any OpenAI-compatible endpoint. For bigger tasks it can draft an implementation plan to approve before it starts (plan mode), and long conversations are compacted automatically. Every edit or command waits for your approval, and its file tools refuse to read or write `.env` files. Mention files with `@` and queue follow-up messages while it works.
+- **Messaging bots.** Connect the AI to Telegram, Discord, Slack, WhatsApp or Signal from Settings. Each bot has full tool access, streams its replies and syncs the conversation back to the web UI. Send `/workspace` to switch projects and `/new` to start a fresh chat.
 
 Chats are stored as files too, so your AI conversations are searchable, editable and commit-able alongside your code.
 
