@@ -3,7 +3,19 @@ sidebar_position: 3
 title: "Open Terminal"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # ⚡ Open Terminal
+
+<ThemedImage
+  alt="Open Terminal: the Open WebUI core driving a real terminal session in a loop, running commands and reading the output"
+  sources={{
+    light: useBaseUrl('/images/banners/terminal-light.svg'),
+    dark: useBaseUrl('/images/banners/terminal-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Give your AI a real computer to work on.**
 

@@ -3,7 +3,19 @@ title: "Computer (cptr)"
 sidebar_position: 1
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 🖥️ Computer (cptr)
+
+<ThemedImage
+  alt="Computer (cptr): the cptr workspace running on a desktop screen and a phone, the same session across devices, with optional AI"
+  sources={{
+    light: useBaseUrl('/images/banners/computer-light.svg'),
+    dark: useBaseUrl('/images/banners/computer-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Your computer, in a browser tab. From anywhere.**
 

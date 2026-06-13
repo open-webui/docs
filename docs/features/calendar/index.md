@@ -3,7 +3,19 @@ sidebar_position: 2
 title: "Calendar"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 📅 Calendar
+
+<ThemedImage
+  alt="Calendar: a month grid with color-coded events and a recurring weekday standup, with AI creating events from a natural-language request"
+  sources={{
+    light: useBaseUrl('/images/banners/calendar-light.svg'),
+    dark: useBaseUrl('/images/banners/calendar-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Schedule, track, and manage events, with AI that can plan for you.**
 

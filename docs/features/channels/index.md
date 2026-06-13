@@ -3,7 +3,19 @@ sidebar_position: 1000
 title: "Channels"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 💬 Channels
+
+<ThemedImage
+  alt="Channels: a shared #product-launch channel where people and AI models talk in one timeline, summoned with @model mentions"
+  sources={{
+    light: useBaseUrl('/images/banners/channels-light.svg'),
+    dark: useBaseUrl('/images/banners/channels-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Where your team and AI think together, in real time.**
 

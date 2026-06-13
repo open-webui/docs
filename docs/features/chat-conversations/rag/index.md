@@ -3,6 +3,18 @@ sidebar_position: 1
 title: "Retrieval Augmented Generation (RAG)"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+<ThemedImage
+  alt="Chat & Conversations map with the Documents (RAG) cell highlighted"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-documents-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-documents-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
 :::warning
 
 If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.

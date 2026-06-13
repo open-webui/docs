@@ -1,0 +1,32 @@
+---
+title: "Workspace"
+sidebar_position: 0
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 🧠 Workspace
+
+<ThemedImage
+  alt="Workspace: the five building blocks (Models, Knowledge, Prompts, Skills, Tools) composing into the Open WebUI core"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+**Compose your own AI from five building blocks.**
+
+The Workspace is where you turn a raw model into something tailored to your work. Bind knowledge, attach tools, set a system prompt, teach it skills and save the result as a reusable model. Every piece is optional and they stack: a model with your handbook attached, your house style as a prompt and the right tools wired in.
+
+| Building block | What it is for |
+| :--- | :--- |
+| [**Models**](/features/workspace/models) | Wrap a base model with a system prompt, parameters, knowledge and tools, then save it as a reusable preset in the model picker. |
+| [**Knowledge**](/features/workspace/knowledge) | Upload documents and build collections the AI retrieves from (RAG), so it answers from your sources instead of guessing. |
+| [**Prompts**](/features/workspace/prompts) | Save reusable prompt templates with typed variables, callable in any chat with a `/` slash command. |
+| [**Skills**](/features/workspace/skills) | Markdown instruction sets that teach a model how to approach a task (methodology, steps, house rules), loaded on demand. |
+| [**Tools** ↗](/features/extensibility/plugin/tools) | Give models real abilities they can call: APIs, code, the web. Tools are documented under [**Plugins & Extensibility**](/features/extensibility/plugin/tools), not here. |
+
+Each has its own page, so start anywhere. Most people begin with a custom **Model** and add the other pieces as they need them.

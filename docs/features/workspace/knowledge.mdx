@@ -3,7 +3,19 @@ sidebar_position: 4
 title: "Knowledge"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 📚 Knowledge
+
+<ThemedImage
+  alt="Workspace map with the Knowledge cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-knowledge-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-knowledge-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Give your AI access to your documents and let it find what matters.**
 
@@ -39,7 +51,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | :--- | :--- |
 | 📄 **9 vector databases** | ChromaDB and PGVector (officially maintained), plus community options: Qdrant, Milvus, OpenSearch, Elasticsearch, and more |
 | 🔍 **Hybrid search** | BM25 keyword search + vector search with cross-encoder reranking |
-| 📑 **5 extraction engines** | Tika, Docling, Azure, Mistral OCR, custom loaders |
+| 📑 **8 extraction engines** | Tika, Docling, Azure, Mistral OCR, Datalab Marker, MinerU, PaddleOCR, custom loaders |
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |

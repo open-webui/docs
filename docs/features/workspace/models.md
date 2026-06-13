@@ -4,7 +4,19 @@ title: "Models"
 sidebar_label: "Models"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 🤖 Models
+
+<ThemedImage
+  alt="Workspace map with the Models cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-models-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-models-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Wrap any model with custom instructions, tools, and knowledge to build specialized agents.**
 
