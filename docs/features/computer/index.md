@@ -14,7 +14,7 @@ AI is built in but optional. Bring your own key and it becomes an agent that can
 [**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
 
 :::info New, and moving fast
-cptr is a young project (currently v0.3.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
+cptr is a young project (currently v0.4.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
 :::
 
 ## cptr vs Open Terminal
@@ -46,6 +46,8 @@ If you want the model to build software for you inside a chat, that is Open Term
 - **Skills.** Drop reusable `SKILL.md` instruction sets in a workspace or globally. The AI discovers them and loads them on demand, and you can pull one in with `$` in the chat input.
 - **Model configuration.** Set parameters and a system prompt per model or as a global default. System prompts take `{{VARIABLE}}` placeholders (workspace name, file tree, OS, date, skills), and a workspace `.cptr/system.md` file overrides the prompt for that project.
 - **Optional AI agent.** A chat panel with multi-provider support (Anthropic, OpenAI, Ollama and OpenAI-compatible endpoints). With a key it reads, searches and edits files, runs shell commands, searches the web and reads URLs. It also reads and describes images in your workspace and can drive a real browser (navigate, click, type, screenshot, run JavaScript) via local Chrome, Firecrawl or Browser-Use. Web search runs through Exa, Tavily, Brave, DuckDuckGo, Perplexity or any OpenAI-compatible endpoint. For bigger tasks it can draft an implementation plan to approve before it starts (plan mode), and long conversations are compacted automatically. Every edit or command waits for your approval, and its file tools refuse to read or write `.env` files. Mention files with `@` and queue follow-up messages while it works.
+- **Tool servers.** Connect external tools over MCP or OpenAPI from the Tool Servers admin tab (bearer auth and custom headers supported). Once verified, the AI uses them alongside its built-in tools.
+- **Sub-agents and parallel tools.** The AI can spin up sub-agents that work on tasks in parallel, each with full tool access and inspectable afterwards as its own chat. Multiple tool calls in a single response also run concurrently. Set concurrency and limits in the Subagents admin tab.
 - **Messaging bots.** Connect the AI to Telegram, Discord, Slack, WhatsApp or Signal from Settings. Each bot has full tool access, streams its replies and syncs the conversation back to the web UI. Send `/workspace` to switch projects and `/new` to start a fresh chat.
 - **OpenAI-compatible gateway.** Expose each workspace as a model over `/v1/models` and `/v1/chat/completions`, so Open WebUI or any OpenAI-compatible client can drive the full cptr agent loop as if it were a model. Create and manage gateway API keys from the Gateway settings tab. Connecting from Open WebUI is first-class: the Gateway tab gives you a one-click header config that turns on chat branching and stops OWUI's background tasks (title, tag and follow-up generation) from spawning ghost chats (needs Open WebUI 0.9.7+).
 
