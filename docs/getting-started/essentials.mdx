@@ -15,7 +15,8 @@ Work through in order, or jump to the section you need:
 4. [**Basic RAG**](#basic-rag)
 5. [**Web Search**](#web-search)
 6. [**Open Terminal**](#open-terminal)
-7. [**Troubleshooting**](#troubleshooting)
+7. [**Computer (cptr)**](#computer-cptr)
+8. [**Troubleshooting**](#troubleshooting)
 
 :::tip Deploying for a team?
 If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive — work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
@@ -213,6 +214,22 @@ This is the biggest "aha" feature once you get past basic chat. It turns Open We
 More detail:
 - [Open Terminal: give your AI a real computer](/features/open-terminal)
 - [Use cases: software development, data reports, app builder, research assistant, and more](/features/open-terminal/use-cases/advanced-workflows/)
+
+---
+
+## Computer (cptr)
+
+Open Terminal gives the AI a computer. **[cptr](/features/computer)** ("computer") is the flip side: it gives _you_ your computer in a browser tab. It is a **separate Open WebUI project**, not a feature of this app. cptr is a self-hosted workspace with a terminal, file browser, editor and git that you operate from any device, with an optional AI agent as a helper. Run a project from your phone on the train, then pick it up on your laptop later.
+
+It also connects back here: cptr's OpenAI-compatible gateway exposes each workspace as a model, so you can add a cptr workspace to Open WebUI as a connection and chat with it like any other model.
+
+:::tip When to reach for which
+Open Terminal when you want the chat AI to build things for you inside Open WebUI. cptr when you want to _be_ at your own machine remotely, with the AI as an extra pair of hands. They are complementary, not competitors.
+:::
+
+More detail:
+- [Computer (cptr): your computer in a browser](/features/computer)
+- [Connect a cptr workspace to Open WebUI](/features/computer/open-webui)
 
 ---
 
