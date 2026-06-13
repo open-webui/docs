@@ -4,7 +4,19 @@ title: "Skills"
 sidebar_label: "Skills"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 🧩 Skills
+
+<ThemedImage
+  alt="Workspace map with the Skills cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-skills-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-skills-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Teach your AI how to approach a task with plain-text instructions.**
 

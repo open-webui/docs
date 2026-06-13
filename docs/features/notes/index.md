@@ -3,7 +3,19 @@ sidebar_position: 2
 title: "Notes"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 📝 Notes
+
+<ThemedImage
+  alt="Notes: a two-pane note editor with an AI chat sidebar, selecting text in the note and asking the AI to edit it in place"
+  sources={{
+    light: useBaseUrl('/images/banners/notes-light.svg'),
+    dark: useBaseUrl('/images/banners/notes-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Write, think, and refine with AI by your side.**
 

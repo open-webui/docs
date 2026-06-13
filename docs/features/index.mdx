@@ -3,15 +3,30 @@ sidebar_position: 200
 title: "⭐ Features"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+export const Banner = ({slug, alt}) => (
+  <ThemedImage
+    alt={alt}
+    sources={{ light: useBaseUrl(`/images/banners/${slug}-light.svg`), dark: useBaseUrl(`/images/banners/${slug}-dark.svg`) }}
+    style={{ width: '100%', margin: '0.25rem 0 1.25rem' }}
+  />
+);
+
 # What You Can Do with Open WebUI
 
 **One interface for every AI model. Private, extensible, and built for teams.**
+
+<Banner slug="features" alt="Open WebUI overview: chat, models, knowledge, web search, images, voice and an extensible platform, all in one interface" />
 
 Open WebUI replaces the patchwork of AI tools your team juggles daily - ChatGPT for writing, a separate app for image generation, another for document search, spreadsheets full of prompts nobody can find. Everything lives in one place: conversations, knowledge, tools, and the models that power them.
 
 ---
 
 ## 💬 Chat & Conversations
+
+<Banner slug="chat-conversations" alt="Chat & Conversations" />
 
 **Talk to any model, switch mid-conversation, and keep your context intact.**
 
@@ -37,6 +52,8 @@ Your conversations are the core of Open WebUI. Chat with Ollama, OpenAI, Anthrop
 
 ## 📚 Knowledge & RAG
 
+<Banner slug="kbsync" alt="Knowledge and RAG" />
+
 **Give your AI access to your documents - and let it find what matters.**
 
 Upload files, build knowledge bases, and let the AI retrieve exactly the information it needs. Choose between vector search (RAG) for large collections or full-content injection for precision. With native function calling, models autonomously search, browse, and synthesize across your entire knowledge base.
@@ -45,7 +62,7 @@ Upload files, build knowledge bases, and let the AI retrieve exactly the informa
 | :--- | :--- |
 | 📄 **9 vector databases** | ChromaDB and PGVector (officially maintained), plus community options: Qdrant, Milvus, Elasticsearch, and more |
 | 🔍 **Hybrid search** | BM25 + vector search with cross-encoder reranking |
-| 📑 **5 extraction engines** | Tika, Docling, Azure, Mistral OCR, custom loaders |
+| 📑 **8 extraction engines** | Tika, Docling, Azure, Mistral OCR, Datalab Marker, MinerU, PaddleOCR, custom loaders |
 | 🤖 **Agentic retrieval** | Models search and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents - no chunking, no guessing |
 | 🔄 **Knowledge Base sync** | Keep a KB current with a folder, Git repo, wiki, or storage bucket via [oikb](/features/knowledge-base-sync) |
@@ -55,6 +72,8 @@ Upload files, build knowledge bases, and let the AI retrieve exactly the informa
 ---
 
 ## 🤖 Models & Agents
+
+<Banner slug="workspace" alt="Models and Agents" />
 
 **Wrap any model with custom instructions, tools, and knowledge to build specialized agents.**
 
@@ -74,6 +93,8 @@ Create a "Python Tutor" that always uses your style guide. A "Meeting Summarizer
 
 ## 📝 Notes
 
+<Banner slug="notes" alt="Notes" />
+
 **Write, think, and refine with AI by your side.**
 
 A dedicated workspace for content that lives outside of any single conversation. Draft with a rich editor, use AI to rewrite text in place, and attach notes to any chat for precise context injection - no chunking, no vector search.
@@ -90,6 +111,8 @@ A dedicated workspace for content that lives outside of any single conversation.
 ---
 
 ## 💬 Channels
+
+<Banner slug="channels" alt="Channels" />
 
 **Where your team and AI think together, in real time.**
 
@@ -108,6 +131,8 @@ Persistent, shared spaces where humans and AI models participate in the same con
 
 ## ⚡ Open Terminal
 
+<Banner slug="terminal" alt="Open Terminal" />
+
 **Give your AI a real computer to work on.**
 
 Connect a real computing environment to Open WebUI. The AI writes code, executes it, reads the output, fixes errors, and iterates - all from the chat. Handles files, installs packages, runs servers, and returns results.
@@ -123,7 +148,28 @@ Connect a real computing environment to Open WebUI. The AI writes code, executes
 
 ---
 
+## 🖥️ Computer (cptr)
+
+<Banner slug="computer" alt="Computer (cptr)" />
+
+**Your computer in a browser tab, from any device. A separate app, not a plugin.**
+
+cptr serves a machine you own to the browser: files, an editor, a terminal and git, built mobile-first. You operate it; AI is an optional helper. Not to be confused with Open Terminal, which is a tool the chat AI drives.
+
+| | |
+| :--- | :--- |
+| 📱 **Mobile-first** | A full computer from your phone, sessions survive disconnects |
+| 🖥️ **Terminal, editor, git** | PTY shell, file editor and a git panel in one tab |
+| 🤖 **Optional AI agent** | Bring your own key; it reads, edits and runs in your project |
+| 🔑 **Your machine** | Runs on your hardware, full host access like SSH |
+
+[**Learn about Computer (cptr) →**](/features/computer)
+
+---
+
 ## 🔌 Extensibility
+
+<Banner slug="extensibility" alt="Extensibility" />
 
 **Add any capability with Python tools, pipelines, MCP, or OpenAPI servers.**
 
@@ -144,6 +190,8 @@ Open WebUI is a platform, not a locked-down product. Write Python tools that run
 
 ## 🔐 Authentication & Access
 
+<Banner slug="authentication-access" alt="Authentication and Access" />
+
 **Control who gets in, what they can do, and how it connects to your identity stack.**
 
 Open WebUI is multi-user from day one. Define roles, create user groups, set per-model access, and integrate with your identity provider. From a solo install to an organization with thousands of seats.
@@ -160,6 +208,8 @@ Open WebUI is multi-user from day one. Define roles, create user groups, set per
 ---
 
 ## 🔧 Administration
+
+<Banner slug="administration" alt="Administration" />
 
 **Monitor usage, evaluate models, and communicate with your users.**
 

@@ -69,17 +69,17 @@ The selected terminal name appears next to the cloud icon. The AI can now execut
 
 ### 8. Enable native function calling
 
-For the AI to use terminal tools reliably, you need to enable **native function calling** on your model:
+Native function calling is the default tool-calling mode as of v0.9.7, so it is already active for new models. The only thing to check is that the model was not switched to **Legacy**:
 
 1. Go to **Workspace → Models**
 2. Click the edit button on the model you're using
-3. Under **Capabilities**, enable **Native Function Calling** (also called "tool use")
+3. Make sure **Function Calling** is set to **Native** (the default), not **Legacy**
 4. Save
 
 ![Model capabilities showing Builtin Tools enabled](/images/open-terminal-model-capabilities.png)
 
-:::warning Without this, tools may not work
-Native function calling lets the model invoke tools directly using the provider's built-in tool-calling format. Without it, Open WebUI falls back to prompt-based tool calling, which is less reliable and may not trigger terminal commands at all.
+:::warning Legacy Mode is less reliable for tools
+If the model is set to **Legacy**, Open WebUI falls back to prompt-based tool calling instead of the provider's structured tool-call format. That is less reliable and may not trigger terminal commands at all. Native (the default) is recommended.
 :::
 
 :::tip Performance depends on the model

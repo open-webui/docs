@@ -32,8 +32,8 @@ To unlock these features, your model must support native tool calling and have s
 1.  **Enable Web Search Globally**: Ensure a search engine is configured in **Admin Panel → Settings → Web Search**.
 2.  **Enable Model Capability**: In **Admin Panel → Settings → Models**, select your model and enable the **Web Search** capability.
 3.  **Enable Default Feature**: In the same model settings, under **Default Features**, check **Web Search**. This controls whether the `search_web` and `fetch_url` tools are available by default in new chat sessions.
-4.  **Enable Native Mode (Agentic Mode)**:
-    *   In the same model settings, under **Advanced Parameters**, set **Function Calling** to `Native`.
+4.  **Confirm Native Mode (Agentic Mode)**:
+    *   Native is the default tool-calling mode as of v0.9.7, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).
 5.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
 
 :::info Configuring via environment variables instead
@@ -43,7 +43,7 @@ The steps above use the Admin Panel, which is the recommended route. If you mana
 :::tip Model Capability, Default Features, and Chat Toggle
 In **Native Mode** (the supported mode), the `search_web` and `fetch_url` tools require both the **Web Search** capability to be enabled *and* **Web Search** to be checked under **Default Features** in the model settings (or toggled on in the chat). If either is missing, the tools will not be injected — even though other builtin tools may still appear.
 
-Default Mode's RAG-style injection behavior is documented here only for legacy deployments. Default Mode is no longer supported; all models should be configured for Native Mode.
+Legacy Mode's RAG-style injection behavior is documented here only for legacy deployments. Native Mode is the default; Legacy Mode is the unsupported opt-out.
 
 **Important**: If you disable the `web_search` capability on a model but use Native Mode, the tools won't be available even if you manually toggle Web Search on in the chat.
 :::
