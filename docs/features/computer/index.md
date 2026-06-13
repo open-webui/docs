@@ -33,25 +33,15 @@ These two look related because both involve a terminal and an AI, but they sit o
 
 If you want the model to build software for you inside a chat, that is Open Terminal. If you want to _be_ at your computer from your phone, with the model as an extra pair of hands, that is cptr.
 
-## What you get
+## What you can do
 
-- **Terminal.** A real PTY-backed shell in the browser (macOS, Linux and Windows). Anything you would do over SSH.
-- **File browser and editor.** Navigate, view, edit and manage files, with icons by type. Markdown previews inline.
-- **Git, without the command line.** See status, stage and commit from a git panel, or drop into the terminal if you prefer.
-- **Workspaces.** Manage several project directories from one instance and switch between them without losing your place.
-- **Global search and shortcuts.** `Cmd+K` / `Cmd+Shift+F` searches chats (by title and content) and files (by name) across every workspace, plus a customisable keybinding system.
-- **Port preview.** A built-in reverse proxy detects ports your processes open, so you can preview a running app in another tab.
-- **Voice memos.** Record audio from the `+` menu or `Cmd+Shift+M`. Recordings save to the workspace as audio files with an auto-generated transcript, via any OpenAI-compatible speech-to-text API (Whisper and similar), configured in Settings > Audio.
-- **Automations.** Schedule recurring tasks on a timer, or ask the AI to set one up. Each automation runs as a real chat with full tool access, and can alert you when it finishes by browser notification or a webhook (Slack, Discord, Teams).
-- **Skills.** Drop reusable `SKILL.md` instruction sets in a workspace or globally. The AI discovers them and loads them on demand, and you can pull one in with `$` in the chat input.
-- **Model configuration.** Set parameters and a system prompt per model or as a global default. System prompts take `{{VARIABLE}}` placeholders (workspace name, file tree, OS, date, skills), and a workspace `.cptr/system.md` file overrides the prompt for that project.
-- **Optional AI agent.** A chat panel with multi-provider support (Anthropic, OpenAI, Ollama and OpenAI-compatible endpoints). With a key it reads, searches and edits files, runs shell commands, searches the web and reads URLs. It also reads and describes images in your workspace and can drive a real browser (navigate, click, type, screenshot, run JavaScript) via local Chrome, Firecrawl or Browser-Use. Web search runs through Exa, Tavily, Brave, DuckDuckGo, Perplexity or any OpenAI-compatible endpoint. For bigger tasks it can draft an implementation plan to approve before it starts (plan mode), and long conversations are compacted automatically. Every edit or command waits for your approval, and its file tools refuse to read or write `.env` files. Mention files with `@` and queue follow-up messages while it works.
-- **Tool servers.** Connect external tools over MCP or OpenAPI from the Tool Servers admin tab (bearer auth and custom headers supported). Once verified, the AI uses them alongside its built-in tools.
-- **Sub-agents and parallel tools.** The AI can spin up sub-agents that work on tasks in parallel, each with full tool access and inspectable afterwards as its own chat. Multiple tool calls in a single response also run concurrently. Set concurrency and limits in the Subagents admin tab.
-- **Messaging bots.** Connect the AI to Telegram, Discord, Slack, WhatsApp or Signal from Settings. Each bot has full tool access, streams its replies and syncs the conversation back to the web UI. Send `/workspace` to switch projects and `/new` to start a fresh chat.
-- **OpenAI-compatible gateway.** Expose each workspace as a model over `/v1/models` and `/v1/chat/completions`, so Open WebUI or any OpenAI-compatible client can drive the full cptr agent loop as if it were a model. Create and manage gateway API keys from the Gateway settings tab. Connecting from Open WebUI is first-class: the Gateway tab gives you a one-click header config that turns on chat branching and stops OWUI's background tasks (title, tag and follow-up generation) from spawning ghost chats (needs Open WebUI 0.9.7+).
+cptr is a full workspace with an optional AI agent on top:
 
-Chats are stored as files too, so your AI conversations are searchable, editable and commit-able alongside your code.
+- **The computer you operate.** A browser-based terminal, file browser, code editor and git across multiple project workspaces, with global search, live port previews and voice memos.
+- **An optional AI agent.** With your own key it reads, edits and runs code, browses the web, uses external MCP/OpenAPI tool servers and spins up sub-agents, following skills you define. Every change waits for your approval.
+- **Automation and reach.** Scheduled automations, messaging bots (Telegram, Discord, Slack, WhatsApp, Signal) and an OpenAI-compatible gateway that lets Open WebUI drive a workspace as a model.
+
+See the [**full feature list**](/features/computer/features), and [**Connect to Open WebUI**](/features/computer/open-webui) to use a cptr workspace as a model from your own Open WebUI instance.
 
 ## Install and run
 
