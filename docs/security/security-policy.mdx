@@ -44,6 +44,16 @@ If you have found something that you know is **not strictly a vulnerability unde
 
 In line with the CVE rules, we will **not** publish an advisory or mint a CVE for these, but we **will** act on them (for example, ship the bump) and keep the report confidential until it is handled. <ins>**Where a fix lands as a result of your report and you would like credit, we will try to acknowledge you (for example, as a co-author on the change).**</ins>
 
+## What a Valid Report Gets You
+
+If your report describes a real vulnerability under this policy, here is what you can expect from us:
+
+- **Credit on the advisory.** You are named as the reporter on the published advisory. Where multiple reporters each demonstrated a distinct vector, every one of you is credited (see [Report Handling](#report-handling)).
+- **Coordinated disclosure.** We will not publish out from under you while you are still working the issue with us. Status moves visibly on the advisory itself — including the CVE request — and GitHub notifies you of those updates, so you can follow it through to publication.
+- **A real fix, handled responsibly.** For findings with broad or severe real-world impact, we may hold publication for up to roughly two weeks after the patched release so administrators can update before details are public.
+
+We are a small volunteer team, so what we **cannot** offer is a bounty or a guaranteed turnaround. What you get is a serious fix, honest credit, and a process that treats your work as the contribution it is.
+
 ## Alignment with the CVE Program
 
 The **CVE Program rules** (and CNA operational rules) are the **baseline** for all CVE handling here, and this policy operates within them. Under those rules, the determination of whether a report constitutes a security vulnerability in Open WebUI is the vendor's to make; this policy documents the criteria by which we exercise that determination. Where the rules are silent, they still apply; where this policy specifies how we apply them to Open WebUI, it does so as the vendor's published disposition criteria, not as a replacement for or exception to the program rules.
@@ -114,16 +124,6 @@ We appreciate the community's interest in identifying potential vulnerabilities.
 13. **Self-Affecting Issues Are Not Vulnerabilities**: A vulnerability requires crossing a security boundary that affects **a party other than the reporter**. Crossing one of the security boundaries only against the reporter's own data, account, session, or environment is not a vulnerability — it is a bug, and belongs in the [Issue Tracker](https://github.com/open-webui/open-webui/issues), not in a security report. If the same action also affects another user, the operator, the host system, or shared resources, identify that second party clearly in the PoC.
 
 Non-compliant submissions may be closed, and repeat or extreme violators may be banned. Our goal is to foster a constructive reporting environment where quality submissions promote better security for all users.
-
-## What a Valid Report Gets You
-
-If your report describes a real vulnerability under this policy, here is what you can expect from us:
-
-- **Credit on the advisory.** You are named as the reporter on the published advisory. Where multiple reporters each demonstrated a distinct vector, every one of you is credited (see [Report Handling](#report-handling)).
-- **Coordinated disclosure.** We will not publish out from under you while you are still working the issue with us. Status moves visibly on the advisory itself — including the CVE request — and GitHub notifies you of those updates, so you can follow it through to publication.
-- **A real fix, handled responsibly.** For findings with broad or severe real-world impact, we may hold publication for up to roughly two weeks after the patched release so administrators can update before details are public.
-
-We are a small volunteer team, so what we **cannot** offer is a bounty or a guaranteed turnaround. What you get is a serious fix, honest credit, and a process that treats your work as the contribution it is.
 
 ## Expected Timeframe
 
