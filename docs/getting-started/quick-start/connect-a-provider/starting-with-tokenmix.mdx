@@ -1,0 +1,45 @@
+---
+sidebar_position: 8
+title: "TokenMix"
+---
+
+## Overview
+
+[TokenMix](https://tokenmix.ai/) is an OpenAI-compatible API gateway that exposes 300+ models from 17 vendors — including OpenAI, Anthropic, and Google, plus Chinese models that are otherwise hard to access from outside China (Qwen, DeepSeek, Doubao, GLM, Kimi, Hunyuan) — behind a single base URL and one API key.
+
+Because TokenMix implements the OpenAI Chat Completions and `/models` endpoints, Open WebUI connects to it natively as an OpenAI connection, with model auto-detection.
+
+---
+
+## Configuration
+
+1. Open Open WebUI and go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
+2. Click ➕ **Add Connection**.
+3. Fill in the connection details:
+
+| Setting | Value |
+|---|---|
+| **URL** | `https://api.tokenmix.ai/v1` |
+| **API Key** | Your TokenMix API key from [tokenmix.ai](https://tokenmix.ai/) |
+| **Model IDs** | Auto-detected from `/models` — optionally filter to specific models |
+
+4. Click **Save**.
+
+Select a TokenMix model (for example `deepseek/deepseek-v3.2`, `qwen/qwen3.7-max`, or `anthropic/claude-opus-4.8`) from the model dropdown and start chatting.
+
+---
+
+## Docker Environment Variables
+
+To configure the connection at startup instead, set the OpenAI base URL and key in your Docker environment:
+
+```bash
+-e OPENAI_API_BASE_URL="https://api.tokenmix.ai/v1"
+-e OPENAI_API_KEY="<your-tokenmix-key>"
+```
+
+:::tip
+TokenMix exposes 300+ models. To keep your model selector tidy, add only the model IDs you use to the **Model IDs (Filter)** allowlist in the connection settings.
+:::
+
+See the [TokenMix documentation](https://tokenmix.ai/docs) for the full model catalog and API reference.
