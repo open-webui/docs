@@ -88,3 +88,7 @@ Additional languages (Rust, Go, Java, etc.) can be installed on the fly.
 - **[Document & data analysis →](./file-analysis)** — spreadsheets, PDFs, Word docs
 - **[Web development →](./web-development)** — build and preview websites
 - **[System automation →](./system-automation)** — file management, backups, batch operations
+
+:::tip
+Want a persistent environment on your real machine? [**cptr**](https://github.com/open-webui/computer) puts your computer in a browser tab, accessible from any device.
+:::
