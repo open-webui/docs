@@ -89,4 +89,4 @@ Need isolated, per-user terminal containers for your team? **[Terminals](./termi
 
 ## Your Whole Machine
 
-Open Terminal adds a computing environment to Open WebUI. [**cptr**](https://github.com/open-webui/computer) by the Open WebUI team is the computer itself: files, terminal, git, editor, and AI in a browser tab, accessible from any device.
+Open Terminal adds a computing environment to Open WebUI. [**cptr**](https://github.com/open-webui/computer) (Open WebUI Computer) is the computer itself: files, terminal, git, editor, and AI in a browser tab, accessible from any device.
