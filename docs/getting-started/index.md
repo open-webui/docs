@@ -30,6 +30,22 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 
 ---
 
+## 📱 Open WebUI as an App
+
+**Already running Open WebUI? Install it as an app on any device.**
+
+Open WebUI is a Progressive Web App (PWA). Add it to your phone's home screen, your desktop taskbar, or your dock. No separate download required. Get a full-screen, native-feeling experience from any browser.
+
+| | |
+| :--- | :--- |
+| 📱 **iPhone / iPad** | Share → Add to Home Screen |
+| 🤖 **Android** | Menu → Install app |
+| 🖥️ **Chrome / Edge** | Address bar install icon |
+
+[**Install as an app →**](/getting-started/open-webui-as-app)
+
+---
+
 ## Essentials for Open WebUI
 
 **Installed and chatting — now what?**
