@@ -326,27 +326,42 @@ For the full setup guide, see [OpenTelemetry Monitoring](/reference/monitoring/o
 
 Here's what a production-ready scaled deployment typically looks like:
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   Load Balancer                     │
-│              (Nginx, HAProxy, Cloud LB)             │
-└──────────┬──────────┬──────────┬────────────────────┘
-           │          │          │
-     ┌─────▼──┐ ┌─────▼──┐ ┌────▼───┐
-     │ WebUI  │ │ WebUI  │ │ WebUI  │   ← Stateless containers
-     │ Pod 1  │ │ Pod 2  │ │ Pod N  │
-     └───┬────┘ └───┬────┘ └───┬────┘
-         │          │          │
-    ┌────▼──────────▼──────────▼────┐
-    │         PostgreSQL            │   ← Shared database
-    │     (+ PGVector for RAG)      │   ← Vector DB (or other Vector DB)
-    └───────────────────────────────┘
-    ┌───────────────────────────────┐
-    │           Redis               │   ← Shared state & websockets
-    └───────────────────────────────┘
-    ┌───────────────────────────────┐
-    │  Shared Storage (NFS or S3)   │   ← Shared file storage
-    └───────────────────────────────┘
+```mermaid
+flowchart TD
+    %% Main Flow
+    LB["Load Balancer<br/>(Nginx, HAProxy, Cloud LB)"]
+
+    subgraph Pods ["Stateless Containers"]
+        direction LR
+        P1["WebUI<br/>Pod 1"]
+        P2["WebUI<br/>Pod 2"]
+        PN["WebUI<br/>Pod N"]
+    end
+
+    subgraph Shared ["Shared Infrastructure"]
+        direction LR
+        DB[("PostgreSQL<br/>(+ PGVector for RAG)")]
+        Redis{{"Redis"}}
+        Storage[/"Shared Storage<br/>(NFS or S3)"/]
+    end
+
+    %% Annotations
+    DBNote["Shared database<br/>+ Vector DB"]
+    RedisNote["Shared state & websockets"]
+    StoreNote["Shared file storage"]
+
+    %% Connections
+    LB --> P1
+    LB --> P2
+    LB --> PN
+    P1 --> Shared
+    P2 --> Shared
+    PN --> Shared
+
+    %% Alignment Links
+    DB -.-> DBNote
+    Redis -.-> RedisNote
+    Storage -.-> StoreNote
 ```
 
 **Running into issues?** The [Scaling & HA Troubleshooting](/troubleshooting/multi-replica) guide covers common problems (login loops, WebSocket failures, database locks, worker crashes) and their solutions. For performance tuning at scale, see [Optimization, Performance & RAM Usage](/troubleshooting/performance).

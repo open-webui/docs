@@ -140,7 +140,7 @@ No complex setup—just REST APIs ready to use.
 
 Deploying your MCP-to-OpenAPI proxy (powered by mcpo) is straightforward. Here's how to easily Dockerize and deploy it to cloud or VPS solutions:
 
-### 🐳 Dockerize your Proxy Server using mcpo
+### Dockerize your Proxy Server using mcpo
 
 1. **Dockerfile Example**
 
@@ -160,6 +160,42 @@ CMD ["uvx", "mcpo", "--host", "0.0.0.0", "--port", "8000", "--", "uvx", "mcp-ser
 ```bash
 docker build -t mcp-proxy-server .
 docker run -d -p 8000:8000 mcp-proxy-server
+```
+
+If you want to use the published mcpo image instead of building your own image, bind the proxy to `0.0.0.0` so Docker port publishing can reach it:
+
+```bash
+docker run --rm -p 8000:8000 ghcr.io/open-webui/mcpo:main \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --api-key "top-secret" \
+  -- your_mcp_server_command
+```
+
+For Docker Compose, put the same mcpo arguments in the service command:
+
+```yaml
+services:
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    ports:
+      - "8000:8000"
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-key
+      - top-secret
+      - --
+      - your_mcp_server_command
+```
+
+Replace `your_mcp_server_command` with your MCP server command, adding each argument as its own `command` list item. Then start and remove the proxy with:
+
+```bash
+docker compose up
+docker compose down
 ```
 
 3. **Deploying Your Container**
