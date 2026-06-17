@@ -86,3 +86,7 @@ If the AI starts more than one server (say, a frontend on port 3000 and a backen
 - **[Run code from chat →](./code-execution)** — the AI writes, runs, and debugs code
 - **[Analyze documents & data →](./file-analysis)** — spreadsheets, PDFs, Word docs, emails
 - **[Automate tasks →](./system-automation)** — file management, backups, batch operations
+
+:::tip
+Want to preview and iterate on websites from your phone? [**cptr**](https://github.com/open-webui/computer) gives you your whole machine in a browser tab, accessible from any device.
+:::

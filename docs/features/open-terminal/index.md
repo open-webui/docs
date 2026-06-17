@@ -84,3 +84,9 @@ Open Terminal requires models with **native function calling** support. Frontier
 ## Enterprise Multi-User
 
 Need isolated, per-user terminal containers for your team? **[Terminals](./terminals/)** provisions a dedicated Open Terminal instance for every user with automatic lifecycle management, resource controls, and policy-based environments.
+
+---
+
+## Your Whole Machine
+
+Open Terminal adds a computing environment to Open WebUI. [**cptr**](https://github.com/open-webui/computer) (Open WebUI Computer) is the computer itself: files, terminal, git, editor, and AI in a browser tab, accessible from any device.
