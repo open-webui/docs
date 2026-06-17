@@ -44,6 +44,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | GitHub Models | No — uses non-standard path | Add model IDs manually to the whitelist |
 | Perplexity | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | MiniMax | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
+| Pinstripes | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes — but returns thousands of models | Strongly recommend adding a filtered allowlist |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
@@ -222,6 +223,30 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
   1. **Use an allowlist** — add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
   2. **Enable model caching** via `Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
+  :::
+
+  </TabItem>
+  <TabItem value="pinstripes" label="Pinstripes">
+
+  **[Pinstripes](https://pinstripes.io)** is an OpenAI-compatible inference API offering low-cost access to popular open-weight models with no rate limits and no queues.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://pinstripes.io/v1` |
+  | **API Key** | Your API key from [pinstripes.io](https://pinstripes.io) |
+  | **Model IDs** | **Required** — add manually (see list below) |
+
+  **Available models:**
+
+  | Model ID | Description |
+  |---|---|
+  | `ps/deepseek-v4-flash` | DeepSeek V4 Flash — $0.10/M input tokens |
+  | `ps/glm-4.5-air` | GLM-4.5 Air |
+  | `ps/qwen3-35b` | Qwen3 35B |
+  | `ps/minimax-m2.7` | MiniMax M2.7 |
+
+  :::caution
+  Pinstripes does **not** expose a `/models` endpoint, so auto-detection will fail. You must add model IDs to the **Model IDs (Filter)** allowlist manually before the models appear in your selector.
   :::
 
   </TabItem>
