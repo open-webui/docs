@@ -19,7 +19,7 @@ Work through in order, or jump to the section you need:
 8. [**Troubleshooting**](#troubleshooting)
 
 :::tip Deploying for a team?
-If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive — work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
+If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive: work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
 :::
 
 ---
@@ -142,7 +142,7 @@ The defaults are reasonable for getting started. When you outgrow them, there ar
 
 - **Embedding engine.** The default (SentenceTransformers `all-MiniLM-L6-v2`) runs locally on CPU and consumes roughly 500 MB of RAM per worker. For any multi-user deployment, point at an external embeddings API (OpenAI, or Ollama with `nomic-embed-text`) via `RAG_EMBEDDING_ENGINE`.
 - **Content extraction engine.** The default uses `pypdf`, which leaks memory during heavy ingestion. For anything beyond casual use, switch to **Tika** or **Docling** via `CONTENT_EXTRACTION_ENGINE`.
-- **Vector database.** The default ChromaDB (local SQLite-backed) does not tolerate multi-worker deployments. At scale, switch to **PGVector** — it is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available but are community-maintained: they may break on upgrades and fixes depend on community contributions. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the community disclaimers on each provider.
+- **Vector database.** The default ChromaDB (local SQLite-backed) does not tolerate multi-worker deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available but are community-maintained: they may break on upgrades and fixes depend on community contributions. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the community disclaimers on each provider.
 
 :::note When to worry about this
 None of these matter for "a single user with a handful of PDFs." All of them start mattering the moment you have 100 documents or 10 concurrent users.
@@ -175,8 +175,8 @@ More detail:
 - [RAG overview](/features/chat-conversations/rag/)
 - [Knowledge workspace](/features/workspace/knowledge)
 - [Performance tuning for RAG](/troubleshooting/performance#embedding-engine)
-- [Scaling: external vector database](/getting-started/advanced-topics/scaling#step-4--switch-to-an-external-vector-database) — required for multi-worker and multi-replica deployments
-- [Scaling: content extraction & embeddings](/getting-started/advanced-topics/scaling#step-6--fix-content-extraction--embeddings) — fixing memory leaks at scale
+- [Scaling: external vector database](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database), required for multi-worker and multi-replica deployments
+- [Scaling: content extraction & embeddings](/getting-started/advanced-topics/scaling#step-6-fix-content-extraction--embeddings), fixing memory leaks at scale
 
 ---
 

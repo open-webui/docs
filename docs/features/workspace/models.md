@@ -93,7 +93,7 @@ The current date is {{ CURRENT_DATE }}.
 ```
 
 :::tip Group-aware system prompts
-`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups — e.g. *"You may discuss internal roadmap items only when `{{ USER_GROUPS }}` contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
+`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups, e.g. *"You may discuss internal roadmap items only when `{{ USER_GROUPS }}` contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
 :::
 
 ### Capabilities and bindings
@@ -203,7 +203,7 @@ Set global defaults to disable code interpreter across all models, enforce a con
 
 ## Curated-Interface Deployments
 
-A common deployment pattern is to present regular users with a curated model — a preconfigured agent with a specific name, icon, system prompt, and tools — while keeping the underlying base model visible only to power users or admins who need direct access.
+A common deployment pattern is to present regular users with a curated model (a preconfigured agent with a specific name, icon, system prompt, and tools) while keeping the underlying base model visible only to power users or admins who need direct access.
 
 ### The recommended pattern: two base model entries
 
@@ -214,7 +214,7 @@ The correct way to achieve differential visibility is to create **two separate b
 | **Base model** (e.g. "GPT-4o") | Restricted to power users | No | Power users only | Direct exploration and testing |
 | **Curated model** (e.g. "Company Assistant") | Public | No | Everyone | The sanctioned product for regular users |
 
-The curated model is a first-class base model entry — not a workspace model wrapping the restricted one. Configure it with its own name, avatar, system prompt, knowledge bases, tools, and parameter overrides. It connects to the same upstream LLM but is an independent configuration entry.
+The curated model is a first-class base model entry, not a workspace model wrapping the restricted one. Configure it with its own name, avatar, system prompt, knowledge bases, tools, and parameter overrides. It connects to the same upstream LLM but is an independent configuration entry.
 
 **Step-by-step setup:**
 
@@ -232,7 +232,7 @@ When you switch to a newer LLM (e.g. Qwen 3 → Qwen 3.5), update the base model
 
 ### Why not a workspace model on a restricted base?
 
-Workspace models inherit the access requirements of their base model. If a user does not have access to the base model, they cannot use any workspace model built on top of it — even if the workspace model itself is shared with them.
+Workspace models inherit the access requirements of their base model. If a user does not have access to the base model, they cannot use any workspace model built on top of it, even if the workspace model itself is shared with them.
 
 This is by design. Without this requirement, anyone could bypass base model access restrictions by creating a workspace model on a restricted base and sharing it publicly. That would be broken access control.
 
@@ -242,7 +242,7 @@ If you previously relied on workspace models to give users access to base models
 
 ### Alternative: hidden base model
 
-If you don't need differential visibility — meaning no group needs to see the raw base model in the picker — you can use a simpler approach:
+If you don't need differential visibility, meaning no group needs to see the raw base model in the picker, you can use a simpler approach:
 
 1. Set the base model to **Public** (so everyone has access).
 2. **Hide** the base model (ellipsis > Hide) so it doesn't appear in the model selector.

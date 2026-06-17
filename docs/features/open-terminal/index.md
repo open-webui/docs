@@ -87,13 +87,13 @@ Open Terminal needs a model that does tool calling at agentic quality, not just 
 
 ## Use Cases
 
-- **[Code execution](./use-cases/code-execution)** — write, run, and debug scripts
-- **[Software development](./use-cases/software-development)** — repos, tests, debugging, refactoring, Git
-- **[Document & data analysis](./use-cases/file-analysis)** — spreadsheets, PDFs, Word docs, emails
-- **[Web development](./use-cases/web-development)** — build and preview websites
-- **[System automation](./use-cases/system-automation)** — file management, backups, batch operations
-- **[Advanced workflows](./use-cases/advanced-workflows)** — skills for data reports, research, code review, and more
-- **[File browser](./file-browser)** — uploading, previewing, editing files
+- **[Code execution](./use-cases/code-execution)**: write, run, and debug scripts
+- **[Software development](./use-cases/software-development)**: repos, tests, debugging, refactoring, Git
+- **[Document & data analysis](./use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
+- **[Web development](./use-cases/web-development)**: build and preview websites
+- **[System automation](./use-cases/system-automation)**: file management, backups, batch operations
+- **[Advanced workflows](./use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
+- **[File browser](./file-browser)**: uploading, previewing, editing files
 
 ---
 

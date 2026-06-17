@@ -34,7 +34,7 @@ licence: MIT
 ```
 
 :::tip Metadata auto-fill (v0.9.6+)
-When you create a **new** tool (also applies to functions and skills), the editor reads the frontmatter as you paste or type code and auto-fills the **Name**, **ID**, and **Description** fields from `title` and `description` if you haven't already filled them in. It never overwrites a value you've entered, and it does not re-derive fields when editing an existing item — so you no longer need to retype metadata that's already declared in the source.
+When you create a **new** tool (also applies to functions and skills), the editor reads the frontmatter as you paste or type code and auto-fills the **Name**, **ID**, and **Description** fields from `title` and `description` if you haven't already filled them in. It never overwrites a value you've entered, and it does not re-derive fields when editing an existing item, so you no longer need to retype metadata that's already declared in the source.
 :::
 
 ### Tools Class
@@ -64,7 +64,7 @@ class Tools:
 ### Type Hints
 Each tool must have type hints for arguments. The types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
 
-### Valves and UserValves - (optional, but HIGHLY encouraged)
+### Valves and UserValves (optional, but HIGHLY encouraged)
 
 Valves and UserValves are used for specifying customizable settings of the Tool, you can read more on the dedicated [Valves & UserValves page](/features/extensibility/plugin/development/valves).
 
@@ -128,13 +128,13 @@ class Tools:
 Event Emitters are used to add additional information to the chat interface. Similarly to Filter Outlets, Event Emitters are capable of appending content to the chat. Unlike Filter Outlets, they are not capable of stripping information. Additionally, emitters can be activated at any stage during the Tool.
 
 :::danger Author tools for Native Mode
-Legacy Mode is **legacy and no longer supported** — see the [Tool Calling Modes guide](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for the full policy. Write your tools to work correctly under **Native (Agentic) Mode**, which is the only supported mode going forward. The event-emitter compatibility matrix below still documents Legacy Mode behavior for historical reference and for maintainers of pre-existing tools that haven't been migrated yet — but new tools should not depend on Legacy-Mode-only event types. If your tool's UX fundamentally requires an event type that only works in Legacy Mode (`message`, `chat:message:delta`, `chat:message`, `replace` mid-stream), redesign the UX around Native-compatible events (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`) rather than requiring users to switch their model to legacy mode.
+Legacy Mode is **legacy and no longer supported**. See the [Tool Calling Modes guide](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for the full policy. Write your tools to work correctly under **Native (Agentic) Mode**, which is the only supported mode going forward. The event-emitter compatibility matrix below still documents Legacy Mode behavior for historical reference and for maintainers of pre-existing tools that haven't been migrated yet, but new tools should not depend on Legacy-Mode-only event types. If your tool's UX fundamentally requires an event type that only works in Legacy Mode (`message`, `chat:message:delta`, `chat:message`, `replace` mid-stream), redesign the UX around Native-compatible events (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`) rather than requiring users to switch their model to legacy mode.
 :::
 
 Event Emitter behavior differs between the two function calling modes. The function calling mode is controlled by the `function_calling` parameter:
 
-- **Native Mode (Agentic Mode)** (`function_calling = "native"`) — the only supported mode. Uses the model's structured tool-call API. **Limited event-emitter surface** — see the matrix below for exactly which event types are supported.
-- **Legacy Mode** (`function_calling = "legacy"`) — the prompt-injection mode. Full event-emitter surface, but the mode itself is unsupported and should not be selected for new deployments.
+- **Native Mode (Agentic Mode)** (`function_calling = "native"`): the only supported mode. Uses the model's structured tool-call API. **Limited event-emitter surface**: see the matrix below for exactly which event types are supported.
+- **Legacy Mode** (`function_calling = "legacy"`): the prompt-injection mode. Full event-emitter surface, but the mode itself is unsupported and should not be selected for new deployments.
 
 For the full mode policy, model requirements, and configuration, see the [**Tool Calling Modes guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native). In short: **use Native Mode**; the matrix below tells you which event types work there.
 
@@ -182,23 +182,23 @@ Here's the comprehensive breakdown of how each event type behaves across functio
 
 | Event Type | Legacy Mode Functionality | Native Mode Functionality | Status |
 |------------|---------------------------|--------------------------|--------|
-| `status` | ✅ Full support - Updates status history during tool execution | ✅ **Identical** - Tracks function execution status | **COMPATIBLE** |
-| `message` | ✅ Full support - Appends incremental content during streaming | ❌ **BROKEN** - Gets overwritten by native completion snapshots | **INCOMPATIBLE** |
-| `chat:completion` | ✅ Full support - Handles streaming responses and completion data | ⚠️ **LIMITED** - Carries function results but may overwrite tool updates | **PARTIALLY COMPATIBLE** |
-| `chat:message:delta` | ✅ Full support - Streams delta content during execution | ❌ **BROKEN** - Content gets replaced by native function snapshots | **INCOMPATIBLE** |
-| `chat:message` | ✅ Full support - Replaces entire message content cleanly | ❌ **BROKEN** - Gets overwritten by subsequent native completions | **INCOMPATIBLE** |
-| `replace` | ✅ Full support - Replaces content with precise control | ❌ **BROKEN** - Replaced content gets overwritten immediately | **INCOMPATIBLE** |
-| `chat:message:files` / `files` | ✅ Full support - Handles file attachments in messages | ✅ **Identical** - Processes files from function outputs | **COMPATIBLE** |
-| `chat:message:error` | ✅ Full support - Displays error notifications | ✅ **Identical** - Shows function call errors | **COMPATIBLE** |
-| `chat:message:follow_ups` | ✅ Full support - Shows follow-up suggestions | ✅ **Identical** - Displays function-generated follow-ups | **COMPATIBLE** |
-| `chat:title` | ✅ Full support - Updates chat title dynamically | ✅ **Identical** - Updates title based on function interactions | **COMPATIBLE** |
-| `chat:tags` | ✅ Full support - Modifies chat tags | ✅ **Identical** - Manages tags from function outputs | **COMPATIBLE** |
-| `chat:tasks:cancel` | ✅ Full support - Cancels ongoing tasks | ✅ **Identical** - Cancels native function executions | **COMPATIBLE** |
-| `citation` / `source` | ✅ Full support - Handles citations with full metadata | ✅ **Identical** - Processes function-generated citations | **COMPATIBLE** |
-| `notification` | ✅ Full support - Shows toast notifications | ✅ **Identical** - Displays function execution notifications | **COMPATIBLE** |
-| `confirmation` | ✅ Full support - Requests user confirmations | ✅ **Identical** - Confirms function executions | **COMPATIBLE** |
-| `execute` | ✅ Full support - Executes code dynamically | ✅ **Identical** - Runs function-generated code | **COMPATIBLE** |
-| `input` | ✅ Full support - Requests user input with full UI | ✅ **Identical** - Collects input for functions | **COMPATIBLE** |
+| `status` | ✅ Full support: Updates status history during tool execution | ✅ **Identical**: Tracks function execution status | **COMPATIBLE** |
+| `message` | ✅ Full support: Appends incremental content during streaming | ❌ **BROKEN**: Gets overwritten by native completion snapshots | **INCOMPATIBLE** |
+| `chat:completion` | ✅ Full support: Handles streaming responses and completion data | ⚠️ **LIMITED**: Carries function results but may overwrite tool updates | **PARTIALLY COMPATIBLE** |
+| `chat:message:delta` | ✅ Full support: Streams delta content during execution | ❌ **BROKEN**: Content gets replaced by native function snapshots | **INCOMPATIBLE** |
+| `chat:message` | ✅ Full support: Replaces entire message content cleanly | ❌ **BROKEN**: Gets overwritten by subsequent native completions | **INCOMPATIBLE** |
+| `replace` | ✅ Full support: Replaces content with precise control | ❌ **BROKEN**: Replaced content gets overwritten immediately | **INCOMPATIBLE** |
+| `chat:message:files` / `files` | ✅ Full support: Handles file attachments in messages | ✅ **Identical**: Processes files from function outputs | **COMPATIBLE** |
+| `chat:message:error` | ✅ Full support: Displays error notifications | ✅ **Identical**: Shows function call errors | **COMPATIBLE** |
+| `chat:message:follow_ups` | ✅ Full support: Shows follow-up suggestions | ✅ **Identical**: Displays function-generated follow-ups | **COMPATIBLE** |
+| `chat:title` | ✅ Full support: Updates chat title dynamically | ✅ **Identical**: Updates title based on function interactions | **COMPATIBLE** |
+| `chat:tags` | ✅ Full support: Modifies chat tags | ✅ **Identical**: Manages tags from function outputs | **COMPATIBLE** |
+| `chat:tasks:cancel` | ✅ Full support: Cancels ongoing tasks | ✅ **Identical**: Cancels native function executions | **COMPATIBLE** |
+| `citation` / `source` | ✅ Full support: Handles citations with full metadata | ✅ **Identical**: Processes function-generated citations | **COMPATIBLE** |
+| `notification` | ✅ Full support: Shows toast notifications | ✅ **Identical**: Displays function execution notifications | **COMPATIBLE** |
+| `confirmation` | ✅ Full support: Requests user confirmations | ✅ **Identical**: Confirms function executions | **COMPATIBLE** |
+| `execute` | ✅ Full support: Executes code dynamically | ✅ **Identical**: Runs function-generated code | **COMPATIBLE** |
+| `input` | ✅ Full support: Requests user input with full UI | ✅ **Identical**: Collects input for functions | **COMPATIBLE** |
 
 #### Why Native Mode Breaks Certain Event Types
 
@@ -491,8 +491,8 @@ async def batch_processor_tool(
 Message events (`message`, `chat:message`, `chat:message:delta`, `replace`) allow you to append or modify message content at any stage during tool execution. This enables embedding images, rendering web pages, streaming content updates, and creating rich interactive experiences.
 
 **However, these event types have major compatibility issues:**
-- ✅ **Legacy Mode**: Full functionality - content persists and displays properly
-- ❌ **Native Mode**: BROKEN - content gets overwritten by completion snapshots and disappears
+- ✅ **Legacy Mode**: Full functionality, content persists and displays properly
+- ❌ **Native Mode**: BROKEN, content gets overwritten by completion snapshots and disappears
 
 **Why Message Events Break in Native Mode:**
 Native function calling emits repeated `chat:completion` events with full content snapshots that completely replace message content, causing any tool-emitted message updates to flicker and disappear.
@@ -1095,18 +1095,18 @@ await __event_emitter__({
 
 #### Comprehensive Function Calling Mode Guide
 
-:::danger Write tools for Native Mode — Legacy Mode is unsupported
+:::danger Write tools for Native Mode, Legacy Mode is unsupported
 Legacy Mode is **legacy and no longer supported**. New tools should be written to work under Native Mode. The mode-comparison details below are retained so that maintainers of pre-existing Legacy-Mode tools understand the gap they need to close when migrating. They are **not** a recommendation to choose Legacy Mode for new work.
 
 If your tool design depends on a Legacy-Mode-only event type, redesign the UX around the Native-compatible surface (`status`, `notification`, `citation`, `chat:message:files`, `confirmation`, `chat:message:follow_ups`, plus returning a final content block from the tool method). Requiring users to switch their model to legacy mode to run your tool is not acceptable going forward.
 :::
 
-**Mode Comparison Overview** *(for migration reference only — Native is the only supported target)*:
+**Mode Comparison Overview** *(for migration reference only; Native is the only supported target)*:
 
 | Aspect | Legacy Mode (Legacy / Unsupported) | Native Mode (Supported) |
 |--------|-------------|-------------|
 | **Status** | ❌ Legacy, no longer supported | ✅ Required for new tools |
-| **Latency** | Higher — full prompt-injection pipeline | Lower — direct tool-call API |
+| **Latency** | Higher (full prompt-injection pipeline) | Lower (direct tool-call API) |
 | **KV Cache** | ❌ Broken every turn | ✅ Preserved |
 | **Event Support** | Full event-type surface | Limited surface (see matrix above) |
 | **Streaming** | Mid-stream content rewrites work | Mid-stream rewrites are overwritten by completion snapshots |
@@ -1117,11 +1117,11 @@ If your tool design depends on a Legacy-Mode-only event type, redesign the UX ar
 **How to design for Native Mode:**
 
 - Deliver your tool's primary output as the **return value** of the tool method. That content is emitted by the model as part of its response and is not subject to the event-overwrite issue.
-- Use `status` and `notification` for progress and user-facing alerts — they are fully supported in Native Mode.
-- Use `citation` / `source` events for references — fully supported in Native Mode.
-- Use `confirmation` / `input` via `__event_call__` for interactive flows — fully supported in Native Mode.
-- Attach files via the `chat:message:files` event — fully supported in Native Mode.
-- Avoid depending on `message`, `chat:message:delta`, `chat:message`, or `replace` mid-stream — these are the four events that break under Native Mode. If you need progressive output, emit a series of `status` updates and return the final content from the tool.
+- Use `status` and `notification` for progress and user-facing alerts; they are fully supported in Native Mode.
+- Use `citation` / `source` events for references; fully supported in Native Mode.
+- Use `confirmation` / `input` via `__event_call__` for interactive flows; fully supported in Native Mode.
+- Attach files via the `chat:message:files` event; fully supported in Native Mode.
+- Avoid depending on `message`, `chat:message:delta`, `chat:message`, or `replace` mid-stream; these are the four events that break under Native Mode. If you need progressive output, emit a series of `status` updates and return the final content from the tool.
 
 <details>
 <summary>Migrating a Legacy-Mode tool to Native Mode</summary>
@@ -1131,7 +1131,7 @@ Common rewrites when moving a Legacy-Mode tool to Native:
 - Replace mid-stream `message` events that append content with a single final return value containing the assembled content.
 - Replace `replace`-based progress bars with a sequence of `status` events (`"description": "Step 3 of 5 — fetching..."`).
 - Replace `chat:message`-based dashboards with a return value containing the rendered dashboard (Markdown / HTML is fine).
-- Keep `citation`, `notification`, `confirmation`, and file attachments as-is — they work identically in both modes.
+- Keep `citation`, `notification`, `confirmation`, and file attachments as-is; they work identically in both modes.
 
 **Universal Compatibility Pattern:** branch on [`is_legacy_mode()`](#detecting-the-mode-in-your-tool). On the Legacy path send `message` events for progressive output; on the Native path (the default) emit `status` updates and return the result from the tool. The helper and the branch skeleton are in [Detecting the Mode](#detecting-the-mode-in-your-tool).
 
@@ -1143,8 +1143,8 @@ Common rewrites when moving a Legacy-Mode tool to Native:
 **Common Issues and Solutions:**
 
 **Issue: Content appears then disappears**
-- **Cause**: Using `message` / `chat:message` / `replace` events in Native Mode — completion snapshots overwrite them.
-- **Solution**: Return the content from the tool method and use `status` events for progress instead. Do **not** switch to Legacy Mode — Legacy Mode is no longer supported.
+- **Cause**: Using `message` / `chat:message` / `replace` events in Native Mode; completion snapshots overwrite them.
+- **Solution**: Return the content from the tool method and use `status` events for progress instead. Do **not** switch to Legacy Mode. Legacy Mode is no longer supported.
 
 **Issue: Tool seems unresponsive**
 - **Cause**: Function calling not enabled for model

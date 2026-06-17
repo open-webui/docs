@@ -77,8 +77,9 @@ Controls what users can share with the community or make public.
 | **Public Skills** | *(Requires Share Skills)* Ability to make skills public. |
 | **Share Notes** | **(Parent)** Ability to share Notes. |
 | **Public Notes** | *(Requires Share Notes)* Ability to make Notes public. |
+| **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
 | **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by anyone (including unauthenticated visitors). When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
-| **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads — owners can still share with specific users or groups. Admins are always exempt. |
+| **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
 
 ### 3. Chat Permissions
 Controls the features available to the user inside the chat interface.
@@ -98,6 +99,7 @@ Controls the features available to the user inside the chat interface.
 | **Rate Response** | Ability to thumbs up/down responses. |
 | **Share Chat** | Ability to generate a share link for a chat. |
 | **Export Chat** | Ability to export chat history. |
+| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI). |
 | **Speech-to-Text (STT)**| Ability to use voice input. |
 | **Text-to-Speech (TTS)**| Ability to use voice output. |
 | **Audio Call** | Ability to use the real-time audio call feature. |
@@ -121,6 +123,7 @@ Controls access to broad platform capabilities.
 | **Memories** | Access to the Memories feature for persistent user context. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
+| **User Webhooks** | Ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default. |
 
 :::info Automations Permission Scope
 

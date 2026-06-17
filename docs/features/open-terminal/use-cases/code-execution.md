@@ -5,7 +5,7 @@ title: "Code Execution"
 
 # Code Execution
 
-Open Terminal allows the AI to write, execute, and debug code in real time. It handles the full cycle — writing the script, running it, reading errors, and iterating until the result is correct.
+Open Terminal allows the AI to write, execute, and debug code in real time. It handles the full cycle: writing the script, running it, reading errors, and iterating until the result is correct.
 
 ---
 
@@ -84,10 +84,10 @@ Additional languages (Rust, Go, Java, etc.) can be installed on the fly.
 
 ## Related
 
-- **[Software development →](./software-development)** — repos, tests, debugging, refactoring
-- **[Document & data analysis →](./file-analysis)** — spreadsheets, PDFs, Word docs
-- **[Web development →](./web-development)** — build and preview websites
-- **[System automation →](./system-automation)** — file management, backups, batch operations
+- **[Software development →](./software-development)**: repos, tests, debugging, refactoring
+- **[Document & data analysis →](./file-analysis)**: spreadsheets, PDFs, Word docs
+- **[Web development →](./web-development)**: build and preview websites
+- **[System automation →](./system-automation)**: file management, backups, batch operations
 
 :::tip
 Want a persistent environment on your real machine? [**cptr**](https://github.com/open-webui/computer) puts your computer in a browser tab, accessible from any device.

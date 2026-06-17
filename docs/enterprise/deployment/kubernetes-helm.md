@@ -8,7 +8,7 @@ title: "Kubernetes with Helm"
 Deploy using the official Open WebUI Helm chart on any Kubernetes distribution (EKS, AKS, GKE, OpenShift, Rancher, self-managed).
 
 :::info Prerequisites
-Before proceeding, ensure you have configured the [shared infrastructure requirements](/enterprise/deployment#shared-infrastructure-requirements) — PostgreSQL, Redis, a vector database, shared storage, and content extraction.
+Before proceeding, ensure you have configured the [shared infrastructure requirements](/enterprise/deployment#shared-infrastructure-requirements): PostgreSQL, Redis, a vector database, shared storage, and content extraction.
 :::
 
 ## When to Choose This Pattern
@@ -62,7 +62,7 @@ helm repo update
 helm install openwebui open-webui/open-webui -f values.yaml
 ```
 
-Your `values.yaml` should override the defaults to point at your shared infrastructure. The chart has dedicated values for many common settings — use these instead of raw environment variables where available:
+Your `values.yaml` should override the defaults to point at your shared infrastructure. The chart has dedicated values for many common settings: use these instead of raw environment variables where available:
 
 ```yaml
 # Example values.yaml overrides (refer to chart documentation for full schema)

@@ -28,7 +28,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 ### Prerequisites
 
 - A [Kagi account](https://kagi.com) (any plan)
-- **Separate API billing** — API access is billed independently from your Kagi subscription. Set up billing and generate an API key at [kagi.com/api](https://kagi.com/api)
+- **Separate API billing:** API access is billed independently from your Kagi subscription. Set up billing and generate an API key at [kagi.com/api](https://kagi.com/api)
 - Search API pricing: **$12 per 1,000 requests** (pay-as-you-go, invoiced every 30 days or when usage reaches $100)
 
 ### Setup
@@ -59,8 +59,8 @@ services:
 
 The Kagi Search API inherits settings from your Kagi account, including:
 
-- **Blocked or promoted websites** — your [personalization rules](https://help.kagi.com/kagi/getting-started/index.html) apply to API results
-- **Snippet length** — configured in [Settings → Search](https://help.kagi.com/kagi/settings/search.html)
+- **Blocked or promoted websites:** your [personalization rules](https://help.kagi.com/kagi/getting-started/index.html) apply to API results
+- **Snippet length:** configured in [Settings → Search](https://help.kagi.com/kagi/settings/search.html)
 
 This means you can customize your API search results the same way you customize the Kagi web interface.
 

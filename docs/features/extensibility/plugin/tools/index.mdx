@@ -9,7 +9,7 @@ title: "Tools"
 **Workspace Tools and Functions execute arbitrary Python code on your server.** Only install from trusted sources, review code before importing, and restrict Workspace access to trusted administrators only. Granting a user the ability to create or import Tools is equivalent to giving them shell access to the server. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
-⚙️ Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things — like search the web, scrape data, generate images, talk back using AI voices, and more.
+⚙️ Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things like search the web, scrape data, generate images, talk back using AI voices, and more.
 
 Because there are several ways to integrate "Tools" in Open WebUI, it's important to understand which type you are using.
 
@@ -22,12 +22,12 @@ Because there are several ways to integrate "Tools" in Open WebUI, it's importan
 | Type | Location in UI | Best For... | Source |
 | :--- | :--- | :--- | :--- |
 | **Native Features** | Admin/Settings | Core platform functionality (these are the [built-in system tools](#built-in-system-tools-nativeagentic-mode)) | Built-in to Open WebUI |
-| **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts — **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
+| **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts, **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
 | **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External tool server |
 | **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
 | **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External tool server |
 
-The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool servers**: the tool code runs on a separate process or machine and Open WebUI calls it over HTTP. **Native Features** are the built-in system tools that ship with Open WebUI. **Workspace Tools** are Python that runs in-process — for the most demanding use cases they are by far the most capable option with the fewest limitations (see below).
+The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool servers**: the tool code runs on a separate process or machine and Open WebUI calls it over HTTP. **Native Features** are the built-in system tools that ship with Open WebUI. **Workspace Tools** are Python that runs in-process; for the most demanding use cases they are by far the most capable option with the fewest limitations (see below).
 
 ### 1. Native Features (Built-in)
 These are deeply integrated into Open WebUI and generally don't require external scripts.
@@ -40,7 +40,7 @@ These are deeply integrated into Open WebUI and generally don't require external
 In [**Native Mode**](#built-in-system-tools-nativeagentic-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
-These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations** — they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](../development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
+These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations**: they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](../development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
 - **Capability**: Can do anything Python can do (web scraping, complex math, API calls), and hold secrets (API keys) entirely server-side so neither the user nor the model can read them.
 - **Access**: Managed via the `Workspace` menu. 
 - **Safety**: Always review code before importing, as these run on your server.
@@ -55,8 +55,8 @@ These are **Python scripts** that run directly within the Open WebUI environment
 ### 4. OpenAPI / Function Calling Servers
 Generic web servers that provide an OpenAPI (`.json` or `.yaml`) specification. Open WebUI can ingest these specs and treat every endpoint as a tool.
 
-:::info Open Terminal — a separate code-execution integration
-Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/features/open-terminal)**: an always-on, isolated Docker container that gives a model a real shell and filesystem. Once connected, it exposes its own set of **built-in tools** (`run_command`, `read_file`, `write_file`, `grep_search`, `glob_search`, process management, and more) that the model can call directly — effectively a sandboxed code-execution and file-handling environment, distinct from the per-message [Code Interpreter](#built-in-system-tools-nativeagentic-mode) tool. See the [Open Terminal documentation](/features/open-terminal) for setup, multi-user, and security considerations.
+:::info Open Terminal, a separate code-execution integration
+Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/features/open-terminal)**: an always-on, isolated Docker container that gives a model a real shell and filesystem. Once connected, it exposes its own set of **built-in tools** (`run_command`, `read_file`, `write_file`, `grep_search`, `glob_search`, process management, and more) that the model can call directly, effectively a sandboxed code-execution and file-handling environment, distinct from the per-message [Code Interpreter](#built-in-system-tools-nativeagentic-mode) tool. See the [Open Terminal documentation](/features/open-terminal) for setup, multi-user, and security considerations.
 :::
 
 ---
@@ -81,7 +81,7 @@ Never import a Tool you don’t recognize or trust. These are Python scripts and
 🔧 Once installed or connected, here’s how to enable them for your conversations:
 
 ### Option 1: Enable on-the-fly (Specific Chat)
-While chatting, click the **➕ (plus)** icon in the input area. You’ll see a list of available Tools — you can enable them specifically for that session.
+While chatting, click the **➕ (plus)** icon in the input area. You’ll see a list of available Tools, and you can enable them specifically for that session.
 
 ### Option 2: Enable by Default (Global/Model Level)
 1. Go to **Workspace ➡️ Models**.
@@ -93,11 +93,11 @@ While chatting, click the **➕ (plus)** icon in the input area. You’ll see a 
 For models that support it, **Native tool calling mode** (see [Tool Calling Modes](#tool-calling-modes-default-vs-native) below) lets the model itself decide which of the attached tools to call on each turn. This replaces the older prompt-injection "auto-tool" filter approach and is the recommended way to let the model auto-select tools.
 
 :::caution Attached Tools Still Require User Access
-Attaching a workspace tool to a model does **not** bypass access control. When a user chats with the model, Open WebUI checks whether **that specific user** has read access to each attached tool. Tools the user cannot access are silently skipped — the model won't be able to call them.
+Attaching a workspace tool to a model does **not** bypass access control. When a user chats with the model, Open WebUI checks whether **that specific user** has read access to each attached tool. Tools the user cannot access are silently skipped, so the model won't be able to call them.
 
 **Example scenario**: An admin creates a private tool and attaches it to a model shared with all users. Regular users chatting with this model will **not** have the tool available because they don't have read access to the tool itself.
 
-**Solution**: Make sure users who need the model's tools also have read access to each tool (via access grants, group permissions, or by making the tool public). The "Workspace → Tools" permission controls whether users can *create and manage* tools — it does **not** affect whether model-attached tools work for them.
+**Solution**: Make sure users who need the model's tools also have read access to each tool (via access grants, group permissions, or by making the tool public). The "Workspace → Tools" permission controls whether users can *create and manage* tools; it does **not** affect whether model-attached tools work for them.
 :::
 
 ---
@@ -127,7 +127,7 @@ Why it is legacy:
 - **Cannot access built-in system tools.** Memory, Notes, Knowledge, Channels, Agentic Research, Interleaved Thinking, and the tool-injected Web Search / Image Generation / Code Interpreter features are **Native-only**.
 - **Does not support modern capabilities.** Every new feature shipped since 2024 targets Native Mode.
 
-### 🟢 Native Mode (Agentic Mode / System Function Calling) — The Only Supported Mode
+### 🟢 Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** as of v0.9.7 and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
@@ -145,21 +145,21 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 #### How to Enable Native Mode (Agentic Mode)
 Native Mode is the **default** as of v0.9.7, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
-1.  **Universal Default for Every Model (Fastest — Recommended)**:
+1.  **Universal Default for Every Model (Fastest, Recommended)**:
     *   Navigate to **Admin Panel → Settings → Models**.
-    *   Click the **Settings** button at the **top right** of the models list — this opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
+    *   Click the **Settings** button at the **top right** of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. All existing models that haven't explicitly set their own value, and all models you add later, inherit `Native`. You do **not** need to edit them one by one.
 2.  **Per-Model Override**:
     *   In **Admin Panel → Settings → Models**, pick a specific model and click its edit button.
     *   Under **Model Parameters**, set **Function Calling** to `Native`. This value overrides the global default for that model only.
-    *   Use this when a specific model needs different parameters — otherwise prefer the global setting.
+    *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
     *   Inside a chat, open **Chat Controls** (right sidebar).
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
-:::tip Set Function Calling Globally — Once, For All Models
-Tired of switching every model to Native one at a time? The **global model parameters** panel (the **Settings** button at the top right of **Admin Panel → Settings → Models**) lets you configure any model parameter — `function_calling`, temperature, top_p, max_tokens, etc. — **once, for every model in your Open WebUI instance**. Values set there become the default for every existing model that hasn't overridden them *and* every model you add later. Set `Function Calling = Native` there, save, done.
+:::tip Set Function Calling Globally, Once, For All Models
+Tired of switching every model to Native one at a time? The **global model parameters** panel (the **Settings** button at the top right of **Admin Panel → Settings → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**. Values set there become the default for every existing model that hasn't overridden them *and* every model you add later. Set `Function Calling = Native` there, save, done.
 :::
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -169,7 +169,7 @@ The UI is the recommended route, but if you configure your instance entirely thr
 DEFAULT_MODEL_PARAMS: '{"function_calling": "native"}'
 ```
 
-This is equivalent to setting **Function Calling = Native** in the global model parameters panel above: it becomes the default for every model that hasn't overridden it. There is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable — `function_calling` is a key inside `DEFAULT_MODEL_PARAMS`.
+This is equivalent to setting **Function Calling = Native** in the global model parameters panel above: it becomes the default for every model that hasn't overridden it. There is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable; `function_calling` is a key inside `DEFAULT_MODEL_PARAMS`.
 :::
 
 ![Chat Controls](/images/features/plugin/tools/chat-controls.png)
@@ -218,7 +218,7 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 
 | Feature | Legacy Mode (formerly Default) | Native Mode (Default, Only Supported) |
 |:---|:---|:---|
-| **Status** | ❌ Legacy, no longer supported | ✅ Required — all models should use this |
+| **Status** | ❌ Legacy, no longer supported | ✅ Required, all models should use this |
 | **Latency** | Medium/High | Low |
 | **KV Cache** | ❌ Breaks cache on every turn | ✅ Cache-friendly |
 | **Model Compatibility** | Any text model (obsolete concern) | Every mainstream model since 2024 |
@@ -237,7 +237,7 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled AND per-chat "Web Search" toggle enabled.* |
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
-| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge — see note below.* |
+| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge; see note below.* |
 | `list_knowledge` | List attached knowledge (KBs, files, notes). Start here when attachments exist. |
 | `list_knowledge_bases` | List accessible knowledge bases with file counts. |
 | `query_knowledge_bases` | Semantic search over KB names/descriptions to find the right KB. |
@@ -286,7 +286,7 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed — attaching a skill is the only requirement.* |
+| **Skills** | *Requires at least one skill to be attached to the model via **Workspace/Admin Panel → Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed; attaching a skill is the only requirement.* |
 | `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
@@ -329,13 +329,13 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
-| `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional — single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches) |
-| `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000), `line_numbers` (default: false), `start_line` / `end_line` (optional — line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}` — includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
-| `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, knowledge_id, knowledge_name}` — includes pagination metadata when truncated |
-| `kb_exec` | `command` (required) — filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
+| `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional, single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches) |
+| `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000), `line_numbers` (default: false), `start_line` / `end_line` (optional; line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}`, includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
+| `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000) | `{id, filename, content, knowledge_id, knowledge_name}`, includes pagination metadata when truncated |
+| `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
-| `generate_image` | `prompt` (required) | `{status, message, images}` — auto-displayed |
-| `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}` — auto-displayed |
+| `generate_image` | `prompt` (required) | `{status, message, images}`, auto-displayed |
+| `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}`, auto-displayed |
 | **Code Interpreter** | | |
 | `execute_code` | `code` (required) | `{status, stdout, stderr, result}` |
 | **Memory** | | |
@@ -362,14 +362,14 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `update_task` | `id` (required), `status` (default: `completed`; one of `pending`, `in_progress`, `completed`, `cancelled`) | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | **Automations** | | |
 | `create_automation` | `name` (required), `prompt` (required), `rrule` (required) | `{status, id, name, model_id, is_active, next_runs}` |
-| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id` (all optional — only provided fields are changed) | `{status, id, name, model_id, is_active, next_runs}` |
+| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id` (all optional; only provided fields are changed) | `{status, id, name, model_id, is_active, next_runs}` |
 | `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
 | `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
 | `delete_automation` | `automation_id` (required) | `{status, message}` |
 | **Calendar** | | |
 | `search_calendar_events` | `query` (optional), `start` (optional datetime string, e.g. `"2026-04-20 00:00"`), `end` (optional datetime string), `count` (default: 10) | `{events: [{id, calendar_id, title, description, start, end, all_day, location, color, is_cancelled}], total}` |
-| `create_calendar_event` | `title` (required), `start` (required datetime string), `end` (optional), `description` (optional), `calendar_id` (optional — uses default calendar), `all_day` (default: false), `location` (optional) | `{status, id, calendar_id, title, start, end, ...}` |
-| `update_calendar_event` | `event_id` (required), `title`, `description`, `start`, `end`, `all_day`, `location`, `is_cancelled` (all optional — only provided fields are changed) | `{status, id, title, start, end, ...}` |
+| `create_calendar_event` | `title` (required), `start` (required datetime string), `end` (optional), `description` (optional), `calendar_id` (optional; uses default calendar), `all_day` (default: false), `location` (optional) | `{status, id, calendar_id, title, start, end, ...}` |
+| `update_calendar_event` | `event_id` (required), `title`, `description`, `start`, `end`, `all_day`, `location`, `is_cancelled` (all optional; only provided fields are changed) | `{status, id, title, start, end, ...}` |
 | `delete_calendar_event` | `event_id` (required) | `{status, message}` |
 | **Skills** | | |
 | `view_skill` | `name` (required) | `{name, content}` |
@@ -400,7 +400,7 @@ Attaching a knowledge base to a custom model does **not** bypass access control.
 | **Individual File** | Owner or admin only (no access grants) |
 | **Note** | Owner, admin, or explicit read access grant |
 
-**Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself — even though they can use the model.
+**Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself, even though they can use the model.
 
 **Solution**: Make sure users who need access to the model's knowledge also have read access to the underlying knowledge base (via access grants or group permissions in the Knowledge settings).
 :::
@@ -409,14 +409,14 @@ Attaching a knowledge base to a custom model does **not** bypass access control.
 **With attached knowledge:**
 1. First call `list_knowledge` to discover attached KBs, files, and notes
 2. Use `query_knowledge_files` to search file contents (auto-scoped to attachments)
-3. Use `view_file` or `view_knowledge_file` to read specific files — use `offset` and `max_chars` for large files
+3. Use `view_file` or `view_knowledge_file` to read specific files; use `offset` and `max_chars` for large files
 
 **Without attached knowledge:**
 1. First call `list_knowledge_bases` to discover what knowledge is available
 2. Then use `query_knowledge_files` to search file contents within relevant KBs
 3. If still empty, the files may not be embedded yet, or you may have **Full Context mode enabled** which bypasses the vector store
 
-**Do NOT use Full Context mode with knowledge tools** — Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
+**Do NOT use Full Context mode with knowledge tools.** Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
 :::
 
 :::tip Knowledge Base Tools and Hybrid Search
@@ -453,7 +453,7 @@ The **Builtin Tools** capability can be toggled on or off for each model in the 
 
 1. **No tool injection**: The model won't receive any of the built-in system tools, even in Native Mode.
 2. **RAG still works** (if File Context is enabled): Attached files are still processed via RAG and injected as context.
-3. **No autonomous retrieval**: The model cannot decide to search knowledge bases or fetch additional information—it works only with what's provided upfront.
+3. **No autonomous retrieval**: The model cannot decide to search knowledge bases or fetch additional information; it works only with what's provided upfront.
 
 #### Granular Builtin Tool Categories (Per-Model)
 
@@ -478,7 +478,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
-:::info Skills / view_skill — Not a Category Toggle
+:::info Skills / view_skill, Not a Category Toggle
 The `view_skill` tool does **not** appear in the Builtin Tools category checkboxes. It is injected when at least one skill is **attached to the model** via **Workspace → Models → Edit → Skills**. When skills are attached:
 
 1. The model receives a summary of each attached skill (name + description) in its system prompt via `<available_skills>` tags
@@ -502,7 +502,7 @@ These per-category toggles only appear when the main **Builtin Tools** capabilit
 :::
 
 :::info Global Features Take Precedence
-Enabling a per-model category toggle does **not** override global feature flags. For example, if `ENABLE_NOTES` is disabled globally (Admin Panel), Notes tools will not be available even if the "Notes" category is enabled for the model. The per-model toggles only allow you to *further restrict* what's already available—they cannot enable features that are disabled at the global level.
+Enabling a per-model category toggle does **not** override global feature flags. For example, if `ENABLE_NOTES` is disabled globally (Admin Panel), Notes tools will not be available even if the "Notes" category is enabled for the model. The per-model toggles only allow you to *further restrict* what's already available; they cannot enable features that are disabled at the global level.
 :::
 
 :::warning User-Level Permissions Also Apply
@@ -519,15 +519,15 @@ Builtin tools that correspond to an RBAC feature permission are also gated by th
 | Automations | `features.automations` |
 | Calendar | `features.calendar` |
 
-This ensures that RBAC permissions are respected end-to-end — disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
+This ensures that RBAC permissions are respected end-to-end: disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
 :::
 
 :::tip Per-Chat Feature Toggles (Web Search, Image Generation, Code Interpreter)
 **Web Search**, **Image Generation**, and **Code Interpreter** built-in tools have an additional layer of control: the **per-chat feature toggle** in the chat input bar. For these tools to be injected in Native Mode, **all three conditions** must be met:
 
-1. **Global config enabled** — the feature is turned on in Admin Panel (e.g., `ENABLE_WEB_SEARCH`)
-2. **Model capability enabled** — the model has the capability checked in Workspace > Models (e.g., "Web Search")
-3. **Per-chat toggle enabled** — the user has activated the feature for this specific chat via the chat input bar toggles
+1. **Global config enabled**: the feature is turned on in Admin Panel (e.g., `ENABLE_WEB_SEARCH`)
+2. **Model capability enabled**: the model has the capability checked in Workspace > Models (e.g., "Web Search")
+3. **Per-chat toggle enabled**: the user has activated the feature for this specific chat via the chat input bar toggles
 
 This means users can disable web search (or image generation, or code interpreter) on a per-conversation basis, even if it's enabled globally and on the model. This is useful for chats where information must stay offline or where you want to prevent unintended tool usage.
 :::
@@ -537,7 +537,7 @@ For the best out-of-the-box agentic experience, administrators can enable **Web 
 :::
 
 :::tip Builtin Tools vs File Context
-**Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG—that's controlled by the separate **File Context** capability.
+**Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG; that's controlled by the separate **File Context** capability.
 
 - **File Context** = Whether Open WebUI extracts and injects file content (RAG processing)
 - **Builtin Tools** = Whether the model gets tools to autonomously search/retrieve additional content

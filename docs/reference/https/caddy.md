@@ -110,7 +110,7 @@ You should now be able to access Open WebUI at `https://your-domain.com`.
 ## Optional: Security Headers via Reverse Proxy
 
 Open WebUI supports setting security headers directly at the application layer via environment variables
-(recommended path — see [Security Headers](/getting-started/advanced-topics/hardening#security-headers)).
+(recommended path, see [Security Headers](/getting-started/advanced-topics/hardening#security-headers)).
 If you manage multiple applications behind a single Caddy instance, or if your deployment does not allow
 direct environment variable access, you can set these headers at the proxy layer instead.
 
@@ -138,10 +138,10 @@ your.domain.example {
 }
 ```
 
-**HSTS is sticky and hard to undo.** `max-age=31536000` (1 year) with `includeSubDomains` instructs every browser that has visited this domain to refuse plain HTTP for the domain **and all its subdomains** for a full year — this cannot be reverted server-side quickly (you must serve `max-age=0` and wait for each client to revisit). Only keep `includeSubDomains` if every current and future subdomain serves valid HTTPS. If unsure, start with a short value such as `max-age=300` and increase it after confirming HTTPS works everywhere. Do **not** add `preload` unless you understand it is near-permanent and requires separate submission to the browser preload list.
+**HSTS is sticky and hard to undo.** `max-age=31536000` (1 year) with `includeSubDomains` instructs every browser that has visited this domain to refuse plain HTTP for the domain **and all its subdomains** for a full year. This cannot be reverted server-side quickly (you must serve `max-age=0` and wait for each client to revisit). Only keep `includeSubDomains` if every current and future subdomain serves valid HTTPS. If unsure, start with a short value such as `max-age=300` and increase it after confirming HTTPS works everywhere. Do **not** add `preload` unless you understand it is near-permanent and requires separate submission to the browser preload list.
 
 The `-Server` directive removes the `Server` response header that Caddy adds by default.
-Caddy handles WebSocket upgrades and SSE connections automatically — no additional configuration
+Caddy handles WebSocket upgrades and SSE connections automatically. No additional configuration
 is required for Open WebUI's streaming responses.
 
 The `Permissions-Policy` example above is a deny-list of common sensitive features, not an exhaustive
@@ -151,8 +151,8 @@ instead of removing it.
 **Content-Security-Policy.** CSP is highly deployment-specific (custom plugins, embedded iframes,
 external model providers, Artifacts/code rendering, voice input), so this section intentionally does
 **not** ship a ready-made proxy-layer CSP. Set CSP via the `CONTENT_SECURITY_POLICY` environment
-variable and use `CONTENT_SECURITY_POLICY_REPORT_ONLY` to derive a working policy before enforcing it —
-see [Security Headers](/getting-started/advanced-topics/hardening#security-headers).
+variable and use `CONTENT_SECURITY_POLICY_REPORT_ONLY` to derive a working policy before enforcing it.
+See [Security Headers](/getting-started/advanced-topics/hardening#security-headers).
 
 Verify headers are applied after reloading Caddy:
 

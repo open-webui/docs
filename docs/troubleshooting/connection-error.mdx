@@ -14,7 +14,7 @@ If you're experiencing connectivity problems with Open WebUI, especially when us
 You might be experiencing these issues if you see:
 - Empty responses like `"{}"` in the chat
 - Errors like `"Unexpected token 'd', "data: {"id"... is not valid JSON"`
-- Garbled markdown (visible `##`, `**`, broken formatting) during streaming—see [Streaming Response Corruption](#-garbled-markdown--streaming-response-corruption)
+- Garbled markdown (visible `##`, `**`, broken formatting) during streaming, see [Streaming Response Corruption](#-garbled-markdown--streaming-response-corruption)
 - WebSocket connection failures in browser console
 - WebSocket connection failures in CLI logs
 - Login problems or session issues
@@ -75,11 +75,11 @@ For reverse proxy and TLS setups, check our [tutorials here](/reference/https).
 
 WebSocket support is required for Open WebUI v0.5.0 and later. If WebSockets aren't working:
 
-1. **Check your reverse proxy configuration** - Ensure `Upgrade` and `Connection` headers are properly set
-2. **Verify CORS settings** - WebSocket connections respect CORS policies
-3. **Check browser console** - Look for WebSocket connection errors
-4. **Test direct connection** - Try connecting directly to Open WebUI without the proxy to isolate the issue.
-5. **Check for HTTP/2 WebSocket Issues** - Some proxies (like HAProxy 3.x) enable HTTP/2 by default. If your proxy handles client connections via HTTP/2 but the backend/application doesn't support RFC 8441 (WebSockets over H2) properly, the instance may "freeze" or stop responding. 
+1. **Check your reverse proxy configuration**: Ensure `Upgrade` and `Connection` headers are properly set
+2. **Verify CORS settings**: WebSocket connections respect CORS policies
+3. **Check browser console**: Look for WebSocket connection errors
+4. **Test direct connection**: Try connecting directly to Open WebUI without the proxy to isolate the issue.
+5. **Check for HTTP/2 WebSocket Issues**: Some proxies (like HAProxy 3.x) enable HTTP/2 by default. If your proxy handles client connections via HTTP/2 but the backend/application doesn't support RFC 8441 (WebSockets over H2) properly, the instance may "freeze" or stop responding. 
    - **Fix for HAProxy**: Add `option h2-workaround-bogus-websocket-clients` to your configuration or force the backend connection to use HTTP/1.1.
    - **Fix for Nginx**: Ensure you are using `proxy_http_version 1.1;` in your location block (which is the default in many Open WebUI examples).
 
@@ -126,7 +126,7 @@ If streaming responses show garbled markdown rendering (e.g., visible `##`, `**`
 
 ### Cause: Nginx Proxy Buffering
 
-When nginx's proxy buffering is enabled, it re-chunks the SSE (Server-Sent Events) stream arbitrarily. This breaks markdown tokens across chunk boundaries—for example, `**bold**` becomes separate chunks `**` + `bold` + `**`, causing the markdown parser to fail.
+When nginx's proxy buffering is enabled, it re-chunks the SSE (Server-Sent Events) stream arbitrarily. This breaks markdown tokens across chunk boundaries: for example, `**bold**` becomes separate chunks `**` + `bold` + `**`, causing the markdown parser to fail.
 
 ### Solution: Disable Proxy Buffering
 
@@ -176,7 +176,7 @@ Several Open WebUI features offer **two ways** to configure connections: a **use
 
 ### Why the Same URL Can Work and Fail
 
-When you add a URL like `https://myserver.com/api` as a **user/direct** connection, your browser resolves `myserver.com` and connects directly. When you add the same URL as an **admin/global** connection, the Open WebUI backend resolves that hostname — and inside a Docker container, it may resolve to `127.0.0.1`, bypassing your reverse proxy entirely.
+When you add a URL like `https://myserver.com/api` as a **user/direct** connection, your browser resolves `myserver.com` and connects directly. When you add the same URL as an **admin/global** connection, the Open WebUI backend resolves that hostname, and inside a Docker container, it may resolve to `127.0.0.1`, bypassing your reverse proxy entirely.
 
 **Common symptoms:**
 - 502 Bad Gateway on admin-configured connections while user connections work fine
@@ -189,7 +189,7 @@ When you add a URL like `https://myserver.com/api` as a **user/direct** connecti
 - Internal IPs (e.g. `http://192.168.1.50:8000`)
 
 :::tip
-This applies to **all** backend-proxied connections in Open WebUI — not just Open Terminal. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
+This applies to **all** backend-proxied connections in Open WebUI, not just Open Terminal. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
 This applies to **all** backend-proxied connections in Open WebUI. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
 :::
 
@@ -300,7 +300,7 @@ See the [Environment Configuration](/reference/env-configuration#aiohttp_client_
 
 ## 🐢 Slow Performance or Timeouts on Low-Spec Hardware
 
-If you're experiencing slow page loads, API timeouts, or unresponsive UI—especially on resource-constrained systems—this may be related to database session sharing.
+If you're experiencing slow page loads, API timeouts, or unresponsive UI, especially on resource-constrained systems, this may be related to database session sharing.
 
 ### Cause
 

@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "RAG"
 ---
 
-Retrieval-Augmented Generation (RAG) enables language models to reason over external content—documents, knowledge bases, and more—by retrieving relevant info and feeding it into the model. When things don't work as expected (e.g., the model "hallucinates" or misses relevant info), it's often not the model's fault—it's a context issue.
+Retrieval-Augmented Generation (RAG) enables language models to reason over external content (documents, knowledge bases, and more) by retrieving relevant info and feeding it into the model. When things don't work as expected (e.g., the model "hallucinates" or misses relevant info), it's often not the model's fault, it's a context issue.
 
 This page covers the most common RAG problems and their solutions.
 
@@ -27,16 +27,16 @@ Typical for Ollama models on consumer hardware (Llama 3.1 8B, Qwen 2.5 7B, Gemma
 | **Markdown Header Splitting** | **On** | Preserves document structure |
 | **Chunk Size** | `1000` | Smaller chunks so each retrieval result fits comfortably |
 | **Chunk Overlap** | `100` | Standard overlap |
-| **Top K** | `3–5` | Fewer chunks to avoid blowing out your limited context budget |
+| **Top K** | `3` to `5` | Fewer chunks to avoid blowing out your limited context budget |
 | **Full Context Mode** | Off | Cannot afford to send full documents |
 
 :::tip Context budget math
-With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. Add your system prompt and conversation history — if your model has an 8K context window, that leaves about 2–3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
+With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. Add your system prompt and conversation history. If your model has an 8K context window, that leaves about 2 to 3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
 :::
 
 ### Cloud models with large context (32K+ tokens)
 
-Typical for OpenAI (GPT-4o, GPT-5), Anthropic (Claude), Google (Gemini), DeepSeek, and other API providers where context windows are 32K–1M+ tokens.
+Typical for OpenAI (GPT-4o, GPT-5), Anthropic (Claude), Google (Gemini), DeepSeek, and other API providers where context windows are 32K to 1M+ tokens.
 
 | Setting | Value | Why |
 |---------|-------|-----|
@@ -44,7 +44,7 @@ Typical for OpenAI (GPT-4o, GPT-5), Anthropic (Claude), Google (Gemini), DeepSee
 | **Markdown Header Splitting** | **On** | Preserves document structure |
 | **Chunk Size** | `2000` | Larger chunks preserve more surrounding context per hit |
 | **Chunk Overlap** | `200` | More overlap prevents sentence splits |
-| **Top K** | `15–25` | Cast a wide net — you have the context budget for it |
+| **Top K** | `15` to `25` | Cast a wide net, you have the context budget for it |
 | **Full Context Mode** | Consider for small docs | If a document is under ~20K tokens, full context can outperform retrieval |
 
 :::tip When to use Full Context Mode
@@ -59,9 +59,9 @@ If you use both local and cloud models, configure for the lowest common denomina
 |---------|-------|-----|
 | **Text Splitter** | `token` | Works for both |
 | **Markdown Header Splitting** | **On** | Works for both |
-| **Chunk Size** | `1500` | Compromise — not too large for local, not too small for cloud |
+| **Chunk Size** | `1500` | Compromise, not too large for local, not too small for cloud |
 | **Chunk Overlap** | `200` | Safe default |
-| **Top K** | `10` | Moderate — a good middle ground for mixed model usage |
+| **Top K** | `10` | Moderate, a good middle ground for mixed model usage |
 
 ---
 
@@ -84,7 +84,7 @@ After changing your embedding model, **reindex all existing documents** in **Adm
 
 ### 1. The Model "Can't See" Your Content
 
-This is the most common problem—and it's typically caused by issues during content ingestion. The model doesn't hallucinate because it's wrong; it hallucinates because it was never given the right content in the first place.
+This is the most common problem, and it's typically caused by issues during content ingestion. The model doesn't hallucinate because it's wrong; it hallucinates because it was never given the right content in the first place.
 
 **Solution:** Check your content extraction settings.
 
@@ -110,12 +110,12 @@ Open WebUI is designed to work with models that have limited context windows by 
 
 - Go to **Admin Settings > Documents**
 - Either:
-  - **Enable "Bypass Embedding and Retrieval"** — sends full content directly without applying retrieval filters.
-  - **Toggle on "Full Context Mode"** — injects more comprehensive content into the model prompt.
+  - **Enable "Bypass Embedding and Retrieval"**: sends full content directly without applying retrieval filters.
+  - **Toggle on "Full Context Mode"**: injects more comprehensive content into the model prompt.
 
 :::warning
 
-Be mindful of context limits—if your model can't handle more tokens, content will still be truncated.
+Be mindful of context limits: if your model can't handle more tokens, content will still be truncated.
 
 :::
 
@@ -123,7 +123,7 @@ Be mindful of context limits—if your model can't handle more tokens, content w
 
 ### 3. Token Limit is Too Short
 
-Even if retrieval works, your model might still not process all the content it receives—because it simply can't.
+Even if retrieval works, your model might still not process all the content it receives, because it simply can't.
 
 By default, many models (especially Ollama-hosted LLMs) are limited to a 2048-token context window. That means only a fraction of your retrieved data will actually be used.
 
@@ -160,7 +160,7 @@ For web search and complex document analysis, stick with models that support 819
 
 ### 4. Embedding Model is Low-Quality or Mismatched
 
-Bad embeddings = bad retrieval. If the vector representation of your content is poor, the retriever won't pull the right content—no matter how powerful your LLM is.
+Bad embeddings = bad retrieval. If the vector representation of your content is poor, the retriever won't pull the right content, no matter how powerful your LLM is.
 
 **Solution:**
 
@@ -173,7 +173,7 @@ After changing the model, **reindex all existing documents** so the new embeddin
 
 ### 5. 400: 'NoneType' object has no attribute 'encode'
 
-This error indicates a misconfigured or missing embedding model. When Open WebUI tries to create embeddings but doesn't have a valid model loaded, it can't process the text—and the result is this cryptic error.
+This error indicates a misconfigured or missing embedding model. When Open WebUI tries to create embeddings but doesn't have a valid model loaded, it can't process the text, and the result is this cryptic error.
 
 **Cause:**
 - Your embedding model isn't set up properly.
@@ -183,7 +183,7 @@ This error indicates a misconfigured or missing embedding model. When Open WebUI
 **Solution:**
 
 - Go to: **Admin Settings > Documents > Embedding Model**
-- Save the embedding model again—even if it's already selected. This forces a recheck/download.
+- Save the embedding model again, even if it's already selected. This forces a recheck/download.
 - If you're using a remote/external embedding tool, make sure it's running and accessible to Open WebUI.
 
 :::tip
@@ -264,7 +264,7 @@ When uploading files via the API and immediately adding them to a knowledge base
 400: The content provided is empty. Please ensure that there is text or data present before proceeding.
 ```
 
-**The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously—the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
+**The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously: the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
 
 ✅ **Solution: Wait for Processing to Complete**
 
@@ -352,7 +352,7 @@ When using a **remote/external embedding provider** (OpenAI, Azure OpenAI, etc.)
 Error generating embeddings: 429 Rate limit reached
 ```
 
-**The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits — especially on free-tier or lower-tier plans.
+**The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits, especially on free-tier or lower-tier plans.
 
 ✅ **Solutions:**
 
@@ -407,7 +407,7 @@ There are **two distinct causes** for this in multi-worker setups:
 
 #### Cause A: ChromaDB SQLite + Fork (Instant Crash)
 
-If you are using the **default ChromaDB** vector database (which uses a local SQLite-backed `PersistentClient`) with `UVICORN_WORKERS > 1`, the crash is caused by SQLite being **not fork-safe**. When uvicorn forks multiple workers, each process inherits the same SQLite database connection. Concurrent writes to the vector database from multiple workers cause an immediate crash — not a timeout, but an instant fatal error.
+If you are using the **default ChromaDB** vector database (which uses a local SQLite-backed `PersistentClient`) with `UVICORN_WORKERS > 1`, the crash is caused by SQLite being **not fork-safe**. When uvicorn forks multiple workers, each process inherits the same SQLite database connection. Concurrent writes to the vector database from multiple workers cause an immediate crash, not a timeout, but an instant fatal error.
 
 You will typically see this pattern all within the same second:
 ```
@@ -424,7 +424,7 @@ See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-dur
 
 #### Cause B: SentenceTransformers Health Check Timeout (Older Versions)
 
-When using the **default SentenceTransformers** embedding engine (local embeddings) with multiple workers, uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. In older versions of Open WebUI, the embedding call blocked the event loop entirely — preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
+When using the **default SentenceTransformers** embedding engine (local embeddings) with multiple workers, uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. In older versions of Open WebUI, the embedding call blocked the event loop entirely, preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
 
 :::note
 
@@ -467,8 +467,8 @@ You attached a knowledge base to a model in **Workspace > Models > Edit**, but w
 
 | Mode | How Knowledge Works |
 |------|-------------------|
-| **Legacy (non-native)** | Open WebUI automatically performs RAG — it queries the attached knowledge base, retrieves relevant chunks, and injects them into the conversation context. This happens behind the scenes without the model doing anything. |
-| **Native Function Calling** | Knowledge is **not auto-injected**. Instead, the model receives tools (like `query_knowledge_bases`) and must actively decide to call them. This is **agentic RAG** — the model autonomously searches when it determines it needs information. |
+| **Legacy (non-native)** | Open WebUI automatically performs RAG: it queries the attached knowledge base, retrieves relevant chunks, and injects them into the conversation context. This happens behind the scenes without the model doing anything. |
+| **Native Function Calling** | Knowledge is **not auto-injected**. Instead, the model receives tools (like `query_knowledge_bases`) and must actively decide to call them. This is **agentic RAG**: the model autonomously searches when it determines it needs information. |
 
 Because **Native Function Calling is now the default**, the model needs both the **ability** and the **instruction** to use the knowledge tools (unless you switch the model to Legacy).
 
@@ -476,10 +476,10 @@ Because **Native Function Calling is now the default**, the model needs both the
 
 | | **KB Attached to Model** | **No KB Attached** |
 |---|---|---|
-| **Legacy Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG — user must manually add a knowledge base to the chat via `#` |
-| **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** — must actively call them | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled) — must actively call them |
+| **Legacy Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG; user must manually add a knowledge base to the chat via `#` |
+| **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** (must actively call them) | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled); must actively call them |
 
-Key takeaway: in Native Mode (the supported mode), the model must use its knowledge tools regardless — attaching a KB only restricts *which* KBs are searchable. Legacy Mode's auto-injection behavior is documented here for legacy deployments only; Legacy Mode is no longer supported and all models should be on Native Mode.
+Key takeaway: in Native Mode (the supported mode), the model must use its knowledge tools regardless. Attaching a KB only restricts *which* KBs are searchable. Legacy Mode's auto-injection behavior is documented here for legacy deployments only; Legacy Mode is no longer supported and all models should be on Native Mode.
 
 :::tip Preventing Knowledge Base Access in Native Mode
 If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Workspace > Models > Edit > Builtin Tools**. This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.
@@ -492,12 +492,12 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 1. **Check Global Model Settings first**:
    - Go to **Admin Panel > Settings > Models > ⚙️ (gear icon)**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
-   - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter — even if you never intended for a specific model to use native mode
+   - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter, even if you never intended for a specific model to use native mode
    - Either change the global setting to `default`, or explicitly set `function_calling` in the per-model **Advanced Params** to override the global value
-   - Also check the **Model Capabilities** section — if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
+   - Also check the **Model Capabilities** section: if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
 
 :::warning Global Settings Override
-The most common cause of this issue is a global `Function Calling: native` setting in **Admin Panel > Settings > Models > ⚙️ > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set — a model that simply doesn't have `function_calling` configured will inherit the global value.
+The most common cause of this issue is a global `Function Calling: native` setting in **Admin Panel > Settings > Models > ⚙️ > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
 :::
 
 2. **Ensure Built-in Tools are enabled for the model** (if using native mode):
@@ -524,4 +524,4 @@ For the full explanation of how knowledge scoping and retrieval modes work, see 
 
 ---
 
-By optimizing these areas—extraction, embedding, retrieval, and model context—you can dramatically improve how accurately your LLM works with your documents.
+By optimizing these areas (extraction, embedding, retrieval, and model context) you can dramatically improve how accurately your LLM works with your documents.

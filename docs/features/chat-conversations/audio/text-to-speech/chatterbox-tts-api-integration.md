@@ -1,9 +1,9 @@
 ---
 sidebar_position: 3
-title: "Chatterbox TTS — Voice Cloning"
+title: "Chatterbox TTS: Voice Cloning"
 ---
 
-# Chatterbox TTS — Voice Cloning
+# Chatterbox TTS: Voice Cloning
 
 :::warning
 
@@ -19,7 +19,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Key Features
 
-- Zero-shot voice cloning — only ~10 seconds of any voice sample needed
+- Zero-shot voice cloning: only ~10 seconds of any voice sample needed
 - [Outperforms ElevenLabs](https://podonos.com/resembleai/chatterbox)
 - Watermarked outputs for responsible voice cloning
 - 0.5B Llama backbone
@@ -32,7 +32,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 - Memory: 4GB minimum, 8GB+ recommended
 - GPU: CUDA (Nvidia), Apple M-series (MPS)
-- CPU: Works but slower — GPU recommended for production
+- CPU: Works but slower, GPU recommended for production
 
 :::info
 
@@ -44,7 +44,7 @@ Chatterbox can use a good deal of memory and has hardware requirements that migh
 
 ### 🐍 Using Python
 
-#### Option A: Using uv (Recommended - Faster & Better Dependencies)
+#### Option A: Using uv (Recommended, Faster & Better Dependencies)
 
 ```bash
 
@@ -250,7 +250,7 @@ If you experience memory issues, consider using a lighter alternative like [Open
 
 If Open WebUI can't connect to Chatterbox:
 
-- **Docker Desktop:** Use `http://host.docker.internal:4123/v1` 
+- **Docker Desktop:** Use `http://host.docker.internal:4123/v1`
 - **Docker Compose:** Use `http://chatterbox-tts-api:4123/v1`
 - **Linux:** Use your host machine's IP address
 

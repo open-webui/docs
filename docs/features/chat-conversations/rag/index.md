@@ -104,7 +104,7 @@ The merging algorithm addresses this by intelligently combining undersized chunk
 
 ### The algorithm: a single forward pass
 
-The merging logic is deliberately simple—a single forward pass through all chunks:
+The merging logic is deliberately simple, a single forward pass through all chunks:
 
 1. Start with the first chunk as the "current" accumulator.
 2. For each **subsequent** chunk, check if it can be absorbed into the current chunk.
@@ -128,7 +128,7 @@ The merging logic is deliberately simple—a single forward pass through all chu
 
 **Respects maximum size**: If merging two chunks would exceed `CHUNK_SIZE`, both are kept separate. Content is never discarded to force a merge.
 
-**Metadata inheritance**: Merged chunks inherit metadata from the *first* chunk in the merge sequence. This is consistent with forward-merge semantics—source and header information reflects where the merged section "started," which is typically the right choice for retrieval and citation purposes.
+**Metadata inheritance**: Merged chunks inherit metadata from the *first* chunk in the merge sequence. This is consistent with forward-merge semantics: source and header information reflects where the merged section "started," which is typically the right choice for retrieval and citation purposes.
 
 **The `\n\n` separator**: When chunks merge, they're joined with double newlines rather than concatenated directly. This preserves visual and structural separation in the combined text, which can matter for both embedding quality and human readability if you inspect your chunks.
 
@@ -138,13 +138,13 @@ The merging logic is deliberately simple—a single forward pass through all chu
 
 **Small chunk followed by large chunk**: If a small chunk is followed by a chunk large enough that merging would exceed `CHUNK_SIZE`, the small chunk gets finalized as-is, still undersized. This is unavoidable without backward merging or content splitting, but it's also rare in practice. It typically occurs at natural semantic boundaries (a brief transition before a dense section), and the small chunk being standalone at that boundary is arguably correct anyway.
 
-**Last chunk in document**: If the final chunk is undersized, it stays undersized since there's nothing to merge forward into. Again, unavoidable and usually fine—document endings are natural boundaries.
+**Last chunk in document**: If the final chunk is undersized, it stays undersized since there's nothing to merge forward into. Again, unavoidable and usually fine: document endings are natural boundaries.
 
 ### Performance characteristics
 
-The algorithm is O(n) in the number of chunks—a single pass with no lookahead or backtracking. This makes it fast even for large document collections.
+The algorithm is O(n) in the number of chunks: a single pass with no lookahead or backtracking. This makes it fast even for large document collections.
 
-The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute—you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
+The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute, you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
 
 Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size of 2000) can reduce chunk counts by over 90% while improving retrieval accuracy, because each remaining chunk carries meaningful semantic context rather than being a fragment that confuses both the embedding model and the retrieval ranking. As positive side effects, it also uses less storage space in the vector database and requires fewer embedding operations, which can be a significant cost saving if outsourcing to an embedding service.
 
@@ -160,12 +160,12 @@ If you need to change your chunking configuration (chunk size, overlap) or embed
 
 ### Changing Chunk Size and Overlap
 
-New documents will **automatically** use the updated chunk size and overlap settings — no action is required for newly uploaded files.
+New documents will **automatically** use the updated chunk size and overlap settings. No action is required for newly uploaded files.
 
 Existing documents in knowledge bases **retain their original chunking** until you run a re-index. Retrieval will still work for these old chunks (vector similarity search does not depend on chunk size), but you may notice inconsistent retrieval quality if old and new documents have very different chunk sizes.
 
 :::tip
-If you are only changing chunk settings and not the embedding model, a re-index is not strictly required — old documents will continue to work. However, for consistent retrieval quality across all documents, running a re-index is recommended.
+If you are only changing chunk settings and not the embedding model, a re-index is not strictly required. Old documents will continue to work. However, for consistent retrieval quality across all documents, running a re-index is recommended.
 :::
 
 ### Changing the Embedding Model

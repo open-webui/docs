@@ -15,9 +15,9 @@ When a CVE is filed against Open WebUI, we evaluate the report against our [Secu
 
 A **vendor disposition** is the software vendor's official, public response to a CVE or vulnerability report. It is a standard part of the coordinated vulnerability disclosure process and serves several purposes:
 
-- **Transparency** — Users and administrators can see exactly how we evaluated a claim and why we reached our conclusion.
-- **Accuracy** — CVE databases sometimes contain reports that misrepresent severity, misunderstand the threat model, or describe intended behavior as a vulnerability. Dispositions correct the public record.
-- **Guidance** — Each disposition includes context that helps administrators assess whether the reported issue is relevant to their specific deployment.
+- **Transparency**: Users and administrators can see exactly how we evaluated a claim and why we reached our conclusion.
+- **Accuracy**: CVE databases sometimes contain reports that misrepresent severity, misunderstand the threat model, or describe intended behavior as a vulnerability. Dispositions correct the public record.
+- **Guidance**: Each disposition includes context that helps administrators assess whether the reported issue is relevant to their specific deployment.
 
 ---
 
@@ -27,10 +27,10 @@ Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** applic
 
 - All users are **authenticated** before accessing any functionality.
 - **Administrators** are trusted actors with full system control.
-- **Security settings are at their defaults or tighter** — the threat model does not assume intentional weakening of security settings. Valid vulnerability reports must be reproducible on default or stricter configurations.
-- **Tools, Functions, and Pipelines** execute arbitrary code by design — this is a feature, not a vulnerability. Administrators control who can install and use them.
+- **Security settings are at their defaults or tighter**: the threat model does not assume intentional weakening of security settings. Valid vulnerability reports must be reproducible on default or stricter configurations.
+- **Tools, Functions, and Pipelines** execute arbitrary code by design: this is a feature, not a vulnerability. Administrators control who can install and use them.
 
-Reports that ignore these architectural assumptions — for example, claiming a vulnerability that requires admin-level access, intentionally weakened settings, or misconfigured deployments — may be disputed.
+Reports that ignore these architectural assumptions, for example, claiming a vulnerability that requires admin-level access, intentionally weakened settings, or misconfigured deployments, may be disputed.
 
 For a full overview, see the [Security Policy](../security-policy).
 

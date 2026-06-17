@@ -62,7 +62,7 @@ Functions let you intercept and transform messages before they reach the model (
 
 ### Run heavy or long-running work
 
-Open WebUI's backend is **fully async**. Long-running Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users, and synchronous/CPU-bound plugin code is offloaded to a worker thread pool (see [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size)) — so it doesn't stall the event loop either. In practice you can run heavy work **in-process** without the latency problems that older synchronous releases had.
+Open WebUI's backend is **fully async**. Long-running Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users, and synchronous/CPU-bound plugin code is offloaded to a worker thread pool (see [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size)) so it doesn't stall the event loop either. In practice you can run heavy work **in-process** without the latency problems that older synchronous releases had.
 
 If you genuinely need **GPU access, large or conflicting dependencies, hard isolation or independent scaling**, run that work as an **external service behind an [OpenAPI or MCP tool server](mcp)**.
 
@@ -90,7 +90,7 @@ Understanding which layer to use saves time:
 
 | Layer | Runs where | Best for | Trade-off |
 |-------|-----------|----------|-----------|
-| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers — including heavy/long-running work (the async backend keeps it from blocking) | Shares CPU/RAM with the main server |
+| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers, including heavy/long-running work (the async backend keeps it from blocking) | Shares CPU/RAM with the main server |
 | **OpenAPI / MCP** | Any HTTP endpoint | Connecting existing services, third-party APIs, and GPU / heavy-dependency / isolated workloads | Requires a running external server |
 
 Most users start with **Tools & Functions**. They require no extra setup, have a built-in code editor, and cover the majority of use cases.
@@ -113,7 +113,7 @@ An engineering team uses Pipe Functions to add Anthropic, Google Vertex AI, and 
 
 ### GPU-bound external processing
 
-A research group needs to re-rank retrieval results with a cross-encoder model that requires a GPU. They run it as a small service on a dedicated GPU node and expose it to Open WebUI as an **[OpenAPI tool server](mcp)**. The model calls it like any other tool while the main instance stays on commodity hardware. (The async backend means lighter custom logic can simply run in-process as a Function — only the GPU dependency pushes this particular workload to a separate service.)
+A research group needs to re-rank retrieval results with a cross-encoder model that requires a GPU. They run it as a small service on a dedicated GPU node and expose it to Open WebUI as an **[OpenAPI tool server](mcp)**. The model calls it like any other tool while the main instance stays on commodity hardware. (The async backend means lighter custom logic can simply run in-process as a Function, and only the GPU dependency pushes this particular workload to a separate service.)
 
 ---
 
@@ -125,7 +125,7 @@ Tools and Functions execute **arbitrary Python code** on your server. Only insta
 
 ### Resource sharing
 
-In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running and blocking work from stalling other requests, but it does not create more hardware — genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
+In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running and blocking work from stalling other requests, but it does not create more hardware: genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
 
 ### MCP transport
 
@@ -139,4 +139,4 @@ Native MCP support is **Streamable HTTP only**. For stdio or SSE-based MCP serve
 |-------|-------------------|
 | [**Tools & Functions**](plugin) | Writing Python Tools, Functions (Pipes, Filters, Actions), and the development API |
 | [**MCP**](mcp) | Connecting Model Context Protocol servers, OAuth setup, troubleshooting |
-| [**Pipelines**](pipelines) *(legacy)* | Reference only — the deprecated separate-worker framework, superseded by Functions and Tools |
+| [**Pipelines**](pipelines) *(legacy)* | Reference only: the deprecated separate-worker framework, superseded by Functions and Tools |

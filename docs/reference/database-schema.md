@@ -279,7 +279,7 @@ Things to know about the calendar table:
 
 - Indexed on `user_id` for efficient per-user calendar listing.
 - A default "Personal" calendar is auto-created on first access.
-- The "Scheduled Tasks" calendar is **virtual** — it is not stored in this table. Instead, the API synthesizes it at response time (with constant ID `__scheduled_tasks__`) for users who have Automations access. Automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
+- The "Scheduled Tasks" calendar is **virtual**: it is not stored in this table. Instead, the API synthesizes it at response time (with constant ID `__scheduled_tasks__`) for users who have Automations access. Automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
 - Access control is managed via the `access_grant` table with `resource_type = 'calendar'`, enabling calendar sharing between users and groups.
 - A user can only delete non-default calendars. Deleting a calendar cascades to all its events, attendees, and access grants.
 
@@ -581,11 +581,11 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
 
-Pin state is no longer stored on this table — the legacy `is_pinned` column was removed in migration `4de81c2a3af1` and replaced by a per-user [Pinned Note Table](#pinned-note-table). Pre-existing pins were backfilled to the note owner; the API surfaces `is_pinned` as a per-request join against the calling user's rows.
+Pin state is no longer stored on this table. The legacy `is_pinned` column was removed in migration `4de81c2a3af1` and replaced by a per-user [Pinned Note Table](#pinned-note-table). Pre-existing pins were backfilled to the note owner; the API surfaces `is_pinned` as a per-request join against the calling user's rows.
 
 ## Pinned Note Table
 
-Per-user note pins. Each row records that one user has pinned one note for their own sidebar — pinning is private and does not affect any other user with access to the same note.
+Per-user note pins. Each row records that one user has pinned one note for their own sidebar. Pinning is private and does not affect any other user with access to the same note.
 
 | **Column Name** | **Data Type** | **Constraints**                                      | **Description**                                  |
 | --------------- | ------------- | ---------------------------------------------------- | ------------------------------------------------ |
@@ -1091,10 +1091,10 @@ When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open
 
 To use SQLCipher with existing data, you must either:
 
-1. **Start fresh** - Enable SQLCipher on a new installation and have users export/re-import their chats manually
-2. **Manual database migration** - Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
-3. **Use filesystem-level encryption** - Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
-4. **Switch to PostgreSQL** - For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
+1. **Start fresh**: Enable SQLCipher on a new installation and have users export/re-import their chats manually
+2. **Manual database migration**: Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
+3. **Use filesystem-level encryption**: Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
+4. **Switch to PostgreSQL**: For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
 
 :::
 

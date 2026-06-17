@@ -293,7 +293,7 @@ The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Re
 
 :::danger Critical: Socket Timeout for Sentinel Deployments
 
-Redis Sentinel setups require explicit socket connection timeout configuration to ensure proper failover behavior. Without a timeout, the application can hang indefinitely when a Redis master node goes offline—potentially preventing even application restarts.
+Redis Sentinel setups require explicit socket connection timeout configuration to ensure proper failover behavior. Without a timeout, the application can hang indefinitely when a Redis master node goes offline, potentially preventing even application restarts.
 
 **Symptoms of missing timeout configuration:**
 - Application becomes completely unresponsive during failover
@@ -323,21 +323,21 @@ WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
 
 #### Retry and Reconnect Logic
 
-To enhance resilience during Sentinel failover—the window when a new master is being elected and promoted—you can configure retry behavior to prevent the application from exhausting its reconnection attempts too quickly.
+To enhance resilience during Sentinel failover (the window when a new master is being elected and promoted) you can configure retry behavior to prevent the application from exhausting its reconnection attempts too quickly.
 
 - **`REDIS_SENTINEL_MAX_RETRY_COUNT`**: Sets the maximum number of retries for Redis operations when using Sentinel (Default: `2`).
 - **`REDIS_RECONNECT_DELAY`**: Adds an optional delay in **milliseconds** between retry attempts (e.g., `REDIS_RECONNECT_DELAY=500`). This prevents tight retry loops that may otherwise overwhelm the event loop or block the application before a new master is ready.
 
 #### Connection Health Checks
 
-If your Redis server has a `timeout` configured (recommended — see above), pooled connections that sit idle longer than that timeout will be reaped server-side. Without health checks, the next request that grabs one of those dead sockets will fail with `ConnectionError: Connection reset by peer`.
+If your Redis server has a `timeout` configured (recommended, see above), pooled connections that sit idle longer than that timeout will be reaped server-side. Without health checks, the next request that grabs one of those dead sockets will fail with `ConnectionError: Connection reset by peer`.
 
 - **`REDIS_HEALTH_CHECK_INTERVAL`**: How often (in seconds) redis-py should PING an idle pooled connection before reusing it (e.g., `REDIS_HEALTH_CHECK_INTERVAL=60`). The value must be **shorter** than your Redis server's `timeout` and any firewall/load balancer idle timeout on the path to Redis. Set to `0` or leave empty to disable.
 - **`REDIS_SOCKET_KEEPALIVE`**: Enables TCP `SO_KEEPALIVE` on all Redis client sockets (e.g., `REDIS_SOCKET_KEEPALIVE=True`). When enabled, the OS kernel sends TCP keepalive probes on idle connections, detecting half-closed sockets caused by silent firewall/load balancer resets or network flaps at the TCP level.
 
 These two mechanisms are complementary:
-- `REDIS_HEALTH_CHECK_INTERVAL` works at the **application level** — redis-py PINGs idle connections on checkout, validating the socket and resetting the server's idle timer.
-- `REDIS_SOCKET_KEEPALIVE` works at the **TCP level** — the kernel detects dead peers even when no application-level traffic is flowing.
+- `REDIS_HEALTH_CHECK_INTERVAL` works at the **application level**: redis-py PINGs idle connections on checkout, validating the socket and resetting the server's idle timer.
+- `REDIS_SOCKET_KEEPALIVE` works at the **TCP level**: the kernel detects dead peers even when no application-level traffic is flowing.
 
 :::tip Recommended pairing
 
@@ -462,7 +462,7 @@ In the examples above, we use `redis://redis:6379` because:
 - Docker's internal DNS resolves this name to the correct IP address within the network
 - This is the recommended approach for Docker deployments
 
-Do **not** use `127.0.0.1` or `localhost` when connecting from one container to another - these refer to the container's own localhost, not the Redis container.
+Do **not** use `127.0.0.1` or `localhost` when connecting from one container to another. These refer to the container's own localhost, not the Redis container.
 
 :::
 
@@ -698,7 +698,7 @@ REDIS_KEY_PREFIX="openwebui-dev"
    docker restart redis
    ```
 
-**Prevention:** Always configure `timeout` to a reasonable value (e.g., 1800 seconds). The timeout only affects idle TCP connections, not user sessions — it's safe and recommended. Pair this with `REDIS_HEALTH_CHECK_INTERVAL` on the client side (see below).
+**Prevention:** Always configure `timeout` to a reasonable value (e.g., 1800 seconds). The timeout only affects idle TCP connections, not user sessions. It's safe and recommended. Pair this with `REDIS_HEALTH_CHECK_INTERVAL` on the client side (see below).
 
 #### Issue: "Connection reset by peer" errors on first request after idle period
 
@@ -707,7 +707,7 @@ REDIS_KEY_PREFIX="openwebui-dev"
 - Sporadic `redis.exceptions.ConnectionError: Connection reset by peer` in logs
 - Errors tend to appear after periods of low activity (nights, weekends)
 - The request that triggers the error fails with a 500 Internal Server Error, but subsequent requests succeed
-- More common when Redis server `timeout` is configured (which it should be — see above)
+- More common when Redis server `timeout` is configured (which it should be, see above)
 
 **Cause:** The Redis server reaped an idle connection (via its `timeout` setting), but the pooled socket in redis-py was not aware it was dead. The next request that grabbed that socket from the pool sent a command to a closed connection.
 

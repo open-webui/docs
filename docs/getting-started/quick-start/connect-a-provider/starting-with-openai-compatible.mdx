@@ -33,18 +33,18 @@ For a detailed explanation of this architectural decision, see our **[FAQ on pro
 When you add a connection, Open WebUI verifies it by calling the provider's `/models` endpoint using a standard `Bearer` token. **Some providers do not implement the `/models` endpoint** at all or use non-standard authentication for it. In these cases:
 
 - The connection verification will **fail with an error** (e.g., 400, 401 or 403).
-- This does **not** mean the provider is incompatible — **chat completions will still work**.
+- This does **not** mean the provider is incompatible: **chat completions will still work**.
 - You just need to **manually add model names** to the **Model IDs (Filter)** allowlist in the connection settings.
 
 **Providers with known `/models` issues:**
 
 | Provider | `/models` works? | Action Needed |
 |---|---|---|
-| Anthropic | Yes — built-in compatibility layer | Auto-detection works |
-| GitHub Models | No — uses non-standard path | Add model IDs manually to the whitelist |
-| Perplexity | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
-| MiniMax | No — endpoint doesn't exist | Add model IDs manually to the whitelist |
-| OpenRouter | Yes — but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| Anthropic | Yes, built-in compatibility layer | Auto-detection works |
+| GitHub Models | No, uses non-standard path | Add model IDs manually to the whitelist |
+| Perplexity | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
+| MiniMax | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
+| OpenRouter | Yes, but returns thousands of models | Strongly recommend adding a filtered allowlist |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
@@ -82,13 +82,13 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   See the dedicated **[Anthropic (Claude)](/getting-started/quick-start/connect-a-provider/starting-with-anthropic)** guide for a full step-by-step walkthrough.
   :::
 
-  **Anthropic** (Claude) offers an OpenAI-compatible endpoint. Open WebUI includes a built-in compatibility layer that automatically detects Anthropic URLs and handles model discovery — just plug in your API key and models are auto-detected. Note that this is intended for testing and comparison — for production use with full Claude features (PDF processing, citations, extended thinking, prompt caching), Anthropic recommends their native API.
+  **Anthropic** (Claude) offers an OpenAI-compatible endpoint. Open WebUI includes a built-in compatibility layer that automatically detects Anthropic URLs and handles model discovery: just plug in your API key and models are auto-detected. Note that this is intended for testing and comparison. For production use with full Claude features (PDF processing, citations, extended thinking, prompt caching), Anthropic recommends their native API.
 
   | Setting | Value |
   |---|---|
   | **URL** | `https://api.anthropic.com/v1` |
   | **API Key** | Your Anthropic API key from [console.anthropic.com](https://console.anthropic.com/) |
-  | **Model IDs** | Auto-detected — leave empty or filter to specific models |
+  | **Model IDs** | Auto-detected, leave empty or filter to specific models |
 
   </TabItem>
   <TabItem value="gemini" label="Google Gemini">
@@ -99,10 +99,10 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://generativelanguage.googleapis.com/v1beta/openai` |
   | **API Key** | Your Gemini API key from [aistudio.google.com](https://aistudio.google.com/apikey) |
-  | **Model IDs** | Auto-detected — leave empty or filter to specific models |
+  | **Model IDs** | Auto-detected, leave empty or filter to specific models |
 
   :::warning No trailing slash
-  The URL must be exactly `https://generativelanguage.googleapis.com/v1beta/openai` — **without** a trailing slash. A trailing slash will break the `/models` endpoint call.
+  The URL must be exactly `https://generativelanguage.googleapis.com/v1beta/openai`, **without** a trailing slash. A trailing slash will break the `/models` endpoint call.
   :::
 
   </TabItem>
@@ -147,7 +147,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://api.perplexity.ai` |
   | **API Key** | Your API key from [perplexity.ai/settings](https://www.perplexity.ai/settings) (under API tab) |
-  | **Model IDs** | **Required** — add manually (e.g., `sonar-pro`, `sonar-reasoning-pro`, `sonar-deep-research`) |
+  | **Model IDs** | **Required**, add manually (e.g., `sonar-pro`, `sonar-reasoning-pro`, `sonar-deep-research`) |
 
   :::caution
   Perplexity does **not** have a `/models` endpoint. You must manually add model IDs to the allowlist. Some Perplexity models may also reject certain parameters like `stop` or `frequency_penalty`.
@@ -162,7 +162,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://api.minimax.io/v1` |
   | **API Key** | Your Coding Plan API key (see Step 2 below) |
-  | **Model IDs** | **Required** — add manually (e.g., `MiniMax-M2.5`) |
+  | **Model IDs** | **Required**, add manually (e.g., `MiniMax-M2.5`) |
 
   **Step 1: Subscribe to a MiniMax Coding Plan**
 
@@ -216,11 +216,11 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://openrouter.ai/api/v1` |
   | **API Key** | Your API key from [openrouter.ai/keys](https://openrouter.ai/keys) |
-  | **Model IDs** | **Strongly recommended** — add a filtered allowlist |
+  | **Model IDs** | **Strongly recommended**, add a filtered allowlist |
 
   :::tip
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
-  1. **Use an allowlist** — add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
+  1. **Use an allowlist**: add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
   2. **Enable model caching** via `Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
   :::
 
@@ -234,21 +234,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   * **Bedrock Access Gateway** (BAG)
   * **stdapi.ai**
   * **LiteLLM** with its Bedrock provider (LiteLLM is not dedicated to AWS).
-  * **Bedrock Mantle** - AWS native solution, no installation required
+  * **Bedrock Mantle**: AWS native solution, no installation required
 
   #### Feature Comparison
 
   | Capability                   | Bedrock Access Gateway (BAG) | stdapi.ai | LiteLLM (Bedrock provider) | AWS Bedrock Mantle |
   |------------------------------| --- | --- | --- | --- |
-  | Automatic models discovery   | ✅ | ✅ | — | ✅ |
+  | Automatic models discovery   | ✅ | ✅ | ❌ | ✅ |
   | Chat completion              | ✅ | ✅ | ✅ | ✅ |
-  | Embeddings                   | ✅ | ✅ | ✅ | — |
-  | Text to speech               | — | ✅ | — | — |
-  | Speech to text               | — | ✅ | — | — |
-  | Image generation             | — | ✅ | ✅ | — |
-  | Image editing                | — | ✅ | — | — |
-  | Models from multiple regions | — | ✅ | ✅ | — |
-  | No installation required     | — | — | — | ✅ |
+  | Embeddings                   | ✅ | ✅ | ✅ | ❌ |
+  | Text to speech               | ❌ | ✅ | ❌ | ❌ |
+  | Speech to text               | ❌ | ✅ | ❌ | ❌ |
+  | Image generation             | ❌ | ✅ | ✅ | ❌ |
+  | Image editing                | ❌ | ✅ | ❌ | ❌ |
+  | Models from multiple regions | ❌ | ✅ | ✅ | ❌ |
+  | No installation required     | ❌ | ❌ | ❌ | ✅ |
   | License                      | MIT | AGPL or Commercial | MIT or Commercial | AWS Service |
 
   #### Solution 1: Bedrock Access Gateway (BAG)
@@ -300,7 +300,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   2. Use the **+** button to add a new connection under OpenAI.
   3. For the URL, use `http://host.docker.internal:8000/api/v1`.
   4. For the API Key, the default key defined in BAG is `bedrock` (you can change this via `DEFAULT_API_KEYS` in BAG settings).
-  5. Click **Verify Connection** — you should see a "Server connection verified" alert.
+  5. Click **Verify Connection**. You should see a "Server connection verified" alert.
 
   ![Add New Connection](/images/tutorials/amazon-bedrock/amazon-bedrock-proxy-connection.png)
 
@@ -423,15 +423,15 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Key Advantages**
 
-  - No installation required - Uses AWS-managed endpoints directly
-  - Simple configuration - Just requires an API key
-  - Native AWS integration - Fully managed by AWS
+  - No installation required: Uses AWS-managed endpoints directly
+  - Simple configuration: Just requires an API key
+  - Native AWS integration: Fully managed by AWS
 
   **Limitations**
 
-  - Chat completion only - Does not support embeddings, image generation, or other features
-  - Subset of models - Only provides access to a limited selection of Bedrock models (Open weight models)
-  - Single region - Does not support multi-region access
+  - Chat completion only: Does not support embeddings, image generation, or other features
+  - Subset of models: Only provides access to a limited selection of Bedrock models (Open weight models)
+  - Single region: Does not support multi-region access
 
   **Prerequisites**
 
@@ -479,7 +479,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **URL** | Your Azure endpoint (e.g., `https://my-resource.openai.azure.com`) |
   | **API Version** | e.g., `2024-02-15-preview` |
   | **API Key** | Your Azure API Key |
-  | **Model IDs** | **Required** — add your specific Deployment Names (e.g., `my-gpt4-deployment`) |
+  | **Model IDs** | **Required**, add your specific Deployment Names (e.g., `my-gpt4-deployment`) |
 
   :::info
   Azure OpenAI uses **deployment names** as model IDs, not standard OpenAI model names. You must add your deployment names to the Model IDs allowlist.
@@ -488,8 +488,8 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   :::tip Two Azure URL Formats
   Azure offers two URL formats:
 
-  - **Legacy (deployment-based):** `https://my-resource.openai.azure.com` — Open WebUI rewrites the URL to `/openai/deployments/{model}/...` and adds the `api-version` query parameter automatically.
-  - **v1 format:** `https://my-resource.openai.azure.com/openai/v1` — the model stays in the request body (like standard OpenAI) and no `api-version` parameter is needed.
+  - **Legacy (deployment-based):** `https://my-resource.openai.azure.com`. Open WebUI rewrites the URL to `/openai/deployments/{model}/...` and adds the `api-version` query parameter automatically.
+  - **v1 format:** `https://my-resource.openai.azure.com/openai/v1`. The model stays in the request body (like standard OpenAI) and no `api-version` parameter is needed.
 
   If your base URL ends with `/openai/v1`, Open WebUI skips the deployment URL rewriting and routes requests directly. Use whichever format your Azure resource supports.
   :::
@@ -657,7 +657,7 @@ Open WebUI passes standard OpenAI parameters such as `temperature`, `top_p`, `ma
 
 Select your connected provider's model in the chat menu and get started!
 
-That's it! Whether you choose a cloud provider or a local server, you can manage multiple connections — all from within Open WebUI.
+That's it! Whether you choose a cloud provider or a local server, you can manage multiple connections, all from within Open WebUI.
 
 ---
 

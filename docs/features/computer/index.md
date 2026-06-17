@@ -26,7 +26,7 @@ AI is built in but optional. Bring your own key and it becomes an agent that can
 [**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
 
 :::info New, and moving fast
-cptr is a young project (currently v0.4.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
+cptr is a young project (currently v0.5.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
 :::
 
 ## cptr vs Open Terminal
@@ -78,6 +78,8 @@ cptr run --host 0.0.0.0
 `cptr run` prints a one-time setup URL with a token, for example `http://localhost:8000/?token=...`. Other flags: `--port` (default `8000`), `--headless` (do not auto-open a browser) and `--reload` (for development).
 
 State lives in `~/.cptr` by default; set `CPTR_DATA_DIR` to change it. After first-time setup you log in with a username and password, and sessions use JWTs.
+
+For operations, cptr can write structured logs and an audit trail. Set `CPTR_AUDIT_LOG_LEVEL` to log every mutating API request (POST, PUT, PATCH, DELETE) to a JSON file with passwords and API keys redacted, and `CPTR_LOG_UPSTREAM_REQUESTS=true` to log outgoing AI API calls (provider, model, endpoint) to a separate file for debugging and cost tracking.
 
 ### Docker
 

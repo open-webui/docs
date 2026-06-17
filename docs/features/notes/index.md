@@ -137,7 +137,7 @@ The sidebar Notes folder only appears when at least one note is pinned and the N
 
 :::info Pins are personal
 
-Pinning a note only affects **your** sidebar — collaborators with access to the same note can pin or unpin it independently without changing what you see. Pinned notes are listed in pin-time order (newest first), and toggling a pin no longer counts as an edit, so it does not bump the note's "Updated" timestamp. Pre-existing pins from before this change are kept for the note's owner only; other users will need to re-pin shared notes they want in their own sidebar.
+Pinning a note only affects **your** sidebar: collaborators with access to the same note can pin or unpin it independently without changing what you see. Pinned notes are listed in pin-time order (newest first), and toggling a pin no longer counts as an edit, so it does not bump the note's "Updated" timestamp. Pre-existing pins from before this change are kept for the note's owner only; other users will need to re-pin shared notes they want in their own sidebar.
 
 :::
 

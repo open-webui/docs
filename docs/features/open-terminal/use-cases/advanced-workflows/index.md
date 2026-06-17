@@ -5,7 +5,7 @@ title: "Advanced Workflows"
 
 # Advanced Workflows with Skills
 
-These workflows combine multiple Open Terminal capabilities into powerful multi-step pipelines. Each one includes a **Skill** — a reusable set of instructions you create in Open WebUI that tells the AI exactly how to approach a specific type of task.
+These workflows combine multiple Open Terminal capabilities into powerful multi-step pipelines. Each one includes a **Skill**, a reusable set of instructions you create in Open WebUI that tells the AI exactly how to approach a specific type of task.
 
 ---
 
@@ -13,7 +13,7 @@ These workflows combine multiple Open Terminal capabilities into powerful multi-
 
 A **Skill** is a reusable set of markdown instructions that you save in Open WebUI. When you invoke a skill, its instructions are injected into the AI's system prompt for that conversation, making the AI an expert at that specific task.
 
-Think of it like giving someone a detailed SOP (standard operating procedure) before asking them to do a job — except the AI can reference it consistently across conversations.
+Think of it like giving someone a detailed SOP (standard operating procedure) before asking them to do a job, except the AI can reference it consistently across conversations.
 
 ### Creating a Skill
 
@@ -53,15 +53,15 @@ Type `$` in the chat input, then search for your skill by name. Select it, and t
 
 **Option 2: Attach it to a Model (auto-discovery)**
 
-This is the more powerful option. Go to **Workspace → Models → Edit** and check the skill under the **Skills** section. Now the AI **automatically discovers and uses it when relevant** — you don't need to mention the skill at all.
+This is the more powerful option. Go to **Workspace → Models → Edit** and check the skill under the **Skills** section. Now the AI **automatically discovers and uses it when relevant**. You don't need to mention the skill at all.
 
 Here's how it works behind the scenes:
 
-1. The AI receives a manifest listing each attached skill's **name and description** (not the full instructions — that would waste context)
+1. The AI receives a manifest listing each attached skill's **name and description** (not the full instructions, that would waste context)
 2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the full instructions
 3. The AI then follows those instructions to handle your request
 
-This means you can attach a "Data Report Generator" skill to your model, and any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions — without you needing to remember the skill exists.
+This means you can attach a "Data Report Generator" skill to your model, and any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.
 
 ![Model capabilities settings page](/images/open-terminal-model-capabilities.png)
 

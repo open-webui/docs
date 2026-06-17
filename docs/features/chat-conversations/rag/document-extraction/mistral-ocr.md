@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## 👁️ Mistral OCR
 
-This documentation provides a step-by-step guide to integrating Mistral OCR with Open WebUI. Mistral OCR is an optical character recognition library designed to extract text from a variety of image-based file formats—including scanned PDFs, images, and handwritten documents—into structured data such as JSON or plain text. With advanced support for multilingual text recognition, layout analysis, and handwriting interpretation, Mistral OCR simplifies the process of digitizing and processing documents for AI applications like search, summarization, and data extraction, all through a robust and customizable interface.
+This documentation provides a step-by-step guide to integrating Mistral OCR with Open WebUI. Mistral OCR is an optical character recognition library designed to extract text from a variety of image-based file formats (including scanned PDFs, images, and handwritten documents) into structured data such as JSON or plain text. With advanced support for multilingual text recognition, layout analysis, and handwriting interpretation, Mistral OCR simplifies the process of digitizing and processing documents for AI applications like search, summarization, and data extraction, all through a robust and customizable interface.
 
 ## Prerequisites
 

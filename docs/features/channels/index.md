@@ -95,10 +95,10 @@ Mentioning a model in a channel runs through the same chat-completion pipeline a
 | **Knowledge (RAG)** | Knowledge bases attached to the model are queried and injected |
 | **Attached documents** | Images **and** non-image files (PDF, DOCX, etc.) uploaded in the thread are forwarded into the model's context |
 
-In other words, a channel-summoned model is a fully-equipped agent — not a one-shot completion.
+In other words, a channel-summoned model is a fully-equipped agent, not a one-shot completion.
 
 :::note Document attachments in channels (v0.9.6+)
-Before v0.9.6, tagging a model in a channel only forwarded **images** from the thread — uploaded PDFs, DOCX, and other non-image documents were ignored, so summarization and document-comparison prompts silently had nothing to work with. As of v0.9.6 these files are forwarded the same way they are in a direct chat, so document workflows behave identically in channels.
+Before v0.9.6, tagging a model in a channel only forwarded **images** from the thread. Uploaded PDFs, DOCX, and other non-image documents were ignored, so summarization and document-comparison prompts silently had nothing to work with. As of v0.9.6 these files are forwarded the same way they are in a direct chat, so document workflows behave identically in channels.
 :::
 
 ### Tagging people and linking channels

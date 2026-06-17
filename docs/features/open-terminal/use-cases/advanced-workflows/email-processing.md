@@ -19,9 +19,9 @@ Drop a batch of `.eml` files and get a structured spreadsheet with action items 
 5. Flags overdue items
 6. Writes a summary of the most critical emails
 
-{/* TODO: Screenshot — Chat showing the AI processing 45 email files and producing a summary. File browser previews email_actions.csv as a formatted table with Date, From, Subject, Action Item, Deadline, Status columns. */}
+{/* TODO: Screenshot: Chat showing the AI processing 45 email files and producing a summary. File browser previews email_actions.csv as a formatted table with Date, From, Subject, Action Item, Deadline, Status columns. */}
 
-{/* TODO: Screenshot — The summary output listing the 5 most critical action items with their deadlines and which email they came from. */}
+{/* TODO: Screenshot: The summary output listing the 5 most critical action items with their deadlines and which email they came from. */}
 
 ## Skill content
 

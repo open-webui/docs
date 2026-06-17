@@ -5,7 +5,7 @@ title: "Rich UI Embedding"
 
 # Rich UI Element Embedding
 
-Tools and Actions both support rich UI element embedding, allowing them to return HTML content and interactive iframes that display directly within chat conversations. This feature enables sophisticated visual interfaces, interactive widgets, charts, dashboards, and other rich web content — regardless of whether the function was triggered by the model (Tool) or by the user (Action).
+Tools and Actions both support rich UI element embedding, allowing them to return HTML content and interactive iframes that display directly within chat conversations. This feature enables sophisticated visual interfaces, interactive widgets, charts, dashboards, and other rich web content, regardless of whether the function was triggered by the model (Tool) or by the user (Action).
 
 When a function returns an `HTMLResponse` with the appropriate headers, the content will be embedded as an interactive iframe in the chat interface rather than displayed as plain text.
 
@@ -76,21 +76,21 @@ def render_feedback_form(self, prompt: str) -> tuple:
 ```
 
 The context can be:
-- A **string** — sent as-is to the LLM (e.g., `"Rendered a 5-item checklist"`)
-- A **dict** — serialized as JSON for structured context
-- A **list** — serialized as JSON for multiple items
+- A **string**: sent as-is to the LLM (e.g., `"Rendered a 5-item checklist"`)
+- A **dict**: serialized as JSON for structured context
+- A **list**: serialized as JSON for multiple items
 
 If the second element is missing or not one of these types, the generic fallback message is used.
 
 :::tip When to use this
-This is particularly useful when your tool generates dynamic content and the LLM needs to reference what was generated in follow-up conversation — for example, telling the LLM which parameters were used, what data is being displayed, or what actions the user can take next.
+This is particularly useful when your tool generates dynamic content and the LLM needs to reference what was generated in follow-up conversation. For example, telling the LLM which parameters were used, what data is being displayed, or what actions the user can take next.
 :::
 
 ## Action Usage
 
 Actions work exactly the same way. The rich UI embed is delivered to the chat via the event emitter:
 
-**Option A — HTMLResponse:**
+**Option A, HTMLResponse:**
 
 ```python
 from fastapi.responses import HTMLResponse
@@ -100,7 +100,7 @@ async def action(self, body, __event_emitter__=None):
     return HTMLResponse(content=html, headers={"Content-Disposition": "inline"})
 ```
 
-**Option B — Tuple with headers:**
+**Option B, Tuple with headers:**
 
 ```python
 async def action(self, body, __event_emitter__=None):
@@ -112,7 +112,7 @@ async def action(self, body, __event_emitter__=None):
 
 When a **Tool** is called through Open WebUI's built-in tool calling layer (either native or legacy), the middleware automatically detects `HTMLResponse` results, extracts the HTML into embeds, and emits the `"embeds"` event. No extra work is needed.
 
-However, when a **Pipe function** makes direct API calls to an external provider (e.g., Azure OpenAI, Anthropic), it bypasses the middleware entirely. The pipe manages the tool call cycle itself — sending tool definitions to the provider, receiving `tool_calls` in the response, executing the tool, and feeding the result back. In this scenario, the middleware never sees the `HTMLResponse`, so **the pipe must emit the embed manually**.
+However, when a **Pipe function** makes direct API calls to an external provider (e.g., Azure OpenAI, Anthropic), it bypasses the middleware entirely. The pipe manages the tool call cycle itself: sending tool definitions to the provider, receiving `tool_calls` in the response, executing the tool, and feeding the result back. In this scenario, the middleware never sees the `HTMLResponse`, so **the pipe must emit the embed manually**.
 
 ### The Pattern
 
@@ -157,10 +157,10 @@ Open WebUI's middleware processes tool results in `process_tool_result()`, which
 
 ### Key Steps
 
-1. **Detect `HTMLResponse`** — Check if the tool's return value is an `HTMLResponse` with `Content-Disposition: inline`
-2. **Extract HTML** — Decode the response body
-3. **Emit `"embeds"` event** — Send the HTML via `__event_emitter__` so the frontend renders it as a Rich UI card
-4. **Return text to the LLM** — The model should receive a text summary (not raw HTML) so it can continue the conversation naturally
+1. **Detect `HTMLResponse`**: Check if the tool's return value is an `HTMLResponse` with `Content-Disposition: inline`
+2. **Extract HTML**: Decode the response body
+3. **Emit `"embeds"` event**: Send the HTML via `__event_emitter__` so the frontend renders it as a Rich UI card
+4. **Return text to the LLM**: The model should receive a text summary (not raw HTML) so it can continue the conversation naturally
 
 ### Tuple Context Support
 
@@ -201,15 +201,15 @@ Add this script to the end of your `<body>` in every Rich UI embed. Without it, 
 
 ### Same-Origin Auto-Resize
 
-When `allowSameOrigin` is **on** (via the user setting `iframeSandboxAllowSameOrigin`), the parent page can directly measure the iframe's content height and resize it automatically — no script needed in your HTML. However, this comes with security trade-offs (see below).
+When `allowSameOrigin` is **on** (via the user setting `iframeSandboxAllowSameOrigin`), the parent page can directly measure the iframe's content height and resize it automatically, with no script needed in your HTML. However, this comes with security trade-offs (see below).
 
 ## Sandbox and Security
 
 Embedded iframes run inside a [sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox). The following sandbox flags are always enabled by default:
 
-- `allow-scripts` — JavaScript execution
-- `allow-popups` — Popups (e.g. window.open)
-- `allow-downloads` — File downloads
+- `allow-scripts`: JavaScript execution
+- `allow-popups`: Popups (e.g. window.open)
+- `allow-downloads`: File downloads
 
 Two additional flags can be toggled by the user in **Settings → Interface**:
 
@@ -232,15 +232,15 @@ This is the most important flag to be aware of. It is **off by default** for sec
 - The iframe can interact with the parent page's context
 - Auto-resizing works without any script in your HTML
 - Chart.js and Alpine.js dependencies are automatically injected if detected
-- ⚠️ **Use with caution** — only enable this when you trust the embedded content
+- ⚠️ **Use with caution**: only enable this when you trust the embedded content
 
 Users can toggle this setting in **Settings → Interface → Iframe Same-Origin Access**.
 
 :::caution Practical Impact of Sandbox Settings
 When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandboxed. This means:
-- **Downloads from within the embed** are difficult or impossible — especially on iOS, where sandboxed iframes cannot trigger file downloads at all
-- **JavaScript in the embed cannot interact with Open WebUI itself** — the iframe has no access to the parent page's DOM, cookies, localStorage, or any Open WebUI APIs
-- **Cross-frame communication** is limited to `postMessage` only — however, [prompt submission](#prompt-submission) works cross-origin with a user confirmation dialog
+- **Downloads from within the embed** are difficult or impossible, especially on iOS, where sandboxed iframes cannot trigger file downloads at all
+- **JavaScript in the embed cannot interact with Open WebUI itself**: the iframe has no access to the parent page's DOM, cookies, localStorage, or any Open WebUI APIs
+- **Cross-frame communication** is limited to `postMessage` only. However, [prompt submission](#prompt-submission) works cross-origin with a user confirmation dialog
 
 If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → Iframe Same-Origin Access**.
 
@@ -252,9 +252,9 @@ If you want to see how far Rich UI can go when same-origin is enabled, take a lo
 
 It demonstrates patterns that aren't in the basic docs:
 
-- **Live streaming HTML/SVG.** The tool returns an empty wrapper; the model then emits markup inline between plain-text `@@@VIZ-START / @@@VIZ-END` markers in its normal response. A same-origin observer inside the iframe tails the parent chat's DOM, extracts the growing block, and reconciles new nodes into the iframe as tokens arrive — so dashboards and diagrams paint live, token-by-token, instead of popping in at the end of the stream.
+- **Live streaming HTML/SVG.** The tool returns an empty wrapper; the model then emits markup inline between plain-text `@@@VIZ-START / @@@VIZ-END` markers in its normal response. A same-origin observer inside the iframe tails the parent chat's DOM, extracts the growing block, and reconciles new nodes into the iframe as tokens arrive, so dashboards and diagrams paint live, token-by-token, instead of popping in at the end of the stream.
 - **Bidirectional bridges.** `sendPrompt(text)` turns any clickable node into a follow-up user message. `saveState(k, v)` / `loadState(k, fallback)` proxies parent `localStorage` scoped per-message so sliders and toggles survive reloads. `copyText`, `toast(msg, kind)`, and `openLink` round it out.
-- **A shipped design system.** Theme-aware CSS variables, a 9-ramp color palette, SVG utility classes, auto light/dark adaptation, and 230 localized strings across 46 languages — all delivered from a single tool with no core changes.
+- **A shipped design system.** Theme-aware CSS variables, a 9-ramp color palette, SVG utility classes, auto light/dark adaptation, and 230 localized strings across 46 languages, all delivered from a single tool with no core changes.
 - **Incremental DOM reconciliation.** A safe-cut HTML parser flushes the longest valid prefix on every tick; the reconciler only appends new nodes so existing elements never re-mount and animations never re-trigger during the stream.
 
 This is a useful reference when you're trying to decide whether a generative-UI / streaming-UI feature needs a core change or can live purely in plugin-land. (Spoiler: almost always the latter.)
@@ -292,18 +292,18 @@ The iframe can ask the parent for a data payload after it loads:
 The parent responds with `{ type: 'payload', requestId: ..., payload: ... }`.
 
 :::info Where the payload comes from
-There is no separate "set the payload" call. The payload is whatever the parent component had configured when it instantiated the iframe — and today only one path actually configures one:
+There is no separate "set the payload" call. The payload is whatever the parent component had configured when it instantiated the iframe, and today only one path actually configures one:
 
-- ✅ **Citation-opened embeds in the chat-controls Embeds panel** — when the user clicks a citation badge whose source has an embed URL, the side panel opens and exposes **the full citation/source object** (the same dict you sent in your `source` / `citation` event via `__event_emitter__`) as the payload. To set it, emit a [`source` event](./events#source-or-citation-and-code-execution) whose `data` includes whatever you want the iframe to be able to fetch. The iframe then asks for it via the postMessage above and receives the citation object back.
-- ❌ **Inline tool-call embeds** (from a tool method returning `HTMLResponse` or `(HTMLResponse, context)`) — the parent does not configure a payload on this path, so a payload request returns `{ type: 'payload', requestId: ..., payload: null }`. Use [Tool Args Injection](#tool-args-injection-tools-only) (subject to `allowSameOrigin`) to pass data into a tool-call embed instead.
-- ❌ **`__event_emitter__({"type": "embeds", ...})` and Action embeds** — also configured without a payload; the response is `null`.
+- ✅ **Citation-opened embeds in the chat-controls Embeds panel**: when the user clicks a citation badge whose source has an embed URL, the side panel opens and exposes **the full citation/source object** (the same dict you sent in your `source` / `citation` event via `__event_emitter__`) as the payload. To set it, emit a [`source` event](./events#source-or-citation-and-code-execution) whose `data` includes whatever you want the iframe to be able to fetch. The iframe then asks for it via the postMessage above and receives the citation object back.
+- ❌ **Inline tool-call embeds** (from a tool method returning `HTMLResponse` or `(HTMLResponse, context)`): the parent does not configure a payload on this path, so a payload request returns `{ type: 'payload', requestId: ..., payload: null }`. Use [Tool Args Injection](#tool-args-injection-tools-only) (subject to `allowSameOrigin`) to pass data into a tool-call embed instead.
+- ❌ **`__event_emitter__({"type": "embeds", ...})` and Action embeds**: also configured without a payload; the response is `null`.
 
 In short: payload-request is the side-panel-citation channel, not a generic iframe-data channel. Pick the right rendering path for the data flow you need.
 :::
 
 ### Tool Args Injection (Tools Only)
 
-When a **Tool** method returns a Rich UI embed inline at the tool-call display (i.e. you return an `HTMLResponse`, or a `(HTMLResponse, context)` tuple, from the tool method itself), the arguments the model passed are exposed on the iframe as `window.args` — **as a JSON string**, not a parsed object. Parse it before use:
+When a **Tool** method returns a Rich UI embed inline at the tool-call display (i.e. you return an `HTMLResponse`, or a `(HTMLResponse, context)` tuple, from the tool method itself), the arguments the model passed are exposed on the iframe as `window.args`, **as a JSON string**, not a parsed object. Parse it before use:
 
 ```html
 <script>
@@ -313,30 +313,30 @@ When a **Tool** method returns a Rich UI embed inline at the tool-call display (
       const args = JSON.parse(raw);      // parse to object
       document.getElementById('output').textContent = JSON.stringify(args, null, 2);
     } else {
-      console.warn('window.args not set — see Requirements below.');
+      console.warn('window.args not set, see Requirements below.');
     }
   });
 </script>
 ```
 
-:::warning Requires `allowSameOrigin` — otherwise `window.args` is silently `undefined`
+:::warning Requires `allowSameOrigin`, otherwise `window.args` is silently `undefined`
 The args are injected from the parent page via `iframe.contentWindow.args = ...`, which the browser blocks under same-origin policy unless the iframe sandbox carries `allow-same-origin`. That is gated by the per-user **Settings → Interface → "iframe Sandbox Allow Same Origin"** toggle, which is **off by default**. If `window.args` comes back undefined and you have not changed this setting, that is the cause: turn it on and reload. See [allowSameOrigin](#allowsameorigin) above for the security trade-off.
 :::
 
 :::note Where `window.args` is set, and where it is not
-- ✅ **Tool method returning `HTMLResponse` or `(HTMLResponse, context)` tuple** — rendered inline at the "View Result from..." tool call indicator. `window.args` is injected (subject to the `allowSameOrigin` requirement above).
-- ❌ **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`** — rendered through the chat-controls Embeds panel, which does not wire `args` at all. `window.args` will always be undefined here, regardless of sandbox settings. This is by design: the embeds-event path has no tool call attached, so there are no args to inject.
-- ❌ **Action embeds** — triggered by the user, not the model, so there are no model-supplied args to inject.
+- ✅ **Tool method returning `HTMLResponse` or `(HTMLResponse, context)` tuple**: rendered inline at the "View Result from..." tool call indicator. `window.args` is injected (subject to the `allowSameOrigin` requirement above).
+- ❌ **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`**: rendered through the chat-controls Embeds panel, which does not wire `args` at all. `window.args` will always be undefined here, regardless of sandbox settings. This is by design: the embeds-event path has no tool call attached, so there are no args to inject.
+- ❌ **Action embeds**: triggered by the user, not the model, so there are no model-supplied args to inject.
 
 If you need to pass dynamic data into an embed rendered via either of the ❌ paths, use the [Payload Requests](#payload-requests) pattern above instead.
 :::
 
 ### Auto-Injected Libraries
 
-When `allowSameOrigin` is enabled, the iframe component auto-detects usage of certain libraries in your HTML and injects them automatically — no CDN `<script>` tags needed:
+When `allowSameOrigin` is enabled, the iframe component auto-detects usage of certain libraries in your HTML and injects them automatically, with no CDN `<script>` tags needed:
 
-- **Alpine.js** — Detected when any `x-data`, `x-init`, `x-show`, `x-bind`, `x-on`, `x-text`, `x-html`, `x-model`, `x-for`, `x-if`, `x-effect`, `x-transition`, `x-cloak`, `x-ref`, `x-teleport`, or `x-id` directives are found
-- **Chart.js** — Detected when `new Chart(` or `Chart.` appears in the HTML
+- **Alpine.js**: Detected when any `x-data`, `x-init`, `x-show`, `x-bind`, `x-on`, `x-text`, `x-html`, `x-model`, `x-for`, `x-if`, `x-effect`, `x-transition`, `x-cloak`, `x-ref`, `x-teleport`, or `x-id` directives are found
+- **Chart.js**: Detected when `new Chart(` or `Chart.` appears in the HTML
 
 This means you can write Alpine or Chart.js code directly in your HTML and it will just work when same-origin is enabled, without importing scripts.
 
@@ -382,9 +382,9 @@ Rich UI embeds can interact with the chat input using three message types:
 
 **Same-origin vs cross-origin behavior:**
 
-- When `allowSameOrigin` is **on**, `input:prompt:submit` submits the prompt **immediately** — no user interaction required.
+- When `allowSameOrigin` is **on**, `input:prompt:submit` submits the prompt **immediately**, with no user interaction required.
 - When `allowSameOrigin` is **off** (default), `input:prompt:submit` from cross-origin iframes shows a **confirmation dialog** to the user before submitting. This prevents abuse while still enabling interactive embeds without requiring same-origin access.
-- `input:prompt` and `action:submit` work the same regardless of origin — they only fill or submit text that the user can already see.
+- `input:prompt` and `action:submit` work the same regardless of origin: they only fill or submit text that the user can already see.
 
 :::tip
 This means your Rich UI embed can include interactive buttons (e.g., "Explain this chart", "Regenerate with different parameters") that submit prompts to the chat, **without requiring the user to enable same-origin access**. The user simply sees a confirmation dialog and clicks "Confirm" to proceed.
@@ -397,7 +397,7 @@ Rich UI embeds and the [`execute` event](/features/extensibility/plugin/developm
 | | Rich UI Embed | `execute` Event |
 |---|---|---|
 | **Runs in** | Sandboxed iframe | Main page context (no sandbox) |
-| **Persistence** | Persistent — saved in chat history | Ephemeral — gone on reload/navigate |
+| **Persistence** | Persistent, saved in chat history | Ephemeral, gone on reload/navigate |
 | **Page access** | Isolated from parent by default | Full (DOM, cookies, localStorage) |
 | **Forms** | Requires `allowForms` setting enabled | Always works (no sandbox) |
 | **Best for** | Persistent visual content, dashboards, charts | Transient interactions, side effects, downloads, DOM manipulation |
@@ -408,14 +408,14 @@ Use Rich UI embeds for persistent visual content you want to stay in the convers
 
 Rich UI embedding is perfect for:
 
-- **Interactive dashboards** — Real-time data visualization and controls
-- **Charts and graphs** — Interactive plotting with libraries like Plotly, D3.js, or Chart.js
-- **Form interfaces** — Complex input forms with validation and dynamic behavior
-- **Media players** — Video, audio, or interactive media content
-- **Download triggers** — Especially useful for iOS PWA where native download links are blocked
-- **Custom widgets** — Specialized UI components for specific tool functionality
-- **External integrations** — Embedding content from external services or APIs
-- **Human-triggered visualizations** — Actions that display results when a user clicks a button, e.g. generating a report or triggering a download
+- **Interactive dashboards**: Real-time data visualization and controls
+- **Charts and graphs**: Interactive plotting with libraries like Plotly, D3.js, or Chart.js
+- **Form interfaces**: Complex input forms with validation and dynamic behavior
+- **Media players**: Video, audio, or interactive media content
+- **Download triggers**: Especially useful for iOS PWA where native download links are blocked
+- **Custom widgets**: Specialized UI components for specific tool functionality
+- **External integrations**: Embedding content from external services or APIs
+- **Human-triggered visualizations**: Actions that display results when a user clicks a button, e.g. generating a report or triggering a download
 
 ## Full Sample Action
 

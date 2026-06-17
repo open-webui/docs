@@ -113,7 +113,7 @@ After saving:
 
 If the MCP server publishes a `resource` field in its [RFC 9728 Protected Resource Metadata document](https://datatracker.ietf.org/doc/html/rfc9728) (`/.well-known/oauth-protected-resource`), Open WebUI captures it during discovery and forwards it as the `resource` parameter on the **authorization redirect**, on the **token exchange**, and on every **refresh-token call**. This sets the `aud` claim correctly on issued tokens and is required by identity providers that validate audiences strictly per [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707).
 
-No configuration is needed on the Open WebUI side — the resource indicator is discovered automatically. If your IdP rejects MCP tool calls with `invalid_audience` or similar errors, confirm that your MCP server's protected-resource metadata document advertises the correct `resource` URL.
+No configuration is needed on the Open WebUI side: the resource indicator is discovered automatically. If your IdP rejects MCP tool calls with `invalid_audience` or similar errors, confirm that your MCP server's protected-resource metadata document advertises the correct `resource` URL.
 
 :::
 
@@ -146,7 +146,7 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 
 :::note
-`{{USER_EMAIL}}` and `{{USER_ROLE}}` were added in v0.9.6. The same release also fixed MCP server connections, where custom-header templates were previously stored but **not** interpolated at request time — they now expand the same way they always have for direct connections and OpenAPI tool servers.
+`{{USER_EMAIL}}` and `{{USER_ROLE}}` were added in v0.9.6. The same release also fixed MCP server connections, where custom-header templates were previously stored but **not** interpolated at request time. They now expand the same way they always have for direct connections and OpenAPI tool servers.
 :::
 
 ### Function Name Filter List
@@ -190,7 +190,7 @@ Native MCP support in Open WebUI is **Streamable HTTP only**. This design choice
 
 Browsers operate within strict **sandboxed and event-driven HTTP constraints**, making long-lived stdio or SSE connections difficult to maintain securely across users and sessions.
 
-If you need to bridge those other MCP transports, check out [**mcpo**](https://github.com/open-webui/mcpo) — an open-source proxy that translates **stdio or SSE-based MCP servers into OpenAPI-compatible endpoints**. It effectively lets you run traditional MCP tools inside Open WebUI without modifying their transport layer.
+If you need to bridge those other MCP transports, check out [**mcpo**](https://github.com/open-webui/mcpo), an open-source proxy that translates **stdio or SSE-based MCP servers into OpenAPI-compatible endpoints**. It effectively lets you run traditional MCP tools inside Open WebUI without modifying their transport layer.
 
 **Is MCP considered stable here?**
 

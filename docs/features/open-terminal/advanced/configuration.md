@@ -21,20 +21,20 @@ Settings are applied in this order (later ones override earlier ones):
 
 | Setting | Default | Environment Variable | Description |
 | :--- | :--- | :--- | :--- |
-| **Host** | `0.0.0.0` | — | Network address to listen on |
-| **Port** | `8000` | — | Port number |
+| **Host** | `0.0.0.0` | (none) | Network address to listen on |
+| **Port** | `8000` | (none) | Port number |
 | **API Key** | Auto-generated | `OPEN_TERMINAL_API_KEY` | Password for connecting |
-| **API Key File** | — | `OPEN_TERMINAL_API_KEY_FILE` | Load the key from a file (for Docker secrets) |
+| **API Key File** | (none) | `OPEN_TERMINAL_API_KEY_FILE` | Load the key from a file (for Docker secrets) |
 | **Log Directory** | `~/.local/state/open-terminal/logs` | `OPEN_TERMINAL_LOG_DIR` | Where to save log files |
 | **Max Sessions** | `16` | `OPEN_TERMINAL_MAX_SESSIONS` | Maximum concurrent terminal sessions |
 | **Enable Terminal** | `true` | `OPEN_TERMINAL_ENABLE_TERMINAL` | Turn the interactive terminal on/off |
 | **Enable Notebooks** | `true` | `OPEN_TERMINAL_ENABLE_NOTEBOOKS` | Turn Jupyter notebook execution on/off |
 | **TERM** | `xterm-256color` | `OPEN_TERMINAL_TERM` | Terminal color support |
 | **Execute Timeout** | Unset | `OPEN_TERMINAL_EXECUTE_TIMEOUT` | How long (seconds) to wait for command output |
-| **Execute Description** | — | `OPEN_TERMINAL_EXECUTE_DESCRIPTION` | Custom text telling the AI about installed tools |
+| **Execute Description** | (none) | `OPEN_TERMINAL_EXECUTE_DESCRIPTION` | Custom text telling the AI about installed tools |
 | **Multi-User** | `false` | `OPEN_TERMINAL_MULTI_USER` | Enable [per-user isolation](./multi-user) |
-| **CORS Origins** | — | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains |
-| **Allowed Domains** | — | `OPEN_TERMINAL_ALLOWED_DOMAINS` | [Egress firewall](./security#egress-filtering): only allow outbound connections to these domains |
+| **CORS Origins** | (none) | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains |
+| **Allowed Domains** | (none) | `OPEN_TERMINAL_ALLOWED_DOMAINS` | [Egress firewall](./security#egress-filtering): only allow outbound connections to these domains |
 
 ---
 
