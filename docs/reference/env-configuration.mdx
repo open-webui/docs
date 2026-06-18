@@ -4248,12 +4248,16 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Description: Sets the Sogou API SK.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-#### `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`
+#### `OLLAMA_CLOUD_API_KEY`
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the Ollama Cloud Web Search API Key.
+- Description: Sets your Ollama Cloud API key. It is currently used to authenticate the Ollama Cloud web search provider (the search service hosted at `ollama.com`).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+:::warning Environment variable name vs. config field name
+The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and the config API and persisted value use the key `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` (`rag.web.search.ollama_cloud_api_key`). The environment variable that seeds it on startup is `OLLAMA_CLOUD_API_KEY`, not `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`. Setting `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` in the environment has no effect, so use `OLLAMA_CLOUD_API_KEY`.
+:::
 
 #### `TAVILY_EXTRACT_DEPTH`
 
