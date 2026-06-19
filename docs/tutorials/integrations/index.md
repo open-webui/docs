@@ -5,7 +5,7 @@ title: "Integrations"
 
 # 🔌 Integration Tutorials
 
-**Connect Open WebUI to LLM providers, developer tools, monitoring platforms, and external services.**
+**Connect Open WebUI to LLM providers, AI gateways, developer tools, monitoring platforms, and external services.**
 
 These community-contributed guides cover specific integration scenarios with step-by-step instructions. For authentication and SSO integrations, see [Authentication & SSO](../auth-sso).
 
@@ -18,6 +18,16 @@ These community-contributed guides cover specific integration scenarios with ste
 | [Azure OpenAI (Entra ID)](./llm-providers/azure-openai) | Keyless authentication to Azure OpenAI via Entra ID | 👤 Admin · ⏱️ 30–60 min |
 | [DeepSeek R1 Dynamic](./llm-providers/deepseekr1-dynamic) | Run the full 671B DeepSeek-R1 model via llama.cpp | 👤 Developer · ⏱️ 45 min |
 | [Intel GPU (IPEX-LLM)](./llm-providers/ipex_llm) | Accelerate Ollama with IPEX-LLM on Intel GPUs | 👤 Developer · ⏱️ 20 min |
+
+---
+
+### AI Gateways
+
+Proxy layers that sit between Open WebUI and your LLM providers — handling routing, governance, and observability in one place.
+
+| Tutorial | What you'll achieve | Details |
+|----------|-------------------|---------|
+| [TrueFoundry AI Gateway](./ai-gateways/truefoundry) | Route Open WebUI requests through TrueFoundry for unified LLM access, governance, and observability | 👤 Admin · ⏱️ 15 min |
 
 ---
 
