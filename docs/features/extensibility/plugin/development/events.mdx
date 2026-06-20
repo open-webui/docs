@@ -34,8 +34,8 @@ External tools can emit events via a **dedicated REST endpoint**. Open WebUI pas
 
 | Header | Description |
 |--------|-------------|
-| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked |
-| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call |
+| `X-OpenWebUI-Chat-Id` | The chat ID where the tool was invoked |
+| `X-OpenWebUI-Message-Id` | The message ID associated with the tool call |
 
 Your external tool can use these headers to emit events back to the UI via:
 
@@ -393,11 +393,21 @@ await __event_emitter__(
     {
         "type": "source",  # or "citation"
         "data": {
-            # Open WebUI Source (Citation) Object
+            "source": {"name": "My Source Name", "id": "my-source-id"},
+            "document": ["The exact text passage being cited."],
+            "metadata": [
+                {
+                    "source": "https://example.com/page",
+                    "name": "Page Title",
+                    "url": "https://example.com/page",
+                }
+            ],
         }
     }
 )
 ```
+
+`document` and `metadata` are parallel lists (one entry per cited passage). `source.name` / `source.id` label the citation group, and each `metadata` entry's `source` / `url` is the link shown under the response. External tools (OpenAPI and MCP) emit this same `source` event by POSTing the `{"type": "source", "data": {...}}` body to the [event endpoint](#-external-tool-events); this is how an MCP search tool attaches citations, including in native function calling mode.
 
 **For code execution (track execution state):**
 
@@ -786,8 +796,8 @@ When Open WebUI calls your external tool (with header forwarding enabled), it in
 
 | Header | Description | Env Var Override |
 |--------|-------------|------------------|
-| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked | `FORWARD_SESSION_INFO_HEADER_CHAT_ID` |
-| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call | `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID` |
+| `X-OpenWebUI-Chat-Id` | The chat ID where the tool was invoked | `FORWARD_SESSION_INFO_HEADER_CHAT_ID` |
+| `X-OpenWebUI-Message-Id` | The message ID associated with the tool call | `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID` |
 
 ### Event Endpoint
 
@@ -796,12 +806,12 @@ When Open WebUI calls your external tool (with header forwarding enabled), it in
 **Authentication:** Requires a valid Open WebUI API key or session token.
 
 :::warning Open WebUI does **not** forward user credentials to external tools
-The `X-OpenWebUI-User-*` and `X-Open-WebUI-Chat-Id` / `X-Open-WebUI-Message-Id` headers forwarded to your tool are **identification only**: they carry no API key or session token. The same applies to MCP custom-header template tokens (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{CHAT_ID}}`, `{{MESSAGE_ID}}`): there is no `{{API_KEY}}` or `{{TOKEN}}` placeholder, and the user's own API key / session is never sent to the tool server.
+The `X-OpenWebUI-User-*` and `X-OpenWebUI-Chat-Id` / `X-OpenWebUI-Message-Id` headers forwarded to your tool are **identification only**: they carry no API key or session token. The same applies to MCP custom-header template tokens (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{CHAT_ID}}`, `{{MESSAGE_ID}}`): there is no `{{API_KEY}}` or `{{TOKEN}}` placeholder, and the user's own API key / session is never sent to the tool server.
 
 So an external tool **must hold its own statically-configured Open WebUI API key** to call this endpoint. The endpoint's authorization check requires the caller to be the chat's owner **or an admin**, which gives you two practical options:
 
 - **Per-user key (uncommon)**: the tool server holds the specific user's API key. Only works for a single-user setup; impractical for a shared MCP server.
-- **Admin / service-account key (recommended)**: provision a dedicated admin (or service-account) user in Open WebUI, generate an API key for it, and use that key from the tool server. An admin key works for any user's chat, so a single key serves all callers; the forwarded `X-Open-WebUI-Chat-Id` + `X-Open-WebUI-Message-Id` headers tell your tool *which* chat/message to post to.
+- **Admin / service-account key (recommended)**: provision a dedicated admin (or service-account) user in Open WebUI, generate an API key for it, and use that key from the tool server. An admin key works for any user's chat, so a single key serves all callers; the forwarded `X-OpenWebUI-Chat-Id` + `X-OpenWebUI-Message-Id` headers tell your tool *which* chat/message to post to.
 
 Store the key as a secret on the tool server (env var, secrets manager, etc.); do not expect Open WebUI to push it for you.
 :::
@@ -840,8 +850,8 @@ import httpx
 
 def my_tool_handler(request):
     # Extract headers from incoming request
-    chat_id = request.headers.get("X-Open-WebUI-Chat-Id")
-    message_id = request.headers.get("X-Open-WebUI-Message-Id")
+    chat_id = request.headers.get("X-OpenWebUI-Chat-Id")
+    message_id = request.headers.get("X-OpenWebUI-Message-Id")
     api_key = "your-open-webui-api-key"
     
     # Emit a status event

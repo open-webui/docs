@@ -39,6 +39,38 @@ Access detailed API documentation for different services provided by Open WebUI:
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
 
+### 🛠️ Programmatic Model Management (Export / Import / Sync)
+
+Custom models are plain JSON, so you can manage them declaratively (in git, via scripts or from an AI agent) without the UI. These endpoints live under `/api/v1/models`:
+
+| Endpoint | Description |
+| :--- | :--- |
+| `GET /api/v1/models/export` | Export **all** custom models as a JSON array. |
+| `POST /api/v1/models/import` | Bulk **upsert**: create new models and update existing ones (matched by `id`). Additive, never deletes. |
+| `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
+| `POST /api/v1/models/create` | Create a single model. |
+| `POST /api/v1/models/model/update` | Update a single model. |
+| `POST /api/v1/models/model/delete` | Delete a single model. |
+
+**Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+
+**Version-controlled, code-driven workflow:**
+
+```bash
+# 1. Snapshot your live models into a file you can commit to git
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  http://localhost:3000/api/v1/models/export > models.json
+
+# 2. Edit or generate models.json with your scripts or an agent, commit it, then
+#    reconcile the instance to match the file exactly (creates, updates, prunes)
+curl -X POST -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"models\": $(cat models.json)}" \
+  http://localhost:3000/api/v1/models/sync
+```
+
+This gives reproducible, version-controlled model definitions. Use `/import` instead of `/sync` for additive updates that never delete existing models. Run the sync step on deploy, in CI or at container startup to load your models automatically.
+
 ### 💬 Chat Completions
 
 - **Endpoint**: `POST /api/chat/completions`

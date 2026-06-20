@@ -31,7 +31,7 @@ As a chat grows, the history grows. Large attachments or long tool-call outputs 
 
 ## Why Open WebUI doesn't auto-truncate for you
 
-Open WebUI intentionally does **not** ship a built-in context trimmer. This is a design choice, not an oversight, and it is unlikely to change. Here's why:
+Open WebUI does **not** silently truncate your conversation. It ships one optional, off-by-default mechanism, **Context Compaction** (covered below), which *summarizes* older messages rather than dropping them. Apart from that opt-in, Open WebUI does no automatic context trimming, by design. Here is why blind trimming is not a built-in default:
 
 1. **Every model uses a different tokenizer.** The token count for the same text differs between OpenAI (tiktoken), Anthropic, Gemini, GLM, Llama-family, Mistral, Qwen, and so on. A truly correct trimmer would need a per-model tokenizer for every provider in existence. Getting that wrong ships silent data corruption.
 2. **Every model has a different context window.** 8k, 32k, 128k, 200k, 1M, and that's before you factor in reserved output tokens, provider-side overhead, and multimodal content.
@@ -46,7 +46,27 @@ Open WebUI intentionally does **not** ship a built-in context trimmer. This is a
    - Summarize older messages instead of dropping them, and replace the dropped block with the summary.
    - Per-model policies (keep 1M tokens for Gemini, 400k for GPT-5, 32k for smaller local models).
 
-There is no single policy that is correct for every deployment, every user, and every model. A built-in implementation would be wrong for most users by definition, and would hide the much better option: give the user the hook and let them pick.
+There is no single policy that is correct for every deployment, every user, and every model. That is why context management is **opt-in**: the built-in Context Compaction covers the common summarize-and-replace case, and for anything else the filter hook lets you pick exactly the policy you want.
+
+## The built-in option: Context Compaction
+
+Open WebUI ships an optional **Context Compaction** feature that handles the common case for you. When a chat's estimated context grows past a token threshold, it asks a model to summarize the older messages, then continues the conversation from that summary plus the most recent messages, so a long chat keeps going without overflowing the window.
+
+It is **disabled by default**. An administrator enables and tunes it in **Admin Panel > Settings > Interface**:
+
+- **Context Compaction**: the on/off toggle ([`ENABLE_CONTEXT_COMPACTION`](/reference/env-configuration#enable_context_compaction)).
+- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window.
+- **Context Compaction Prompt**: an optional custom summarization prompt ([`CONTEXT_COMPACTION_PROMPT_TEMPLATE`](/reference/env-configuration#context_compaction_prompt_template)); leave it empty for the built-in default. It supports `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
+
+This is the summarize-and-replace strategy (option 4 below), built in. If you need a different policy (hard caps, attachment-first trimming, per-model windows), use a filter Function instead.
+
+### How it works
+
+- **It runs server-side, per request, and is invisible in the chat.** Your full conversation is still stored and displayed in the UI; compaction only changes what is sent to the model on a given turn. There is no badge or marker indicating it happened.
+- **It keeps a rolling checkpoint, it does not wipe history.** When the threshold is crossed, the oldest ~60% of the active window is summarized and the most recent ~40% (at least two messages) is kept verbatim, and the split never separates an assistant tool call from its result. The summary is saved onto a message as a checkpoint. Later turns resume from that checkpoint (the summary plus the messages after it), and if the window grows past the threshold again it compacts again, folding the previous summary into the new one and moving the checkpoint forward.
+- **The task model writes the summary.** It uses the same model selection as title and tag generation: your configured Task Model (`TASK_MODEL` / `TASK_MODEL_EXTERNAL`) if set, otherwise the chat's current model, with a fallback to the chat model when the task model is unavailable. Summary length is capped by the task model's `max_tokens` (default 1000).
+- **Your system prompt, tools, and skills are preserved.** Compaction only summarizes conversation messages. The model, workspace and folder system prompts, the available tools and their instructions, skills and any RAG, web search or memory context are all reassembled fresh on every request, after compaction runs, so they are never summarized away. The one exception is older **tool-call results** that live in the chat history: a past tool result inside the compacted block is condensed into the summary, though what the model can still call is unaffected.
+- **It fails safe.** If the summarizer returns nothing, Open WebUI falls back to a short mechanical summary (the previous summary plus truncated excerpts of the dropped messages). If compaction errors entirely, it is logged and the request proceeds with the full, uncompacted history.
 
 ## The supported way: use a filter Function
 

@@ -804,9 +804,15 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 #### `AIOHTTP_CLIENT_SESSION_SSL`
 
-- Type: `bool`
+- Type: `bool` or `str`
 - Default: `True`
-- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings, and, since v0.9.6, Speech-to-Text / Text-to-Speech audio endpoints). Set to `False` to allow self-signed or custom CA certificates on these upstream services.
+- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings, and, since v0.9.6, Speech-to-Text / Text-to-Speech audio endpoints). Accepts `True` (verify, the default), `False` (disable verification, allowing self-signed or custom certificates) or a path to a CA bundle file (e.g. `/etc/ssl/certs/corporate-ca.crt`) to verify against your own certificate authority. When set to `True`, it uses `AIOHTTP_CLIENT_SSL_CERT_FILE` as the CA bundle if that variable is configured.
+
+#### `AIOHTTP_CLIENT_SSL_CERT_FILE`
+
+- Type: `str`
+- Default: `""` (unset)
+- Description: Path to a custom CA bundle file used as the default for all outbound HTTPS connections whose SSL verification is enabled (that is, whose own SSL variable is set to `True`). Use it to trust a corporate or internal certificate authority across the whole application without disabling verification. A per-connection override (setting a variable such as `AIOHTTP_CLIENT_SESSION_SSL` directly to a path) takes precedence over this global fallback. Follows the convention of `SSL_CERT_FILE` / `REQUESTS_CA_BUNDLE` but is scoped to Open WebUI so it does not interfere with system-level settings.
 
 #### `AIOHTTP_CLIENT_ALLOW_REDIRECTS`
 
@@ -828,9 +834,9 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 #### `AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`
 
-- Type: `bool`
+- Type: `bool` or `str`
 - Default: `True`
-- Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
+- Description: Controls SSL/TLS verification specifically for tool server connections (including MCP) via the AIOHTTP client. Accepts `True` (verify, the default), `False` (disable) or a path to a CA bundle file to verify against your own certificate authority. When set to `True`, it falls back to `AIOHTTP_CLIENT_SSL_CERT_FILE` if that variable is configured.
 
 #### `MCP_INITIALIZE_TIMEOUT`
 
@@ -993,6 +999,10 @@ By default, audit logging uses **blacklist mode**: all paths are logged except t
 - Example: `http://host-one:11434;http://host-two:11434`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+:::info Context length: `num_ctx` overrides `OLLAMA_CONTEXT_LENGTH`
+`OLLAMA_CONTEXT_LENGTH` is an **Ollama-server** setting, not an Open WebUI variable. Open WebUI's per-model `num_ctx` advanced parameter, when set, is sent on every request and **overrides** it, and the `num_ctx` control pre-fills a small `2048`. See [Context Length](/getting-started/quick-start/connect-a-provider/starting-with-ollama#context-length-num_ctx-and-ollama_context_length) for how to set this correctly and avoid blank responses with Native function calling.
+:::
+
 #### `USE_OLLAMA_DOCKER`
 
 - Type: `bool`
@@ -1074,6 +1084,27 @@ when using Ollama models.
 - Type: `str`
 - Description: The default model to use for tasks such as title and web search query generation
 when using OpenAI-compatible endpoints.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_CONTEXT_COMPACTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Admin Panel > Settings > Interface**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
+
+- Type: `int`
+- Default: `80000`
+- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Default: Empty string (falls back to the built-in default compaction prompt)
+- Description: The prompt used to summarize the messages being compacted. Leave empty to use the built-in default, or provide a custom prompt. Supports two variables: `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
@@ -3348,13 +3379,9 @@ Provide a clear and direct response to the user's query, including inline citati
 <context>
 {{CONTEXT}}
 </context>
-
-<user_query>
-{{QUERY}}
-</user_query>
 ```
 
-- Description: Template to use when injecting RAG documents into chat completion.
+- Description: Template to use when injecting RAG documents into chat completion. The template wraps the retrieved context (use the `{{CONTEXT}}` placeholder); the user's query is appended automatically, so do **not** add a `{{QUERY}}` / `[query]` placeholder or the query will appear twice in the final prompt. See [RAG Template Customization](/features/chat-conversations/rag#rag-template-customization).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Document Processing

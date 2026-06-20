@@ -190,8 +190,24 @@ When you add a URL like `https://myserver.com/api` as a **user/direct** connecti
 
 :::tip
 This applies to **all** backend-proxied connections in Open WebUI, not just Open Terminal. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
-This applies to **all** backend-proxied connections in Open WebUI. The same pattern affects [Tool Server connections](/features/extensibility/plugin/tools/openapi-servers/open-webui#main-difference-where-are-requests-made-from), [Open Terminal admin connections](/features/open-terminal#enterprise-multi-user), and Ollama/OpenAI API endpoints.
 :::
+
+## "Open WebUI backend required" / Front-end Only Error
+
+**Symptom:** the page loads but shows *"Open WebUI backend required. Oops! You're using an unsupported method (frontend only). Please serve the WebUI from the backend."* It commonly appears on a **second instance**, behind a reverse proxy, or through an **SSH tunnel**, while another instance works fine.
+
+**What it actually means:** on load, the frontend fetches `/api/config` from its own origin. If that request fails, Open WebUI shows this error. It does **not** mean you are running a frontend-only build. The official image is a single process that serves the UI and the API together on container port **`8080`**, so if the page reached you, the API is supposed to be there too. The error means the request for `/api/config` at that origin did not reach the backend.
+
+Two causes account for almost all of these:
+
+1. **A port-mapping or tunnel mismatch.** The origin you opened serves the page but does not route `/api/config` to the backend. Check that:
+   - Each container maps its host port to container port **`8080`**, for example `ports: ["3001:8080"]`. Mapping to any other internal port breaks the API while still potentially serving cached assets.
+   - Your SSH tunnel forwards the local port to the **remote host port that instance actually publishes**. Running several instances makes it easy to forward to the wrong one.
+   - Quick test from the browser machine, through the tunnel: `curl http://localhost:3001/api/config`. JSON back means the backend is reachable, so look at cause 2. An empty reply or connection refused means the tunnel or port mapping is wrong.
+
+2. **A stale service worker serving a cached page.** Open WebUI registers a service worker, so the browser can display the cached UI shell while the live `/api/config` call fails, which produces this exact error. A normal hard refresh does not unregister the service worker. Clear it from **DevTools > Application > Service Workers > Unregister** for that origin, or open the instance in a fresh private/incognito window.
+
+This is a deployment and networking condition, not an Open WebUI bug.
 
 ## Connection to Ollama Server
 

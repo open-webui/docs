@@ -26,7 +26,7 @@ AI is built in but optional. Bring your own key and it becomes an agent that can
 [**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
 
 :::info New, and moving fast
-cptr is a young project (currently v0.5.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
+cptr is a young project (currently v0.6.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
 :::
 
 ## cptr vs Open Terminal
@@ -62,6 +62,8 @@ cptr is a Python package (Python 3.10 or newer):
 ```bash
 pip install cptr
 ```
+
+To pull in every optional dependency (MCP tool servers, document support, PAM login) at once, install the `all` extra instead: `pip install cptr[all]`.
 
 Start the server and it opens in your browser:
 

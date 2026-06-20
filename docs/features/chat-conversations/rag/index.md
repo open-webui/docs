@@ -55,6 +55,12 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 Customize the RAG template from the `Admin Panel` > `Settings` > `Documents` menu.
 
+The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
+
+:::warning Do not include a query placeholder
+Your message (the query) is **always appended automatically** after the rendered template, so the model already sees it once. The template also recognizes `{{QUERY}}` / `[query]` and will substitute the query there, but because the query is still appended afterward, including that placeholder makes the query appear **twice** in the final prompt. Leave `{{QUERY}}` / `[query]` out of your template: it is a wrapper for the retrieved context, not the place to position the query.
+:::
+
 ## Markdown Header Splitting
 
 When enabled, documents are first split by markdown headers (H1-H6). This preserves document structure and ensures that sections under the same header are kept together when possible. The resulting chunks are then further processed by the standard character or token splitter.
