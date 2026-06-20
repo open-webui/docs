@@ -43,6 +43,21 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 Customize the RAG template from the `Admin Panel` > `Settings` > `Documents` menu.
 
+## File Context Scope
+
+Admins can choose how attached non-image files are added to the prompt from `Admin Panel` > `Settings` > `Documents` > `File Context Scope`.
+
+| Scope | Behavior | Use when |
+|---|---|---|
+| **Conversation** (default) | Collects attached file context at the conversation level and injects it into the latest user message. | You want each new prompt to include the currently attached file context. |
+| **Message** | Scopes attached file context to the user message that originally included the file. | Users compare several files over multiple turns, or refer back to "this document", "the previous document", or "the first document". |
+
+Message scope can also improve prompt-cache reuse because older attached document context stays in a more stable position instead of moving into the latest prompt on every turn.
+
+:::note
+`RAG_SYSTEM_CONTEXT=True` takes priority over File Context Scope. When system-context mode is enabled, RAG context is injected into the system message and the File Context Scope selector is hidden.
+:::
+
 ## Markdown Header Splitting
 
 When enabled, documents are first split by markdown headers (H1-H6). This preserves document structure and ensures that sections under the same header are kept together when possible. The resulting chunks are then further processed by the standard character or token splitter.

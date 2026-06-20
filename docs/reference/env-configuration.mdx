@@ -3768,11 +3768,21 @@ Strictly return in JSON format:
 - Description: Specifies whether to use the full context for RAG.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `RAG_FILE_CONTEXT_SCOPE`
+
+- Type: `str`
+- Default: `conversation`
+- Accepted values:
+  - `conversation` - Attached file context is collected at the conversation level and injected into the latest user message.
+  - `message` - Attached file context is scoped to the user message that owns the file attachment.
+- Description: Controls where non-image attached file context is injected when RAG runs. Use `message` for chats that compare or reference multiple attached files over several turns, so each file's context stays with the message where it was uploaded. If `RAG_SYSTEM_CONTEXT=True`, this setting is ignored and RAG context is injected into the system message instead.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `RAG_SYSTEM_CONTEXT`
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, injects RAG context into the **system message** instead of the user message. For models that support **KV prefix caching** or **Prompt Caching** (local engines like Ollama, llama.cpp or vLLM, and cloud providers like OpenAI and Vertex AI), this keeps the context at a stable position at the start of the conversation, so the cache can persist across turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
+- Description: When enabled, injects RAG context into the **system message** instead of the user message. For models that support **KV prefix caching** or **Prompt Caching** (local engines like Ollama, llama.cpp or vLLM, and cloud providers like OpenAI and Vertex AI), this keeps the context at a stable position at the start of the conversation, so the cache can persist across turns. When disabled (default), context is injected into user messages according to `RAG_FILE_CONTEXT_SCOPE`.
 
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 

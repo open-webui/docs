@@ -236,6 +236,8 @@ If your initial response is fast but follow-up questions become increasingly slo
 - This injects the RAG context into the **system message**, which stays at a fixed position at the start of the conversation.
 - This allows providers to effectively use **KV prefix caching** or **Prompt Caching**, resulting in nearly instant follow-up responses even with large documents.
 
+If you want attached file context to stay with the message that introduced each file, set **File Context Scope** to **Message** in **Admin Settings > Documents**, or set `RAG_FILE_CONTEXT_SCOPE=message`. This can help multi-file chats where users refer back to "the first document" or "the previous document". `RAG_SYSTEM_CONTEXT=True` takes priority over this setting.
+
 ---
 
 | Problem | Fix |
