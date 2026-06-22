@@ -19,15 +19,15 @@ When a user opens a terminal, Open WebUI routes through `/p/{policy_id}/...`. Th
 
 ## Read This Section
 
-- [Policies](./policies): image selection, resources, storage, env vars, and idle timeout.
-- [Environment Variables](./environment-variables): raw env values, quote handling, forwarding behavior, and reserved keys.
-- [Applying Changes](./applying-changes): why changes affect newly provisioned terminals and how to refresh users.
-- [Custom Images](./custom-images): build, tag, push, configure, and roll out custom Open Terminal images.
-- [Scheduled Resets](./scheduled-resets): recurring reset schedules, idle-safe reset behavior, and what gets deleted.
-- [OpenShift](./openshift): restricted per-user terminal sandboxes on OpenShift.
-- [System Prompts](./system-prompts): generated prompts, `OPEN_TERMINAL_SYSTEM_PROMPT`, placeholders, and `OPEN_TERMINAL_INFO`.
-- [File Browser Root](./file-browser-home-boundary): how Open Terminal exposes a visual root for clients to render and clamp navigation.
-- [API and Troubleshooting](./api-troubleshooting): policy APIs, refresh API, and sharp support answers.
+- [Policies](/features/open-terminal/terminals/orchestration/policies): image selection, resources, storage, env vars, and idle timeout.
+- [Environment Variables](/features/open-terminal/terminals/orchestration/environment-variables): raw env values, quote handling, forwarding behavior, and reserved keys.
+- [Applying Changes](/features/open-terminal/terminals/orchestration/applying-changes): why changes affect newly provisioned terminals and how to refresh users.
+- [Custom Images](/features/open-terminal/terminals/orchestration/custom-images): build, tag, push, configure, and roll out custom Open Terminal images.
+- [Scheduled Resets](/features/open-terminal/terminals/orchestration/scheduled-resets): recurring reset schedules, idle-safe reset behavior, and what gets deleted.
+- [OpenShift](/features/open-terminal/terminals/orchestration/openshift): restricted per-user terminal sandboxes on OpenShift.
+- [System Prompts](/features/open-terminal/terminals/orchestration/system-prompts): generated prompts, `OPEN_TERMINAL_SYSTEM_PROMPT`, placeholders, and `OPEN_TERMINAL_INFO`.
+- [File Browser Root](/features/open-terminal/terminals/orchestration/file-browser-home-boundary): how Open Terminal exposes a visual root for clients to render and clamp navigation.
+- [API and Troubleshooting](/features/open-terminal/terminals/orchestration/api-troubleshooting): policy APIs, refresh API, and sharp support answers.
 
 ## Responsibilities
 
