@@ -55,6 +55,10 @@ These only work with the Docker image:
 These packages are reinstalled every time the container starts. If you need many packages, consider [building a custom image](https://github.com/open-webui/open-terminal) instead.
 :::
 
+:::note OpenShift image
+The `ghcr.io/open-webui/open-terminal:openshift` image does not support runtime package installation, `OPEN_TERMINAL_ALLOWED_DOMAINS`, Docker socket workflows, or `OPEN_TERMINAL_MULTI_USER=true`. Install required tools in a custom image before deploying to OpenShift.
+:::
+
 ---
 
 ## Config file

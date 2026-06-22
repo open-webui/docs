@@ -24,6 +24,7 @@ When a user opens a terminal, Open WebUI routes through `/p/{policy_id}/...`. Th
 - [Applying Changes](./applying-changes): why changes affect newly provisioned terminals and how to refresh users.
 - [Custom Images](./custom-images): build, tag, push, configure, and roll out custom Open Terminal images.
 - [Scheduled Resets](./scheduled-resets): recurring reset schedules, idle-safe reset behavior, and what gets deleted.
+- [OpenShift](./openshift): restricted per-user terminal sandboxes on OpenShift.
 - [System Prompts](./system-prompts): generated prompts, `OPEN_TERMINAL_SYSTEM_PROMPT`, placeholders, and `OPEN_TERMINAL_INFO`.
 - [File Browser Root](./file-browser-home-boundary): how Open Terminal exposes a visual root for clients to render and clamp navigation.
 - [API and Troubleshooting](./api-troubleshooting): policy APIs, refresh API, and sharp support answers.
