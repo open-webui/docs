@@ -539,6 +539,55 @@ result = await __event_call__(
 This uses the same `SensitiveInput` component used for user valve password fields, providing a familiar "eye" icon toggle for showing/hiding the value.
 :::
 
+#### Select Input
+                                                            
+To present the user with a fixed set of choices, set `type` to `"select"` and provide an `options` array. For up to 10 options the UI renders clickable pill buttons; beyond 10 it falls back to a dropdown.
+
+```python                                                                                                                                                                                                                                              
+  result = await __event_call__(
+      {
+          "type": "input",
+          "data": {
+              "title": "Choose priority",
+              "message": "Select the processing priority.",
+              "placeholder": "Pick one...",
+              "type": "select",
+              "options": ["low", "medium", "high"]
+          }
+      }
+  )
+```
+
+  Options can also be label/value pairs, using the same shape as Valve select fields:
+
+  "options": [
+      {"label": "Fast (GPT-4o mini)", "value": "gpt-4o-mini"},
+      {"label": "Smart (GPT-4o)",     "value": "gpt-4o"},
+  ]
+
+  result will be the selected value string, or False if the user cancelled.
+
+**Requiring a selection*:*
+
+  By default the user can confirm without picking anything (result will be an empty string). Set required to True to keep the Confirm button disabled until a choice is made:
+
+  result = await __event_call__(
+      {
+          "type": "input",
+          "data": {
+              "title": "Choose priority",
+              "message": "Select the processing priority.",
+              "type": "select",
+              "options": ["low", "medium", "high"],
+              "required": True
+          }
+      }
+  )
+
+  :::tip
+  The select options format is identical to the one used in Valve json_schema_extra — both accept plain strings or {"label": ..., "value": ...} objects.
+  :::
+
 ---
 
 ### `execute` (works with both `__event_call__` and `__event_emitter__`)
