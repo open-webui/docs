@@ -99,16 +99,43 @@ Runs at module load (once per source version). The patch persists in `sys.module
 
 Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
 
-### 3. Add a new HTTP route at load
+### 3. Serve a page or asset from a route
 
 ```python
-def _ensure_route(app):
-    if any(getattr(r, "path", None) == "/my/route" for r in app.routes):
-        return
-    app.add_api_route("/my/route", my_handler, methods=["GET"])
+from fastapi.responses import HTMLResponse, Response
+
+def _ensure_routes(app):
+    if any(getattr(r, "path", None) == "/my/tool" for r in app.routes):
+        return  # idempotency guard: the loader may re-exec on edits
+
+    async def page():
+        return HTMLResponse(
+            "<html><head><link rel=stylesheet href=/my/tool.css></head>"
+            "<body><div id=app></div><script src=/my/tool.js></script></body></html>"
+        )
+
+    async def script():
+        return Response(MY_JS, media_type="application/javascript")
+
+    async def style():
+        return Response(MY_CSS, media_type="text/css")
+
+    app.add_api_route("/my/tool", page, methods=["GET"])
+    app.add_api_route("/my/tool.js", script, methods=["GET"])
+    app.add_api_route("/my/tool.css", style, methods=["GET"])
 ```
 
-Call from the first hook with access to `__request__.app`. The idempotency guard is important: the loader may re-execute on edits, and `add_api_route` will happily register the same path twice.
+Call from the first hook (or a `system.startup.completed` event) that has `__request__.app` / `__app__`. The idempotency guard matters: the loader may re-execute on edits, and `add_api_route` registers the same path twice without complaint.
+
+`__app__` is the **real** FastAPI app, so a route can return anything HTTP can carry: JSON, `HTMLResponse`, JavaScript, CSS, images, even a whole bundled SPA. You can host an entire standalone tool at its own URL, shipped as a plugin, with **no frontend rebuild**. This is how a plugin serves a ToS/consent page, an approval screen, an OAuth callback, a status dashboard, or a one-click-installer UI.
+
+**The line to not blur:** a route is *your own page*. Your page can reference your own `/my/tool.js` and `/my/tool.css` and they load fine. It does **not** inject into the Open WebUI chat UI. Registering `/my/tool.js` does not make Open WebUI's own `index.html` load it; the user only gets your asset by navigating to *your* route.
+
+To put your JS/CSS into the **actual** Open WebUI SPA (a button on real messages, a theme over the real app, a first-run tour over the real interface), the frontend has to reference your asset. That means writing into the custom-CSS / custom-JS loader seam at startup, which is the indirect, fragile path. A dedicated asset-injection primitive is what would formalize that seam so multiple plugins can do it safely. Route registration alone gets you **pages**, not **injection**.
+
+:::warning
+A registered route runs on the real application and is **not** authenticated unless you add an auth dependency yourself. Anything you expose at a path is reachable by anyone who can reach the server, so gate sensitive routes (admin checks, signed tokens) explicitly.
+:::
 
 ### 4. Spawn a background task
 
