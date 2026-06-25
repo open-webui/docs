@@ -613,16 +613,16 @@ Because Tools and Functions execute server-side code, any user with permission t
 Open WebUI has two code execution features enabled by default:
 
 ```bash
-# Allows code blocks in chat responses to be executed (default: true, engine: pyodide)
+# Allows code blocks in chat responses to be executed (default: true; engine pyodide, legacy)
 ENABLE_CODE_EXECUTION=true
 CODE_EXECUTION_ENGINE=pyodide
 
-# Allows the model to run code as part of its reasoning (default: true, engine: pyodide)
+# Allows the model to run code as part of its reasoning (default: true; engine pyodide, legacy)
 ENABLE_CODE_INTERPRETER=true
 CODE_INTERPRETER_ENGINE=pyodide
 ```
 
-The default engine is `pyodide`, which runs Python in the browser via WebAssembly and does not execute code on the server. If you switch to Jupyter (`jupyter`), code runs on the Jupyter server, which has server-side access. Secure the Jupyter instance accordingly if using this engine.
+`pyodide` (browser/WebAssembly) and `jupyter` (server) are **legacy** code-execution engines. **If you do not need in-chat code execution, disable both features** by setting `ENABLE_CODE_EXECUTION=false` and `ENABLE_CODE_INTERPRETER=false`. If you do need it, isolate it: prefer **[Open Terminal](/features/open-terminal)**, which runs code in a separate Docker container, with **[Terminals](/enterprise)** for per-user isolation in multi-tenant deployments. Do not treat the browser-based `pyodide` engine as a security boundary, and never expose the `jupyter` engine without securing the Jupyter instance, which has direct server-side access.
 
 ### Safe Mode
 
@@ -796,7 +796,7 @@ For organizations where security is a priority, the following practices define t
 
 7. **Keep Tool and Function creation restricted to administrators and review all code before importing.** By default, only administrators can create, import, and manage Tools and Functions. Do not grant workspace permissions to untrusted users. Treat third-party Tools with the same scrutiny as any code running on your infrastructure. Never import Tools without reviewing their source code first. [Details](#tools-functions-and-pipelines)
 
-8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely. If it is needed, keep the default `pyodide` engine, which runs in the browser, not on the server. Do not switch to the Jupyter engine without securing the Jupyter instance. Keep direct connections and direct tool servers disabled. [Details](#dependency-installation)
+8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely (`ENABLE_CODE_EXECUTION=false`, `ENABLE_CODE_INTERPRETER=false`). If it is needed, isolate it with **Open Terminal** (container-isolated) rather than relying on the legacy `pyodide` or `jupyter` engines, and never expose a `jupyter` engine without securing the Jupyter instance. Keep direct connections and direct tool servers disabled. [Details](#dependency-installation)
 
 ### Data Protection
 

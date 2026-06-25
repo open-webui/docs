@@ -9,7 +9,7 @@ Open WebUI offers powerful code execution capabilities directly within your chat
 
 - **Code Interpreter Capability**: Enable models to autonomously write and execute Python code as part of their responses. In Native (Agentic) Mode, the only supported tool-calling mode, this runs via the `execute_code` tool. The older XML-based mechanism is itself the legacy approach and is unsupported, so new deployments should stay on Native Mode.
 
-- **Python Code Execution**: Run Python scripts directly in your browser using Pyodide, or on a server using Jupyter. Supports popular libraries like pandas and matplotlib with no setup required.
+- **Python Code Execution**: Run Python in your browser via Pyodide or on a server via Jupyter, with no setup, for self-contained tasks. Both are now **legacy** engines: for real Python workloads (any package, full performance, shell access) use **Open Terminal**.
 
 - **MermaidJS Rendering**: Create and visualize flowcharts, diagrams, and other visual representations with MermaidJS syntax that automatically renders in your chat.
 
@@ -23,7 +23,15 @@ These execution capabilities bridge the gap between conversation and implementat
 
 Open WebUI supports multiple code execution backends, each suited to different use cases. The right choice depends on what you need: lightweight browser-based execution, a full Python environment, or unrestricted shell access.
 
-### Pyodide (Default)
+:::tip Recommended: Open Terminal
+**[Open Terminal](#open-terminal)** is the recommended backend for real code execution: full native Python, any package, any language, and shell access, isolated in a Docker container. **Pyodide** and **Jupyter** are now **legacy** engines, kept for zero-setup, in-chat use, not the path forward for serious workloads.
+:::
+
+### Pyodide (Legacy)
+
+:::caution Legacy Engine
+Pyodide is a **legacy** code-execution engine. It is still the built-in, zero-setup default for the in-chat Code Interpreter and remains a safe browser sandbox, but it is no longer the recommended path: for anything beyond basic analysis use **[Open Terminal](#open-terminal)**, which gives full native Python, any package, and shell access. Pyodide may be deprecated in a future release.
+:::
 
 Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with some constraints:
 
@@ -50,7 +58,7 @@ The Code Interpreter toggle and the Open Terminal toggle cannot be active at the
 ### Jupyter (Legacy)
 
 :::caution Legacy Engine
-Jupyter is now considered a **legacy** code execution engine. The Pyodide engine is recommended for most use cases, and Open Terminal is recommended when you need full server-side execution. Jupyter support may be deprecated in a future release.
+Jupyter is a **legacy** code execution engine, as is Pyodide. **Open Terminal** is the recommended backend when you need server-side execution. Jupyter support may be deprecated in a future release.
 :::
 
 Jupyter provides a full Python environment and can handle virtually any task: file creation, package installation, and complex library usage. However, it has significant drawbacks in shared deployments:
@@ -96,7 +104,7 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 
 ### Comparison
 
-| Consideration | Pyodide | Jupyter (Legacy) | Open Terminal | Terminals |
+| Consideration | Pyodide (Legacy) | Jupyter (Legacy) | Open Terminal | Terminals |
 | :--- | :--- | :--- | :--- | :--- |
 | **Runs in** | Browser (WebAssembly) | Server (Python kernel) | Server (Docker container) | Server (orchestrated containers) |
 | **Library support** | Limited subset | Full Python ecosystem | Full OS (any language, any tool) | Full OS (any language, any tool) |
@@ -108,7 +116,7 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 | **Multi-user safety** | ✅ Per-user by design | ⚠️ Not isolated | ℹ️ Built-in multi-user mode (small teams) | ✅ Container-per-user with lifecycle management |
 | **File generation** | ✅ Write to `/mnt/uploads/`, download via file browser | ✅ Full support | ✅ Full support with upload/download | ✅ Full support with upload/download |
 | **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations | Separate service + Docker socket or K8s cluster |
-| **Recommended for orgs** | ✅ Safe default | ❌ Not without isolation | ℹ️ Best for small teams | ✅ Designed for multi-tenant orgs |
+| **Recommended for orgs** | ⚠️ Legacy (safe but limited) | ❌ Not without isolation | ℹ️ Best for small teams | ✅ Designed for multi-tenant orgs |
 | **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ℹ️ Single container, shared resources | ✅ Horizontally scalable (Docker or Kubernetes) |
 | **Idle management** | N/A | N/A | N/A (always running) | ✅ Auto-stop after configurable timeout |
 | **License** | MIT | MIT | MIT | [Enterprise](/enterprise) |

@@ -1232,7 +1232,7 @@ The format for the JSON response is strictly:
 
 - Type: `str`
 - Default: `pyodide`
-- Description: Specifies the code execution engine to use.
+- Description: Specifies the code execution engine to use. `pyodide` (browser) and `jupyter` (server) are **legacy** engines; for full Python and shell access use [Open Terminal](/features/open-terminal) instead.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_EXECUTION_JUPYTER_URL`
@@ -1283,7 +1283,7 @@ The format for the JSON response is strictly:
 
 - Type: `str`
 - Default: `pyodide`
-- Description: Specifies the code interpreter engine to use.
+- Description: Specifies the code interpreter engine to use. `pyodide` and `jupyter` are **legacy** engines; for full Python and shell access use [Open Terminal](/features/open-terminal) instead.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_INTERPRETER_BLACKLISTED_MODULES`

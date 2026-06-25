@@ -14,6 +14,10 @@ Open WebUI provides two ways to execute Python code:
 
 Both methods support visual outputs like matplotlib charts that can be displayed inline in your chat. When using the Pyodide engine, a **persistent virtual filesystem** at `/mnt/uploads/` is available. Files survive across code executions and page reloads, and files attached to messages are automatically placed there for your code to access.
 
+:::caution Pyodide and Jupyter are legacy engines
+The in-browser **Pyodide** engine and the **Jupyter** engine are **legacy**. They remain for zero-setup, in-chat Python, but for real workloads, full package support, and shell access use **[Open Terminal](/features/chat-conversations/chat-features/code-execution#open-terminal)** instead. Pyodide may be deprecated in a future release.
+:::
+
 ## Code Interpreter Capability
 
 The Code Interpreter is a model capability that enables LLMs to write and execute Python code autonomously during a conversation. When enabled, models can:
@@ -35,7 +39,7 @@ The Code Interpreter is a model capability that enables LLMs to write and execut
 
 These settings can be configured at **Admin Panel → Settings → Code Execution**:
 - Enable/disable code interpreter
-- Select engine: **Pyodide** (recommended) or **Jupyter (Legacy)**
+- Select engine: **Pyodide (legacy)** or **Jupyter (legacy)** (for full Python and shell access, use [Open Terminal](/features/open-terminal) instead)
 - Configure Jupyter connection settings
 - Set blocked modules
 
@@ -44,7 +48,7 @@ These settings can be configured at **Admin Panel → Settings → Code Executio
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `ENABLE_CODE_INTERPRETER` | `true` | Enable/disable code interpreter globally |
-| `CODE_INTERPRETER_ENGINE` | `pyodide` | Engine to use: `pyodide` (browser, recommended) or `jupyter` (server, legacy) |
+| `CODE_INTERPRETER_ENGINE` | `pyodide` | Engine to use: `pyodide` (browser, legacy) or `jupyter` (server, legacy). For full Python and shell access, use [Open Terminal](/features/open-terminal) instead. |
 | `CODE_INTERPRETER_PROMPT_TEMPLATE` | (built-in) | Custom prompt template for code interpreter |
 | `CODE_INTERPRETER_BLACKLISTED_MODULES` | `""` | Comma-separated list of blocked Python modules |
 
