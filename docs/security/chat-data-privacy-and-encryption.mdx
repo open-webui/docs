@@ -1,0 +1,192 @@
+---
+sidebar_position: 1510
+title: "Chat Data Privacy & Encryption"
+---
+
+# Chat Data Privacy & Encryption
+
+Open WebUI is self-hosted software. Your organization controls the server, database, storage, model connections, logs, backups, and network placement.
+
+Open WebUI can reduce chat-data exposure with database encryption, HTTPS/TLS, SSO/RBAC, admin-access controls, temporary chats, private models, and separate deployments for sensitive groups.
+
+Open WebUI's standard experience is designed for self-hosted control, auditability, history, search, RAG, tools, and administrative governance. The controls below help organizations decide where chat data is stored, who can access it through the product, which model endpoints receive prompts, and how long data is retained.
+
+## Controls by Concern
+
+| Concern | Best available measure |
+| :--- | :--- |
+| Reduce admin product access to employee chats | Set `ENABLE_ADMIN_CHAT_ACCESS=false` |
+| Control admin product exports | Set `ENABLE_ADMIN_EXPORT=false` |
+| Scope admin workspace list/selector visibility | Set `BYPASS_ADMIN_ACCESS_CONTROL=false` |
+| Production database storage exposure | Use PostgreSQL with encrypted volumes, provider encryption, TDE where available, TLS, and encrypted backups |
+| SQLite-only deployments | Use SQLCipher with `DATABASE_TYPE=sqlite+sqlcipher` |
+| Employees asking sensitive or personal questions | Use Temporary Chat, or force Temporary Chat for all users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` |
+| Keep prompts inside your infrastructure | Use local or private model endpoints and restrict approved models by group |
+| Sensitive documents being uploaded or indexed | Keep file upload and knowledge permissions off by default; grant only by group |
+| Control server-side code execution | Keep Tools and Functions restricted to trusted admins |
+| Chat content appearing in logs | Keep audit logging at metadata level unless body logging is explicitly approved |
+| Sharing control | Keep community sharing off by default and review chat-sharing permissions |
+| Different teams needing different trust boundaries | Run separate Open WebUI instances with separate databases, backups, credentials, operators, and model providers |
+
+## Recommended Baseline
+
+### Use PostgreSQL with Encrypted Storage
+
+For production deployments, use PostgreSQL and configure encryption at the PostgreSQL or storage layer. Use encrypted volumes, provider-managed encryption, TDE where available, TLS for database connections, encrypted backups, and network isolation.
+
+```bash
+DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
+```
+
+Database encryption protects data at rest. The running Open WebUI application uses the database key to serve authenticated users and normal product workflows.
+
+For SQLite-only deployments, SQLCipher can encrypt the local SQLite database file:
+
+```bash
+DATABASE_TYPE=sqlite+sqlcipher
+DATABASE_PASSWORD=your-secure-password
+```
+
+### Limit Admin Chat and Export Surfaces
+
+```bash
+ENABLE_ADMIN_CHAT_ACCESS=false
+ENABLE_ADMIN_EXPORT=false
+BYPASS_ADMIN_ACCESS_CONTROL=false
+```
+
+These reduce what admins can access through Open WebUI. Direct database, host, backup, and application-secret access should be limited to operators inside your approved trust boundary.
+
+### Use SSO and Restrict Accounts
+
+```bash
+ENABLE_LOGIN_FORM=false
+ENABLE_PASSWORD_AUTH=false
+ENABLE_PASSWORD_CHANGE_FORM=false
+DEFAULT_USER_ROLE=pending
+```
+
+Use your identity provider for MFA, conditional access, device posture, group membership, and user lifecycle. Use SCIM where possible.
+
+### Use Temporary Chat Where History Is Not Needed
+
+Temporary Chat reduces saved chat history. Enforced Temporary Chat can require this behavior for users instead of leaving it optional.
+
+To make Temporary Chat available by default:
+
+```bash
+USER_PERMISSIONS_CHAT_TEMPORARY=true
+```
+
+To force Temporary Chat for all users by default:
+
+```bash
+USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true
+```
+
+Relevant permissions:
+
+- **Chat > Temporary Chat**
+- **Chat > Enforced Temporary**
+
+Temporary Chat is a data-minimization control for saved history. The active prompt is still processed by Open WebUI and the configured model endpoint.
+
+### Keep Sensitive Prompts on Private Models
+
+For sensitive data, prefer local or private model endpoints controlled by your organization. Restrict external models by group and approve providers by data class.
+
+### Restrict Advanced Capabilities
+
+```bash
+USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=false
+USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS=false
+USER_PERMISSIONS_CHAT_FILE_UPLOAD=false
+ENABLE_DIRECT_CONNECTIONS=false
+ENABLE_COMMUNITY_SHARING=false
+ENABLE_API_KEYS=false
+```
+
+Grant advanced capabilities only to approved groups.
+
+### Keep Logs Metadata-Only by Default
+
+```bash
+AUDIT_LOG_LEVEL=METADATA
+ENABLE_AUDIT_STDOUT=true
+LOG_FORMAT=json
+```
+
+Use `REQUEST` or `REQUEST_RESPONSE` audit logging only when your log platform is approved for chat content.
+
+## Who Can Read Chat Data?
+
+### Regular Users
+
+Regular users can read their own chats and chats explicitly shared with them. Access is governed by roles, groups, permissions, and resource-level access grants.
+
+### Admin Users
+
+Admins have broad control by design. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` prevent casual access through Open WebUI product surfaces. Infrastructure-level access should be handled through operator trust, access review, and separation of duties.
+
+### Database, Host, and Backup Operators
+
+Operators with access to the database, host, persistent volumes, app secrets, or unencrypted backups are part of the chat-data trust boundary.
+
+For groups that require a separate operator trust boundary, use a separate Open WebUI instance with separate infrastructure and operators.
+
+### Model Providers
+
+If an external model provider is configured, prompts and context sent for inference may be visible to that provider. Use private/local models for data that should remain inside your infrastructure.
+
+## What Encryption Protects
+
+Encryption at rest helps protect against:
+
+- Lost or stolen disks.
+- Copied database files.
+- Misplaced volume snapshots.
+- Backup compromise, when backups are encrypted separately.
+- Some infrastructure compromises that stay outside live application secrets.
+
+Keep these paths inside your operational trust boundary:
+
+- The running Open WebUI application and its database key.
+- Database administrators with live query access.
+- Host operators with access to environment variables or mounted secrets.
+- Exports, logs, traces, and backups that contain chat data.
+- Model providers that receive prompts for inference.
+
+## Practical Deployment Patterns
+
+For general internal use:
+
+- Use SSO/MFA.
+- Encrypt the database and backups.
+- Limit admin chat access and exports.
+- Keep logs metadata-only.
+- Restrict external models and file uploads by group.
+
+For sensitive departments such as HR, legal, or regulated workloads:
+
+- Run a separate Open WebUI instance.
+- Use a separate database and backups.
+- Use separate operators and credentials.
+- Use private/local models.
+- Consider Enforced Temporary Chat, or enable it by default with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true`.
+
+For personal or highly sensitive employee questions:
+
+- Publish clear usage guidance.
+- Offer Temporary Chat, or require it for all users by default.
+- Route those prompts only to approved model providers.
+- Make clear who administers the system and what is retained.
+
+## Related Documentation
+
+- [Hardening Open WebUI](/getting-started/advanced-topics/hardening)
+- [HTTPS Reference](/reference/https)
+- [Database Encryption with SQLCipher](/reference/database-schema#database-encryption-with-sqlcipher)
+- [Authentication & Access](/features/authentication-access)
+- [RBAC Permissions](/features/authentication-access/rbac/permissions)
+- [Temporary Chat URL Parameter](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions)
+- [Enterprise Security](/enterprise/security)
