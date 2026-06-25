@@ -39,7 +39,7 @@ services:
     environment:
       ENABLE_WEB_SEARCH: True
       WEB_SEARCH_ENGINE: "youcom"
-      YOUCOM_API_KEY: "YOUR_API_KEY"
+      YDC_API_KEY: "YOUR_API_KEY"  # legacy YOUCOM_API_KEY also accepted
       WEB_SEARCH_RESULT_COUNT: 3
       WEB_SEARCH_CONCURRENT_REQUESTS: 10
 ```
