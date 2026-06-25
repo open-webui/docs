@@ -64,6 +64,10 @@ docker logs open-terminal
 ```
 :::
 
+:::note OpenShift
+For OpenShift restricted SCC, use `ghcr.io/open-webui/open-terminal:openshift` through Terminals. That image supports restricted non-root pods, but not runtime package installs, Docker socket access, the iptables egress firewall, or `OPEN_TERMINAL_MULTI_USER=true`.
+:::
+
   </TabItem>
   <TabItem value="bare-metal" label="Bare Metal">
 
