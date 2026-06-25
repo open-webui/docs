@@ -55,7 +55,7 @@ Open WebUI ships an optional **Context Compaction** feature that handles the com
 It is **disabled by default**. An administrator enables and tunes it in **Admin Panel > Settings > Interface**:
 
 - **Context Compaction**: the on/off toggle ([`ENABLE_CONTEXT_COMPACTION`](/reference/env-configuration#enable_context_compaction)).
-- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window.
+- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window. An individual model can compact sooner by setting a lower **Context Compaction Threshold** (`compact_token_threshold`) in its advanced parameters; the global value stays the ceiling.
 - **Context Compaction Prompt**: an optional custom summarization prompt ([`CONTEXT_COMPACTION_PROMPT_TEMPLATE`](/reference/env-configuration#context_compaction_prompt_template)); leave it empty for the built-in default. It supports `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
 
 This is the summarize-and-replace strategy (option 4 below), built in. If you need a different policy (hard caps, attachment-first trimming, per-model windows), use a filter Function instead.

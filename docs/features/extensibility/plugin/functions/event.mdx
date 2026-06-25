@@ -1,0 +1,271 @@
+---
+sidebar_position: 5
+title: "Event Function"
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 🔔 Event Function: React to System Events
+
+<ThemedImage
+  alt="Event functions react to system events: auth.signup, chat.deleted, system.startup and config.updated flow into an Open WebUI Event function"
+  sources={{
+    light: useBaseUrl('/images/banners/event-function-light.svg'),
+    dark: useBaseUrl('/images/banners/event-function-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+:::info New in 0.10.0
+Event functions are a new plugin primitive introduced in Open WebUI **0.10.0**.
+:::
+
+:::danger ⚠️ Critical Security Warning
+**Functions execute arbitrary Python code on your server**, and Event functions run automatically in response to system activity, not just when a user acts. Function creation is restricted to administrators. Only install from trusted sources and review code before importing. See the [Plugin Security Warning](/features/extensibility/plugin/).
+:::
+
+An **Event function** is the fourth function primitive, alongside [Pipe](./pipe), [Filter](./filter), and [Action](./action). Where those shape an individual chat request, an Event function runs custom Python **in response to events happening across Open WebUI**: a user signs up, a chat is deleted, a model is created, the server starts up, configuration changes, and so on.
+
+This turns Open WebUI from an app you configure into a platform you can program: lifecycle automation, audit logging, signup gating, provisioning, alerting, and integrations with external systems, all expressed as a single function.
+
+---
+
+## Basic Structure
+
+The type is auto-detected from a top-level `class Event`:
+
+```python
+"""
+title: Example Event
+author: open-webui
+version: 0.1
+"""
+
+from pydantic import BaseModel
+
+
+class Event:
+    class Valves(BaseModel):
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def event(
+        self,
+        event: dict,
+        __event_id__: str = None,
+        __event_name__: str = None,
+        __id__: str = None,
+        __app__=None,
+        __request__=None,
+    ):
+        print(f"event id:   {__event_id__}")
+        print(f"event name: {__event_name__}")
+        print(f"payload:    {event}")
+```
+
+Your `event()` handler is called for **every** system event. You decide what to act on by checking `__event_name__`.
+
+### The `event()` handler arguments
+
+| Argument | Description |
+| :--- | :--- |
+| `event` | The event payload (a `dict`): what changed, plus an `actor` (the user who triggered it, when applicable). Sensitive fields are redacted before the payload reaches your function. |
+| `__event_name__` | The event's name, for example `auth.signup` or `chat.deleted`. Use this to filter. |
+| `__event_id__` | A unique id for this specific event occurrence. |
+| `__id__` | The id of your Event function. |
+| `__app__` | The Open WebUI FastAPI application instance. This lets you register new API routes, read or update application state, and call internal services (see [Registering endpoints](#registering-endpoints-and-self-installing-plugins)). |
+| `__request__` | The current request, when the event was triggered by one. |
+
+### Filtering by event
+
+```python
+async def event(self, event: dict, __event_name__: str = None, **kwargs):
+    if __event_name__ == "auth.signup":
+        await self.on_signup(event)
+    elif __event_name__ == "system.startup.completed":
+        await self.on_startup()
+```
+
+---
+
+## The Event Catalog
+
+Open WebUI emits **170+ events** spanning every subsystem. Each name is namespaced as `<area>.<action>`. A representative selection:
+
+| Area | Example events |
+| :--- | :--- |
+| **System** | `system.startup.started`, `system.startup.completed`, `system.shutdown.started`, `system.shutdown.completed` |
+| **Auth** | `auth.signup`, `auth.login`, `auth.logout`, `auth.password_changed`, `auth.api_key.created` |
+| **Users & groups** | `user.created`, `user.deleted`, `user.role_updated`, `user.permissions_updated`, `group.member_added` |
+| **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `message.created`, `message.reaction_added` |
+| **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `prompt.created` |
+| **Knowledge & files** | `knowledge.created`, `knowledge.file.added`, `knowledge.reindexed`, `file.uploaded`, `file.deleted` |
+| **Plugins** | `tool.created`, `function.enabled`, `function.valves_updated`, `tool.valves_updated`, `skill.created` |
+| **Config** | `config.updated`, `config.models.updated`, `config.connections.updated`, `config.webhook.updated` |
+| **Other** | `channel.*`, `calendar.*`, `automation.*`, `memory.*`, `note.*`, `image.*`, `audio.*`, `terminal.*`, `feedback.*` |
+
+The authoritative, complete list is exposed by the backend event catalog and shown in **Admin Settings > Events** when configuring webhooks.
+
+---
+
+## Lifecycle Hooks (Startup & Shutdown)
+
+The `system.startup.completed` event fires once when the server is ready, and `system.shutdown.started` fires when it begins to stop. Use them for setup and teardown:
+
+```python
+async def event(self, event: dict, __event_name__: str = None, __app__=None, **kwargs):
+    if __event_name__ == "system.startup.completed":
+        # Apply a saved configuration, warm a cache, register routes, etc.
+        ...
+    elif __event_name__ == "system.shutdown.started":
+        # Flush buffers, close connections, etc.
+        ...
+```
+
+This is what makes Event functions a good fit for **self-applying configuration**: run the same setup on every startup using values your admin set in [Valves](#configuration-with-valves), so the whole configuration lives inside Open WebUI rather than in external scripts.
+
+---
+
+## Concurrency, multiple replicas, and exactly-once
+
+:::danger You are responsible for deduplication
+Open WebUI dispatches events **in-process on whichever instance handled the activity**, fire-and-forget: a failed handler is logged, not retried, and there is **no exactly-once guarantee and no coordination across replicas**. If your handler has a side effect that must happen once, you have to enforce that yourself.
+:::
+
+How often your `event()` runs depends on the event:
+
+- **Request-scoped events** (`auth.signup`, `chat.deleted`, `model.created`, …) fire on the **single** instance that handled that request. One signup, one handler call.
+- **Lifecycle events** (`system.startup.completed`, `system.shutdown.started`) fire on **every replica**, because every replica boots and shuts down independently. In a 4-replica deployment your startup handler runs **4 times**.
+
+So the classic footgun: an Event function that logs signups, sends a "server is up" alert, or provisions a resource on startup will do it **once per replica**, not once globally, the moment you scale past a single instance.
+
+The fix is a shared lock or idempotency key. In a correctly configured multi-instance deployment `REDIS_URL` is already set (websockets and shared caches require it), so use Redis to claim the work for exactly one replica:
+
+```python
+from open_webui.utils.redis import get_redis_connection
+from open_webui.env import REDIS_URL, REDIS_KEY_PREFIX
+
+_redis = get_redis_connection(REDIS_URL, decode_responses=True) if REDIS_URL else None
+
+
+def run_once(key: str, ttl: int = 300) -> bool:
+    # Redis SET NX EX: atomic "set if not exists" with expiry. Exactly one
+    # caller across all replicas gets True within the ttl window.
+    if _redis is None:
+        return True  # single process: nothing to coordinate with
+    return bool(_redis.set(f"{REDIS_KEY_PREFIX}:event:{key}", "1", nx=True, ex=ttl))
+
+
+class Event:
+    async def event(self, event: dict, __event_name__: str = None, **kwargs):
+        if __event_name__ == "system.startup.completed":
+            if run_once("startup-provision"):
+                await self.provision()          # runs on one replica only
+        elif __event_name__ == "auth.signup":
+            actor_id = (event.get("actor") or {}).get("id", "unknown")
+            if run_once(f"signup-log:{actor_id}"):
+                await self.log_signup(event)     # logged once, even if delivered twice
+```
+
+This is the same pattern, and the same caveats (key choice, `ttl`, the in-tree `RedisLock` helper for long-running work), documented for all plugin types under [Under the Hood → Concurrency and multiple instances](/features/extensibility/plugin/development/under-the-hood#concurrency-and-multiple-instances).
+
+---
+
+## Registering Endpoints and Self-Installing Plugins
+
+Because the handler receives `__app__` (the FastAPI application), an Event function can **register its own API routes** at startup and reach internal services. This unlocks patterns that previously needed an external service:
+
+- **Self-installing / self-configuring plugins.** On `system.startup.completed`, check whether a component is installed and configured, and if not, provision it by calling the admin endpoints, using values from your Valves. Admins configure everything from inside Open WebUI instead of fiddling with manual setup.
+- **Custom flows that span a request and an event.** For example, an **email-verification** flow: on `system.startup.completed` register a `/verify` endpoint; on `auth.signup` email the new user a tokenized link; when they click it and hit your endpoint, flip their role from `pending` to `user`. A complete activation flow with no external service, as one function.
+
+:::warning
+Registering routes and calling admin endpoints from a function is powerful and effectively unrestricted. Treat any Event function as trusted, server-level code.
+:::
+
+---
+
+## Configuration with Valves
+
+Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel → Functions → ⚙️**, not hard-coded.
+
+The `function.valves_updated` event also fires when an admin saves new Valve values, so a function can **react to its own configuration changing** and apply it live.
+
+---
+
+## Example Use Cases
+
+Event functions turn one-off admin chores and external glue scripts into configuration that lives inside Open WebUI. Because they receive `__app__`, they can read and write application state, call internal services, register routes, and run scheduled work, all gated by [Valves](#configuration-with-valves). The families below are a map of what that unlocks.
+
+:::info React, don't intercept
+An Event function runs **after** the activity it reacts to (the user is already created, the message already exists). It can respond, remediate, or notify, but it cannot block or rewrite the triggering action in-band. To validate or transform a chat request as it flows, use a [Filter](./filter); to gate a signup, hold the freshly created account as `pending` rather than trying to stop the request.
+:::
+
+### Onboarding and provisioning
+
+Fire on `auth.signup` / `user.created` to shape a new user's first five minutes, and on `system.startup.completed` to provision the instance itself.
+
+- **Welcome chat.** Create a pre-populated chat for the new user (with a getting-started message, links, and screenshots), then emit a socket event so it appears in their sidebar, optionally with a notification pointing them to it.
+- **Auto-group assignment.** Add the new user to Valve-configured default groups so they inherit the right models, channels, and permissions from day one.
+- **Apply interface defaults.** Push your admin-chosen UI defaults onto each new user's settings. Pair with `function.valves_updated` to re-apply across all existing users when you change the defaults, the configuration-as-data replacement for hand-editing each account.
+- **Email verification.** Register a `/verify` endpoint on startup, email the new user a tokenized link on signup, and flip their role from `pending` to `user` when they click it. A full activation flow with no external service (see [Registering Endpoints](#registering-endpoints-and-self-installing-plugins)).
+- **Seed starter content.** Create a starter knowledge base, a set of prompts, or a personal channel for each new user.
+
+### Access control and signup gating
+
+Because the account already exists when the event fires, gating means *holding or removing* it, not rejecting the request.
+
+- **Domain allowlist.** On `auth.signup`, check the email domain against a Valve allowlist, auto-approve matches, hold everyone else as `pending`.
+- **Disposable-email block.** Reject signups from known throwaway domains, on its own or combined with email verification for real signup hygiene.
+- **Burst defense.** Track signups per Valve-tuned window and auto-hold new accounts during a spike (bot-signup defense).
+- **Approval queue.** Post "User X wants access [Approve] / [Deny]" to Slack or Discord with buttons that hit a registered endpoint, so an admin approves from their phone with no Open WebUI login.
+
+### Lifecycle and housekeeping
+
+Register a periodic background task on `system.startup.completed` (see [Spawn a background task](/features/extensibility/plugin/development/under-the-hood#patterns)) and let it run on a schedule.
+
+- **Self-cleaning chats.** Archive or delete chats older than N days (Valve-configurable). The recurring "prune" job, built in.
+- **Orphaned-knowledge GC.** Periodically prune knowledge files no model references anymore.
+- **Offboarding cascade.** On `user.deleted`, revoke the user's API keys, reassign or purge their shared resources, and disable their automations. One event, clean teardown.
+- **Scheduled maintenance.** Any recurring upkeep your instance needs, scheduled from one place instead of an external cron box.
+
+### Compliance and audit
+
+- **Privilege-escalation alarm.** On `user.role_updated`, if an account is promoted to **admin**, raise a loud, multi-sink alert: post to an Open WebUI channel, email the admins, **and** write to your logging stack or SIEM. In a single-trust-domain instance a new admin is the single highest-signal security event there is, so make it impossible to miss, not a quiet log line.
+- **Immutable audit sink.** Subscribe to every event and ship a sanitized record to an append-only store (object-locked S3) or a SIEM. Tamper-evident audit logging, for free.
+- **Config-change alerts.** On `config.updated` / `config.models.updated`, diff old to new and post "Admin X changed the default model" to a compliance channel. Change management without a separate tool.
+- **Content flagging.** On `message.created`, scan content against a regex or classifier and flag or alert on secrets and PII. (To *redact or block* before a message is sent, use a [Filter](./filter) `outlet`, this is detection after the fact.)
+
+### Instance-as-code and fleet ops
+
+- **Bootstrap from manifest.** On `system.startup.completed`, read a Valve manifest (connectors, models, prompts, knowledge) and idempotently provision the whole instance to spec. New deployment, paste manifest, fully configured.
+- **Self-installing components.** On startup, check whether an integration is present and, if not, provision it by calling the admin endpoints with values from your Valves. One function becomes a one-click install-and-configure for a tool that previously needed manual setup.
+- **GitOps sync.** On startup and on a schedule, pull prompts, models, groups, and config from a central git repo and apply them, so a fleet of instances stays in lockstep.
+- **Backup on change.** On `config.updated`, snapshot config to external storage, or to the backend's persisted `/data` directory, for point-in-time recovery.
+- **Model retirement with reassignment.** Set a *retiring* model and a *destination* model in Valves; on `function.valves_updated`, rewrite every model definition (`base_model_id`) and every automation that still references the retiring model to point at the destination. Decommission a model without leaving dangling references or silently broken automations behind.
+
+### Operations and integrations
+
+- **Self-healing connectors.** On startup and periodically, health-check each connector, auto-disable a dead endpoint, and alert, so one down backend does not break the model picker for everyone.
+- **Notify-anything bridge.** Forward selected events to external services to make Open WebUI a node in a larger automation graph (n8n / Zapier style).
+- **Usage metering.** Accumulate per-user token usage from message events and push periodic reports to an external system. Token *counts* come from the events, but turning them into a currency budget or a hard spend cap needs an external price source, so a true cost circuit-breaker is event-function-**plus-external**, not event-function-only.
+- **Honeypot / intrusion detection.** Register decoy admin routes, then log and auto-deactivate anyone who probes them.
+
+:::warning One-time work runs once per replica
+Several of these (provisioning, welcome chat, scheduled jobs) must happen once globally, but `system.startup.completed` fires on **every** replica and request-scoped handlers can run concurrently. Guard at-most-once side effects with a distributed lock, see [Concurrency, multiple replicas, and exactly-once](#concurrency-multiple-replicas-and-exactly-once).
+:::
+
+---
+
+## Event Functions vs Event Webhooks
+
+There are two ways to react to events, for different needs:
+
+- **Event functions** (this page) run **Python** in-process. Use them when you need real logic: branching, calling internal services, registering endpoints, transforming data.
+- **Event webhooks** (configured in **Admin Settings > Events**) send selected events to **external HTTP endpoints as JSON**, or to chat destinations (Slack, Discord) as readable messages, filtered by event pattern and by user or group. Use them for simple "notify an external system" needs without writing code.
+
+:::info Breaking change in 0.10.0
+The single global notification webhook is being replaced by this per-event webhook system. Existing webhook configuration is migrated automatically into **Admin Settings > Events**. If you previously received a notification on every action (including page refreshes), you now choose exactly which events fire a webhook and where they go.
+:::

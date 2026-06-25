@@ -113,7 +113,7 @@ timeout 1800
 services:
   redis:
     image: redis:7-alpine
-    command: "redis-server --save 30 1 --maxclients 10000 --timeout 1800"
+    command: "redis-server --save 30 1 --appendonly yes --maxclients 10000 --timeout 1800 --maxmemory-policy noeviction"
     # ... rest of config
 ```
 
@@ -135,6 +135,47 @@ With proper `timeout` configuration, this number should fluctuate naturally (ris
 
 :::
 
+### Critical: Memory Eviction Policy
+
+:::danger
+
+**Do not give Open WebUI's Redis an `allkeys-*` eviction policy.**
+
+Open WebUI uses Redis as a **stateful store, not a disposable cache**. Its keys fall into two groups:
+
+- **TTL'd security keys** — token-revocation entries (`{prefix}:auth:token:<jti>:revoked`, set to expire exactly when the token would) and distributed locks (set with an expiry).
+- **Persistent operational keys** — the websocket **session** and **usage** pools (Redis hashes with no expiry) and cached configuration.
+
+Under an `allkeys-lru`, `allkeys-lfu`, or `allkeys-random` policy, Redis evicts **any** key when memory fills, including the two groups above. That can:
+
+- **silently un-revoke a signed-out token** — if the revocation key is evicted before its TTL, a token that was invalidated by logout, password change, or admin deactivation starts working again (a security regression), and
+- **break websockets, session tracking, and configuration** by evicting the persistent pools.
+
+Use **`noeviction`** (the safe default). When memory is exhausted, Redis rejects new writes with an error, which is a loud, recoverable signal, instead of silently discarding auth and session state:
+
+```conf
+maxmemory-policy noeviction
+```
+
+Open WebUI's Redis working set is small (sessions, revocations, locks, config), so with `maxmemory` left unset Redis simply uses what it needs and never evicts. Only set a `maxmemory` cap if you have a specific reason to, and if you do, alert on usage rather than relying on eviction.
+
+If you genuinely must cap memory **with** eviction, the only acceptable policies are `volatile-ttl` or `volatile-lru`: these evict **only** keys that carry a TTL (locks and revocations) and never the persistent pools. Be aware this can still drop a revocation early, so prefer adding RAM over enabling eviction.
+
+:::
+
+### Persistence
+
+The example command uses `--save 30 1` (an RDB snapshot every 30 minutes, if at least one key changed). On an **unclean** restart, Redis loses every write since the last snapshot, up to 30 minutes of token revocations and session state, so a crash can resurrect signed-out tokens and drop active sessions.
+
+For production, also enable the append-only file so durability is measured in seconds, not tens of minutes:
+
+```conf
+appendonly yes
+appendfsync everysec
+```
+
+`appendfsync everysec` flushes the AOF to disk once per second, bounding worst-case loss to roughly one second at a small, usually negligible I/O cost for Open WebUI's modest Redis workload. RDB and AOF coexist; keeping both gives fast restarts plus second-level durability. The example `command` in the next section already includes `--appendonly yes` and `--maxmemory-policy noeviction`.
+
 ## Setting up Redis
 
 To set up Redis for websocket support, you will need to create a `docker-compose.yml` file with the following contents:
@@ -146,7 +187,7 @@ services:
     container_name: redis
     volumes:
       - redis-data:/data
-    command: "redis-server --save 30 1 --maxclients 10000 --timeout 1800"
+    command: "redis-server --save 30 1 --appendonly yes --maxclients 10000 --timeout 1800 --maxmemory-policy noeviction"
     healthcheck:
       test: "[ $$(redis-cli ping) = 'PONG' ]"
       start_period: 5s
@@ -182,9 +223,9 @@ Notes
 
 The `ports` directive is not included in this configuration, as it is not necessary in most cases. The Redis service will still be accessible from within the Docker network by the Open WebUI service. However, if you need to access the Redis instance from outside the Docker network (e.g., for debugging or monitoring purposes), you can add the `ports` directive to expose the Redis port (e.g., `6379:6379`).
 
-The above configuration sets up a Redis container named `redis` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option saves the Redis database to disk every 30 minutes if at least 1 key has changed.
+The above configuration sets up a Redis container named `redis` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option writes an RDB snapshot every 30 minutes if at least 1 key has changed, and `--appendonly yes` adds the append-only log for second-level durability.
 
-**Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion. See the "Critical: Redis Server Configuration" section above for details.
+**Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion, and `--maxmemory-policy noeviction` stops Redis from silently evicting Open WebUI's session and token-revocation keys. See the [Critical: Redis Server Configuration](#critical-redis-server-configuration), [Memory Eviction Policy](#critical-memory-eviction-policy), and [Persistence](#persistence) sections above for details.
 
 :::
 
@@ -640,16 +681,32 @@ REDIS_KEY_PREFIX="openwebui-dev"
 - Redis memory usage increases over time
 - Container eventually runs out of memory
 
+:::danger
+Do **not** "fix" this with `--maxmemory-policy allkeys-lru`. Open WebUI's Redis holds token-revocation keys, session pools, and locks, not disposable cache. An `allkeys-*` policy can silently un-revoke a signed-out token and break sessions. See [Memory Eviction Policy](#critical-memory-eviction-policy).
+:::
+
+Continuously growing memory usually means key growth, not a missing eviction policy, so investigate the cause rather than masking it with eviction.
+
 **Solutions:**
 
-1. Configure Redis maxmemory policy:
+1. Find what is consuming memory and whether it is growing without bound:
 
-```yml
-   command: "redis-server --save 30 1 --maxmemory 256mb --maxmemory-policy allkeys-lru"
-```
+   ```bash
+   docker exec -it redis redis-cli info memory
+   docker exec -it redis redis-cli --bigkeys
+   docker exec -it redis redis-cli info keyspace   # key counts per DB
+   ```
 
-2. Monitor Redis memory: `docker exec -it redis redis-cli info memory`
-3. Clear old keys if needed: `docker exec -it redis redis-cli FLUSHDB`
+2. Confirm `timeout` is set (idle-connection accumulation also shows up as memory growth), per the [Critical: Redis Server Configuration](#critical-redis-server-configuration) section.
+
+3. If you must cap memory, set a `maxmemory` limit paired with **`noeviction`** so Redis fails writes loudly instead of dropping auth/session state, then alert on `used_memory`:
+
+   ```conf
+   maxmemory 512mb
+   maxmemory-policy noeviction
+   ```
+
+4. Avoid `FLUSHDB`/`FLUSHALL` on a live instance: it wipes active sessions, the revocation list, and locks. Restart the Redis container instead if you need to clear accumulated state during a maintenance window.
 
 #### Issue: "max number of clients reached" after days/weeks of operation
 

@@ -1,0 +1,67 @@
+---
+title: "Community Plugins"
+sidebar_position: 0
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 🧩 Community Plugins
+
+<ThemedImage
+  alt="The Open WebUI plugin community: Pipe, Tool, Action, Event, Filter and MCP plugin types orbiting the Open WebUI logo amid a constellation of community-built plugins"
+  sources={{
+    light: useBaseUrl('/images/banners/community-light.svg'),
+    dark: useBaseUrl('/images/banners/community-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+The [Open WebUI Community site](https://openwebui.com/) hosts hundreds of community-built Tools and Functions you can import into your instance in one click. This page is a beginner's map: how the library works, how to pick a plugin by what you want to do, and how to import safely.
+
+:::danger Highlighted does not mean vetted
+
+Being highlighted on this page, or **featured, popular, or listed on the Open WebUI Community site, is not an endorsement** and does **not** mean the code has been reviewed for security or quality. Listings are community-submitted and unaudited.
+
+Tools and Functions execute **arbitrary Python on your server**. A plugin's star count or placement tells you nothing about what its code actually does. Read the source before you import, every time. See the full [Plugin Security Warning](/features/extensibility/plugin/).
+
+:::
+
+## How the library works
+
+- **Browse** Tools and Functions at [openwebui.com](https://openwebui.com/), or [search](https://openwebui.com/search) by keyword.
+- **Import** with one click (or by pasting the source into the built-in editor). There is no `pip install` and no restart.
+- **Where they land:** imported **Tools** appear under **Workspace → Tools**, imported **Functions** under **Admin Panel → Functions**. Both are managed by administrators. For the difference between the two, see [Tools & Functions](/features/extensibility/plugin/).
+
+## Find a plugin by what you want to do
+
+The plugin *type* is not always obvious from the name, so start from the goal. Search the [community site](https://openwebui.com/search) for the terms below, then read the code before importing.
+
+| I want to... | Plugin type | Search the community site for |
+| :--- | :--- | :--- |
+| Give the model **live web search** or real-time data | [Tool](/features/extensibility/plugin/tools) | `web search`, `weather`, `search` |
+| **Add a model provider** (Anthropic, Gemini, a router, a local engine) | [Pipe](/features/extensibility/plugin/functions/pipe) | `pipe`, the provider name |
+| **Track or limit per-user cost / usage** | [Filter](/features/extensibility/plugin/functions/filter) | `cost`, `usage`, `budget`, `rate limit` |
+| **Redact PII** or moderate message content | [Filter](/features/extensibility/plugin/functions/filter) | `pii`, `redact`, `moderation` |
+| **Summarize or compact** long conversations | [Filter](/features/extensibility/plugin/functions/filter) | `context`, `memory`, `compaction` |
+| Add a **button on a message** (export, re-run, translate) | [Action](/features/extensibility/plugin/functions/action) | `action`, the task name |
+| **React to system events** (audit logging, signup gating, provisioning) | [Event](/features/extensibility/plugin/functions/event) | `event`, `webhook`, `audit` |
+| Connect an **existing HTTP service** | [OpenAPI / MCP server](/features/extensibility/mcp) | n/a (point Open WebUI at the spec) |
+
+Not sure which type fits? The [Which Extension Do I Need?](/features/extensibility#which-extension-do-i-need) table walks through it.
+
+## Before you import: a beginner safety checklist
+
+A community plugin runs with the same access as the rest of the server. Treat installing one like running someone else's script as an administrator. Before you import:
+
+1. **Read the code.** If you do not understand what it does, do not install it. Be especially wary of network calls to unfamiliar hosts, code that reads your `data` directory or environment variables, and anything obfuscated.
+2. **Check it only does what it claims.** A "translation" Action has no reason to phone home or read your database.
+3. **Look at `requirements:`.** Extra pip dependencies are installed at load time. Unknown packages are a supply-chain risk, and in multi-replica deployments runtime installs race across workers (set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and bake them into your image instead).
+4. **Try it on a non-production instance first**, then promote it once you trust it.
+5. **Restrict who can import.** Only trusted administrators should create or import plugins. Regular users should not have Workspace access unless they need it.
+
+For the deeper version of what a plugin can reach once loaded (and the footguns that come with it), see [Under the Hood](/features/extensibility/plugin/development/under-the-hood).
+
+## Sharing your own plugin
+
+Built something useful? Publish it to the community site so others can find and import it. The same caveat applies in reverse: a clear README and readable, auditable code are what earn trust, because no one is auditing it for you. Keep secrets in [Valves](/features/extensibility/plugin/development/valves) rather than hard-coding them, and write `async` handlers so your plugin stays compatible as the backend moves toward fully async execution.

@@ -19,13 +19,14 @@ Functions are stored in the database as Python source code, dynamically loaded a
 
 ## Function Types
 
-Open WebUI supports three types of Functions. The type is **auto-detected** from the class name in your Python code, so you never need to configure it manually.
+Open WebUI supports four types of Functions. The type is **auto-detected** from the class name in your Python code, so you never need to configure it manually.
 
 | Type | Class Name | What It Does | How Users See It |
 |:-----|:-----------|:-------------|:-----------------|
 | **Pipe** | `class Pipe` | Adds a custom model or agent | Appears as a selectable model in the chat sidebar |
 | **Filter** | `class Filter` | Intercepts data flowing to/from models | Runs transparently as middleware on existing models |
 | **Action** | `class Action` | Adds interactive buttons to messages | Appears as a clickable button on chat messages |
+| **Event** | `class Event` | Runs custom logic in response to system events | Runs in the background; no direct UI |
 
 ### Pipe Functions
 
@@ -62,13 +63,21 @@ Actions can do anything Python can do: summarize or translate a message, copy fo
 
 → **[Action Function Guide](./action)**
 
+### Event Functions
+
+*New in Open WebUI 0.10.0.*
+
+An Event function runs custom Python in response to **system events** (a user signs up, a chat is deleted, the server starts, configuration changes). Its `event()` method is called for every event and filters on the event name. Event functions can register their own API endpoints and call internal services, which suits them to lifecycle automation, audit logging, signup gating, provisioning, and self-installing plugins.
+
+→ **[Event Function Guide](./event)**
+
 ---
 
 ## How Functions Work
 
 ### Type Detection
 
-When you save a Function, Open WebUI scans the Python source code for a top-level class named `Pipe`, `Filter`, or `Action`. The first match determines the function type. You never need to manually set the type because it's inferred from the code.
+When you save a Function, Open WebUI scans the Python source code for a top-level class named `Pipe`, `Filter`, `Action`, or `Event`. The first match determines the function type. You never need to manually set the type because it's inferred from the code.
 
 ```
 # This is detected as a Pipe function:
@@ -217,6 +226,7 @@ Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Fil
 | [Pipe Function Guide](./pipe) | Build custom models, agents, and non-LLM interfaces |
 | [Filter Function Guide](./filter) | Intercept, translate, moderate, and log messages |
 | [Action Function Guide](./action) | Add buttons for export, workflows, and interactive tasks |
+| [Event Function Guide](./event) | Run custom logic in response to system events |
 | [Valves](/features/extensibility/plugin/development/valves) | Configure functions with admin and user settings |
 | [Events](/features/extensibility/plugin/development/events) | Send real-time updates to the UI |
 | [Reserved Arguments](/features/extensibility/plugin/development/reserved-args) | `__user__`, `__event_emitter__`, `__metadata__`, and more |

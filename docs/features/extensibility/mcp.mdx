@@ -75,6 +75,16 @@ Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-
 *   **OAuth 2.1**: Uses Dynamic Client Registration (DCR). Best when your MCP server supports registering OAuth clients automatically.
 *   **OAuth 2.1 (Static)**: Uses a pre-created client ID/client secret. Best when your provider does not support DCR, or when your security team requires manually managed credentials.
 
+:::info OAuth Resource Parameter
+With either OAuth mode, an **OAuth Resource Parameter** setting appears. It controls whether Open WebUI sends the OAuth `resource` parameter ([RFC 8707 resource indicators](https://datatracker.ietf.org/doc/html/rfc8707)) on the authorization and token requests:
+
+- **Automatic** (default): Open WebUI decides based on what the server advertises.
+- **Include**: always send the `resource` parameter. Use this if your provider requires it.
+- **Omit**: never send it. Use this if your provider rejects the request when the `resource` parameter is present.
+
+Leave it on **Automatic** unless OAuth fails and the provider's error or documentation points at the `resource` parameter.
+:::
+
 :::tip Choosing Between OAuth 2.1 and OAuth 2.1 (Static)
 
 - Start with **OAuth 2.1** if your server supports DCR.

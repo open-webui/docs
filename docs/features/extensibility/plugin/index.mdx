@@ -11,13 +11,15 @@ title: "Tools & Functions (Plugins)"
 
 1. **Only install from trusted sources.** Never import Tools or Functions from unknown or untrusted sources. Malicious code can compromise your entire system.
 
-2. **Review code before importing.** Before installing any community Tool or Function, review its source code. If you don't understand what it does, don't install it.
+2. **Featured does not mean vetted.** A plugin being highlighted, featured, popular, or listed on the [Open WebUI Community site](https://openwebui.com/) is **not** an endorsement and does **not** mean its code was reviewed for security or quality. Listings are community-submitted and unaudited. See [Community Plugins](/features/extensibility/plugin/community).
 
-3. **Protect your data directory.** The `data` directory (mounted at `/app/backend/data` in Docker) contains your database, configurations, and cached Tools/Functions. If an attacker gains write access to this directory, they can inject malicious code that will execute on your server.
+3. **Review code before importing.** Before installing any community Tool or Function, review its source code. If you don't understand what it does, don't install it.
 
-4. **Restrict Workspace access.** Only trusted administrators should have permission to create, import, or modify Tools and Functions. Regular users should **not** have Workspace access unless explicitly required.
+4. **Protect your data directory.** The `data` directory (mounted at `/app/backend/data` in Docker) contains your database, configurations, and cached Tools/Functions. If an attacker gains write access to this directory, they can inject malicious code that will execute on your server.
 
-5. **Audit installed plugins regularly.** Periodically review the Tools and Functions installed in your instance via **Workspace → Tools** and **Admin Panel → Functions**.
+5. **Restrict Workspace access.** Only trusted administrators should have permission to create, import, or modify Tools and Functions. Regular users should **not** have Workspace access unless explicitly required.
+
+6. **Audit installed plugins regularly.** Periodically review the Tools and Functions installed in your instance via **Workspace → Tools** and **Admin Panel → Functions**.
 
 **What could go wrong?** A malicious Tool or Function could exfiltrate data, install malware, mine cryptocurrency, pivot to other systems on your network, or corrupt your instance.
 

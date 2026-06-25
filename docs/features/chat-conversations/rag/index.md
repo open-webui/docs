@@ -35,6 +35,48 @@ Need to clean up multiple uploaded documents or audit your storage? You can now 
 
 You can also load documents into the workspace area with their access by starting a prompt with `#`, followed by a URL. This can help incorporate web content directly into your conversations.
 
+## External Knowledge Sources (External Vector Databases)
+
+:::warning Experimental
+This feature is experimental, and its configuration may change between releases.
+:::
+
+Instead of uploading and embedding documents inside Open WebUI, you can point a knowledge base at an **external vector database** you already maintain. Open WebUI queries it directly at chat time, so your documents, embeddings and indexing stay in your own store and are never re-ingested.
+
+Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Python client must be present in your Open WebUI image (for example `qdrant-client` or `pymilvus`).
+
+### Adding an external knowledge source
+
+Configure these under **Admin Settings > Integrations > External Knowledge Sources**:
+
+1. **Create a connection** to your vector database:
+   - **Provider** (Qdrant / Milvus / pgvector)
+   - **Endpoint** (the database URL)
+   - **API Key / Token** (if your database requires authentication)
+   - **Database** / **Table** / **Collection** (depending on the provider)
+   - **Timeout**
+2. **Map the result fields** so Open WebUI knows how to read your records. Each setting maps a field in your stored documents to what Open WebUI expects:
+
+   | Open WebUI field | Mapping setting | Default field |
+   | :--- | :--- | :--- |
+   | Chunk text | **Content Field** | `content` |
+   | Title | **Title Field** | `title` |
+   | Source | **Source Field** | `source` |
+   | URL | **URL Field** | `url` |
+   | Document ID | **Document ID Field** | `document_id` |
+   | Page | **Page Field** | `page` |
+   | Extra metadata | **Metadata Field** | `metadata` |
+   | Relevance score | **Score Field** | `score` |
+
+   Dotted paths are supported for nested fields (for example `payload.text`).
+3. **Test the query** with a sample question. Open WebUI runs a live retrieval against the source and shows the results. A successful test is required before you can create or save the source.
+
+Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. At chat time, Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
+
+:::info Embedding model must match
+Because Open WebUI embeds the query and searches your database by vector, the vectors stored in your external database must come from the **same embedding model** Open WebUI uses (matching model and dimensions). Mismatched embeddings produce poor or meaningless results.
+:::
+
 ## Web Search for RAG
 
 :::warning
