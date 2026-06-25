@@ -9,6 +9,8 @@ For enterprise organizations, AI adoption isn't just a technology decision, it's
 
 Open WebUI is built with security as a core priority. Whether you are navigating strict regulatory requirements or simply committed to protecting your organization's intellectual property, Open WebUI provides controls to help you deploy AI with confidence. As with any self-hosted software, the deploying organization is responsible for securing its environment, infrastructure, and configuration.
 
+For a detailed explanation of chat storage, administrator visibility, encryption at rest, temporary chats, model-provider exposure, and recommended controls, see [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption).
+
 ### Security Architecture
 
 #### Your Data, Your Infrastructure
