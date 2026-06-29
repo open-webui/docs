@@ -3,7 +3,19 @@ sidebar_position: 2
 title: "Notes"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 📝 Notes
+
+<ThemedImage
+  alt="Notes: a two-pane note editor with an AI chat sidebar, selecting text in the note and asking the AI to edit it in place"
+  sources={{
+    light: useBaseUrl('/images/banners/notes-light.svg'),
+    dark: useBaseUrl('/images/banners/notes-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Write, think, and refine with AI by your side.**
 
@@ -88,6 +100,8 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 
 The full content of the note is injected into the context window for that conversation.
 
+You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **folders** and **models** from the sidebar.
+
 ---
 
 ## Agentic Note Management
@@ -125,7 +139,7 @@ The sidebar Notes folder only appears when at least one note is pinned and the N
 
 :::info Pins are personal
 
-Pinning a note only affects **your** sidebar — collaborators with access to the same note can pin or unpin it independently without changing what you see. Pinned notes are listed in pin-time order (newest first), and toggling a pin no longer counts as an edit, so it does not bump the note's "Updated" timestamp. Pre-existing pins from before this change are kept for the note's owner only; other users will need to re-pin shared notes they want in their own sidebar.
+Pinning a note only affects **your** sidebar: collaborators with access to the same note can pin or unpin it independently without changing what you see. Pinned notes are listed in pin-time order (newest first), and toggling a pin no longer counts as an edit, so it does not bump the note's "Updated" timestamp. Pre-existing pins from before this change are kept for the note's owner only; other users will need to re-pin shared notes they want in their own sidebar.
 
 :::
 

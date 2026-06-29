@@ -7,7 +7,7 @@ title: "Tutorials"
 
 **Step-by-step guides for real-world scenarios, contributed by the Open WebUI community.**
 
-These tutorials walk through specific tasks — connecting identity providers, integrating developer tools, managing deployments, and more. Each guide covers a practical scenario you can follow from start to finish.
+These tutorials walk through specific tasks: connecting identity providers, integrating developer tools, managing deployments, and more. Each guide covers a practical scenario you can follow from start to finish.
 
 :::tip Where should I start?
 If you're looking for **initial setup**, see [Getting Started](/getting-started). For **feature documentation**, see [Features](/features). Tutorials are for when you already have Open WebUI running and want to **do more with it**.
@@ -37,7 +37,7 @@ Connect Open WebUI to LLM providers, monitoring platforms, developer tools, and 
 
 | Tutorial | What you'll achieve | Details |
 |----------|-------------------|---------|
-| [Azure OpenAI (Entra ID)](/tutorials/integrations/llm-providers/azure-openai) | Keyless authentication to Azure OpenAI | 👤 Admin · ⏱️ 30–60 min |
+| [Azure OpenAI (Entra ID)](/tutorials/integrations/llm-providers/azure-openai) | Keyless authentication to Azure OpenAI | 👤 Admin · ⏱️ 30 to 60 min |
 | [DeepSeek R1 Dynamic](/tutorials/integrations/llm-providers/deepseekr1-dynamic) | Run the full 671B DeepSeek-R1 via llama.cpp | 👤 Developer · ⏱️ 45 min |
 | [Intel GPU (IPEX-LLM)](/tutorials/integrations/llm-providers/ipex_llm) | Accelerate Ollama on Intel GPUs | 👤 Developer · ⏱️ 20 min |
 | [Helicone](/tutorials/integrations/monitoring/helicone) | Monitor LLM API calls, costs, and latency | 👤 Admin · ⏱️ 15 min |
@@ -57,7 +57,7 @@ Connect Open WebUI to LLM providers, monitoring platforms, developer tools, and 
 
 ## Maintenance
 
-Keep your deployment healthy — backups, storage, offline mode, and database management.
+Keep your deployment healthy: backups, storage, offline mode, and database management.
 
 | Tutorial | What you'll achieve | Details |
 |----------|-------------------|---------|

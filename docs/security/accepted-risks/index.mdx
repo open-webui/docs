@@ -1,0 +1,48 @@
+---
+sidebar_position: 0
+title: "⚖️ Accepted Risks"
+---
+
+# Known &amp; Accepted Risks
+
+**Residual risks that Open WebUI has assessed, mitigated as far as is technically possible, and then formally accepted.**
+
+Some weaknesses cannot be fully eliminated in application code. They are bounded by the programming language, the runtime, compiler and interpreter optimisations, the operating system, the CPU or the network, not by a defect Open WebUI can patch. For these we reduce the exploitable portion as far as application-level code allows, and then document the remainder here as a known, accepted risk.
+
+Each entry records what the risk is, what we changed to shrink it, why the remainder is not fixable by us, and how it sits within our [threat model](#threat-model).
+
+---
+
+## Why we accept these
+
+Accepting a residual risk is a deliberate engineering decision, not an oversight. A weakness is listed here only when both of the following hold:
+
+- The **exploitable portion has been mitigated** as far as application-level code allows, and the **residual that remains is bounded** and not reliably exploitable in practice.
+- **Eliminating that residual is not warranted**, for at least one of the following reasons:
+  - it is **not technically fixable** by us, arising from the language, runtime, operating system, CPU or network rather than from Open WebUI's own logic; or
+  - a further fix would carry a **real and disproportionate cost**, degrading or removing functionality that users legitimately depend on, or harming performance or correctness, in exchange for a marginal or illusory security benefit.
+
+In either case we document the residual and its limit explicitly, rather than implying a guarantee that cannot, or should not, be made.
+
+---
+
+## Threat Model
+
+Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** application. The risks listed here are evaluated inside that model:
+
+- All users are **authenticated** before reaching the affected functionality.
+- **Administrators** are trusted actors with full system control.
+- Reports are assessed against **default or stricter** configurations.
+
+A residual whose practical impact is dominated by network and scheduling noise, or that is only observable under conditions the threat model already excludes, is accepted rather than treated as a remediable defect. For the full model, see the [Security Policy](../security-policy).
+
+---
+
+## Accepted Risks
+
+{/* Add new accepted risks to the top of this table as pages are created. */}
+
+| Risk | Class | Mitigation | Status |
+| :--- | :--- | :--- | :--- |
+| [LLM output unpredictability](./llm-output-unpredictability) | Inherent model behavior (OWASP LLM01 family) | System hardened around the model; model bound by caller's privileges | Inherent to LLMs; out of scope as a vulnerability |
+| [Authentication timing side-channel](./auth-timing) | CWE-208, Observable Timing Discrepancy | bcrypt cost equalised across all sign-in paths | Mitigated, residual accepted |

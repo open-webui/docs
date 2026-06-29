@@ -12,7 +12,7 @@ Open WebUI provides powerful folder-based organization that turns simple chat co
 Folders are enabled by default. Administrators can control this feature via:
 
 - **Admin Panel**: The folders feature is controlled globally alongside other features.
-- **Environment Variable**: [`ENABLE_FOLDERS`](/reference/env-configuration#enable_folders) - Set to `True` (default) to enable or `False` to disable.
+- **Environment Variable**: [`ENABLE_FOLDERS`](/reference/env-configuration#enable_folders). Set to `True` (default) to enable or `False` to disable.
 
 ## Core Features
 
@@ -73,7 +73,7 @@ Assign a dedicated **System Prompt** to the folder that automatically applies to
 
 - The system prompt is **prepended to every new conversation** created in the folder.
 - This tailors the AI's behavior for specific tasks or personas.
-- System prompts are optional—you can use folders purely for organization without one.
+- System prompts are optional. You can use folders purely for organization without one.
 
 :::info
 
@@ -87,7 +87,26 @@ Link **knowledge bases and files** to your folder:
 
 - All attached files and knowledge bases are automatically included as **context** for every chat in the folder.
 - This enables RAG (Retrieval Augmented Generation) for all folder conversations.
-- Knowledge is optional—folders work for organization without any attached files.
+- Knowledge is optional. Folders work for organization without any attached files.
+
+## Sharing Folders
+
+Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
+
+1. Hover over a folder in the sidebar and open the **three-dot menu** (⋯).
+2. Select **Share**.
+3. Add the users or groups to share with and choose their access:
+   - **Read**: they can open the folder and read its chats.
+   - **Write**: they can also rename the folder, add chats and create subfolders inside it.
+4. Save.
+
+Shared folders appear in the recipient's sidebar. A few rules to know:
+
+- **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
+- **Only the owner or an admin can delete a shared root folder** or change who it is shared with. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
+- **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
+
+Folder sharing is gated by the **Folders Sharing** permission, which is off by default. An administrator enables it per group under **Admin Panel > Users > Groups > Permissions**, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
 ## Example Use Case
 
@@ -102,7 +121,7 @@ Imagine you're working on a Python development project:
    ```
 3. **Attach Knowledge** by linking your project's technical specification PDF or library documentation.
 4. **Click on the folder** to select it as your active workspace.
-5. **Start chatting** — every new conversation will have:
+5. **Start chatting**: every new conversation will have:
    - The expert Python persona
    - Access to your project documents
    - Automatic organization in the folder
@@ -129,3 +148,4 @@ If you frequently discuss topics like "marketing" or "development," tag conversa
 |---------|-------------|
 | [`ENABLE_FOLDERS`](/reference/env-configuration#enable_folders) | Enable/disable the folders feature globally (Default: `True`) |
 | [`USER_PERMISSIONS_FEATURES_FOLDERS`](/reference/env-configuration#user_permissions_features_folders) | Control user-level access to the folders feature (Default: `True`) |
+| [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing) | Allow users to share folders with specific users or groups (Default: `False`) |

@@ -5,7 +5,11 @@ title: "File Browser"
 
 # The File Browser
 
-When Open Terminal is connected, a **file browser** appears in the sidebar of your chat. It works like the file explorer on your computer — you can browse folders, open files, upload things, and download results. Everything the AI creates shows up here automatically.
+When Open Terminal is connected, a **file browser** appears in the sidebar of your chat. It works like the file explorer on your computer. You can browse folders, open files, upload things, and download results. Everything the AI creates shows up here automatically.
+
+:::tip Auto-open behavior
+By default the file browser opens automatically when you select a terminal. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
+:::
 
 ![Chat interface with the file browser sidebar](/images/open-terminal-file-browser.png)
 
@@ -33,12 +37,12 @@ Source code and text files are shown with syntax highlighting and line numbers.
 ![Python code with syntax highlighting and line numbers](/images/open-terminal-preview-code.png)
 
 ### PDFs
-PDF documents render directly in the browser — you can read them without downloading.
+PDF documents render directly in the browser, so you can read them without downloading.
 
 ![File browser with rendered markdown preview](/images/open-terminal-preview-markdown.png)
 
 ### Spreadsheets (CSV, TSV)
-Data files render as **formatted tables** with headers and clean rows — much easier to read than raw comma-separated text.
+Data files render as **formatted tables** with headers and clean rows, much easier to read than raw comma-separated text.
 
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
@@ -56,7 +60,7 @@ Images display inline at a comfortable size.
 
 ## Uploading files
 
-**Drag and drop** files from your computer directly onto the file browser to upload them. This is how you share data with the AI — drop a spreadsheet, a PDF, an image, or any file you want the AI to work with.
+**Drag and drop** files from your computer directly onto the file browser to upload them. This is how you share data with the AI: drop a spreadsheet, a PDF, an image, or any file you want the AI to work with.
 
 ![File browser showing uploaded files with names and sizes](/images/open-terminal-file-browser-home.png)
 
@@ -76,7 +80,7 @@ Click the **download button** on any file to save it to your computer. This is h
 
 ## Editing files
 
-Click the **edit icon** on any text file to open it in an editor. Make your changes and save. This is handy for quick fixes — editing a config value, correcting a typo, or tweaking something the AI generated.
+Click the **edit icon** on any text file to open it in an editor. Make your changes and save. This is handy for quick fixes: editing a config value, correcting a typo, or tweaking something the AI generated.
 
 ![Editing a file directly in the file browser](/images/open-terminal-preview-code.png)
 
@@ -106,9 +110,9 @@ If you have more than one terminal connected, switching between them in the drop
 
 ## More things to try
 
-- **[Analyze documents & data →](./use-cases/file-analysis)** — drag in a spreadsheet or PDF and ask about it
-- **[Run code from chat →](./use-cases/code-execution)** — the AI creates files you can see here
-- **[Build & preview websites →](./use-cases/web-development)** — the files the AI creates appear in the browser
+- **[Analyze documents & data →](./use-cases/file-analysis)**: drag in a spreadsheet or PDF and ask about it
+- **[Run code from chat →](./use-cases/code-execution)**: the AI creates files you can see here
+- **[Build & preview websites →](./use-cases/web-development)**: the files the AI creates appear in the browser
 
 :::tip
 Want to browse and edit your real files from any device? [**cptr**](https://github.com/open-webui/computer) puts your entire machine in a browser tab, with a full file browser, terminal, git, and editor.

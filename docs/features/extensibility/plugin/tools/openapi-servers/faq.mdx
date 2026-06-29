@@ -50,25 +50,25 @@ It is important to set a custom operationId for all endpoints.
 
 **A:** OpenAPI wins over MCP in most real-world scenarios due to its simplicity, tooling ecosystem, stability, and developer-friendliness. Here's why:
 
-- ✅ **Reuse Your Existing Code**: If you’ve built REST APIs before, you're mostly done—you don’t need to rewrite your logic. Just define a compliant OpenAPI spec and expose your current code as a tool server.
+- ✅ **Reuse Your Existing Code**: If you’ve built REST APIs before, you're mostly done: you don’t need to rewrite your logic. Just define a compliant OpenAPI spec and expose your current code as a tool server.
 
   With MCP, you had to reimplement your tool logic inside a custom protocol layer, duplicating work and increasing the surface area to maintain.
 
-- 💼 **Less to Maintain & Debug**: OpenAPI fits naturally into modern dev workflows. You can test endpoints with Postman, inspect logs with built-in APIs, troubleshoot easily with mature ecosystem tools—and often without modifying your core app at all.
+- 💼 **Less to Maintain & Debug**: OpenAPI fits naturally into modern dev workflows. You can test endpoints with Postman, inspect logs with built-in APIs, troubleshoot easily with mature ecosystem tools, and often without modifying your core app at all.
 
   MCP introduced new layers of transport, schema parsing, and runtime quirks, all of which had to be debugged manually.
 
 - 🌍 **Standards-Based**: OpenAPI is widely adopted across the tech industry. Its well-defined structure means tools, agents, and servers can interoperate immediately, without needing special bridges or translations.
 
-- 🧰 **Better Tooling**: There’s an entire universe of tools that support OpenAPI—automatic client/server generation, documentation, validation, mocking, testing, and even security audit tools.
+- 🧰 **Better Tooling**: There’s an entire universe of tools that support OpenAPI: automatic client/server generation, documentation, validation, mocking, testing, and even security audit tools.
 
-- 🔐 **First-Class Security Support**: OpenAPI includes native support for things like OAuth2, JWTs, API Keys, and HTTPS—making it easier to build secure endpoints with common libraries and standards.
+- 🔐 **First-Class Security Support**: OpenAPI includes native support for things like OAuth2, JWTs, API Keys, and HTTPS, making it easier to build secure endpoints with common libraries and standards.
 
 - 🧠 **More Devs Already Know It**: Using OpenAPI means you're speaking a language already familiar to backend teams, frontend developers, DevOps, and product engineers. There’s no learning curve or costly onboarding required.
 
-- 🔄 **Future-Proof & Extensible**: OpenAPI evolves with API standards and is designed for forward compatibility. MCP, by contrast, was less standardized—often requiring changes as the surrounding ecosystem changed.
+- 🔄 **Future-Proof & Extensible**: OpenAPI evolves with API standards and is designed for forward compatibility. MCP, by contrast, was less standardized, often requiring changes as the surrounding ecosystem changed.
 
-🧵 Bottom line: OpenAPI lets you do more with less effort, less code duplication, and fewer surprises. It’s a production-ready, developer-friendly route to powering LLM tools—without rebuilding everything from scratch.
+🧵 Bottom line: OpenAPI lets you do more with less effort, less code duplication, and fewer surprises. It’s a production-ready, developer-friendly route to powering LLM tools, without rebuilding everything from scratch.
 
 ---
 
@@ -103,7 +103,7 @@ Use HTTPS in production to encrypt data in transit, and restrict endpoints with 
 
 **A:** Absolutely. Each tool server runs independently and exposes its own OpenAPI schema. Your agent configuration can point to multiple tool servers, allowing you to mix and match based on need.
 
-There's no limit—just ensure each server runs on its own port or address and is reachable by the agent host.
+There's no limit: just ensure each server runs on its own port or address and is reachable by the agent host.
 
 ---
 
@@ -149,9 +149,9 @@ Just make sure they’re securely configured and publicly reachable (or VPN'd) i
 
 #### 🧪 Q: What if I have an existing MCP server?
 
-**A:** Great news! You can use our MCP-to-OpenAPI Bridge: [mcpo](https://github.com/open-webui/mcpo), exposing your existing MCP-based tools as OpenAPI-compatible APIs is now easier than ever. No rewrites, no headaches — just plug and go! 🚀
+**A:** Great news! You can use our MCP-to-OpenAPI Bridge: [mcpo](https://github.com/open-webui/mcpo), exposing your existing MCP-based tools as OpenAPI-compatible APIs is now easier than ever. No rewrites, no headaches, just plug and go! 🚀
 
-If you've already built tools using the MCP protocol, `mcpo` helps you instantly unlock compatibility with Open WebUI and any OpenAPI-based agent — helping keep your hard work accessible and future-ready.
+If you've already built tools using the MCP protocol, `mcpo` helps you instantly unlock compatibility with Open WebUI and any OpenAPI-based agent, helping keep your hard work accessible and future-ready.
 
 [Check out the optional Bridge to MCP section in the docs for setup instructions.](https://github.com/open-webui/openapi-servers?tab=readme-ov-file#-bridge-to-mcp-optional)
 
@@ -160,13 +160,13 @@ If you've already built tools using the MCP protocol, `mcpo` helps you instantly
 uvx mcpo --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
 ```
 
-✨ That’s it — your MCP server is now OpenAPI-ready!
+✨ That’s it, your MCP server is now OpenAPI-ready!
 
 ---
 
 #### 🗂️ Q: Can one OpenAPI server implement multiple tools?
 
-**A:** Yes. A single OpenAPI server can offer multiple related capabilities grouped under different endpoints. For example, a document server may provide search, upload, OCR, and summarization—all within one schema.
+**A:** Yes. A single OpenAPI server can offer multiple related capabilities grouped under different endpoints. For example, a document server may provide search, upload, OCR, and summarization, all within one schema.
 
 You can also modularize completely by creating one OpenAPI server per tool if you prefer isolation and flexibility.
 

@@ -28,8 +28,8 @@ The following table lists the available URL parameters, their function, and exam
 - **Description**: The `models` and `model` parameters allow you to specify which [language models](/features/workspace/models) should be used for a particular chat session.
 - **How to Set**: You can use either `models` for multiple models or `model` for a single model.
 - **Example**:
-  - `/?models=model1,model2` – This initializes the chat with `model1` and `model2`.
-  - `/?model=model1` – This sets `model1` as the sole model for the chat.
+  - `/?models=model1,model2`: This initializes the chat with `model1` and `model2`.
+  - `/?model=model1`: This sets `model1` as the sole model for the chat.
 
 ### 2. **YouTube Transcription**
 
@@ -47,7 +47,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 4. **Web Search**
 
-- **Description**: Enabling `web-search` allows the chat session to access [web search](/category/web-search/) functionality.
+- **Description**: Enabling `web-search` allows the chat session to access [web search](/features/chat-conversations/web-search) functionality.
 - **How to Set**: Set this parameter to `true` to enable web search.
 - **Example**: `/?web-search=true`
 - **Behavior**: If enabled, the chat can retrieve web search results as part of its responses.

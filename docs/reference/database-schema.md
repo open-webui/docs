@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.9.6.
+> This documentation reflects schema changes up to Open WebUI v0.10.0.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -66,7 +66,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 10      | chat_file        | Links files to chats and messages                            |
 | 11      | chatidtag        | Maps relationships between chats and their associated tags   |
 | 12      | config           | Maintains system-wide configuration settings                 |
-| 13      | document         | Stores documents and their metadata for knowledge management |
+| 13      | document         | **Legacy.** Pre-Knowledge documents table; data migrated to `knowledge` and no longer used (see note below) |
 | 14      | feedback         | Captures user feedback and ratings                           |
 | 15      | file             | Manages uploaded files and their metadata                    |
 | 16      | folder           | Organizes files and content into hierarchical structures     |
@@ -92,11 +92,14 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 36      | automation       | Stores user-defined scheduled automations                    |
 | 37      | automation_run   | Stores execution history for automation runs                 |
 | 38      | pinned_note      | Tracks per-user note pins (each row = one user pinning one note) |
+| 39      | chat_message     | Normalized per-message store for chat conversations              |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
 - Alembic Version table
 - Migrate History table
+
+Note on the `document` table: it is a **legacy** table from before the Knowledge feature. Its rows were migrated into the `knowledge` table (migration `6a39f3d8e55c`) and nothing writes to it anymore, but no migration drops it, so it may still be present (empty) in databases that predate the Knowledge feature. There is no backing model for it in current code.
 
 Now that we have all the tables, let's understand the structure of each table.
 
@@ -205,6 +208,7 @@ Things to know about the chat table:
 - `tasks` and `summary` support structured planning/status UX in chat sessions.
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
+- A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
 
@@ -224,6 +228,37 @@ Things to know about the shared_chat table:
 - Each row is an immutable snapshot of the original chat at the time of sharing (or last re-share). The snapshot is updated when the user clicks "Update and Copy Link".
 - Deleting the original chat cascades to delete the shared snapshot.
 - Access control for shared chats is managed via the `access_grant` table with `resource_type = 'shared_chat'`.
+
+## Chat Message Table
+
+The `chat_message` table is the **normalized per-message store** for chat conversations: one row per message, separate from the JSON history blob in `chat.chat` and distinct from the channel [Message Table](#message-table) (which holds channel/thread messages, not chat-model turns).
+
+| **Column Name** | **Data Type** | **Constraints**                          | **Description**                                          |
+| --------------- | ------------- | ---------------------------------------- | -------------------------------------------------------- |
+| id              | Text          | PRIMARY KEY                              | Unique identifier (UUID)                                 |
+| chat_id         | Text          | FOREIGN KEY(chat.id) CASCADE, NOT NULL   | Parent chat                                              |
+| user_id         | Text          | indexed                                  | Author of the message                                   |
+| role            | Text          | NOT NULL                                 | Message role: `user`, `assistant`, or `system`           |
+| parent_id       | Text          | nullable                                 | Parent message id (for branched conversations)           |
+| content         | JSON          | nullable                                 | Message content (a string or a list of content blocks)   |
+| output          | JSON          | nullable                                 | Generated output payload                                 |
+| model_id        | Text          | nullable, indexed                        | Model that produced the message                          |
+| files           | JSON          | nullable                                 | Attached files                                           |
+| sources         | JSON          | nullable                                 | Retrieval/citation sources                              |
+| embeds          | JSON          | nullable                                 | Embedded artifacts                                       |
+| done            | Boolean       | default=True                             | Whether generation completed                             |
+| status_history  | JSON          | nullable                                 | Streamed status updates during generation                |
+| error           | JSON          | nullable                                 | Error payload when generation failed                     |
+| usage           | JSON          | nullable                                 | Token/usage statistics                                   |
+| context_summary | Text          | nullable                                 | Per-message context summary (added in v0.10.0)           |
+| created_at      | BigInteger    | indexed                                  | Creation timestamp                                       |
+| updated_at      | BigInteger    | -                                        | Last update timestamp                                    |
+
+Things to know about the chat_message table:
+
+- Deleting a chat cascades to delete its messages (`chat_id` foreign key with `ON DELETE CASCADE`).
+- Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
+- `context_summary` was added in v0.10.0 (migration `4c5ce3d2f27f`) to store a summary of the message's context.
 
 ## Automation Table
 
@@ -279,7 +314,7 @@ Things to know about the calendar table:
 
 - Indexed on `user_id` for efficient per-user calendar listing.
 - A default "Personal" calendar is auto-created on first access.
-- The "Scheduled Tasks" calendar is **virtual** — it is not stored in this table. Instead, the API synthesizes it at response time (with constant ID `__scheduled_tasks__`) for users who have Automations access. Automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
+- The "Scheduled Tasks" calendar is **virtual**: it is not stored in this table. Instead, the API synthesizes it at response time (with constant ID `__scheduled_tasks__`) for users who have Automations access. Automation RRULE future runs and past execution records are rendered as virtual events on this calendar.
 - Access control is managed via the `access_grant` table with `resource_type = 'calendar'`, enabling calendar sharing between users and groups.
 - A user can only delete non-default calendars. Deleting a calendar cascades to all its events, attendees, and access grants.
 
@@ -366,13 +401,19 @@ Things to know about the chat_file table:
 
 ## Config
 
-| **Column Name** | **Data Type** | **Constraints** | **Default**       | **Description**        |
-| --------------- | ------------- | --------------- | ----------------- | ---------------------- |
-| id              | INTEGER       | NOT NULL        | -                 | Primary key identifier |
-| data            | JSON          | NOT NULL        | -                 | Configuration data     |
-| version         | INTEGER       | NOT NULL        | -                 | Config version number  |
-| created_at      | DATETIME      | NOT NULL        | CURRENT_TIMESTAMP | Creation timestamp     |
-| updated_at      | DATETIME      | -               | CURRENT_TIMESTAMP | Last update timestamp  |
+As of v0.10.0 the config table is **per-key**: every setting is its own row keyed by a dot-notation path, replacing the previous single-row JSON blob.
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                                          |
+| --------------- | ------------- | --------------- | -------------------------------------------------------- |
+| key             | Text          | PRIMARY KEY     | Config key in dot notation (e.g. `audio.stt.engine`)     |
+| value           | JSON          | NOT NULL        | The stored value for this key                            |
+| updated_at      | BigInteger    | nullable        | Last update timestamp (epoch)                            |
+
+Things to know about the config table:
+
+- Reshaped in migration `3ff2c63645b8`. The old single-row schema (`id` INTEGER PK, `data` JSON, `version` INTEGER, `created_at`/`updated_at` DATETIME) was migrated by exploding the JSON blob into one row per key.
+- The pre-migration table is preserved as **`config_old`** (renamed, not dropped) so the change is reversible; it is not used at runtime.
+- Reads/writes go through individual keys, which avoids rewriting the entire configuration blob on every change.
 
 ## Feedback Table
 
@@ -454,7 +495,7 @@ Things to know about the folder table:
 
 Things to know about the function table:
 
-- `type` can only be: ["filter", "action"]
+- `type` is one of: `pipe`, `filter`, `action`, `event` (the `event` type was added in v0.10.0). The type is auto-detected from the top-level class name in the function's source code.
 
 ## Group Table
 
@@ -522,13 +563,21 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 
 ## Memory Table
 
-| **Column Name** | **Data Type** | **Constraints** | **Description**          |
-| --------------- | ------------- | --------------- | ------------------------ |
-| id              | String        | PRIMARY KEY     | Unique identifier (UUID) |
-| user_id         | String        | -               | Memory owner             |
-| content         | Text          | -               | Memory content           |
-| created_at      | BigInteger    | -               | Creation timestamp       |
-| updated_at      | BigInteger    | -               | Last update timestamp    |
+| **Column Name** | **Data Type** | **Constraints**            | **Description**          |
+| --------------- | ------------- | -------------------------- | ------------------------ |
+| id              | String        | PRIMARY KEY                | Unique identifier (UUID) |
+| user_id         | String        | indexed                    | Memory owner             |
+| type            | String        | default `context`, indexed | Memory type: `user` or `context` (added in v0.10.0) |
+| path            | Text          | nullable                   | Optional path for organizing memories into a hierarchy (added in v0.10.0) |
+| content         | Text          | -                          | Memory content           |
+| meta            | JSON          | nullable                   | Optional metadata (added in v0.10.0) |
+| created_at      | BigInteger    | -                          | Creation timestamp       |
+| updated_at      | BigInteger    | -                          | Last update timestamp    |
+
+Things to know about the memory table:
+
+- `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
+- `path` and `meta` (added in a later v0.10.0 migration) back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
 
 ## Message Table
 
@@ -581,11 +630,11 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
 
-Pin state is no longer stored on this table — the legacy `is_pinned` column was removed in migration `4de81c2a3af1` and replaced by a per-user [Pinned Note Table](#pinned-note-table). Pre-existing pins were backfilled to the note owner; the API surfaces `is_pinned` as a per-request join against the calling user's rows.
+Pin state is no longer stored on this table. The legacy `is_pinned` column was removed in migration `4de81c2a3af1` and replaced by a per-user [Pinned Note Table](#pinned-note-table). Pre-existing pins were backfilled to the note owner; the API surfaces `is_pinned` as a per-request join against the calling user's rows.
 
 ## Pinned Note Table
 
-Per-user note pins. Each row records that one user has pinned one note for their own sidebar — pinning is private and does not affect any other user with access to the same note.
+Per-user note pins. Each row records that one user has pinned one note for their own sidebar. Pinning is private and does not affect any other user with access to the same note.
 
 | **Column Name** | **Data Type** | **Constraints**                                      | **Description**                                  |
 | --------------- | ------------- | ---------------------------------------------------- | ------------------------------------------------ |
@@ -771,6 +820,7 @@ erDiagram
     %% Content Relationships
     message ||--o{ message_reaction : "has"
     chat ||--o{ tag : "tagged_with"
+    chat ||--o{ chat_message : "contains"
     chat ||--o{ shared_chat : "shared_via"
     chat }|--|| folder : "organized_in"
     calendar ||--o{ calendar_event : "contains"
@@ -823,6 +873,22 @@ erDiagram
         json chat
         bigint created_at
         bigint updated_at
+    }
+
+    chat_message {
+        text id PK
+        text chat_id FK
+        text user_id FK
+        text role
+        text parent_id FK
+        json content
+        json output
+        text model_id
+        json files
+        json sources
+        boolean done
+        json usage
+        text context_summary
     }
 
     calendar {
@@ -954,7 +1020,10 @@ erDiagram
     memory {
         string id PK
         string user_id FK
+        string type
+        text path
         text content
+        json meta
     }
 
     model {
@@ -1091,10 +1160,10 @@ When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open
 
 To use SQLCipher with existing data, you must either:
 
-1. **Start fresh** - Enable SQLCipher on a new installation and have users export/re-import their chats manually
-2. **Manual database migration** - Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
-3. **Use filesystem-level encryption** - Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
-4. **Switch to PostgreSQL** - For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
+1. **Start fresh**: Enable SQLCipher on a new installation and have users export/re-import their chats manually
+2. **Manual database migration**: Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
+3. **Use filesystem-level encryption**: Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
+4. **Switch to PostgreSQL**: For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
 
 :::
 

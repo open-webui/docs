@@ -19,9 +19,9 @@ Describe what you want and get a working app with frontend, backend, and databas
 5. Starts the server and tests every endpoint
 6. The port preview shows the running app
 
-{/* TODO: Screenshot — The port preview showing a polished dashboard: summary cards (Total Items: 156, Total Value: $24,350, Low Stock: 3), a bar chart by category, and a searchable product table. */}
+{/* TODO: Screenshot: The port preview showing a polished dashboard: summary cards (Total Items: 156, Total Value: $24,350, Low Stock: 3), a bar chart by category, and a searchable product table. */}
 
-{/* TODO: Screenshot — File browser showing the project structure: app.py, database.py, templates/, static/. */}
+{/* TODO: Screenshot: File browser showing the project structure: app.py, database.py, templates/, static/. */}
 
 ## Skill content
 

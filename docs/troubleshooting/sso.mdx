@@ -16,7 +16,7 @@ Most OAuth flows require the application's external URL ("redirect URI") so the 
 
 :::tip
 
-Check for typos — OAuth is strict. URLs must match exactly, including `https://`.
+Check for typos. OAuth is strict. URLs must match exactly, including `https://`.
 
 :::
 
@@ -31,7 +31,7 @@ This is the **most common cause** of OAuth breakage. A misspelled, omitted, or i
 - `OIDC_CONFIG` → Use `OPENID_PROVIDER_URL` instead
 - `WEBUI_OIDC_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
 - `WEBUI_ENABLE_SSO` → Use `ENABLE_OAUTH_SIGNUP` instead
-- `WEBUI_AUTH_TYPE` → This doesn't exist - configure provider-specific variables instead
+- `WEBUI_AUTH_TYPE` → This doesn't exist; configure provider-specific variables instead
 - `OPENID_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
 - `OPENID_CLIENT_SECRET` → Use `OAUTH_CLIENT_SECRET` instead
 
@@ -142,8 +142,8 @@ OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.w
 
 **Important:** Open WebUI has **two** persistence settings that affect OAuth:
 
-1. **`ENABLE_PERSISTENT_CONFIG`** (defaults to **`true`**) — Controls whether *all* settings (including OAuth) are loaded from the database rather than environment variables, once they've been saved to the DB.
-2. **`ENABLE_OAUTH_PERSISTENT_CONFIG`** (defaults to **`false`**) — An *additional* gate specifically for OAuth settings. When set to `false`, OAuth settings with a config path starting with `oauth.` are **not** loaded from the database, even if `ENABLE_PERSISTENT_CONFIG` is `true`.
+1. **`ENABLE_PERSISTENT_CONFIG`** (defaults to **`true`**): Controls whether *all* settings (including OAuth) are loaded from the database rather than environment variables, once they've been saved to the DB.
+2. **`ENABLE_OAUTH_PERSISTENT_CONFIG`** (defaults to **`false`**): An *additional* gate specifically for OAuth settings. When set to `false`, OAuth settings with a config path starting with `oauth.` are **not** loaded from the database, even if `ENABLE_PERSISTENT_CONFIG` is `true`.
 
 By default, OAuth env vars **will** take priority over database values because `ENABLE_OAUTH_PERSISTENT_CONFIG` defaults to `false`. However, if you previously configured OAuth through the Admin Panel, those DB values may have been saved, and they will be loaded if `ENABLE_OAUTH_PERSISTENT_CONFIG` is later set to `true`.
 
@@ -181,7 +181,7 @@ Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Az
     - Google: `https://your-domain/oauth/google/callback`
   - Client ID and secret match the values given in your environment settings
   - Scopes and allowed grant types (e.g., `authorization_code`) are set as required by Open WebUI
-- Check the provider's logs—misconfigured apps will often show clear error messages there
+- Check the provider's logs: misconfigured apps will often show clear error messages there
 
 📌 **Redirect URI Format Examples:**
 ```
@@ -448,8 +448,8 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | Problem | Fix |
 |-------------------------------|------------------------------------------------------------|
 | 🔗 WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
-| 📝 Env var typo or missing    | Double-check against official docs - avoid non-existent vars like `OIDC_CONFIG` |
-| 🚨 Missing OPENID_PROVIDER_URL | Always required for OIDC - set to provider's `.well-known/openid-configuration` |
+| 📝 Env var typo or missing    | Double-check against official docs; avoid non-existent vars like `OIDC_CONFIG` |
+| 🚨 Missing OPENID_PROVIDER_URL | Always required for OIDC; set to provider's `.well-known/openid-configuration` |
 | 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` or use admin panel |
 | 🏢 Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
 | 🧊 Proxy caching interfering  | Exclude OAuth endpoints from all server-side caches         |
@@ -461,13 +461,13 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 
 ---
 
-By carefully configuring both your OAuth provider and your Open WebUI environment — and keeping critical login endpoints immune from caching — you can eliminate nearly all SSO/OAuth login problems.
+By carefully configuring both your OAuth provider and your Open WebUI environment, and keeping critical login endpoints immune from caching, you can eliminate nearly all SSO/OAuth login problems.
 
 ---
 
 :::warning Token Revocation Requires Redis
 
-Without Redis, **signing out does not revoke JWT tokens** — they remain valid until they expire (default: 4 weeks). This is especially relevant for SSO/OAuth deployments where you may need to revoke access quickly (e.g., when an employee leaves the organization). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+Without Redis, **signing out does not revoke JWT tokens**: they remain valid until they expire (default: 4 weeks). This is especially relevant for SSO/OAuth deployments where you may need to revoke access quickly (e.g., when an employee leaves the organization). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
 
 For production SSO deployments, configure Redis or shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) and the [Redis tutorial](/tutorials/integrations/redis) for details.
 

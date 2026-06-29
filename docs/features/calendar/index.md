@@ -3,7 +3,19 @@ sidebar_position: 2
 title: "Calendar"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 📅 Calendar
+
+<ThemedImage
+  alt="Calendar: a month grid with color-coded events and a recurring weekday standup, with AI creating events from a natural-language request"
+  sources={{
+    light: useBaseUrl('/images/banners/calendar-light.svg'),
+    dark: useBaseUrl('/images/banners/calendar-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Schedule, track, and manage events, with AI that can plan for you.**
 
@@ -196,7 +208,7 @@ Calendars support the same access grant system used by knowledge bases, models, 
 Only the calendar **owner** (or an admin) can manage access grants and delete the calendar itself.
 
 :::info Public sharing is permission-gated
-Wildcard access grants (calendar readable or writable by every user with the Calendar feature) are gated by the **Calendars Public Sharing** permission. When disabled for a non-admin owner, public principals are silently stripped from the access grant list on calendar create/update — per-user and per-group grants remain unaffected. Admins always retain the ability to share publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions** or via [`USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_calendar_allow_public_sharing).
+Wildcard access grants (calendar readable or writable by every user with the Calendar feature) are gated by the **Calendars Public Sharing** permission. When disabled for a non-admin owner, public principals are silently stripped from the access grant list on calendar create/update; per-user and per-group grants remain unaffected. Admins always retain the ability to share publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions** or via [`USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_calendar_allow_public_sharing).
 :::
 
 ---

@@ -5,7 +5,7 @@ title: "Analyze Documents & Data"
 
 # Analyze Your Documents and Data
 
-Got a pile of spreadsheets, PDFs, Word documents, or emails you need to make sense of? Drop them into the file browser and let the AI read them for you. Open Terminal can open and understand all of these formats — no special setup needed.
+Got a pile of spreadsheets, PDFs, Word documents, or emails you need to make sense of? Drop them into the file browser and let the AI read them for you. Open Terminal can open and understand all of these formats, no special setup needed.
 
 ## What file types can it read?
 
@@ -16,7 +16,7 @@ Got a pile of spreadsheets, PDFs, Word documents, or emails you need to make sen
 | **Presentations** | PowerPoint (.pptx), OpenDocument (.odp) |
 | **Other** | Email (.eml), E-books (.epub), plain text, HTML, Markdown, JSON, XML |
 
-The AI can read all of these directly — it doesn't need to upload them to any external service. File content stays on your server and is processed locally.
+The AI can read all of these directly. It doesn't need to upload them to any external service. File content stays on your server and is processed locally.
 
 ---
 
@@ -25,7 +25,7 @@ The AI can read all of these directly — it doesn't need to upload them to any 
 > **You:** *(drag-drop a PDF into the file browser)* <br/>
 > Can you read this quarterly report and give me the key takeaways?
 
-The AI opens the PDF, reads through it, and gives you a concise summary — pulling out revenue figures, key decisions, notable changes, whatever matters.
+The AI opens the PDF, reads through it, and gives you a concise summary, pulling out revenue figures, key decisions, notable changes, whatever matters.
 
 ![AI reading and analyzing file contents](/images/open-terminal-ai-csv-analysis.png)
 
@@ -35,7 +35,7 @@ The AI opens the PDF, reads through it, and gives you a concise summary — pull
 
 > **You:** There are about 30 invoices in the /invoices folder. Can you read them all and make a spreadsheet with the vendor name, date, and amount?
 
-The AI opens every file in the folder — even if they're a mix of PDFs and Word documents — extracts the information, and creates a clean spreadsheet you can download.
+The AI opens every file in the folder (even if they're a mix of PDFs and Word documents), extracts the information, and creates a clean spreadsheet you can download.
 
 ![AI listing files and providing structured analysis](/images/open-terminal-ai-file-listing.png)
 
@@ -46,7 +46,7 @@ The AI opens every file in the folder — even if they're a mix of PDFs and Word
 > **You:** *(upload several .eml files)* <br/>
 > Read through these emails and find any mentions of deadlines or due dates.
 
-The AI reads the email files — including sender, date, subject, and body — and pulls out the relevant information.
+The AI reads the email files (including sender, date, subject, and body) and pulls out the relevant information.
 
 ![AI reading files and extracting specific information](/images/open-terminal-ai-file-listing.png)
 
@@ -67,12 +67,12 @@ The AI reads the spreadsheet, processes the data, creates a chart, and saves it 
 
 > **You:** Search through everything in the /contracts folder for any mention of "termination clause" or "cancellation".
 
-The AI searches across every file — PDFs, Word docs, spreadsheets, whatever's there — and tells you exactly where it found matches.
+The AI searches across every file (PDFs, Word docs, spreadsheets, whatever's there) and tells you exactly where it found matches.
 
 ![AI searching across files for specific content](/images/open-terminal-ai-file-listing.png)
 
 :::tip No indexing required
-Unlike traditional search or RAG systems, the AI reads files live every time you ask. That means it sees the current version on disk — no re-indexing, no sync delays, no database to manage.
+Unlike traditional search or RAG systems, the AI reads files live every time you ask. That means it sees the current version on disk: no re-indexing, no sync delays, no database to manage.
 :::
 
 ---
@@ -87,6 +87,6 @@ If a document is very long, the AI is smart about reading it in sections rather 
 
 ## More things to try
 
-- **[Run code from chat →](./code-execution)** — the AI writes, runs, and debugs code
-- **[Build & preview websites →](./web-development)** — create and iterate on web pages
-- **[Explore the file browser →](../file-browser)** — upload, preview, download, and edit files
+- **[Run code from chat →](./code-execution)**: the AI writes, runs, and debugs code
+- **[Build & preview websites →](./web-development)**: create and iterate on web pages
+- **[Explore the file browser →](../file-browser)**: upload, preview, download, and edit files

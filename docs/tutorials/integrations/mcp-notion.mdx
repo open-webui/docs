@@ -12,7 +12,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-Notion hosts a remote MCP server at `https://mcp.notion.com/mcp` that Open WebUI connects to natively via **Streamable HTTP**. Authentication is handled through Notion's OAuth flow — no API tokens, no proxies, no extra containers.
+Notion hosts a remote MCP server at `https://mcp.notion.com/mcp` that Open WebUI connects to natively via **Streamable HTTP**. Authentication is handled through Notion's OAuth flow: no API tokens, no proxies, no extra containers.
 
 
 ## Setup
@@ -65,7 +65,7 @@ You can also click **Import** in the modal and paste this configuration:
 
 ### 2. Authorize
 
-In any chat, open **+ → Integrations → Tools** and toggle **Notion** on. You'll be redirected to Notion's OAuth flow — select your workspace and grant access.
+In any chat, open **+ → Integrations → Tools** and toggle **Notion** on. You'll be redirected to Notion's OAuth flow. Select your workspace and grant access.
 
 ![Chat input bar with Notion tool toggled on.](/images/mcp-notion/notion-setup-step6.png)
 
@@ -103,7 +103,7 @@ You're accessing Open WebUI via `localhost`, but `WEBUI_URL` is set to a public 
 
 ### `Object not found`
 
-The page hasn't been shared with the integration. During the OAuth flow, Notion asks which pages to grant access to — make sure the relevant pages are selected. You can update access anytime from your [Notion integrations settings](https://www.notion.so/profile/integrations).
+The page hasn't been shared with the integration. During the OAuth flow, Notion asks which pages to grant access to, so make sure the relevant pages are selected. You can update access anytime from your [Notion integrations settings](https://www.notion.so/profile/integrations).
 
 ### `missing_property` when creating a page
 

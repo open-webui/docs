@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.9.6](https://github.com/open-webui/open-webui/releases/tag/v0.9.6), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.10.0](https://github.com/open-webui/open-webui/releases/tag/v0.10.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -92,6 +92,13 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 
 :::
 
+#### `ENABLE_API_OUTLET_FILTERS`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled, **outlet** [filter functions](/features/extensibility/plugin/functions/filter) also run for completions requested directly through the API (both streaming and non-streaming), not only for chats made from the Open WebUI interface. Disable to skip outlet filters on direct API traffic. Inlet filters and other pipeline stages are unaffected.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `ENABLE_SIGNUP`
 
 - Type: `bool`
@@ -157,6 +164,14 @@ After the admin account is created, sign-up is automatically disabled for securi
 - Description: Controls visibility of the password change UI in **Settings > Account**. When set to `False`, users do not see the password update form, which is useful for SSO-focused deployments where password changes should not be presented in the UI.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `PASSWORD_HASH_ALGORITHM`
+
+- Type: `str`
+- Default: `bcrypt`
+- Options: `bcrypt`, `argon2`
+- Description: Selects the algorithm used to hash new user passwords. `bcrypt` (default) rejects passwords longer than **72 bytes** (a hard bcrypt limit). `argon2` removes that limit and accepts arbitrarily long passwords (requires the `argon2-cffi` package). Existing hashes keep working after a switch: verification auto-detects the algorithm from each stored hash (an `$argon2` prefix verifies with argon2, otherwise bcrypt), so changing this affects only newly set passwords.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `ENABLE_PASSWORD_AUTH`
 
 - Type: `bool`
@@ -202,7 +217,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline — per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
+- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_metadata`.
 
 :::info
@@ -219,7 +234,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time — per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_params`.
 
 :::info
@@ -235,9 +250,9 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Options:
-  - `pending` - New users are pending until their accounts are manually activated by an admin.
-  - `user` - New users are automatically activated with regular user permissions.
-  - `admin` - New users are automatically activated with administrator permissions.
+  - `pending`: New users are pending until their accounts are manually activated by an admin.
+  - `user`: New users are automatically activated with regular user permissions.
+  - `admin`: New users are automatically activated with administrator permissions.
 - Default: `pending`
 - Description: Sets the default role assigned to new users.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -254,7 +269,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `str`
 - Options: `members`, `true`, `false`
 - Default: `members`
-- Description: Controls the default "Who can share to this group" setting for newly created groups. `members` means only group members can share to the group, `true` means anyone can share, and `false` means no one can share to the group. This applies both to groups created manually and groups created automatically (e.g. via SCIM or OAuth group sync). Existing groups are not affected — this only sets the initial default for new groups.
+- Description: Controls the default "Who can share to this group" setting for newly created groups. `members` means only group members can share to the group, `true` means anyone can share, and `false` means no one can share to the group. This applies both to groups created manually and groups created automatically (e.g. via SCIM or OAuth group sync). Existing groups are not affected; this only sets the initial default for new groups.
 
 #### `PENDING_USER_OVERLAY_TITLE`
 
@@ -319,6 +334,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets the minimum allowed interval in seconds between automation recurrences for non-admin users. When set, any automation schedule that recurs more frequently than this value will be rejected with a `400 Bad Request` error. One-time automations (`COUNT=1`) are exempt from this check. Admins bypass this limit.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `AUTOMATION_AUTH_TOKEN_EXPIRES_IN`
+
+- Type: `str` (duration)
+- Default: `1h`
+- Description: Lifetime of the short-lived auth token an automation uses to call back into Open WebUI while running headless (so a scheduled run can reach session-authenticated tools and terminals). Accepts duration strings like `30m`, `1h`, `24h`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 :::tip Common values for AUTOMATION_MIN_INTERVAL
 
 | Value | Meaning |
@@ -370,9 +392,9 @@ Open WebUI is single-tenant by architecture and the `admin` role is root-equival
 
 These toggles are appropriate for:
 
-- **Performance** — keeping admin-facing list/selector surfaces fast on large multi-user deployments where loading every user's items is a hard performance problem.
-- **UI clutter reduction** — keeping those same surfaces usable when populated with thousands of items from other users.
-- **Compliance posture** — meeting requirements (especially in jurisdictions with stronger labour-protection law, e.g. DE / AT / EU) that admins not be *casually* presented with other users' data, even though they remain technically able to reach it via the routes above.
+- **Performance**: keeping admin-facing list/selector surfaces fast on large multi-user deployments where loading every user's items is a hard performance problem.
+- **UI clutter reduction**: keeping those same surfaces usable when populated with thousands of items from other users.
+- **Compliance posture**: meeting requirements (especially in jurisdictions with stronger labour-protection law, e.g. DE / AT / EU) that admins not be *casually* presented with other users' data, even though they remain technically able to reach it via the routes above.
 
 These toggles are **not** appropriate for:
 
@@ -387,27 +409,27 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the admin-panel **export** action is available (data, chats, and database export). When disabled, the export endpoints reject requests. Database exports only work for SQLite databases for now. Note that admin retains the underlying ability to dump the database directly via deployment access — this toggle controls the in-product export surface, see the admin-posture-toggles note above. Requires a restart to take effect.
+- Description: Controls whether the admin-panel **export** action is available (data, chats, and database export). When disabled, the export endpoints reject requests. Database exports only work for SQLite databases for now. Note that admin retains the underlying ability to dump the database directly via deployment access; this toggle controls the in-product export surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the admin-panel **other-users-chats** access surface is available. When disabled, admins can no longer access other users' chats in the admin panel and the corresponding endpoints reject the request. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats and would re-open the same data on a different surface. Note that admin retains underlying database access regardless — this toggle controls the in-product surface, see the admin-posture-toggles note above.
+- Description: Controls whether the admin-panel **other-users-chats** access surface is available. When disabled, admins can no longer access other users' chats in the admin panel and the corresponding endpoints reject the request. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats and would re-open the same data on a different surface. Note that admin retains underlying database access regardless; this toggle controls the in-product surface, see the admin-posture-toggles note above.
 
 #### `ENABLE_ADMIN_ANALYTICS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the admin-panel **Analytics** tab is visible and the analytics API router is mounted. When set to `False`, the tab is hidden and the corresponding endpoints are not registered. Disabling does not stop the underlying data being collected, and admin retains the ability to query that data directly from the database — this toggle controls the in-product surface, see the admin-posture-toggles note above. Requires a restart to take effect.
+- Description: Controls whether the admin-panel **Analytics** tab is visible and the analytics API router is mounted. When set to `False`, the tab is hidden and the corresponding endpoints are not registered. Disabling does not stop the underlying data being collected, and admin retains the ability to query that data directly from the database; this toggle controls the in-product surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the file browser list, etc.). When set to `True` (default), those surfaces show every item from every user — convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see.
+- Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the file browser list, etc.). When set to `True` (default), those surfaces show every item from every user, convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see.
 
-  Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be — gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
+  Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
   This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`, switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
@@ -429,20 +451,20 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `str`
 - Default: Empty string (no CSP injected)
-- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI — Artifacts, code/HTML previews, file previews, and citation modals. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset to keep the existing behavior (sandbox-only).
+- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, and citation modals. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset to keep the existing behavior (sandbox-only).
 
 #### `THREAD_POOL_SIZE`
 
 - Type: `int`
-- Default: `0` (unset — the AnyIO default limit of `40` applies)
+- Default: `0` (unset, the AnyIO default limit of `40` applies)
 - Description: Sets the maximum number of **concurrent** blocking operations that may run in the AnyIO worker thread pool at once. Open WebUI offloads synchronous/blocking work (many DB calls, file I/O, sync route handlers, some library calls) to this pool via `run_in_threadpool`. The value is a **concurrency ceiling (a token limit), not a fixed pool of pre-spawned OS threads and not a CPU-core/thread count**: worker threads are created lazily only when needed and reused, so a high value does **not** by itself create that many threads, consume CPU, or cause CPU contention while idle. It only raises how many blocking operations can be in flight simultaneously before the rest must queue.
 
 :::warning Set this high on any real server (2000+); never lower it
-The AnyIO default of `40` is far too low for production. When more than `THREAD_POOL_SIZE` blocking operations are needed at once (many users acting at the same time, or a few users each triggering several blocking calls), every further request **waits** for a free slot. The symptom is the whole app appearing to **hang / freeze / stop responding** under load, even though CPU and memory look fine — it is pool starvation, not resource exhaustion.
+The AnyIO default of `40` is far too low for production. When more than `THREAD_POOL_SIZE` blocking operations are needed at once (many users acting at the same time, or a few users each triggering several blocking calls), every further request **waits** for a free slot. The symptom is the whole app appearing to **hang / freeze / stop responding** under load, even though CPU and memory look fine. It is pool starvation, not resource exhaustion.
 
-- **Normal servers / production:** `2000` or higher. `2000` is a *lower* bound for very large multi-user instances — going higher is fine and is **not** a CPU or contention risk (it is a ceiling, not a preallocation).
+- **Normal servers / production:** `2000` or higher. `2000` is a *lower* bound for very large multi-user instances; going higher is fine and is **not** a CPU or contention risk (it is a ceiling, not a preallocation).
 - **Never decrease below the default.** An idle high ceiling costs effectively nothing; a low ceiling causes freezes.
-- **Exception — weak hardware (Raspberry Pi, tiny VPS, containers capped at ~250m CPU / very low RAM):** do **not** set `2000` here. Each *genuinely concurrent* blocking op still uses a real OS thread (stack memory), so on a tiny device an enormous ceiling lets a traffic burst spawn enough threads to exhaust RAM. Leave it at the default, or set a modest value (e.g. a few hundred) matched to what the device can actually absorb. This caveat applies only to constrained single-board / micro deployments — any normal server should use `2000+`.
+- **Exception, weak hardware (Raspberry Pi, tiny VPS, containers capped at ~250m CPU / very low RAM):** do **not** set `2000` here. Each *genuinely concurrent* blocking op still uses a real OS thread (stack memory), so on a tiny device an enormous ceiling lets a traffic burst spawn enough threads to exhaust RAM. Leave it at the default, or set a modest value (e.g. a few hundred) matched to what the device can actually absorb. This caveat applies only to constrained single-board / micro deployments; any normal server should use `2000+`.
 
 :::
 
@@ -489,8 +511,8 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 
 - Type: `str`
 - Options:
-  - `dev` - Enables the FastAPI API documentation on `/docs`
-  - `prod` - Automatically configures several environment variables
+  - `dev`: Enables the FastAPI API documentation on `/docs`
+  - `prod`: Automatically configures several environment variables
 - Default:
   - **Backend Default**: `dev`
   - **Docker Default**: `prod`
@@ -569,19 +591,19 @@ Enabling `ENABLE_REALTIME_CHAT_SAVE` causes every single token generated by the 
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the user and model profile-image endpoints honor an external `http(s)://` URL stored in `profile_image_url` by issuing a `302 Found` redirect to the original origin. When `False`, the redirect is suppressed and the endpoint falls through to the bundled default image instead. Set to `False` to prevent client-side IP, User-Agent, and Referer leaks to attacker-controlled origins via attacker-stored profile URLs (data URIs and same-origin/static images continue to load normally). Existing deployments that legitimately rely on external profile image URLs (e.g. Gravatar redirects served by upstream identity providers) should keep the default. **This variable is read once at startup — it is not a `ConfigVar` and cannot be changed from the Admin UI.**
+- Description: Controls whether the user and model profile-image endpoints honor an external `http(s)://` URL stored in `profile_image_url` by issuing a `302 Found` redirect to the original origin. When `False`, the redirect is suppressed and the endpoint falls through to the bundled default image instead. Set to `False` to prevent client-side IP, User-Agent, and Referer leaks to attacker-controlled origins via attacker-stored profile URLs (data URIs and same-origin/static images continue to load normally). Existing deployments that legitimately rely on external profile image URLs (e.g. Gravatar redirects served by upstream identity providers) should keep the default. **This variable is read once at startup; it is not a `ConfigVar` and cannot be changed from the Admin UI.**
 
 #### `PROFILE_IMAGE_ALLOWED_MIME_TYPES`
 
 - Type: `str` (comma-separated MIME types)
 - Default: `image/png,image/jpeg,image/gif,image/webp`
-- Description: Allowlist of MIME types accepted when serving a base64 `data:` URI as a profile image. The MIME type is parsed from the data URI prefix and checked against this list before the response is streamed; non-allowlisted types fall through to the bundled default image. Responses also set `X-Content-Type-Options: nosniff` to prevent the browser from sniffing the body into an executable type. SVG is intentionally not in the default list because it can carry inline `<script>`. The same allowlist drives the Pydantic data-URI prefix validator, so adding a type here both serves it on the read path and accepts it on the write path. **This variable is read once at startup — it is not a `ConfigVar` and cannot be changed from the Admin UI.**
+- Description: Allowlist of MIME types accepted when serving a base64 `data:` URI as a profile image. The MIME type is parsed from the data URI prefix and checked against this list before the response is streamed; non-allowlisted types fall through to the bundled default image. Responses also set `X-Content-Type-Options: nosniff` to prevent the browser from sniffing the body into an executable type. SVG is intentionally not in the default list because it can carry inline `<script>`. The same allowlist drives the Pydantic data-URI prefix validator, so adding a type here both serves it on the read path and accepts it on the write path. **This variable is read once at startup; it is not a `ConfigVar` and cannot be changed from the Admin UI.**
 
 #### `PROFILE_IMAGE_MAX_DATA_URI_SIZE`
 
 - Type: `int` (bytes)
 - Default: unset (no limit)
-- Description: Maximum length, in bytes, of an inline `data:image/...;base64,...` profile image. The shared profile-image validator rejects a longer data URI on save, and it applies to both user avatars and model icons. Use it to bound the Postgres/Redis bloat (and the slower model-list responses) that oversized inline images cause. Only `data:` URIs are limited; `http(s)` avatar URLs and the built-in static paths are unaffected. The limit counts the base64-encoded string, which is about a third larger than the raw image, so `262144` (256 KiB) corresponds to roughly 190 KiB of actual image. Unset (the default) leaves inline images uncapped. **Read once at startup — not a `ConfigVar`, so it cannot be changed from the Admin UI.**
+- Description: Maximum length, in bytes, of an inline `data:image/...;base64,...` profile image. The shared profile-image validator rejects a longer data URI on save, and it applies to both user avatars and model icons. Use it to bound the Postgres/Redis bloat (and the slower model-list responses) that oversized inline images cause. Only `data:` URIs are limited; `http(s)` avatar URLs and the built-in static paths are unaffected. The limit counts the base64-encoded string, which is about a third larger than the raw image, so `262144` (256 KiB) corresponds to roughly 190 KiB of actual image. Unset (the default) leaves inline images uncapped. **Read once at startup, not a `ConfigVar`, so it cannot be changed from the Admin UI.**
 
 #### `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE`
 
@@ -605,10 +627,10 @@ It is recommended to set this to a high single-digit or low double-digit value i
 
 - Type: `int`
 - Default: `256`
-- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls — a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The pre-v0.9.6 name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (old default `30`) is still honored as a fallback if this is unset; prefer the new name.
+- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The pre-v0.9.6 name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (old default `30`) is still honored as a fallback if this is unset; prefer the new name.
 
 :::info Hitting the limit is visible (since v0.9.6)
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze") — upgrading is the fix. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -778,8 +800,8 @@ allowing the client to wait indefinitely.
 
 Connection URLs configured via the Admin Settings UI are **persisted in the database** and take precedence over environment variables. If you save an unreachable URL and the UI becomes unresponsive, you may need to use one of these recovery options:
 
-- `RESET_CONFIG_ON_START=true` - Resets database config to environment variable values on next startup
-- `ENABLE_PERSISTENT_CONFIG=false` - Always use environment variables (UI changes won't persist)
+- `RESET_CONFIG_ON_START=true`: Resets database config to environment variable values on next startup
+- `ENABLE_PERSISTENT_CONFIG=false`: Always use environment variables (UI changes won't persist)
 
 See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for detailed recovery steps.
 
@@ -804,20 +826,26 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 #### `AIOHTTP_CLIENT_SESSION_SSL`
 
-- Type: `bool`
+- Type: `bool` or `str`
 - Default: `True`
-- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings, and — since v0.9.6 — Speech-to-Text / Text-to-Speech audio endpoints). Set to `False` to allow self-signed or custom CA certificates on these upstream services.
+- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings, and, since v0.9.6, Speech-to-Text / Text-to-Speech audio endpoints). Accepts `True` (verify, the default), `False` (disable verification, allowing self-signed or custom certificates) or a path to a CA bundle file (e.g. `/etc/ssl/certs/corporate-ca.crt`) to verify against your own certificate authority. When set to `True`, it uses `AIOHTTP_CLIENT_SSL_CERT_FILE` as the CA bundle if that variable is configured.
+
+#### `AIOHTTP_CLIENT_SSL_CERT_FILE`
+
+- Type: `str`
+- Default: `""` (unset)
+- Description: Path to a custom CA bundle file used as the default for all outbound HTTPS connections whose SSL verification is enabled (that is, whose own SSL variable is set to `True`). Use it to trust a corporate or internal certificate authority across the whole application without disabling verification. A per-connection override (setting a variable such as `AIOHTTP_CLIENT_SESSION_SSL` directly to a path) takes precedence over this global fallback. Follows the convention of `SSL_CERT_FILE` / `REQUESTS_CA_BUNDLE` but is scoped to Open WebUI so it does not interfere with system-level settings.
 
 #### `AIOHTTP_CLIENT_ALLOW_REDIRECTS`
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether outbound HTTP requests across the application follow `3xx` redirects. When `False` (the default since v0.9.6), redirects are not followed — this closes a class of SSRF where a public, validated URL `302`-redirects to an internal address (RFC 1918, loopback `127.0.0.1`, cloud-metadata `169.254.169.254`) that bypasses the original allowlist check. Affected call sites include the RAG web loader, image loading and base64 conversion, OAuth pre-flight, code-interpreter login, and tool-server execution. Set to `True` only if your deployment legitimately requires redirect following (e.g. shortlink-style URLs) AND you have other SSRF protections in place — typically an egress firewall or `WEB_FETCH_FILTER_LIST` covering your internal ranges.
+- Description: Controls whether outbound HTTP requests across the application follow `3xx` redirects. When `False` (the default since v0.9.6), redirects are not followed. This closes a class of SSRF where a public, validated URL `302`-redirects to an internal address (RFC 1918, loopback `127.0.0.1`, cloud-metadata `169.254.169.254`) that bypasses the original allowlist check. Affected call sites include the RAG web loader, image loading and base64 conversion, OAuth pre-flight, code-interpreter login, and tool-server execution. Set to `True` only if your deployment legitimately requires redirect following (e.g. shortlink-style URLs) AND you have other SSRF protections in place, typically an egress firewall or `WEB_FETCH_FILTER_LIST` covering your internal ranges.
 
 #### `USER_AGENT`
 
 - Type: `str`
-- Default: `""` (unset — falls back to the underlying library default, typically `python-requests/2.x`)
+- Default: `""` (unset, falls back to the underlying library default, typically `python-requests/2.x`)
 - Description: Overrides the `User-Agent` header that the web loader (`SafeWebBaseLoader`) sends on outbound fetches for web search and the `fetch_url` tool. The default Python library UA is aggressively blocked by Cloudflare, Wikipedia, and similar bot-detection layers, which manifests as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access. Applies to both the synchronous `_scrape()` and the async `_fetch()` code paths.
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
@@ -828,9 +856,9 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 #### `AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`
 
-- Type: `bool`
+- Type: `bool` or `str`
 - Default: `True`
-- Description: Controls SSL/TLS verification specifically for tool server connections via AIOHTTP client.
+- Description: Controls SSL/TLS verification specifically for tool server connections (including MCP) via the AIOHTTP client. Accepts `True` (verify, the default), `False` (disable) or a path to a CA bundle file to verify against your own certificate authority. When set to `True`, it falls back to `AIOHTTP_CLIENT_SSL_CERT_FILE` if that variable is configured.
 
 #### `MCP_INITIALIZE_TIMEOUT`
 
@@ -962,7 +990,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Auth endpoints (signin, signout, signup) are always logged regardless of filtering mode.
 
 :::tip Whitelist vs Blacklist
-By default, audit logging uses **blacklist mode** — all paths are logged except those in `AUDIT_EXCLUDED_PATHS`. If you set `AUDIT_INCLUDED_PATHS`, it switches to **whitelist mode** — only the specified paths are logged. If both are set, whitelist mode takes precedence and a warning is logged at startup.
+By default, audit logging uses **blacklist mode**: all paths are logged except those in `AUDIT_EXCLUDED_PATHS`. If you set `AUDIT_INCLUDED_PATHS`, it switches to **whitelist mode**: only the specified paths are logged. If both are set, whitelist mode takes precedence and a warning is logged at startup.
 :::
 
 
@@ -992,6 +1020,10 @@ By default, audit logging uses **blacklist mode** — all paths are logged excep
 [`OLLAMA_BASE_URL`](#ollama_base_url). Takes precedence over[`OLLAMA_BASE_URL`](#ollama_base_url).
 - Example: `http://host-one:11434;http://host-two:11434`
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+:::info Context length: `num_ctx` overrides `OLLAMA_CONTEXT_LENGTH`
+`OLLAMA_CONTEXT_LENGTH` is an **Ollama-server** setting, not an Open WebUI variable. Open WebUI's per-model `num_ctx` advanced parameter, when set, is sent on every request and **overrides** it, and the `num_ctx` control pre-fills a small `2048`. See [Context Length](/getting-started/quick-start/connect-a-provider/starting-with-ollama#context-length-num_ctx-and-ollama_context_length) for how to set this correctly and avoid blank responses with Native function calling.
+:::
 
 #### `USE_OLLAMA_DOCKER`
 
@@ -1056,7 +1088,7 @@ Do not use provider management/master keys unless your deployment explicitly req
 
 :::danger
 
-**Keep this disabled unless you explicitly need it.** The catch-all proxy forwards requests to the upstream API using the admin's API key with no model-level access control. Any authenticated user can reach any upstream endpoint — including endpoints not natively handled by Open WebUI — using the admin's credentials. Only enable this if you understand and accept these implications.
+**Keep this disabled unless you explicitly need it.** The catch-all proxy forwards requests to the upstream API using the admin's API key with no model-level access control. Any authenticated user can reach any upstream endpoint, including endpoints not natively handled by Open WebUI, using the admin's credentials. Only enable this if you understand and accept these implications.
 
 :::
 
@@ -1074,6 +1106,27 @@ when using Ollama models.
 - Type: `str`
 - Description: The default model to use for tasks such as title and web search query generation
 when using OpenAI-compatible endpoints.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_CONTEXT_COMPACTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Admin Panel > Settings > Interface**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
+
+- Type: `int`
+- Default: `80000`
+- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global maximum: an individual model can set a *lower* threshold of its own with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), but it cannot raise it above this value.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Default: Empty string (falls back to the built-in default compaction prompt)
+- Description: The prompt used to summarize the messages being compacted. Leave empty to use the built-in default, or provide a custom prompt. Supports two variables: `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
@@ -1201,7 +1254,7 @@ The format for the JSON response is strictly:
 
 - Type: `str`
 - Default: `pyodide`
-- Description: Specifies the code execution engine to use.
+- Description: Specifies the code execution engine to use. `pyodide` (browser) and `jupyter` (server) are **legacy** engines; for full Python and shell access use [Open Terminal](/features/open-terminal) instead.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_EXECUTION_JUPYTER_URL`
@@ -1239,6 +1292,13 @@ The format for the JSON response is strictly:
 - Description: Specifies the timeout for Jupyter code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_PYODIDE_FILE_PERSISTENCE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether the browser-based **Pyodide** engine keeps its virtual filesystem (`/mnt/uploads/`, backed by IndexedDB) **persistent across page reloads**. When `False` (default), Pyodide runs in an isolated, sandboxed (opaque-origin) iframe and its filesystem does not survive a reload. Set to `True` to enable persistent file storage, which requires running Pyodide same-origin and relaxes that isolation. Files created within a single session work either way; this flag only affects cross-reload persistence and the durability of the file browser.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 ### Code Interpreter
 
 #### `ENABLE_CODE_INTERPRETER`
@@ -1252,7 +1312,7 @@ The format for the JSON response is strictly:
 
 - Type: `str`
 - Default: `pyodide`
-- Description: Specifies the code interpreter engine to use.
+- Description: Specifies the code interpreter engine to use. `pyodide` and `jupyter` are **legacy** engines; for full Python and shell access use [Open Terminal](/features/open-terminal) instead.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_INTERPRETER_BLACKLISTED_MODULES`
@@ -1410,7 +1470,7 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
 - Default: `{}`
 - Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward and take precedence on conflicts, so admins can set deployment-specific headers on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added.
 
-  **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional — many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
+  **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional: many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
 
   ```bash
   TERMINAL_PROXY_HEADERS='{"Content-Security-Policy": "sandbox allow-scripts; default-src '\''none'\''; img-src '\''self'\'' data:; style-src '\''unsafe-inline'\''", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"}'
@@ -1634,13 +1694,13 @@ This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment va
 
 - Type: `str`
 - Default: `x-api-key`
-- Description: Name of the HTTP header the auth middleware checks for API-key credentials. Useful when Open WebUI sits behind a reverse proxy or API gateway that consumes the `Authorization` header for its own authentication — set this to a distinct header (for example `X-OpenWebUI-Key`) so clients can deliver their Open WebUI API key without colliding with the proxy's own auth.
+- Description: Name of the HTTP header the auth middleware checks for API-key credentials. Useful when Open WebUI sits behind a reverse proxy or API gateway that consumes the `Authorization` header for its own authentication, set this to a distinct header (for example `X-OpenWebUI-Key`) so clients can deliver their Open WebUI API key without colliding with the proxy's own auth.
 - Read at startup from the process environment (not a `ConfigVar`).
 
 **How the auth middleware picks up a credential**, in order:
 
-1. `Authorization: Bearer <token>` (most common — API key or JWT)
-2. `token` cookie (Bearer — used by the WebUI itself)
+1. `Authorization: Bearer <token>` (most common, API key or JWT)
+2. `token` cookie (Bearer, used by the WebUI itself)
 3. The header named by `CUSTOM_API_KEY_HEADER` (default `x-api-key`)
 
 If none of the three is present, the request falls through as anonymous.
@@ -1732,22 +1792,57 @@ If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change 
 
 :::
 
+### Memory
+
+Settings for the experimental long-term memory system (**Settings → Personalization → Memory**). Memories are stored per user and can be of `type` `user` (explicit facts) or `context` (learned from conversation).
+
+#### `ENABLE_MEMORY_BACKGROUND_REVIEW`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, Open WebUI periodically reviews recent conversation in the background and updates the user's `context` memories automatically, instead of only on explicit save. Off by default.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MEMORIES_REVIEW_INTERVAL_TURNS`
+
+- Type: `int`
+- Default: `10`
+- Description: How many conversation turns elapse between background memory reviews when `ENABLE_MEMORY_BACKGROUND_REVIEW` is enabled.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MEMORIES_CONTEXT_CHAR_LIMIT`
+
+- Type: `int`
+- Default: `2000`
+- Description: Maximum number of characters of `context`-type memories injected into the prompt. Older or lower-priority context memories beyond this budget are not included.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MEMORIES_USER_CHAR_LIMIT`
+
+- Type: `int`
+- Default: `2000`
+- Description: Maximum number of characters of `user`-type memories injected into the prompt.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 ## Security Variables
 
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
 
 - type: `bool`
 - Default: `False`
-- Description: Forwards user and session information as HTTP headers to OpenAI API, Ollama API, MCP servers, and Tool servers.
-If enabled, the following headers are forwarded:
-  - `X-OpenWebUI-User-Name`
-  - `X-OpenWebUI-User-Id`
-  - `X-OpenWebUI-User-Email`
-  - `X-OpenWebUI-User-Role`
-  - `X-OpenWebUI-Chat-Id`
-  - `X-OpenWebUI-Message-Id`
+- Description: When `true`, Open WebUI attaches the signed-in user's identity to its outbound requests, plus the chat and message session IDs where applicable. This enables per-user authorization, auditing, rate limiting and request tracing on external services.
 
-This enables per-user authorization, auditing, rate limiting, and request tracing on external services. The chat and message ID headers are also required for [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
+The four **user-info** headers are forwarded to nearly every outbound backend. The two **session** headers are narrower:
+
+| Header | Forwarded to |
+|---|---|
+| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio and image services |
+| `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers (not Anthropic) |
+| `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP) |
+
+So an OpenAI, Ollama or Pipelines request receives **five** of the six headers (the four user headers plus `X-OpenWebUI-Chat-Id`); only `X-OpenWebUI-Message-Id` is tool-server-specific, since it is what powers [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
+
+If you set `FORWARD_USER_INFO_HEADER_JWT_SECRET`, the four `X-OpenWebUI-User-*` headers are replaced by a single signed JWT (see [`FORWARD_USER_INFO_HEADER_JWT_SECRET`](#forward_user_info_header_jwt_secret) below).
 
 #### `FORWARD_USER_INFO_HEADER_USER_NAME`
 
@@ -1827,11 +1922,11 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 
 - Type: `str`
 - Options:
-  - `lax` - Sets the `SameSite` attribute to lax, allowing session cookies to be sent with
+  - `lax`: Sets the `SameSite` attribute to lax, allowing session cookies to be sent with
 requests initiated by third-party websites.
-  - `strict` - Sets the `SameSite` attribute to strict, blocking session cookies from being sent
+  - `strict`: Sets the `SameSite` attribute to strict, blocking session cookies from being sent
 with requests initiated by third-party websites.
-  - `none` - Sets the `SameSite` attribute to none, allowing session cookies to be sent with
+  - `none`: Sets the `SameSite` attribute to none, allowing session cookies to be sent with
 requests initiated by third-party websites, but only over HTTPS.
 - Default: `lax`
 - Description: Sets the `SameSite` attribute for session cookies.
@@ -1854,11 +1949,11 @@ However, a `strict` session cookie is not sent with the callback request, leadin
 
 - Type: `str`
 - Options:
-  - `lax` - Sets the `SameSite` attribute to lax, allowing auth cookies to be sent with
+  - `lax`: Sets the `SameSite` attribute to lax, allowing auth cookies to be sent with
 requests initiated by third-party websites.
-  - `strict` - Sets the `SameSite` attribute to strict, blocking auth cookies from being sent
+  - `strict`: Sets the `SameSite` attribute to strict, blocking auth cookies from being sent
 with requests initiated by third-party websites.
-  - `none` - Sets the `SameSite` attribute to none, allowing auth cookies to be sent with
+  - `none`: Sets the `SameSite` attribute to none, allowing auth cookies to be sent with
 requests initiated by third-party websites, but only over HTTPS.
 - Default: `lax`
 - Description: Sets the `SameSite` attribute for auth cookies.
@@ -1954,15 +2049,15 @@ When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_
 
 :::info How the secret key is generated
 
-You do **not** need to manually set this variable for a secure installation — **all standard launch methods automatically generate and persist a cryptographically random key on first start:**
+You do **not** need to manually set this variable for a secure installation. **All standard launch methods automatically generate and persist a cryptographically random key on first start:**
 
 | Launch method | Auto-generates? | Persisted to |
 |---|---|---|
 | **Docker** (`start.sh`) | ✅ Yes | `.webui_secret_key` file inside the container |
 | **pip install** (`open-webui serve`) | ✅ Yes | `.webui_secret_key` file in the working directory |
-| **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A — uses the code-level fallback |
+| **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A (set `WEBUI_SECRET_KEY` yourself) |
 
-The code-level fallback value (`t0p-s3cr3t`) exists **only** for development convenience and is **never used** when Open WebUI is launched through the standard Docker or `open-webui serve` methods. Both of those methods check for the environment variable first, and if it is not set, generate a secure random key, save it to a file, and inject it into the environment — all before the application starts.
+The standard Docker and `open-webui serve` methods check for the environment variable first, and if it is not set, they generate a secure random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
 
 :::
 
@@ -1998,6 +2093,17 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 :::
 
+#### `ENABLE_VALVE_ENCRYPTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, plugin (Tool and Function) **Valve** values are encrypted at rest using Fernet (AES-128) instead of being stored as plaintext JSON in the database. Useful when Valves hold secrets like API keys.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::warning Requires a valid Fernet `WEBUI_SECRET_KEY`
+Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key), which must be a valid 44-character url-safe base64 Fernet key when this is enabled. If you rotate `WEBUI_SECRET_KEY`, previously encrypted Valve values can no longer be decrypted and must be re-entered.
+:::
+
 #### `ENABLE_VERSION_UPDATE_CHECK`
 
 - Type: `bool`
@@ -2022,7 +2128,7 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 
 - Automatic version update checks (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 - Downloads of embedding models from Hugging Face Hub
-  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
+  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly. On a **fresh install** this aborts startup with `No embedding model is loaded`, see [Startup & Docker Failures](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install) for the fix.
 - Update notifications in the UI (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 
 **Still functional:**
@@ -2141,7 +2247,7 @@ modeling files for reranking.
 
 :::danger ChromaDB (Default) Is Not Safe for Multi-Worker or Multi-Replica Deployments
 
-The default ChromaDB configuration uses a **local `PersistentClient`** backed by **SQLite**. SQLite is not fork-safe — when uvicorn forks multiple worker processes (`UVICORN_WORKERS > 1`), each worker inherits a copy of the same SQLite connection. Concurrent writes from these forked processes cause immediate crashes (`Child process died`) or database corruption.
+The default ChromaDB configuration uses a **local `PersistentClient`** backed by **SQLite**. SQLite is not fork-safe. When uvicorn forks multiple worker processes (`UVICORN_WORKERS > 1`), each worker inherits a copy of the same SQLite connection. Concurrent writes from these forked processes cause immediate crashes (`Child process died`) or database corruption.
 
 **This also applies to multi-replica deployments** (Kubernetes, Docker Swarm) where multiple containers point at the same ChromaDB data directory.
 
@@ -2196,7 +2302,7 @@ For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HO
 #### `CHROMA_HTTP_HOST`
 
 - Type: `str`
-- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-worker or multi-replica deployments** — it switches ChromaDB from the local SQLite-backed `PersistentClient` to a fork-safe `HttpClient`.
+- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-worker or multi-replica deployments**: it switches ChromaDB from the local SQLite-backed `PersistentClient` to a fork-safe `HttpClient`.
 
 #### `CHROMA_HTTP_PORT`
 
@@ -2468,7 +2574,7 @@ If you use Multitenancy Mode, you should always check for any changes to the col
 
 - Type: `str`
 - Default: `open_webui`
-- Description: Sets the prefix for Milvus collection names. In multitenancy mode, collections become `{prefix}_memories`, `{prefix}_knowledge`, etc. In legacy mode, collections are `{prefix}_{collection_name}`. Changing this value creates an entirely separate namespace—existing collections with the old prefix become invisible to Open WebUI but remain in Milvus consuming resources. Use this for true multi-instance isolation on a shared Milvus server, not for migration between modes. Milvus only accepts underscores, hyphens/dashes are not possible and will cause errors.
+- Description: Sets the prefix for Milvus collection names. In multitenancy mode, collections become `{prefix}_memories`, `{prefix}_knowledge`, etc. In legacy mode, collections are `{prefix}_{collection_name}`. Changing this value creates an entirely separate namespace, and existing collections with the old prefix become invisible to Open WebUI but remain in Milvus consuming resources. Use this for true multi-instance isolation on a shared Milvus server, not for migration between modes. Milvus only accepts underscores, hyphens/dashes are not possible and will cause errors.
 
 ### MariaDB Vector
 
@@ -2483,7 +2589,7 @@ If you want to use MariaDB Vector, be careful when upgrading Open WebUI (create 
 
 MariaDB Dependencies
 
-The `mariadb` Python connector is **not included by default** — it was removed from the bundled dependencies. To use `mariadb-vector`, you must install it explicitly:
+The `mariadb` Python connector is **not included by default**. It was removed from the bundled dependencies. To use `mariadb-vector`, you must install it explicitly:
 
 ```bash
 pip install open-webui[mariadb]
@@ -2512,14 +2618,14 @@ Your MariaDB server must support `VECTOR` and `VECTOR INDEX` features (MariaDB 1
 
 - Type: `int`
 - Default: `1536`
-- Description: Specifies the maximum vector length (number of dimensions) for the `VECTOR(n)` column. Must match the dimensionality of your embedding model. Once the table is created, changing this value requires data migration — the backend will refuse to start if the configured dimension differs from the stored column dimension.
+- Description: Specifies the maximum vector length (number of dimensions) for the `VECTOR(n)` column. Must match the dimensionality of your embedding model. Once the table is created, changing this value requires data migration: the backend will refuse to start if the configured dimension differs from the stored column dimension.
 
 #### `MARIADB_VECTOR_DISTANCE_STRATEGY`
 
 - Type: `str`
 - Options:
-  - `cosine` - Uses `vec_distance_cosine()` for similarity measurement.
-  - `euclidean` - Uses `vec_distance_euclidean()` for similarity measurement.
+  - `cosine`: Uses `vec_distance_cosine()` for similarity measurement.
+  - `euclidean`: Uses `vec_distance_euclidean()` for similarity measurement.
 - Default: `cosine`
 - Description: Controls which distance function is used for the `VECTOR INDEX` and similarity search queries.
 
@@ -2626,8 +2732,8 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
 
 - Type: `str`
 - Options:
-  - `ivfflat` - Uses inverted file with flat compression, better for datasets with many dimensions.
-  - `hnsw` - Uses Hierarchical Navigable Small World graphs, generally provides better query performance.
+  - `ivfflat`: Uses inverted file with flat compression, better for datasets with many dimensions.
+  - `hnsw`: Uses Hierarchical Navigable Small World graphs, generally provides better query performance.
 - Default: Not specified (pgvector will use its default)
 - Description: Specifies the index method for pgvector. The choice affects query performance and index build time.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -3053,14 +3159,14 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Type: `str`
 - Options:
   - Leave empty to use default
-  - `external` - Use external loader
-  - `tika` - Use a local Apache Tika server
-  - `docling` - Use Docling engine
-  - `document_intelligence` - Use Document Intelligence engine
-  - `mistral_ocr` - Use Mistral OCR engine
-  - `datalab_marker` - Use Datalab Marker engine
-  - `mineru` - Use MinerU engine
-  - `paddleocr_vl` - Use a PaddleOCR-vl server (requires `PADDLEOCR_VL_TOKEN`; see below)
+  - `external`: Use external loader
+  - `tika`: Use a local Apache Tika server
+  - `docling`: Use Docling engine
+  - `document_intelligence`: Use Document Intelligence engine
+  - `mistral_ocr`: Use Mistral OCR engine
+  - `datalab_marker`: Use Datalab Marker engine
+  - `mineru`: Use MinerU engine
+  - `paddleocr_vl`: Use a PaddleOCR-vl server (requires `PADDLEOCR_VL_TOKEN`; see below)
 - Description: Sets the content extraction engine to use for document ingestion.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -3078,6 +3184,13 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Description: Configures custom Mistral OCR API endpoints for flexible deployment options, allowing users to point to self-hosted or alternative Mistral OCR instances.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `MISTRAL_OCR_USE_BASE64`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Admin Panel → Settings → Documents**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
 
 - Type: `str`
@@ -3090,6 +3203,13 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Type: `str`
 - Default: `None`
 - Description: Sets the API key for authenticating with the external document loader service.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `EXTERNAL_DOCUMENT_LOADER_HEADERS`
+
+- Type: `str` (JSON object)
+- Default: `{}`
+- Description: Custom HTTP headers sent to the external document loader service, as a JSON object (for example `{"X-Tenant": "acme"}`). Header values support placeholder templating with the file placeholders `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}` and the same user placeholders as other custom headers (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`). Useful for per-request authentication or routing on your loader service. Invalid JSON is ignored and falls back to `{}`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TIKA_SERVER_URL`
@@ -3211,6 +3331,20 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. MinerU was previously hardcoded to PDF only, so only add extensions your MinerU deployment actually supports.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `MINERU_MAX_MARKDOWN_BYTES`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Caps the size, in bytes, of the Markdown the **MinerU** loader returns from a processed document. Output beyond the cap is truncated, guarding against a single huge document flooding context or memory. Leave unset for no limit.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MINERU_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{}` (engine defaults)
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Admin Panel → Settings → Documents** when MinerU is the content-extraction engine.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `PADDLEOCR_VL_BASE_URL`
 
 - Type: `str`
@@ -3222,7 +3356,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `str`
 - Default: `""` (empty)
-- Description: Authentication token for the PaddleOCR-vl server. Sent as `Authorization: token <value>` on every layout-parsing request. **The PaddleOCR-vl engine is skipped at runtime if this value is empty** — the loader falls back to the default PyPDFLoader for the current document even when `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` is set. Set this to activate the engine.
+- Description: Authentication token for the PaddleOCR-vl server. Sent as `Authorization: token <value>` on every layout-parsing request. **The PaddleOCR-vl engine is skipped at runtime if this value is empty**: the loader falls back to the default PyPDFLoader for the current document even when `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` is set. Set this to activate the engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info Supported file types
@@ -3237,10 +3371,10 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
 
 - Type: `str`
 - Options:
-  - Leave empty for `Default (SentenceTransformers)` - Uses SentenceTransformers for embeddings.
-  - `ollama` - Uses the Ollama API for embeddings.
-  - `openai` - Uses the OpenAI API for embeddings.
-  - `azure_openai` - Uses Azure OpenAI Services for embeddings.
+  - Leave empty for `Default (SentenceTransformers)`: Uses SentenceTransformers for embeddings.
+  - `ollama`: Uses the Ollama API for embeddings.
+  - `openai`: Uses the OpenAI API for embeddings.
+  - `azure_openai`: Uses Azure OpenAI Services for embeddings.
 - Description: Selects an embedding engine to use for RAG.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -3285,12 +3419,12 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
 - Default: `False`
 - Description: When enabled, adds a `kb_exec` tool that lets the model interact with knowledge bases through shell-style commands (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`) with pipe support (e.g. `grep "auth" | head -5`). Directory-aware: `ls docs/` lists a subdirectory, `tree` renders a recursive view, `grep "text" docs/` scopes the search, and files can be referenced by path (`docs/api/auth.md`), filename, or file ID.
 
-  Turning this on **replaces** the file-oriented per-purpose tools (`list_knowledge`, `search_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`) — they would overlap with the equivalent `kb_exec` commands. Tools that do something `kb_exec` can't are **kept** alongside it:
-  - `query_knowledge_files` (semantic / RAG search) — always
-  - `view_note` — when notes are attached to the model
-  - `query_knowledge_bases` and `search_knowledge_bases` — when no knowledge is attached, so the model can still discover KBs by name/description
+  Turning this on **replaces** the file-oriented per-purpose tools (`list_knowledge`, `search_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`): they would overlap with the equivalent `kb_exec` commands. Tools that do something `kb_exec` can't are **kept** alongside it:
+  - `query_knowledge_files` (semantic / RAG search), always
+  - `view_note`, when notes are attached to the model
+  - `query_knowledge_bases` and `search_knowledge_bases`, when no knowledge is attached, so the model can still discover KBs by name/description
 
-  **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** enabled (it is a native-mode builtin tool); in Default Mode it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+  **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** (the default; it is a native-mode builtin tool); for models set to Legacy it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 
 #### `RAG_HYBRID_BM25_WEIGHT`
 
@@ -3345,13 +3479,9 @@ Provide a clear and direct response to the user's query, including inline citati
 <context>
 {{CONTEXT}}
 </context>
-
-<user_query>
-{{QUERY}}
-</user_query>
 ```
 
-- Description: Template to use when injecting RAG documents into chat completion.
+- Description: Template to use when injecting RAG documents into chat completion. The template wraps the retrieved context (use the `{{CONTEXT}}` placeholder); the user's query is appended automatically, so do **not** add a `{{QUERY}}` / `[query]` placeholder or the query will appear twice in the final prompt. See [RAG Template Customization](/features/chat-conversations/rag#rag-template-customization).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Document Processing
@@ -3384,7 +3514,14 @@ Provide a clear and direct response to the user's query, including inline citati
   - `character`
   - `token`
 - Default: `character`
-- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter (Tiktoken-based).
+- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter. By default the `token` splitter is Tiktoken-based; set `RAG_TOKENIZER_MODEL` to use a HuggingFace tokenizer instead.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_TOKENIZER_MODEL`
+
+- Type: `str`
+- Default: `(empty)`
+- Description: When `RAG_TEXT_SPLITTER=token`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Leave empty to use Tiktoken. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`); use it to match chunk boundaries to your embedding model's own tokenizer.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
@@ -3426,8 +3563,8 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `str`
 - Options:
-  - `page` - Creates one document per page (default).
-  - `single` - Combines all pages into one document for better chunking across page boundaries.
+  - `page`: Creates one document per page (default).
+  - `single`: Combines all pages into one document for better chunking across page boundaries.
 - Default: `page`
 - Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -3443,6 +3580,13 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Type: `int`
 - Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_FILE_CONTENT_SEARCH_MAX_CHARS`
+
+- Type: `int`
+- Default: `67108864` (64 MiB)
+- Description: Caps how many characters of a file's extracted content are scanned during content search. Guards against a single very large document making search slow or memory-heavy.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `FILE_IMAGE_COMPRESSION_WIDTH`
 
@@ -3496,7 +3640,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 :::info
 
 Check if your API and embedding model supports batched processing.
-Only increase this variable's value if it does - otherwise you might run into unexpected issues.
+Only increase this variable's value if it does. Otherwise you might run into unexpected issues.
 
 :::
 
@@ -3541,7 +3685,7 @@ If you are hitting rate limits from your embedding provider (e.g., 429 errors), 
 
 :::info
 
-This variable was introduced alongside a fix for **uvicorn worker death during document uploads**. Previously, local embedding operations could block the worker thread long enough to trigger uvicorn's health check timeout (default: 5 seconds), causing the worker process to be killed. The underlying fix uses `run_coroutine_threadsafe` to keep the main event loop responsive to health checks regardless of this timeout setting. The timeout is purely a safety net for aborting abnormally long embedding operations — it does not affect worker health check behavior.
+This variable was introduced alongside a fix for **uvicorn worker death during document uploads**. Previously, local embedding operations could block the worker thread long enough to trigger uvicorn's health check timeout (default: 5 seconds), causing the worker process to be killed. The underlying fix uses `run_coroutine_threadsafe` to keep the main event loop responsive to health checks regardless of this timeout setting. The timeout is purely a safety net for aborting abnormally long embedding operations; it does not affect worker health check behavior.
 
 :::
 
@@ -3642,7 +3786,7 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `int`
 - Default: `32`
-- Description: Controls how many query–document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call.
+- Description: Controls how many query-document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_SIGMOID_ACTIVATION_FUNCTION`
@@ -3847,14 +3991,14 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the "Personal OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_PERSONAL` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured — without a client ID, the option stays hidden even if this variable is `True`.
+- Description: Controls whether the "Personal OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_PERSONAL` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured. Without a client ID, the option stays hidden even if this variable is `True`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_ONEDRIVE_BUSINESS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the "Work/School OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_BUSINESS` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured — without a client ID, the option stays hidden even if this variable is `True`.
+- Description: Controls whether the "Work/School OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_BUSINESS` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured. Without a client ID, the option stays hidden even if this variable is `True`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ONEDRIVE_CLIENT_ID`
@@ -3928,7 +4072,7 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 
 - Type: `bool`
 - Default: `True`
-- Description: Routes the web-page content fetcher (the stage that scrapes result pages after a web search, and the general website/URL loader) through the proxy defined by the http_proxy / https_proxy environment variables, also honoring no_proxy and .netrc. Needed because the default fetcher uses aiohttp, which — unlike requests — ignores these proxy variables unless told to trust the environment. This does not affect the search-engine query request itself (that already respects proxy env vars), and it never overrides an explicitly configured proxy; for the Firecrawl/Tavily/Playwright loaders it only acts as a fallback when no proxy is otherwise set.
+- Description: Routes the web-page content fetcher (the stage that scrapes result pages after a web search, and the general website/URL loader) through the proxy defined by the http_proxy / https_proxy environment variables, also honoring no_proxy and .netrc. Needed because the default fetcher uses aiohttp, which, unlike requests, ignores these proxy variables unless told to trust the environment. This does not affect the search-engine query request itself (that already respects proxy env vars), and it never overrides an explicitly configured proxy; for the Firecrawl/Tavily/Playwright loaders it only acts as a fallback when no proxy is otherwise set.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEB_FETCH_FILTER_LIST`
@@ -3990,32 +4134,34 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 
 - Type: `str`
 - Options:
-  - `searxng` - Uses the [SearXNG](https://github.com/searxng/searxng) search engine.
-  - `google_pse` - Uses the [Google Programmable Search Engine](https://programmablesearchengine.google.com/about/).
-  - `brave` - Uses the [Brave search engine](https://brave.com/search/api/).
-  - `brave_llm_context` - Uses Brave's [LLM Context API](https://brave.com/search/api/) endpoint (`/res/v1/llm/context`). Returns pre-extracted, relevance-scored page passages instead of short snippets, so Open WebUI skips the post-search scraping step. Same API key and rate limits as `brave`.
-  - `kagi` - Uses the [Kagi](https://www.kagi.com/) search engine.
-  - `mojeek` - Uses the [Mojeek](https://www.mojeek.com/) search engine.
-  - `bocha` - Uses the Bocha search engine.
-  - `serpstack` - Uses the [Serpstack](https://serpstack.com/) search engine.
-  - `serper` - Uses the [Serper](https://serper.dev/) search engine.
-  - `serply` - Uses the [Serply](https://serply.io/) search engine.
-  - `searchapi` - Uses the [SearchAPI](https://www.searchapi.io/) search engine.
-  - `serpapi` - Uses the [SerpApi](https://serpapi.com/) search engine.
-  - `duckduckgo` - Uses the [DuckDuckGo](https://duckduckgo.com/) search engine.
-  - `tavily` - Uses the [Tavily](https://tavily.com/) search engine.
-  - `linkup` - Uses the [Linkup](https://www.linkup.so/) search API. Requires `LINKUP_API_KEY`; tunable via `LINKUP_SEARCH_PARAMS` (search depth, output type).
-  - `jina` - Uses the [Jina](https://jina.ai/) search engine.
-  - `bing` - Uses the [Bing](https://www.bing.com/) search engine.
-  - `exa` - Uses the [Exa](https://exa.ai/) search engine.
-  - `perplexity` - Uses the [Perplexity API](https://www.perplexity.ai/) to access perplexity's AI models. Calls their AI models, which execute a search and also return a full response.
-  - `perplexity_search` - Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
-  - `sougou` - Uses the [Sougou](https://www.sogou.com/) search engine.
-  - `ollama_cloud` - Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
+  - `searxng`: Uses the [SearXNG](https://github.com/searxng/searxng) search engine.
+  - `google_pse`: Uses the [Google Programmable Search Engine](https://programmablesearchengine.google.com/about/).
+  - `brave`: Uses the [Brave search engine](https://brave.com/search/api/).
+  - `brave_llm_context`: Uses Brave's [LLM Context API](https://brave.com/search/api/) endpoint (`/res/v1/llm/context`). Returns pre-extracted, relevance-scored page passages instead of short snippets, so Open WebUI skips the post-search scraping step. Same API key and rate limits as `brave`.
+  - `kagi`: Uses the [Kagi](https://www.kagi.com/) search engine.
+  - `mojeek`: Uses the [Mojeek](https://www.mojeek.com/) search engine.
+  - `bocha`: Uses the Bocha search engine.
+  - `serpstack`: Uses the [Serpstack](https://serpstack.com/) search engine.
+  - `serper`: Uses the [Serper](https://serper.dev/) search engine.
+  - `serply`: Uses the [Serply](https://serply.io/) search engine.
+  - `searchapi`: Uses the [SearchAPI](https://www.searchapi.io/) search engine.
+  - `serpapi`: Uses the [SerpApi](https://serpapi.com/) search engine.
+  - `duckduckgo`: Uses the [DuckDuckGo](https://duckduckgo.com/) search engine.
+  - `tavily`: Uses the [Tavily](https://tavily.com/) search engine.
+  - `linkup`: Uses the [Linkup](https://www.linkup.so/) search API. Requires `LINKUP_API_KEY`; tunable via `LINKUP_SEARCH_PARAMS` (search depth, output type).
+  - `jina`: Uses the [Jina](https://jina.ai/) search engine.
+  - `bing`: Uses the [Bing](https://www.bing.com/) search engine.
+  - `exa`: Uses the [Exa](https://exa.ai/) search engine.
+  - `perplexity`: Uses the [Perplexity API](https://www.perplexity.ai/) to access perplexity's AI models. Calls their AI models, which execute a search and also return a full response.
+  - `serphouse`: Uses the [SERPHouse](https://www.serphouse.com/) search API. Requires `SERPHOUSE_API_KEY`; `SERPHOUSE_DOMAIN` picks the Google domain (default `google.com`).
+  - `microsoft_web_iq`: Uses the **Microsoft Web IQ** search API. Requires `MICROSOFT_WEB_IQ_API_KEY`; `MICROSOFT_WEB_IQ_API_BASE_URL` and `MICROSOFT_WEB_IQ_LANGUAGE` are configurable.
+  - `perplexity_search`: Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
+  - `sougou`: Uses the [Sougou](https://www.sogou.com/) search engine.
+  - `ollama_cloud`: Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
   - `azure_ai_search`
   - `yacy`
-  - `yandex` - Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
-  - `youcom` - Uses the [You.com](https://you.com/) YDC Index API for web search.
+  - `yandex`: Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
+  - `youcom`: Uses the [You.com](https://you.com/) YDC Index API for web search.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DDGS_BACKEND`
@@ -4082,7 +4228,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `int`
 - Default: `8192`
-- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024`–`32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Admin Panel → Settings → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
+- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Admin Panel → Settings → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.brave_search_context_tokens`.
 
 #### `KAGI_SEARCH_API_KEY`
@@ -4245,12 +4391,16 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Description: Sets the Sogou API SK.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-#### `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`
+#### `OLLAMA_CLOUD_API_KEY`
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the Ollama Cloud Web Search API Key.
+- Description: Sets your Ollama Cloud API key. It is currently used to authenticate the Ollama Cloud web search provider (the search service hosted at `ollama.com`).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+:::warning Environment variable name vs. config field name
+The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and the config API and persisted value use the key `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` (`rag.web.search.ollama_cloud_api_key`). The environment variable that seeds it on startup is `OLLAMA_CLOUD_API_KEY`, not `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`. Setting `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` in the environment has no effect, so use `OLLAMA_CLOUD_API_KEY`.
+:::
 
 #### `TAVILY_EXTRACT_DEPTH`
 
@@ -4369,7 +4519,56 @@ If you use `perplexity`, this variable is not relevant to you.
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets the API key for [You.com](https://you.com/) YDC Index API web search. Required when `WEB_SEARCH_ENGINE` is set to `youcom`. Obtain an API key from [You.com API](https://you.com/api).
+- Description: Sets the API key for [You.com](https://you.com/) YDC Index API web search. Required when `WEB_SEARCH_ENGINE` is set to `youcom`. Obtain an API key from [You.com API](https://you.com/api). Also accepts `YDC_API_KEY` as an alternative variable name; `YOUCOM_API_KEY` takes precedence if both are set.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SERPHOUSE_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for the [SERPHouse](https://www.serphouse.com/) web search engine. Required when `WEB_SEARCH_ENGINE` is set to `serphouse`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SERPHOUSE_DOMAIN`
+
+- Type: `str`
+- Default: `google.com`
+- Description: The Google domain SERPHouse queries against (e.g. `google.com`, `google.co.uk`). Used only when `WEB_SEARCH_ENGINE` is set to `serphouse`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MICROSOFT_WEB_IQ_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: API key for the **Microsoft Web IQ** search engine. Required when `WEB_SEARCH_ENGINE` is set to `microsoft_web_iq`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MICROSOFT_WEB_IQ_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.microsoft.ai/v3`
+- Description: Base URL for the Microsoft Web IQ API. Used only when `WEB_SEARCH_ENGINE` is set to `microsoft_web_iq`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MICROSOFT_WEB_IQ_LANGUAGE`
+
+- Type: `str`
+- Default: `en`
+- Description: Language code for Microsoft Web IQ results (e.g. `en`, `de`). Used only when `WEB_SEARCH_ENGINE` is set to `microsoft_web_iq`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_WEB_SEARCH_CONFIRMATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, the user is shown a confirmation prompt before a web search runs, so a query is not sent to the external provider without consent. The prompt text is set by `WEB_SEARCH_CONFIRMATION_CONTENT`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `WEB_SEARCH_CONFIRMATION_CONTENT`
+
+- Type: `str`
+- Default: `Your query will be sent to the configured web search provider.`
+- Description: The message shown in the web-search confirmation prompt when `ENABLE_WEB_SEARCH_CONFIRMATION` is `True`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Web Loader Configuration
@@ -4380,11 +4579,11 @@ If you use `perplexity`, this variable is not relevant to you.
 - Default: `(empty)`
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
-  - `safe_web` (default) - Uses internal fetching with enhanced error handling.
-  - `playwright` - Uses Playwright for rendering pages with JavaScript support.
-  - `firecrawl` - Uses Firecrawl service.
-  - `tavily` - Uses Tavily service.
-  - `external` - Uses an external web loader API.
+  - `safe_web` (default): Uses internal fetching with enhanced error handling.
+  - `playwright`: Uses Playwright for rendering pages with JavaScript support.
+  - `firecrawl`: Uses Firecrawl service.
+  - `tavily`: Uses Tavily service.
+  - `external`: Uses an external web loader API.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -4445,7 +4644,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `float`
 - Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10–30 seconds depending on your network conditions.
+- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10 to 30 seconds depending on your network conditions.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `WEB_FETCH_MAX_CONTENT_LENGTH`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Caps the number of characters kept from a fetched web page (e.g. the `fetch_url` tool / URL content retrieval). Content beyond the limit is truncated, preventing one very large page from flooding the context. Leave unset for no limit.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning
@@ -4536,11 +4742,11 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Options:
-  - `""` (empty string) - Uses the built-in local Whisper engine for Speech-to-Text. This runs Whisper on the backend server.
-  - `openai` - Uses an OpenAI-compatible API for Speech-to-Text.
-  - `deepgram` - Uses Deepgram engine for Speech-to-Text.
-  - `azure` - Uses Azure Cognitive Services for Speech-to-Text.
-  - `mistral` - Uses Mistral API for Speech-to-Text.
+  - `""` (empty string): Uses the built-in local Whisper engine for Speech-to-Text. This runs Whisper on the backend server.
+  - `openai`: Uses an OpenAI-compatible API for Speech-to-Text.
+  - `deepgram`: Uses Deepgram engine for Speech-to-Text.
+  - `azure`: Uses Azure Cognitive Services for Speech-to-Text.
+  - `mistral`: Uses Mistral API for Speech-to-Text.
 - Description: Specifies the Speech-to-Text engine to use. When left as an empty string (the default), the backend runs a local Whisper instance. Note: The "Web API" option seen in User Settings is a frontend-only setting that uses the browser's built-in speech recognition and does not call this backend endpoint at all.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4662,12 +4868,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Options:
-  - `""` (empty string) - **Disables backend TTS.** When empty, TTS requests do not reach the backend. All TTS is handled client-side using the browser's Web Speech API or the user-configurable "Browser Kokoro" option in User Settings.
-  - `openai` - Uses an OpenAI-compatible API for Text-to-Speech.
-  - `mistral` - Uses Mistral's Text-to-Speech API.
-  - `elevenlabs` - Uses ElevenLabs engine for Text-to-Speech.
-  - `azure` - Uses Azure Cognitive Services for Text-to-Speech.
-  - `transformers` - Uses a local SentenceTransformers-based model for Text-to-Speech (runs on the backend).
+  - `""` (empty string): **Disables backend TTS.** When empty, TTS requests do not reach the backend. All TTS is handled client-side using the browser's Web Speech API or the user-configurable "Browser Kokoro" option in User Settings.
+  - `openai`: Uses an OpenAI-compatible API for Text-to-Speech.
+  - `mistral`: Uses Mistral's Text-to-Speech API.
+  - `elevenlabs`: Uses ElevenLabs engine for Text-to-Speech.
+  - `azure`: Uses Azure Cognitive Services for Text-to-Speech.
+  - `transformers`: Uses a local SentenceTransformers-based model for Text-to-Speech (runs on the backend).
 - Description: Specifies the Text-to-Speech engine to use on the backend. When left as an empty string (the default), no backend TTS service is configured, and audio playback relies entirely on the user's browser capabilities or frontend options like "Browser Kokoro".
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4720,7 +4926,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected — the model uses only the regular system prompt and chat history. Configurable in **Admin Settings → Interface → Voice Mode Custom Prompt** (toggle).
+- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Admin Settings → Interface → Voice Mode Custom Prompt** (toggle).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.voice.prompt.enable`.
 
 #### `VOICE_MODE_PROMPT_TEMPLATE`
@@ -4840,10 +5046,10 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Options:
-  - `openai` - Uses OpenAI DALL-E for image generation.
-  - `comfyui` - Uses ComfyUI engine for image generation.
-  - `automatic1111` - Uses AUTOMATIC1111 engine for image generation.
-  - `gemini` - Uses Gemini for image generation.
+  - `openai`: Uses OpenAI DALL-E for image generation.
+  - `comfyui`: Uses ComfyUI engine for image generation.
+  - `automatic1111`: Uses AUTOMATIC1111 engine for image generation.
+  - `gemini`: Uses Gemini for image generation.
 - Default: `openai`
 - Description: Specifies the engine to use for image generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -4896,9 +5102,9 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Options:
-  - `openai` - Uses OpenAI DALL-E for image editing.
-  - `gemini` - Uses Gemini for image editing.
-  - `comfyui` - Uses ComfyUI engine for image editing.
+  - `openai`: Uses OpenAI DALL-E for image editing.
+  - `gemini`: Uses Gemini for image editing.
+  - `comfyui`: Uses ComfyUI engine for image editing.
 - Default: `openai`
 - Description: Configures the engine used for image editing operations, enabling modification of existing images using text prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -4909,6 +5115,13 @@ Strictly return in JSON format:
 - Default: ``
 - Description: Specifies the model to use for image editing operations within the selected engine (e.g., `dall-e-2`, `gemini-2.5-flash`).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_OPENAI_IMAGE_EDIT_NORMALIZATION`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `IMAGE_EDIT_ENGINE=openai`, normalizes the input image (re-encoding it to a format/shape the OpenAI image-edit API accepts) before sending the edit request. Disable only if your input images are already in a compatible format and you want to skip the conversion.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `IMAGE_EDIT_SIZE`
 
@@ -5005,8 +5218,8 @@ For a detailed setup guide and example configuration, please refer to the [Gemin
 
 - Type: `str`
 - Options:
-  - `predict` - Uses the predict endpoint (default for Imagen models).
-  - `generateContent` - Uses the generateContent endpoint (for Gemini 2.5 Flash and newer models).
+  - `predict`: Uses the predict endpoint (default for Imagen models).
+  - `generateContent`: Uses the generateContent endpoint (for Gemini 2.5 Flash and newer models).
 - Default: ``
 - Description: Specifies the Gemini API endpoint method for image generation, supporting both legacy Imagen models and newer Gemini models with image generation capabilities.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -5650,7 +5863,7 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 
 - Type: `str`
 - Options:
-  - `S256` - Hash `code_verifier` with SHA-256.
+  - `S256`: Hash `code_verifier` with SHA-256.
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the code challenge method for OAuth authentication. Set to `S256` when PKCE is required by the provider.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -5722,9 +5935,9 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: `true`
 - Options:
-  - `true` — Groups created via OAuth will have sharing enabled for anyone.
-  - `members` — Groups created via OAuth will only allow sharing with group members.
-  - `false` — Groups created via OAuth will have sharing disabled (no one can share).
+  - `true`: Groups created via OAuth will have sharing enabled for anyone.
+  - `members`: Groups created via OAuth will only allow sharing with group members.
+  - `false`: Groups created via OAuth will have sharing disabled (no one can share).
 - Description: Controls the default sharing permission for groups that are automatically created via OAuth group management. Only applies when `ENABLE_OAUTH_GROUP_CREATION` is enabled. Existing groups are not affected by this setting.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -5779,7 +5992,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Specifies an audience parameter passed to the OAuth provider's authorization endpoint during login. Some providers (such as Auth0 and Ory) use this value to determine the type of access token returned—without it, providers typically return an opaque token, while with it, they return a JWT that can be decoded and validated. This parameter is not part of the official OAuth/OIDC spec for authorization endpoints but is widely supported by some providers.
+- Description: Specifies an audience parameter passed to the OAuth provider's authorization endpoint during login. Some providers (such as Auth0 and Ory) use this value to determine the type of access token returned. Without it, providers typically return an opaque token, while with it, they return a JWT that can be decoded and validated. This parameter is not part of the official OAuth/OIDC spec for authorization endpoints but is widely supported by some providers.
 
 :::info
 
@@ -5894,13 +6107,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `str`
 - Default: `None`
-- Description: Sets additional filter conditions for LDAP user search. This filter is **appended** to the automatically-generated username filter. Open WebUI automatically constructs the username portion of the filter using `LDAP_ATTRIBUTE_FOR_USERNAME`, so you should **not** include user placeholders like `%(user)s` or `%s` — these are not supported. Use this for additional conditions such as group membership restrictions (e.g., `(memberOf=cn=allowed-users,ou=groups,dc=example,dc=com)`). Alternative to `LDAP_SEARCH_FILTERS`.
+- Description: Sets additional filter conditions for LDAP user search. This filter is **appended** to the automatically-generated username filter. Open WebUI automatically constructs the username portion of the filter using `LDAP_ATTRIBUTE_FOR_USERNAME`, so you should **not** include user placeholders like `%(user)s` or `%s`; these are not supported. Use this for additional conditions such as group membership restrictions (e.g., `(memberOf=cn=allowed-users,ou=groups,dc=example,dc=com)`). Alternative to `LDAP_SEARCH_FILTERS`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_SEARCH_FILTERS`
 
 - Type: `str`
-- Description: Sets additional filter conditions for LDAP user search. This is an alias for `LDAP_SEARCH_FILTER`. The filter is appended to the automatically-generated username filter — do **not** include user placeholders like `%(user)s` or `%s`.
+- Description: Sets additional filter conditions for LDAP user search. This is an alias for `LDAP_SEARCH_FILTER`. The filter is appended to the automatically-generated username filter. Do **not** include user placeholders like `%(user)s` or `%s`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_USE_TLS`
@@ -6026,6 +6239,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to edit chats.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_CHAT_IMPORT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). When disabled, non-admins cannot import chats.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`
@@ -6188,6 +6408,13 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 - Description: Enables or disables the ability for users to create their own group channels.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables the ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `USER_PERMISSIONS_FEATURES_API_KEYS`
 
 - Type: `bool`
@@ -6242,6 +6469,20 @@ For API Key creation (and the API keys themselves):
 - Description: Enables or disables user permission to access workspace skills.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_IMPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to **import** skills into the Skills workspace.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_EXPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to **export** skills from the Skills workspace.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 ### Sharing (Private)
 
 These settings control whether users can share workspace items with other users **privately** (non-public sharing).
@@ -6286,6 +6527,13 @@ These settings control whether users can share workspace items with other users 
 - Type: `str`
 - Default: `True`
 - Description: Enables or disables **private sharing** of notes.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
+
+- Type: `str`
+- Default: `False`
+- Description: Enables or disables **private sharing** of chat folders with specific users or groups.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Sharing (Public)
@@ -6338,14 +6586,14 @@ These settings control whether users can share workspace items **publicly**.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of chat conversations. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users — they can still create share links scoped to specific users or groups, but cannot make a chat reachable by anyone with the link. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
+- Description: Enables or disables **public sharing** of chat conversations. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by anyone with the link. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update — public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Calendars Public Sharing**.
+- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Calendars Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Access Grants
@@ -6354,7 +6602,7 @@ These settings control whether users can share workspace items **publicly**.
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists — group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Users**.
+- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Users**.
 
 ### Import / Export
 
@@ -6420,9 +6668,9 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `str`
 - Options:
-  - `s3` - uses the S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
-  - `gcs` - uses the GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
-  - `azure` - uses the Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
+  - `s3`: uses the S3 client library and related environment variables mentioned in [Amazon S3 Storage](#amazon-s3-storage)
+  - `gcs`: uses the GCS client library and related environment variables mentioned in [Google Cloud Storage](#google-cloud-storage)
+  - `azure`: uses the Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
 
@@ -6430,7 +6678,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether a local copy of a file is retained after it has been uploaded to a cloud storage provider (S3, GCS, Azure). When `True` (the default), the local cache copy in `UPLOAD_DIR` is preserved — matching previous behavior. When `False`, the local copy is removed automatically once processing completes, so files live only in cloud storage. Has no effect when `STORAGE_PROVIDER=local`.
+- Description: Controls whether a local copy of a file is retained after it has been uploaded to a cloud storage provider (S3, GCS, Azure). When `True` (the default), the local cache copy in `UPLOAD_DIR` is preserved, matching previous behavior. When `False`, the local copy is removed automatically once processing completes, so files live only in cloud storage. Has no effect when `STORAGE_PROVIDER=local`.
 
 #### Amazon S3 Storage
 
@@ -6494,7 +6742,7 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 - Type: `str`
 - Description: Contents of Google Application Credentials JSON file.
-  - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Google Metadata server if run on a Google Compute Engine.
+  - Optional: if not provided, credentials will be taken from the environment. User credentials if run locally and Google Metadata server if run on a Google Compute Engine.
   - A file can be generated for a service account following this [guide.](https://developers.google.com/workspace/guides/create-credentials#service-account)
 
 #### `GCS_BUCKET_NAME`
@@ -6518,7 +6766,7 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 - Type: `str`
 - Description: Set the access key for Azure Storage.
-  - Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
+  - Optional: if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services.
 
 ### OpenTelemetry Configuration
 
@@ -6629,7 +6877,7 @@ pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 
 - Type: `int`
 - Default: `10000` (10 seconds)
-- Description: Controls how often OpenTelemetry metrics are exported, in milliseconds. The default of 10 seconds produces approximately 6 data points per minute. Lower this value for higher resolution, or increase it to reduce cost on platforms that charge per data point (e.g. Grafana Cloud recommends staying below 1 DPM — set to `60000` for one export per minute).
+- Description: Controls how often OpenTelemetry metrics are exported, in milliseconds. The default of 10 seconds produces approximately 6 data points per minute. Lower this value for higher resolution, or increase it to reduce cost on platforms that charge per data point (e.g. Grafana Cloud recommends staying below 1 DPM: set to `60000` for one export per minute).
 
 #### `OTEL_METRICS_BASIC_AUTH_USERNAME`
 
@@ -6699,11 +6947,11 @@ For configuration using individual parameters or encrypted SQLite, see the relev
 :::
 
 :::tip Single-user / single-replica on local disk? The default is fine.
-The default `sqlite:///${DATA_DIR}/webui.db` is a perfectly good choice for personal use, evaluation, home-lab setups, and small single-replica deployments — **as long as `DATA_DIR` lives on a locally-attached SSD/NVMe**. No migration needed. The rest of this callout is for operators running on network storage or scaling out.
+The default `sqlite:///${DATA_DIR}/webui.db` is a perfectly good choice for personal use, evaluation, home-lab setups, and small single-replica deployments, **as long as `DATA_DIR` lives on a locally-attached SSD/NVMe**. No migration needed. The rest of this callout is for operators running on network storage or scaling out.
 :::
 
 :::danger SQLite is only supported on locally-attached SSD/NVMe
-Running SQLite on **NFS, CIFS/SMB, Azure Files, GlusterFS, CephFS, or any Kubernetes PersistentVolumeClaim backed by network storage is not supported** — this is SQLite upstream's own position ([SQLite FAQ #5](https://www.sqlite.org/faq.html#q5)), and under the async backend (0.9.0+) it will produce pool-timeout errors (`QueuePool limit of size N overflow M reached`), multi-minute stalls, WAL deadlocks, and potential database corruption.
+Running SQLite on **NFS, CIFS/SMB, Azure Files, GlusterFS, CephFS, or any Kubernetes PersistentVolumeClaim backed by network storage is not supported** (this is SQLite upstream's own position, see [SQLite FAQ #5](https://www.sqlite.org/faq.html#q5)), and under the async backend (0.9.0+) it will produce pool-timeout errors (`QueuePool limit of size N overflow M reached`), multi-minute stalls, WAL deadlocks, and potential database corruption.
 
 **For multi-replica, multi-worker, Kubernetes, Docker Swarm, or any deployment where `DATA_DIR` is on shared/network storage, set `DATABASE_URL` to a PostgreSQL URL:**
 
@@ -6711,11 +6959,11 @@ Running SQLite on **NFS, CIFS/SMB, Azure Files, GlusterFS, CephFS, or any Kubern
 DATABASE_URL=postgresql://user:password@host:5432/openwebui
 ```
 
-See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the full mechanism (fsync + async pool saturation) and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for migration guidance.
+See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the full mechanism (fsync + async pool saturation) and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql) for migration guidance.
 :::
 
 :::warning Multi-replica / multi-worker deployments REQUIRE PostgreSQL
-For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), you **must** use an external database (PostgreSQL) instead of SQLite. SQLite does not support concurrent writes from multiple instances and will result in database corruption or data inconsistency. A shared SQLite file on NFS does not count as "supported" — it will still corrupt or deadlock. See the scaling guide linked above.
+For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), you **must** use an external database (PostgreSQL) instead of SQLite. SQLite does not support concurrent writes from multiple instances and will result in database corruption or data inconsistency. A shared SQLite file on NFS does not count as "supported"; it will still corrupt or deadlock. See the scaling guide linked above.
 :::
 
 #### `ENABLE_DB_MIGRATIONS`
@@ -6743,6 +6991,13 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 - Type: `str`
 - Default: `None`
 - Description: Specifies the username for database authentication. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_ENABLE_IAM_TOKEN_AUTH`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, authenticate to an **AWS RDS** database using a short-lived **IAM auth token** (generated via boto3 `generate_db_auth_token`) instead of a static password. The token is refreshed automatically before it expires. **PostgreSQL only**, and the database host and user must be set. Requires `boto3` and AWS credentials/region available to the process (standard AWS SDK resolution).
 - Persistence: No
 
 #### `DATABASE_PASSWORD`
@@ -6785,13 +7040,13 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 - Default: `None`
 - Description: Minimum interval, in seconds, between writes of a user's `last_active_at` timestamp to the database (this timestamp drives online/"active" presence, evaluated over a ~3-minute window). The write is throttled **per user**: within the interval, repeat activity does not hit the database.
 
-:::warning Set this on every deployment — mandatory at scale
-**With the default (`None`, or an invalid value which becomes `0.0`), throttling is disabled and the write is unthrottled: essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for no functional benefit — presence only needs ~minute granularity.
+:::warning Set this on every deployment, mandatory at scale
+**With the default (`None`, or an invalid value which becomes `0.0`), throttling is disabled and the write is unthrottled: essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs ~minute granularity.
 
-Setting a positive interval collapses thousands of these writes into at most one per user per interval. This is **free performance for any setup** and is **required** for large/production deployments — leaving it unset is a common, avoidable database bottleneck.
+Setting a positive interval collapses thousands of these writes into at most one per user per interval. This is **free performance for any setup** and is **required** for large/production deployments; leaving it unset is a common, avoidable database bottleneck.
 
-- **Recommended:** a few hundred seconds, e.g. `300`–`500`. Presence accuracy stays within the interval, which is well inside the 3-minute active window.
-- Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes — there is no downside to setting it on a Raspberry Pi).
+- **Recommended:** a few hundred seconds, e.g. `300` to `500`. Presence accuracy stays within the interval, which is well inside the 3-minute active window.
+- Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
 - Read once at startup; not a `ConfigVar` and not changeable from the Admin UI.
 :::
 
@@ -6891,19 +7146,19 @@ Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Number 
 
 For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, and 4 instances (whether workers, pods, or replicas), you could open up to **140 connections** (35 × 4).
 
-When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation—connection pools cannot be shared across separate processes or containers.
+When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation: connection pools cannot be shared across separate processes or containers.
 
 :::
 
-:::warning SQLite on NFS / network storage — increasing the pool does not help
+:::warning SQLite on NFS / network storage, increasing the pool does not help
 If you are seeing `QueuePool limit of size N overflow M reached, connection timed out` errors on SQLite and the database file lives on NFS, CephFS, Azure Files, an SMB mount, or any network-backed Kubernetes PVC, **increasing this value will not fix it**. The root cause is slow `fsync` on the network filesystem, which keeps each connection checked out far longer than on local disk; more pool slots just means more concurrent slow `fsync`s against the same slow storage. The async backend saturates any size pool you give it.
 
 The only real fixes are:
-1. Migrate to PostgreSQL (`DATABASE_URL=postgresql+asyncpg://...`) — strongly recommended.
+1. Migrate to PostgreSQL (`DATABASE_URL=postgresql+asyncpg://...`), strongly recommended.
 2. Move `webui.db` to a locally-attached SSD/NVMe.
-3. Temporary workaround: `DATABASE_POOL_SIZE=1` + `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000` — serializes DB access, not a supported long-term config.
+3. Temporary workaround: `DATABASE_POOL_SIZE=1` + `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000`, serializes DB access, not a supported long-term config.
 
-See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the mechanism, and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for migration guidance.
+See [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage) for the mechanism, and [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql) for migration guidance.
 :::
 
 #### `DATABASE_POOL_MAX_OVERFLOW`
@@ -6964,7 +7219,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 
 - Type: `str`
 - Default: `-65536`
-- Description: Sets the SQLite `PRAGMA cache_size` value. Negative values specify the cache size in KiB — the default `-65536` allocates approximately 64 MB of page cache. Larger caches reduce disk I/O for read-heavy workloads. Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+- Description: Sets the SQLite `PRAGMA cache_size` value. Negative values specify the cache size in KiB: the default `-65536` allocates approximately 64 MB of page cache. Larger caches reduce disk I/O for read-heavy workloads. Set to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
 
 :::warning This cache is per connection, not global
 SQLite's page cache is allocated **per connection**, so the real worst case is `cache_size` times the number of simultaneously active pooled connections, not a single 64 MB allocation. With the default SQLite pool fallback (`DATABASE_POOL_SIZE` unset, see above) that multiplier can be large enough to OOM a memory-constrained container. On small / low-spec deployments lower this (e.g. `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000` for ~2 MB per connection) and cap `DATABASE_POOL_SIZE`. See [Performance → SQLite Memory Footprint on Constrained Containers](/troubleshooting/performance#4-sqlite-memory-footprint-on-constrained-containers).
@@ -6990,7 +7245,7 @@ Like the page cache above, the mmap window is established **per connection**. It
 
 - Type: `str`
 - Default: `67108864`
-- Description: Sets the SQLite `PRAGMA journal_size_limit` value in bytes. Caps the WAL file size after checkpoint — without this, the WAL file can grow unbounded during write bursts. The default `67108864` caps it at approximately 64 MB. Set to `-1` for no limit (SQLite default), or to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
+- Description: Sets the SQLite `PRAGMA journal_size_limit` value in bytes. Caps the WAL file size after checkpoint. Without this, the WAL file can grow unbounded during write bursts. The default `67108864` caps it at approximately 64 MB. Set to `-1` for no limit (SQLite default), or to an empty string to skip this PRAGMA entirely. **This setting only applies to SQLite databases.**
 
 ### Redis
 
@@ -7022,13 +7277,13 @@ Redis serves as the central state store that allows multiple Open WebUI instance
 
 **Single Instance Deployments**
 
-If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required** for basic functionality. However, without Redis, signing out and password changes do **not** invalidate existing JWT tokens — they remain valid until they expire (default: 4 weeks). For production deployments, either configure Redis or shorten [`JWT_EXPIRES_IN`](#jwt_expires_in). See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) for details.
+If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required** for basic functionality. However, without Redis, signing out and password changes do **not** invalidate existing JWT tokens; they remain valid until they expire (default: 4 weeks). For production deployments, either configure Redis or shorten [`JWT_EXPIRES_IN`](#jwt_expires_in). See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) for details.
 
 :::
 
 :::danger
 
-**Critical Redis Server Configuration — Prevent Connection Exhaustion**
+**Critical Redis Server Configuration: Prevent Connection Exhaustion**
 
 Open WebUI uses Redis for token validation, WebSocket management, and session storage. Each user action can create Redis connections. If your Redis server is misconfigured, connections will accumulate over time until the limit is reached, causing **500 Internal Server Errors** and preventing all users from logging in.
 
@@ -7195,8 +7450,8 @@ A typical value is `60` (seconds). This keeps actively-used pooled connections w
 
 When enabled, redis-py performs a lightweight `PING` on checkout for any connection that has been idle longer than the configured interval. This serves two purposes:
 
-1. **Detects dead connections** — stale sockets are identified and replaced before your application code runs a command on them
-2. **Keeps active connections alive** — the PING resets the Redis server's per-connection idle timer, preventing the server from reaping connections that are still in the pool
+1. **Detects dead connections**: stale sockets are identified and replaced before your application code runs a command on them
+2. **Keeps active connections alive**: the PING resets the Redis server's per-connection idle timer, preventing the server from reaping connections that are still in the pool
 
 Without this setting, if your Redis server has a `timeout` configured (recommended to prevent connection exhaustion), the first request that grabs a reaped socket from the pool will fail with a `ConnectionError`.
 
@@ -7305,7 +7560,7 @@ This option has no effect if `WEBSOCKET_SENTINEL_HOSTS` is defined.
 
 **Precedence with REDIS_SOCKET_CONNECT_TIMEOUT**
 
-When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is automatically applied to websocket connections if set. However, if you explicitly set `WEBSOCKET_REDIS_OPTIONS` to any value, `REDIS_SOCKET_CONNECT_TIMEOUT` will **not** be injected—you must include `socket_connect_timeout` manually within this JSON if needed.
+When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is automatically applied to websocket connections if set. However, if you explicitly set `WEBSOCKET_REDIS_OPTIONS` to any value, `REDIS_SOCKET_CONNECT_TIMEOUT` will **not** be injected. You must include `socket_connect_timeout` manually within this JSON if needed.
 
 :::
 
@@ -7313,11 +7568,11 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 
 - Type: `bool`
 - Default: `false`
-- Description: Controls logging for SocketIO server related to websocket operations.
+- Description: When `true`, enables the Socket.IO server logger (passed as `logger=True` to the `AsyncServer`). This writes detailed Socket.IO protocol logs to the standard application log, covering client connects and disconnects, namespace and room joins, and every event packet the server sends or receives. It applies whether or not websocket Redis is configured. Use it to debug real-time problems such as clients that fail to connect, events that never arrive, or sessions that drop. It does not, on its own, control the lower-level transport logs. For those, see `WEBSOCKET_SERVER_ENGINEIO_LOGGING`, which defaults to this value, so enabling this flag also enables transport logging unless you explicitly set `WEBSOCKET_SERVER_ENGINEIO_LOGGING=false`.
 
 :::warning
 
-**This can be very verbose, it is only recommended to use this flag when debugging Redis related issues.**
+**This is very verbose at scale, since it logs an entry for every websocket event. Enable it only while you are actively debugging, then turn it off again.**
 
 :::
 
@@ -7325,11 +7580,11 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 
 - Type: `bool`
 - Default: Falls back to `WEBSOCKET_SERVER_LOGGING` if not set, otherwise `false`
-- Description: Controls logging for Engine.IO server related to websocket operations. If not explicitly set, this inherits the value from `WEBSOCKET_SERVER_LOGGING`.
+- Description: When `true`, enables the Engine.IO server logger (passed as `engineio_logger=True` to the `AsyncServer`). Engine.IO is the transport layer underneath Socket.IO, so this logs the raw transport activity: the polling and websocket connections, transport upgrades, and the periodic ping and pong heartbeats. If it is not set explicitly, it inherits the value of `WEBSOCKET_SERVER_LOGGING`.
 
 :::warning
 
-**This can be very verbose, it is only recommended to use this flag when debugging Redis related issues.**
+**This is even more verbose than `WEBSOCKET_SERVER_LOGGING`, since it logs at the packet and heartbeat level. Enable it only when you are debugging the transport itself, for example dropped connections or failed upgrades.**
 
 :::
 
@@ -7359,7 +7614,7 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 - Persistence: This is an experimental environment variable.
 
 :::warning
-**Experimental Feature - Known Limitations**
+**Experimental Feature: Known Limitations**
 
 This feature is currently experimental and has known compatibility issues:
 
@@ -7394,7 +7649,7 @@ If you use UVICORN_WORKERS, you also need to ensure that related environment var
 
 :::danger ChromaDB Not Compatible with Multiple Workers
 
-The default vector database (ChromaDB) uses a local SQLite-backed `PersistentClient`. SQLite connections are **not fork-safe** — when uvicorn forks multiple workers, each process inherits the same SQLite connection, and concurrent writes will crash workers instantly (`Child process died`).
+The default vector database (ChromaDB) uses a local SQLite-backed `PersistentClient`. SQLite connections are **not fork-safe**: when uvicorn forks multiple workers, each process inherits the same SQLite connection, and concurrent writes will crash workers instantly (`Child process died`).
 
 If you set `UVICORN_WORKERS > 1`, you **must** either switch to a client-server vector database (PGVector, Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a separate server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host).
 
@@ -7421,9 +7676,9 @@ It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a spec
 - Default: Not set (no Cache-Control header added)
 - Description: Sets the Cache-Control header for all HTTP responses. Supports standard directives like `public`, `private`, `no-cache`, `no-store`, `must-revalidate`, `max-age=seconds`, etc. If an invalid value is provided, defaults to `"no-store, max-age=0"` (no caching).
 - Examples:
-  - `"private, max-age=86400"` - Cache privately for 24 hours
-  - `"public, max-age=3600, must-revalidate"` - Cache publicly for 1 hour, then revalidate
-  - `"no-cache, no-store, must-revalidate"` - Never cache
+  - `"private, max-age=86400"`: Cache privately for 24 hours
+  - `"public, max-age=3600, must-revalidate"`: Cache publicly for 1 hour, then revalidate
+  - `"no-cache, no-store, must-revalidate"`: Never cache
 
 ### Proxy Settings
 
@@ -7455,7 +7710,7 @@ Open WebUI provides environment variables to customize the pip installation proc
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether Open WebUI automatically runs `pip install` for Python packages declared in function and tool `requirements` frontmatter. When enabled, dependencies are installed at runtime — both on startup (for all active functions and admin tools) and when saving a function or tool with new requirements.
+- Description: Controls whether Open WebUI automatically runs `pip install` for Python packages declared in function and tool `requirements` frontmatter. When enabled, dependencies are installed at runtime, both on startup (for all active functions and admin tools) and when saving a function or tool with new requirements.
 
 :::warning Security Hardening for Production
 
@@ -7463,7 +7718,7 @@ Open WebUI provides environment variables to customize the pip installation proc
 
 - **Prevents arbitrary package installation** from user-uploaded code
 - **Eliminates race conditions** that crash workers when `UVICORN_WORKERS > 1` or multiple replicas attempt concurrent pip installs
-- **Ensures reproducible deployments** — all dependencies are baked into the container image
+- **Ensures reproducible deployments**: all dependencies are baked into the container image
 
 Pre-install required packages in your Dockerfile instead:
 

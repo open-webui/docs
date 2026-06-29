@@ -1,8 +1,4 @@
 {
 	"label": "Speech-to-Text & Text-to-Speech",
-	"position": 500,
-	"link": {
-		"type": "generated-index",
-		"slug": "/features/chat-conversations/audio"
-	}
+	"position": 500
 }

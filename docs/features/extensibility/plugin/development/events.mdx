@@ -5,7 +5,7 @@ title: "Events"
 
 # 🔔 Events: Using `__event_emitter__` and `__event_call__` in Open WebUI
 
-Open WebUI's plugin architecture is not just about processing input and producing output—**it's about real-time, interactive communication with the UI and users**. To make your Tools, Functions, and Pipes more dynamic, Open WebUI provides a built-in event system via the `__event_emitter__` and `__event_call__` helpers.
+Open WebUI's plugin architecture is not just about processing input and producing output: **it's about real-time, interactive communication with the UI and users**. To make your Tools, Functions, and Pipes more dynamic, Open WebUI provides a built-in event system via the `__event_emitter__` and `__event_call__` helpers.
 
 This guide explains **what events are**, **how you can trigger them** from your code, and **the full catalog of event types** you can use (including much more than just `"input"`).
 
@@ -34,8 +34,8 @@ External tools can emit events via a **dedicated REST endpoint**. Open WebUI pas
 
 | Header | Description |
 |--------|-------------|
-| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked |
-| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call |
+| `X-OpenWebUI-Chat-Id` | The chat ID where the tool was invoked |
+| `X-OpenWebUI-Message-Id` | The message ID associated with the tool call |
 
 Your external tool can use these headers to emit events back to the UI via:
 
@@ -66,7 +66,7 @@ await __event_emitter__(
 )
 ```
 
-You **do not** need to manually add fields like `chat_id` or `message_id`—these are handled automatically by Open WebUI.
+You **do not** need to manually add fields like `chat_id` or `message_id`. These are handled automatically by Open WebUI.
 
 ### Interactive Events
 
@@ -157,13 +157,13 @@ The `done` field controls the **shimmer animation** on the status text in the UI
 
 | `done` value | Visual effect |
 |---|---|
-| `false` (or omitted) | Status text has a **shimmer/loading animation** — indicates ongoing processing |
-| `true` | Status text appears **static** — indicates the step is complete |
+| `false` (or omitted) | Status text has a **shimmer/loading animation**, indicates ongoing processing |
+| `true` | Status text appears **static**, indicates the step is complete |
 
-The backend does not inspect `done` at all — it simply saves the value and forwards it to the frontend. The shimmer effect is purely a frontend visual cue.
+The backend does not inspect `done` at all. It simply saves the value and forwards it to the frontend. The shimmer effect is purely a frontend visual cue.
 
 :::warning Always Emit a Final `done: True`
-If you emit status events, always send at least one with `done: True` at the end of your status sequence. Without it, the last status item keeps its shimmer animation indefinitely, making it look like processing never finished — even after the response is complete.
+If you emit status events, always send at least one with `done: True` at the end of your status sequence. Without it, the last status item keeps its shimmer animation indefinitely, making it look like processing never finished, even after the response is complete.
 
 ```python
 # ✅ Correct pattern
@@ -171,7 +171,7 @@ await __event_emitter__({"type": "status", "data": {"description": "Fetching dat
 # ... do work ...
 await __event_emitter__({"type": "status", "data": {"description": "Complete!", "done": True}})
 
-# ⚠️ Broken pattern — shimmer never stops
+# ⚠️ Broken pattern: shimmer never stops
 await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
 # ... do work, return result, but never sent done: True
 ```
@@ -181,7 +181,7 @@ await __event_emitter__({"type": "status", "data": {"description": "Fetching dat
 
 When `hidden` is `true`, the status is saved to `statusHistory` but **not shown** in the current status display. This is useful for internal status tracking that shouldn't be visible to the user.
 
-Additionally, when `message.content` is empty and the last status has `hidden: true` (or no status exists at all), the frontend shows a skeleton loader instead of the status bar — so hidden statuses don't replace the loading indicator.
+Additionally, when `message.content` is empty and the last status has `hidden: true` (or no status exists at all), the frontend shows a skeleton loader instead of the status bar, so hidden statuses don't replace the loading indicator.
 
 ---
 
@@ -271,14 +271,14 @@ await __event_emitter__(
 
 #### Append vs. replace
 
-By default the new entries are **appended** to whatever is already on the message — repeated emits stack up. For a single live widget you want to update in place, set `data.replace: True`; the entire `embeds` array on the message is overwritten with the payload's array. (Pass an empty list with `replace: True` to clear all embeds for the message.)
+By default the new entries are **appended** to whatever is already on the message, and repeated emits stack up. For a single live widget you want to update in place, set `data.replace: True`; the entire `embeds` array on the message is overwritten with the payload's array. (Pass an empty list with `replace: True` to clear all embeds for the message.)
 
 | Mode | Behavior | Typical use |
 | :--- | :--- | :--- |
 | `replace` omitted / `False` | Each new payload's items are appended to `message.embeds`. | One-shot tools / actions that emit a single embed at the end. |
 | `replace: True` | The message's `embeds` array is replaced with the payload's array. | Long-running pipes that keep refreshing one widget (progress bar, live dashboard, polling status card). |
 
-The `replace` flag was added so that re-emitting an embed doesn't leave stale copies stacked in the conversation when the user reloads — only the latest version is persisted.
+The `replace` flag was added so that re-emitting an embed doesn't leave stale copies stacked in the conversation when the user reloads. Only the latest version is persisted.
 
 #### Example: append a single embed at the end of a tool
 
@@ -294,7 +294,7 @@ async def get_weather_dashboard(self, city: str, __event_emitter__) -> str:
     return f"Rendered weather dashboard for {city}."
 ```
 
-This is equivalent to returning an `HTMLResponse` from a tool — the [Rich UI Embedding](/features/extensibility/plugin/development/rich-ui) doc covers that path and is the recommended option whenever a single embed is enough.
+This is equivalent to returning an `HTMLResponse` from a tool. The [Rich UI Embedding](/features/extensibility/plugin/development/rich-ui) doc covers that path and is the recommended option whenever a single embed is enough.
 
 #### Example: replace a live progress widget from a pipe
 
@@ -319,7 +319,7 @@ async def pipe(self, body: dict, __event_emitter__):
         )
         await asyncio.sleep(2)
 
-    # Final state — also replaces, leaving exactly one embed on the message
+    # Final state, also replaces, leaving exactly one embed on the message
     await __event_emitter__(
         {
             "type": "embeds",
@@ -329,7 +329,7 @@ async def pipe(self, body: dict, __event_emitter__):
     yield "Indexing complete."
 ```
 
-When the user reloads the chat, `message.embeds` contains exactly one entry — the most recent one — instead of five stacked progress cards.
+When the user reloads the chat, `message.embeds` contains exactly one entry (the most recent one) instead of five stacked progress cards.
 
 #### Example: clear all embeds
 
@@ -344,9 +344,9 @@ await __event_emitter__(
 
 #### Notes
 
-- **Persistence requires the short name.** Emit `"embeds"` (or `"chat:message:embeds"`) but be aware only the short name `"embeds"` is persisted to the database — see the [persistence table](#which-event-types-are-persisted-to-the-database) below. The `replace` flag has no effect on the unpersisted alias.
+- **Persistence requires the short name.** Emit `"embeds"` (or `"chat:message:embeds"`) but be aware only the short name `"embeds"` is persisted to the database. See the [persistence table](#which-event-types-are-persisted-to-the-database) below. The `replace` flag has no effect on the unpersisted alias.
 - **Sandbox and sizing.** Each embed is rendered inside a sandboxed iframe with `allow-scripts`, `allow-popups`, and `allow-downloads` enabled by default. Same-origin and form submissions are user-toggled. For auto-resize behavior, height reporting, and the Chart.js / Alpine auto-injection details, see [Rich UI Embedding → Sandbox and Security](/features/extensibility/plugin/development/rich-ui#sandbox-and-security).
-- **External tools.** External-tool callers can post the same `embeds` payload (including `replace: true`) to `/api/v1/chats/{chatId}/messages/{messageId}/event` — see [External Tools below](#external-tools-openapi--mcp).
+- **External tools.** External-tool callers can post the same `embeds` payload (including `replace: true`) to `/api/v1/chats/{chatId}/messages/{messageId}/event`. See [External Tools below](#external-tools-openapi--mcp).
 
 ---
 
@@ -393,11 +393,21 @@ await __event_emitter__(
     {
         "type": "source",  # or "citation"
         "data": {
-            # Open WebUI Source (Citation) Object
+            "source": {"name": "My Source Name", "id": "my-source-id"},
+            "document": ["The exact text passage being cited."],
+            "metadata": [
+                {
+                    "source": "https://example.com/page",
+                    "name": "Page Title",
+                    "url": "https://example.com/page",
+                }
+            ],
         }
     }
 )
 ```
+
+`document` and `metadata` are parallel lists (one entry per cited passage). `source.name` / `source.id` label the citation group, and each `metadata` entry's `source` / `url` is the link shown under the response. External tools (OpenAPI and MCP) emit this same `source` event by POSTing the `{"type": "source", "data": {...}}` body to the [event endpoint](#-external-tool-events); this is how an MCP search tool attaches citations, including in native function calling mode.
 
 **For code execution (track execution state):**
 
@@ -578,7 +588,7 @@ await __event_emitter__(
 #### Fire-and-forget example (with `__event_emitter__`)
 
 ```python
-# Trigger a blob download — no return value needed
+# Trigger a blob download, no return value needed
 try:
     await __event_emitter__(
         {
@@ -605,7 +615,7 @@ except Exception:
 ```
 
 :::tip iOS PWA compatibility
-On iOS Safari (especially in PWA / standalone mode), using `__event_call__` for blob downloads can fail with a `"TypeError: Load failed"` error — the two-way response channel breaks when the browser processes the download. Using `__event_emitter__` (fire-and-forget) avoids this issue entirely, since no response channel is needed.
+On iOS Safari (especially in PWA / standalone mode), using `__event_call__` for blob downloads can fail with a `"TypeError: Load failed"` error. The two-way response channel breaks when the browser processes the download. Using `__event_emitter__` (fire-and-forget) avoids this issue entirely, since no response channel is needed.
 
 If your `execute` code triggers a file download and you don't need a return value, prefer `__event_emitter__` for maximum cross-platform compatibility.
 :::
@@ -615,12 +625,12 @@ If your `execute` code triggers a file download and you don't need a return valu
 The `execute` event runs JavaScript **directly in the main page context** using `new Function()`. This means:
 
 - It runs with **full access** to the page's DOM, cookies, localStorage, and session
-- It is **not sandboxed** — there are no iframe restrictions
+- It is **not sandboxed**, there are no iframe restrictions
 - It can manipulate the Open WebUI interface directly (show/hide elements, read form data, trigger downloads)
 - The code runs as an async function, so you can use `await` and `return` a value back to the backend (when using `__event_call__`)
 
 :::tip Frontend Automation
-Because `execute` runs in the main page context with full DOM access, you can use it to **automate virtually anything on the Open WebUI frontend**: click buttons, fill input fields, navigate between pages, read page state, trigger downloads, interact with the model selector, submit messages on behalf of the user, and more. Think of it as a remote control for the browser UI — if a user can do it manually, your function can do it programmatically via `execute`.
+Because `execute` runs in the main page context with full DOM access, you can use it to **automate virtually anything on the Open WebUI frontend**: click buttons, fill input fields, navigate between pages, read page state, trigger downloads, interact with the model selector, submit messages on behalf of the user, and more. Think of it as a remote control for the browser UI: if a user can do it manually, your function can do it programmatically via `execute`.
 :::
 
 #### Example: Display a Custom Form
@@ -664,7 +674,7 @@ The `execute` event and [Rich UI Embeds](/features/extensibility/plugin/developm
 | | `execute` Event | Rich UI Embed |
 |---|---|---|
 | **Runs in** | Main page context (no sandbox) | Sandboxed iframe |
-| **Persistence** | Ephemeral — gone on reload/navigate | Persistent — saved in chat history |
+| **Persistence** | Ephemeral, gone on reload/navigate | Persistent, saved in chat history |
 | **Page access** | Full (DOM, cookies, localStorage) | Isolated from parent by default |
 | **Forms** | Always works (no sandbox) | Requires `allowForms` setting enabled |
 | **Best for** | Transient interactions, side effects, downloads, DOM manipulation | Persistent visual content, dashboards, charts |
@@ -672,7 +682,7 @@ The `execute` event and [Rich UI Embeds](/features/extensibility/plugin/developm
 Use `execute` for transient interactions (confirmations, custom dialogs, triggering downloads, reading page state) and Rich UI embeds for persistent visual content you want to stay in the conversation.
 
 :::warning
-Because `execute` runs unsandboxed JavaScript in the user's browser session, it has full access to the Open WebUI page context. Only use this in trusted functions — never execute untrusted or user-provided code through this event.
+Because `execute` runs unsandboxed JavaScript in the user's browser session, it has full access to the Open WebUI page context. Only use this in trusted functions. Never execute untrusted or user-provided code through this event.
 :::
 
 ---
@@ -690,7 +700,7 @@ For Pipes, be careful about mixing content delivery methods. If your `pipe()` me
 
 **Recommendation**: Use return/yield as your primary content delivery mechanism. Events like `status`, `source`, `files`, and `notification` work well alongside return/yield, but avoid using `chat:message:delta` or `chat:message` events as your **sole** way to deliver message content from a pipe.
 
-**Why event-only content delivery is fragile for pipes**: When a pipe completes, the frontend saves the entire chat history (including all message content from its local state) to the database. This full-history save can **overwrite** content that was previously persisted by the backend event emitter. If the pipe returns `None` or an empty string and relies solely on `type: "message"` events for content, the final save may write empty content to the database — erasing what the event emitter had written.
+**Why event-only content delivery is fragile for pipes**: When a pipe completes, the frontend saves the entire chat history (including all message content from its local state) to the database. This full-history save can **overwrite** content that was previously persisted by the backend event emitter. If the pipe returns `None` or an empty string and relies solely on `type: "message"` events for content, the final save may write empty content to the database, erasing what the event emitter had written.
 
 ```python
 # ❌ Fragile: relies only on events for content — can be overwritten on save
@@ -718,9 +728,9 @@ async def pipe(self, body: dict, __event_emitter__=None):
 
 ## 💡 Tips & Advanced Notes
 
-- **Multiple types per message:** You can emit several events of different types for one message—for example, show `status` updates, then stream with `chat:message:delta`, then complete with a `chat:message`.
+- **Multiple types per message:** You can emit several events of different types for one message. For example, show `status` updates, then stream with `chat:message:delta`, then complete with a `chat:message`.
 - **Custom event types:** While the above list is the standard, you may use your own types and detect/handle them in custom UI code.
-- **Extensibility:** The event system is designed to evolve—always check the [Open WebUI documentation](https://github.com/open-webui/open-webui) for the most current list and advanced usage.
+- **Extensibility:** The event system is designed to evolve, so always check the [Open WebUI documentation](https://github.com/open-webui/open-webui) for the most current list and advanced usage.
 
 ---
 
@@ -753,16 +763,16 @@ response = await __event_call__({
 ### Q: What event types are available for `__event_call__`?
 - `"input"`: Input box dialog
 - `"confirmation"`: Yes/No, OK/Cancel dialog
-- `"execute"`: Run provided code on client and return result (also works with `__event_emitter__` for fire-and-forget — see [execute](#execute-works-with-both-__event_call__-and-__event_emitter__) above)
+- `"execute"`: Run provided code on client and return result (also works with `__event_emitter__` for fire-and-forget, see [execute](#execute-works-with-both-__event_call__-and-__event_emitter__) above)
 
 ### Q: Can I update files attached to a message?
-Yes—use the `"files"` or `"chat:message:files"` event type with a `{files: [...]}` payload.
+Yes, use the `"files"` or `"chat:message:files"` event type with a `{files: [...]}` payload.
 
 ### Q: Can I update the conversation title or tags?
 Absolutely: use `"chat:title"` or `"chat:tags"` accordingly.
 
 ### Q: Can I stream responses (partial tokens) to the user?
-Yes—emit `"chat:message:delta"` events in a loop, then finish with `"chat:message"`.
+Yes, emit `"chat:message:delta"` events in a loop, then finish with `"chat:message"`.
 
 ---
 
@@ -786,8 +796,8 @@ When Open WebUI calls your external tool (with header forwarding enabled), it in
 
 | Header | Description | Env Var Override |
 |--------|-------------|------------------|
-| `X-Open-WebUI-Chat-Id` | The chat ID where the tool was invoked | `FORWARD_SESSION_INFO_HEADER_CHAT_ID` |
-| `X-Open-WebUI-Message-Id` | The message ID associated with the tool call | `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID` |
+| `X-OpenWebUI-Chat-Id` | The chat ID where the tool was invoked | `FORWARD_SESSION_INFO_HEADER_CHAT_ID` |
+| `X-OpenWebUI-Message-Id` | The message ID associated with the tool call | `FORWARD_SESSION_INFO_HEADER_MESSAGE_ID` |
 
 ### Event Endpoint
 
@@ -796,12 +806,12 @@ When Open WebUI calls your external tool (with header forwarding enabled), it in
 **Authentication:** Requires a valid Open WebUI API key or session token.
 
 :::warning Open WebUI does **not** forward user credentials to external tools
-The `X-OpenWebUI-User-*` and `X-Open-WebUI-Chat-Id` / `X-Open-WebUI-Message-Id` headers forwarded to your tool are **identification only** — they carry no API key or session token. The same applies to MCP custom-header template tokens (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{CHAT_ID}}`, `{{MESSAGE_ID}}`): there is no `{{API_KEY}}` or `{{TOKEN}}` placeholder, and the user's own API key / session is never sent to the tool server.
+The `X-OpenWebUI-User-*` and `X-OpenWebUI-Chat-Id` / `X-OpenWebUI-Message-Id` headers forwarded to your tool are **identification only**: they carry no API key or session token. The same applies to MCP custom-header template tokens (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{CHAT_ID}}`, `{{MESSAGE_ID}}`): there is no `{{API_KEY}}` or `{{TOKEN}}` placeholder, and the user's own API key / session is never sent to the tool server.
 
 So an external tool **must hold its own statically-configured Open WebUI API key** to call this endpoint. The endpoint's authorization check requires the caller to be the chat's owner **or an admin**, which gives you two practical options:
 
-- **Per-user key (uncommon)** — the tool server holds the specific user's API key. Only works for a single-user setup; impractical for a shared MCP server.
-- **Admin / service-account key (recommended)** — provision a dedicated admin (or service-account) user in Open WebUI, generate an API key for it, and use that key from the tool server. An admin key works for any user's chat, so a single key serves all callers; the forwarded `X-Open-WebUI-Chat-Id` + `X-Open-WebUI-Message-Id` headers tell your tool *which* chat/message to post to.
+- **Per-user key (uncommon)**: the tool server holds the specific user's API key. Only works for a single-user setup; impractical for a shared MCP server.
+- **Admin / service-account key (recommended)**: provision a dedicated admin (or service-account) user in Open WebUI, generate an API key for it, and use that key from the tool server. An admin key works for any user's chat, so a single key serves all callers; the forwarded `X-OpenWebUI-Chat-Id` + `X-OpenWebUI-Message-Id` headers tell your tool *which* chat/message to post to.
 
 Store the key as a secret on the tool server (env var, secrets manager, etc.); do not expect Open WebUI to push it for you.
 :::
@@ -821,13 +831,13 @@ Store the key as a secret on the tool server (env var, secrets manager, etc.); d
 ### Supported Event Types
 
 External tools can emit the same event types as native tools:
-- `status` – Show progress/status updates
-- `notification` – Display toast notifications
-- `chat:message:delta` / `message` – Append content to the message
-- `chat:message` / `replace` – Replace message content
-- `files` / `chat:message:files` – Attach files
-- `embeds` / `chat:message:embeds` – Attach Rich UI iframes; pass `data.replace: true` to overwrite the existing embeds array (see [`embeds`](#embeds-or-chatmessageembeds))
-- `source` / `citation` – Add citations
+- `status`: Show progress/status updates
+- `notification`: Display toast notifications
+- `chat:message:delta` / `message`: Append content to the message
+- `chat:message` / `replace`: Replace message content
+- `files` / `chat:message:files`: Attach files
+- `embeds` / `chat:message:embeds`: Attach Rich UI iframes; pass `data.replace: true` to overwrite the existing embeds array (see [`embeds`](#embeds-or-chatmessageembeds))
+- `source` / `citation`: Add citations
 
 :::note
 Interactive events (`input`, `confirmation`) require `__event_call__` and are **not supported** for external tools as they need bidirectional WebSocket communication. `execute` via `__event_call__` is similarly unsupported for external tools; however, fire-and-forget `execute` via `__event_emitter__` does not require a return channel and may work depending on your setup.
@@ -840,8 +850,8 @@ import httpx
 
 def my_tool_handler(request):
     # Extract headers from incoming request
-    chat_id = request.headers.get("X-Open-WebUI-Chat-Id")
-    message_id = request.headers.get("X-Open-WebUI-Message-Id")
+    chat_id = request.headers.get("X-OpenWebUI-Chat-Id")
+    message_id = request.headers.get("X-OpenWebUI-Message-Id")
     api_key = "your-open-webui-api-key"
     
     # Emit a status event
@@ -910,12 +920,12 @@ When you send a chat request, Open WebUI creates a background `asyncio` task tha
 1. The WebSocket disconnects and the Socket.IO disconnect handler fires
 2. The disconnect handler cleans up session data but **does not cancel any running tasks**
 3. The background task continues running to completion on the server
-4. `sio.emit()` calls succeed silently — events are sent to an empty room and discarded
+4. `sio.emit()` calls succeed silently: events are sent to an empty room and discarded
 5. **Database writes still happen** for persisted event types (see below)
 6. The task runs until the function returns, raises an error, or is manually cancelled
 
 :::info No Execution Timeout
-There is **no timeout** on pipe, tool, or action execution. Your code can run for minutes or hours — nothing in Open WebUI will kill it automatically. The only things that can stop a running task are:
+There is **no timeout** on pipe, tool, or action execution. Your code can run for minutes or hours, and nothing in Open WebUI will kill it automatically. The only things that can stop a running task are:
 - The function itself returning or raising an exception
 - Manual cancellation via `POST /api/tasks/stop/{task_id}` (the stop button in the UI)
 - The Open WebUI server process restarting
@@ -943,7 +953,7 @@ The backend event emitter only recognizes the short names above for DB writes. I
 :::
 
 :::caution Pipes: Backend Persistence Can Be Overwritten
-For **Pipes specifically**, the backend-persisted content from `"message"` and `"replace"` events can be **overwritten** by the frontend after the pipe completes. When a pipe's `pipe()` method returns, the frontend saves the entire local chat history to the database. If the pipe returned `None` or empty content and relied solely on `"message"` events, the frontend's local state may still have empty content for the assistant message — causing it to overwrite the event-emitter-written content with an empty string.
+For **Pipes specifically**, the backend-persisted content from `"message"` and `"replace"` events can be **overwritten** by the frontend after the pipe completes. When a pipe's `pipe()` method returns, the frontend saves the entire local chat history to the database. If the pipe returned `None` or empty content and relied solely on `"message"` events, the frontend's local state may still have empty content for the assistant message, causing it to overwrite the event-emitter-written content with an empty string.
 
 This does **not** affect Tools, Actions, or Filters, where events supplement the return value rather than replace it. It also does not affect `"status"`, `"files"`, `"source"`, or `"embeds"` events, which update separate fields that aren't overwritten by the content save.
 
@@ -954,7 +964,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 
 | Type | Why it's lost |
 |------|--------------|
-| `chat:completion` | Streaming LLM deltas — Socket.IO only |
+| `chat:completion` | Streaming LLM deltas, Socket.IO only |
 | `chat:message:delta` | Frontend alias, backend doesn't persist |
 | `chat:message` | Frontend alias, backend doesn't persist |
 | `chat:message:files` | Frontend alias, backend doesn't persist |
@@ -964,7 +974,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 | `chat:message:favorite` | Socket.IO only (updates frontend state) |
 | `chat:title` | Socket.IO only |
 | `chat:tags` | Socket.IO only |
-| `notification` | Toast popup — Socket.IO only |
+| `notification` | Toast popup, Socket.IO only |
 
 :::tip Alternative for Streaming LLM Output
 If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
@@ -974,14 +984,14 @@ If your pipe or tool needs to call an LLM and have the result persist even when 
 
 | Type | Why |
 |------|-----|
-| `confirmation` | Uses `sio.call()` — waits for client response, will timeout |
-| `input` | Uses `sio.call()` — waits for client response, will timeout |
-| `execute` via `__event_call__` | Uses `sio.call()` — waits for client response, will timeout |
-| `execute` via `__event_emitter__` | Fires and forgets — **will not error**, but JS may not run if no browser is connected |
+| `confirmation` | Uses `sio.call()`, waits for client response, will timeout |
+| `input` | Uses `sio.call()`, waits for client response, will timeout |
+| `execute` via `__event_call__` | Uses `sio.call()`, waits for client response, will timeout |
+| `execute` via `__event_emitter__` | Fires and forgets, **will not error**, but JS may not run if no browser is connected |
 
 `confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code. The timeout is configurable via the [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) environment variable (default: 300 seconds).
 
-`execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value — particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
+`execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value, particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 
 ### Return Value Persistence
 
@@ -996,7 +1006,7 @@ When a pipe's `pipe()` method returns (or its generator finishes yielding), the 
 Either way, the final assistant message is always persisted. When you reopen the chat, it will be there.
 
 :::caution
-The return value takes precedence over event-emitted content. If your pipe emits `"message"` events but returns `None`, the saved content will be empty — the frontend's final save overwrites whatever the event emitter wrote to the database. Always return or yield your content directly from the `pipe()` method.
+The return value takes precedence over event-emitted content. If your pipe emits `"message"` events but returns `None`, the saved content will be empty, since the frontend's final save overwrites whatever the event emitter wrote to the database. Always return or yield your content directly from the `pipe()` method.
 :::
 
 #### Tools
@@ -1020,7 +1030,7 @@ Actions go through the same return handling as tools. The same persistence rules
 
 #### Filters
 
-Filters transform `form_data` in the pipeline — they don't return results to the user directly. However, filters **do receive `__event_emitter__`** and can emit persisted event types like `"status"`, `"embeds"`, `"message"`, etc.
+Filters transform `form_data` in the pipeline, so they don't return results to the user directly. However, filters **do receive `__event_emitter__`** and can emit persisted event types like `"status"`, `"embeds"`, `"message"`, etc.
 
 ### Function Type Capabilities Matrix
 
@@ -1035,16 +1045,16 @@ Filters transform `form_data` in the pipeline — they don't return results to t
 
 If you want your function's output to **survive a closed browser tab**, follow these rules:
 
-1. **Always return your final answer** from your `pipe()`, tool, or action function — the return value is always saved
+1. **Always return your final answer** from your `pipe()`, tool, or action function. The return value is always saved
 2. **Use short event type names** (`"status"`, `"message"`, `"embeds"`, `"files"`, `"source"`) for DB persistence
-3. **Avoid relying on** `"notification"`, `"confirmation"`, `"input"`, or `"execute"` for critical workflows — these require a live browser connection
+3. **Avoid relying on** `"notification"`, `"confirmation"`, `"input"`, or `"execute"` for critical workflows. These require a live browser connection
 4. Rich UI HTML embeds (`"embeds"` type or `HTMLResponse` return) **are persisted** and will render when the user reopens the chat
 
 ---
 
 ## 📝 Conclusion
 
-**Events** give you real-time, interactive superpowers inside Open WebUI. They let your code update content, trigger notifications, request user input, stream results, handle code, and much more—seamlessly plugging your backend intelligence into the chat UI.
+**Events** give you real-time, interactive superpowers inside Open WebUI. They let your code update content, trigger notifications, request user input, stream results, handle code, and much more, seamlessly plugging your backend intelligence into the chat UI.
 
 - Use `__event_emitter__` for one-way status/content updates.
 - Use `__event_call__` for interactions that require user follow-up (input, confirmation, execution).

@@ -15,14 +15,14 @@ Upload messy data, and the AI cleans it, analyzes it, builds charts, and produce
 
 1. Reads the CSV and identifies data quality issues
 2. Cleans the data (fixes formatting, removes duplicates, handles missing values)
-3. Computes statistics — response rates, averages, distributions
+3. Computes statistics: response rates, averages, distributions
 4. Generates charts (bar charts, pie charts, trend lines)
 5. Assembles everything into a formatted PDF with title page, summary, charts, and data tables
 6. Saves the PDF to the file browser for download
 
-{/* TODO: Screenshot — File browser showing three outputs: survey_cleaned.csv, charts/ folder with .png files, and survey_report.pdf. The PDF is previewed showing a professional title page. */}
+{/* TODO: Screenshot: File browser showing three outputs: survey_cleaned.csv, charts/ folder with .png files, and survey_report.pdf. The PDF is previewed showing a professional title page. */}
 
-{/* TODO: Screenshot — A page inside the generated PDF showing a bar chart, key findings, and a summary table. */}
+{/* TODO: Screenshot: A page inside the generated PDF showing a bar chart, key findings, and a summary table. */}
 
 ## Skill content
 

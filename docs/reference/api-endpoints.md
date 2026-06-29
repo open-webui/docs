@@ -7,10 +7,10 @@ This guide provides essential information on how to interact with the API endpoi
 
 ## Authentication
 
-To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication. For full instructions on enabling and generating API keys - including the admin toggle and group permissions required for non-admin users - see [API Keys](/features/authentication-access/api-keys).
+To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication. For full instructions on enabling and generating API keys (including the admin toggle and group permissions required for non-admin users) see [API Keys](/features/authentication-access/api-keys).
 
 :::tip Alternate credential header for proxy-heavy setups
-When Open WebUI is behind a reverse proxy that already uses the `Authorization` header for its own auth, you can deliver the API key via a custom header instead (`x-api-key` by default). Admins can rename the header via the [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header) environment variable to avoid collisions — see [Behind a reverse proxy that consumes `Authorization`?](/features/authentication-access/api-keys#behind-a-reverse-proxy-that-consumes-authorization) for the full pattern.
+When Open WebUI is behind a reverse proxy that already uses the `Authorization` header for its own auth, you can deliver the API key via a custom header instead (`x-api-key` by default). Admins can rename the header via the [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header) environment variable to avoid collisions. See [Behind a reverse proxy that consumes `Authorization`?](/features/authentication-access/api-keys#behind-a-reverse-proxy-that-consumes-authorization) for the full pattern.
 :::
 
 ## Swagger Documentation Links
@@ -38,6 +38,38 @@ Access detailed API documentation for different services provided by Open WebUI:
   ```bash
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
+
+### 🛠️ Programmatic Model Management (Export / Import / Sync)
+
+Custom models are plain JSON, so you can manage them declaratively (in git, via scripts or from an AI agent) without the UI. These endpoints live under `/api/v1/models`:
+
+| Endpoint | Description |
+| :--- | :--- |
+| `GET /api/v1/models/export` | Export **all** custom models as a JSON array. |
+| `POST /api/v1/models/import` | Bulk **upsert**: create new models and update existing ones (matched by `id`). Additive, never deletes. |
+| `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
+| `POST /api/v1/models/create` | Create a single model. |
+| `POST /api/v1/models/model/update` | Update a single model. |
+| `POST /api/v1/models/model/delete` | Delete a single model. |
+
+**Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+
+**Version-controlled, code-driven workflow:**
+
+```bash
+# 1. Snapshot your live models into a file you can commit to git
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  http://localhost:3000/api/v1/models/export > models.json
+
+# 2. Edit or generate models.json with your scripts or an agent, commit it, then
+#    reconcile the instance to match the file exactly (creates, updates, prunes)
+curl -X POST -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"models\": $(cat models.json)}" \
+  http://localhost:3000/api/v1/models/sync
+```
+
+This gives reproducible, version-controlled model definitions. Use `/import` instead of `/sync` for additive updates that never delete existing models. Run the sync step on deploy, in CI or at container startup to load your models automatically.
 
 ### 💬 Chat Completions
 
@@ -112,7 +144,7 @@ If your external client sends its own OpenAI-style `tools` array, Open WebUI for
 
 ### 🔮 Anthropic Messages API
 
-Open WebUI provides an Anthropic Messages API compatible endpoint. This allows tools, SDKs, and applications built for the Anthropic API to work directly against Open WebUI — routing requests through all configured models, filters, and pipelines.
+Open WebUI provides an Anthropic Messages API compatible endpoint. This allows tools, SDKs, and applications built for the Anthropic API to work directly against Open WebUI, routing requests through all configured models, filters, and pipelines.
 
 Internally, the endpoint converts the Anthropic request format to OpenAI Chat Completions format, routes it through the existing chat completion pipeline, and converts the response back to Anthropic format. Both streaming and non-streaming requests are supported.
 
@@ -207,7 +239,7 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
   This routes all Claude Code requests through Open WebUI's authentication and access control layer, letting you use any configured model (including local models via Ollama or vLLM) with Claude Code's interface.
 
 :::info
-All models configured in Open WebUI are accessible through this endpoint — including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
+All models configured in Open WebUI are accessible through this endpoint, including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
 
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
 :::
@@ -217,23 +249,23 @@ All models configured in Open WebUI are accessible through this endpoint — inc
 When using the API endpoints directly, filters (Functions) behave differently than when requests come from the web interface.
 
 :::info Authentication Note
-Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** for API authentication. This is intentional—the web interface uses JWT tokens internally for the same API endpoints. Both authentication methods provide equivalent API access.
+Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** for API authentication. This is intentional: the web interface uses JWT tokens internally for the same API endpoints. Both authentication methods provide equivalent API access.
 :::
 
 #### Filter Execution
 
-| Filter Function | WebUI Request | Direct API — stable (`main`) | Direct API — pre-release (`dev`) |
+| Filter Function | WebUI Request | Direct API, stable (`main`) | Direct API, pre-release (`dev`) |
 |----------------|--------------|------------------------------|-----------------------------------|
 | `inlet()` | ✅ Runs | ✅ Runs | ✅ Runs |
 | `stream()` | ✅ Runs | ✅ Runs | ✅ Runs |
-| `outlet()` | ✅ Runs | ❌ Not called by `/api/chat/completions` — use `/api/chat/completed` | ⚠️ Runs inline only under narrow conditions (see below) |
+| `outlet()` | ✅ Runs | ❌ Not called by `/api/chat/completions`, use `/api/chat/completed` | ⚠️ Runs inline only under narrow conditions (see below) |
 
 The `inlet()` function always executes, making it ideal for:
-- **Rate limiting** - Track and limit requests per user
-- **Request logging** - Log all API usage for monitoring
-- **Input validation** - Reject invalid requests before they reach the model
+- **Rate limiting**: Track and limit requests per user
+- **Request logging**: Log all API usage for monitoring
+- **Input validation**: Reject invalid requests before they reach the model
 
-:::danger Outlet Behavior for Direct API Calls — Read Carefully
+:::danger Outlet Behavior for Direct API Calls, Read Carefully
 Earlier versions of this page said `outlet()` runs inline during `/api/chat/completions` for both WebUI and API requests. That was wrong. The accurate picture, verified in the backend source, is:
 
 **On tagged releases / `main`:** `outlet()` is **not** invoked inline by `/api/chat/completions` at all. It only runs if the caller performs the second POST to `/api/chat/completed`. For now, if your integration needs `outlet()`, you must still do that second call.
@@ -251,7 +283,7 @@ Even in the non-streaming case, **`outlet()` does not rewrite the HTTP response 
 
 #### Legacy / Supported-for-API Endpoint: `/api/chat/completed`
 
-`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. On `dev` it is marked deprecated in favor of inline execution, but as described above, inline execution does not currently return the filtered payload to pure API callers — so in practice `/api/chat/completed` remains the right call for most API integrations today.
+`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. On `dev` it is marked deprecated in favor of inline execution, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
 
 - **Endpoint**: `POST /api/chat/completed`
 - **Description**: Runs `outlet()` filters (and pipeline outlet filters) unconditionally over a completed chat payload. Returns the filtered payload.
@@ -308,7 +340,7 @@ If you need `outlet()` output over HTTP today, call `/api/chat/completions` foll
 
 ### 🦙 Ollama API Proxy Support
 
-If you want to interact directly with Ollama models—including for embedding generation or raw prompt streaming—Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
+If you want to interact directly with Ollama models (including for embedding generation or raw prompt streaming) Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
 
 - **Base URL**: `/ollama/<api>`
 - **Reference**: [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)

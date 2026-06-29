@@ -143,8 +143,8 @@ A `dict` with wide ranging information about the chat, model, files, etc.
 :::tip Detecting Request Source
 
 The `interface` field indicates where the request originated:
-- **`"open-webui"`** - Request came from the web interface
-- **Other/missing** - Request likely came from a direct API call
+- **`"open-webui"`**: Request came from the web interface
+- **Other/missing**: Request likely came from a direct API call
 
 For direct API calls, some fields like `chat_id`, `message_id`, and `session_id` may be absent or `null` if not explicitly provided by the API client. You can use this to distinguish between WebUI and API requests in your filters:
 

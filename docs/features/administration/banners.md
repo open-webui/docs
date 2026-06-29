@@ -113,7 +113,7 @@ If users dismissed a banner and you want them to see an updated message, change 
 
 ## Supported content formatting (HTML only)
 
-Banner `title` and `content` support a subset of **HTML only** — Markdown syntax is not rendered. Unsupported tags may render as plain text or break the layout.
+Banner `title` and `content` support a subset of **HTML only**: Markdown syntax is not rendered. Unsupported tags may render as plain text or break the layout.
 
 ### Text formatting
 
@@ -239,7 +239,7 @@ renders more predictably than heavily formatted HTML with many line breaks.
 
 The following are not supported in banners and may render as plain text or break the layout:
 
-- Headings (`<h1>`–`<h6>`)
+- Headings (`<h1>` to `<h6>`)
 - Lists (`<ul>`, `<ol>`)
 - Tables
 - Blockquotes

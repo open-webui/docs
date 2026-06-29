@@ -12,7 +12,7 @@ title: "Pipelines"
 
 # Pipelines: UI-Agnostic OpenAI API Plugin Framework
 
-:::danger Pipelines are legacy — do not use for new deployments
+:::danger Pipelines are legacy, do not use for new deployments
 **Pipelines are legacy and are no longer recommended.** They predate the in-process [Functions](/features/extensibility/plugin/functions/) (Pipes, Filters, Actions) and [Tools](/features/extensibility/plugin/tools/) system, which now covers the same use cases without running a separate worker container.
 
 - Custom provider / RAG / request routing (a Pipeline **pipe**) → use a [Pipe Function](/features/extensibility/plugin/functions/pipe).
@@ -22,7 +22,7 @@ title: "Pipelines"
 These pages are kept for reference and for existing deployments only. New work should target Functions, Tools, or external tool servers instead.
 :::
 
-Welcome to **Pipelines**, an [Open WebUI](https://github.com/open-webui) initiative. Pipelines bring modular, customizable workflows to any UI client supporting OpenAI API specs – and much more! Easily extend functionalities, integrate unique logic, and create dynamic workflows with just a few lines of code.
+Welcome to **Pipelines**, an [Open WebUI](https://github.com/open-webui) initiative. Pipelines bring modular, customizable workflows to any UI client supporting OpenAI API specs, and much more! Easily extend functionalities, integrate unique logic, and create dynamic workflows with just a few lines of code.
 
 ## 🚀 Why Choose Pipelines?
 
@@ -54,7 +54,7 @@ Integrating Pipelines with any OpenAI API-compatible UI client is simple. Launch
 
 :::danger ⚠️ Security Warning
 
-Pipelines are a plugin system with arbitrary code execution — **don't fetch random pipelines from sources you don't trust**. A malicious Pipeline could access your file system, exfiltrate data, mine cryptocurrency, or compromise your system. Always review Pipeline source code before installing. See the [Security Policy](/security) for more details.
+Pipelines are a plugin system with arbitrary code execution: **don't fetch random pipelines from sources you don't trust**. A malicious Pipeline could access your file system, exfiltrate data, mine cryptocurrency, or compromise your system. Always review Pipeline source code before installing. See the [Security Policy](/security) for more details.
 
 :::
 

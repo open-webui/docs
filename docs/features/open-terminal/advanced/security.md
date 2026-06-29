@@ -26,14 +26,14 @@ The `--memory 2g` and `--cpus 2` flags prevent runaway processes from consuming 
 {/* TODO: Screenshot — A simple diagram showing your computer on the left, a Docker container in the middle (labeled "Open Terminal — isolated"), and an arrow showing that only the /home/user volume is shared. The rest of the host filesystem is blocked off. */}
 
 :::warning Running without Docker
-Without Docker (bare metal mode), the AI can run any command with your user's permissions — including deleting files, installing software, or accessing anything your account can access. Only use bare metal on your own personal machine for personal projects.
+Without Docker (bare metal mode), the AI can run any command with your user's permissions, including deleting files, installing software, or accessing anything your account can access. Only use bare metal on your own personal machine for personal projects.
 :::
 
 ---
 
 ## Always set a password
 
-Without an API key, **anyone who can reach the port has full access** — they can run commands, read files, and control the terminal.
+Without an API key, **anyone who can reach the port has full access**: they can run commands, read files, and control the terminal.
 
 ```bash
 -e OPEN_TERMINAL_API_KEY=a-strong-password-here

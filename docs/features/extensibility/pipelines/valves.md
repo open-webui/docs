@@ -5,7 +5,7 @@ title: "Valves"
 
 ## Valves
 
-:::danger Pipelines are legacy — do not use for new deployments
+:::danger Pipelines are legacy, do not use for new deployments
 **Pipelines are outdated and legacy, and are no longer recommended.** A Pipeline can run as a **pipe** or as a **filter**; both forms now have in-process replacements that support [Valves](/features/extensibility/plugin/development/valves) too, are built in, and need no separate worker container:
 
 - Pipeline **pipe** (custom provider, RAG, request routing) → [Pipe Function](/features/extensibility/plugin/functions/pipe)

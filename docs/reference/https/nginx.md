@@ -37,7 +37,7 @@ proxy_set_header Connection "upgrade";
 
 **This is the most common cause of garbled markdown and broken streaming responses.**
 
-When Nginx's `proxy_buffering` is enabled (the default!), it re-chunks SSE streams arbitrarily. This breaks markdown tokens across chunk boundaries—for example, `**bold**` becomes `**` + `bold` + `**`—causing corrupted output with visible `##`, `**`, or missing words.
+When Nginx's `proxy_buffering` is enabled (the default!), it re-chunks SSE streams arbitrarily. This breaks markdown tokens across chunk boundaries. For example, `**bold**` becomes `**` + `bold` + `**`, causing corrupted output with visible `##`, `**`, or missing words.
 
 **You MUST include these directives in your Nginx location block:**
 
@@ -279,10 +279,10 @@ Replace `www-data` with your nginx user (check with `ps aux | grep nginx`). Comm
 
 These paths must **never** be cached to prevent security issues and broken logins:
 
-- `/api/v1/auths/` - Authentication endpoints
-- `/oauth/` - OAuth/SSO callbacks
-- `/api/` (general) - Dynamic API responses
-- `/ws/` - WebSocket connections
+- `/api/v1/auths/`: Authentication endpoints
+- `/oauth/`: OAuth/SSO callbacks
+- `/api/` (general): Dynamic API responses
+- `/ws/`: WebSocket connections
 
 Always include these directives for auth endpoints:
 
@@ -354,10 +354,10 @@ add_header X-Cache-Status $upstream_cache_status always;
 ```
 
 Check the header in browser DevTools:
-- `HIT` - Served from cache
-- `MISS` - Fetched from backend, now cached
-- `EXPIRED` - Cache expired, refreshed
-- `BYPASS` - Cache intentionally skipped
+- `HIT`: Served from cache
+- `MISS`: Fetched from backend, now cached
+- `EXPIRED`: Cache expired, refreshed
+- `BYPASS`: Cache intentionally skipped
 
 ### Trade-offs
 

@@ -3,7 +3,19 @@ sidebar_position: 1000
 title: "Channels"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 💬 Channels
+
+<ThemedImage
+  alt="Channels: a shared #product-launch channel where people and AI models talk in one timeline, summoned with @model mentions"
+  sources={{
+    light: useBaseUrl('/images/banners/channels-light.svg'),
+    dark: useBaseUrl('/images/banners/channels-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Where your team and AI think together, in real time.**
 
@@ -83,10 +95,10 @@ Mentioning a model in a channel runs through the same chat-completion pipeline a
 | **Knowledge (RAG)** | Knowledge bases attached to the model are queried and injected |
 | **Attached documents** | Images **and** non-image files (PDF, DOCX, etc.) uploaded in the thread are forwarded into the model's context |
 
-In other words, a channel-summoned model is a fully-equipped agent — not a one-shot completion.
+In other words, a channel-summoned model is a fully-equipped agent, not a one-shot completion.
 
 :::note Document attachments in channels (v0.9.6+)
-Before v0.9.6, tagging a model in a channel only forwarded **images** from the thread — uploaded PDFs, DOCX, and other non-image documents were ignored, so summarization and document-comparison prompts silently had nothing to work with. As of v0.9.6 these files are forwarded the same way they are in a direct chat, so document workflows behave identically in channels.
+Before v0.9.6, tagging a model in a channel only forwarded **images** from the thread. Uploaded PDFs, DOCX, and other non-image documents were ignored, so summarization and document-comparison prompts silently had nothing to work with. As of v0.9.6 these files are forwarded the same way they are in a direct chat, so document workflows behave identically in channels.
 :::
 
 ### Tagging people and linking channels
@@ -121,12 +133,12 @@ If you want a one-click path from a chat message into a channel, the community *
 
 ## Getting Started
 
-:::info Beta Feature
-Channels is currently in **Beta** and must be enabled by an administrator.
+:::info
+Channels must be enabled by an administrator before use.
 :::
 
 1. Navigate to **Admin Panel > Settings > General**
-2. Toggle **Channels (Beta)** on and save
+2. Toggle **Channels** on and save
 3. Channels appear in the sidebar. Click **(+)** to create your first one
 
 Channel creation is restricted to administrators by default. Channels support granular permissions including read-only access, write access, and feature-level toggles via environment variables or group permissions.

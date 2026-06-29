@@ -18,8 +18,8 @@ The following speech-to-text providers are supported:
 | Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/chat-conversations/audio/speech-to-text/env-variables) |
 | OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/chat-conversations/audio/speech-to-text/openai-stt-integration) |
 | Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
-| Deepgram | ✅ | — |
-| Azure | ✅ | — |
+| Deepgram | ✅ | N/A |
+| Azure | ✅ | N/A |
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 
@@ -78,8 +78,8 @@ Once your recording has begun you can:
 If you see an error like `Error transcribing chunk: Requested int8 compute type, but the target device or backend do not support efficient int8 computation`, this usually means your GPU doesn't support the requested `int8` compute operations.
 
 **Solutions:**
-- **Upgrade to the latest version** — persistent configuration for compute type has been improved in recent updates to resolve known issues with CUDA compatibility.
-- **Switch to the standard Docker image** instead of the `:cuda` image — older GPUs (Maxwell architecture, ~2014-2016) may not be supported by modern CUDA accelerated libraries.
+- **Upgrade to the latest version:** persistent configuration for compute type has been improved in recent updates to resolve known issues with CUDA compatibility.
+- **Switch to the standard Docker image** instead of the `:cuda` image. Older GPUs (Maxwell architecture, ~2014-2016) may not be supported by modern CUDA accelerated libraries.
 - **Change the compute type** using the `WHISPER_COMPUTE_TYPE` environment variable:
   ```yaml
   environment:
@@ -92,15 +92,15 @@ For smaller models like Whisper, CPU mode often provides comparable performance 
 
 #### Microphone Not Working
 
-1. **Check browser permissions** — ensure your browser has microphone access
-2. **Use HTTPS** — some browsers require secure connections for microphone access
-3. **Try another browser** — Chrome typically has the best support for web audio APIs
+1. **Check browser permissions:** ensure your browser has microphone access
+2. **Use HTTPS:** some browsers require secure connections for microphone access
+3. **Try another browser:** Chrome typically has the best support for web audio APIs
 
 #### Poor Recognition Accuracy
 
 - **Set the language explicitly** using `WHISPER_LANGUAGE=en` (uses ISO 639-1 codes)
-- **Toggles multilingual support** — Use `WHISPER_MULTILINGUAL=true` if you need to support languages other than English. When disabled (default), only the English-only variant of the model is used for better performance in English tasks.
-- **Use a larger Whisper model** — options: `tiny`, `base`, `small`, `medium`, `large`
+- **Toggles multilingual support:** use `WHISPER_MULTILINGUAL=true` if you need to support languages other than English. When disabled (default), only the English-only variant of the model is used for better performance in English tasks.
+- **Use a larger Whisper model:** options: `tiny`, `base`, `small`, `medium`, `large`
 - Larger models are more accurate but slower
 
 For more detailed troubleshooting, see the [Audio Troubleshooting Guide](/troubleshooting/audio).

@@ -170,7 +170,7 @@ Messages use a **tree structure** rather than a flat list. Each message referenc
 
 ### ChatGPT Export Format
 
-ChatGPT exports are automatically detected when the first object in the array contains a `mapping` key. You don't need to manually convert ChatGPT exports—just import the file directly and Open WebUI will handle the conversion.
+ChatGPT exports are automatically detected when the first object in the array contains a `mapping` key. You don't need to manually convert ChatGPT exports: just import the file directly and Open WebUI will handle the conversion.
 
 ### Minimal Working Example
 

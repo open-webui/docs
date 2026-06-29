@@ -24,11 +24,11 @@ You need manual migration only if:
 :::
 
 :::tip Quick Fix: Migration Errors After Upgrading
-**"No such table"** — Your migrations didn't apply. Enter your container, set the required environment variables ([see Step 2](#step-2-diagnose-current-state)), and run `alembic upgrade head`. See [details](#no-such-table-errors).
+**"No such table"**: Your migrations didn't apply. Enter your container, set the required environment variables ([see Step 2](#step-2-diagnose-current-state)), and run `alembic upgrade head`. See [details](#no-such-table-errors).
 
-**"Table already exists"** — A previous migration partially completed. You need to stamp the partially-applied migration and then upgrade. See [details](#table-already-exists-errors).
+**"Table already exists"**: A previous migration partially completed. You need to stamp the partially-applied migration and then upgrade. See [details](#table-already-exists-errors).
 
-**Multiple errors after a major version jump** (e.g., "duplicate column" then "table already exists" then "no such column") — Your database is partially migrated across several migrations. You need to step through them one at a time. See [details](#multiple-failures-after-a-major-version-jump).
+**Multiple errors after a major version jump** (e.g., "duplicate column" then "table already exists" then "no such column"): Your database is partially migrated across several migrations. You need to step through them one at a time. See [details](#multiple-failures-after-a-major-version-jump).
 :::
 
 :::danger Critical Warning
@@ -314,7 +314,7 @@ INFO  [alembic.runtime.migration] Running upgrade abc123 -> def456, add_new_colu
 :::note "Will assume non-transactional DDL"
 This is a **normal informational message** for SQLite, not an error. SQLite doesn't support rollback of schema changes, so migrations run without transaction protection.
 
-If the process appears to hang after this message, wait 2-3 minutes - some migrations take time, especially:
+If the process appears to hang after this message, wait 2-3 minutes; some migrations take time, especially:
 - Migrations that add indexes to large tables (1M+ rows: 1-5 minutes)
 - Migrations with data transformations (100K+ rows: 30 seconds to several minutes)
 - Migrations that rebuild tables (SQLite doesn't support all ALTER operations)
@@ -462,7 +462,7 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table chat_message a
 
 or similar errors for other tables (e.g., `access_grant`).
 
-**Cause:** A previous migration **partially completed** — the table was created in the database, but Alembic's version tracking was not updated (typically because the migration was interrupted during the data backfill step that runs after table creation). Alembic still thinks the migration hasn't been applied, so it tries to create the table again.
+**Cause:** A previous migration **partially completed**: the table was created in the database, but Alembic's version tracking was not updated (typically because the migration was interrupted during the data backfill step that runs after table creation). Alembic still thinks the migration hasn't been applied, so it tries to create the table again.
 
 :::tip Migrations are idempotent as of v0.9.6
 v0.9.6 reworked the bundled Alembic migrations to introspect the live schema and **skip tables, indexes, and columns that already exist** (and to add missing primary keys to legacy peewee-era tables). Many partially-applied-schema upgrades that used to fail with this error now complete cleanly on a straight `alembic upgrade head`. If you are hitting "table already exists" on an older version, upgrading to v0.9.6+ before manual intervention is often the simplest fix. The recovery steps below remain valid for databases mutated in other ways.
@@ -487,7 +487,7 @@ There are three ways to resolve this, listed from safest to most lossy:
 
 #### Option 1: Restore from Backup (Recommended)
 
-Restore your database from the backup you created in [Step 1](#step-1-create-and-verify-backup), then run `alembic upgrade head` on the clean backup. This guarantees the full migration — including all data backfills — completes correctly.
+Restore your database from the backup you created in [Step 1](#step-1-create-and-verify-backup), then run `alembic upgrade head` on the clean backup. This guarantees the full migration, including all data backfills, completes correctly.
 
 #### Option 2: Drop the Table and Re-Run
 
@@ -524,7 +524,7 @@ alembic upgrade head
 ```
 
 :::caution Check the Migration File First
-This is only safe if the migration **copies** data from old columns into the new table (the original data remains intact). Open the migration file and verify it uses `INSERT INTO ... SELECT FROM` or similar — **not** destructive operations that modify or delete the source data. If you're unsure, use Option 1 instead.
+This is only safe if the migration **copies** data from old columns into the new table (the original data remains intact). Open the migration file and verify it uses `INSERT INTO ... SELECT FROM` or similar, **not** destructive operations that modify or delete the source data. If you're unsure, use Option 1 instead.
 :::
 
 #### Option 3: Stamp Past It (Last Resort)
@@ -540,20 +540,20 @@ alembic upgrade head
 ```
 
 :::warning This Skips the Data Backfill
-Stamping marks the migration as done but skips any remaining steps like copying historical data into the new table. Your old data is **not deleted** — it still exists in the original columns — but the application may not read from those old columns anymore. Some features may work with gaps in historical data, while others may lose settings entirely.
+Stamping marks the migration as done but skips any remaining steps like copying historical data into the new table. Your old data is **not deleted** (it still exists in the original columns) but the application may not read from those old columns anymore. Some features may work with gaps in historical data, while others may lose settings entirely.
 :::
 
 If `alembic upgrade head` fails again with another "table already exists" error for a different migration, repeat the process for each stuck migration.
 
 :::tip Multiple Stuck Migrations?
-If you're hitting different errors on each retry — "duplicate column", then "table already exists", then "no such column" — your database is partially migrated across several steps. This typically happens after a major version jump (e.g., 0.7.x → 0.8.x). See [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump) for a step-by-step recovery workflow.
+If you're hitting different errors on each retry ("duplicate column", then "table already exists", then "no such column") your database is partially migrated across several steps. This typically happens after a major version jump (e.g., 0.7.x → 0.8.x). See [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump) for a step-by-step recovery workflow.
 :::
 
 ### Multiple Failures After a Major Version Jump
 
 **Symptom:** After upgrading across several versions (e.g., 0.7.x → 0.8.x), Open WebUI crashes on startup with a "no such column" error (e.g., `no such column: user.scim`). Running `alembic upgrade head` fails with a "duplicate column" or "already exists" error on an *earlier* migration. Fixing that one reveals another error on the *next* migration, and so on.
 
-**Cause:** When Open WebUI starts after a major version jump, it attempts to run all pending migrations in sequence. If any single migration in the chain fails partway through (common causes: SQLite `NOT NULL` constraints without defaults, interrupted processes, memory limits on large backfills), the partial schema changes stick — because SQLite migrations are non-transactional — but `alembic_version` does not advance. Every subsequent startup retries the same failing migration, crashes on the already-applied parts, and never reaches the later migrations. The result is a database where the schema is a patchwork: some changes from early migrations applied, none from later ones.
+**Cause:** When Open WebUI starts after a major version jump, it attempts to run all pending migrations in sequence. If any single migration in the chain fails partway through (common causes: SQLite `NOT NULL` constraints without defaults, interrupted processes, memory limits on large backfills), the partial schema changes stick (because SQLite migrations are non-transactional) but `alembic_version` does not advance. Every subsequent startup retries the same failing migration, crashes on the already-applied parts, and never reaches the later migrations. The result is a database where the schema is a patchwork: some changes from early migrations applied, none from later ones.
 
 **Diagnosis:**
 
@@ -577,7 +577,7 @@ sqlite3 /app/backend/data/webui.db "SELECT name FROM sqlite_master WHERE type='t
 
 If `alembic current` shows an old revision but you can see tables or columns from later migrations already in the database, you have a partially-applied migration chain.
 
-**Solution — Step Through One Migration at a Time:**
+**Solution, Step Through One Migration at a Time:**
 
 The approach: upgrade to each revision individually. If it succeeds, move on. If it fails with "duplicate column" or "already exists", stamp past it. If it fails with a different error, stop and investigate.
 
@@ -610,19 +610,19 @@ alembic upgrade <next_revision>
 Repeat until you reach head.
 
 :::info When is stamping safe here?
-Stamping is safe when you've confirmed that the migration's schema changes are already present in the database — which the "already exists" or "duplicate column" error itself confirms. This is different from blindly running `alembic stamp head`, which skips *all* pending migrations regardless of whether they applied.
+Stamping is safe when you've confirmed that the migration's schema changes are already present in the database, which the "already exists" or "duplicate column" error itself confirms. This is different from blindly running `alembic stamp head`, which skips *all* pending migrations regardless of whether they applied.
 :::
 
-**Special case — migrations with data backfills:**
+**Special case, migrations with data backfills:**
 
-Some migrations don't just change schema — they also copy data from old tables into new ones (e.g., the `chat_message` migration backfills from the `chat` table's JSON column). If such a migration's *table creation* succeeded but the *backfill* was interrupted:
+Some migrations don't just change schema: they also copy data from old tables into new ones (e.g., the `chat_message` migration backfills from the `chat` table's JSON column). If such a migration's *table creation* succeeded but the *backfill* was interrupted:
 
 ```bash title="Terminal - Check if Backfill Completed"
 # Check if the table has data
 sqlite3 /app/backend/data/webui.db "SELECT COUNT(*) FROM <table_name>;"
 ```
 
-If the count is greater than zero, the backfill likely completed — stamp past it. If the count is zero, you have two options:
+If the count is greater than zero, the backfill likely completed, so stamp past it. If the count is zero, you have two options:
 
 1. **Drop and re-run** (preserves data, but the backfill may take a long time on large databases):
    ```bash
@@ -630,7 +630,7 @@ If the count is greater than zero, the backfill likely completed — stamp past 
    alembic upgrade <that_revision>
    ```
 
-2. **Stamp past it** (fast, but the backfill is skipped — some features that depend on the new table may show gaps in historical data):
+2. **Stamp past it** (fast, but the backfill is skipped, so some features that depend on the new table may show gaps in historical data):
    ```bash
    alembic stamp <that_revision>
    ```
@@ -718,7 +718,7 @@ alembic heads
 
     **Cause:** Someone manually modified the database schema without migrations, or a previous migration partially failed.
     
-    **Fix:** Restore from backup - you have database corruption.
+    **Fix:** Restore from backup; you have database corruption.
     
     ```bash title="Terminal"
     # Stop everything
@@ -749,7 +749,7 @@ You may see advice to run `alembic stamp head` to "fix" version mismatches. **Th
 
 **`alembic stamp <specific_revision>` is safe only when:**
 
-- You have confirmed that the migration's schema changes are already present in the database (e.g., the "already exists" or "duplicate column" error proves it) — see [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump)
+- You have confirmed that the migration's schema changes are already present in the database (e.g., the "already exists" or "duplicate column" error proves it); see [Multiple Failures After a Major Version Jump](#multiple-failures-after-a-major-version-jump)
 - You manually created all tables using `create_all()` and need to mark them as migrated
 - You're a developer initializing a fresh database that matches current schema
 - You imported a database backup from another system and need to mark it at the correct revision
@@ -887,7 +887,7 @@ sqlite3 /app/backend/data/webui.db "PRAGMA table_info(message);"
 # 15|reply_to_id|TEXT|0||0  <- Duplicate!
 ```
 
-**Solution - Manual Column Removal:**
+**Solution: Manual Column Removal:**
 
 :::warning Data Loss Risk
 Removing columns can cause data loss. **Backup your database first** before proceeding.
@@ -940,7 +940,7 @@ cd /app/backend/open_webui
 alembic upgrade head
 ```
 
-**Alternative - Simpler approach if you know the duplicate column:**
+**Alternative: Simpler approach if you know the duplicate column:**
 
 ```bash title="Terminal - Quick Fix for Known Duplicate"
 # This only works if the column truly is completely duplicate
@@ -1232,5 +1232,5 @@ alembic upgrade head 2>&1 >> diagnostics.txt
    - What you were doing when it failed
 
 :::note
-Do not share your `webui.db` database file publicly - it contains user credentials and sensitive data. Only share the diagnostic text output.
+Do not share your `webui.db` database file publicly; it contains user credentials and sensitive data. Only share the diagnostic text output.
 :::

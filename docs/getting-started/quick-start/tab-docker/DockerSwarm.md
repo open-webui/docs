@@ -9,7 +9,7 @@ Additionally, there are pre-filled [Environment Variables](https://docs.openwebu
 
 This stack correctly deploys ChromaDB as a **separate HTTP server** container, with Open WebUI connecting to it via `CHROMA_HTTP_HOST` and `CHROMA_HTTP_PORT`. This is **required** for any multi-worker or multi-replica deployment.
 
-The default ChromaDB mode (without `CHROMA_HTTP_HOST`) uses a local SQLite-backed `PersistentClient` that is **not fork-safe** — concurrent writes from multiple worker processes will crash workers instantly. Running ChromaDB as a separate server avoids this by using HTTP connections instead of direct SQLite access.
+The default ChromaDB mode (without `CHROMA_HTTP_HOST`) uses a local SQLite-backed `PersistentClient` that is **not fork-safe**: concurrent writes from multiple worker processes will crash workers instantly. Running ChromaDB as a separate server avoids this by using HTTP connections instead of direct SQLite access.
 
 If you plan to scale the `openWebUI` service to multiple replicas, you should also switch to PostgreSQL for the main database and set up Redis. See the [Scaling & HA guide](https://docs.openwebui.com/troubleshooting/multi-replica) for full requirements.
 

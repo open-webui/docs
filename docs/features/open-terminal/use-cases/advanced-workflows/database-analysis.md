@@ -5,7 +5,7 @@ title: "Database Analysis"
 
 # 🗄️ Connect to a Database and Analyze It
 
-Connect to your PostgreSQL, MySQL, or SQLite database directly and let the AI explore the schema, run queries, and produce insights — all without writing SQL yourself.
+Connect to your PostgreSQL, MySQL, or SQLite database directly and let the AI explore the schema, run queries, and produce insights, all without writing SQL yourself.
 
 > **You:** $Database Analyst <br/>
 > Connect to my PostgreSQL database at `db.example.com` and analyze the `orders` table. What are our top-selling products this quarter? Any trends I should know about?
@@ -14,18 +14,18 @@ Connect to your PostgreSQL, MySQL, or SQLite database directly and let the AI ex
 
 1. Installs the database driver if needed (`pip install psycopg2-binary` or `pymysql`)
 2. Connects to the database using your credentials
-3. Explores the schema — lists tables, columns, relationships
+3. Explores the schema: lists tables, columns, relationships
 4. Writes and runs SQL queries to answer your question
 5. Pulls results into pandas for analysis
 6. Generates charts (revenue trends, top products, regional breakdowns)
 7. Saves everything as a report
 
-{/* TODO: Screenshot — Chat showing the AI connecting to a PostgreSQL database, listing tables, and then running a query. Results show a formatted table with product names, quantities sold, and revenue. */}
+{/* TODO: Screenshot: Chat showing the AI connecting to a PostgreSQL database, listing tables, and then running a query. Results show a formatted table with product names, quantities sold, and revenue. */}
 
-{/* TODO: Screenshot — Charts generated from the database query: a bar chart of top 10 products by revenue, a line chart showing monthly order trends, and a pie chart of sales by region. */}
+{/* TODO: Screenshot: Charts generated from the database query: a bar chart of top 10 products by revenue, a line chart showing monthly order trends, and a pie chart of sales by region. */}
 
 :::tip Keep credentials safe
-Pass database credentials as environment variables when starting Open Terminal, or store them in a `.env` file in the container. Never paste passwords directly in chat — they get saved in chat history. Example:
+Pass database credentials as environment variables when starting Open Terminal, or store them in a `.env` file in the container. Never paste passwords directly in chat: they get saved in chat history. Example:
 
 ```bash
 docker run -d --name open-terminal \

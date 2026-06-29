@@ -278,7 +278,7 @@ OAUTH_ALLOWED_ROLES=user,admin,superadmin
 OAUTH_MERGE_ACCOUNTS_BY_EMAIL=false
 ```
 
-When enabled, an OAuth login with an email matching an existing local account will merge the two. **This is not recommended.** It depends on your OAuth provider reliably verifying email addresses. If your provider does not guarantee email verification, a user who controls a matching email could gain access to the existing account — effectively an account takeover. Keep this set to `false` unless you have verified that your provider enforces email verification.
+When enabled, an OAuth login with an email matching an existing local account will merge the two. **This is not recommended.** It depends on your OAuth provider reliably verifying email addresses. If your provider does not guarantee email verification, a user who controls a matching email could gain access to the existing account, effectively an account takeover. Keep this set to `false` unless you have verified that your provider enforces email verification.
 
 ### Session limits
 
@@ -294,7 +294,7 @@ ENABLE_OAUTH_BACKCHANNEL_LOGOUT=true
 
 ## Trusted Header Authentication
 
-If your reverse proxy handles authentication (Authelia, Authentik, oauth2-proxy), you can pass the authenticated identity to Open WebUI via HTTP headers. **This is possible but risky depending on your setup** — incorrect configuration allows any client to authenticate as any user by forging the header:
+If your reverse proxy handles authentication (Authelia, Authentik, oauth2-proxy), you can pass the authenticated identity to Open WebUI via HTTP headers. **This is possible but risky depending on your setup.** Incorrect configuration allows any client to authenticate as any user by forging the header:
 
 ```bash
 WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-Forwarded-Email
@@ -334,7 +334,7 @@ For production deployments, PostgreSQL provides better concurrency and reliabili
 DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 ```
 
-See the [Scaling Guide](/getting-started/advanced-topics/scaling#step-1--switch-to-postgresql) for migration details. Use strong, unique credentials and keep the database on an internal network.
+See the [Scaling Guide](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql) for migration details. Use strong, unique credentials and keep the database on an internal network.
 
 ### SQLCipher
 
@@ -423,7 +423,7 @@ BYPASS_MODEL_ACCESS_CONTROL=false
 ENABLE_OPENAI_API_PASSTHROUGH=false
 ```
 
-The OpenAI router includes a catch-all proxy endpoint (`/{path:path}`) that forwards any request to the upstream OpenAI-compatible API using the admin-configured API key. **This is disabled by default and should be kept disabled.** When enabled, any authenticated user can reach any upstream endpoint — including endpoints not natively handled by Open WebUI — using the admin's credentials and without model-level access control. Only enable this if you explicitly need direct passthrough to upstream API endpoints and understand the security implications.
+The OpenAI router includes a catch-all proxy endpoint (`/{path:path}`) that forwards any request to the upstream OpenAI-compatible API using the admin-configured API key. **This is disabled by default and should be kept disabled.** When enabled, any authenticated user can reach any upstream endpoint (including endpoints not natively handled by Open WebUI) using the admin's credentials and without model-level access control. Only enable this if you explicitly need direct passthrough to upstream API endpoints and understand the security implications.
 
 ### Data sharing and export
 
@@ -557,7 +557,7 @@ Earlier versions applied URL validation and the redirect gate only to the defaul
 
 ### Profile image URL forwarding
 
-The user and model profile-image endpoints can issue a `302 Found` redirect to whatever origin is stored in `profile_image_url` so that externally-hosted avatars (e.g. Gravatar via an upstream identity provider) display in the UI. That redirect causes the user's browser to make a request directly to the external origin, leaking client IP, User-Agent, and Referer headers — and an account whose `profile_image_url` was set to an attacker-controlled host can use that to deanonymize anyone who renders their avatar.
+The user and model profile-image endpoints can issue a `302 Found` redirect to whatever origin is stored in `profile_image_url` so that externally-hosted avatars (e.g. Gravatar via an upstream identity provider) display in the UI. That redirect causes the user's browser to make a request directly to the external origin, leaking client IP, User-Agent, and Referer headers. An account whose `profile_image_url` was set to an attacker-controlled host can use that to deanonymize anyone who renders their avatar.
 
 To suppress the redirect entirely and serve the bundled default image instead:
 
@@ -565,7 +565,7 @@ To suppress the redirect entirely and serve the bundled default image instead:
 ENABLE_PROFILE_IMAGE_URL_FORWARDING=false
 ```
 
-Default is `true` so existing deployments relying on external avatars keep working. Data URIs and same-origin/static images are unaffected by this flag — they continue to render normally.
+Default is `true` so existing deployments relying on external avatars keep working. Data URIs and same-origin/static images are unaffected by this flag: they continue to render normally.
 
 Profile images stored as base64 `data:` URIs are also constrained to a MIME-type allowlist. The default is `image/png,image/jpeg,image/gif,image/webp`; SVG is intentionally excluded because it can carry inline `<script>`. Responses also set `X-Content-Type-Options: nosniff` so the browser cannot sniff a non-image payload into an executable type. To narrow further (e.g. PNG/JPEG only), set:
 
@@ -575,13 +575,13 @@ PROFILE_IMAGE_ALLOWED_MIME_TYPES=image/png,image/jpeg
 
 ### Iframe content-security-policy
 
-Open WebUI renders LLM-generated and user-uploaded HTML inside `srcdoc` iframes for Artifacts, code/HTML previews, file previews, and citation modals. The `sandbox` attribute on those iframes provides the baseline isolation. For deployments that want a stronger limit on what the rendered HTML can do — particularly outbound network requests — set a CSP that is injected into every iframe document:
+Open WebUI renders LLM-generated and user-uploaded HTML inside `srcdoc` iframes for Artifacts, code/HTML previews, file previews, and citation modals. The `sandbox` attribute on those iframes provides the baseline isolation. For deployments that want a stronger limit on what the rendered HTML can do, particularly outbound network requests, set a CSP that is injected into every iframe document:
 
 ```bash
 IFRAME_CSP=default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'
 ```
 
-The example above lets inline scripts run inside the sandbox (needed for most artifacts) but blocks all `fetch`/`XMLHttpRequest`/`WebSocket` traffic — useful when you do not want a model to be able to exfiltrate session data through a generated artifact. Tighten or relax as appropriate; an overly strict policy will break legitimate artifacts.
+The example above lets inline scripts run inside the sandbox (needed for most artifacts) but blocks all `fetch`/`XMLHttpRequest`/`WebSocket` traffic, useful when you do not want a model to be able to exfiltrate session data through a generated artifact. Tighten or relax as appropriate; an overly strict policy will break legitimate artifacts.
 
 ### File upload limits
 
@@ -613,16 +613,16 @@ Because Tools and Functions execute server-side code, any user with permission t
 Open WebUI has two code execution features enabled by default:
 
 ```bash
-# Allows code blocks in chat responses to be executed (default: true, engine: pyodide)
+# Allows code blocks in chat responses to be executed (default: true; engine pyodide, legacy)
 ENABLE_CODE_EXECUTION=true
 CODE_EXECUTION_ENGINE=pyodide
 
-# Allows the model to run code as part of its reasoning (default: true, engine: pyodide)
+# Allows the model to run code as part of its reasoning (default: true; engine pyodide, legacy)
 ENABLE_CODE_INTERPRETER=true
 CODE_INTERPRETER_ENGINE=pyodide
 ```
 
-The default engine is `pyodide`, which runs Python in the browser via WebAssembly and does not execute code on the server. If you switch to Jupyter (`jupyter`), code runs on the Jupyter server, which has server-side access. Secure the Jupyter instance accordingly if using this engine.
+`pyodide` (browser/WebAssembly) and `jupyter` (server) are **legacy** code-execution engines. **If you do not need in-chat code execution, disable both features** by setting `ENABLE_CODE_EXECUTION=false` and `ENABLE_CODE_INTERPRETER=false`. If you do need it, isolate it: prefer **[Open Terminal](/features/open-terminal)**, which runs code in a separate Docker container, with **[Terminals](/enterprise)** for per-user isolation in multi-tenant deployments. Do not treat the browser-based `pyodide` engine as a security boundary, and never expose the `jupyter` engine without securing the Jupyter instance, which has direct server-side access.
 
 ### Safe Mode
 
@@ -796,7 +796,7 @@ For organizations where security is a priority, the following practices define t
 
 7. **Keep Tool and Function creation restricted to administrators and review all code before importing.** By default, only administrators can create, import, and manage Tools and Functions. Do not grant workspace permissions to untrusted users. Treat third-party Tools with the same scrutiny as any code running on your infrastructure. Never import Tools without reviewing their source code first. [Details](#tools-functions-and-pipelines)
 
-8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely. If it is needed, keep the default `pyodide` engine, which runs in the browser, not on the server. Do not switch to the Jupyter engine without securing the Jupyter instance. Keep direct connections and direct tool servers disabled. [Details](#dependency-installation)
+8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely (`ENABLE_CODE_EXECUTION=false`, `ENABLE_CODE_INTERPRETER=false`). If it is needed, isolate it with **Open Terminal** (container-isolated) rather than relying on the legacy `pyodide` or `jupyter` engines, and never expose a `jupyter` engine without securing the Jupyter instance. Keep direct connections and direct tool servers disabled. [Details](#dependency-installation)
 
 ### Data Protection
 

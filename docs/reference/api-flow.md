@@ -34,10 +34,10 @@ This tutorial describes a comprehensive 6-step process that enables server-side 
 
 The essential steps are:
 
-1. **Create a new chat with user and assistant messages** — Initialize the conversation with the user's input and an empty assistant placeholder
-2. **Trigger the assistant completion** — Generate the actual AI response (with optional knowledge integration)
-3. **Wait for response completion** — Monitor the assistant response until fully generated
-4. **Fetch and process the final chat** — Retrieve and parse the completed conversation
+1. **Create a new chat with user and assistant messages**: Initialize the conversation with the user's input and an empty assistant placeholder
+2. **Trigger the assistant completion**: Generate the actual AI response (with optional knowledge integration)
+3. **Wait for response completion**: Monitor the assistant response until fully generated
+4. **Fetch and process the final chat**: Retrieve and parse the completed conversation
 
 This enables server-side orchestration while still making replies show up in the frontend UI exactly as if they were generated through normal user interaction.
 
@@ -73,8 +73,8 @@ The assistant message needs to exist in the chat data as a critical prerequisite
 
 The assistant message must appear in both locations:
 
-- `chat.messages[]` — The main message array (used for legacy compatibility)
-- `chat.history.messages[<assistantId>]` — The indexed message history (used by the frontend to render the tree)
+- `chat.messages[]`: The main message array (used for legacy compatibility)
+- `chat.history.messages[<assistantId>]`: The indexed message history (used by the frontend to render the tree)
 
 **Expected structure of the assistant message:**
 
@@ -170,11 +170,11 @@ curl -X POST https://<host>/api/v1/chats/new \
   }'
 ```
 
-**Save the `id` field from the response** — this is your `chatId` for all subsequent steps.
+**Save the `id` field from the response.** This is your `chatId` for all subsequent steps.
 
 :::note
 
-The `messages[]` array at the top level is a flat list used for legacy compatibility. The `history.messages{}` object is the authoritative structure — it is a dictionary keyed by message ID that the frontend uses to build the conversation tree via `parentId` and `childrenIds`.
+The `messages[]` array at the top level is a flat list used for legacy compatibility. The `history.messages{}` object is the authoritative structure: it is a dictionary keyed by message ID that the frontend uses to build the conversation tree via `parentId` and `childrenIds`.
 
 :::
 
@@ -399,7 +399,7 @@ curl -X POST https://<host>/api/chat/completions \
 
 :::note
 
-When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, you can pass partial updates — existing messages that are not included in the update will be preserved.
+When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, you can pass partial updates: existing messages that are not included in the update will be preserved.
 
 :::
 
@@ -763,16 +763,16 @@ This cleaning process handles:
 
 **Chat Creation - Required Fields:**
 
-- `title` — Chat title (string)
-- `models` — Array of model names (string[])
-- `messages` — Initial message array
-- `history` — Message tree with `currentId` and `messages` map
+- `title`: Chat title (string)
+- `models`: Array of model names (string[])
+- `messages`: Initial message array
+- `history`: Message tree with `currentId` and `messages` map
 
 **Chat Creation - Optional Fields:**
 
-- `files` — Knowledge files for RAG (defaults to empty array)
-- `tags` — Chat tags (defaults to empty array)
-- `params` — Model parameters (defaults to empty object)
+- `files`: Knowledge files for RAG (defaults to empty array)
+- `tags`: Chat tags (defaults to empty array)
+- `params`: Model parameters (defaults to empty object)
 
 **Message Structure - User Message:**
 
@@ -786,20 +786,20 @@ This cleaning process handles:
 
 **ChatCompletionsRequest - Required Fields:**
 
-- `chat_id` — Target chat ID
-- `id` — Assistant message ID
-- `messages` — Array of ChatCompletionMessage
-- `model` — Model identifier
-- `session_id` — Session identifier (caller-generated UUID)
+- `chat_id`: Target chat ID
+- `id`: Assistant message ID
+- `messages`: Array of ChatCompletionMessage
+- `model`: Model identifier
+- `session_id`: Session identifier (caller-generated UUID)
 
 **ChatCompletionsRequest - Optional Fields:**
 
-- `stream` — Enable streaming (defaults to false)
-- `background_tasks` — Control automatic tasks
-- `features` — Enable/disable features
-- `variables` — Template variables
-- `filter_ids` — Pipeline filters
-- `files` — Knowledge collections for RAG
+- `stream`: Enable streaming (defaults to false)
+- `background_tasks`: Control automatic tasks
+- `features`: Enable/disable features
+- `variables`: Template variables
+- `filter_ids`: Pipeline filters
+- `files`: Knowledge collections for RAG
 
 #### Field Constraints
 
@@ -834,10 +834,10 @@ This cleaning process handles:
 
 - This workflow is compatible with Open WebUI + backend orchestration scenarios
 - **Critical: Use `currentId` (camelCase)** in the history object, not `current_id` (snake_case)
-- **Critical: Include `childrenIds`** on every message — the frontend uses this to build the message tree
+- **Critical: Include `childrenIds`** on every message. The frontend uses this to build the message tree
 - No frontend code changes are required for this approach
 - The `stream: true` parameter allows for real-time response streaming if needed
-- `outlet()` filters run inline during `/api/chat/completions` when `chat_id` and `id` (message ID) are present in the request body. Pure API callers that omit these fields will have outlet silently skipped — see [Filter Functions: Running outlet() for API Callers](/features/extensibility/plugin/functions/filter#running-outlet-for-api-callers-apichatcompleted) for a workaround. The separate `/api/chat/completed` endpoint is deprecated and no longer needed
+- `outlet()` filters run inline during `/api/chat/completions` when `chat_id` and `id` (message ID) are present in the request body. Pure API callers that omit these fields will have outlet silently skipped. See [Filter Functions: Running outlet() for API Callers](/features/extensibility/plugin/functions/filter#running-outlet-for-api-callers-apichatcompleted) for a workaround. The separate `/api/chat/completed` endpoint is deprecated and no longer needed
 - Background tasks like title generation can be controlled via the `background_tasks` object
 - Session IDs help maintain conversation context across requests
 - **Knowledge Integration:** Use the `files` array to include knowledge collections for RAG capabilities
@@ -857,17 +857,17 @@ This cleaning process handles:
 
 Use the Open WebUI backend APIs to:
 
-1. **Start a chat with messages** — Create the conversation with user input and an empty assistant placeholder (including proper `childrenIds` and `currentId`)
-2. **Trigger a reply** — Generate the AI response (with optional knowledge integration)
-3. **Monitor completion** — Wait for the assistant response using streaming or polling
-4. **Fetch the final chat** — Retrieve and parse the completed conversation
+1. **Start a chat with messages**: Create the conversation with user input and an empty assistant placeholder (including proper `childrenIds` and `currentId`)
+2. **Trigger a reply**: Generate the AI response (with optional knowledge integration)
+3. **Monitor completion**: Wait for the assistant response using streaming or polling
+4. **Fetch the final chat**: Retrieve and parse the completed conversation
 
 **Enhanced Capabilities:**
 
-- **RAG Integration** — Include knowledge collections for context-aware responses
-- **Asynchronous Processing** — Handle long-running AI operations with streaming or polling
-- **Response Parsing** — Clean and validate JSON responses from the assistant
-- **Session Management** — Maintain conversation context across requests
+- **RAG Integration**: Include knowledge collections for context-aware responses
+- **Asynchronous Processing**: Handle long-running AI operations with streaming or polling
+- **Response Parsing**: Clean and validate JSON responses from the assistant
+- **Session Management**: Maintain conversation context across requests
 
 This enables backend-controlled workflows that still appear properly in the Web UI frontend chat interface, providing seamless integration between programmatic control and user experience.
 

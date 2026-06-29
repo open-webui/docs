@@ -15,13 +15,13 @@ If you connect Open WebUI to this proxy using an API Key or Auth Token, you **MU
 
 ### 📌 What is the MCP Proxy Server?
 
-The MCP-to-OpenAPI proxy server lets you use tool servers implemented with MCP (Model Context Protocol) directly via standard REST/OpenAPI APIs—no need to manage unfamiliar or complicated custom protocols. If you're an end-user or application developer, this means you can interact easily with powerful MCP-based tooling directly through familiar REST-like endpoints.
+The MCP-to-OpenAPI proxy server lets you use tool servers implemented with MCP (Model Context Protocol) directly via standard REST/OpenAPI APIs, with no need to manage unfamiliar or complicated custom protocols. If you're an end-user or application developer, this means you can interact easily with powerful MCP-based tooling directly through familiar REST-like endpoints.
 
 ### 💡 Why Use mcpo?
 
-While MCP tool servers are powerful and flexible, they commonly communicate via standard input/output (stdio)—often running on your local machine where they can easily access your filesystem, environment, and other native system capabilities.
+While MCP tool servers are powerful and flexible, they commonly communicate via standard input/output (stdio), often running on your local machine where they can easily access your filesystem, environment, and other native system capabilities.
 
-That’s a strength—but also a limitation.
+That’s a strength, but also a limitation.
 
 If you want to deploy your main interface (like Open WebUI) on the cloud, you quickly run into a problem: your cloud instance can’t speak directly to an MCP server running locally on your machine via stdio.
 
@@ -38,16 +38,16 @@ The mcpo proxy addresses those issues:
 - ✅ Instantly compatible with existing OpenAPI tools, SDKs, and clients
 - 🛡 Wraps your tools with secure, scalable, and standards-based HTTP endpoints
 - 🧠 Auto-generates interactive OpenAPI documentation for every tool, entirely config-free
-- 🔌 Uses plain HTTP—no socket setup, daemon juggling, or platform-specific glue code
+- 🔌 Uses plain HTTP, with no socket setup, daemon juggling, or platform-specific glue code
 
-So even though adding mcpo might at first seem like "just one more layer"—in reality, it simplifies everything while giving you:
+So even though adding mcpo might at first seem like "just one more layer", in reality it simplifies everything while giving you:
 
 - Better integration ✅
 - Better security ✅
 - Better scalability ✅
 - Happier developers & users ✅
 
-✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable—typically without changing your tool server code.
+✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable, typically without changing your tool server code.
 
 :::tip
 **Events Supported**: While mcpo exposes MCP tools as OpenAPI endpoints, they can still emit events (status updates, notifications) via Open WebUI's [event REST endpoint](/features/extensibility/plugin/development/events#-external-tool-events). Open WebUI automatically passes the required `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to your tool. However, interactive events requiring user input are only available for native Python tools.
@@ -134,13 +134,13 @@ Assuming you started the above server command (`uvx mcp-server-time`):
 - Select a generated endpoint (e.g., `/get_current_time`) and use the provided interactive form.
 - Click "**Execute**" and instantly receive your response.
 
-No complex setup—just REST APIs ready to use.
+No complex setup: just REST APIs ready to use.
 
 ## 🚀 Deploying in Production (Example)
 
 Deploying your MCP-to-OpenAPI proxy (powered by mcpo) is straightforward. Here's how to easily Dockerize and deploy it to cloud or VPS solutions:
 
-### 🐳 Dockerize your Proxy Server using mcpo
+### Dockerize your Proxy Server using mcpo
 
 1. **Dockerfile Example**
 
@@ -160,6 +160,42 @@ CMD ["uvx", "mcpo", "--host", "0.0.0.0", "--port", "8000", "--", "uvx", "mcp-ser
 ```bash
 docker build -t mcp-proxy-server .
 docker run -d -p 8000:8000 mcp-proxy-server
+```
+
+If you want to use the published mcpo image instead of building your own image, bind the proxy to `0.0.0.0` so Docker port publishing can reach it:
+
+```bash
+docker run --rm -p 8000:8000 ghcr.io/open-webui/mcpo:main \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --api-key "top-secret" \
+  -- your_mcp_server_command
+```
+
+For Docker Compose, put the same mcpo arguments in the service command:
+
+```yaml
+services:
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    ports:
+      - "8000:8000"
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-key
+      - top-secret
+      - --
+      - your_mcp_server_command
+```
+
+Replace `your_mcp_server_command` with your MCP server command, adding each argument as its own `command` list item. Then start and remove the proxy with:
+
+```bash
+docker compose up
+docker compose down
 ```
 
 3. **Deploying Your Container**

@@ -5,7 +5,7 @@ title: "Automate Tasks"
 
 # Automate Tasks
 
-Open Terminal isn't just for code. The AI can manage files, organize folders, process data in bulk, handle backups, and automate repetitive work — all from a conversation.
+Open Terminal isn't just for code. The AI can manage files, organize folders, process data in bulk, handle backups, and automate repetitive work, all from a conversation.
 
 ---
 
@@ -82,9 +82,9 @@ If a tool isn't installed, the AI can install it on the fly (`sudo apt install .
 
 ## More things to try
 
-- **[Run code from chat →](./code-execution)** — the AI writes, runs, and debugs code
-- **[Analyze documents & data →](./file-analysis)** — spreadsheets, PDFs, Word docs, emails
-- **[Build & preview websites →](./web-development)** — create and iterate on web pages
+- **[Run code from chat →](./code-execution)**: the AI writes, runs, and debugs code
+- **[Analyze documents & data →](./file-analysis)**: spreadsheets, PDFs, Word docs, emails
+- **[Build & preview websites →](./web-development)**: create and iterate on web pages
 
 :::tip
 Want to automate tasks on your real machine from anywhere? [**cptr**](https://github.com/open-webui/computer) puts your computer in a browser tab, accessible from any device.

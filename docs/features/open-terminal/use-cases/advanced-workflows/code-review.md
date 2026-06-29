@@ -5,7 +5,7 @@ title: "Code Review"
 
 # 🔍 Automated Code Review
 
-Point the AI at a pull request, a branch diff, or a file, and get a detailed code review — security issues, performance problems, style violations, and suggestions for improvement.
+Point the AI at a pull request, a branch diff, or a file, and get a detailed code review: security issues, performance problems, style violations, and suggestions for improvement.
 
 > **You:** $Code Reviewer <br/>
 > Review the changes in the `feature/auth-refactor` branch compared to `main`.
@@ -13,15 +13,15 @@ Point the AI at a pull request, a branch diff, or a file, and get a detailed cod
 ## What the AI does
 
 1. Runs `git diff main..feature/auth-refactor` to see all changes
-2. Reads each modified file in full context (not just the diff — it understands surrounding code)
+2. Reads each modified file in full context (not just the diff, it understands surrounding code)
 3. Categorizes findings: security, performance, correctness, style, documentation
 4. Prioritizes issues from critical to nitpick
 5. Suggests specific fixes with code snippets
 6. Saves a structured review report
 
-{/* TODO: Screenshot — Chat showing the AI reviewing a branch diff. The response lists findings organized by severity: "🔴 Critical: SQL injection in user_query() — use parameterized queries. 🟡 Warning: N+1 query in get_orders(). 🔵 Suggestion: Extract validation logic into a helper." */}
+{/* TODO: Screenshot: Chat showing the AI reviewing a branch diff. The response lists findings organized by severity: "🔴 Critical: SQL injection in user_query(), use parameterized queries. 🟡 Warning: N+1 query in get_orders(). 🔵 Suggestion: Extract validation logic into a helper." */}
 
-{/* TODO: Screenshot — The generated review report in the file browser: a markdown file with sections for each file reviewed, findings with line numbers, and suggested fixes with code blocks. */}
+{/* TODO: Screenshot: The generated review report in the file browser: a markdown file with sections for each file reviewed, findings with line numbers, and suggested fixes with code blocks. */}
 
 ## Skill content
 

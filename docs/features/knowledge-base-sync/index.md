@@ -4,7 +4,19 @@ title: "Knowledge Base Sync (oikb)"
 slug: /features/knowledge-base-sync
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 🔄 Knowledge Base Sync (oikb)
+
+<ThemedImage
+  alt="Knowledge Base Sync: many different source connectors flowing through the oikb sync hub into Open WebUI Knowledge Bases"
+  sources={{
+    light: useBaseUrl('/images/banners/kbsync-light.svg'),
+    dark: useBaseUrl('/images/banners/kbsync-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Keep a Knowledge Base in sync with the source of truth, automatically.**
 

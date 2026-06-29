@@ -1,0 +1,28 @@
+---
+title: "Web Search"
+sidebar_position: 0
+slug: /features/chat-conversations/web-search
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import DocCardList from '@theme/DocCardList';
+
+# 🌐 Web Search
+
+<ThemedImage
+  alt="Chat & Conversations map with the Web Search cell highlighted"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-websearch-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-websearch-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+Let Open WebUI search the live web and fetch pages, then ground its answers in what it finds. Choose a provider, toggle search on per chat, and have the model cite or save what it retrieves.
+
+:::tip Require confirmation before searching
+Admins can require users to **confirm before a web search runs**, so a query is never sent to an external provider unintentionally. Enable it in **Admin Panel → Settings → Web Search** (or via [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation)); the prompt text is set by [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content).
+:::
+
+<DocCardList />
