@@ -92,6 +92,13 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 
 :::
 
+#### `ENABLE_API_OUTLET_FILTERS`
+
+- Type: `bool`
+- Default: `True`
+- Description: When enabled, **outlet** [filter functions](/features/extensibility/plugin/functions/filter) also run for completions requested directly through the API (both streaming and non-streaming), not only for chats made from the Open WebUI interface. Disable to skip outlet filters on direct API traffic. Inlet filters and other pipeline stages are unaffected.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `ENABLE_SIGNUP`
 
 - Type: `bool`
@@ -156,6 +163,14 @@ After the admin account is created, sign-up is automatically disabled for securi
 - Default: `True`
 - Description: Controls visibility of the password change UI in **Settings > Account**. When set to `False`, users do not see the password update form, which is useful for SSO-focused deployments where password changes should not be presented in the UI.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `PASSWORD_HASH_ALGORITHM`
+
+- Type: `str`
+- Default: `bcrypt`
+- Options: `bcrypt`, `argon2`
+- Description: Selects the algorithm used to hash new user passwords. `bcrypt` (default) rejects passwords longer than **72 bytes** (a hard bcrypt limit). `argon2` removes that limit and accepts arbitrarily long passwords (requires the `argon2-cffi` package). Existing hashes keep working after a switch: verification auto-detects the algorithm from each stored hash (an `$argon2` prefix verifies with argon2, otherwise bcrypt), so changing this affects only newly set passwords.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ENABLE_PASSWORD_AUTH`
 
@@ -318,6 +333,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `("") empty string` (no minimum)
 - Description: Sets the minimum allowed interval in seconds between automation recurrences for non-admin users. When set, any automation schedule that recurs more frequently than this value will be rejected with a `400 Bad Request` error. One-time automations (`COUNT=1`) are exempt from this check. Admins bypass this limit.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `AUTOMATION_AUTH_TOKEN_EXPIRES_IN`
+
+- Type: `str` (duration)
+- Default: `1h`
+- Description: Lifetime of the short-lived auth token an automation uses to call back into Open WebUI while running headless (so a scheduled run can reach session-authenticated tools and terminals). Accepts duration strings like `30m`, `1h`, `24h`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::tip Common values for AUTOMATION_MIN_INTERVAL
 
@@ -1270,6 +1292,13 @@ The format for the JSON response is strictly:
 - Description: Specifies the timeout for Jupyter code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_PYODIDE_FILE_PERSISTENCE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether the browser-based **Pyodide** engine keeps its virtual filesystem (`/mnt/uploads/`, backed by IndexedDB) **persistent across page reloads**. When `False` (default), Pyodide runs in an isolated, sandboxed (opaque-origin) iframe and its filesystem does not survive a reload. Set to `True` to enable persistent file storage, which requires running Pyodide same-origin and relaxes that isolation. Files created within a single session work either way; this flag only affects cross-reload persistence and the durability of the file browser.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 ### Code Interpreter
 
 #### `ENABLE_CODE_INTERPRETER`
@@ -1763,6 +1792,38 @@ If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change 
 
 :::
 
+### Memory
+
+Settings for the experimental long-term memory system (**Settings → Personalization → Memory**). Memories are stored per user and can be of `type` `user` (explicit facts) or `context` (learned from conversation).
+
+#### `ENABLE_MEMORY_BACKGROUND_REVIEW`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, Open WebUI periodically reviews recent conversation in the background and updates the user's `context` memories automatically, instead of only on explicit save. Off by default.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MEMORIES_REVIEW_INTERVAL_TURNS`
+
+- Type: `int`
+- Default: `10`
+- Description: How many conversation turns elapse between background memory reviews when `ENABLE_MEMORY_BACKGROUND_REVIEW` is enabled.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MEMORIES_CONTEXT_CHAR_LIMIT`
+
+- Type: `int`
+- Default: `2000`
+- Description: Maximum number of characters of `context`-type memories injected into the prompt. Older or lower-priority context memories beyond this budget are not included.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MEMORIES_USER_CHAR_LIMIT`
+
+- Type: `int`
+- Default: `2000`
+- Description: Maximum number of characters of `user`-type memories injected into the prompt.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 ## Security Variables
 
 #### `ENABLE_FORWARD_USER_INFO_HEADERS`
@@ -2032,6 +2093,17 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 :::
 
+#### `ENABLE_VALVE_ENCRYPTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, plugin (Tool and Function) **Valve** values are encrypted at rest using Fernet (AES-128) instead of being stored as plaintext JSON in the database. Useful when Valves hold secrets like API keys.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::warning Requires a valid Fernet `WEBUI_SECRET_KEY`
+Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key), which must be a valid 44-character url-safe base64 Fernet key when this is enabled. If you rotate `WEBUI_SECRET_KEY`, previously encrypted Valve values can no longer be decrypted and must be re-entered.
+:::
+
 #### `ENABLE_VERSION_UPDATE_CHECK`
 
 - Type: `bool`
@@ -2056,7 +2128,7 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 
 - Automatic version update checks (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 - Downloads of embedding models from Hugging Face Hub
-  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly
+  - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly. On a **fresh install** this aborts startup with `No embedding model is loaded`, see [Startup & Docker Failures](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install) for the fix.
 - Update notifications in the UI (see flag `ENABLE_VERSION_UPDATE_CHECK`)
 
 **Still functional:**
@@ -3112,6 +3184,13 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Description: Configures custom Mistral OCR API endpoints for flexible deployment options, allowing users to point to self-hosted or alternative Mistral OCR instances.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `MISTRAL_OCR_USE_BASE64`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Admin Panel → Settings → Documents**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
 
 - Type: `str`
@@ -3250,6 +3329,20 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Type: `str` (comma-separated)
 - Default: `pdf`
 - Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. MinerU was previously hardcoded to PDF only, so only add extensions your MinerU deployment actually supports.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MINERU_MAX_MARKDOWN_BYTES`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Caps the size, in bytes, of the Markdown the **MinerU** loader returns from a processed document. Output beyond the cap is truncated, guarding against a single huge document flooding context or memory. Leave unset for no limit.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `MINERU_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{}` (engine defaults)
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Admin Panel → Settings → Documents** when MinerU is the content-extraction engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `PADDLEOCR_VL_BASE_URL`
@@ -3421,7 +3514,14 @@ Provide a clear and direct response to the user's query, including inline citati
   - `character`
   - `token`
 - Default: `character`
-- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter (Tiktoken-based).
+- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter. By default the `token` splitter is Tiktoken-based; set `RAG_TOKENIZER_MODEL` to use a HuggingFace tokenizer instead.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_TOKENIZER_MODEL`
+
+- Type: `str`
+- Default: `(empty)`
+- Description: When `RAG_TEXT_SPLITTER=token`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Leave empty to use Tiktoken. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`); use it to match chunk boundaries to your embedding model's own tokenizer.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
@@ -3480,6 +3580,13 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Type: `int`
 - Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_FILE_CONTENT_SEARCH_MAX_CHARS`
+
+- Type: `int`
+- Default: `67108864` (64 MiB)
+- Description: Caps how many characters of a file's extracted content are scanned during content search. Guards against a single very large document making search slow or memory-heavy.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `FILE_IMAGE_COMPRESSION_WIDTH`
 
@@ -4046,6 +4153,8 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `bing`: Uses the [Bing](https://www.bing.com/) search engine.
   - `exa`: Uses the [Exa](https://exa.ai/) search engine.
   - `perplexity`: Uses the [Perplexity API](https://www.perplexity.ai/) to access perplexity's AI models. Calls their AI models, which execute a search and also return a full response.
+  - `serphouse`: Uses the [SERPHouse](https://www.serphouse.com/) search API. Requires `SERPHOUSE_API_KEY`; `SERPHOUSE_DOMAIN` picks the Google domain (default `google.com`).
+  - `microsoft_web_iq`: Uses the **Microsoft Web IQ** search API. Requires `MICROSOFT_WEB_IQ_API_KEY`; `MICROSOFT_WEB_IQ_API_BASE_URL` and `MICROSOFT_WEB_IQ_LANGUAGE` are configurable.
   - `perplexity_search`: Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
   - `sougou`: Uses the [Sougou](https://www.sogou.com/) search engine.
   - `ollama_cloud`: Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
@@ -4410,7 +4519,56 @@ If you use `perplexity`, this variable is not relevant to you.
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets the API key for [You.com](https://you.com/) YDC Index API web search. Required when `WEB_SEARCH_ENGINE` is set to `youcom`. Obtain an API key from [You.com API](https://you.com/api).
+- Description: Sets the API key for [You.com](https://you.com/) YDC Index API web search. Required when `WEB_SEARCH_ENGINE` is set to `youcom`. Obtain an API key from [You.com API](https://you.com/api). Also accepts `YDC_API_KEY` as an alternative variable name; `YOUCOM_API_KEY` takes precedence if both are set.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SERPHOUSE_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: Sets the API key for the [SERPHouse](https://www.serphouse.com/) web search engine. Required when `WEB_SEARCH_ENGINE` is set to `serphouse`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SERPHOUSE_DOMAIN`
+
+- Type: `str`
+- Default: `google.com`
+- Description: The Google domain SERPHouse queries against (e.g. `google.com`, `google.co.uk`). Used only when `WEB_SEARCH_ENGINE` is set to `serphouse`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MICROSOFT_WEB_IQ_API_KEY`
+
+- Type: `str`
+- Default: Empty string (' ')
+- Description: API key for the **Microsoft Web IQ** search engine. Required when `WEB_SEARCH_ENGINE` is set to `microsoft_web_iq`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MICROSOFT_WEB_IQ_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.microsoft.ai/v3`
+- Description: Base URL for the Microsoft Web IQ API. Used only when `WEB_SEARCH_ENGINE` is set to `microsoft_web_iq`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MICROSOFT_WEB_IQ_LANGUAGE`
+
+- Type: `str`
+- Default: `en`
+- Description: Language code for Microsoft Web IQ results (e.g. `en`, `de`). Used only when `WEB_SEARCH_ENGINE` is set to `microsoft_web_iq`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_WEB_SEARCH_CONFIRMATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, the user is shown a confirmation prompt before a web search runs, so a query is not sent to the external provider without consent. The prompt text is set by `WEB_SEARCH_CONFIRMATION_CONTENT`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `WEB_SEARCH_CONFIRMATION_CONTENT`
+
+- Type: `str`
+- Default: `Your query will be sent to the configured web search provider.`
+- Description: The message shown in the web-search confirmation prompt when `ENABLE_WEB_SEARCH_CONFIRMATION` is `True`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Web Loader Configuration
@@ -4487,6 +4645,13 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `float`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10 to 30 seconds depending on your network conditions.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `WEB_FETCH_MAX_CONTENT_LENGTH`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Caps the number of characters kept from a fetched web page (e.g. the `fetch_url` tool / URL content retrieval). Content beyond the limit is truncated, preventing one very large page from flooding the context. Leave unset for no limit.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning
@@ -4950,6 +5115,13 @@ Strictly return in JSON format:
 - Default: ``
 - Description: Specifies the model to use for image editing operations within the selected engine (e.g., `dall-e-2`, `gemini-2.5-flash`).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_OPENAI_IMAGE_EDIT_NORMALIZATION`
+
+- Type: `bool`
+- Default: `True`
+- Description: When `IMAGE_EDIT_ENGINE=openai`, normalizes the input image (re-encoding it to a format/shape the OpenAI image-edit API accepts) before sending the edit request. Disable only if your input images are already in a compatible format and you want to skip the conversion.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `IMAGE_EDIT_SIZE`
 
@@ -6297,6 +6469,20 @@ For API Key creation (and the API keys themselves):
 - Description: Enables or disables user permission to access workspace skills.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_IMPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to **import** skills into the Skills workspace.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_SKILLS_EXPORT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to **export** skills from the Skills workspace.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 ### Sharing (Private)
 
 These settings control whether users can share workspace items with other users **privately** (non-public sharing).
@@ -6805,6 +6991,13 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 - Type: `str`
 - Default: `None`
 - Description: Specifies the username for database authentication. This is used to construct the `DATABASE_URL` when a complete `DATABASE_URL` is not explicitly defined.
+- Persistence: No
+
+#### `DATABASE_ENABLE_IAM_TOKEN_AUTH`
+
+- Type: `bool`
+- Default: `False`
+- Description: When enabled, authenticate to an **AWS RDS** database using a short-lived **IAM auth token** (generated via boto3 `generate_db_auth_token`) instead of a static password. The token is refreshed automatically before it expires. **PostgreSQL only**, and the database host and user must be set. Requires `boto3` and AWS credentials/region available to the process (standard AWS SDK resolution).
 - Persistence: No
 
 #### `DATABASE_PASSWORD`

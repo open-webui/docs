@@ -197,7 +197,7 @@ Functions support a two-tier configuration system built on [Pydantic](https://do
 
 **Valves** are ideal for API keys, model endpoints, and global behavior settings. **UserValves** let individual users customize behavior (e.g., their preferred language, output format, or personal API key).
 
-Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Filter`, or `Action` class. The admin-configured values are stored in the database and loaded automatically at runtime.
+Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Filter`, or `Action` class. The admin-configured values are stored in the database and loaded automatically at runtime. When Valves hold secrets, an administrator can [encrypt them at rest](/features/extensibility/plugin/development/valves#encrypting-valve-values-at-rest).
 
 → **[Valves Development Guide](/features/extensibility/plugin/development/valves)**
 

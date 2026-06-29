@@ -181,7 +181,7 @@ Filter the admin model list by status (Enabled, Disabled, Visible, Hidden) and u
 
 ## Model Switching in Chat
 
-Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them.
+Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
 
 ---
 

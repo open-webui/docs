@@ -35,7 +35,7 @@ Pyodide is a **legacy** code-execution engine. It is still the built-in, zero-se
 
 Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with some constraints:
 
-- **Persistent file storage**: the virtual filesystem at `/mnt/uploads/` is backed by IndexedDB (IDBFS). Files persist across code executions within the same session and survive page reloads.
+- **Persistent file storage**: the virtual filesystem at `/mnt/uploads/` is backed by IndexedDB (IDBFS). Files persist across code executions within a session, but **surviving a page reload requires [`ENABLE_PYODIDE_FILE_PERSISTENCE=true`](/reference/env-configuration#enable_pyodide_file_persistence)** (off by default). With it off, Pyodide runs in a sandboxed opaque-origin iframe and the filesystem is not retained across reloads.
 - **Built-in file browser**: when Code Interpreter is enabled, a file browser panel appears in the chat controls sidebar. You can browse, preview, upload, download, and delete files in the Pyodide filesystem, no terminal needed.
 - **User file access**: files attached to messages are automatically placed in `/mnt/uploads/` before code execution, so the model (and your code) can read them directly.
 - **Limited library support**: only a subset of Python packages are available. Libraries that rely on C extensions or system calls may not work.
@@ -109,7 +109,7 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 | **Runs in** | Browser (WebAssembly) | Server (Python kernel) | Server (Docker container) | Server (orchestrated containers) |
 | **Library support** | Limited subset | Full Python ecosystem | Full OS (any language, any tool) | Full OS (any language, any tool) |
 | **Shell access** | ❌ None | ⚠️ Limited | ✅ Full shell | ✅ Full shell |
-| **File persistence** | ✅ IDBFS (persists across executions & reloads) | ✅ Shared filesystem | ✅ Container filesystem (until removal) | ✅ Persistent volumes per user |
+| **File persistence** | ✅ IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | ✅ Shared filesystem | ✅ Container filesystem (until removal) | ✅ Persistent volumes per user |
 | **File browser** | ✅ Built-in sidebar panel | ❌ None | ✅ Built-in sidebar panel | ✅ Built-in sidebar panel |
 | **User file access** | ✅ Attached files placed in `/mnt/uploads/` | ❌ Manual | ✅ Attached files available | ✅ Attached files available |
 | **Isolation** | ✅ Browser sandbox | ❌ Shared environment | ✅ Container-level (when using Docker) | ✅ Full container-per-user isolation |

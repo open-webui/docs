@@ -21,4 +21,8 @@ import DocCardList from '@theme/DocCardList';
 
 Let Open WebUI search the live web and fetch pages, then ground its answers in what it finds. Choose a provider, toggle search on per chat, and have the model cite or save what it retrieves.
 
+:::tip Require confirmation before searching
+Admins can require users to **confirm before a web search runs**, so a query is never sent to an external provider unintentionally. Enable it in **Admin Panel → Settings → Web Search** (or via [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation)); the prompt text is set by [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content).
+:::
+
 <DocCardList />

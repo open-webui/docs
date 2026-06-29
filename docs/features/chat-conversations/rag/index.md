@@ -117,6 +117,7 @@ Use the **Chunk Min Size Target** setting (found in **Admin Panel > Settings > D
 
 Open WebUI allows you to fine-tune how documents are split into chunks for embedding. This is crucial for optimal retrieval performance.
 
+- **Text Splitter**: Choose how chunk size is measured. [`RAG_TEXT_SPLITTER`](/reference/env-configuration#rag_text_splitter) is `character` (default, RecursiveCharacterTextSplitter) or `token`. The `token` splitter counts tokens with Tiktoken by default; set [`RAG_TOKENIZER_MODEL`](/reference/env-configuration#rag_tokenizer_model) to a HuggingFace tokenizer (e.g. `bert-base-uncased`) to match chunk boundaries to your embedding model's own tokenizer.
 - **Chunk Size**: Sets the maximum number of characters (or tokens) per chunk.
 - **Chunk Overlap**: Specifies how much content is shared between adjacent chunks to maintain context.
 - **Chunk Min Size Target**: Although [Markdown Header Splitting](#markdown-header-splitting) is excellent for preserving structure, it can often create tiny, fragmented chunks (e.g., a standalone sub-header, a table of contents entry, a single-sentence paragraph, or a short list item) that lack enough semantic context for high-quality embedding. You can counteract this by setting the **Chunk Min Size Target** to intelligently merge these small pieces with their neighbors.

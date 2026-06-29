@@ -208,6 +208,7 @@ Things to know about the chat table:
 - `tasks` and `summary` support structured planning/status UX in chat sessions.
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
+- A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
 
@@ -562,13 +563,21 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 
 ## Memory Table
 
-| **Column Name** | **Data Type** | **Constraints** | **Description**          |
-| --------------- | ------------- | --------------- | ------------------------ |
-| id              | String        | PRIMARY KEY     | Unique identifier (UUID) |
-| user_id         | String        | -               | Memory owner             |
-| content         | Text          | -               | Memory content           |
-| created_at      | BigInteger    | -               | Creation timestamp       |
-| updated_at      | BigInteger    | -               | Last update timestamp    |
+| **Column Name** | **Data Type** | **Constraints**            | **Description**          |
+| --------------- | ------------- | -------------------------- | ------------------------ |
+| id              | String        | PRIMARY KEY                | Unique identifier (UUID) |
+| user_id         | String        | indexed                    | Memory owner             |
+| type            | String        | default `context`, indexed | Memory type: `user` or `context` (added in v0.10.0) |
+| path            | Text          | nullable                   | Optional path for organizing memories into a hierarchy (added in v0.10.0) |
+| content         | Text          | -                          | Memory content           |
+| meta            | JSON          | nullable                   | Optional metadata (added in v0.10.0) |
+| created_at      | BigInteger    | -                          | Creation timestamp       |
+| updated_at      | BigInteger    | -                          | Last update timestamp    |
+
+Things to know about the memory table:
+
+- `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
+- `path` and `meta` (added in a later v0.10.0 migration) back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
 
 ## Message Table
 
@@ -1011,7 +1020,10 @@ erDiagram
     memory {
         string id PK
         string user_id FK
+        string type
+        text path
         text content
+        json meta
     }
 
     model {

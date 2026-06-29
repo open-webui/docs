@@ -59,6 +59,8 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 :::
 
 | **Skills Access** | Access the **Skills** workspace to create and manage reusable instruction sets. |
+| **Import Skills** | Import skills into the Skills workspace. |
+| **Export Skills** | Export skills from the Skills workspace. |
 
 ### 2. Sharing Permissions
 Controls what users can share with the community or make public.

@@ -100,6 +100,8 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 
 The full content of the note is injected into the context window for that conversation.
 
+You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **folders** and **models** from the sidebar.
+
 ---
 
 ## Agentic Note Management

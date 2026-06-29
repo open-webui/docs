@@ -17,8 +17,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-:::warning Experimental Feature
-The Memory system is currently in **Beta/Experimental** stage. You may encounter inconsistencies in how models store or retrieve information, and storage formats may change in future updates.
+:::info Model-dependent quality
+How well memories are stored and recalled depends heavily on the model. Frontier models manage memory well; small local models may store or retrieve information inconsistently.
 :::
 
 Open WebUI includes a sophisticated memory system that allows models to remember facts, preferences, and context across different conversations.
@@ -35,17 +35,31 @@ Users can manually add, edit, or delete memories by navigating to:
 
 ### 2. Native Memory Tools (Agentic Mode)
 
-When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using five built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 :::tip Quality Models for Memory Management
 Autonomous memory management works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can intelligently decide what facts are worth saving and when to recall relevant memories. Small local models may struggle with appropriate memory selection.
 :::
 
--   **`add_memory`**: Allows the model to proactively save a new fact it learned about you during the conversation.
--   **`search_memories`**: Allows the model to search your memory bank for relevant context. Results include a unique `id` for each memory snippet. The model can optionally specify how many memories to return (default is 5).
--   **`replace_memory_content`**: Allows the model to update or correct a specific existing memory using its `id`.
--   **`delete_memory`**: Allows the model to remove a memory that is no longer relevant or correct, using its `id`.
--   **`list_memories`**: Allows the model to retrieve all stored memories for the user, including content and timestamps.
+Each memory carries a **type** and an optional **path** (see [Memory Types & Paths](#memory-types--paths) below). The model manages memory through these tools:
+
+-   **`add_memory`**: Save a new fact, preference, or instruction, tagged as `user` or `context`, optionally under a `path`.
+-   **`update_memory`**: Apply a batch of changes (add / replace / move / remove) in a single call.
+-   **`replace_memory_content`**: Update or correct a specific existing memory using its `id`.
+-   **`delete_memory`**: Remove a memory that is no longer relevant or correct, using its `id`.
+-   **`search_memories`**: Search or browse the memory bank by content, path, type, or exact `id`. Results include a unique `id` per snippet (default returns 5).
+-   **`list_memories`**: Retrieve all stored memories for the user, including content and timestamps.
+-   **`list_memory_paths`**: List the saved memory paths (groups), so the model can find where related memories already live before writing.
+-   **`read_memory_path`**: Read the memories stored at a given path, including nearby parent and child paths.
+
+## Memory Types & Paths
+
+Each memory has a **type** and an optional **path**:
+
+- **Type** — `user` memories are facts, preferences, or instructions **about you** (e.g. "prefers Python for backend"); `context` memories are other durable context worth carrying between chats. The two are budgeted separately when injected into the prompt (see [Background Review & Limits](#background-review--limits)).
+- **Path** — an optional stable "address" used to **group related memories** (e.g. `work/projects`), so the model can organize and browse them hierarchically with `list_memory_paths` / `read_memory_path` instead of one flat list.
+
+These are set automatically by the memory tools; you do not need to assign them manually.
 
 ## Benefits of the New Memory System
 
@@ -80,6 +94,11 @@ The Memory feature can be toggled on or off for the entire instance. When disabl
 Administrators can also control Memory access on a per-role or per-group basis from the Permissions interface.
 - **Admin UI**: Admin Panel > Users > Permissions > Features > **Memories**
 - **Environment Variable**: [`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories) (Default: `True`)
+
+### Background Review & Limits
+
+- **Background review** — when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation and updates `context` memories automatically, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
+- **Injection budgets** — [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
 
 ## Privacy & Security
 

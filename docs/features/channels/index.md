@@ -133,12 +133,12 @@ If you want a one-click path from a chat message into a channel, the community *
 
 ## Getting Started
 
-:::info Beta Feature
-Channels is currently in **Beta** and must be enabled by an administrator.
+:::info
+Channels must be enabled by an administrator before use.
 :::
 
 1. Navigate to **Admin Panel > Settings > General**
-2. Toggle **Channels (Beta)** on and save
+2. Toggle **Channels** on and save
 3. Channels appear in the sidebar. Click **(+)** to create your first one
 
 Channel creation is restricted to administrators by default. Channels support granular permissions including read-only access, write access, and feature-level toggles via environment variables or group permissions.

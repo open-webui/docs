@@ -85,6 +85,13 @@ With either OAuth mode, an **OAuth Resource Parameter** setting appears. It cont
 Leave it on **Automatic** unless OAuth fails and the provider's error or documentation points at the `resource` parameter.
 :::
 
+:::info OAuth Scopes
+With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open WebUI requests from the server's authorization server:
+
+- **Use discovered scopes** (default): request the scopes advertised in the server's OAuth metadata.
+- **Custom scopes**: provide an explicit, space- or comma-separated list to override the discovered scopes, for example to request a narrower set than the server advertises, or when the server's metadata does not list usable scopes.
+:::
+
 :::tip Choosing Between OAuth 2.1 and OAuth 2.1 (Static)
 
 - Start with **OAuth 2.1** if your server supports DCR.

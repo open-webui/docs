@@ -1,0 +1,96 @@
+---
+title: "Startup & Docker Failures"
+sidebar_position: 1
+---
+
+# 🚦 Startup & Docker Failures
+
+Open WebUI not coming up at all? Start here. For failures specifically about Alembic migrations (`no such table`, `Can't locate revision`), see [Database Migration](./manual-database-migration) instead.
+
+## Container hangs at startup on Apple Silicon (M1/M2/M3)
+
+### Symptom
+
+On macOS Apple Silicon, the container **freezes during startup** right after the migrations finish and this line prints:
+
+```text
+WARNING: CORS_ALLOW_ORIGIN IS SET TO '*' - NOT RECOMMENDED FOR PRODUCTION DEPLOYMENTS.
+```
+
+There is no `Started server process`, no ASCII banner, no error. It hangs **indefinitely** (still dead after an hour), and it reproduces even on a **brand-new empty data volume**. `OFFLINE_MODE` / `HF_HUB_OFFLINE` make no difference. Stopping it with `Ctrl+C` leaves the container running, so it has to be killed with `docker kill`.
+
+### Cause
+
+Nothing of Open WebUI's own logic runs in this window, migrations are already done, and no DB queries or network calls happen yet. It is pure Python `import` of the app and its native dependencies (`pycrdt`, embedding/vector libraries, `pydub`, etc.).
+
+The usual trigger is an **architecture mismatch**: the host has `DOCKER_DEFAULT_PLATFORM=linux/amd64` set globally, so Docker pulls the **x86_64 image and runs it under Rosetta emulation** on an ARM host. A native extension wedges during import under emulation.
+
+### Fix
+
+Run the **native `arm64` image**, do not emulate x86 on Apple Silicon:
+
+1. Let Docker auto-select the architecture, or force it explicitly:
+
+   ```bash
+   docker run --platform linux/arm64 ... ghcr.io/open-webui/open-webui:main
+   ```
+
+2. Check for a global override and unset it (or override per run):
+
+   ```bash
+   echo $DOCKER_DEFAULT_PLATFORM     # also check Docker Desktop → Settings
+   ```
+
+3. Confirm the architecture the container actually runs as (should be `aarch64` on Apple Silicon):
+
+   ```bash
+   docker run --rm ghcr.io/open-webui/open-webui:main uname -m
+   ```
+
+:::warning Emulation is not supported
+Running the **x86 image under emulation (Rosetta) on Apple Silicon is best-effort and unsupported**, and can hang at startup like this. Use the native `arm64` image.
+:::
+
+:::tip Capturing the exact blocking import
+If a startup hang is *not* arch-related, dump every thread's stack after 60s (no install needed, `faulthandler` is stdlib):
+
+```bash
+docker run --rm --entrypoint python ghcr.io/open-webui/open-webui:main \
+  -X faulthandler -c "import faulthandler; faulthandler.dump_traceback_later(60); import open_webui.main; print('IMPORT OK')"
+```
+
+`IMPORT OK` means imports are fine and the problem is elsewhere; a stack trace after ~60s names the exact import that is blocking.
+:::
+
+---
+
+## `ValueError: No embedding model is loaded` with offline mode on a fresh install
+
+### Symptom
+
+Startup fails (after the banner) with:
+
+```text
+huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached
+snapshot folder ... outgoing traffic has been disabled.
+
+ValueError: No embedding model is loaded. Set RAG_EMBEDDING_MODEL to a valid
+SentenceTransformer model name, or configure an external RAG_EMBEDDING_ENGINE
+(ollama, openai, azure_openai).
+```
+
+It happens when [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode) and/or [`HF_HUB_OFFLINE=1`](/reference/env-configuration#hf_hub_offline) are set on a **fresh install**.
+
+### Cause
+
+Offline mode means *never reach the network*. The default RAG embedding engine uses a **local SentenceTransformers model that must be downloaded once**. On a fresh install with offline mode already enabled, it was never cached, so there is nothing to load and startup aborts.
+
+### Fix
+
+Pick one:
+
+- **Cache it first.** Boot once **without** `OFFLINE_MODE` / `HF_HUB_OFFLINE` so the embedding model downloads and caches, then re-enable offline mode for subsequent runs.
+- **Use an external embedder** so nothing needs downloading: set [`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine) to `ollama` (with a pulled [`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model)), `openai`, or `azure_openai`.
+- **Pre-bake or mount the model cache** into the image/volume for air-gapped deployments.
+
+See the [Offline Mode guide](/tutorials/maintenance/offline-mode) for the full offline setup.

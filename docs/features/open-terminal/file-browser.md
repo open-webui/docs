@@ -7,6 +7,10 @@ title: "File Browser"
 
 When Open Terminal is connected, a **file browser** appears in the sidebar of your chat. It works like the file explorer on your computer. You can browse folders, open files, upload things, and download results. Everything the AI creates shows up here automatically.
 
+:::tip Auto-open behavior
+By default the file browser opens automatically when you select a terminal. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
+:::
+
 ![Chat interface with the file browser sidebar](/images/open-terminal-file-browser.png)
 
 ---
