@@ -18,7 +18,7 @@ Resize, watermark, convert, or generate thumbnails for a folder of images.
 4. Generates a contact sheet (grid of all thumbnails)
 5. Reports file count and size savings
 
-{/* TODO: Screenshot — File browser showing three output folders: processed/ (watermarked), thumbnails/ (200x200), plus a contact_sheet.png previewed as a grid of product images. */}
+{/* TODO: Screenshot: File browser showing three output folders: processed/ (watermarked), thumbnails/ (200x200), plus a contact_sheet.png previewed as a grid of product images. */}
 
 ## Skill content
 

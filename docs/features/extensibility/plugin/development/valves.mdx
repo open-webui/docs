@@ -102,6 +102,14 @@ When rendered, this field will appear as a masked input (dots instead of charact
 Use password input types for any credential or secret that users configure in their Valves or UserValves. This is especially important for UserValves since they are configurable by end users directly from the chat interface.
 :::
 
+### Encrypting Valve Values at Rest
+
+Password input only masks values **in the UI**, it does not change how they are stored. By default, Valve values (including secrets) are saved as plaintext JSON in the database. To encrypt them at rest, an administrator can set [`ENABLE_VALVE_ENCRYPTION=true`](/reference/env-configuration#enable_valve_encryption), which encrypts Tool and Function Valve values with Fernet (AES-128) using a key derived from [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key).
+
+:::warning
+When encryption is enabled, `WEBUI_SECRET_KEY` must be a valid 44-character url-safe base64 Fernet key, and rotating it makes previously encrypted Valve values unreadable (they must be re-entered). See [`ENABLE_VALVE_ENCRYPTION`](/reference/env-configuration#enable_valve_encryption) for details.
+:::
+
 ### Select Dropdown Input
 
 For fields where users should choose from a predefined list of options, use the select input type to render a dropdown menu. Options can be either static (hardcoded list) or dynamic (generated at runtime by a method).

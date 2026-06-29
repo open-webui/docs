@@ -57,13 +57,13 @@ class Action:
 
 The `action` method receives several parameters that provide access to the execution context:
 
-- **`body`** - Dictionary containing the message data and context
-- **`__user__`** - Current user object with permissions and settings
-- **`__event_emitter__`** - Function to send real-time updates to the frontend
-- **`__event_call__`** - Function for bidirectional communication (confirmations, inputs)
-- **`__model__`** - Model information that triggered the action
-- **`__request__`** - FastAPI request object for accessing headers, etc.
-- **`__id__`** - Action ID (useful for multi-action functions)
+- **`body`**: Dictionary containing the message data and context
+- **`__user__`**: Current user object with permissions and settings
+- **`__event_emitter__`**: Function to send real-time updates to the frontend
+- **`__event_call__`**: Function for bidirectional communication (confirmations, inputs)
+- **`__model__`**: Model information that triggered the action
+- **`__request__`**: FastAPI request object for accessing headers, etc.
+- **`__id__`**: Action ID (useful for multi-action functions)
 
 ## Event System Integration
 
@@ -153,12 +153,12 @@ async def action(self, body: dict, __id__=None, **kwargs):
 ```
 
 ### Global vs Model-Specific Actions
-- **Global Actions** - Turn on the toggle in the Action's settings, to globally enable it for all users and all models.
-- **Model-Specific Actions** - Configure enabled actions for specific models in the model settings.
+- **Global Actions**: Turn on the toggle in the Action's settings, to globally enable it for all users and all models.
+- **Model-Specific Actions**: Configure enabled actions for specific models in the model settings.
 
 ### Button Display Order (Priority)
 
-Action buttons beneath assistant messages are sorted by their `priority` valve value in **ascending order** — lower values appear first (leftmost), higher values appear later (rightmost). The default priority is `0`.
+Action buttons beneath assistant messages are sorted by their `priority` valve value in **ascending order**: lower values appear first (leftmost), higher values appear later (rightmost). The default priority is `0`.
 
 To control the order, add a `priority` field to your Action's Valves:
 
@@ -228,7 +228,7 @@ async def action(self, body: dict, __user__=None):
     return {"content": f"Hello {user_name}, admin action completed"}
 ```
 
-## Example - Specifying Action Frontmatter
+## Example: Specifying Action Frontmatter
 
 Each Action function can include a docstring at the top to define metadata for the button. This helps customize the display and behavior of your Action in Open WebUI.
 
@@ -237,12 +237,12 @@ Example of supported frontmatter fields:
 - `author`: Name of the creator.
 - `version`: Version number of the Action.
 - `required_open_webui_version`: Minimum compatible version of Open WebUI.
-- `icon_url (optional)`: A URL pointing to an icon image (PNG, SVG, JPEG, etc.). While base64 data URIs are technically supported, **using a hosted URL is strongly recommended** — see the warning below.
+- `icon_url (optional)`: A URL pointing to an icon image (PNG, SVG, JPEG, etc.). While base64 data URIs are technically supported, **using a hosted URL is strongly recommended**. See the warning below.
 
-:::danger Avoid Base64 Icons — Use URLs Instead
+:::danger Avoid Base64 Icons, Use URLs Instead
 Do **not** embed base64-encoded images as your `icon_url`. The icon data for every action is included in the `/api/models` API response, which is sent to the frontend on every page load for **every model** that has the action enabled.
 
-**Example of the impact:** If you use a 500 KB base64 icon for an action, and that action is enabled on 20 models, the API response grows by **20 × 500 KB = ~10 MB** — just for that one action. If you have three such actions, that becomes **~30 MB of unnecessary payload**. This will:
+**Example of the impact:** If you use a 500 KB base64 icon for an action, and that action is enabled on 20 models, the API response grows by **20 × 500 KB = ~10 MB**, just for that one action. If you have three such actions, that becomes **~30 MB of unnecessary payload**. This will:
 - **Significantly slow down frontend load times** for all users
 - **Increase backend memory usage and network bandwidth** on every request
 - **Degrade the overall user experience**, especially on slower connections
@@ -250,7 +250,7 @@ Do **not** embed base64-encoded images as your `icon_url`. The icon data for eve
 Instead, host your icon as a static file (e.g., on your web server, a CDN, or a public URL) and reference it by URL. This keeps the API payload minimal.
 :::
 
-**Example (Recommended — URL icon):**
+**Example (Recommended, URL icon):**
 
 <details>
 <summary>Example</summary>
@@ -342,11 +342,11 @@ async def action(self, body: dict, __event_emitter__=None):
 ## Integration with Open WebUI Features
 
 Actions integrate seamlessly with other Open WebUI features:
-- **Models** - Actions can be model-specific or global
-- **Tools** - Actions can invoke external tools and APIs
-- **Files** - Actions can process uploaded files and generate new ones
-- **Memory** - Actions can access conversation history and context
-- **Permissions** - Actions respect user roles and access controls
-- **[Rich UI Embedding](/features/extensibility/plugin/development/rich-ui)** - Actions can return HTML content that renders as interactive iframes in the chat
+- **Models**: Actions can be model-specific or global
+- **Tools**: Actions can invoke external tools and APIs
+- **Files**: Actions can process uploaded files and generate new ones
+- **Memory**: Actions can access conversation history and context
+- **Permissions**: Actions respect user roles and access controls
+- **[Rich UI Embedding](/features/extensibility/plugin/development/rich-ui)**: Actions can return HTML content that renders as interactive iframes in the chat
 
 For more examples and community-contributed actions, visit [https://openwebui.com/search](https://openwebui.com/search) where you can discover, download, and explore custom functions built by the Open WebUI community.

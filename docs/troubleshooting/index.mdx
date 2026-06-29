@@ -35,6 +35,8 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | "The prompt is too long" / context length exceeded | [Context Window / Prompt Too Long](./context-window) |
 | Forgot admin password | [Reset Admin Password](./password-reset) |
 | `no such table` or `table already exists` on startup | [Database Migration](./manual-database-migration) |
+| Container hangs at startup on Apple Silicon (M1/M2/M3) after the CORS warning | [Startup → Apple Silicon hang](./startup#container-hangs-at-startup-on-apple-silicon-m1m2m3) |
+| `No embedding model is loaded` on startup with `OFFLINE_MODE` | [Startup → Offline embedding](./startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install) |
 
 ## All Troubleshooting Guides
 
@@ -49,6 +51,7 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | [Scaling & HA](./multi-replica) | Multi-replica, multi-worker, Redis, shared storage, database concurrency |
 | [Image Generation](./image-generation) | OpenAI, ComfyUI, Automatic1111, Gemini |
 | [Web Search](./web-search) | Proxy issues, SearXNG, empty results, timeouts |
+| [Startup & Docker Failures](./startup) | Container hangs on startup, Apple Silicon emulation, offline-mode embedding failures |
 | [Reset Admin Password](./password-reset) | Password reset for Docker and local installations |
 | [Database Migration](./manual-database-migration) | Manual Alembic migrations, recovery from failed upgrades |
 

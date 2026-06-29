@@ -20,11 +20,11 @@ Admins can configure server-wide audio defaults:
 4. Select the **Audio** tab
 
 Here you can configure:
-- **Speech-to-Text Engine** — Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
-- **Whisper Model** — Select model size for local STT (tiny, base, small, medium, large)
-- **Text-to-Speech Engine** — Choose between OpenAI-compatible, Mistral, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
-- **TTS Voice** — Select the default voice
-- **API Keys and Base URLs** — Configure external service connections
+- **Speech-to-Text Engine**: Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
+- **Whisper Model**: Select model size for local STT (tiny, base, small, medium, large)
+- **Text-to-Speech Engine**: Choose between OpenAI-compatible, Mistral, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
+- **TTS Voice**: Select the default voice
+- **API Keys and Base URLs**: Configure external service connections
 
 ### User Settings (Per-User)
 
@@ -35,13 +35,13 @@ Individual users can customize their audio experience:
 3. Click the **Audio** tab
 
 User-level options include:
-- **STT Engine Override** — Use "Web API" for browser-based speech recognition
-- **STT Language** — Set preferred language for transcription
-- **TTS Engine** — Choose "Browser Kokoro" for local in-browser TTS
-- **TTS Voice** — Select from available voices
-- **Auto-playback** — Automatically play AI responses
-- **Playback Speed** — Adjust audio speed
-- **Conversation Mode** — Enable hands-free voice interaction
+- **STT Engine Override**: Use "Web API" for browser-based speech recognition
+- **STT Language**: Set preferred language for transcription
+- **TTS Engine**: Choose "Browser Kokoro" for local in-browser TTS
+- **TTS Voice**: Select from available voices
+- **Auto-playback**: Automatically play AI responses
+- **Playback Speed**: Adjust audio speed
+- **Conversation Mode**: Enable hands-free voice interaction
 
 :::tip
 User settings override admin defaults. If you're having issues, check both locations to ensure settings aren't conflicting.
@@ -429,7 +429,7 @@ curl http://your-tts-service:port/health
 
 | Variable | Description |
 |----------|-------------|
-| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS - uses browser), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` |
+| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS, uses browser), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` |
 | `AUDIO_TTS_MODEL` | TTS model to use (default: `tts-1`) |
 | `AUDIO_TTS_VOICE` | Default voice for TTS (default: `alloy`) |
 | `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS |
@@ -450,7 +450,7 @@ curl http://your-tts-service:port/health
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible STT |
 | `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |
 | `DEEPGRAM_API_KEY` | Deepgram API key |
-| `AIOHTTP_CLIENT_SESSION_SSL` | TLS verification for outbound STT/TTS API calls (default: `True`; set `False` for self-signed certs — honored by audio engines since v0.9.6) |
+| `AIOHTTP_CLIENT_SESSION_SSL` | TLS verification for outbound STT/TTS API calls (default: `True`; set `False` for self-signed certs; honored by audio engines since v0.9.6) |
 
 For a complete list of audio environment variables, see [Environment Variable Configuration](/reference/env-configuration#audio).
 

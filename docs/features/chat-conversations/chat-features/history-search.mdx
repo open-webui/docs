@@ -30,6 +30,18 @@ You can search through your conversations using the global search bar in the sid
     *   **Tags** (Search using `tag:my-tag-name`)
 3.  Click on a result to immediately jump to that conversation.
 
+### Filter prefixes
+
+You can narrow results with filter prefixes, alone or combined with a query:
+
+*   `tag:<name>` — chats with a given tag
+*   `folder:<name>` — chats in a folder
+*   `pinned:` — pinned chats only
+*   `archived:` — archived chats only
+*   `shared:` — shared chats only
+
+For example, `folder:work meeting notes` searches for "meeting notes" within the **work** folder. Matching results show a short **snippet** of the matched message.
+
 ---
 
 ## Native Conversation Search (Agentic)
@@ -43,7 +55,7 @@ When using a model with **Native Function Calling** enabled (see the [**Central 
 ### Why use native tool calling for Search?
 This allows the model to leverage its own previous work. You can ask: *"What was the feedback I got on my last email draft?"* or *"Find the Python script I wrote about image processing two weeks ago."*
 
-The model will search your history, identify the correct chat, read it, and provide you with an answer or the code you were looking for—saving you the effort of manual scrolling and copy-pasting.
+The model will search your history, identify the correct chat, read it, and provide you with an answer or the code you were looking for, saving you the effort of manual scrolling and copy-pasting.
 
 ---
 

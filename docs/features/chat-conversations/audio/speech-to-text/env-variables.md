@@ -38,10 +38,10 @@ Most of these settings can also be configured in the **Admin Panel → Settings 
 | `WHISPER_VAD_FILTER` | Enable Voice Activity Detection filter | `false` |
 
 :::info WHISPER_COMPUTE_TYPE Options
-- `int8` — CPU default, fastest but may not work on older GPUs
-- `float16` — **Recommended for CUDA/GPU**
-- `int8_float16` — Hybrid mode (int8 weights, float16 computation)
-- `float32` — Maximum compatibility, slowest
+- `int8`: CPU default, fastest but may not work on older GPUs
+- `float16`: **Recommended for CUDA/GPU**
+- `int8_float16`: Hybrid mode (int8 weights, float16 computation)
+- `float32`: Maximum compatibility, slowest
 
 If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=float16` to avoid errors.
 :::

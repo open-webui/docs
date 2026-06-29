@@ -1,0 +1,36 @@
+---
+title: "Chat & Conversations"
+sidebar_position: 0
+slug: /features/chat-conversations
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 💬 Chat & Conversations
+
+<ThemedImage
+  alt="Chat & Conversations overview: the Open WebUI core ringed by its capabilities (Chat, Documents, Web Search, Audio, Images, Memory, Data Controls and Connections)"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+**The conversation is the heart of Open WebUI, and it does far more than trade messages.**
+
+A single chat can read your documents, search the live web, speak and listen, generate images, remember what matters and call your own models. Everything below plugs into the same conversation. Start with a plain chat and switch capabilities on as you need them.
+
+| Capability | What it does |
+| :--- | :--- |
+| [**💬 Chat Features**](/features/chat-conversations/chat-features) | The everyday chat: editing and regenerating messages, formatting, follow-up suggestions, autocomplete, task management and temporal awareness. |
+| [**📄 Documents (RAG)**](/features/chat-conversations/rag) | Attach files and let the model retrieve the relevant passages instead of guessing, with control over extraction and chunking. |
+| [**🌐 Web Search**](/features/chat-conversations/web-search) | Let the model search the live web and fetch URLs, cite its sources and save results back to a Knowledge Base. |
+| [**🎙️ Audio**](/features/chat-conversations/audio) | Speak to the AI and have it speak back, with pluggable speech-to-text and text-to-speech engines and voice cloning. |
+| [**🎨 Image Generation**](/features/chat-conversations/image-generation-and-editing) | Create and edit images from a prompt inline in chat via local or hosted image models. |
+| [**🧠 Memory**](/features/chat-conversations/memory) | Let the AI remember facts about you across conversations for answers tailored to your context. |
+| [**🔒 Data Controls**](/features/chat-conversations/data-controls) | Decide what is kept, shared and sent: chat history, temporary chats and per-request privacy. |
+| [**🔗 Direct Connections**](/features/chat-conversations/direct-connections) | Point the client straight at your own OpenAI-compatible model endpoints, no server config required. |
+
+Each capability has its own page. Most people live in a plain **Chat** and reach for the others, a document here, a web search there, as the conversation calls for them.

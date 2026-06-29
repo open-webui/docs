@@ -39,7 +39,7 @@ By enabling Helicone, you can log LLM requests, evaluate and experiment with pro
 
 Create a [Helicone account](https://www.helicone.ai/) and log in to generate an [API key](https://us.helicone.ai/settings/api-keys).
 
-*— Make sure to generate a [write only API key](https://docs.helicone.ai/helicone-headers/helicone-auth). This ensures you only allow logging data to Helicone without read access to your private data.*
+*Make sure to generate a [write only API key](https://docs.helicone.ai/helicone-headers/helicone-auth). This ensures you only allow logging data to Helicone without read access to your private data.*
 
 ### Step 2: Create an OpenAI account and generate your API key
 

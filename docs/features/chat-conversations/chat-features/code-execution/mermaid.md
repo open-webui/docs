@@ -22,7 +22,7 @@ Note that for the LLM's response to be rendered correctly, it must begin with th
 
 When you request a MermaidJS visualization, the Large Language Model (LLM) will generate the necessary code. Open WebUI will automatically render the visualization directly within the chat interface, as long as the code uses valid MermaidJS syntax.
 
-If the model generates MermaidJS syntax, but the visualization does not render, it usually indicates a syntax error in the code. Don't worry – you'll be notified of any errors once the response has been fully generated. If this happens, try referencing the [MermaidJS documentation](https://mermaid.js.org/intro/) to identify the issue and revise the prompt accordingly.
+If the model generates MermaidJS syntax, but the visualization does not render, it usually indicates a syntax error in the code. Don't worry, you'll be notified of any errors once the response has been fully generated. If this happens, try referencing the [MermaidJS documentation](https://mermaid.js.org/intro/) to identify the issue and revise the prompt accordingly.
 
 ## Interacting with Your Visualization
 

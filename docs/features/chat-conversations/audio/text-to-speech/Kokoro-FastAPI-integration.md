@@ -164,15 +164,15 @@ If the GPU version isn't using your GPU:
 
 If Open WebUI can't reach Kokoro, this is usually a Docker networking issue. Choose the method that matches your setup:
 
-**Option 1 — Docker Desktop (Windows/Mac):**
+**Option 1, Docker Desktop (Windows/Mac):**
 
 Use `host.docker.internal` instead of `localhost`:http://host.docker.internal:8880/v1
 
-**Option 2 — Docker Compose (same network):**
+**Option 2, Docker Compose (same network):**
 
 Use the service name directly:http://kokoro-fastapi-gpu:8880/v1
 
-**Option 3 — Docker Network (recommended for Linux):**
+**Option 3, Docker Network (recommended for Linux):**
 
 If `host.docker.internal` doesn't work, create a shared Docker network:
 

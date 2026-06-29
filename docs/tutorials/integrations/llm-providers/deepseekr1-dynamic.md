@@ -3,7 +3,7 @@ sidebar_position: 1
 title: "DeepSeek R1 Dynamic"
 ---
 
-A huge shoutout to **UnslothAI** for their incredible efforts! Thanks to their hard work, we can now run the **full DeepSeek-R1** 671B parameter model in its dynamic 1.58-bit quantized form (compressed to just 131GB) on **Llama.cpp**! And the best part? You no longer have to despair about needing massive enterprise-class GPUs or servers — it’s possible to run this model on your personal machine (albeit slowly for most consumer hardware).
+A huge shoutout to **UnslothAI** for their incredible efforts! Thanks to their hard work, we can now run the **full DeepSeek-R1** 671B parameter model in its dynamic 1.58-bit quantized form (compressed to just 131GB) on **Llama.cpp**! And the best part? You no longer have to despair about needing massive enterprise-class GPUs or servers: it’s possible to run this model on your personal machine (albeit slowly for most consumer hardware).
 
 :::note
 
@@ -28,7 +28,7 @@ Head over to [Unsloth’s Hugging Face page](https://huggingface.co/unsloth/Deep
 
 :::tip
 
-Know your "working directory" — where your Python script or terminal session is running. The model files will download to a subfolder of that directory by default, so be sure you know its path! For example, if you're running the command below in `/Users/yourname/Documents/projects`, your downloaded model will be saved under `/Users/yourname/Documents/projects/DeepSeek-R1-GGUF`.
+Know your "working directory", where your Python script or terminal session is running. The model files will download to a subfolder of that directory by default, so be sure you know its path! For example, if you're running the command below in `/Users/yourname/Documents/projects`, your downloaded model will be saved under `/Users/yourname/Documents/projects/DeepSeek-R1-GGUF`.
 
 :::
 
@@ -70,7 +70,7 @@ DeepSeek-R1-GGUF/
 
 ## Step 3: Make Sure Open WebUI is Installed and Running
 
-If you don’t already have **Open WebUI** installed, no worries! It’s a simple setup. Just follow the [Open WebUI documentation](https://docs.openwebui.com/). Once installed, start the application — we’ll connect it in a later step to interact with the DeepSeek-R1 model.
+If you don’t already have **Open WebUI** installed, no worries! It’s a simple setup. Just follow the [Open WebUI documentation](https://docs.openwebui.com/). Once installed, start the application. We’ll connect it in a later step to interact with the DeepSeek-R1 model.
 
 ## Step 4: Serve the Model Using Llama.cpp
 
@@ -109,7 +109,7 @@ Here’s the command to start the server:
 - **`--model`:** Replace `/[your-directory]/` with the path where the GGUF files were downloaded in Step 2.
 - **`--port`:** The server default is `8080`, but feel free to change it based on your port availability.
 - **`--ctx-size`:** Determines context length (number of tokens). You can increase it if your hardware allows, but be cautious of rising RAM/VRAM usage.
-- **`--n-gpu-layers`:** Set the number of layers you want to offload to your GPU for faster inference. The exact number depends on your GPU’s memory capacity — reference Unsloth’s table for specific recommendations.
+- **`--n-gpu-layers`:** Set the number of layers you want to offload to your GPU for faster inference. The exact number depends on your GPU’s memory capacity. Reference Unsloth’s table for specific recommendations.
 
 :::
 

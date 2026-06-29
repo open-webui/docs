@@ -28,7 +28,7 @@ Open WebUI ships with two Brave-backed search engines that share the same API ke
 | Engine | Endpoint | Behavior |
 | :--- | :--- | :--- |
 | `brave` | `/res/v1/web/search` | Classic web search. Returns short snippets; Open WebUI then scrapes each result URL to build the LLM context. |
-| `brave_llm_context` | `/res/v1/llm/context` | LLM-optimized search. Returns full pre-extracted, relevance-scored page passages directly. Skips the post-search scrape entirely. Pull size is bounded by [`BRAVE_SEARCH_CONTEXT_TOKENS`](/reference/env-configuration#brave_search_context_tokens) (default `8192`, range `1024`–`32768`). |
+| `brave_llm_context` | `/res/v1/llm/context` | LLM-optimized search. Returns full pre-extracted, relevance-scored page passages directly. Skips the post-search scrape entirely. Pull size is bounded by [`BRAVE_SEARCH_CONTEXT_TOKENS`](/reference/env-configuration#brave_search_context_tokens) (default `8192`, range `1024` to `32768`). |
 
 Pick `brave_llm_context` when you want fewer round-trips and higher-fidelity passages without the scraping step; pick `brave` when you need the classic snippet-then-scrape flow (e.g. when scraping is doing useful normalization in your pipeline). Both engines automatically retry once after HTTP 429 with a 1-second backoff.
 

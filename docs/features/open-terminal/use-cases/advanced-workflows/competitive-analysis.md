@@ -18,9 +18,9 @@ Scrape competitor pricing pages and build a comparison.
 4. Builds a comparison spreadsheet and highlights key differences
 5. Writes strategic observations
 
-{/* TODO: Screenshot — File browser previewing competitor_pricing.csv as a table: rows for features, columns for competitors, with prices and ✓/✗ marks. */}
+{/* TODO: Screenshot: File browser previewing competitor_pricing.csv as a table: rows for features, columns for competitors, with prices and ✓/✗ marks. */}
 
-{/* TODO: Screenshot — The summary: "Key findings: Competitor A has a free tier, Competitor C is 30% cheaper on Pro, but we're the only one with 24/7 support included." */}
+{/* TODO: Screenshot: The summary: "Key findings: Competitor A has a free tier, Competitor C is 30% cheaper on Pro, but we're the only one with 24/7 support included." */}
 
 ## Skill content
 

@@ -5,7 +5,7 @@ title: "Software Development"
 
 # Software Development
 
-Open Terminal enables the AI to interact with real codebases — cloning repos, running tests, reading errors, installing dependencies, and iterating on fixes.
+Open Terminal enables the AI to interact with real codebases: cloning repos, running tests, reading errors, installing dependencies, and iterating on fixes.
 
 :::tip
 For a full development environment accessible from any device, see [**cptr**](https://github.com/open-webui/computer). Your computer in a browser tab.
@@ -41,7 +41,7 @@ The AI:
 ![AI running tests and iterating on fixes](/images/open-terminal-ai-test-suite.png)
 
 :::tip Iterative debugging
-The AI sees the same terminal output a developer would — stack traces, assertion errors, log messages. Multiple rounds of "run → read error → fix → re-run" happen automatically.
+The AI sees the same terminal output a developer would: stack traces, assertion errors, log messages. Multiple rounds of "run, read error, fix, re-run" happen automatically.
 :::
 
 ---
@@ -151,10 +151,10 @@ The Docker image comes with common development tools pre-installed:
 | **Editors** | nano, vim |
 | **Build tools** | make, gcc, g++ |
 
-The AI can install additional tools on the fly — Rust, Go, Java, Docker CLI, database clients, and anything else available via `apt` or language-specific package managers.
+The AI can install additional tools on the fly: Rust, Go, Java, Docker CLI, database clients, and anything else available via `apt` or language-specific package managers.
 
 ## Related
 
-- **[Code execution →](./code-execution)** — quick scripts and one-off tasks
-- **[Web development →](./web-development)** — build and preview websites
-- **[Advanced workflows →](./advanced-workflows)** — skills for code review, database analysis, and more
+- **[Code execution →](./code-execution)**: quick scripts and one-off tasks
+- **[Web development →](./web-development)**: build and preview websites
+- **[Advanced workflows →](./advanced-workflows)**: skills for code review, database analysis, and more

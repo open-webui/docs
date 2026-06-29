@@ -5,87 +5,22 @@ title: "Essentials for Open WebUI"
 
 # Essentials for Open WebUI
 
-You have installed Open WebUI, connected a provider, and had your first conversation. This page covers the six things that turn a basic chat UI into a setup that works well day-to-day. None of them are required, but most users end up reaching for all of them within the first week.
+You have installed Open WebUI, connected a provider, and had your first conversation. This page covers the key things that turn a basic chat UI into a setup that works well day-to-day. None of them are required, but most users end up reaching for all of them within the first week.
 
 Work through in order, or jump to the section you need:
 
-1. [**Tool calling**](#tool-calling)
-2. [**Plugins**](#plugins)
-3. [**Task models**](#task-models)
-4. [**Context management**](#context-management)
-5. [**Basic RAG**](#basic-rag)
+1. [**Plugins**](#plugins)
+2. [**Task models**](#task-models)
+3. [**Context management**](#context-management)
+4. [**Basic RAG**](#basic-rag)
+5. [**Web Search**](#web-search)
 6. [**Open Terminal**](#open-terminal)
-7. [**Troubleshooting**](#troubleshooting)
+7. [**Computer (cptr)**](#computer-cptr)
+8. [**Troubleshooting**](#troubleshooting)
 
 :::tip Deploying for a team?
-If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive — work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
+If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive: work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
 :::
-
----
-
-## Tool calling
-
-Without tools, an LLM can only generate text. With tools, it can look things up, run code, and take actions on your behalf. You attach a **Tool** to a chat (or to a model), and the model decides during its response when to call it and with what arguments. Open WebUI executes the call, feeds the result back, and the model continues with that new information.
-
-:::info Why this is first
-Tool calling is what turns a chat model into an agent. Getting this set up unlocks most of the advanced features covered in the rest of this page.
-:::
-
-There are two things worth understanding early on.
-
-### Understanding tool-calling modes
-
-Open WebUI has two ways of connecting a model to its tools, and a common source of confusion is that the one labeled "Default" is not the one most people should be using. The naming makes more sense once you understand the history and Open WebUI's design philosophy.
-
-:::tip Native Mode is recommended for most users
-**Default Mode** is the legacy approach and exists for broad compatibility. If your model supports function calling (most modern models do), **Native Mode** is the better choice. See below for how to switch.
-:::
-
-A core goal of Open WebUI is to support the widest possible range of models, from cutting-edge frontier APIs to tiny quantized models running on a Raspberry Pi. When Open WebUI first introduced tool calling, most models did not have built-in function-calling APIs. The only way to give a model tools was to describe them in the system prompt as plain text and then parse the model's response to figure out which tool it was trying to call. This prompt-based approach is what Open WebUI calls **Default Mode**. It was the original (and at the time, only) implementation, and it is now considered legacy handling. It remains the system default because it is the lowest common denominator: any model that can follow instructions in a system prompt can use it, no special API support required.
-
-Since then, most model providers have added native function-calling support. Open WebUI calls this **Native Mode**. The model receives tool definitions as a structured part of its API request and returns structured tool calls in its response. It is faster, more reliable, preserves KV cache, and is required for all of Open WebUI's built-in system tools (Memory, Notes, Knowledge, Web Search, Image Gen, Code Interpreter). All new tool-calling features are built for Native Mode. But it only works with models that actually expose a function-calling API, which is why it cannot be the universal default.
-
-In practice, most users should enable Native Mode. Every major current model supports it (OpenAI, Anthropic, Gemini, Llama 3.1+, Qwen 2.5+, DeepSeek, GLM, and others). You can set it once for your entire instance:
-
-:::tip Set Native Mode globally in one step
-**Admin Panel > Settings > Models** → click the **Settings** button at the **top right** of the models list → set **Function Calling = Native** → save. Every current and future model inherits the setting.
-:::
-
-- **Per model:** **Admin Panel > Settings > Models > [your model] > Model Parameters > Function Calling = Native**
-- **Per chat:** In the chat's **Chat Controls** (right sidebar)
-
-If you are running an older local model or a fine-tune that does not expose a function-calling API, keep that specific model on Default Mode. For everything else, Native Mode is the better choice.
-
-### Choosing tools to enable
-
-Many of the tools people look for are already built into Open WebUI and just need to be turned on: **web search**, **code execution**, **image generation**, **memory**, and **knowledge-base retrieval** are all available without installing any plugins. Once enabled, these appear automatically as system tools when using Native Mode.
-
-Most of these need a small amount of setup (choosing a provider, adding an API key, or enabling a toggle). Setup guides for the most popular ones:
-
-- [**Web Search**](/category/web-search) — connect a search provider (Google, Brave, DuckDuckGo, SearXNG and many more) so the model can look things up
-- [**Image Generation**](/features/chat-conversations/image-generation-and-editing/usage) — connect an image provider (OpenAI DALL-E, ComfyUI, Automatic1111, etc.) for in-chat image creation
-- [**Code Execution**](/features/chat-conversations/chat-features/code-execution/) — run code blocks directly in chat (Pyodide runs in-browser by default, or connect Jupyter for server-side execution)
-- [**Memory**](/features/chat-conversations/memory) — let the model remember facts about you across conversations
-
-For anything not built in, the [**Open WebUI Community site**](https://openwebui.com/) is worth browsing. A few categories to give a sense of what is available:
-
-- **Observability / cost tracking**: Langfuse, OpenLit, Portkey. Log every chat turn, token usage, and latency to your own stack.
-- **Smart-home / automation**: Home Assistant tools that let the model control devices, routines, and scenes.
-- **Research**: arXiv, PubMed, Semantic Scholar, Wolfram Alpha. Structured results with real citations.
-- **Issue tracking / messaging**: Jira, Linear, GitHub Issues, Slack, Discord, email.
-- **Databases / APIs**: read-only SQL against your own database, or calls to your internal API.
-- **Domain-specific**: weather, stocks, crypto, shipping tracking, recipes, and many more.
-
-Tools appear in the `+` menu in the chat input. The model only sees the tools you have enabled for that conversation.
-
-:::tip The community site is worth a look
-The [**Open WebUI Community**](https://openwebui.com/) hosts thousands of community-built plugins. Before writing anything yourself, browse what is already there: sort by popularity, filter by category, and skim a few pages. Most of the time, someone has already built what you need (or something close enough to fork).
-:::
-
-More detail:
-- [Tools reference](/features/extensibility/plugin/tools)
-- [Tool-calling modes (Default vs Native)](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)
-- [Open WebUI Community: Tools, Functions, Models](https://openwebui.com/)
 
 ---
 
@@ -112,11 +47,11 @@ There are two plugin families: **Tools** and **Functions**.
 | **Filters** | Modify every request and/or response as it passes through, automatically on every chat turn | Context trimming, PII scrubbing, token / cost counting, Langfuse tracing, response reformatting |
 | **Actions** | Add a button under each message that runs custom code when the user clicks it | "Regenerate follow-ups", "Translate reply", "Pin message", "Save to Knowledge" |
 
-Both Tools and Functions can be browsed and installed from the [**Open WebUI Community site**](https://openwebui.com/), which hosts thousands of community-built plugins. You can also write your own from scratch in the admin panel.
-
 ### Installing plugins
 
-The [**Open WebUI Community site**](https://openwebui.com/) hosts the one-click catalog for both Tools and Functions. Pick one, click "Get", paste it into the admin panel, enable it, and configure its **valves** (the plugin's settings).
+Both Tools and Functions are browsed and installed from the [**Open WebUI Community site**](https://openwebui.com/), a one-click catalog of thousands of community-built plugins. Pick one, click "Get", paste it into the admin panel, enable it, and configure its **valves** (the plugin's settings). You can also write your own from scratch in the admin panel.
+
+New to the catalog? The [**Community Plugins**](/features/extensibility/community) guide is the beginner's map: how to find a plugin by what you want to do, and how to import it safely. One rule to internalize now: a plugin being featured or popular is **not** a security or quality review, and plugins run real code on your server, so read the source before you import.
 
 :::note Before you build, browse
 Whenever you think "it would be nice if Open WebUI did X," it almost certainly already does via a plugin. There are thousands of plugins already written, and the one you need is usually already there. Even if nothing matches exactly, the closest hit is usually only about 20 lines off from what you want and you can fork it from the admin panel.
@@ -124,6 +59,7 @@ Whenever you think "it would be nice if Open WebUI did X," it almost certainly a
 
 Reference reading:
 - [Plugin overview](/features/extensibility)
+- [Community Plugins](/features/extensibility/community): browse and import safely
 - [Tools reference](/features/extensibility/plugin/tools)
 - [Functions reference (Pipes/Filters/Actions)](/features/extensibility/plugin/functions)
 - [MCP tool servers](/features/extensibility/mcp)
@@ -207,7 +143,7 @@ The defaults are reasonable for getting started. When you outgrow them, there ar
 
 - **Embedding engine.** The default (SentenceTransformers `all-MiniLM-L6-v2`) runs locally on CPU and consumes roughly 500 MB of RAM per worker. For any multi-user deployment, point at an external embeddings API (OpenAI, or Ollama with `nomic-embed-text`) via `RAG_EMBEDDING_ENGINE`.
 - **Content extraction engine.** The default uses `pypdf`, which leaks memory during heavy ingestion. For anything beyond casual use, switch to **Tika** or **Docling** via `CONTENT_EXTRACTION_ENGINE`.
-- **Vector database.** The default ChromaDB (local SQLite-backed) does not tolerate multi-worker deployments. At scale, switch to **PGVector** — it is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available but are community-maintained: they may break on upgrades and fixes depend on community contributions. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the community disclaimers on each provider.
+- **Vector database.** The default ChromaDB (local SQLite-backed) does not tolerate multi-worker deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available but are community-maintained: they may break on upgrades and fixes depend on community contributions. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the community disclaimers on each provider.
 
 :::note When to worry about this
 None of these matter for "a single user with a handful of PDFs." All of them start mattering the moment you have 100 documents or 10 concurrent users.
@@ -233,15 +169,38 @@ The default SentenceTransformers model runs locally on CPU and is fine for a sin
 :::
 
 :::tip Enhanced agentic RAG: enable kb_exec
-If your models use [Native Mode](#tool-calling) (recommended above), set `ENABLE_KB_EXEC=True` for a noticeably better knowledge-base experience. It gives the model a filesystem-style interface over your knowledge (`ls`, `tree`, `grep`, `cat`, read-by-line) that capable models chain more reliably than the individual search tools, so they find the right passage more often. It only works with native function calling; in Default Mode it has no effect. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+Native function calling is the default, so for a noticeably better knowledge-base experience set `ENABLE_KB_EXEC=True`. It gives the model a filesystem-style interface over your knowledge (`ls`, `tree`, `grep`, `cat`, read-by-line) that capable models chain more reliably than the individual search tools, so they find the right passage more often. It has no effect for models set to Legacy. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
 
 More detail:
 - [RAG overview](/features/chat-conversations/rag/)
 - [Knowledge workspace](/features/workspace/knowledge)
 - [Performance tuning for RAG](/troubleshooting/performance#embedding-engine)
-- [Scaling: external vector database](/getting-started/advanced-topics/scaling#step-4--switch-to-an-external-vector-database) — required for multi-worker and multi-replica deployments
-- [Scaling: content extraction & embeddings](/getting-started/advanced-topics/scaling#step-6--fix-content-extraction--embeddings) — fixing memory leaks at scale
+- [Scaling: external vector database](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database), required for multi-worker and multi-replica deployments
+- [Scaling: content extraction & embeddings](/getting-started/advanced-topics/scaling#step-6-fix-content-extraction--embeddings), fixing memory leaks at scale
+
+---
+
+## Web Search
+
+Models only know what was in their training data. That data has a cutoff date and never includes anything private to your world (today's news, a library released last month, the current price of something). **Web Search** closes the gap: it lets the model run live searches and read the results mid-answer, so replies cite current sources instead of guessing from stale memory.
+
+It is a built-in tool, so there is nothing to install. The one decision is **which search provider to use**, and Open WebUI supports over twenty of them. They fall into two rough groups:
+
+- **Self-hosted, no API key.** Run your own search backend and keep every query in-house. [**SearXNG**](/features/chat-conversations/web-search/providers/searxng) is the usual pick.
+- **Commercial APIs.** [**Tavily**](/features/chat-conversations/web-search/providers/tavily), [**Brave**](/features/chat-conversations/web-search/providers/brave), [**Exa AI**](/features/chat-conversations/web-search/providers/exa), [**Perplexity Search**](/features/chat-conversations/web-search/providers/perplexity_search), [**Firecrawl**](/features/chat-conversations/web-search/providers/firecrawl) and others trade an API key (and usually a bill) for higher-quality, AI-tuned results.
+
+**Enable it:** go to **Admin Panel > Settings > Web Search**, toggle **Enable Web Search**, then pick your provider and paste its key or config. In any chat, switch web search on for a message with the **+** button in the prompt field.
+
+:::tip Native function calling does the rest
+Native is the default tool-calling mode now, so once web search is enabled the model decides on its own when a question needs the live web and runs the search as a tool. You do not have to flip the toggle every time; it is there for when you want to force a fresh lookup.
+:::
+
+More detail:
+- [**Web Search providers**](/features/chat-conversations/web-search): the full list, with setup steps for each, so you can pick the one that fits
+- [Agentic / multi-step web search](/features/chat-conversations/web-search/agentic-search)
+- [Save search results to a Knowledge base](/features/chat-conversations/web-search/save-to-knowledge)
+- [Web Search troubleshooting](/troubleshooting/web-search)
 
 ---
 
@@ -263,17 +222,33 @@ More detail:
 
 ---
 
+## Computer (cptr)
+
+Open Terminal hands the chat model a quick toolbox to run a task for you inside Open WebUI. **[cptr](/features/computer)** ("computer") is a different thing entirely: a full-blown agentic cowork and coding app in its own right. It is a self-hosted workspace with a terminal, file browser, editor, git and a capable AI agent living in it, that you can reach from anywhere once you have set it up to be reachable.
+
+It is a **separate Open WebUI project**, but a first-class, fully integratable one. cptr's OpenAI-compatible gateway exposes each workspace as a model, so you plug a cptr workspace straight into Open WebUI as a connection and drive the whole agentic coding loop (branching and all) from your normal chat UI. The same workspaces are reachable from Telegram, Discord, Slack and other apps too, so a project follows you onto whatever device you happen to be on.
+
+:::tip Use both, they do different jobs
+Open Terminal is the model's scratchpad for one-off tasks inside an Open WebUI chat. cptr is a standing coding workspace you own and operate from anywhere, and you can run both at once: Open Terminal for quick in-chat jobs, a connected cptr workspace when you want a real project environment with the agent set up in it.
+:::
+
+More detail:
+- [Computer (cptr): your computer in a browser](/features/computer)
+- [Connect a cptr workspace to Open WebUI](/features/computer/open-webui)
+
+---
+
 ## What to do next
 
-You do not need all of the above on day one. A reasonable order for a new install:
+You do not need all of the above at once. A reasonable order for a new install:
 
-1. **Day one:** Pick a good default model, have a few conversations, get a feel for the UI.
-2. **First thing after that:** Set a Task Model and decide which background chores you actually want enabled. This is the single biggest "feels better" change you can make, and it directly addresses hidden per-chat costs.
-3. **Within the first week:** Turn on Native Mode globally and install one or two Tools that match your work.
-4. **When you hit it:** Install a context filter the first time you see "prompt is too long."
-5. **When you need it:** Set up a Knowledge base the first time you want to ask questions across multiple documents.
-6. **When you are ready to go big:** Point the model at Open Terminal and let it actually build things for you.
-7. **When you scale up:** Revisit the RAG infrastructure section if you go beyond a single user.
+1. Pick a good default model, have a few conversations, get a feel for the UI.
+2. Set a Task Model and decide which background chores you actually want enabled. This is the single biggest "feels better" change you can make, and it directly addresses hidden per-chat costs.
+3. Enable the built-in tools you want (web search, image generation, code execution, memory) and install one or two community Tools that match your work.
+4. Install a context filter the first time you see "prompt is too long."
+5. Set up a Knowledge base when you want to ask questions across multiple documents.
+6. Point the model at Open Terminal and let it actually build things for you.
+7. Revisit the RAG infrastructure section if you go beyond a single user.
 
 Everything else (enterprise SSO, multi-replica HA, Redis scaling, observability) is in [Advanced Topics](/getting-started/advanced-topics) and [Troubleshooting](/troubleshooting) when and if you need it.
 

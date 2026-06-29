@@ -8,7 +8,7 @@ title: "Container Service"
 Run the official `ghcr.io/open-webui/open-webui` image on a managed container platform such as AWS ECS/Fargate, Azure Container Apps, or Google Cloud Run.
 
 :::info Prerequisites
-Before proceeding, ensure you have configured the [shared infrastructure requirements](/enterprise/deployment#shared-infrastructure-requirements) — PostgreSQL, Redis, a vector database, shared storage, and content extraction.
+Before proceeding, ensure you have configured the [shared infrastructure requirements](/enterprise/deployment#shared-infrastructure-requirements): PostgreSQL, Redis, a vector database, shared storage, and content extraction.
 :::
 
 ## When to Choose This Pattern
@@ -49,7 +49,7 @@ Use **versioned tags** for production stability:
 ghcr.io/open-webui/open-webui:v0.x.x
 ```
 
-Avoid the `:main` tag in production — it tracks the latest development build and can introduce breaking changes without warning. Check the [Open WebUI releases](https://github.com/open-webui/open-webui/releases) for the latest stable version.
+Avoid the `:main` tag in production. It tracks the latest development build and can introduce breaking changes without warning. Check the [Open WebUI releases](https://github.com/open-webui/open-webui/releases) for the latest stable version.
 
 ## Scaling Strategy
 
@@ -65,7 +65,7 @@ Avoid the `:main` tag in production — it tracks the latest development build a
 | **Storage** | Use object storage (S3, GCS, Azure Blob) or a shared filesystem (such as EFS). Container-local storage is ephemeral and not shared across tasks. |
 | **Tika sidecar** | Run Tika as a sidecar container in the same task definition, or as a separate service. Sidecar pattern keeps extraction traffic local. |
 | **Secrets management** | Use your platform's secrets manager (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) for `DATABASE_URL`, `REDIS_URL`, and `WEBUI_SECRET_KEY`. |
-| **Updates** | Perform a rolling deployment with a single task first — this task runs migrations (`ENABLE_DB_MIGRATIONS=true`). Once healthy, scale the remaining tasks with `ENABLE_DB_MIGRATIONS=false`. |
+| **Updates** | Perform a rolling deployment with a single task first. This task runs migrations (`ENABLE_DB_MIGRATIONS=true`). Once healthy, scale the remaining tasks with `ENABLE_DB_MIGRATIONS=false`. |
 
 ## Anti-Patterns to Avoid
 

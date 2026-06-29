@@ -77,8 +77,8 @@ Beyond visibility, knowledge access is also scoped by model configuration. When 
 At a deeper level, resource access is managed through normalized **access grants** stored in the database. Each grant specifies:
 
 *   **Resource**: The type and ID of the resource (e.g., a specific model or knowledge base).
-*   **Principal**: Who receives access — either a **group** or an **individual user**.
-*   **Permission**: The level of access — `read` or `write`.
+*   **Principal**: Who receives access, either a **group** or an **individual user**.
+*   **Permission**: The level of access, `read` or `write`.
 
 For example, granting the "Marketing" group read access and a specific editor user write access to a model would create two separate grant entries. Public access is represented by a user grant with a wildcard (`*`) principal.
 
@@ -87,15 +87,15 @@ For example, granting the "Marketing" group read access and a specific editor us
 
 ### Previewing Access (Audit)
 
-When access grants span many groups and resources, it's easy to lose track of who can see what. Open WebUI ships an admin-only **Preview Access** view that resolves every access grant for a specific user or group and lists the result in one place — no need to crawl through individual resource pages.
+When access grants span many groups and resources, it's easy to lose track of who can see what. Open WebUI ships an admin-only **Preview Access** view that resolves every access grant for a specific user or group and lists the result in one place, no need to crawl through individual resource pages.
 
-**For a user** — In **Admin Panel > Users**, hover over a non-admin user row and click the eye-style **Preview Access** button. The modal shows every model, knowledge base, and tool the user can read, aggregated across all of their group memberships and any direct user grants.
+**For a user**: In **Admin Panel > Users**, hover over a non-admin user row and click the eye-style **Preview Access** button. The modal shows every model, knowledge base, and tool the user can read, aggregated across all of their group memberships and any direct user grants.
 
-**For a group** — In **Admin Panel > Users > Groups**, open the group editor and use the **Preview Group Access** panel. The output is the same shape (models, knowledge, tools), scoped to just that group's grants.
+**For a group**: In **Admin Panel > Users > Groups**, open the group editor and use the **Preview Group Access** panel. The output is the same shape (models, knowledge, tools), scoped to just that group's grants.
 
-Both views are admin-only and read-only — they reflect what the access-grant table currently says without modifying it. Use them after a permission change to confirm the result matches intent, or as part of a periodic RBAC audit.
+Both views are admin-only and read-only: they reflect what the access-grant table currently says without modifying it. Use them after a permission change to confirm the result matches intent, or as part of a periodic RBAC audit.
 
 Programmatic equivalents:
 
-- `GET /api/v1/users/{user_id}/preview` — user view (admin auth required)
-- `GET /api/v1/groups/id/{id}/preview` — group view (admin auth required)
+- `GET /api/v1/users/{user_id}/preview`: user view (admin auth required)
+- `GET /api/v1/groups/id/{id}/preview`: group view (admin auth required)

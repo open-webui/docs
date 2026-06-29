@@ -8,7 +8,7 @@ title: "Python / Pip on VMs"
 Deploy `open-webui serve` as a systemd-managed process on virtual machines in a cloud auto-scaling group (AWS ASG, Azure VMSS, GCP MIG).
 
 :::info Prerequisites
-Before proceeding, ensure you have configured the [shared infrastructure requirements](/enterprise/deployment#shared-infrastructure-requirements) — PostgreSQL, Redis, a vector database, shared storage, and content extraction.
+Before proceeding, ensure you have configured the [shared infrastructure requirements](/enterprise/deployment#shared-infrastructure-requirements): PostgreSQL, Redis, a vector database, shared storage, and content extraction.
 :::
 
 ## When to Choose This Pattern

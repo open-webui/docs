@@ -3,7 +3,19 @@ sidebar_position: 1
 title: "Chat Features"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Chat Features Overview
+
+<ThemedImage
+  alt="Chat & Conversations map with the Chat Features cell highlighted"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-chat-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-chat-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 Open WebUI provides a comprehensive set of chat features designed to enhance your interactions with AI models. This page provides an overview of the key chat capabilities, with links to dedicated pages for more detailed information.
 
@@ -23,7 +35,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **[🕒 Temporal Awareness](./temporal-awareness.mdx)**: How models understand time and date, including native tools for precise time calculations.
 
-- **🎙️ Voice Mode**: Start a hands-free voice conversation with your model using the Voice Mode button. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session — useful in noisy or public environments.
+- **🎙️ Voice Mode**: Start a hands-free voice conversation with your model using the Voice Mode button. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session, useful in noisy or public environments.
 
 - **[🧠 Reasoning & Thinking Models](./reasoning-models.mdx)**: Specialized support for models that generate internal chains of thought using thinking tags.
 
@@ -37,4 +49,4 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **Writing & Content Blocks**: Responses from models that include colon-fence blocks (e.g., `:::writing`, `:::code_execution`, `:::search_results`) are automatically rendered as formatted content in a styled container with a copy button. This is commonly used by newer OpenAI models to distinguish different types of output (prose, code results, search results) from the main response text.
 
-- **Structured Response Editing**: Clicking the edit icon on an assistant response that contains tool calls, reasoning blocks, or code-interpreter output opens a structured editor instead of a plain textarea — each output item (text, thought, tool call, code block, web/file/computer search) becomes its own collapsible field, and a **JSON** toggle exposes the underlying [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) payload for direct editing. Reasoning/thinking blocks are editable here too — the previous textarea editor reduced them to a non-editable `<details>` placeholder. Plain text-only responses keep the original textarea behavior. Editing rewrites the message's `output` array; Open WebUI re-derives the displayed `content` (including `<details>` blocks for thoughts and tool calls) on save, so the rendered message stays consistent.
+- **Structured Response Editing**: Clicking the edit icon on an assistant response that contains tool calls, reasoning blocks, or code-interpreter output opens a structured editor instead of a plain textarea. Each output item (text, thought, tool call, code block, web/file/computer search) becomes its own collapsible field, and a **JSON** toggle exposes the underlying [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) payload for direct editing. Reasoning/thinking blocks are editable here too. The previous textarea editor reduced them to a non-editable `<details>` placeholder. Plain text-only responses keep the original textarea behavior. Editing rewrites the message's `output` array; Open WebUI re-derives the displayed `content` (including `<details>` blocks for thoughts and tool calls) on save, so the rendered message stays consistent.

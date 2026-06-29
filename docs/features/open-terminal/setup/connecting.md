@@ -25,7 +25,7 @@ Click your **name** at the bottom of the left sidebar to open the user menu, the
 
 In the Admin Panel, click **Settings** in the top nav, then click **Integrations**.
 
-![Admin Panel — Settings → Integrations](/images/open-terminal-integrations-page.png)
+![Admin Panel, Settings → Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
 
@@ -34,7 +34,7 @@ Scroll down until you see the **Open Terminal** section.
 ![The Open Terminal section under Integrations](/images/open-terminal-connected.png)
 
 :::warning Don't confuse it with "Tools"
-Open Terminal has its **own section** under Integrations — don't add it under "External Tools" or "Tool Servers". Using the dedicated section gives you the built-in file browser and terminal sidebar.
+Open Terminal has its **own section** under Integrations. Don't add it under "External Tools" or "Tool Servers". Using the dedicated section gives you the built-in file browser and terminal sidebar.
 :::
 
 ### 4. Click + and fill in the details
@@ -69,17 +69,17 @@ The selected terminal name appears next to the cloud icon. The AI can now execut
 
 ### 8. Enable native function calling
 
-For the AI to use terminal tools reliably, you need to enable **native function calling** on your model:
+Native function calling is the default tool-calling mode as of v0.9.7, so it is already active for new models. The only thing to check is that the model was not switched to **Legacy**:
 
 1. Go to **Workspace → Models**
 2. Click the edit button on the model you're using
-3. Under **Capabilities**, enable **Native Function Calling** (also called "tool use")
+3. Make sure **Function Calling** is set to **Native** (the default), not **Legacy**
 4. Save
 
 ![Model capabilities showing Builtin Tools enabled](/images/open-terminal-model-capabilities.png)
 
-:::warning Without this, tools may not work
-Native function calling lets the model invoke tools directly using the provider's built-in tool-calling format. Without it, Open WebUI falls back to prompt-based tool calling, which is less reliable and may not trigger terminal commands at all.
+:::warning Legacy Mode is less reliable for tools
+If the model is set to **Legacy**, Open WebUI falls back to prompt-based tool calling instead of the provider's structured tool-call format. That is less reliable and may not trigger terminal commands at all. Native (the default) is recommended.
 :::
 
 :::tip Performance depends on the model
@@ -98,7 +98,7 @@ The AI should use Open Terminal to run a command and tell you the answer.
 
 
 :::tip Pre-configure via environment variable
-For Docker deployments, you can configure terminal connections automatically using the `TERMINAL_SERVER_CONNECTIONS` environment variable — useful when you want everything set up at startup without manual steps.
+For Docker deployments, you can configure terminal connections automatically using the `TERMINAL_SERVER_CONNECTIONS` environment variable, which is useful when you want everything set up at startup without manual steps.
 :::
 
 ---
@@ -106,7 +106,7 @@ For Docker deployments, you can configure terminal connections automatically usi
 ## Personal Settings (testing only)
 
 :::caution Not recommended for regular use
-Adding a terminal connection via personal Settings sends the API key to your browser and routes requests directly from it. This is fine for **quick testing**, but for anything beyond that, use Admin Settings instead — it's more secure and works for all users automatically.
+Adding a terminal connection via personal Settings sends the API key to your browser and routes requests directly from it. This is fine for **quick testing**, but for anything beyond that, use Admin Settings instead. It's more secure and works for all users automatically.
 :::
 
 If you need to test a connection without admin access, you can add one from **Settings → Integrations → Open Terminal**. The same URL and API key fields apply.

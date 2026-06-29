@@ -5,7 +5,7 @@ title: "Pipes"
 
 ## Pipes
 
-:::danger Pipelines are legacy — do not use for new deployments
+:::danger Pipelines are legacy, do not use for new deployments
 **Pipelines are outdated and legacy, and are no longer recommended.** A Pipeline can run as a **pipe** or as a **filter**; both forms now have in-process replacements that are built in, easier to configure, and need no separate worker container:
 
 - Pipeline **pipe** (custom provider, RAG, request routing) → [Pipe Function](/features/extensibility/plugin/functions/pipe)
@@ -34,8 +34,8 @@ Pipes that are defined in your WebUI show up as a new model with an "External" d
 
 Pipes can return either a single `str` or an iterator/generator. When streaming, each yielded item can be:
 
-- **A plain string** — treated as assistant-visible text content and appended to the message as it arrives. This is the simplest form and the one most agent pipelines should use for regular output.
-- **An OpenAI-compatible SSE chunk dict** — same shape as the `/v1/chat/completions` streaming response, i.e.
+- **A plain string**: treated as assistant-visible text content and appended to the message as it arrives. This is the simplest form and the one most agent pipelines should use for regular output.
+- **An OpenAI-compatible SSE chunk dict**: same shape as the `/v1/chat/completions` streaming response, i.e.
 
   ```python
   {"choices": [{"delta": {"content": "..."}, "finish_reason": None}]}
@@ -49,7 +49,7 @@ For a self-contained stream, close it with a single terminating chunk:
 yield {"choices": [{"delta": {}, "finish_reason": "stop"}]}
 ```
 
-`finish_reason` should appear **exactly once**, at the end, and for a pipeline that handles its own tool execution it should always be `"stop"` — not `"tool_calls"` (see the next section).
+`finish_reason` should appear **exactly once**, at the end, and for a pipeline that handles its own tool execution it should always be `"stop"`, not `"tool_calls"` (see the next section).
 
 ## Self-contained agents and `delta.tool_calls`
 
@@ -57,7 +57,7 @@ This is the single biggest gotcha when building an agent pipeline (LangChain, Ll
 
 `delta.tool_calls` in a chunk means **"please execute this tool call for me, client"**. When Open WebUI's middleware sees it, the tool executor picks up the call, runs it, appends a `role: "tool"` message, and fires a continuation request back at the same pipeline. It does this in a loop capped by [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) (default 256; `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES`, default 30, on versions before v0.9.6).
 
-If your pipeline already executed the tool internally, emitting `delta.tool_calls` makes Open WebUI try to execute it *again* — and since the pipeline keeps emitting the same call on every retry, you get 30 copies of the response stacked on top of each other before the retry cap trips. Same thing happens if you set `finish_reason: "tool_calls"` mid-stream.
+If your pipeline already executed the tool internally, emitting `delta.tool_calls` makes Open WebUI try to execute it *again*, and since the pipeline keeps emitting the same call on every retry, you get 30 copies of the response stacked on top of each other before the retry cap trips. Same thing happens if you set `finish_reason: "tool_calls"` mid-stream.
 
 **Rule of thumb:**
 
@@ -87,7 +87,7 @@ details_block = (
 )
 ```
 
-Yield `details_block` as content — either directly as a string (simplest on a Pipelines server) or inside a `delta.content` chunk:
+Yield `details_block` as content, either directly as a string (simplest on a Pipelines server) or inside a `delta.content` chunk:
 
 ```python
 # Simplest — works on Pipelines servers:
@@ -130,7 +130,7 @@ def pipe(self, user_message, model_id, messages, body):
 
 ### LangChain agent example
 
-Wiring a LangChain agent into this pattern — drop `tool_calls` on `AIMessageChunk`, render `ToolMessage` as a `<details>` block:
+Wiring a LangChain agent into this pattern, drop `tool_calls` on `AIMessageChunk`, render `ToolMessage` as a `<details>` block:
 
 ```python
 import html

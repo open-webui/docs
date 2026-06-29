@@ -4,7 +4,19 @@ title: "Models"
 sidebar_label: "Models"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 🤖 Models
+
+<ThemedImage
+  alt="Workspace map with the Models cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-models-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-models-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Wrap any model with custom instructions, tools, and knowledge to build specialized agents.**
 
@@ -81,7 +93,7 @@ The current date is {{ CURRENT_DATE }}.
 ```
 
 :::tip Group-aware system prompts
-`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups — e.g. *"You may discuss internal roadmap items only when `{{ USER_GROUPS }}` contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
+`{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups, e.g. *"You may discuss internal roadmap items only when `{{ USER_GROUPS }}` contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
 :::
 
 ### Capabilities and bindings
@@ -122,7 +134,7 @@ From the model list, click the ellipsis (**...**) on any model:
 | :--- | :--- |
 | **Edit** | Open the configuration panel |
 | **Hide** | Remove from the model selector without deleting |
-| **Clone** | Create a copy (appends `-clone`) |
+| **Clone** | Create an editable copy you can rename and reconfigure |
 | **Copy Link** | Copy a direct URL to the model settings |
 | **Export** | Download the configuration as `.json` |
 | **Share** | Share to the Open WebUI community |
@@ -169,7 +181,7 @@ Filter the admin model list by status (Enabled, Disabled, Visible, Hidden) and u
 
 ## Model Switching in Chat
 
-Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them.
+Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
 
 ---
 
@@ -191,54 +203,43 @@ Set global defaults to disable code interpreter across all models, enforce a con
 
 ## Curated-Interface Deployments
 
-A common deployment pattern is to present regular users with a curated model — a preconfigured agent with a specific name, icon, system prompt, and tools — while keeping the underlying base model visible only to power users or admins who need direct access.
+A common deployment pattern is to present regular users with a curated model (a preconfigured agent with a specific name, icon, system prompt and tools) while keeping the raw base model out of their way.
 
-### The recommended pattern: two base model entries
+Before picking an approach, understand the one rule that governs all of this.
 
-The correct way to achieve differential visibility is to create **two separate base model entries** that point to the same underlying LLM:
+### The rule: a custom model always requires access to its base model
 
-| Entry | Access | Hidden | Who sees it | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| **Base model** (e.g. "GPT-4o") | Restricted to power users | No | Power users only | Direct exploration and testing |
-| **Curated model** (e.g. "Company Assistant") | Public | No | Everyone | The sanctioned product for regular users |
+Every model you create under **Workspace > Models** is a *workspace model*: it points at a base model and stores a reference to it, rather than being a standalone copy of that base. Creating one never produces a second, independent base model. It always sits on top of an existing base.
 
-The curated model is a first-class base model entry — not a workspace model wrapping the restricted one. Configure it with its own name, avatar, system prompt, knowledge bases, tools, and parameter overrides. It connects to the same upstream LLM but is an independent configuration entry.
+When a user runs a workspace model, Open WebUI checks access to **both** the workspace model **and** its underlying base model. If the user cannot access the base model, the request fails with **"Model not found"**, even when the workspace model itself is shared publicly with them.
 
-**Step-by-step setup:**
-
-1. In **Admin Panel > Models**, locate your base model (e.g. "GPT-4o").
-2. Set its access control to **Private** and grant access only to your power users / admin group.
-3. Click the ellipsis (**...**) on the base model and select **Clone**. This creates a copy with all settings.
-4. Rename the clone to your curated product name (e.g. "Company Assistant"). Update the avatar, system prompt, knowledge, and tools as needed.
-5. Set the curated model's access to **Public** (or restrict it to the groups that should see it).
-
-Now power users see and use the original base model directly, while regular users see only the curated model. Both entries point to the same upstream LLM but are configured independently.
-
-:::tip Upgrading the upstream model
-When you switch to a newer LLM (e.g. Qwen 3 → Qwen 3.5), update the base model selection on both entries. You can also use **Export** and **Import** to keep settings synchronized across entries.
-:::
-
-### Why not a workspace model on a restricted base?
-
-Workspace models inherit the access requirements of their base model. If a user does not have access to the base model, they cannot use any workspace model built on top of it — even if the workspace model itself is shared with them.
-
-This is by design. Without this requirement, anyone could bypass base model access restrictions by creating a workspace model on a restricted base and sharing it publicly. That would be broken access control.
+This is by design. Without it, anyone could bypass a base model's access control by building a workspace model on a restricted base and sharing that wrapper publicly. A shared wrapper can never grant access that the base model withholds.
 
 :::warning
-If you previously relied on workspace models to give users access to base models they couldn't see directly, that pattern depended on an access-control gap that has been patched. The two-base-model pattern described above achieves the same outcome without the security issue.
+If you previously relied on a workspace model to hand users a base model they could not otherwise see, that depended on an access-control gap that has since been patched. It no longer works, and it was never safe.
 :::
 
-### Alternative: hidden base model
+The practical consequence: anyone who should use your curated model must also have access to its base model. You **hide** the base from those users, you do not restrict it away from them.
 
-If you don't need differential visibility — meaning no group needs to see the raw base model in the picker — you can use a simpler approach:
+### Recommended: a hidden public base model with a curated model on top
 
-1. Set the base model to **Public** (so everyone has access).
-2. **Hide** the base model (ellipsis > Hide) so it doesn't appear in the model selector.
-3. Create a workspace model on top of the (now hidden) base model and share it with your users.
+This is the reliable way to give everyone a single curated experience:
 
-Users see only the workspace model. The hidden base model is accessible under the hood but invisible in the UI. Admins can still access hidden models via direct URL parameters.
+1. Set the base model (for example "GPT-4o") to **Public**, so every intended user passes the base-access check.
+2. **Hide** the base model (ellipsis **...** > **Hide**) so it does not appear in the model selector.
+3. Create a curated workspace model on top of that base. Give it its own name, avatar, system prompt, knowledge and tools, then share it with your users (or leave it public).
 
-This approach works when every user should have the same experience. It does **not** work when some groups need direct access to the base model in their picker.
+Regular users now see only the curated model in the picker. The base model stays reachable under the hood, which is what lets the curated model run, but it is invisible in the list. Admins can still open a hidden base model through its direct URL.
+
+:::tip Upgrading the upstream model
+When you move to a newer LLM, update the base model selection on the curated workspace model, and re-point anything else built on the old base. **Export** and **Import** help you carry settings across entries.
+:::
+
+### If some users must also see the raw base model
+
+**Hide** is global: a hidden base model is hidden for everyone, so you cannot use it to show the raw model to power users while keeping it out of regular users' pickers. A workspace model cannot do this either, because it inherits base access as described above.
+
+To give one group the raw model in their picker while everyone else gets only the curated model, the same upstream LLM has to appear as **two independent base models**, each with its own access control. That is a connection-level setup (for example, adding the model through a second connection), not something you can create from **Workspace > Models**. Restrict one base entry to your power users and make the curated one public. Because both are base models, neither inherits the other's access.
 
 ---
 

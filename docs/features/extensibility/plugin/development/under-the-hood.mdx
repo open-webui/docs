@@ -6,7 +6,7 @@ title: "Under the Hood"
 # 🔧 Under the Hood: What the Plugin Loader Actually Does
 
 :::danger ⚠️ Critical Security Warning
-**Tools, Functions, Pipes, Filters, and Actions execute arbitrary Python code on your server.** Function creation is restricted to administrators only, and Workspace Tool creation is gated by the `workspace.tools` permission — granting that permission is equivalent to giving the user shell access to the server. Only install from trusted sources, review code before importing, and restrict creation to trusted administrators. A malicious plugin could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
+**Tools, Functions, Pipes, Filters, and Actions execute arbitrary Python code on your server.** Function creation is restricted to administrators only, and Workspace Tool creation is gated by the `workspace.tools` permission. Granting that permission is equivalent to giving the user shell access to the server. Only install from trusted sources, review code before importing, and restrict creation to trusted administrators. A malicious plugin could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
 Open WebUI's plugins (Tools, Functions = Filters / Pipes / Actions) are not sandboxed scripts running in some restricted runtime. They are **Python modules executed inside your Open WebUI process**, with full access to the standard library, any pip package, the entire `open_webui` codebase, the live FastAPI app, and the database. The documented hooks (`inlet`, `outlet`, `stream`, `pipe`, `action`) are *one* way to use that access. They are not the only way.
@@ -99,16 +99,43 @@ Runs at module load (once per source version). The patch persists in `sys.module
 
 Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
 
-### 3. Add a new HTTP route at load
+### 3. Serve a page or asset from a route
 
 ```python
-def _ensure_route(app):
-    if any(getattr(r, "path", None) == "/my/route" for r in app.routes):
-        return
-    app.add_api_route("/my/route", my_handler, methods=["GET"])
+from fastapi.responses import HTMLResponse, Response
+
+def _ensure_routes(app):
+    if any(getattr(r, "path", None) == "/my/tool" for r in app.routes):
+        return  # idempotency guard: the loader may re-exec on edits
+
+    async def page():
+        return HTMLResponse(
+            "<html><head><link rel=stylesheet href=/my/tool.css></head>"
+            "<body><div id=app></div><script src=/my/tool.js></script></body></html>"
+        )
+
+    async def script():
+        return Response(MY_JS, media_type="application/javascript")
+
+    async def style():
+        return Response(MY_CSS, media_type="text/css")
+
+    app.add_api_route("/my/tool", page, methods=["GET"])
+    app.add_api_route("/my/tool.js", script, methods=["GET"])
+    app.add_api_route("/my/tool.css", style, methods=["GET"])
 ```
 
-Call from the first hook with access to `__request__.app`. The idempotency guard is important: the loader may re-execute on edits, and `add_api_route` will happily register the same path twice.
+Call from the first hook (or a `system.startup.completed` event) that has `__request__.app` / `__app__`. The idempotency guard matters: the loader may re-execute on edits, and `add_api_route` registers the same path twice without complaint.
+
+`__app__` is the **real** FastAPI app, so a route can return anything HTTP can carry: JSON, `HTMLResponse`, JavaScript, CSS, images, even a whole bundled SPA. You can host an entire standalone tool at its own URL, shipped as a plugin, with **no frontend rebuild**. This is how a plugin serves a ToS/consent page, an approval screen, an OAuth callback, a status dashboard, or a one-click-installer UI.
+
+**The line to not blur:** a route is *your own page*. Your page can reference your own `/my/tool.js` and `/my/tool.css` and they load fine. It does **not** inject into the Open WebUI chat UI. Registering `/my/tool.js` does not make Open WebUI's own `index.html` load it; the user only gets your asset by navigating to *your* route.
+
+To put your JS/CSS into the **actual** Open WebUI SPA (a button on real messages, a theme over the real app, a first-run tour over the real interface), the frontend has to reference your asset. That means writing into the custom-CSS / custom-JS loader seam at startup, which is the indirect, fragile path. A dedicated asset-injection primitive is what would formalize that seam so multiple plugins can do it safely. Route registration alone gets you **pages**, not **injection**.
+
+:::warning
+A registered route runs on the real application and is **not** authenticated unless you add an auth dependency yourself. Anything you expose at a path is reachable by anyone who can reach the server, so gate sensitive routes (admin checks, signed tokens) explicitly.
+:::
 
 ### 4. Spawn a background task
 
@@ -169,12 +196,58 @@ A `Tools` class's methods are exposed to the model as callable tools (their docs
 
 ---
 
+## Concurrency and multiple instances
+
+**Open WebUI does not serialize your plugin code and gives you no exactly-once guarantee.** Hooks and handlers run inside an async event loop and can overlap; in a multi-replica deployment the same logical work can run on several workers at once. Coordinating side effects that must happen *at most once* is your responsibility, not the platform's.
+
+Two distinct levels:
+
+- **Within one process.** Async hooks interleave. If two requests hit the same hook concurrently and it does a read-modify-write on shared state (a module global, an `app.state` cache, a file), they can race. An `asyncio.Lock` (for coroutines) or `threading.Lock` (for the offloaded thread pool) serializes them — but only *inside that one process*.
+- **Across replicas.** Each replica is a separate process with its own `sys.modules` and its own `app.state`. A module global or in-process lock coordinates *nothing* between them. Two workers can run the same handler for the same event at the same moment. Anything that must fire once globally (sending an email, provisioning a resource, writing one audit row, calling a non-idempotent external API) will fire once **per replica** unless you guard it with shared state.
+
+The shared-state primitive Open WebUI itself uses is **Redis**. In a correctly configured multi-instance deployment `REDIS_URL` is already set (it has to be, for websockets and shared caches to work across replicas). Use it to grab a distributed lock or to enforce an idempotency key:
+
+```python
+from open_webui.utils.redis import get_redis_connection
+from open_webui.env import REDIS_URL, REDIS_KEY_PREFIX
+
+# decode_responses=True so values come back as str, not bytes.
+_redis = get_redis_connection(REDIS_URL, decode_responses=True) if REDIS_URL else None
+
+
+def run_once(key: str, ttl: int = 300) -> bool:
+    """True for exactly one caller across all replicas within `ttl` seconds.
+
+    Backed by Redis `SET key value NX EX ttl` — an atomic "set if not exists"
+    with expiry, so exactly one worker gets the key and the rest get nothing.
+    """
+    if _redis is None:
+        # No Redis means a single-process deployment: there is no other
+        # replica to coordinate with, so this caller is the only one.
+        return True
+    return bool(_redis.set(f"{REDIS_KEY_PREFIX}:plugin:{key}", "1", nx=True, ex=ttl))
+```
+
+Then gate the side effect:
+
+```python
+if run_once(f"signup-log:{event['actor']['id']}"):
+    await log_signup(event)   # runs on exactly one replica
+```
+
+Pick the `ttl` and the key deliberately. The key is what "the same work" means (a user id, an event id, a date bucket); the `ttl` is how long that claim is remembered, so a retry or a slow duplicate within the window is suppressed but the same key can legitimately recur later.
+
+For work that takes longer than a single atomic claim, Open WebUI ships a renewable lock helper, `RedisLock` in `backend/open_webui/socket/utils.py` (`aquire_lock()` / `renew_lock()` / `release_lock()`), which is what the websocket layer uses for its cleanup jobs. It is convenient, but it is an internal API and subject to the stability caveat in the Footguns below — the raw `set(..., nx=True, ex=...)` call above is plain redis-py and will not move.
+
+---
+
 ## Footguns
 
 - **No sandboxing.** Tools and Functions execute Python in your backend process as the backend user. The security policy ([Rule 10](/security/security-policy#reporting-guidelines)) treats this as intended behaviour: granting Tool or Function creation permission is equivalent to granting shell access on the host. Treat plugin authors as administrators.
 - **Stream hooks use a stale cache.** Edits to a `stream` method only take effect after another hook (or a process restart) refreshes the module. If you edit a stream filter and the change does not seem to apply, trigger an `inlet`/`outlet` reload or restart.
 - **Cross-plugin interference is not detected.** Two plugins patching the same function, registering the same route, or writing to the same `app.state` key will collide. Load order is not deterministic. Prefer additive patterns (your own namespaces, wrappers that delegate) over destructive ones.
 - **Disabling does not unload.** The module stays in `sys.modules` and any module-level side effects stay installed. Restart the process to fully revert.
+- **No concurrency control, no exactly-once.** Open WebUI does not serialize your handlers and does not deduplicate work across replicas. Async hooks interleave within a process, and in a multi-replica deployment the same handler can run on every worker at once — a side effect that must fire once globally fires once *per replica* unless you coordinate it yourself. See [Concurrency and multiple instances](#concurrency-and-multiple-instances).
 - **`requirements:` runs `pip install` on every replica at load.** In multi-replica deployments set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and pre-install dependencies in your image; runtime installs race across workers and crash. See [Scaling → Function/Tool Dependency Installation Crashes](/troubleshooting/multi-replica#9-functiontool-dependency-installation-crashes).
 - **Internal APIs are not a stable public surface.** `open_webui.utils.*`, the internal model classes, middleware helpers, and pretty much everything outside the documented dunder args and event types can rename, move, or change signatures between releases. If your monkey-patch breaks after an upgrade, that is on you to repair.
 - **The Pipelines server is out of scope here.** This page is about in-process plugins (Tools / Functions). The separate [Pipelines](/features/extensibility/pipelines/) server runs out-of-process and does not share `sys.modules` with Open WebUI: it cannot monkey-patch the main app, but it also is not constrained by it.

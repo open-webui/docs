@@ -1,0 +1,47 @@
+---
+title: "LLM Output Unpredictability"
+---
+
+# LLM Output Unpredictability
+
+|  |  |
+| :--- | :--- |
+| **Class** | Inherent model behavior (prompt injection, jailbreaks, unsafe or hallucinated output) — OWASP LLM01 family |
+| **Status** | Inherent to LLMs; not a remediable application defect; out of scope as a vulnerability |
+
+---
+
+## Summary
+
+Large language models are non-deterministic and steerable by their input. A model can be convinced, through a crafted prompt, injected content in a fetched web page or uploaded document, or adversarial conversation, to produce unsafe, misleading, or attacker-desired output: a jailbreak, a prompt injection, a hallucinated fact, an unsafe recommendation, or an attempt to use an available tool in a way the user did not intend.
+
+This unpredictability is a property of how language models work. It is **not a defect in Open WebUI's code**.
+
+## What we mitigate
+
+Open WebUI controls the system *around* the model, and we harden that surface:
+
+- **Access control and isolation** scope what a model and its tools can reach: per-user data scoping, the [tool and function permission model](/features/extensibility/plugin/), and container-isolated code execution.
+- **A model cannot exceed the calling user's own privileges.** Acting on a user's behalf, it is bound by that user's permissions; it cannot read or do what the user could not.
+- **Operator guardrails** ([filters](/features/extensibility/plugin/functions/filter), content checks, confirmation prompts) let deployments add their own policy layer.
+
+These reduce the *consequences* of bad model output. They do not, and cannot, make the model's output itself predictable or safe in every case.
+
+## What remains, and why it is not treated as a vulnerability
+
+A security issue whose entire impact is **the model's output** — the model was talked into saying something, recommending something, or attempting an action it was already permitted to attempt — is **inherent to LLMs and is not, on its own, an Open WebUI vulnerability**. It is bounded by the state of the art in model alignment, not by anything Open WebUI's code can patch, and "make the model never produce harmful output" is not an achievable application-level fix.
+
+We therefore **do not accept reports as vulnerabilities when the whole impact is the model producing undesirable content, or being persuaded to misuse a capability it was already allowed to use.** That behavior is an accepted, inherent property of running an LLM and will not be addressed as a defect.
+
+**This is a scoping statement about model behavior, not a blanket exemption.** A report **is** in scope, and is treated as a real vulnerability, the moment crafted input crosses from "the model said something" into a concrete flaw in Open WebUI's own code or controls, for example:
+
+- a prompt injection that **escalates into code execution, data access, or privilege gain through an Open WebUI code path**;
+- a **bypass of an access-control, permission, or isolation check**; or
+- any flaw where the model is merely the **trigger** for an underlying application bug.
+
+Those are Open WebUI defects and are fixed as such. See the [Security Policy](../security-policy) for the full reporting scope.
+
+## References
+
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- [Open WebUI Security Policy](../security-policy)

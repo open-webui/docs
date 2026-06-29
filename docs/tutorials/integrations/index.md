@@ -15,7 +15,7 @@ These community-contributed guides cover specific integration scenarios with ste
 
 | Tutorial | What you'll achieve | Details |
 |----------|-------------------|---------|
-| [Azure OpenAI (Entra ID)](./llm-providers/azure-openai) | Keyless authentication to Azure OpenAI via Entra ID | 👤 Admin · ⏱️ 30–60 min |
+| [Azure OpenAI (Entra ID)](./llm-providers/azure-openai) | Keyless authentication to Azure OpenAI via Entra ID | 👤 Admin · ⏱️ 30 to 60 min |
 | [DeepSeek R1 Dynamic](./llm-providers/deepseekr1-dynamic) | Run the full 671B DeepSeek-R1 model via llama.cpp | 👤 Developer · ⏱️ 45 min |
 | [Intel GPU (IPEX-LLM)](./llm-providers/ipex_llm) | Accelerate Ollama with IPEX-LLM on Intel GPUs | 👤 Developer · ⏱️ 20 min |
 

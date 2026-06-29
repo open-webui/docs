@@ -5,7 +5,7 @@ title: "Build & Preview Websites"
 
 # Build and Preview Websites
 
-One of the most impressive things Open Terminal can do: the AI builds a website, starts a server, and you **see it live in a preview panel** — all inside Open WebUI. Then you tell it what to change, and the preview updates in real time.
+One of the most impressive things Open Terminal can do: the AI builds a website, starts a server, and you **see it live in a preview panel**, all inside Open WebUI. Then you tell it what to change, and the preview updates in real time.
 
 ---
 
@@ -25,7 +25,7 @@ One of the most impressive things Open Terminal can do: the AI builds a website,
 
 > **You:** Create a landing page for my photography business. Include a gallery, an about section, and a contact form.
 
-The AI creates the HTML, CSS, and JavaScript files, starts a web server, and the preview appears automatically. It looks professional and polished — not a skeleton wireframe.
+The AI creates the HTML, CSS, and JavaScript files, starts a web server, and the preview appears automatically. It looks professional and polished, not a skeleton wireframe.
 
 ![File browser showing the created HTML files](/images/open-terminal-ai-web-dev-files.png)
 
@@ -83,9 +83,9 @@ If the AI starts more than one server (say, a frontend on port 3000 and a backen
 
 ## More things to try
 
-- **[Run code from chat →](./code-execution)** — the AI writes, runs, and debugs code
-- **[Analyze documents & data →](./file-analysis)** — spreadsheets, PDFs, Word docs, emails
-- **[Automate tasks →](./system-automation)** — file management, backups, batch operations
+- **[Run code from chat →](./code-execution)**: the AI writes, runs, and debugs code
+- **[Analyze documents & data →](./file-analysis)**: spreadsheets, PDFs, Word docs, emails
+- **[Automate tasks →](./system-automation)**: file management, backups, batch operations
 
 :::tip
 Want to preview and iterate on websites from your phone? [**cptr**](https://github.com/open-webui/computer) gives you your whole machine in a browser tab, accessible from any device.

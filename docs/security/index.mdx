@@ -5,7 +5,7 @@ title: "🛡️ Security"
 
 # Security
 
-**How Open WebUI approaches security — and how to report vulnerabilities responsibly.**
+**How Open WebUI approaches security, and how to report vulnerabilities responsibly.**
 
 Open WebUI takes the security and confidentiality of user data seriously. Our technical architecture and development processes are designed to minimize vulnerabilities and uphold the trust our stakeholders place in us. Regular assessments, codebase vetting, and systematic adoption of best practice methodologies help keep security a central part of our project lifecycle.
 
@@ -15,7 +15,7 @@ Open WebUI takes the security and confidentiality of user data seriously. Our te
 
 **Rules of engagement for vulnerability reporting, disclosure, and resolution.**
 
-Everything you need to know before submitting a security report: supported versions, reporting guidelines, expected response times, confidential disclosure requirements, and what is — and isn't — considered a vulnerability.
+Everything you need to know before submitting a security report: supported versions, reporting guidelines, expected response times, confidential disclosure requirements, and what is (and isn't) considered a vulnerability.
 
 | | |
 | :--- | :--- |
@@ -50,7 +50,7 @@ This guide lists concrete controls for reducing chat-data exposure, including da
 
 **Our formal assessments of externally reported CVEs and security claims.**
 
-When a CVE is filed against Open WebUI that we believe is inaccurate, mischaracterized, or does not represent a genuine vulnerability within our threat model, we publish a detailed vendor disposition. Each disposition explains our assessment, the reasoning behind it, and — where applicable — any actions taken.
+When a CVE is filed against Open WebUI that we believe is inaccurate, mischaracterized, or does not represent a genuine vulnerability within our threat model, we publish a detailed vendor disposition. Each disposition explains our assessment, the reasoning behind it, and, where applicable, any actions taken.
 
 | | |
 | :--- | :--- |
@@ -59,3 +59,19 @@ When a CVE is filed against Open WebUI that we believe is inaccurate, mischaract
 | ✅ **Resolution status** | Whether a report was accepted, disputed, or rejected |
 
 [**View Vendor Dispositions →**](./vendor-dispositions)
+
+---
+
+## ⚖️ Known &amp; Accepted Risks
+
+**Residual risks we have mitigated as far as is technically possible, then formally accepted.**
+
+Some weaknesses cannot be fully eliminated in application code, because they are bounded by the language, runtime, operating system, CPU or network rather than by a defect we can patch. We shrink the exploitable portion as far as possible and document the remainder here, with the reasoning and how it fits our threat model.
+
+| | |
+| :--- | :--- |
+| 🛠️ **Mitigated as far as possible** | What we changed to reduce each risk |
+| 🚧 **Why the residual stays** | The language, OS, CPU or network limits that prevent a full fix |
+| 📐 **Threat-model context** | Why the residual is accepted rather than treated as a defect |
+
+[**View Accepted Risks →**](./accepted-risks)

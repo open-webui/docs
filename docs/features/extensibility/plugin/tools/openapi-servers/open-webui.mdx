@@ -5,7 +5,7 @@ title: "Open WebUI Integration"
 
 ## Overview
 
-Open WebUI v0.6+ supports seamless integration with external tools via the OpenAPI servers — meaning you can easily extend your LLM workflows using custom or community-powered tool servers 🧰.
+Open WebUI v0.6+ supports seamless integration with external tools via the OpenAPI servers, meaning you can easily extend your LLM workflows using custom or community-powered tool servers 🧰.
 
 In this guide, you'll learn how to launch an OpenAPI-compatible tool server and connect it to Open WebUI through the intuitive user interface. Let's get started! 🚀
 
@@ -73,12 +73,12 @@ The primary distinction between **User Tool Servers** and **Global Tool Servers*
 
 - **User Tool Servers**
   - Requests to the tool server are performed **directly from your browser** (the client).
-  - This means you can safely connect to localhost URLs (like `http://localhost:8000`)—even exposing private or development-only endpoints such as your local filesystem or dev tools—without risking exposure to the wider internet or other users.
+  - This means you can safely connect to localhost URLs (like `http://localhost:8000`), even exposing private or development-only endpoints such as your local filesystem or dev tools, without risking exposure to the wider internet or other users.
   - Your connection is isolated; only your browser can access that tool server.
 
 - **Global Tool Servers**
   - Requests are sent **from the Open WebUI backend/server** (not your browser).
-  - The backend must be able to reach the tool server URL you specify—so `localhost` means the backend server's localhost, *not* your computer's.
+  - The backend must be able to reach the tool server URL you specify, so `localhost` means the backend server's localhost, *not* your computer's.
   - Use this for sharing tools with other users across the deployment, but be mindful: since the backend makes the requests, you cannot access your personal local resources (like your own filesystem) through this method.
   - Think security! Only expose remote/global endpoints that are safe and meant to be accessed by multiple users.
 
@@ -108,7 +108,7 @@ For example, if you're using memory and time tools simultaneously through mcpo, 
 
 This means:
 
-- When connecting a tool in Open WebUI, you must enter the full route to that specific tool — do NOT enter just the root URL (http://localhost:8000).
+- When connecting a tool in Open WebUI, you must enter the full route to that specific tool. Do NOT enter just the root URL (http://localhost:8000).
 - Add each tool individually in Open WebUI Settings using their respective subpath URLs.
 
 ![MCPO Config Tools Setting](/images/openapi-servers/open-webui/mcpo-config-tools.png)
@@ -144,7 +144,7 @@ Clicking this icon opens a popup where you can:
 
 ![Tool Info Modal Expanded](/images/openapi-servers/open-webui/info-modal.png)
 
-### 🛠️ Global Tool Servers Look Different — And Are Hidden by Default!
+### 🛠️ Global Tool Servers Look Different, And Are Hidden by Default!
 
 If you've connected a Global Tool Server (i.e., one that's admin-configured), it will not appear automatically in the input area like user tool servers do.
 
@@ -214,14 +214,14 @@ You can run any of these in the same way and connect them to Open WebUI by repea
 
 **Understand which machine "localhost" refers to.** This is the most common connectivity issue and depends on which type of tool server you are registering:
 
-- **User Tool Servers** — Requests come from **your browser**. `localhost` means *the machine running your browser*. This usually works for local development setups, but there is a catch (see below).
-- **Global Tool Servers** — Requests come from the **Open WebUI backend**. `localhost` means the *backend server*, not your personal machine. If the backend runs in Docker, `localhost` inside the container does not reach your host machine — use `host.docker.internal` or the machine's actual IP instead.
+- **User Tool Servers**: Requests come from **your browser**. `localhost` means *the machine running your browser*. This usually works for local development setups, but there is a catch (see below).
+- **Global Tool Servers**: Requests come from the **Open WebUI backend**. `localhost` means the *backend server*, not your personal machine. If the backend runs in Docker, `localhost` inside the container does not reach your host machine, so use `host.docker.internal` or the machine's actual IP instead.
 
 :::warning User Tool Servers: Browser IP matters
 
 Even for User Tool Servers, `localhost` only works if you're accessing Open WebUI at `http://localhost:...` in your browser.
 
-If you're accessing Open WebUI at a different IP address — for example, connecting from another device on your LAN via `http://10.0.0.5:3000`, or using the network URL that `npm run dev` outputs — then your browser is *not* on `localhost` relative to the tool server. The browser will try to reach `localhost` on the device it's running on, not the machine hosting the tool server.
+If you're accessing Open WebUI at a different IP address (for example, connecting from another device on your LAN via `http://10.0.0.5:3000`, or using the network URL that `npm run dev` outputs) then your browser is *not* on `localhost` relative to the tool server. The browser will try to reach `localhost` on the device it's running on, not the machine hosting the tool server.
 
 **Fix:** Replace `localhost` with the actual IP of the machine where your tool server is running (e.g., `http://10.0.0.5:8000`), and ensure the tool server is binding to `0.0.0.0` (not just `127.0.0.1`).
 
@@ -235,6 +235,6 @@ If you see CORS errors, your tool server needs to allow requests from the Open W
 
 - 🔒 If you're using remote servers, check firewalls and HTTPS configs.
 - 📝 To make servers persist across reboots, consider deploying them in Docker or with system services.
-- 🔍 When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) directly in the same browser you use for Open WebUI — if it loads, the browser can reach it.
+- 🔍 When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) directly in the same browser you use for Open WebUI. If it loads, the browser can reach it.
 
 Need help? Visit the 👉 [Discussions page](https://github.com/open-webui/openapi-servers/discussions) or [open an issue](https://github.com/open-webui/openapi-servers/issues).

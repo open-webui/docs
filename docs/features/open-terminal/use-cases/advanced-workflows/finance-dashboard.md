@@ -19,9 +19,9 @@ Upload bank statements and get a spending analysis with charts.
 4. Creates a dashboard with monthly trends, category breakdown, and top merchants
 5. Flags anomalies: unusually large charges, new subscriptions, possible duplicates
 
-{/* TODO: Screenshot — File browser previewing a generated spending_dashboard.html: pie chart of spending categories, bar chart of monthly trends, table of top merchants. */}
+{/* TODO: Screenshot: File browser previewing a generated spending_dashboard.html: pie chart of spending categories, bar chart of monthly trends, table of top merchants. */}
 
-{/* TODO: Screenshot — The anomaly report: "3 things to check: $450 charge to 'TECHSTORE' on Feb 15 (unusually large), new $14.99/month subscription to 'StreamPlus', possible duplicate $89.00 charge on March 3 and 5." */}
+{/* TODO: Screenshot: The anomaly report: "3 things to check: $450 charge to 'TECHSTORE' on Feb 15 (unusually large), new $14.99/month subscription to 'StreamPlus', possible duplicate $89.00 charge on March 3 and 5." */}
 
 ## Skill content
 

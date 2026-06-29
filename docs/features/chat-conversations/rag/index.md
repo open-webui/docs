@@ -3,6 +3,18 @@ sidebar_position: 1
 title: "Retrieval Augmented Generation (RAG)"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+<ThemedImage
+  alt="Chat & Conversations map with the Documents (RAG) cell highlighted"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-documents-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-documents-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
 :::warning
 
 If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
@@ -22,6 +34,48 @@ Need to clean up multiple uploaded documents or audit your storage? You can now 
 :::
 
 You can also load documents into the workspace area with their access by starting a prompt with `#`, followed by a URL. This can help incorporate web content directly into your conversations.
+
+## External Knowledge Sources (External Vector Databases)
+
+:::warning Experimental
+This feature is experimental, and its configuration may change between releases.
+:::
+
+Instead of uploading and embedding documents inside Open WebUI, you can point a knowledge base at an **external vector database** you already maintain. Open WebUI queries it directly at chat time, so your documents, embeddings and indexing stay in your own store and are never re-ingested.
+
+Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Python client must be present in your Open WebUI image (for example `qdrant-client` or `pymilvus`).
+
+### Adding an external knowledge source
+
+Configure these under **Admin Settings > Integrations > External Knowledge Sources**:
+
+1. **Create a connection** to your vector database:
+   - **Provider** (Qdrant / Milvus / pgvector)
+   - **Endpoint** (the database URL)
+   - **API Key / Token** (if your database requires authentication)
+   - **Database** / **Table** / **Collection** (depending on the provider)
+   - **Timeout**
+2. **Map the result fields** so Open WebUI knows how to read your records. Each setting maps a field in your stored documents to what Open WebUI expects:
+
+   | Open WebUI field | Mapping setting | Default field |
+   | :--- | :--- | :--- |
+   | Chunk text | **Content Field** | `content` |
+   | Title | **Title Field** | `title` |
+   | Source | **Source Field** | `source` |
+   | URL | **URL Field** | `url` |
+   | Document ID | **Document ID Field** | `document_id` |
+   | Page | **Page Field** | `page` |
+   | Extra metadata | **Metadata Field** | `metadata` |
+   | Relevance score | **Score Field** | `score` |
+
+   Dotted paths are supported for nested fields (for example `payload.text`).
+3. **Test the query** with a sample question. Open WebUI runs a live retrieval against the source and shows the results. A successful test is required before you can create or save the source.
+
+Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. At chat time, Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
+
+:::info Embedding model must match
+Because Open WebUI embeds the query and searches your database by vector, the vectors stored in your external database must come from the **same embedding model** Open WebUI uses (matching model and dimensions). Mismatched embeddings produce poor or meaningless results.
+:::
 
 ## Web Search for RAG
 
@@ -43,6 +97,12 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 Customize the RAG template from the `Admin Panel` > `Settings` > `Documents` menu.
 
+The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
+
+:::warning Do not include a query placeholder
+Your message (the query) is **always appended automatically** after the rendered template, so the model already sees it once. The template also recognizes `{{QUERY}}` / `[query]` and will substitute the query there, but because the query is still appended afterward, including that placeholder makes the query appear **twice** in the final prompt. Leave `{{QUERY}}` / `[query]` out of your template: it is a wrapper for the retrieved context, not the place to position the query.
+:::
+
 ## Markdown Header Splitting
 
 When enabled, documents are first split by markdown headers (H1-H6). This preserves document structure and ensures that sections under the same header are kept together when possible. The resulting chunks are then further processed by the standard character or token splitter.
@@ -57,6 +117,7 @@ Use the **Chunk Min Size Target** setting (found in **Admin Panel > Settings > D
 
 Open WebUI allows you to fine-tune how documents are split into chunks for embedding. This is crucial for optimal retrieval performance.
 
+- **Text Splitter**: Choose how chunk size is measured. [`RAG_TEXT_SPLITTER`](/reference/env-configuration#rag_text_splitter) is `character` (default, RecursiveCharacterTextSplitter) or `token`. The `token` splitter counts tokens with Tiktoken by default; set [`RAG_TOKENIZER_MODEL`](/reference/env-configuration#rag_tokenizer_model) to a HuggingFace tokenizer (e.g. `bert-base-uncased`) to match chunk boundaries to your embedding model's own tokenizer.
 - **Chunk Size**: Sets the maximum number of characters (or tokens) per chunk.
 - **Chunk Overlap**: Specifies how much content is shared between adjacent chunks to maintain context.
 - **Chunk Min Size Target**: Although [Markdown Header Splitting](#markdown-header-splitting) is excellent for preserving structure, it can often create tiny, fragmented chunks (e.g., a standalone sub-header, a table of contents entry, a single-sentence paragraph, or a short list item) that lack enough semantic context for high-quality embedding. You can counteract this by setting the **Chunk Min Size Target** to intelligently merge these small pieces with their neighbors.
@@ -92,7 +153,7 @@ The merging algorithm addresses this by intelligently combining undersized chunk
 
 ### The algorithm: a single forward pass
 
-The merging logic is deliberately simple—a single forward pass through all chunks:
+The merging logic is deliberately simple, a single forward pass through all chunks:
 
 1. Start with the first chunk as the "current" accumulator.
 2. For each **subsequent** chunk, check if it can be absorbed into the current chunk.
@@ -116,7 +177,7 @@ The merging logic is deliberately simple—a single forward pass through all chu
 
 **Respects maximum size**: If merging two chunks would exceed `CHUNK_SIZE`, both are kept separate. Content is never discarded to force a merge.
 
-**Metadata inheritance**: Merged chunks inherit metadata from the *first* chunk in the merge sequence. This is consistent with forward-merge semantics—source and header information reflects where the merged section "started," which is typically the right choice for retrieval and citation purposes.
+**Metadata inheritance**: Merged chunks inherit metadata from the *first* chunk in the merge sequence. This is consistent with forward-merge semantics: source and header information reflects where the merged section "started," which is typically the right choice for retrieval and citation purposes.
 
 **The `\n\n` separator**: When chunks merge, they're joined with double newlines rather than concatenated directly. This preserves visual and structural separation in the combined text, which can matter for both embedding quality and human readability if you inspect your chunks.
 
@@ -126,13 +187,13 @@ The merging logic is deliberately simple—a single forward pass through all chu
 
 **Small chunk followed by large chunk**: If a small chunk is followed by a chunk large enough that merging would exceed `CHUNK_SIZE`, the small chunk gets finalized as-is, still undersized. This is unavoidable without backward merging or content splitting, but it's also rare in practice. It typically occurs at natural semantic boundaries (a brief transition before a dense section), and the small chunk being standalone at that boundary is arguably correct anyway.
 
-**Last chunk in document**: If the final chunk is undersized, it stays undersized since there's nothing to merge forward into. Again, unavoidable and usually fine—document endings are natural boundaries.
+**Last chunk in document**: If the final chunk is undersized, it stays undersized since there's nothing to merge forward into. Again, unavoidable and usually fine: document endings are natural boundaries.
 
 ### Performance characteristics
 
-The algorithm is O(n) in the number of chunks—a single pass with no lookahead or backtracking. This makes it fast even for large document collections.
+The algorithm is O(n) in the number of chunks: a single pass with no lookahead or backtracking. This makes it fast even for large document collections.
 
-The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute—you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
+The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute, you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
 
 Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size of 2000) can reduce chunk counts by over 90% while improving retrieval accuracy, because each remaining chunk carries meaningful semantic context rather than being a fragment that confuses both the embedding model and the retrieval ranking. As positive side effects, it also uses less storage space in the vector database and requires fewer embedding operations, which can be a significant cost saving if outsourcing to an embedding service.
 
@@ -148,12 +209,12 @@ If you need to change your chunking configuration (chunk size, overlap) or embed
 
 ### Changing Chunk Size and Overlap
 
-New documents will **automatically** use the updated chunk size and overlap settings — no action is required for newly uploaded files.
+New documents will **automatically** use the updated chunk size and overlap settings. No action is required for newly uploaded files.
 
 Existing documents in knowledge bases **retain their original chunking** until you run a re-index. Retrieval will still work for these old chunks (vector similarity search does not depend on chunk size), but you may notice inconsistent retrieval quality if old and new documents have very different chunk sizes.
 
 :::tip
-If you are only changing chunk settings and not the embedding model, a re-index is not strictly required — old documents will continue to work. However, for consistent retrieval quality across all documents, running a re-index is recommended.
+If you are only changing chunk settings and not the embedding model, a re-index is not strictly required. Old documents will continue to work. However, for consistent retrieval quality across all documents, running a re-index is recommended.
 :::
 
 ### Changing the Embedding Model
@@ -254,7 +315,7 @@ These capabilities work independently, giving you fine-grained control:
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
 :::tip Filesystem-style knowledge access (`kb_exec`)
-For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode builtin tool) and is off by default; in Default Mode it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode builtin tool) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
 
 ## YouTube RAG Pipeline

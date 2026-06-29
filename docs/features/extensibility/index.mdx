@@ -3,7 +3,19 @@ sidebar_position: 0
 title: "Extensibility"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 🔌 Extensibility
+
+<ThemedImage
+  alt="Open WebUI Extensibility: the Pipe, Filter, Tool, Action and Event plugin types orbiting the Open WebUI logo"
+  sources={{
+    light: useBaseUrl('/images/banners/extensibility-light.svg'),
+    dark: useBaseUrl('/images/banners/extensibility-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Make Open WebUI do anything with Python, HTTP, or community plugins you install in one click.**
 
@@ -13,10 +25,6 @@ There are two layers, and most teams end up using both:
 
 - **In-process Python** (Tools & Functions) runs inside Open WebUI itself with zero infrastructure and instant iteration.
 - **External HTTP** (OpenAPI & MCP servers) connects to services running anywhere, from a sidecar container to a third-party SaaS.
-
-:::warning Pipelines are legacy
-You may still see **Pipelines** referenced as a third layer. It is **legacy and no longer recommended** — the heavy-processing problem it solved no longer exists (see [Run heavy or long-running work](#run-heavy-or-long-running-work) below). Use Functions, Tools, or an external tool server instead. See the [Pipelines pages](pipelines) for the full deprecation notice.
-:::
 
 ---
 
@@ -28,15 +36,12 @@ The names don't always map obviously to what they do. Start from what you're try
 |---|---|---|
 | Let the model **call an API or perform an action** (and keep a secret/API key the user and model can never read) | **[Tool](plugin/tools)** | The key lives inside the tool, server-side. The model only sees the *result*, never the credential. |
 | **Add a new model or provider** to the model selector | **[Pipe Function](plugin/functions/pipe)** | A Pipe appears as a selectable "model" and handles the request however you like. |
-| **Modify messages** going in or out (redact PII, inject system text, log, translate) | **[Filter Function](plugin/functions/filter)** | Filters run on every message via `inlet`/`outlet`/`stream` without touching model config. |
 | Add a **button on a message** that runs custom code | **[Action Function](plugin/functions/action)** | Actions are user-triggered, per-message operations. |
-| Teach the model **how to approach a task** (methodology, steps, house style) | **[Skill](/features/workspace/skills)** | Skills are instructions, not code. The model reads them; they don't execute anything. |
-| Give the model **documents to retrieve from** | **[Knowledge](/features/workspace/knowledge)** | RAG over your files, attached to a model or referenced with `#`. |
-| Save a **reusable prompt** behind a slash command | **[Prompt](/features/workspace/prompts)** | Templated text with typed variables; expands when you type `/name`. |
+| **Modify messages** going in or out (redact PII, inject system text, log, translate) | **[Filter Function](plugin/functions/filter)** | Filters run on every message via `inlet`/`outlet`/`stream` without touching model config. |
 | Connect an **existing external service** that already speaks HTTP | **[OpenAPI / MCP server](mcp)** | Point Open WebUI at the spec; endpoints become callable tools. No glue code. |
 
-:::tip "Pipe" vs "Pipeline" — not the same thing
-This is the single most common naming mix-up. A **Pipe** is a type of **Function** (in-process Python, adds a provider to the model list). A **Pipeline** is a **separate external worker container**. They share a prefix and nothing else. If you want to add a model provider, you almost always want a **Pipe Function**, not a Pipeline.
+:::info Looking for Models, Knowledge, Prompts or Skills?
+Those are **Workspace** building blocks, they configure a model rather than extend the platform with code. See the [**Workspace**](/features/workspace) section.
 :::
 
 ---
@@ -57,13 +62,15 @@ Functions let you intercept and transform messages before they reach the model (
 
 ### Run heavy or long-running work
 
-Open WebUI's backend is **fully async**. Long-running Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users, and synchronous/CPU-bound plugin code is offloaded to a worker thread pool (see [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size)) — so it doesn't stall the event loop either. In practice you can run heavy work **in-process** without the latency problems that older synchronous releases had.
+Open WebUI's backend is **fully async**. Long-running Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users, and synchronous/CPU-bound plugin code is offloaded to a worker thread pool (see [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size)) so it doesn't stall the event loop either. In practice you can run heavy work **in-process** without the latency problems that older synchronous releases had.
 
-The historical reason to push heavy pipes/filters onto a separate **Pipelines** worker — keeping the single synchronous event loop unblocked — no longer applies. If you genuinely need **GPU access, large or conflicting dependencies, hard isolation, or independent scaling**, run that work as an **external service behind an [OpenAPI or MCP tool server](mcp)**, not a Pipeline.
+If you genuinely need **GPU access, large or conflicting dependencies, hard isolation or independent scaling**, run that work as an **external service behind an [OpenAPI or MCP tool server](mcp)**.
 
 ### Import from the community
 
 Browse hundreds of community-built Tools and Functions from the Open WebUI Community site. Find what you need, click **Import**, and it's live. No `pip install`, no restart.
+
+Featured or popular status on the community site is not a security or quality review, so read the code before you import. See [Community Plugins](community) for a beginner's guide to browsing and importing safely.
 
 ---
 
@@ -75,8 +82,6 @@ Browse hundreds of community-built Tools and Functions from the Open WebUI Commu
 | ⚙️ **Functions** | Platform extensions that add model providers (Pipes), message processing (Filters), or UI actions (Actions) |
 | 🔗 **MCP support** | Native Streamable HTTP for Model Context Protocol servers |
 | 🌐 **OpenAPI servers** | Auto-discover and expose tools from any OpenAPI-compatible endpoint |
-| 📝 **Skills** | Markdown instruction sets that teach models how to approach specific tasks |
-| ⚡ **Prompts** | Slash-command templates with typed input variables and versioning |
 | 🏪 **Community library** | One-click import of community-built Tools and Functions |
 
 ---
@@ -87,10 +92,10 @@ Understanding which layer to use saves time:
 
 | Layer | Runs where | Best for | Trade-off |
 |-------|-----------|----------|-----------|
-| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers — including heavy/long-running work (the async backend keeps it from blocking) | Shares CPU/RAM with the main server |
+| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers, including heavy/long-running work (the async backend keeps it from blocking) | Shares CPU/RAM with the main server |
 | **OpenAPI / MCP** | Any HTTP endpoint | Connecting existing services, third-party APIs, and GPU / heavy-dependency / isolated workloads | Requires a running external server |
 
-Most users start with **Tools & Functions**. They require no extra setup, have a built-in code editor, and cover the majority of use cases. (**Pipelines** is a legacy third option, no longer recommended — see the note above.)
+Most users start with **Tools & Functions**. They require no extra setup, have a built-in code editor, and cover the majority of use cases.
 
 ---
 
@@ -110,7 +115,7 @@ An engineering team uses Pipe Functions to add Anthropic, Google Vertex AI, and 
 
 ### GPU-bound external processing
 
-A research group needs to re-rank retrieval results with a cross-encoder model that requires a GPU. They run it as a small service on a dedicated GPU node and expose it to Open WebUI as an **[OpenAPI tool server](mcp)**. The model calls it like any other tool while the main instance stays on commodity hardware. (The async backend means lighter custom logic can simply run in-process as a Function — only the GPU dependency pushes this particular workload to a separate service.)
+A research group needs to re-rank retrieval results with a cross-encoder model that requires a GPU. They run it as a small service on a dedicated GPU node and expose it to Open WebUI as an **[OpenAPI tool server](mcp)**. The model calls it like any other tool while the main instance stays on commodity hardware. (The async backend means lighter custom logic can simply run in-process as a Function, and only the GPU dependency pushes this particular workload to a separate service.)
 
 ---
 
@@ -122,7 +127,7 @@ Tools and Functions execute **arbitrary Python code** on your server. Only insta
 
 ### Resource sharing
 
-In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running and blocking work from stalling other requests, but it does not create more hardware — genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
+In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running and blocking work from stalling other requests, but it does not create more hardware: genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
 
 ### MCP transport
 
@@ -135,5 +140,6 @@ Native MCP support is **Streamable HTTP only**. For stdio or SSE-based MCP serve
 | Topic | What you'll learn |
 |-------|-------------------|
 | [**Tools & Functions**](plugin) | Writing Python Tools, Functions (Pipes, Filters, Actions), and the development API |
+| [**Community Plugins**](community) | Browsing and importing community Tools and Functions safely |
 | [**MCP**](mcp) | Connecting Model Context Protocol servers, OAuth setup, troubleshooting |
-| [**Pipelines**](pipelines) *(legacy)* | Reference only — the deprecated separate-worker framework, superseded by Functions and Tools |
+| [**Pipelines**](pipelines) *(legacy)* | Reference only: the deprecated separate-worker framework, superseded by Functions and Tools |

@@ -51,7 +51,7 @@ If you prefer the workflow where you can click a button on any message to genera
 2. Click **Get** to import it into your local instance (or copy the code and paste it into your local instance).
 3. Once imported, go to **Workspace** > **Functions** and ensure the **Generate Image** action is enabled.
 
-This action adds a "Generate Image" icon to the message action bar, allowing you to generate images directly from LLM responses - which is helpful if you want the assistant to first iterate on the image prompt and generate it once you are satisfied.
+This action adds a "Generate Image" icon to the message action bar, allowing you to generate images directly from LLM responses, which is helpful if you want the assistant to first iterate on the image prompt and generate it once you are satisfied.
 
 
 :::info
@@ -68,7 +68,7 @@ You can edit an image by providing the image and a text prompt directly in the c
 
 ## Image Compositing (Multi-Image Fusion)
 
-Seamlessly combine multiple images into a single cohesive scene—a process professionally known as **Image Compositing** or **Multi-Image Fusion**. This allows you to merge elements from different sources (e.g., placing a subject from one image into the background of another) while harmonizing lighting, perspective, and style.
+Seamlessly combine multiple images into a single cohesive scene, a process professionally known as **Image Compositing** or **Multi-Image Fusion**. This allows you to merge elements from different sources (e.g., placing a subject from one image into the background of another) while harmonizing lighting, perspective, and style.
 
 1. **Upload images** to the chat (e.g., upload an image of a subject and an image of a background).
 2. **Enter a prompt** describing the desired composition (e.g., "Combine these images to show the cat sitting on the park bench, ensuring consistent lighting").

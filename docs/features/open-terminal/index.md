@@ -3,7 +3,19 @@ sidebar_position: 3
 title: "Open Terminal"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # ⚡ Open Terminal
+
+<ThemedImage
+  alt="Open Terminal: the Open WebUI core driving a real terminal session in a loop, running commands and reading the output"
+  sources={{
+    light: useBaseUrl('/images/banners/terminal-light.svg'),
+    dark: useBaseUrl('/images/banners/terminal-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Give your AI a real computer to work on.**
 
@@ -12,6 +24,10 @@ Open Terminal connects a real computing environment to Open WebUI. The AI can wr
 This is where ideas become working software. Ask a question, get a running script. Describe a website, see it rendered live. Point it at a dataset, get a finished report.
 
 ![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
+
+:::tip Looking for "your computer in a browser" instead?
+Open Terminal is a tool the **chat AI** drives. If you instead want to operate your own machine from any browser (files, editor, terminal and git, mobile-first), with AI as an optional helper, see [**Computer (cptr)**](/features/computer), a separate Open WebUI project. [Compare the two](/features/computer#cptr-vs-open-terminal).
+:::
 
 ---
 
@@ -64,20 +80,20 @@ Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage di
 **[Installation →](./setup/installation)** · **[Connect to Open WebUI →](./setup/connecting)**
 
 :::info Model requirements
-Open Terminal requires models with **native function calling** support. Frontier models (GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro) handle complex multi-step tasks well. Smaller models may work for simple commands but can struggle with longer workflows. [Enable native function calling](./setup/connecting#8-enable-native-function-calling) on your model.
+Open Terminal needs a model that does tool calling at agentic quality, not just one that technically supports it. Driving a terminal is a multi-step loop: call a tool, read the output, decide the next command, repeat, often for many turns. Small models cannot sustain that. A 4B to 9B model will not cut it here, even if it ticks the "supports tools" box. Frontier models (GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro) handle these complex multi-step workflows well. Native is the default tool-calling mode as of v0.9.7, so it works out of the box unless the model was switched to Legacy; [check the model's tool-calling mode](./setup/connecting#8-enable-native-function-calling) if tools are not firing.
 :::
 
 ---
 
 ## Use Cases
 
-- **[Code execution](./use-cases/code-execution)** — write, run, and debug scripts
-- **[Software development](./use-cases/software-development)** — repos, tests, debugging, refactoring, Git
-- **[Document & data analysis](./use-cases/file-analysis)** — spreadsheets, PDFs, Word docs, emails
-- **[Web development](./use-cases/web-development)** — build and preview websites
-- **[System automation](./use-cases/system-automation)** — file management, backups, batch operations
-- **[Advanced workflows](./use-cases/advanced-workflows)** — skills for data reports, research, code review, and more
-- **[File browser](./file-browser)** — uploading, previewing, editing files
+- **[Code execution](./use-cases/code-execution)**: write, run, and debug scripts
+- **[Software development](./use-cases/software-development)**: repos, tests, debugging, refactoring, Git
+- **[Document & data analysis](./use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
+- **[Web development](./use-cases/web-development)**: build and preview websites
+- **[System automation](./use-cases/system-automation)**: file management, backups, batch operations
+- **[Advanced workflows](./use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
+- **[File browser](./file-browser)**: uploading, previewing, editing files
 
 ---
 

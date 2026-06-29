@@ -105,6 +105,27 @@ The `deepseek_r1` parser works for most reasoning models, including Qwen3. If yo
 
 ---
 
+## Context Length (`num_ctx`) and `OLLAMA_CONTEXT_LENGTH`
+
+How much of your conversation a model actually sees is set by the **context length**, and for Ollama it can come from two places, one of which quietly overrides the other:
+
+- **`OLLAMA_CONTEXT_LENGTH`** is set on the **Ollama server** and is the default context length Ollama uses for a model. Ollama itself defaults this to a small value (historically `2048`, `4096` on newer builds).
+- **`num_ctx`** is an **Open WebUI advanced parameter** (Chat Controls > Advanced Parameters, or per model in the model editor). It is **unset by default**, so out of the box Ollama's `OLLAMA_CONTEXT_LENGTH` applies.
+
+:::warning `num_ctx` overrides `OLLAMA_CONTEXT_LENGTH`
+If `num_ctx` is set anywhere in Open WebUI (a model preset's parameters or the chat's Advanced Parameters), Open WebUI sends it to Ollama on every request, and a per-request `num_ctx` **overrides** the server's `OLLAMA_CONTEXT_LENGTH`. Toggling the `num_ctx` control on **pre-fills it with `2048`**, which is very small, so it is easy to cap a model at 2048 tokens without realizing it, even after raising `OLLAMA_CONTEXT_LENGTH` on the Ollama side.
+:::
+
+A context that is too small silently truncates the prompt. This is most visible with **Native function calling**, where tool schemas are injected into the prompt: at `2048` tokens the model can run out of room and return a **blank response**, or emit a raw tool-call JSON blob instead of actually calling the tool. Raising the context resolves it.
+
+**What to do:**
+
+- To set a default for all Ollama models, set `OLLAMA_CONTEXT_LENGTH` on the **Ollama server** and **leave `num_ctx` unset** in Open WebUI so it is not overridden.
+- To set it per model or per chat, set `num_ctx` to a realistic value for the model (for example `8192`, `16384` or the model's maximum), not the `2048` default. Remember it overrides `OLLAMA_CONTEXT_LENGTH`.
+- A larger context uses more VRAM and RAM, so size it to what your hardware can hold.
+
+---
+
 ## All Set!
 
 That’s it! Once your connection is configured and your models are downloaded, you’re ready to start using Ollama with Open WebUI. Whether you’re exploring new models or running your existing ones, Open WebUI makes everything simple and efficient.

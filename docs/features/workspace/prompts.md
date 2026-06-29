@@ -3,7 +3,19 @@ sidebar_position: 3
 title: "Prompts"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # 📝 Prompts
+
+<ThemedImage
+  alt="Workspace map with the Prompts cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-prompts-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-prompts-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **Reusable slash commands that turn complex instructions into one-click forms.**
 

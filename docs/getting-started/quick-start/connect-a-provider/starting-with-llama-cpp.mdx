@@ -33,7 +33,7 @@ After installing, make sure `llama-server` is available in your local system pat
 You can load and run various GGUF-format quantized LLMs using Llama.cpp. One impressive example is the DeepSeek-R1 1.58-bit model optimized by UnslothAI. To download this version:
 
 1. Visit the [Unsloth DeepSeek-R1 repository on Hugging Face](https://huggingface.co/unsloth/DeepSeek-R1-GGUF)
-2. Download the 1.58-bit quantized version – around 131GB.
+2. Download the 1.58-bit quantized version, around 131GB.
 
 Alternatively, use Python to download programmatically:
 
@@ -59,7 +59,7 @@ DeepSeek-R1-GGUF/
     └── DeepSeek-R1-UD-IQ1_S-00003-of-00003.gguf
 ```
 
-📍 Keep track of the full path to the first GGUF file — you’ll need it in Step 3.
+📍 Keep track of the full path to the first GGUF file. You’ll need it in Step 3.
 
 ---
 
@@ -105,7 +105,7 @@ To control and query your locally running model directly from Open WebUI:
    - **URL**: `http://127.0.0.1:10000/v1`
      (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker. **Note the `/v1` at the end!**)
    - **API Key**: `none` (leave blank or type specific key if configured)
-   - **Provider**: pick `llama.cpp` from the **Provider** dropdown. This unlocks the loaded-model indicator and the admin **Eject** button in the model selector — see [Unloading Loaded Models](#unloading-loaded-models) below. Leave at `Default` if you do not need that feature.
+   - **Provider**: pick `llama.cpp` from the **Provider** dropdown. This unlocks the loaded-model indicator and the admin **Eject** button in the model selector. See [Unloading Loaded Models](#unloading-loaded-models) below. Leave at `Default` if you do not need that feature.
 
 💡 Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
 
@@ -128,7 +128,7 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 ## Unloading Loaded Models
 
-Once a model is held in memory by your `llama-server` instance, Open WebUI marks it with a green "Loaded" indicator in the model selector. Admins also see an **Eject** button on the row that unloads the model without restarting the server — it calls `POST /api/models/unload`, which in turn hits llama.cpp's `POST /models/unload` endpoint on the OpenAI-compatible connection's root URL.
+Once a model is held in memory by your `llama-server` instance, Open WebUI marks it with a green "Loaded" indicator in the model selector. Admins also see an **Eject** button on the row that unloads the model without restarting the server. It calls `POST /api/models/unload`, which in turn hits llama.cpp's `POST /models/unload` endpoint on the OpenAI-compatible connection's root URL.
 
 For this to work, the matching connection in **Admin Settings → Connections → OpenAI** must have its **Provider** set to `llama.cpp` (Open WebUI uses that hint to pick the correct unload mechanism). Connections left at the default OpenAI-compatible provider type return an error when an admin attempts to unload a model.
 
@@ -148,7 +148,7 @@ Once configured, Open WebUI makes it easy to:
 
 - Manage and switch between local models served by Llama.cpp
 - Use the OpenAI-compatible API with no key needed
-- Experiment with massive models like DeepSeek-R1 — right from your machine!
+- Experiment with massive models like DeepSeek-R1, right from your machine!
 
 ---
 
