@@ -56,13 +56,21 @@ Example lifecycle payload:
 }
 ```
 
+## Status API
+
+| Method | Endpoint | Purpose |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/status` | Orchestrator status (for the admin UI) |
+| `GET` | `/api/v1/terminals` | List active terminals/sessions (for the admin UI) |
+
 ## Refresh API
 
 | Method | Endpoint | Purpose |
 | :--- | :--- | :--- |
 | `POST` | `/api/v1/terminals/refresh` | Stop matching terminals so they provision fresh next time |
+| `POST` | `/api/v1/terminals/stop` | Stop one user's terminal so the next access starts fresh |
 
-Request body:
+Refresh request body:
 
 ```json
 {
@@ -74,6 +82,17 @@ Request body:
 ```
 
 `only_idle` defaults to `true`. `reset` defaults to `false`.
+
+Stop request body:
+
+```json
+{
+  "user_id": "...",
+  "policy_id": "default"
+}
+```
+
+`policy_id` defaults to `default`.
 
 ## Troubleshooting
 

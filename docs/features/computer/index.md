@@ -26,7 +26,7 @@ AI is built in but optional. Bring your own key and it becomes an agent that can
 [**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
 
 :::info New, and moving fast
-cptr is a young project (currently v0.6.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
+cptr is a young project (currently v0.7.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
 :::
 
 ## cptr vs Open Terminal
@@ -51,6 +51,7 @@ cptr is a full workspace with an optional AI agent on top:
 
 - **The computer you operate.** A browser-based terminal, file browser, code editor and git across multiple project workspaces, with global search, live port previews and voice memos.
 - **An optional AI agent.** With your own key it reads, edits and runs code, browses the web, uses external MCP/OpenAPI tool servers and spins up sub-agents, following skills you define. Every change waits for your approval.
+- **Coding agents as backends.** Connect a coding agent you already subscribe to (Codex, Claude Code, Cursor, Grok, OpenCode) as a native backend, no API key needed. It shows up in the model picker and runs in the workspace with full tool access.
 - **Automation and reach.** Scheduled automations, messaging bots (Telegram, Discord, Slack, WhatsApp, Signal) and an OpenAI-compatible gateway that lets Open WebUI drive a workspace as a model.
 
 See the [**full feature list**](/features/computer/features), and [**Connect to Open WebUI**](/features/computer/open-webui) to use a cptr workspace as a model from your own Open WebUI instance.

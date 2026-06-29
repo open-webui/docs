@@ -98,6 +98,8 @@ The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to m
 | `TERMINALS_MAX_CPU` | (empty) | CPU limit for user containers (e.g., `2`). |
 | `TERMINALS_MAX_MEMORY` | (empty) | Memory limit for user containers (e.g., `4Gi`). |
 | `TERMINALS_OPEN_WEBUI_URL` | (empty) | If set, validates incoming JWTs against this Open WebUI instance instead of using `TERMINALS_API_KEY`. |
+| `TERMINALS_ENABLE_UI` | `true` | Serve the built-in minimal admin UI at `/`. Set `false` for API-only deployments. |
+| `TERMINALS_LOG_LEVEL` | `INFO` | Server and operator log level (DEBUG, INFO, WARNING, ERROR, CRITICAL). |
 
 </details>
 
@@ -106,7 +108,7 @@ The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to m
 <details>
 <summary>Container lifecycle details</summary>
 
-**Naming.** Containers are named `terminals-{policy_id}-{user_id}`, making them easy to filter with `docker ps --filter "label=managed-by=terminals"`.
+**Naming.** Containers are named `terminals-<user-hash>` (where `<user-hash>` is the first 12 hex chars of the SHA-256 of the user ID, for a DNS-safe name), or `terminals-<user-hash>-<policy>` for non-default policies. They are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`.
 
 **Health checks.** After creating a container, the orchestrator polls its `/health` endpoint until it returns HTTP 200 (up to 15 seconds). Only then does it start proxying traffic.
 

@@ -103,6 +103,13 @@ cd /path/to/your/project
 uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 ```
 
+Or skip the `cd` and point the server at the project with the `--cwd` flag:
+
+```bash
+uvx open-terminal run --cwd /path/to/your/project --host 0.0.0.0 --port 8000 --api-key your-secret-key
+open-terminal run --cwd /path/to/your/project
+```
+
 ### Windows
 
 Supported via [pywinpty](https://github.com/andfoy/pywinpty). Full PowerShell support with colored output and interactive programs.
@@ -155,6 +162,35 @@ http://open-terminal:8000
 
   </TabItem>
 </Tabs>
+
+---
+
+## Run as an MCP server
+
+Open Terminal can also run as a [Model Context Protocol](https://modelcontextprotocol.io/) server with `open-terminal mcp`, exposing the terminal to MCP-compatible clients. This needs the optional `mcp` extra (which pulls in [FastMCP](https://github.com/jlowin/fastmcp)).
+
+**Option A: Run without installing:**
+
+```bash
+uvx --from "open-terminal[mcp]" open-terminal mcp
+```
+
+**Option B: Install with pip:**
+
+```bash
+pip install "open-terminal[mcp]"
+open-terminal mcp
+```
+
+By default the server uses the `stdio` transport (the client launches the process and talks to it over standard input/output), so most MCP clients just need the command above.
+
+To serve over HTTP instead, switch to the `streamable-http` transport. The `--host` and `--port` flags apply only to this transport (defaults: host `0.0.0.0`, port `8000`):
+
+```bash
+open-terminal mcp --transport streamable-http --host 127.0.0.1 --port 8000
+```
+
+The `--config` (path to a TOML config file) and `--cwd` (working directory for the server process) flags work the same as for `open-terminal run`.
 
 ---
 

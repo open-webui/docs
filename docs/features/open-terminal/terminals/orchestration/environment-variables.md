@@ -41,3 +41,14 @@ Policy env vars are visible to the user inside their terminal. Do not put secret
 | `OPEN_TERMINAL_PACKAGES` | Space-separated apt packages installed at container startup |
 | `OPEN_TERMINAL_PIP_PACKAGES` | Space-separated Python packages installed at container startup |
 | `OPEN_TERMINAL_NPM_PACKAGES` | Space-separated npm packages installed globally at container startup |
+
+## Automatically Injected Resource Vars
+
+These are set automatically by the orchestrator from the policy's `cpu_limit` and `memory_limit`, so a system prompt or tool can read the container's resource budget. They are not user-configured.
+
+| Variable | Purpose |
+| :--- | :--- |
+| `OPEN_TERMINAL_CPU_LIMIT` | CPU limit from the policy `cpu_limit` |
+| `OPEN_TERMINAL_CPU_COUNT` | CPU count derived from the policy `cpu_limit` |
+| `OPEN_TERMINAL_MEMORY_LIMIT` | Memory limit from the policy `memory_limit` |
+| `OPEN_TERMINAL_MEMORY_BYTES` | Memory limit in bytes derived from the policy `memory_limit` |

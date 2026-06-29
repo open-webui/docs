@@ -37,8 +37,15 @@ Settings are applied in this order (later ones override earlier ones):
 | **Environment Info** | None | `OPEN_TERMINAL_INFO` | Append operator-provided environment context to the generated prompt |
 | **File Browser Root** | `home` | `OPEN_TERMINAL_FILE_BROWSER_ROOT` | Use `home`, an explicit path such as `/workspace`, or `filesystem` to opt out |
 | **Multi-User** | `false` | `OPEN_TERMINAL_MULTI_USER` | Enable [per-user isolation](./multi-user) |
-| **CORS Origins** | None | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains |
+| **CORS Origins** | `*` | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains. The default `*` allows all origins (permissive); a startup warning is printed when it is left unset (since ~0.11.30) |
 | **Allowed Domains** | None | `OPEN_TERMINAL_ALLOWED_DOMAINS` | [Egress firewall](./security#egress-filtering): only allow outbound connections to these domains |
+| **Session CWD TTL** | `604800` (7 days) | `OPEN_TERMINAL_SESSION_CWD_TTL` | How long a session's saved working directory is remembered |
+| **Max Log Size** | `50000000` (50 MB) | `OPEN_TERMINAL_MAX_LOG_SIZE` | Max size of a session log before rotation |
+| **Log Retention** | `604800` (7 days) | `OPEN_TERMINAL_LOG_RETENTION` | How long session logs are kept |
+| **Log Flush Interval** | `0` | `OPEN_TERMINAL_LOG_FLUSH_INTERVAL` | Seconds between log flushes (0 = flush immediately); raise it to batch writes on slow storage (ARM/eMMC) |
+| **Log Flush Buffer** | `0` | `OPEN_TERMINAL_LOG_FLUSH_BUFFER` | Bytes buffered before a forced flush (pairs with the interval) |
+| **Binary MIME Prefixes** | `image` | `OPEN_TERMINAL_BINARY_MIME_PREFIXES` | MIME prefixes treated as binary in the file browser |
+| **User Prefix** | Empty | `OPEN_TERMINAL_USER_PREFIX` | Prefix added to provisioned multi-user account names |
 
 ---
 
@@ -50,6 +57,7 @@ These only work with the Docker image:
 | :--- | :--- | :--- |
 | **System Packages** | `OPEN_TERMINAL_PACKAGES` | Space-separated list of system packages to install at startup |
 | **Python Packages** | `OPEN_TERMINAL_PIP_PACKAGES` | Space-separated list of Python packages to install at startup |
+| **npm Packages** | `OPEN_TERMINAL_NPM_PACKAGES` | Space-separated list of npm packages to install at startup |
 
 :::note
 These packages are reinstalled every time the container starts. If you need many packages, consider [building a custom image](https://github.com/open-webui/open-terminal) instead.

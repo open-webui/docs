@@ -47,6 +47,10 @@ The orchestrator sits between Open WebUI and the Open Terminal instances:
 
 The orchestrator also exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can execute commands, read files, and run code, all scoped to the requesting user's container.
 
+:::info Admin UI (new in 0.0.4)
+The orchestrator serves a built-in minimal admin UI at `/` for viewing terminal status, active sessions, and policies. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
+:::
+
 ---
 
 ## Deployment

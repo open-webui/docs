@@ -33,7 +33,7 @@ Without Docker (bare metal mode), the AI can run any command with your user's pe
 
 ## Always set a password
 
-Without an API key, **anyone who can reach the port has full access**: they can run commands, read files, and control the terminal.
+An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the terminal. Keyless operation is no longer possible. As of v0.11.30 the server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set (it exits otherwise), and the CLI auto-generates one for you when you don't supply your own. The protection is now enforced at startup, so set a strong key of your own rather than relying on the generated one.
 
 ```bash
 -e OPEN_TERMINAL_API_KEY=a-strong-password-here
