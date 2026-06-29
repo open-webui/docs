@@ -37,6 +37,6 @@ The `{{...}}` values are Open WebUI's [custom-header placeholders](/reference/en
 - **Branch correctly.** Regenerating or editing a message in Open WebUI creates a matching branch in the cptr sidebar (via `X-OpenWebUI-User-Message-Id` and `X-OpenWebUI-User-Message-Parent-Id`), instead of appending in the wrong place.
 - **Ignore background work.** Open WebUI also calls the gateway for title generation, tag extraction and follow-up suggestions. `X-OpenWebUI-Task` tells cptr which requests are background tasks, so it skips them instead of spawning ghost chats or running a full agent loop.
 
-:::caution Requires Open WebUI 0.9.7 or newer
-The `{{USER_MESSAGE_ID}}`, `{{USER_MESSAGE_PARENT_ID}}` and `{{TASK}}` placeholders were added in Open WebUI 0.9.7. On 0.9.6 the basic gateway connection still works, you can chat with a workspace as a model, but those three headers are not filled in, so branching and background-task filtering do not work yet.
+:::caution Requires Open WebUI 0.10.0 or newer
+The `{{USER_MESSAGE_ID}}`, `{{USER_MESSAGE_PARENT_ID}}` and `{{TASK}}` placeholders were added in Open WebUI 0.10.0. On 0.9.6 the basic gateway connection still works, you can chat with a workspace as a model, but those three headers are not filled in, so branching and background-task filtering do not work yet.
 :::

@@ -173,7 +173,7 @@ else:
 ```
 
 :::caution Do not check for `"native"` or `"default"`
-Before v0.9.7 an unset model carried `"default"`, and tools detected Native with `function_calling == "native"`. That is now wrong. An unset model runs **Native** but does not carry the string `"native"`, so a `== "native"` test (or treating a `"default"` fallback as non-native) misclassifies the now-default case as Legacy and feeds it Legacy-only events that silently break. Test for `== "legacy"` and treat everything else as Native.
+Before v0.10.0 an unset model carried `"default"`, and tools detected Native with `function_calling == "native"`. That is now wrong. An unset model runs **Native** but does not carry the string `"native"`, so a `== "native"` test (or treating a `"default"` fallback as non-native) misclassifies the now-default case as Legacy and feeds it Legacy-only events that silently break. Test for `== "legacy"` and treat everything else as Native.
 :::
 
 #### Complete Event Type Compatibility Matrix

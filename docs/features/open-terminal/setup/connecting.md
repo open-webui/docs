@@ -69,7 +69,7 @@ The selected terminal name appears next to the cloud icon. The AI can now execut
 
 ### 8. Enable native function calling
 
-Native function calling is the default tool-calling mode as of v0.9.7, so it is already active for new models. The only thing to check is that the model was not switched to **Legacy**:
+Native function calling is the default tool-calling mode as of v0.10.0, so it is already active for new models. The only thing to check is that the model was not switched to **Legacy**:
 
 1. Go to **Workspace → Models**
 2. Click the edit button on the model you're using

@@ -33,7 +33,7 @@ To unlock these features, your model must support native tool calling and have s
 2.  **Enable Model Capability**: In **Admin Panel → Settings → Models**, select your model and enable the **Web Search** capability.
 3.  **Enable Default Feature**: In the same model settings, under **Default Features**, check **Web Search**. This controls whether the `search_web` and `fetch_url` tools are available by default in new chat sessions.
 4.  **Confirm Native Mode (Agentic Mode)**:
-    *   Native is the default tool-calling mode as of v0.9.7, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).
+    *   Native is the default tool-calling mode as of v0.10.0, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).
 5.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
 
 :::info Configuring via environment variables instead
