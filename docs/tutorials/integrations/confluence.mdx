@@ -1,0 +1,136 @@
+---
+sidebar_position: 33
+title: "Confluence"
+---
+
+:::info
+
+This guide explains how to set up the **Confluence knowledge integration** in Open WebUI, which allows users to import pages from Atlassian Confluence directly into Open WebUI knowledge bases for use with RAG (Retrieval Augmented Generation). Supports both **Confluence Cloud** and **Confluence Data Center** (self-hosted). This documentation is up to date as of Open WebUI v0.6.x.
+
+:::
+
+---
+
+# Confluence Knowledge Integration
+
+Open WebUI can connect to your Atlassian Confluence instance so users can browse spaces, select pages, and import them directly into a knowledge base — without any manual export/download/upload workflow.
+
+Once imported, the pages are chunked, vectorized, and queryable via RAG, just like any other knowledge base document.
+
+## Prerequisites
+
+- Open WebUI instance with admin access
+- A Confluence instance (Cloud or Data Center)
+- Confluence API token (Cloud) or Personal Access Token / credentials (Data Center)
+
+---
+
+## Step 1: Enable Confluence in Admin Settings
+
+1. Navigate to **Settings → Admin → Documents**.
+2. Scroll to the **Confluence** section.
+3. Toggle **Enable Confluence Integration** on.
+4. Set the **Confluence Base URL**:
+   - **Cloud**: `https://yourcompany.atlassian.net`
+   - **Data Center / Server**: `https://confluence.yourcompany.com`
+5. Set the **Deployment Type**: `cloud` or `datacenter`.
+6. Save the settings.
+
+:::info Environment Variables
+
+You can alternatively configure the integration via environment variables at startup:
+
+```bash
+ENABLE_CONFLUENCE_INTEGRATION=true
+CONFLUENCE_BASE_URL=https://yourcompany.atlassian.net
+CONFLUENCE_DEPLOYMENT_TYPE=cloud   # or "datacenter"
+```
+
+These are loaded as defaults on first startup. After that, the admin UI settings take precedence.
+
+:::
+
+---
+
+## Step 2: Set Your Confluence Credentials (per user)
+
+Each user configures their own Confluence credentials. This means no shared service account is required — every user authenticates with their own identity and only has access to the spaces and pages they are already permitted to see in Confluence.
+
+1. Open your **Account Settings** (click your avatar → Account).
+2. Scroll to the **Confluence** section.
+3. Enter your credentials based on deployment type:
+
+### Confluence Cloud
+
+| Field | Value |
+|---|---|
+| **Email** | Your Atlassian account email |
+| **API Token** | Token generated at [id.atlassian.com → Security → API tokens](https://id.atlassian.com/manage-profile/security/api-tokens) |
+
+### Confluence Data Center / Server
+
+| Field | Value |
+|---|---|
+| **Username** | Your Confluence username |
+| **Personal Access Token (PAT)** | Recommended — generated in your Confluence profile settings |
+| **Password** | Alternative to PAT (basic auth) |
+
+4. Click **Save**. Open WebUI will test the connection and confirm it is working.
+
+---
+
+## Step 3: Import Pages into a Knowledge Base
+
+1. Navigate to **Workspace → Knowledge** and open or create a knowledge base.
+2. Click the **Add Content** button (or the `+` icon).
+3. Select **Import from Confluence**.
+4. A modal will open:
+   - **Select a Space**: All spaces your Confluence account has access to are listed.
+   - **Browse the page tree**: After selecting a space, a hierarchical tree of pages loads, reflecting the parent/child structure from Confluence.
+   - **Select pages**: Check individual pages or entire subtrees using parent checkboxes.
+5. Click **Import**.
+   - Pages are fetched from Confluence, HTML is stripped to clean plain text, content is chunked and vectorized.
+   - Progress is shown during the import; per-page errors are surfaced if any pages fail.
+6. Once complete, the imported pages appear as documents in your knowledge base and are immediately available for RAG queries.
+
+:::tip Keeping content fresh
+
+The Confluence integration performs a one-time import at the time you click **Import**. If your Confluence pages are updated frequently, re-import the relevant pages to refresh the content in the knowledge base.
+
+:::
+
+---
+
+## Architecture overview
+
+| Component | Details |
+|---|---|
+| **Backend loader** | `backend/open_webui/retrieval/loaders/confluence.py` — calls the Confluence REST API, strips HTML, returns plain text chunks |
+| **API endpoints** | `/api/v1/retrieval/confluence/test`, `/spaces`, `/spaces/{key}/pages`, `/import` |
+| **Admin config** | `ENABLE_CONFLUENCE_INTEGRATION`, `CONFLUENCE_BASE_URL`, `CONFLUENCE_DEPLOYMENT_TYPE` |
+| **User credentials** | Stored per-user in the Open WebUI database; never shared across users |
+| **Supported auth** | Cloud: email + API token · Data Center: PAT or username + password |
+
+---
+
+## Troubleshooting
+
+**"Import from Confluence" option not appearing in Add Content menu**
+- Verify the admin toggle is enabled in **Settings → Documents → Confluence**.
+- Refresh your browser after the admin enables the setting.
+
+**Connection test fails after entering credentials**
+- For Cloud: make sure you're using an **API token** (not your Atlassian password). Tokens are created at [id.atlassian.com → Security → API tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
+- For Data Center: if using a PAT, verify it hasn't expired. Alternatively try username + password.
+- Confirm the **Base URL** in admin settings matches your Confluence instance exactly (no trailing slash needed).
+
+**Spaces list is empty**
+- Your credentials may not have permission to view any spaces. Check your Confluence permissions.
+- Confirm the **Deployment Type** in admin settings matches your actual deployment (Cloud vs. Data Center).
+
+**Pages fail to import**
+- Pages with restricted permissions are skipped; errors are reported per-page in the import modal.
+- Very large pages (e.g. pages with embedded macros outputting huge tables) may time out — try importing them individually.
+
+**Content is outdated**
+- The Confluence integration does not sync automatically. Re-import the relevant pages to refresh the content.
