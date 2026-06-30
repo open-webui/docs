@@ -1,0 +1,65 @@
+---
+sidebar_position: 4
+title: "Open WebUI & Atomic Chat"
+sidebar_label: "Open WebUI & Atomic Chat"
+description: "How Open WebUI and Atomic Chat work together. Local OpenAI-compatible inference with a desktop app."
+keywords: ["Open WebUI Atomic Chat", "Atomic Chat alternative", "local AI interface", "OpenAI compatible local"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I use Atomic Chat with Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Run Atomic Chat so its local API is available, then add http://127.0.0.1:1337/v1 as an OpenAI-compatible connection in Open WebUI. Use api key atomic if prompted."}}, {"@type": "Question", "name": "What API does Atomic Chat expose?", "acceptedAnswer": {"@type": "Answer", "text": "Atomic Chat serves an OpenAI-compatible REST API at /v1 (chat completions, models, and related endpoints) on port 1337 by default."}}]})}</script>
+</Head>
+
+
+# Open WebUI & Atomic Chat
+
+*Last updated: June 2026*
+
+[Atomic Chat](https://atomic.chat/) is a desktop app for running local models with an **OpenAI-compatible API** on your machine. Open WebUI can use it as a backend the same way you would connect LM Studio, llama.cpp, or other local servers.
+
+---
+
+## What Atomic Chat Does Well
+
+- **Local inference** with models on your hardware
+- **OpenAI-compatible API** at `http://127.0.0.1:1337/v1` (default)
+- **Simple desktop workflow** for loading models and chatting
+- **Works with any OpenAI-compatible client**, including Open WebUI
+
+---
+
+## What Open WebUI Adds
+
+- **Web-based chat** with multi-user access, knowledge bases, and team features
+- **Multiple providers** in one UI (local Atomic Chat plus cloud APIs)
+- **RAG, tools, and automations** on top of your local models
+
+---
+
+## Use Them Together
+
+1. Install and open **Atomic Chat**, then load a model so the local API is running.
+2. In **Open WebUI**, go to **Admin → Settings → Connections → OpenAI**.
+3. Add a connection:
+   - **URL:** `http://127.0.0.1:1337/v1` (use `http://host.docker.internal:1337/v1` if Open WebUI runs in Docker on the same host)
+   - **API Key:** `atomic` (placeholder; required by some clients)
+4. If model auto-discovery fails, add model IDs from `GET /v1/models` to **Model IDs (Filter)**.
+5. Select the model in chat and start a conversation.
+
+See also: **[OpenAI-compatible providers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)**.
+
+---
+
+## Frequently Asked Questions
+
+**Can I use Atomic Chat with Open WebUI?**
+Yes. Point an OpenAI-compatible connection at `http://127.0.0.1:1337/v1`.
+
+**Do I need an API key?**
+Atomic Chat accepts the placeholder key `atomic` for OpenAI-compatible clients that require a non-empty key.
+
+---
+
+**Related:** [Open WebUI & LM Studio](/alternatives/lm-studio) · [Open WebUI & Ollama](/alternatives/ollama) · [OpenAI-compatible setup](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)

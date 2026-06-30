@@ -585,6 +585,19 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   Start the server in LM Studio via the "Local Server" tab before connecting.
 
   </TabItem>
+  <TabItem value="atomic-chat" label="Atomic Chat">
+
+  **Atomic Chat** is a desktop app that exposes a local **OpenAI-compatible** API (default port **1337**).
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://127.0.0.1:1337/v1` |
+  | **API Key** | `atomic` (placeholder) |
+
+  Load a model in Atomic Chat before connecting. If Open WebUI runs in Docker on the same machine, use `http://host.docker.internal:1337/v1` instead of `127.0.0.1`.
+
+  </TabItem>
+
   <TabItem value="vllm" label="vLLM">
 
   **vLLM** is a high-throughput inference engine with an OpenAI-compatible server. See the dedicated **[vLLM guide](/getting-started/quick-start/connect-a-provider/starting-with-vllm)** for full setup instructions.
