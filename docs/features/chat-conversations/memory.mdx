@@ -100,6 +100,11 @@ Administrators can also control Memory access on a per-role or per-group basis f
 - **Background review** — when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation and updates `context` memories automatically, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
 - **Injection budgets** — [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
 
+### Memory System Context
+By default Open WebUI injects the user's stored memories into the model's system context so the model is aware of them on every turn. This injection can be turned off independently of the memory tools: when disabled, the model can still add, update and delete memories on request, but remembered information is no longer added to the prompt automatically.
+- **Admin UI**: Admin Panel > Settings > General > **Memory System Context** (shown when Memories is enabled)
+- **Environment Variable**: [`ENABLE_MEMORY_SYSTEM_CONTEXT`](/reference/env-configuration#enable_memory_system_context) (Default: `True`)
+
 ## Privacy & Security
 
 Memories are stored locally in your Open WebUI database and are scoped to your user account. They are not shared with other users by default, and you can clear your entire memory bank at any time.
