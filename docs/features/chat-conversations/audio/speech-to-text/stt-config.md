@@ -20,6 +20,7 @@ The following speech-to-text providers are supported:
 | Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
 | Deepgram | ✅ | N/A |
 | Azure | ✅ | N/A |
+| OpenRouter | ✅ | N/A |
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 
