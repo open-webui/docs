@@ -564,11 +564,10 @@ article p a {
 	border-color: rgb(255 255 255 / 14%);
 }
 
-.markdown details > table {
+.markdown details table {
 	width: calc(100% - 3rem);
 	min-width: 0;
-	margin-right: auto;
-	margin-left: auto;
+	margin-inline: auto;
 }
 
 .markdown thead,
