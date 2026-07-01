@@ -23,7 +23,6 @@ export default function IconMenu({
 				strokeLinecap="round"
 				strokeLinejoin="round"
 				strokeWidth="1.35"
-				opacity="0.42"
 			/>
 		</svg>
 	);
