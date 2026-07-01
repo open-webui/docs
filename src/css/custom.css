@@ -345,6 +345,7 @@ blockquote {
 .navbar__toggle,
 [class*="toggleButton"] {
 	color: var(--ifm-navbar-link-color);
+	line-height: 0;
 	transition: color var(--ifm-transition-fast)
 		var(--ifm-transition-timing-default);
 }
@@ -826,6 +827,14 @@ a.footer__link-item:hover {
 
 .header-discord-link {
 	margin-right: 12px;
+}
+
+.header-github-link::before,
+.header-discord-link::before {
+	flex: 0 0 18px;
+	mask-position: center;
+	mask-repeat: no-repeat;
+	mask-size: contain;
 }
 
 .header-github-link::before {
