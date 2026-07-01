@@ -89,8 +89,8 @@ const config: Config = {
 		navbar: {
 			title: "Open WebUI",
 			logo: {
-				src: "images/logo.png",
-				srcDark: "images/logo-dark.png",
+				src: "images/favicon.png",
+				srcDark: "images/favicon.png",
 			},
 			items: [
 				{
