@@ -3,7 +3,7 @@ sidebar_position: 5
 title: "Document Comparison"
 ---
 
-# 📑 Compare Two Versions of a Document
+# Compare Two Versions of a Document
 
 Upload two versions of a contract or proposal and get a clear summary of what changed.
 

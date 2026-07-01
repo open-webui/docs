@@ -6,7 +6,7 @@ title: "Notes"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 📝 Notes
+# Notes
 
 <ThemedImage
   alt="Notes: a two-pane note editor with an AI chat sidebar, selecting text in the note and asking the AI to edit it in place"

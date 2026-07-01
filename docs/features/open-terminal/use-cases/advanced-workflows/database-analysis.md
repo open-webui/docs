@@ -3,7 +3,7 @@ sidebar_position: 2
 title: "Database Analysis"
 ---
 
-# 🗄️ Connect to a Database and Analyze It
+# Connect to a Database and Analyze It
 
 Connect to your PostgreSQL, MySQL, or SQLite database directly and let the AI explore the schema, run queries, and produce insights, all without writing SQL yourself.
 

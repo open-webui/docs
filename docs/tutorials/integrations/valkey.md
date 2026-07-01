@@ -3,7 +3,7 @@ sidebar_position: 51
 title: "Using Valkey (Redis-compatible)"
 ---
 
-# 🔗 Using Valkey
+# Using Valkey
 
 :::warning
 

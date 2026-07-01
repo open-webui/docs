@@ -5,7 +5,7 @@ title: "Daemon, Webhooks & Deployment"
 
 # Running the daemon
 
-The CLI on the [main page](/features/knowledge-base-sync) covers one-off and watched syncs. For anything unattended, scheduled or driven by external events, run oikb as a long-lived **daemon**. It reads your [`.oikb.yaml`](#the-oikbyaml-config-file), syncs each source on its own schedule and exposes a small HTTP API for health checks, metrics, history and on-demand triggers.
+The CLI on the [main page](/ecosystem/knowledge-base-sync) covers one-off and watched syncs. For anything unattended, scheduled or driven by external events, run oikb as a long-lived **daemon**. It reads your [`.oikb.yaml`](#the-oikbyaml-config-file), syncs each source on its own schedule and exposes a small HTTP API for health checks, metrics, history and on-demand triggers.
 
 ```bash
 oikb daemon
@@ -331,12 +331,12 @@ The scheduler and per-KB locks live in one process, so the daemon is meant to ru
 
 ### GitHub Actions
 
-For push-based, build-time syncing instead of a long-running daemon, run the image as a one-shot step. See [One-shot sync in CI](/features/knowledge-base-sync#one-shot-sync-in-ci) on the main page.
+For push-based, build-time syncing instead of a long-running daemon, run the image as a one-shot step. See [One-shot sync in CI](/ecosystem/knowledge-base-sync#one-shot-sync-in-ci) on the main page.
 
 ---
 
 ## See also
 
-- **[Knowledge Base Sync (oikb)](/features/knowledge-base-sync)**: installation, sources, connectors, filtering and the CLI.
+- **[Knowledge Base Sync (oikb)](/ecosystem/knowledge-base-sync)**: installation, sources, connectors, filtering and the CLI.
 - **[Knowledge](/features/workspace/knowledge)**: the Knowledge Base feature this keeps in sync.
 - **[OpenAPI / MCP tool servers](/features/extensibility/mcp)**: connecting external tool servers to Open WebUI.

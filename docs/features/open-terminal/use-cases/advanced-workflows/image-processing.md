@@ -3,7 +3,7 @@ sidebar_position: 7
 title: "Image Processing"
 ---
 
-# 📸 Batch Process Images
+# Batch Process Images
 
 Resize, watermark, convert, or generate thumbnails for a folder of images.
 

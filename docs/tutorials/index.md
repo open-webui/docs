@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Tutorials"
 ---
 
-# 🎓 Tutorials
+# Tutorials
 
 **Step-by-step guides for real-world scenarios, contributed by the Open WebUI community.**
 

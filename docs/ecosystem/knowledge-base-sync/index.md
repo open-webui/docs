@@ -1,13 +1,13 @@
 ---
 sidebar_position: 1
 title: "Knowledge Base Sync (oikb)"
-slug: /features/knowledge-base-sync
+slug: /ecosystem/knowledge-base-sync
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 🔄 Knowledge Base Sync (oikb)
+# Knowledge Base Sync (oikb)
 
 <ThemedImage
   alt="Knowledge Base Sync: many different source connectors flowing through the oikb sync hub into Open WebUI Knowledge Bases"
@@ -24,7 +24,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 Unlike a one-time upload, which is stale the moment the source changes, oikb does **incremental** sync: it wires a Knowledge Base to a living source once, then keeps it fresh on a schedule, on every push or on demand. A docs repo, a wiki, a storage bucket, all stay current without anyone babysitting them.
 
-It is a separate program (a command-line tool plus an optional long-running [daemon](/features/knowledge-base-sync/daemon)), not part of the Open WebUI server, but it is built for Open WebUI and talks to it over the normal REST API.
+It is a separate program (a command-line tool plus an optional long-running [daemon](/ecosystem/knowledge-base-sync/daemon)), not part of the Open WebUI server, but it is built for Open WebUI and talks to it over the normal REST API.
 
 :::info Requires Open WebUI 0.9.6+
 oikb drives the incremental sync endpoints (`/sync/diff` and `/sync/cleanup`) that landed in **v0.9.6**. Against an older server there is nothing for it to call. The server side of these endpoints is documented under [Knowledge → Syncing a local directory](/features/workspace/knowledge#syncing-a-local-directory).
@@ -48,11 +48,11 @@ Point it at a local folder, a Git repo, a Confluence or Notion space, an S3 buck
 
 ### Stays fresh on its own
 
-Sync once by hand, or hand it to the [daemon](/features/knowledge-base-sync/daemon) to run on an interval, a cron or the instant someone pushes. A Knowledge Base wired to a living source stops quietly drifting out of date.
+Sync once by hand, or hand it to the [daemon](/ecosystem/knowledge-base-sync/daemon) to run on an interval, a cron or the instant someone pushes. A Knowledge Base wired to a living source stops quietly drifting out of date.
 
 ### The model can drive it
 
-The daemon doubles as an [OpenAPI tool server](/features/knowledge-base-sync/daemon#let-the-model-trigger-syncs), so a model can trigger a re-sync and report back mid-conversation, without anyone touching the command line.
+The daemon doubles as an [OpenAPI tool server](/ecosystem/knowledge-base-sync/daemon#let-the-model-trigger-syncs), so a model can trigger a re-sync and report back mid-conversation, without anyone touching the command line.
 
 ---
 
@@ -90,7 +90,7 @@ pip install oikb[all]      # every optional connector at once
 
 The full set of extras is `s3`, `gcs`, `azure`, `dropbox`, `r2`, `gdrive`, `gmail`, `gsites`, `web`, `oracle`, `sharepoint-cert` and `all`. Connectors not listed here (GitHub, Confluence, Notion, Jira, Slack and most others) need no extra.
 
-For production, a Docker image is published at `ghcr.io/open-webui/oikb`. See [Running the daemon](/features/knowledge-base-sync/daemon#deployment).
+For production, a Docker image is published at `ghcr.io/open-webui/oikb`. See [Running the daemon](/ecosystem/knowledge-base-sync/daemon#deployment).
 
 ---
 
@@ -164,7 +164,7 @@ The matching server-side behaviour and the same two endpoints exposed for your o
 
 ## Sources and connectors
 
-A **source** is either a local path or a `scheme:target` string. oikb resolves the scheme to a connector, pulls the files and syncs them into the Knowledge Base. Credentials are never written into the source string or `.oikb.yaml`; each connector reads them from **environment variables**, so secrets stay out of your config (pair with [`${VAR}` interpolation](/features/knowledge-base-sync/daemon#the-oikbyaml-config-file) to keep config files committable).
+A **source** is either a local path or a `scheme:target` string. oikb resolves the scheme to a connector, pulls the files and syncs them into the Knowledge Base. Credentials are never written into the source string or `.oikb.yaml`; each connector reads them from **environment variables**, so secrets stay out of your config (pair with [`${VAR}` interpolation](/ecosystem/knowledge-base-sync/daemon#the-oikbyaml-config-file) to keep config files committable).
 
 In the table below, `[brackets]` mark optional parts of the source string.
 
@@ -225,7 +225,7 @@ A few connector notes worth knowing:
 
 ## Filtering what gets synced
 
-Narrow a source with include/exclude globs and a size cap. These live under `filter:` in [`.oikb.yaml`](/features/knowledge-base-sync/daemon#the-oikbyaml-config-file):
+Narrow a source with include/exclude globs and a size cap. These live under `filter:` in [`.oikb.yaml`](/ecosystem/knowledge-base-sync/daemon#the-oikbyaml-config-file):
 
 ```yaml
 sources:
@@ -270,13 +270,13 @@ For a local directory you are actively editing, `watch` re-syncs the moment a fi
 oikb watch ./docs --kb-id your-kb-id
 ```
 
-It uses filesystem events (not polling), debounced one second (tune with `--debounce`), and runs until you stop it with Ctrl+C. Good for a live notes folder; for anything remote or unattended, use the [daemon](/features/knowledge-base-sync/daemon) instead.
+It uses filesystem events (not polling), debounced one second (tune with `--debounce`), and runs until you stop it with Ctrl+C. Good for a live notes folder; for anything remote or unattended, use the [daemon](/ecosystem/knowledge-base-sync/daemon) instead.
 
 ---
 
 ## One-shot sync in CI
 
-The Docker image runs as a one-shot command, which makes it a drop-in [GitHub Actions](/features/knowledge-base-sync/daemon#deployment) step to push docs into a Knowledge Base on every merge:
+The Docker image runs as a one-shot command, which makes it a drop-in [GitHub Actions](/ecosystem/knowledge-base-sync/daemon#deployment) step to push docs into a Knowledge Base on every merge:
 
 ```yaml
 - name: Sync docs to Open WebUI
@@ -294,7 +294,7 @@ The Docker image runs as a one-shot command, which makes it a drop-in [GitHub Ac
 
 | Command | What it does |
 |---|---|
-| `oikb sync <source>` | Incremental sync from a source to a KB (`--kb-id`). Omit `<source>` to sync every entry in [`.oikb.yaml`](/features/knowledge-base-sync/daemon#the-oikbyaml-config-file). |
+| `oikb sync <source>` | Incremental sync from a source to a KB (`--kb-id`). Omit `<source>` to sync every entry in [`.oikb.yaml`](/ecosystem/knowledge-base-sync/daemon#the-oikbyaml-config-file). |
 | `oikb sync --dry-run` | Preview added/modified/deleted without uploading. |
 | `oikb sync --concurrency N` | Upload N files in parallel (default 1, sequential). |
 | `oikb sync --max-file-size 50mb` | Skip files above a size. |
@@ -303,7 +303,7 @@ The Docker image runs as a one-shot command, which makes it a drop-in [GitHub Ac
 | `oikb watch <dir> --kb-id ID` | Auto-sync a local directory on change (`--debounce`). |
 | `oikb init` | Interactive wizard that writes a `.oikb.yaml`. |
 | `oikb validate` | Check `.oikb.yaml` syntax. Add `--deep` to also ping Open WebUI, verify the API key and confirm each KB exists. |
-| `oikb daemon` | Run the scheduled [daemon](/features/knowledge-base-sync/daemon) with an HTTP API. |
+| `oikb daemon` | Run the scheduled [daemon](/ecosystem/knowledge-base-sync/daemon) with an HTTP API. |
 | `oikb ls --kb-id ID` | List files in a KB. |
 | `oikb status --kb-id ID` | Show a KB's name, file count and total size. |
 | `oikb history` | View sync history (`--json`, `--errors`, `--kb-id`, `--clear --days N`). |
@@ -350,7 +350,7 @@ The incremental sync endpoints landed in v0.9.6. Against an older server there i
 
 ### The daemon runs as one process
 
-Scheduling and the per-KB locks live in a single process, so the [daemon](/features/knowledge-base-sync/daemon#deployment) is meant to run as one replica. To cover more sources, add entries to one daemon rather than running several copies.
+Scheduling and the per-KB locks live in a single process, so the [daemon](/ecosystem/knowledge-base-sync/daemon#deployment) is meant to run as one replica. To cover more sources, add entries to one daemon rather than running several copies.
 
 ### Indexing still happens server-side
 
@@ -374,6 +374,6 @@ oikb uploads fast, but Open WebUI extracts and embeds each new file asynchronous
 
 ## See also
 
-- **[Running the daemon →](/features/knowledge-base-sync/daemon)**: scheduled sync, webhooks, the HTTP API, observability, deployment and letting a model trigger syncs.
+- **[Running the daemon →](/ecosystem/knowledge-base-sync/daemon)**: scheduled sync, webhooks, the HTTP API, observability, deployment and letting a model trigger syncs.
 - **[Knowledge](/features/workspace/knowledge)**: the Knowledge Base feature oikb feeds, including the server-side [sync endpoints](/features/workspace/knowledge#api-access).
 - **[OpenAPI / MCP tool servers](/features/extensibility/mcp)**: how the daemon plugs in as a tool the model can call.

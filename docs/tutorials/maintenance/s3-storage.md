@@ -3,7 +3,7 @@ sidebar_position: 40
 title: "S3 Storage"
 ---
 
-# 🪣 Switching to S3 Storage
+# Switching to S3 Storage
 
 :::warning
 

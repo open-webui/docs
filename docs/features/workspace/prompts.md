@@ -6,7 +6,7 @@ title: "Prompts"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 📝 Prompts
+# Prompts
 
 <ThemedImage
   alt="Workspace map with the Prompts cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"

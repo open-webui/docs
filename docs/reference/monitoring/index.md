@@ -3,7 +3,7 @@ sidebar_position: 6
 title: "Monitoring"
 ---
 
-# 📊 Monitoring
+# Monitoring
 
 **Know when something breaks before your users do.**
 

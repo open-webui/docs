@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Authentication & SSO"
 ---
 
-# 🔐 Authentication & SSO Tutorials
+# Authentication & SSO Tutorials
 
 **Connect Open WebUI to your identity provider for single sign-on, LDAP, and group synchronization.**
 

@@ -6,7 +6,7 @@ title: "Calendar"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 📅 Calendar
+# Calendar
 
 <ThemedImage
   alt="Calendar: a month grid with color-coded events and a recurring weekday standup, with AI creating events from a natural-language request"

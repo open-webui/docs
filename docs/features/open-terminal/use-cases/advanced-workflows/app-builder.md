@@ -3,7 +3,7 @@ sidebar_position: 9
 title: "App Builder"
 ---
 
-# 🏗️ Build a Complete Application
+# Build a Complete Application
 
 Describe what you want and get a working app with frontend, backend, and database.
 

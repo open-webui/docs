@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: "💾 Import & Export"
+title: "Import & Export"
 ---
 
 Open WebUI provides tools to backup your chat history and restore it later, or migrate conversations from other platforms.
