@@ -6,7 +6,7 @@ title: "Knowledge"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 📚 Knowledge
+# Knowledge
 
 <ThemedImage
   alt="Workspace map with the Knowledge cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
@@ -55,7 +55,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
-| 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/features/knowledge-base-sync) |
+| 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
 ---
@@ -252,7 +252,7 @@ Individual files can be renamed in place from the workspace via the file's item 
 The **Add Content → Sync Directory** action mirrors a local folder into the knowledge base **incrementally**: the client hashes each local file (SHA-256), the server compares hashes and paths against what is already stored, and only **new**, **modified**, and **deleted** files are touched. Unmodified files (the typical majority) are left alone: no re-upload, no re-embedding. The local folder's subdirectory structure is mirrored in the KB; missing subdirectories are created, and subdirectories that no longer exist locally are removed.
 
 :::tip Syncing a lot of files? Use oikb instead
-The in-app **Sync Directory** runs in your browser: it enumerates, hashes and uploads every file client-side. That is fine for a modest folder, but on a **large** set (thousands of files or a multi-gigabyte vault) it gets slow and gives little progress feedback, often sitting for a long time before it even reports the file count. For large or frequently-changing libraries we **strongly recommend** the official [**Knowledge Base Sync (oikb)**](/features/knowledge-base-sync) tool instead: it runs natively with progress bars, parallel uploads and retries, built for exactly this. Point it at the top of your folder and it syncs the entire tree (every subdirectory, recursively) into one Knowledge Base.
+The in-app **Sync Directory** runs in your browser: it enumerates, hashes and uploads every file client-side. That is fine for a modest folder, but on a **large** set (thousands of files or a multi-gigabyte vault) it gets slow and gives little progress feedback, often sitting for a long time before it even reports the file count. For large or frequently-changing libraries we **strongly recommend** the official [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync) tool instead: it runs natively with progress bars, parallel uploads and retries, built for exactly this. Point it at the top of your folder and it syncs the entire tree (every subdirectory, recursively) into one Knowledge Base.
 :::
 
 Behavior to be aware of:
@@ -265,7 +265,7 @@ Behavior to be aware of:
 For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
 
 :::tip Sync remote sources, or on a schedule
-The in-app **Sync Directory** action handles a local folder on your machine. To mirror a **remote** source instead (a GitHub repo, a Confluence space, an S3 bucket and [dozens more](/features/knowledge-base-sync#sources-and-connectors)), or to keep a Knowledge Base current **automatically** on a schedule or on every push, use the official [**Knowledge Base Sync (oikb)**](/features/knowledge-base-sync) companion tool. It drives these same endpoints for you.
+The in-app **Sync Directory** action handles a local folder on your machine. To mirror a **remote** source instead (a GitHub repo, a Confluence space, an S3 bucket and [dozens more](/ecosystem/knowledge-base-sync#sources-and-connectors)), or to keep a Knowledge Base current **automatically** on a schedule or on every push, use the official [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync) companion tool. It drives these same endpoints for you.
 :::
 
 ### Exporting

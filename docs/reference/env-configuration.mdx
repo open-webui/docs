@@ -32,7 +32,7 @@ Please note that `ConfigVar` environment variables are clearly marked as such in
 
 To disable this behavior and force Open WebUI to always use your environment variables (ignoring the database), set `ENABLE_PERSISTENT_CONFIG` to `False`.
 
-**CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved permanently**. They will persist only for the current session and will be **lost** when you restart the container, as the system will revert to the values defined in your environment variables.
+**CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved**.
 
 :::
 

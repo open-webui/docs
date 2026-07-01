@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Maintenance"
 ---
 
-# 🔧 Maintenance Tutorials
+# Maintenance Tutorials
 
 **Keep your Open WebUI deployment healthy: backups, storage, offline mode, and database management.**
 

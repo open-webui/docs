@@ -6,7 +6,7 @@ title: "Open Terminal"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# ⚡ Open Terminal
+# Open Terminal
 
 <ThemedImage
   alt="Open Terminal: the Open WebUI core driving a real terminal session in a loop, running commands and reading the output"
@@ -26,7 +26,7 @@ This is where ideas become working software. Ask a question, get a running scrip
 ![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
 
 :::tip Looking for "your computer in a browser" instead?
-Open Terminal is a tool the **chat AI** drives. If you instead want to operate your own machine from any browser (files, editor, terminal and git, mobile-first), with AI as an optional helper, see [**Computer (cptr)**](/features/computer), a separate Open WebUI project. [Compare the two](/features/computer#cptr-vs-open-terminal).
+Open Terminal is a tool the **chat AI** drives. If you instead want to operate your own machine from any browser (files, editor, terminal and git, mobile-first), with AI as an optional helper, see [**Open WebUI Computer**](/ecosystem/computer), a separate Open WebUI project. [Compare the two](/ecosystem/computer#open-webui-computer-vs-open-terminal).
 :::
 
 ---
@@ -105,4 +105,4 @@ Need isolated, per-user terminal containers for your team? **[Terminals](./termi
 
 ## Your Whole Machine
 
-Open Terminal adds a computing environment to Open WebUI. [**cptr**](https://github.com/open-webui/computer) (Open WebUI Computer) is the computer itself: files, terminal, git, editor, and AI in a browser tab, accessible from any device.
+Open Terminal adds a computing environment to Open WebUI. [**Open WebUI Computer**](/ecosystem/computer) is the computer itself: files, terminal, git, editor, and AI in a browser tab, accessible from any device.

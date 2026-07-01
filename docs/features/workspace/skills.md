@@ -7,7 +7,7 @@ sidebar_label: "Skills"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 🧩 Skills
+# Skills
 
 <ThemedImage
   alt="Workspace map with the Skills cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"

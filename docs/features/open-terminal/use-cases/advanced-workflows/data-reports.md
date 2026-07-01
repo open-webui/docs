@@ -3,7 +3,7 @@ sidebar_position: 1
 title: "Data Reports"
 ---
 
-# 📊 Turn Raw Data into a Polished Report
+# Turn Raw Data into a Polished Report
 
 Upload messy data, and the AI cleans it, analyzes it, builds charts, and produces a downloadable PDF report.
 

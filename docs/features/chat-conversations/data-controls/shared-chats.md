@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: "🔗 Shared Chats"
+title: "Shared Chats"
 ---
 
 Open WebUI provides a centralized dashboard to manage every chat conversation you have shared. This feature allows users to audit their shared content and quickly revoke access if needed.

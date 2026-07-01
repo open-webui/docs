@@ -1,28 +1,28 @@
 ---
 sidebar_position: 0
-title: "Open WebUI Computer (cptr)"
-sidebar_label: "Open WebUI Computer (cptr)"
+title: "Open WebUI Computer"
+sidebar_label: "Open WebUI Computer"
 ---
 
-# Open WebUI Computer (cptr)
+# Open WebUI Computer
 
-**Open WebUI Computer. Connect `cptr` to Open WebUI.**
+**Connect Open WebUI Computer to Open WebUI.**
 
-[**cptr**](https://github.com/open-webui/computer) puts your computer in a browser tab. Files, terminal, git, editor, AI, accessible from any device. It runs on your machine and serves it to you over HTTP.
+[**Open WebUI Computer**](https://github.com/open-webui/computer) puts your computer in a browser tab. Files, terminal, git, editor, AI, accessible from any device. It runs on your machine and serves it to you over HTTP.
 
-cptr exposes an **OpenAI-compatible gateway API** (`/v1/chat/completions`). Each workspace appears as a model in Open WebUI with full tool access: file operations, terminal commands, web search, and more.
+Open WebUI Computer exposes an **OpenAI-compatible gateway API** (`/v1/chat/completions`). Each workspace appears as a model in Open WebUI with full tool access: file operations, terminal commands, web search, and more.
 
 :::info What You'll Need
-- **cptr** installed on your machine (`pip install cptr` or `uvx cptr@latest run`)
+- The `cptr` package installed on your machine (`pip install cptr` or `uvx cptr@latest run`)
 - **Open WebUI** running (via Docker, pip, or desktop app)
 - **~5 minutes** to complete this setup
 :::
 
 ---
 
-## Step 1: Install and Start cptr
+## Step 1: Install and Start Open WebUI Computer
 
-If you haven't installed cptr yet:
+If you haven't installed the `cptr` package yet:
 
 ```bash
 pip install cptr
@@ -35,7 +35,7 @@ Or with [uv](https://docs.astral.sh/uv/):
 uvx cptr@latest run
 ```
 
-cptr starts on port **8000** by default and opens in your browser.
+Open WebUI Computer starts on port **8000** by default and opens in your browser.
 
 To allow access from other devices on the network:
 
@@ -47,7 +47,7 @@ cptr run --host 0.0.0.0
 
 ## Step 2: Create an API Key
 
-1. Open cptr in your browser.
+1. Open Open WebUI Computer in your browser.
 2. Go to **Settings > Gateway**.
 3. Enter a name for the key and click **Create Key**.
 4. Copy the key (`sk-cptr-...`). You will only see it once.
@@ -82,10 +82,10 @@ http://host.docker.internal:8000/v1
 
 ## Step 4: Configure Custom Headers (Recommended)
 
-For the best experience, set up custom request headers so that Open WebUI passes conversation metadata to cptr. This enables proper session mapping (conversations stay in sync between both interfaces) and ensures background tasks like title generation are handled efficiently.
+For the best experience, set up custom request headers so that Open WebUI passes conversation metadata to Open WebUI Computer. This enables proper session mapping (conversations stay in sync between both interfaces) and ensures background tasks like title generation are handled efficiently.
 
 1. In Open WebUI, go to **Admin Settings > Connections**.
-2. Find the cptr connection and click the **⋮** menu, then **Custom Headers**.
+2. Find the Open WebUI Computer connection and click the **⋮** menu, then **Custom Headers**.
 3. Paste the following:
 
 ```json
@@ -99,24 +99,24 @@ For the best experience, set up custom request headers so that Open WebUI passes
 ```
 
 :::tip
-You can copy these headers directly from cptr's **Settings > Gateway** page.
+You can copy these headers directly from Open WebUI Computer's **Settings > Gateway** page.
 :::
 
 ---
 
 ## Step 5: Start Chatting
 
-Your cptr workspaces should now appear in the model dropdown as `cptr/<workspace-name>`. Select one and start chatting. The AI has full access to that workspace: files, terminal, web search, and any configured tools.
+Your Open WebUI Computer workspaces should now appear in the model dropdown as `cptr/<workspace-name>`. Select one and start chatting. The AI has full access to that workspace: files, terminal, web search, and any configured tools.
 
-Conversations are synced. Work done through Open WebUI appears in cptr's sidebar, and vice versa.
+Conversations are synced. Work done through Open WebUI appears in Open WebUI Computer's sidebar, and vice versa.
 
 ---
 
 ## Choosing a Gateway Model
 
-By default, cptr uses the first available model connection for gateway requests. To use a specific model:
+By default, Open WebUI Computer uses the first available model connection for gateway requests. To use a specific model:
 
-1. In cptr, go to **Settings > Gateway**.
+1. In Open WebUI Computer, go to **Settings > Gateway**.
 2. Select a model from the dropdown.
 3. Click **Save**.
 
@@ -133,7 +133,7 @@ echo "anthropic/claude-sonnet-4-20250514" > /path/to/workspace/.cptr/model
 ### No models appear in the dropdown
 
 - Verify the URL includes `/v1`: `http://localhost:8000/v1` (not just `:8000`)
-- Check that cptr is running and accessible
+- Check that Open WebUI Computer is running and accessible
 - Confirm the API key is correct
 
 ### Connection test passes but no models load
@@ -150,11 +150,11 @@ docker run --add-host=host.docker.internal:host-gateway ...
 
 ### Conversations not syncing
 
-Make sure the custom headers from Step 4 are configured. Without them, cptr creates a new chat for each request instead of continuing the existing conversation.
+Make sure the custom headers from Step 4 are configured. Without them, Open WebUI Computer creates a new chat for each request instead of continuing the existing conversation.
 
 ---
 
 ## Learn More
 
-- [cptr on GitHub](https://github.com/open-webui/computer)
+- [Open WebUI Computer on GitHub](https://github.com/open-webui/computer)
 - [Open WebUI Connections](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)

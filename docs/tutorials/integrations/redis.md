@@ -3,7 +3,7 @@ sidebar_position: 50
 title: "Redis Websocket Support"
 ---
 
-# 🔗 Redis Websocket Support
+# Redis Websocket Support
 
 :::warning
 

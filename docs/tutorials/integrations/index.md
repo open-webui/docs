@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Integrations"
 ---
 
-# 🔌 Integration Tutorials
+# Integration Tutorials
 
 **Connect Open WebUI to LLM providers, developer tools, monitoring platforms, and external services.**
 

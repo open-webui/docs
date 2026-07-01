@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: "📁 File Management"
+title: "File Management"
 ---
 
 Open WebUI provides a comprehensive file management system that allows you to upload, organize, and utilize your documents across various features like Knowledge Bases and RAG.
