@@ -1032,6 +1032,14 @@ By default, audit logging uses **blacklist mode**: all paths are logged except t
 `OLLAMA_CONTEXT_LENGTH` is an **Ollama-server** setting, not an Open WebUI variable. Open WebUI's per-model `num_ctx` advanced parameter, when set, is sent on every request and **overrides** it, and the `num_ctx` control pre-fills a small `2048`. See [Context Length](/getting-started/quick-start/connect-a-provider/starting-with-ollama#context-length-num_ctx-and-ollama_context_length) for how to set this correctly and avoid blank responses with Native function calling.
 :::
 
+#### `OLLAMA_API_CONFIGS`
+
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Per-connection configuration for the Ollama backends, as a JSON object keyed by the connection's index in [`OLLAMA_BASE_URLS`](#ollama_base_urls) (its URL is also accepted as a legacy key). Each entry mirrors the per-connection settings from the admin UI, for example `enable`, `prefix_id`, `model_ids`, `tags`, and `connection_type`.
+- Example: `{"0": {"enable": true, "prefix_id": "local", "model_ids": ["llama3.1:latest"]}}`
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `USE_OLLAMA_DOCKER`
 
 - Type: `bool`
@@ -1085,6 +1093,14 @@ Do not use provider management/master keys unless your deployment explicitly req
 - Type: `str`
 - Description: Supports multiple OpenAI API keys, semicolon-separated.
 - Example: `sk-124781258123;sk-4389759834759834`
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `OPENAI_API_CONFIGS`
+
+- Type: `str` (JSON)
+- Default: `{}`
+- Description: Per-connection configuration for the OpenAI-compatible backends, as a JSON object keyed by the connection's index in [`OPENAI_API_BASE_URLS`](#openai_api_base_urls) (its URL is also accepted as a legacy key). Each entry mirrors the per-connection settings from the admin UI, for example `enable`, `prefix_id`, `model_ids`, `tags`, and `connection_type`.
+- Example: `{"0": {"enable": true, "prefix_id": "openai", "model_ids": ["gpt-4o"]}}`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OPENAI_API_PASSTHROUGH`
@@ -1571,6 +1587,13 @@ Output:
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables evaluation arena models.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `EVALUATION_ARENA_MODELS`
+
+- Type: `str` (JSON)
+- Default: `[]`
+- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MESSAGE_RATING`
@@ -4776,6 +4799,14 @@ Note: If none of the specified languages are available and `en` was not in your 
 - Type: `str`
 - Default: `${OPENAI_API_KEY}`
 - Description: Sets the OpenAI API key to use for Speech-to-Text.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `AUDIO_STT_OPENAI_API_REQUEST_FORMAT`
+
+- Type: `str`
+- Default: `multipart`
+- Options: `multipart`, `json`
+- Description: Controls how audio is sent to the OpenAI-compatible Speech-to-Text endpoint. `multipart` uploads the audio as a file (the standard OpenAI format); `json` sends it as base64-encoded audio in a JSON body, which some OpenAI-compatible transcription services require.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Speech-to-Text (Azure)
