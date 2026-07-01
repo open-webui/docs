@@ -600,6 +600,27 @@ div.special_table + table tr:nth-child(even) {
 	display: none;
 }
 
+.theme-doc-sidebar-menu .menu__link--sublist-caret::after,
+.theme-doc-sidebar-menu .menu__caret::before {
+	background: none;
+	border-color: currentcolor;
+	border-style: solid;
+	border-width: 0 1px 1px 0;
+	filter: none;
+	height: 0.35rem;
+	min-width: 0.35rem;
+	opacity: 0.28;
+	transform: rotate(45deg);
+	width: 0.35rem;
+}
+
+.theme-doc-sidebar-menu
+	.menu__list-item--collapsed
+	.menu__link--sublist-caret::after,
+.theme-doc-sidebar-menu .menu__list-item--collapsed .menu__caret::before {
+	transform: rotate(-45deg);
+}
+
 .category-link a::after {
 	content: "\2192";
 	font-size: 16px;
