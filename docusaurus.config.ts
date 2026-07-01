@@ -181,7 +181,7 @@ const config: Config = {
 				styles: [],
 			},
 			darkTheme: {
-				plain: { color: "#ccc", backgroundColor: "#1a1a1a" },
+				plain: { color: "#ccc", backgroundColor: "#000" },
 				styles: [],
 			},
 		},

@@ -69,10 +69,19 @@
 	--ifm-link-color: #ccc;
 	--ifm-heading-color: #eee;
 	--ifm-font-color-base: #bbb;
-	--ifm-background-color: #0a0a0a;
-	--ifm-navbar-background-color: #0a0a0a;
-	--ifm-footer-background-color: #0a0a0a;
+	--ifm-background-color: #000;
+	--ifm-background-surface-color: #000;
+	--ifm-code-background: #000;
+	--ifm-pre-background: #000;
+	--ifm-card-background-color: #000;
+	--ifm-dropdown-background-color: #000;
+	--ifm-hero-background-color: #000;
+	--ifm-menu-color-background-active: #000;
+	--ifm-menu-color-background-hover: #000;
+	--ifm-navbar-background-color: #000;
+	--ifm-footer-background-color: #000;
 	--ifm-footer-color: #555;
+	--ifm-hover-overlay: rgb(255 255 255 / 4%);
 	--ifm-menu-color: #888;
 	--docusaurus-highlighted-code-line-bg: rgb(255 255 255 / 8%);
 }
@@ -141,7 +150,7 @@ nav.menu::-webkit-scrollbar {
 
 [data-theme="dark"] .menu__link--active {
 	color: #fff;
-	background-color: #1a1a1a;
+	background-color: var(--ifm-menu-color-background-active);
 }
 
 /* ─── Hide breadcrumbs ─── */
@@ -167,7 +176,7 @@ code {
 
 [data-theme="dark"] code {
 	color: #ccc;
-	background-color: #222;
+	background-color: var(--ifm-code-background);
 }
 
 [data-theme="light"] code {
@@ -176,7 +185,7 @@ code {
 
 /* stylelint-disable-next-line no-duplicate-selectors */
 [data-theme="dark"] code {
-	background-color: #222;
+	background-color: var(--ifm-code-background);
 }
 
 .theme-code-block {
@@ -220,7 +229,7 @@ code {
 
 /* stylelint-disable-next-line no-duplicate-selectors */
 [data-theme="dark"] .shiki-code-block pre {
-	background-color: var(--shiki-dark-bg, #1a1a1a) !important;
+	background-color: var(--ifm-pre-background) !important;
 }
 
 .shiki-code-block-content {
@@ -251,7 +260,7 @@ code {
 }
 
 [data-theme="dark"] .shiki-copy-button {
-	background: #1a1a1a;
+	background: var(--ifm-pre-background);
 	color: #ccc;
 }
 
@@ -287,7 +296,7 @@ blockquote {
 }
 
 [data-theme="dark"] blockquote {
-	border-left-color: #333;
+	border-left-color: #000;
 	color: #999;
 }
 
@@ -550,7 +559,7 @@ div.special_table + table tr:nth-child(even) {
 }
 
 [data-theme="dark"] .custom-tag {
-	background-color: #1a1a1a;
+	background-color: var(--ifm-background-surface-color);
 	color: #ccc;
 }
 
@@ -559,7 +568,7 @@ div.special_table + table tr:nth-child(even) {
 }
 
 [data-theme="dark"] .custom-tag:hover {
-	background-color: #222;
+	background-color: var(--ifm-menu-color-background-active);
 }
 
 .navbar__link:has(div.custom-tag) {
@@ -625,12 +634,12 @@ a.footer__link-item:hover {
 }
 
 [data-theme="dark"] .footer--dark {
-	background-color: #0a0a0a;
+	background-color: var(--ifm-footer-background-color);
 }
 
 /* ─── Hiring link ─── */
 .hiring-link {
-	background-color: #111;
+	background-color: #000;
 	color: #fff;
 	font-weight: 500;
 	padding: 4px 10px;
@@ -714,6 +723,30 @@ a.footer__link-item:hover {
 	border-right-width: 0 !important;
 }
 
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] [id="__docusaurus"],
+html[data-theme="dark"] .main-wrapper,
+html[data-theme="dark"] main,
+html[data-theme="dark"] .container,
+html[data-theme="dark"] .row,
+html[data-theme="dark"] .col,
+html[data-theme="dark"] div[class*="docsWrapper"],
+html[data-theme="dark"] div[class*="docRoot"],
+html[data-theme="dark"] main[class*="docMainContainer"],
+html[data-theme="dark"] div[class*="docItemWrapper"],
+html[data-theme="dark"] div[class*="docItemCol"],
+html[data-theme="dark"] div[class*="docItemContainer"],
+html[data-theme="dark"] article,
+html[data-theme="dark"] .theme-doc-markdown,
+html[data-theme="dark"] .theme-doc-sidebar-container {
+	background-color: #000 !important;
+}
+
+html[data-theme="dark"] .navbar {
+	background-color: var(--ifm-navbar-background-color) !important;
+}
+
 /* ─── Misc ─── */
 
 .small-text {
@@ -743,7 +776,7 @@ a.footer__link-item:hover {
 }
 
 [data-theme="dark"] .homepage-svg svg {
-	background-color: #111 !important;
+	background-color: #000 !important;
 	color: #fff !important;
 }
 
@@ -804,11 +837,11 @@ a.footer__link-item:hover {
 }
 
 [data-theme="dark"] .hero--bg {
-	background-color: #111 !important;
+	background-color: #000 !important;
 }
 
 .btn--black {
-	background-color: #111;
+	background-color: #000;
 	color: #fff;
 	border-radius: 2px;
 }
