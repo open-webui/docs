@@ -43,6 +43,27 @@ For remote servers, use the appropriate hostname or IP address.
 
 Select any model that's available on your vLLM server from the Model Selector and start chatting.
 
+---
+
+## Video/Multimodal Notes
+
+If you use a multimodal model on vLLM (for example, models that support `video_url` in Chat Completions), keep these points in mind:
+
+- A successful model answer from uploaded video means your vLLM multimodal path is working.
+- You may still see **"No sources found"** in Open WebUI. This is expected when no RAG citations are attached. It does **not** mean video interpretation failed.
+- If you see **"File type video/mp4 is not supported for processing"**, that message is related to file-processing/retrieval, not the model's multimodal inference itself.
+
+### Quick Check (OpenAI-Compatible)
+
+If needed, test your vLLM endpoint directly:
+
+```bash
+curl http://localhost:8000/v1/models \
+  -H "Authorization: Bearer sk-local"
+```
+
+For Docker-based Open WebUI, remember to use `host.docker.internal` in the API URL.
+
 :::tip Connection Timeout Configuration
 
 If your vLLM server is slow to respond (especially during model loading), you can adjust the timeout:
