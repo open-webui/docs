@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-# Integrating `openai-edge-tts`with Open WebUI
+# Integrating `openai-edge-tts` with Open WebUI
 
 ## What is `openai-edge-tts`?
 
