@@ -4,8 +4,7 @@
  * Brutal minimalism theme for Open WebUI docs.
  * Inspired by benji.app — typography-first, zero chrome.
  */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap");
 
 /* Tailwind base styles */
 @tailwind base;
@@ -30,12 +29,14 @@
 	--ifm-global-shadow-md: none;
 	--ifm-footer-background-color: #fff;
 	--ifm-font-family-base:
-		"Inter", -apple-system, blinkmacsystemfont, "Segoe UI", roboto,
+		"IBM Plex Sans", -apple-system, blinkmacsystemfont, "Segoe UI", roboto,
 		"Helvetica Neue", arial, sans-serif;
+	--ifm-heading-font-family: var(--ifm-font-family-base);
 	--ifm-font-size-base: 15px;
 	--ifm-line-height-base: 1.65;
 	--ifm-font-weight-base: 400;
-	--ifm-heading-font-weight: 600;
+	--ifm-font-weight-bold: 600;
+	--ifm-heading-font-weight: 500;
 	--ifm-navbar-shadow: none;
 	--ifm-toc-border-color: transparent;
 	--ifm-menu-link-padding-horizontal: 0.75rem;
@@ -137,7 +138,7 @@ nav.menu::-webkit-scrollbar {
 }
 
 .menu__link--active {
-	font-weight: 600;
+	font-weight: 500;
 }
 
 [data-theme="light"] .menu__link--active {
@@ -310,9 +311,46 @@ blockquote {
 .alert [class*="admonitionHeading"] {
 	font-family: "IBM Plex Mono", monospace;
 	font-size: 0.72rem;
-	font-weight: 600;
+	font-weight: 500;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
+}
+
+.alert [class*="admonitionIcon"] {
+	align-items: center;
+	border: 1px solid currentcolor;
+	display: inline-flex;
+	font-family: "IBM Plex Mono", monospace;
+	font-size: 0.62rem;
+	height: 1rem;
+	justify-content: center;
+	line-height: 1;
+	margin-right: 0.55rem;
+	opacity: 0.78;
+	vertical-align: 0.05rem;
+	width: 1rem;
+}
+
+.alert [class*="admonitionIcon"] :where(svg) {
+	display: none;
+}
+
+.theme-admonition-note [class*="admonitionIcon"]::before,
+.theme-admonition-info [class*="admonitionIcon"]::before {
+	content: "i";
+}
+
+.theme-admonition-tip [class*="admonitionIcon"]::before {
+	content: "+";
+}
+
+.theme-admonition-warning [class*="admonitionIcon"]::before,
+.theme-admonition-caution [class*="admonitionIcon"]::before {
+	content: "!";
+}
+
+.theme-admonition-danger [class*="admonitionIcon"]::before {
+	content: "x";
 }
 
 .alert p:last-child {
@@ -424,7 +462,7 @@ article p a {
 @media screen and (width <= 996px) {
 	h1 {
 		font-size: 1.5rem !important;
-		font-weight: 600;
+		font-weight: 500;
 	}
 
 	.hero .hero__title {
@@ -556,7 +594,7 @@ div.special_table + table {
 div.special_table + table tr th {
 	background: transparent;
 	color: #333;
-	font-weight: 600;
+	font-weight: 500;
 	padding: 6px 20px;
 }
 
@@ -581,7 +619,7 @@ div.special_table + table tr:nth-child(even) {
 	margin-right: 4px;
 	border-radius: 3px;
 	font-size: 0.7em;
-	font-weight: 600;
+	font-weight: 500;
 	color: #333;
 }
 
@@ -612,7 +650,7 @@ div.special_table + table tr:nth-child(even) {
 .category-header .menu__link--sublist {
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 600;
+	font-weight: 500;
 	letter-spacing: 0.05em;
 	margin-top: 32px;
 	color: #999;
@@ -658,7 +696,7 @@ div.special_table + table tr:nth-child(even) {
 	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
-	font-weight: 600;
+	font-weight: 500;
 }
 
 [data-theme="light"] a.footer__link-item {
@@ -812,7 +850,7 @@ html[data-theme="dark"] .navbar {
 
 .select-language {
 	font-size: 1em;
-	font-weight: 600;
+	font-weight: 500;
 	margin-bottom: 8px;
 }
 
