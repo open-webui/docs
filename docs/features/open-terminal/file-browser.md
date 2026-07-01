@@ -115,5 +115,5 @@ If you have more than one terminal connected, switching between them in the drop
 - **[Build & preview websites →](./use-cases/web-development)**: the files the AI creates appear in the browser
 
 :::tip
-Want to browse and edit your real files from any device? [**cptr**](https://github.com/open-webui/computer) puts your entire machine in a browser tab, with a full file browser, terminal, git, and editor.
+Want to browse and edit your real files from any device? [**Open WebUI Computer**](/ecosystem/computer) puts your entire machine in a browser tab, with a full file browser, terminal, git, and editor.
 :::
