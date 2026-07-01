@@ -537,46 +537,117 @@ article p a {
 }
 
 /* ─── Tables ─── */
-div.special_table + table {
-	border: none;
+/* stylelint-disable no-descending-specificity */
+.theme-doc-markdown > table {
+	margin: 1.1rem 0 1.35rem;
 }
 
-div.special_table + table thead {
-	background: rgb(120 120 120 / 6%);
-	overflow: hidden;
+.markdown table {
+	display: table;
+	width: 100%;
+	min-width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	border-width: 1px 0 !important;
+	border-style: solid;
+	font-size: 0.92rem;
+	line-height: 1.55;
 }
 
-div.special_table + table thead tr {
+[data-theme="light"] .markdown table {
+	border-color: rgb(17 17 17 / 12%);
+}
+
+[data-theme="dark"] .markdown table {
+	border-color: rgb(255 255 255 / 14%);
+}
+
+.markdown thead,
+.markdown thead tr,
+.markdown tr,
+.markdown tr:nth-child(even) {
 	background: transparent;
-	border-top: 0;
-	border-bottom: 0;
+	border: 0;
 }
 
-th,
-td,
-div.special_table + table {
+.markdown th,
+.markdown td {
 	border-width: 0 !important;
+	padding: 0.72rem 1rem;
+	text-align: left;
+	vertical-align: top;
 }
 
-div.special_table + table tr th {
-	background: transparent;
-	color: #333;
+.markdown th {
+	font-family: "IBM Plex Mono", monospace;
+	font-size: 0.7rem;
 	font-weight: 500;
-	padding: 6px 20px;
+	letter-spacing: 0.04em;
+	line-height: 1.35;
+	text-transform: uppercase;
+	white-space: nowrap;
 }
 
-[data-theme="dark"] div.special_table + table tr th {
+[data-theme="light"] .markdown th {
+	background: rgb(17 17 17 / 3.5%);
+	color: #333;
+}
+
+[data-theme="dark"] .markdown th {
+	background: rgb(255 255 255 / 5%);
 	color: #ccc;
 }
 
-div.special_table + table tr td {
-	padding: 6px 20px;
-	text-align: left;
+.markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) thead {
+	display: none;
 }
 
-div.special_table + table tr:nth-child(even) {
-	background: transparent;
+.markdown
+	table:has(thead th:empty):not(:has(thead th:not(:empty)))
+	tbody
+	tr:first-child
+	td {
+	border-top-width: 0 !important;
 }
+
+.markdown td {
+	border-top-width: 1px !important;
+	border-top-style: solid;
+}
+
+[data-theme="light"] .markdown td {
+	border-top-color: rgb(17 17 17 / 8%);
+	color: #333;
+}
+
+[data-theme="dark"] .markdown td {
+	border-top-color: rgb(255 255 255 / 10%);
+	color: #bbb;
+}
+
+[data-theme="light"] .markdown tbody tr:hover {
+	background: rgb(17 17 17 / 2.5%);
+}
+
+[data-theme="dark"] .markdown tbody tr:hover {
+	background: rgb(255 255 255 / 4%);
+}
+
+.markdown td code,
+.markdown th code {
+	white-space: nowrap;
+}
+
+div.special_table + table {
+	border: none !important;
+}
+
+div.special_table + table tr th,
+div.special_table + table tr td {
+	padding-top: 0.45rem;
+	padding-bottom: 0.45rem;
+}
+/* stylelint-enable no-descending-specificity */
 
 /* ─── Custom tags ─── */
 .custom-tag {
