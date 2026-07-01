@@ -317,40 +317,7 @@ blockquote {
 }
 
 .alert [class*="admonitionIcon"] {
-	align-items: center;
-	border: 1px solid currentcolor;
-	display: inline-flex;
-	font-family: "IBM Plex Mono", monospace;
-	font-size: 0.62rem;
-	height: 1rem;
-	justify-content: center;
-	line-height: 1;
-	margin-right: 0.55rem;
-	opacity: 0.78;
-	vertical-align: 0.05rem;
-	width: 1rem;
-}
-
-.alert [class*="admonitionIcon"] :where(svg) {
 	display: none;
-}
-
-.theme-admonition-note [class*="admonitionIcon"]::before,
-.theme-admonition-info [class*="admonitionIcon"]::before {
-	content: "i";
-}
-
-.theme-admonition-tip [class*="admonitionIcon"]::before {
-	content: "+";
-}
-
-.theme-admonition-warning [class*="admonitionIcon"]::before,
-.theme-admonition-caution [class*="admonitionIcon"]::before {
-	content: "!";
-}
-
-.theme-admonition-danger [class*="admonitionIcon"]::before {
-	content: "x";
 }
 
 .alert p:last-child {
