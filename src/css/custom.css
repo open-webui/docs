@@ -297,6 +297,28 @@ blockquote {
 	color: #999;
 }
 
+/* ─── Admonitions ─── */
+.alert {
+	background: transparent;
+	border-width: 0 0 0 1px;
+	border-radius: 0;
+	box-shadow: none;
+	padding: 0.85rem 0 0.85rem 1rem;
+}
+
+.alert .admonition-heading,
+.alert [class*="admonitionHeading"] {
+	font-family: "IBM Plex Mono", monospace;
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.alert p:last-child {
+	margin-bottom: 0;
+}
+
 [data-theme="dark"] .table-of-contents__left-border {
 	border-left-color: #101010;
 }
