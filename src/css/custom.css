@@ -546,8 +546,10 @@ article p a {
 	display: table;
 	width: 100%;
 	min-width: 100%;
+	max-width: 100%;
 	border-collapse: separate;
 	border-spacing: 0;
+	table-layout: fixed;
 	border-width: 1px 0 !important;
 	border-style: solid;
 	font-size: 0.92rem;
@@ -560,6 +562,13 @@ article p a {
 
 [data-theme="dark"] .markdown table {
 	border-color: rgb(255 255 255 / 14%);
+}
+
+.markdown details > table {
+	width: calc(100% - 3rem);
+	min-width: 0;
+	margin-right: auto;
+	margin-left: auto;
 }
 
 .markdown thead,
@@ -635,7 +644,9 @@ article p a {
 
 .markdown td code,
 .markdown th code {
-	white-space: nowrap;
+	overflow-wrap: anywhere;
+	white-space: normal;
+	word-break: break-word;
 }
 
 div.special_table + table {
