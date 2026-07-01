@@ -6,7 +6,7 @@ title: "Open Terminal"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# ⚡ Open Terminal
+# Open Terminal
 
 <ThemedImage
   alt="Open Terminal: the Open WebUI core driving a real terminal session in a loop, running commands and reading the output"

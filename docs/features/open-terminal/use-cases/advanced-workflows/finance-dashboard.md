@@ -3,7 +3,7 @@ sidebar_position: 6
 title: "Finance Dashboard"
 ---
 
-# 💰 Personal Finance Dashboard
+# Personal Finance Dashboard
 
 Upload bank statements and get a spending analysis with charts.
 

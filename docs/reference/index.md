@@ -1,6 +1,6 @@
 ---
 sidebar_position: 150
-title: "📖 Reference"
+title: "Reference"
 ---
 
 # Reference

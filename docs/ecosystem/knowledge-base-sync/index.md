@@ -7,7 +7,7 @@ slug: /ecosystem/knowledge-base-sync
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 🔄 Knowledge Base Sync (oikb)
+# Knowledge Base Sync (oikb)
 
 <ThemedImage
   alt="Knowledge Base Sync: many different source connectors flowing through the oikb sync hub into Open WebUI Knowledge Bases"

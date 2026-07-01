@@ -3,7 +3,7 @@ sidebar_position: 4
 title: "Email Processing"
 ---
 
-# 📧 Process a Folder of Emails
+# Process a Folder of Emails
 
 Drop a batch of `.eml` files and get a structured spreadsheet with action items and deadlines.
 

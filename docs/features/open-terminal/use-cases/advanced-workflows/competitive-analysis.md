@@ -3,7 +3,7 @@ sidebar_position: 8
 title: "Competitive Analysis"
 ---
 
-# 🌐 Competitive Analysis
+# Competitive Analysis
 
 Scrape competitor pricing pages and build a comparison.
 

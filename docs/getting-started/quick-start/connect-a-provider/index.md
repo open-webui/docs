@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Connect a Provider"
 ---
 
-# 🔌 Connect a Provider
+# Connect a Provider
 
 **Connect Open WebUI to your model provider and start chatting in minutes.**
 

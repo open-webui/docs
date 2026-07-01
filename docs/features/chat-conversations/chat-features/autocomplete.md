@@ -3,7 +3,7 @@ sidebar_position: 5
 title: "Autocomplete"
 ---
 
-# ✨ Autocomplete
+# Autocomplete
 
 Open WebUI offers an **AI-powered Autocomplete** feature that suggests text completions in real-time as you type your prompt. It acts like a "Copilot" for your chat input, helping you craft prompts faster using your configured task model.
 

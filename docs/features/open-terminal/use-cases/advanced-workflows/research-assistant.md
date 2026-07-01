@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "Research Assistant"
 ---
 
-# 🔍 Research and Summarize Any Topic
+# Research and Summarize Any Topic
 
 Give the AI a question, and it gathers information from the web, organizes it, and writes a structured briefing.
 

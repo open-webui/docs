@@ -3,7 +3,7 @@ sidebar_position: 500
 title: "API Keys"
 ---
 
-# 🔑 API Keys
+# API Keys
 
 **Programmatic access to Open WebUI, for scripts, bots, and integrations.**
 

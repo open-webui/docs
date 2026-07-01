@@ -3,7 +3,7 @@ sidebar_position: 0
 title: "Connect an Agent"
 ---
 
-# 🤖 Connect an Agent
+# Connect an Agent
 
 **Use Open WebUI as the chat frontend for autonomous AI agents.**
 

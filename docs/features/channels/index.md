@@ -6,7 +6,7 @@ title: "Channels"
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 💬 Channels
+# Channels
 
 <ThemedImage
   alt="Channels: a shared #product-launch channel where people and AI models talk in one timeline, summoned with @model mentions"

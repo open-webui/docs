@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: "📦 Archived Chats"
+title: "Archived Chats"
 ---
 
 Open WebUI allows you to archive conversations to declutter your sidebar while preserving them for future reference. The **Archived Chats** dashboard lets you manage all your archived conversations in one place.

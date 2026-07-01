@@ -6,7 +6,7 @@ sidebar_position: 1
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# 🖥️ Open WebUI Computer
+# Open WebUI Computer
 
 <ThemedImage
   alt="Open WebUI Computer workspace running on a desktop screen and a phone, the same session across devices, with optional AI"

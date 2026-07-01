@@ -3,7 +3,7 @@ sidebar_position: 3
 title: "Python Code Execution"
 ---
 
-# 🐍 Python Code Execution
+# Python Code Execution
 
 ## Overview
 

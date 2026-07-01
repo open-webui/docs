@@ -3,7 +3,7 @@ sidebar_position: 10
 title: "Code Review"
 ---
 
-# 🔍 Automated Code Review
+# Automated Code Review
 
 Point the AI at a pull request, a branch diff, or a file, and get a detailed code review: security issues, performance problems, style violations, and suggestions for improvement.
 
