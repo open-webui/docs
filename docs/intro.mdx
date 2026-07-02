@@ -7,14 +7,23 @@ hide_title: true
 
  
 import { SponsorList } from "@site/src/components/SponsorList";
+import ThemedImage from '@theme/ThemedImage';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Open WebUI
 
 **Open WebUI is an [extensible](https://docs.openwebui.com/features/extensibility/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It supports **Ollama** and **OpenAI-compatible APIs**, making it a powerful, provider-agnostic solution for both local and cloud-based models.
 
-![Open WebUI Demo](/images/demo.png)
+<ThemedImage
+  alt="Open WebUI: a self-hosted AI platform connecting local and cloud models with tools and knowledge"
+  sources={{
+    light: useBaseUrl('/images/banners/home-light.svg'),
+    dark: useBaseUrl('/images/banners/home-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
@@ -32,6 +41,12 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
+
+<img
+  alt="Open WebUI chat screen after startup"
+  src={useBaseUrl('/images/demo.png')}
+  style={{ width: '100%', maxWidth: 760, margin: '0.75rem 0 1rem' }}
+/>
 
 For GPU support, Docker Compose, and more → [Full Docker guide](/getting-started/quick-start)
 

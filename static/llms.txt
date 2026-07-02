@@ -5,8 +5,16 @@ Open WebUI documentation is available as regular HTML and raw Markdown.
 Start at https://docs.openwebui.com/sitemap.xml to discover pages.
 For any docs page, append `.md` for Markdown or `.txt` for plain text.
 
+Use https://docs.openwebui.com/search?q=YOUR_QUERY for canonical docs search.
+The search endpoint uses Open WebUI's deterministic docs ranking:
+1. Split the query into lowercase keywords.
+2. Search URL paths and Markdown content separately.
+3. Rank by number of distinct keyword hits; break ties with shorter paths.
+4. Prefer path matches first, then content matches, deduplicated.
+
 Example:
 - https://docs.openwebui.com/features/extensibility/mcp
 - https://docs.openwebui.com/features/extensibility/mcp.md
+- https://docs.openwebui.com/search?q=mcp%20notion
 
 Use canonical HTML URLs when citing sources.
