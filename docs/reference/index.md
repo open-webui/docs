@@ -3,7 +3,19 @@ sidebar_position: 150
 title: "Reference"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Reference
+
+<ThemedImage
+  alt="Open WebUI Reference: canonical technical map for environment variables, API endpoints, HTTPS, monitoring, and network diagrams"
+  sources={{
+    light: useBaseUrl('/images/banners/reference-light.svg'),
+    dark: useBaseUrl('/images/banners/reference-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **The technical details behind every knob, endpoint, and configuration option.**
 

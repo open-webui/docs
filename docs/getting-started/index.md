@@ -3,7 +3,19 @@ sidebar_position: 100
 title: "Getting Started"
 ---
 
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Getting Started with Open WebUI
+
+<ThemedImage
+  alt="Getting Started with Open WebUI: install, connect a provider, start chatting, then expand into app install, agents, sharing, and updates"
+  sources={{
+    light: useBaseUrl('/images/banners/getting-started-light.svg'),
+    dark: useBaseUrl('/images/banners/getting-started-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
 
 **From zero to your first AI conversation in under five minutes.**
 
