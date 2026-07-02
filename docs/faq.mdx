@@ -6,13 +6,13 @@ title: "FAQ"
 
 ### Q: How can I get support or ask for help?
 
-**A:** Community support for Open WebUI is provided by **volunteers** who generously contribute their time and expertise. Because of this, responses are best-effort and may not always be immediate or personalized. For organizations that need dedicated, guaranteed support, check out our **[Enterprise offerings](https://docs.openwebui.com/enterprise)**.
+**A:** Community support for Open WebUI happens in public channels with help from contributors, volunteers, and members of the core team. These channels are best for shared troubleshooting, reproducible reports, and answers that benefit the wider project. For organizations that need dedicated, guaranteed support, check out our **[Enterprise offerings](https://docs.openwebui.com/enterprise)**.
 
 **To get the best help:**
 1. **Search first.** Check these docs, [Discord](https://discord.gg/5rJgQTnV4s), [Reddit](https://www.reddit.com/r/OpenWebUI/), [GitHub Discussions](https://github.com/open-webui/open-webui/discussions), and [Issues](https://github.com/open-webui/open-webui/issues). Your question may already be answered.
 2. **Try the Discord bot.** In our [Discord server](https://discord.gg/5rJgQTnV4s)'s **#questions** channel, we have an experimental bot that has access to all issues, all discussions, and the entire documentation. Simply ping the bot with your question in the same message, wait a few seconds, and it will answer you. As our documentation improves, so does the bot.
 3. **Provide details.** When asking for help, include: your Open WebUI version, deployment method (Docker/pip), model provider and model name, relevant settings (screenshots of the Admin Panel section are ideal), and steps to reproduce the issue.
-4. **Be kind.** Contributors volunteer their limited time, so respectful, well-prepared questions go a long way. Please review our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)** before participating.
+4. **Be kind.** Respectful, well-prepared questions help contributors and core team members respond effectively. Please review our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)** before participating.
 
 **Where to ask:**
 - 🤖 **Quick Answers**: [Discord #questions channel](https://discord.gg/5rJgQTnV4s). Try the bot first, it can answer most Open WebUI questions
@@ -48,7 +48,7 @@ For more details on enterprise solutions and branding customizations, [click her
 
 Open WebUI intentionally does **not** ship a built-in context trimmer. Every model has a different tokenizer and a different context window, and every deployment wants a different truncation policy (by tokens, by turns, by message count, file-attachments-first, summarize-and-replace, per-model budgets, and so on). There is no single policy that is correct for every user, so we expose the hook instead of choosing one for you.
 
-Context management is done with [filter Functions](/features/extensibility/plugin/functions/filter): `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.). Many community-maintained context filters are already available one-click on [openwebui.com](https://openwebui.com/): browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel → Functions** and edit it.
+Context management is done with [filter Functions](/features/extensibility/plugin/functions/filter): `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.). Many published context filters are already available one-click on [openwebui.com](https://openwebui.com/): browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel → Functions** and edit it.
 
 For the full write-up with examples, see [Context Window / Prompt Too Long](/troubleshooting/context-window).
 
@@ -280,7 +280,7 @@ Adding integration code is the easy part. **Maintaining it forever** is where th
 - Every integration requires ongoing testing across multiple scenarios
 - Bug reports flood in for each provider whenever they make changes
 
-Contributors are **volunteers with full-time jobs**. Asking them to maintain 10+ provider integrations indefinitely is not sustainable.
+Open WebUI is maintained by a small core team. Owning 10+ provider integrations indefinitely would pull core engineering focus away from platform stability, release quality, and the features used across all providers.
 
 #### 3. Technical Complexity
 
