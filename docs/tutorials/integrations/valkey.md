@@ -19,7 +19,7 @@ In short, this is the **same setup as the [Redis tutorial](/tutorials/integratio
 
 :::info Two different "Valkey" features, do not mix them up
 - **Valkey as the Redis layer (this page)** is the cache, websocket and session store. It is configured with **`REDIS_URL`** and the `redis://` scheme, because Open WebUI uses the Redis protocol.
-- **Valkey as a vector database** is a separate, community-maintained [vector store](/reference/env-configuration#valkey) (`VECTOR_DB=valkey`, the `valkey-search` module). It is configured with **`VALKEY_URL`** and the `valkey://` scheme.
+- **Valkey as a vector database** is a separate, non-core [vector store](/reference/env-configuration#valkey) (`VECTOR_DB=valkey`, the `valkey-search` module). It is configured with **`VALKEY_URL`** and the `valkey://` scheme.
 
 They are unrelated and you can run either, both, or neither. This tutorial is about the first one.
 :::
