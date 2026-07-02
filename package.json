@@ -6,6 +6,8 @@
 		"docusaurus": "docusaurus",
 		"start": "docusaurus start",
 		"build": "docusaurus build",
+		"postbuild": "node scripts/generate-raw-docs.mjs",
+		"raw-docs": "node scripts/generate-raw-docs.mjs",
 		"swizzle": "docusaurus swizzle",
 		"deploy": "docusaurus deploy",
 		"clear": "docusaurus clear",
