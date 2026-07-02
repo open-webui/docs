@@ -107,7 +107,7 @@ Attaching a workspace tool to a model does **not** bypass access control. When a
 :::danger Native is the default as of v0.10.0; "Legacy" (formerly "Default") is the unsupported opt-out
 **Native (Agentic) Mode is now the default.** As of **v0.10.0**, every chat and model that has not explicitly chosen a tool-calling mode runs **Native**, which relies on the model's built-in function-calling support. The old prompt-injection approach, previously called **Default**, is now renamed **Legacy**. It is the explicit opt-out and remains **unsupported**: no feature work, no bug fixes, no built-in system tools, and incompatible with modern Open WebUI features (Agentic Research, Interleaved Thinking, the built-in Memory/Notes/Knowledge/Channels tools, and web-search/image-gen/code-interpreter tool injection).
 
-**Breaking change:** if any of your models depended on the old prompt-based behavior, they now run Native unless you switch them back to **Legacy**, per chat, per model, or globally in your default model parameters. If a model struggles with Native, the right fix is a stronger tool-calling model, not falling back to Legacy.
+**Breaking change:** if any of your models depended on the old prompt-based behavior, they now run Native unless you switch them back to **Legacy**, [per chat, per model, or globally in your default model parameters](#enable-legacy-for-all-models). If a model struggles with Native, the right fix is a stronger tool-calling model, not falling back to Legacy.
 :::
 
 Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode** (formerly **Default**), the prompt-based opt-out kept only for backward compatibility.
@@ -127,6 +127,27 @@ Why it is legacy:
 - **Cannot access built-in system tools.** Memory, Notes, Knowledge, Channels, Agentic Research, Interleaved Thinking, and the tool-injected Web Search / Image Generation / Code Interpreter features are **Native-only**.
 - **Does not support modern capabilities.** Every new feature shipped since 2024 targets Native Mode.
 
+#### How to switch all models to Legacy {#enable-legacy-for-all-models}
+
+Since v0.10.0 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
+
+1.  **Every model at once (global default, fastest)**:
+    *   Navigate to **Admin Panel → Settings → Models**.
+    *   Click the **Settings** button at the **top right** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
+    *   Under **Model Parameters**, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
+2.  **Per-Model Override**: edit a specific model in **Admin Panel → Settings → Models** and set **Function Calling** to `Legacy` under **Model Parameters**. Overrides the global default for that model only.
+3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
+
+:::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
+To move an entire instance to Legacy through env vars, set the same global default with:
+
+```yaml
+DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
+```
+
+`function_calling` is a key inside `DEFAULT_MODEL_PARAMS`; there is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable. The only value that changes behavior is `"legacy"`; leaving it unset (or `"native"`) keeps the default, Native.
+:::
+
 ### 🟢 Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** as of v0.10.0 and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
@@ -145,11 +166,11 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 #### How to Enable Native Mode (Agentic Mode)
 Native Mode is the **default** as of v0.10.0, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
-1.  **Universal Default for Every Model (Fastest, Recommended)**:
+1.  **Pin Native for Every Model (optional, since Native is already the default)**:
     *   Navigate to **Admin Panel → Settings → Models**.
     *   Click the **Settings** button at the **top right** of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
-    *   Save. All existing models that haven't explicitly set their own value, and all models you add later, inherit `Native`. You do **not** need to edit them one by one.
+    *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
     *   In **Admin Panel → Settings → Models**, pick a specific model and click its edit button.
     *   Under **Model Parameters**, set **Function Calling** to `Native`. This value overrides the global default for that model only.
@@ -158,18 +179,18 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
     *   Inside a chat, open **Chat Controls** (right sidebar).
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
-:::tip Set Function Calling Globally, Once, For All Models
-Tired of switching every model to Native one at a time? The **global model parameters** panel (the **Settings** button at the top right of **Admin Panel → Settings → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**. Values set there become the default for every existing model that hasn't overridden them *and* every model you add later. Set `Function Calling = Native` there, save, done.
+:::tip Set any parameter globally, once, for all models
+The **global model parameters** panel (the **Settings** button at the top right of **Admin Panel → Settings → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
-The UI is the recommended route, but if you configure your instance entirely through env vars you can set the same global default with `DEFAULT_MODEL_PARAMS`:
+If you configure your instance entirely through env vars, `DEFAULT_MODEL_PARAMS` sets the same global defaults. `function_calling` is a key inside it; there is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable. Because Native is the default, the only value worth setting here is `"legacy"` (to move the whole instance to Legacy, per [above](#enable-legacy-for-all-models)):
 
 ```yaml
-DEFAULT_MODEL_PARAMS: '{"function_calling": "native"}'
+DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 ```
 
-This is equivalent to setting **Function Calling = Native** in the global model parameters panel above: it becomes the default for every model that hasn't overridden it. There is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable; `function_calling` is a key inside `DEFAULT_MODEL_PARAMS`.
+Leaving `function_calling` unset (or `"native"`) keeps the default, Native.
 :::
 
 ![Chat Controls](/images/features/plugin/tools/chat-controls.png)
