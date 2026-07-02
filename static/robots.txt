@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://docs.openwebui.com/sitemap.xml
+
+# AI agents: see https://docs.openwebui.com/llms.txt for raw Markdown access.

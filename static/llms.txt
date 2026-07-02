@@ -1,0 +1,12 @@
+# Open WebUI Docs
+
+Open WebUI documentation is available as regular HTML and raw Markdown.
+
+Start at https://docs.openwebui.com/sitemap.xml to discover pages.
+For any docs page, append `.md` for Markdown or `.txt` for plain text.
+
+Example:
+- https://docs.openwebui.com/features/extensibility/mcp
+- https://docs.openwebui.com/features/extensibility/mcp.md
+
+Use canonical HTML URLs when citing sources.
