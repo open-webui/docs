@@ -32,3 +32,6 @@ jobs:
 
       - name: Test build
         run: npm run build
+
+      - name: Test docs search
+        run: npm run test:docs-search
