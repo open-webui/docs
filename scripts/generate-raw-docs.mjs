@@ -65,7 +65,7 @@ function routeForDoc(filePath) {
 	let route = filePath
 		.replace(
 			new RegExp(
-				`^${DOCS_DIR.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${path.sep}`
+				`^${(DOCS_DIR + path.sep).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`
 			),
 			""
 		)
