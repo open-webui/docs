@@ -3,7 +3,7 @@ main = "src/index.mjs"
 compatibility_date = "2026-07-02"
 
 routes = [
-  { pattern = "docs.openwebui.com/search", zone_name = "openwebui.com" }
+  { pattern = "docs.openwebui.com/api/search", zone_name = "openwebui.com" }
 ]
 
 [vars]

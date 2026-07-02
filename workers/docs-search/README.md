@@ -1,6 +1,9 @@
 # Open WebUI Docs Search Worker
 
-This Worker serves `https://docs.openwebui.com/search?q=...`.
+This Worker serves `https://docs.openwebui.com/api/search?q=...`.
+
+Do not route `/search*` to this Worker. Docusaurus uses `/search-doc-*.json`
+for the built-in search index.
 
 Deploy it from the Cloudflare dashboard using Workers Builds:
 
@@ -8,8 +11,8 @@ Deploy it from the Cloudflare dashboard using Workers Builds:
 2. Connect this GitHub repository under **Settings > Builds**.
 3. Set the Worker root directory to `workers/docs-search`.
 4. Use the production branch `main`.
-5. Use `npm install` as the build command.
-6. Use `npx wrangler deploy` as the deploy command.
+5. Leave the build command empty, or use `echo ready` if Cloudflare requires one.
+6. Use `npx wrangler@4 deploy --config wrangler.toml` as the deploy command.
 7. Save and deploy.
 
 No GitHub Cloudflare secrets are needed. The Worker fetches the static corpus

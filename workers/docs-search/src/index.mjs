@@ -62,7 +62,7 @@ export default {
 			return json(
 				{
 					error: "Missing query",
-					example: "https://docs.openwebui.com/search?q=notion%20mcp",
+					example: "https://docs.openwebui.com/api/search?q=notion%20mcp",
 				},
 				{ status: 400 }
 			);
