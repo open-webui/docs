@@ -10,13 +10,14 @@ You have installed Open WebUI, connected a provider, and had your first conversa
 Work through in order, or jump to the section you need:
 
 1. [**Plugins**](#plugins)
-2. [**Task models**](#task-models)
-3. [**Context management**](#context-management)
-4. [**Basic RAG**](#basic-rag)
-5. [**Web Search**](#web-search)
-6. [**Open Terminal**](#open-terminal)
-7. [**Open WebUI Computer**](#open-webui-computer)
-8. [**Troubleshooting**](#troubleshooting)
+2. [**Tool Calling**](#tool-calling-native-vs-legacy)
+3. [**Task models**](#task-models)
+4. [**Context management**](#context-management)
+5. [**Basic RAG**](#basic-rag)
+6. [**Web Search**](#web-search)
+7. [**Open Terminal**](#open-terminal)
+8. [**Open WebUI Computer**](#open-webui-computer)
+9. [**Troubleshooting**](#troubleshooting)
 
 :::tip Deploying for a team?
 If you are setting up Open WebUI for multiple users, also read the [**Scaling Open WebUI**](/getting-started/advanced-topics/scaling) guide. It covers infrastructure decisions (PostgreSQL, Redis, external vector databases, shared storage) that are separate from the feature-level essentials on this page. The two guides are additive: work through the essentials here for day-to-day usage, and the scaling guide for multi-user infrastructure.
@@ -63,6 +64,20 @@ Reference reading:
 - [Tools reference](/features/extensibility/plugin/tools)
 - [Functions reference (Pipes/Filters/Actions)](/features/extensibility/plugin/functions)
 - [MCP tool servers](/features/extensibility/mcp)
+
+---
+
+## Tool Calling (Native vs Legacy)
+
+Almost everything else on this page (Web Search, Knowledge retrieval, Memory, Code Interpreter, Open Terminal) reaches the model as a **tool** it can call mid-answer. One instance-wide switch decides *how* the model calls those tools, and it changed in v0.10.0.
+
+**Native is now the default.** Every model that has not explicitly picked a mode uses **Native (Agentic) Mode**, which relies on the model's own built-in function-calling. This is what lets the model decide on its own when to search the web, look something up in a knowledge base or save a memory, instead of you toggling each tool by hand. It is faster, keeps the KV cache warm and is the only mode that unlocks the built-in system tools (Memory, Notes, Knowledge, Channels, Agentic Research).
+
+**Legacy is the opt-out.** The old prompt-injection approach (previously called "Default") is renamed **Legacy** and is unsupported. Any model that depended on the old behavior now runs Native unless you switch it back. If a model struggles with Native, the right fix is a stronger tool-calling model, not Legacy. For reliable tool use, prefer frontier models like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash or MiniMax M2.5.
+
+More detail, including how to switch one model or your whole instance to Legacy:
+- [Tool Calling Modes: Native vs. Legacy](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)
+- [How to switch all models to Legacy](/features/extensibility/plugin/tools#enable-legacy-for-all-models)
 
 ---
 
