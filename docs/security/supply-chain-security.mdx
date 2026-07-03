@@ -52,13 +52,13 @@ Scanners report a maintainer count taken from package metadata, often "1 maintai
 
 ## Code execution and sandboxing
 
-The most common specific question from evaluators is whether Open WebUI executes code "without enforced sandboxing by default". The default is sandboxed:
+Evaluators often ask whether Open WebUI executes code "without enforced sandboxing by default". The point that matters is that server-side code execution is gated behind explicit administrator action, not exposed to arbitrary users:
 
-- **The default code-execution engine is Pyodide**, which runs client-side in the browser's WebAssembly sandbox. No server-side code execution happens by default.
-- **Server-side execution engines (such as Jupyter) are opt-in** and administrator-configured.
+- **Server-side execution engines (such as Jupyter) are opt-in** and administrator-configured. They are not wired to a server runtime by default.
 - **Authoring server-side Tools and Functions is treated as equivalent to granting server code execution.** It is restricted by the `workspace.tools` permission, which is **disabled by default** for non-administrators, and granting it is documented as equivalent to giving that user shell access to the server.
+- **Isolating the execution environment is a documented deployment responsibility.** Where an administrator enables a server-side execution engine, running it within appropriate container, network and filesystem boundaries is covered in our [hardening guidance](/getting-started/advanced-topics/hardening).
 
-This is intentional, layered design: a sandboxed default, with powerful server-side capabilities gated behind explicit administrator action rather than available to every user. See the [Tools and Functions security model](/features/extensibility/plugin/tools) and the [Security Policy](./security-policy) for the full model.
+This is intentional, layered design: server-side code execution is gated behind explicit administrator configuration and an off-by-default permission, rather than available to every user. See the [Tools and Functions security model](/features/extensibility/plugin/tools) and the [Security Policy](./security-policy) for the full model.
 
 ## For enterprise evaluators
 

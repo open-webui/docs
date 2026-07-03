@@ -96,11 +96,11 @@ Automated supply-chain scanners (for example socket.dev) periodically raise beha
 
 ### Code Execution & Sandboxing
 
-Open WebUI's code-execution features are sandboxed by default and gated behind explicit administrator action:
+Server-side code execution in Open WebUI is gated behind explicit administrator action, not exposed to arbitrary users:
 
-* **The default code interpreter runs client-side** in the browser's WebAssembly sandbox (Pyodide). No server-side code execution happens by default.
-* **Server-side execution engines are opt-in** and administrator-configured.
+* **Server-side execution engines (such as Jupyter) are opt-in** and administrator-configured. They are not wired to a server runtime by default.
 * **Authoring server-side Tools and Functions is treated as equivalent to granting server code execution.** It is restricted by the `workspace.tools` permission, disabled by default for non-administrators and documented as equivalent to giving that user shell access to the server.
+* **Isolating the execution environment is a documented deployment responsibility.** Where an administrator enables a server-side execution engine, running it within appropriate container, network and filesystem boundaries is covered in our [hardening guidance](/getting-started/advanced-topics/hardening).
 
 See the [Tools and Functions security model](/features/extensibility/plugin/tools) for the full model.
 
