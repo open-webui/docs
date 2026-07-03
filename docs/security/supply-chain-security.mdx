@@ -1,0 +1,85 @@
+---
+sidebar_position: 2
+title: "Supply Chain and Security Scanners"
+---
+
+# Supply Chain and Security Scanners
+
+Automated software-composition and supply-chain scanners (for example socket.dev) periodically flag the Open WebUI PyPI packages and container images with risk indicators. This page is the Open WebUI team's official position on those indicators, so that security teams evaluating Open WebUI can interpret them accurately.
+
+:::info The short version
+None of the indicators these scanners raise against Open WebUI correspond to a named vulnerability, a CVE or confirmed malicious code. Most are automated behavioral heuristics that flag capabilities the software has by design. Some go further and publish alarming, unsubstantiated claims, most notably a "potential malware" banner, without identifying any specific file, function or line and without providing any evidence for the claim. No malicious code has been identified in Open WebUI. Because every published artifact is built from the public source in [open-webui/open-webui](https://github.com/open-webui/open-webui) and is reproducible from it, every one of these claims can be checked against the code directly.
+:::
+
+## What these scanners measure
+
+Supply-chain scanners score a package on automated signals: which language features it uses, which system capabilities it can reach, what its dependencies look like and pattern-based classifiers. These signals describe what a package is *capable* of, not whether it *misuses* anything. For a self-hosted AI platform, the capabilities that score highest (running code, reaching the network, invoking a shell) are precisely the product's core, documented features. A high signal count therefore reflects what the software does, not a defect in it.
+
+The headline numeric scores a scanner shows, for example a supply-chain or license score out of 100, are aggregates of these same automated signals, so a score below 100 reflects the heuristic flags described below rather than a count of confirmed defects.
+
+We review each new flag, but a flag is a starting point for analysis, not a finding.
+
+## The indicators, category by category
+
+### Behavioral capability flags: "uses eval", "shell access", "network access"
+
+These describe intended, documented functionality:
+
+- **Network access** is how Open WebUI talks to model providers and external tools.
+- **Code execution ("eval") and shell access** are the code interpreter and the Tools and Functions system, which execute code by design.
+
+These capabilities are governed by administrator configuration and role-based permissions (see [Code execution and sandboxing](#code-execution-and-sandboxing) below). The scanner flags the capability, not any misuse of it, so none of these is a vulnerability.
+
+### Unsubstantiated classifications: "potential malware", "AI-detected security risk", "potential vulnerability"
+
+These are the indicators most likely to alarm a reviewer, and they are the least substantiated:
+
+- **"Potential malware"** is asserted with no identification of any specific file, function or line, and no supporting evidence attached. No malicious code has been identified in Open WebUI. Publishing a "malware detected" banner without naming the code or showing evidence is, in our view, materially misleading, especially to enterprise reviewers who reasonably read such a banner as a confirmed finding rather than an automated guess.
+- **"AI-detected security risk"** is a machine-generated classification (the software "may contain potential security issues"), driven by the behavioral signals above. It names no specific code and confirms nothing.
+- **"Potential vulnerability"** is, by the scanner's own wording, an item *pending further analysis and confirmation*. That is an open queue entry, not a finding.
+
+Because Open WebUI's published packages are built entirely from the public source, any of these can be verified against the code, and we request re-review with the scanning vendor where an unsubstantiated banner appears.
+
+### Dependency alerts and "obfuscated code"
+
+These originate in transitive dependencies and in the pre-built, minified front-end assets bundled in the distribution. Minified JavaScript is routinely classified as "obfuscated" by scanners because it is not human-readable, but it is ordinary compiled front-end code, not hand-obfuscated logic in Open WebUI's source. Dependency alerts track the wider ecosystem and are handled through routine dependency maintenance.
+
+Container-image CVEs are a separate matter: those originate in the base image, are addressed by rebuilding on updated bases and are not part of the PyPI package scan discussed here.
+
+### License score and "N% match" license detection
+
+Scanners also assign a license "score" (for example 80) and report fuzzy "N% match" results against standard licenses, such as "80% match: BSD-3-Clause" or "80% match: MIT". Open WebUI is published under the [Open WebUI License](/license), a BSD-3-Clause license with an added branding-protection clause introduced in v0.6.6 (the codebase up to and including v0.6.5 remains plain BSD-3-Clause). Because that added clause means the license text is not a byte-for-byte copy of a stock SPDX BSD-3-Clause or MIT template, license scanners report a partial match and reduce their license score accordingly. This is a detection artifact of a deliberate, published, valid license, not a missing license, a license conflict or a compliance risk. The full terms are in the repository's LICENSE file and are explained on our [License page](/license).
+
+### Maintainer count
+
+Scanners report a maintainer count taken from package metadata, often "1 maintainer" for Open WebUI. That figure is the number of accounts with publish rights on the PyPI package, a single release account, not the number of people who develop the project. Open WebUI is built by a core team and a broad base of external contributors, visible in the repository's [contributor history](https://github.com/open-webui/open-webui/graphs/contributors) and on our [Team page](/team). Publishing releases from one account is a common, deliberate packaging practice, not a maintenance bus-factor of one.
+
+## Code execution and sandboxing
+
+The most common specific question from evaluators is whether Open WebUI executes code "without enforced sandboxing by default". The default is sandboxed:
+
+- **The default code-execution engine is Pyodide**, which runs client-side in the browser's WebAssembly sandbox. No server-side code execution happens by default.
+- **Server-side execution engines (such as Jupyter) are opt-in** and administrator-configured.
+- **Authoring server-side Tools and Functions is treated as equivalent to granting server code execution.** It is restricted by the `workspace.tools` permission, which is **disabled by default** for non-administrators, and granting it is documented as equivalent to giving that user shell access to the server.
+
+This is intentional, layered design: a sandboxed default, with powerful server-side capabilities gated behind explicit administrator action rather than available to every user. See the [Tools and Functions security model](/features/extensibility/plugin/tools) and the [Security Policy](./security-policy) for the full model.
+
+## For enterprise evaluators
+
+Open WebUI is actively maintained by a core team that runs a defined, hands-on security process rather than relying on automated scoring:
+
+- **Every report is reviewed by a person.** Incoming security reports are triaged and validated by hand against the actual code. Nothing is auto-closed or auto-classified.
+- **Valid findings are fixed and disclosed properly.** We patch confirmed issues as quickly as we reasonably can, request CVE identifiers for valid findings and publish the outcome openly as a GitHub Security Advisory once a fix ships.
+- **The record is public and auditable.** Our full history of accepted, fixed and published issues is visible on the [Open WebUI Security Advisories page](https://github.com/open-webui/open-webui/security/advisories). Anyone can see what was found, how it was resolved and which release contains the fix.
+- **Invalid or mischaracterized claims are answered, not ignored.** Where an external CVE misrepresents the software or our threat model, we publish a reasoned [Vendor Disposition](./vendor-dispositions) rather than leaving the public record unchallenged.
+- **One authoritative channel.** All vulnerability handling runs through GitHub Security Advisories, with the team owning validation, remediation and disclosure timing.
+
+Taken together, that is a materially stronger signal than an automated risk score: a public, auditable trail of found, fixed and published issues, produced by a process a person runs end to end. We are glad to support your evaluation directly.
+
+Useful starting points:
+
+- [Security Policy](./security-policy): the reporting process, threat model and what is and is not treated as a vulnerability.
+- [Vendor Dispositions](./vendor-dispositions): our formal assessments of specific externally reported CVEs.
+- [Tools and Functions](/features/extensibility/plugin/tools): the code-execution and permission model.
+
+If you believe a scanner flag corresponds to a genuine security issue rather than a behavioral heuristic, please report it through [GitHub Security Advisories](https://github.com/open-webui/open-webui/security) so it can be validated and, if confirmed, published.
