@@ -100,7 +100,7 @@ Server-side code execution in Open WebUI is gated behind explicit administrator 
 
 * **Server-side execution engines (such as Jupyter) are opt-in** and administrator-configured. They are not wired to a server runtime by default.
 * **Authoring server-side Tools and Functions is treated as equivalent to granting server code execution.** It is restricted by the `workspace.tools` permission, disabled by default for non-administrators and documented as equivalent to giving that user shell access to the server.
-* **Isolating the execution environment is a documented deployment responsibility.** Where an administrator enables a server-side execution engine, running it within appropriate container, network and filesystem boundaries is covered in our [hardening guidance](/getting-started/advanced-topics/hardening).
+* **For production code and shell execution, use the Terminals orchestrator.** Rather than exposing a shared server runtime, the [Terminals orchestrator](/features/open-terminal/terminals) runs execution in per-session, container-isolated environments with configurable [security-context and resource policies](/features/open-terminal/terminals/orchestration/policies). This is the recommended model for enterprise deployments; general isolation guidance for other engines is in our [hardening documentation](/getting-started/advanced-topics/hardening).
 
 See the [Tools and Functions security model](/features/extensibility/plugin/tools) for the full model.
 
