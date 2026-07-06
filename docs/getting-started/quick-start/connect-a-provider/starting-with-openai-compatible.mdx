@@ -49,6 +49,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
+| Eden AI | Yes, but returns 700+ models | Recommend adding a filtered allowlist |
 
 **How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error.
 
@@ -137,6 +138,17 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **URL** | `https://api.groq.com/openai/v1` |
   | **API Key** | Your API key from [console.groq.com](https://console.groq.com/) |
   | **Model IDs** | Auto-detected (e.g., `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b`) |
+
+  </TabItem>
+  <TabItem value="edenai" label="Eden AI">
+
+  **Eden AI** is an EU-based, GDPR-compliant unified API that exposes an OpenAI-compatible endpoint, giving access to 700+ models from many providers (OpenAI, Anthropic, Mistral, Google, Cohere, and more) through a single API key, with EU data residency.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.edenai.run/v3` |
+  | **API Key** | Your API key from [app.edenai.run](https://app.edenai.run/) |
+  | **Model IDs** | `/models` works but returns 700+ models — recommend adding a filtered allowlist (e.g., `openai/gpt-4o-mini`, `mistral/mistral-large-latest`). Models use the `provider/model` format. |
 
   </TabItem>
   <TabItem value="perplexity" label="Perplexity">
