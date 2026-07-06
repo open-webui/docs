@@ -1,0 +1,127 @@
+---
+sidebar_position: 1.5
+title: "Sovereign AI Platform"
+description: "Learn how Open WebUI supports sovereign AI deployments with self-hosted infrastructure, data residency control, model choice, enterprise identity, and governed AI workflows."
+keywords:
+  [
+    "sovereign AI platform",
+    "sovereign AI",
+    "self-hosted AI platform",
+    "private AI platform",
+    "on-prem AI platform",
+    "air-gapped AI platform",
+    "AI data residency",
+    "enterprise AI governance"
+  ]
+---
+
+# Sovereign AI Platform
+
+Sovereign AI is the ability to decide where AI runs, what data it can reach, which model endpoints it can use, who can access it, and how the system is governed over time.
+
+For enterprise teams, the hard part is rarely a single checkbox. It is the set of operational boundaries around the whole AI workflow: prompts, files, knowledge, model calls, tools, logs, backups, user lifecycle, and administrator access.
+
+Open WebUI supports sovereign AI deployments by giving organizations a self-hosted AI workspace and control layer that can run inside infrastructure they operate. It is not a sovereign cloud provider. It is the application layer teams use to expose approved models, knowledge, tools, and workflows under their own identity, deployment, and governance controls.
+
+## What Sovereign AI Means in Practice
+
+Start by defining the boundaries your organization needs to control.
+
+| Boundary | Questions to answer | Open WebUI concern |
+| :--- | :--- | :--- |
+| Infrastructure | Where does the application run? Which region, cloud account, VPC, cluster, or data center owns it? | Deployment pattern, networking, storage, and high availability |
+| Data path | Where are prompts, uploaded files, knowledge indexes, logs, exports, and backups stored? | Database, object storage, vector database, logs, and backup policy |
+| Model boundary | Which model providers receive prompts and retrieved context? Can sensitive use cases stay on local or private endpoints? | Model connections, provider routing, and group-based access |
+| Identity | Which identity provider controls sign-in, MFA, user lifecycle, and group membership? | SSO, OIDC, LDAP, SCIM, roles, and groups |
+| Permissions | Who can upload files, create knowledge, use tools, create API keys, or access specific models? | RBAC, resource sharing, and feature permissions |
+| Operations | Who administers the instance, reads logs, manages backups, rotates secrets, and approves changes? | Admin settings, audit logging, operator access, and change control |
+
+If these boundaries are not explicit, an AI deployment can still leak control even when it is technically self-hosted. A model endpoint outside your approved data boundary, a shared database operator, or unrestricted file upload can matter as much as where the application itself runs.
+
+## Where Open WebUI Fits
+
+Open WebUI sits above infrastructure and model inference. Your organization still chooses the cloud, data center, Kubernetes platform, storage layer, database, model providers, and network controls.
+
+Open WebUI gives teams the governed workspace that lives inside that environment:
+
+- **A user-facing AI interface** for chat, files, knowledge, tools, and shared workflows.
+- **Model choice** across local models, private endpoints, approved hosted providers, and OpenAI-compatible gateways.
+- **Enterprise identity integration** through SSO, OIDC, LDAP, SCIM, roles, groups, and permissions.
+- **Operational control** over chat history, temporary chat, file upload, knowledge access, tools, API keys, audit logging, and administration.
+- **Deployment autonomy** across VMs, containers, Kubernetes, private cloud, on-premise, hybrid, and offline environments.
+
+Open WebUI does not make an environment sovereign by itself. It gives platform and security teams a self-hosted layer where AI usage can be exposed, restricted, reviewed, and operated according to the boundaries they choose.
+
+## What Teams Need to Evaluate
+
+Use this checklist before rolling AI access out to a broad user base.
+
+| Concern | What to decide | Where to start |
+| :--- | :--- | :--- |
+| Data residency | Which region, tenant, storage account, database, vector database, log sink, and backup system may hold AI data? | [Enterprise Security](/enterprise/security), [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption) |
+| Model provider exposure | Which prompts and retrieved context can be sent to hosted providers, and which must stay on private or local inference? | [Integration](/enterprise/integration), [Workspace Models](/features/workspace/models) |
+| Identity and lifecycle | Will users authenticate through SSO, OIDC, LDAP, or local accounts? How are groups provisioned and removed? | [Authentication & Access](/features/authentication-access), [SSO](/features/authentication-access/auth/sso), [SCIM](/features/authentication-access/auth/scim) |
+| Permissions | Which groups can use file upload, knowledge, tools, web search, API keys, direct connections, and specific models? | [RBAC](/features/authentication-access/rbac), [RBAC Permissions](/features/authentication-access/rbac/permissions) |
+| Knowledge and files | Which data classes can be uploaded, indexed, retained, shared, or deleted? | [Knowledge](/features/workspace/knowledge), [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption) |
+| Tool and code execution | Who is trusted to create tools, functions, or execution workflows? What sandboxing model is required? | [Enterprise Security](/enterprise/security#code-execution--sandboxing), [Hardening Open WebUI](/getting-started/advanced-topics/hardening) |
+| Logs and audit | Should logs stay metadata-only, or may request and response bodies enter the logging platform? | [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption), [Audit Log Level](/reference/env-configuration#audit_log_level) |
+| Operator access | Who can access the host, database, backups, application secrets, and admin settings? Do some teams need separate instances? | [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption#who-can-read-chat-data), [Deployment Options](/enterprise/deployment) |
+| Scale and resilience | Which backing services are required before moving beyond a single instance? | [Architecture & High Availability](/enterprise/architecture), [Deployment Options](/enterprise/deployment) |
+
+## Deployment Patterns
+
+Sovereign AI planning starts with the trust boundary. The right deployment pattern depends on which team operates the infrastructure, where regulated data may live, and which model endpoints are approved.
+
+### Private Cloud or VPC
+
+Run Open WebUI inside your organization's cloud account or tenancy with private networking, managed PostgreSQL, Redis, vector storage, object storage, and approved model endpoints. This pattern works well when your organization already standardizes on AWS, Azure, GCP, or another private cloud environment.
+
+See [Container Service](/enterprise/deployment/container-service) and [Kubernetes with Helm](/enterprise/deployment/kubernetes-helm).
+
+### On-Premise Kubernetes
+
+Run Open WebUI on a Kubernetes cluster in your data center or controlled hosting environment. This pattern is common when the application, storage, and model inference need to remain inside an internal network boundary.
+
+See [Architecture & High Availability](/enterprise/architecture) and [Kubernetes with Helm](/enterprise/deployment/kubernetes-helm).
+
+### Hybrid Model Routing
+
+Run Open WebUI in your controlled environment while exposing different model providers to different user groups. General workloads may use approved hosted providers, while sensitive teams use local models, private endpoints, or dedicated gateways.
+
+This pattern requires clear group permissions, provider approval, and usage guidance. Start with [Integration](/enterprise/integration), [RBAC](/features/authentication-access/rbac), and [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption).
+
+### Offline or Air-Gapped Environments
+
+Run Open WebUI where internet access is unavailable or intentionally blocked. Fully air-gapped deployments require preparation: preloaded models, embeddings, speech models, packages, container images, and update processes.
+
+See [Offline Mode](/tutorials/maintenance/offline-mode) and [Hardening Open WebUI](/getting-started/advanced-topics/hardening).
+
+## Implementation Checklist
+
+| Step | Outcome | Documentation |
+| :--- | :--- | :--- |
+| Choose the deployment boundary | The application runs in the cloud account, region, cluster, or data center your organization controls. | [Deployment Options](/enterprise/deployment) |
+| Configure production backing services | PostgreSQL, Redis, vector storage, shared storage, and extraction services are ready before scale-out. | [Architecture & High Availability](/enterprise/architecture) |
+| Set the identity boundary | Users authenticate through your approved identity system, with lifecycle and groups handled centrally. | [Authentication & Access](/features/authentication-access) |
+| Define group permissions | Access to models, knowledge, files, tools, and API keys matches your data classes and team boundaries. | [RBAC Permissions](/features/authentication-access/rbac/permissions) |
+| Approve model endpoints | Sensitive prompts route only to approved local, private, or hosted providers. | [Integration](/enterprise/integration) |
+| Minimize chat-data exposure | Admin visibility, exports, temporary chat, logging level, backups, and retention are configured deliberately. | [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption) |
+| Harden the deployment | Network placement, cookies, CORS, headers, secrets, auth, and execution settings match your threat model. | [Hardening Open WebUI](/getting-started/advanced-topics/hardening) |
+| Plan operations | Updates, backup recovery, log review, incident response, and operator access are assigned before rollout. | [Enterprise Security](/enterprise/security) |
+
+## Practical Starting Point
+
+For a first sovereign AI deployment, keep the initial boundary simple:
+
+1. Run Open WebUI in infrastructure your organization controls.
+2. Use SSO and group-based permissions.
+3. Start with private or approved model endpoints.
+4. Keep logs metadata-only unless your logging platform is approved for chat content.
+5. Restrict file upload, knowledge, tools, and API keys until each group has a clear use case.
+6. Use separate Open WebUI instances when teams require separate operators, databases, backups, or model providers.
+
+This creates a governed baseline without pretending every workload has the same risk. From there, platform teams can widen access by group, model, feature, and data class.
+
+---
+
+[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)

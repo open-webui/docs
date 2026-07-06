@@ -11,6 +11,10 @@ Open WebUI's **stateless, container-first architecture** means the same applicat
 How you serve LLM models is separate from how you deploy Open WebUI. You can use **managed APIs** (OpenAI, Anthropic, Azure OpenAI, Google Gemini) or **self-hosted inference** (Ollama, vLLM) with any deployment pattern. See [Integration](/enterprise/integration) for details on connecting models.
 :::
 
+:::info Sovereign AI Planning
+For sovereign AI deployments, start by defining four boundaries before choosing a runtime pattern: the deployment boundary, the model boundary, the identity boundary, and the data boundary. The [Sovereign AI Platform](/enterprise/sovereign-ai) guide maps these decisions to the relevant Open WebUI controls.
+:::
+
 ---
 
 ## Shared Infrastructure Requirements

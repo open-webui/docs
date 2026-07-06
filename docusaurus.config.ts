@@ -167,6 +167,10 @@ const config: Config = {
 							to: "https://openwebui.com",
 						},
 						{
+							label: "Sovereign AI",
+							to: "/enterprise/sovereign-ai",
+						},
+						{
 							label: "Report a Vulnerability / Responsible Disclosure",
 							to: "https://github.com/open-webui/open-webui/security",
 						},
