@@ -26,7 +26,7 @@ Unlike SaaS AI platforms where your data traverses third-party servers, Open Web
 
 For organizations handling sensitive data, whether proprietary research, customer information, or classified materials, this architecture is designed to help protect your security posture.
 
-If you are evaluating this through a sovereign AI lens, start by defining the infrastructure, data, model, identity, permission, logging, and operator boundaries your deployment must control. See [Sovereign AI Platform](/enterprise/sovereign-ai) for a practical evaluation checklist.
+If you are evaluating this through a sovereign AI lens, start by defining the infrastructure, data, model, identity, permission, logging, and operator boundaries your deployment must control. See the [Sovereign AI Platform](/enterprise/sovereign-ai) checklist, or the [Sovereign AI product overview](https://openwebui.com/sovereign-ai) on openwebui.com.
 
 ### Regulatory & Compliance Considerations
 
