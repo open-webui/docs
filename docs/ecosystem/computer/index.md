@@ -25,8 +25,8 @@ AI is built in but optional. Bring your own key and it becomes an agent that can
 
 [**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
 
-:::info New, and moving fast
-Open WebUI Computer is a young project (currently v0.7.x) and a **separate product** from Open WebUI, not a plugin or an integration. Expect rapid changes. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
+:::info Separate product
+Open WebUI Computer is a **separate product** from Open WebUI, not a plugin or an integration. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
 :::
 
 ## Open WebUI Computer vs Open Terminal
