@@ -112,4 +112,4 @@ It is **not** safe if untrusted users share the instance, it is reachable from t
 
 ## License
 
-Open WebUI Computer is released under the **Open Use License**: the source is available, but it is not MIT or otherwise open source, and all rights are reserved. [Enterprise licenses are available](mailto:sales@openwebui.com). See the [LICENSE](https://github.com/open-webui/computer/blob/main/LICENSE) file for the exact terms.
+Open WebUI Computer is released under the **Open Use License**: the source is available, and all rights are reserved. [Commercial licenses](https://openwebui.com/computer/license) and [enterprise licenses](mailto:sales@openwebui.com) are available. See the [LICENSE](https://github.com/open-webui/computer/blob/main/LICENSE) file for the exact terms.
