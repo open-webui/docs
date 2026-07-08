@@ -8,7 +8,7 @@ title: "Authentication Timing Side-Channel (CWE-208)"
 | :--- | :--- |
 | **Class** | CWE-208, Observable Timing Discrepancy |
 | **Status** | Exploitable signal mitigated; sub-millisecond residual accepted |
-| **Tracked as** | GHSA-7rw5-9f7q-xj36 |
+| **Tracked as** | [GHSA-7rw5-9f7q-xj36](https://github.com/open-webui/open-webui/security/advisories/GHSA-7rw5-9f7q-xj36) |
 
 ---
 
@@ -18,9 +18,11 @@ The sign-in endpoint took measurably longer for an existing account than for a n
 
 ## What we mitigated
 
-Authentication now performs a bcrypt comparison against a fixed dummy hash on the paths where no user, or no active credential, is found. Every sign-in attempt therefore pays the same bcrypt cost regardless of whether the account exists.
+This was reported to us and is tracked as [GHSA-7rw5-9f7q-xj36](https://github.com/open-webui/open-webui/security/advisories/GHSA-7rw5-9f7q-xj36). We addressed it in the sign-in path: authentication now performs a bcrypt comparison against a fixed dummy hash on the paths where no user, or no active credential, is found. Every sign-in attempt therefore pays the same bcrypt cost regardless of whether the account exists.
 
 Measured, this collapses the difference from roughly 20-40x down to about 1.03x (bcrypt against bcrypt), which is indistinguishable from ordinary run-to-run variance. The practically exploitable enumeration oracle is removed.
+
+The millisecond residual that remains is accepted as-is. This is not a matter of further effort: what is left is bounded by physical and runtime limits (the database, the Python interpreter, CPU behaviour, operating-system scheduling and network jitter) rather than by anything Open WebUI's code can improve, so there is little more to be gained from here. The reasoning is set out in [What remains, and why it is not fixable](#what-remains-and-why-it-is-not-fixable) below.
 
 ## What remains, and why it is not fixable
 

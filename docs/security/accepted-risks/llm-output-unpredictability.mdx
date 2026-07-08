@@ -13,6 +13,8 @@ title: "LLM Output Unpredictability"
 
 ## Summary
 
+Open WebUI respects and appreciates the [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/); it is a valuable framework for reasoning about how AI systems fail. Many of the behaviours it catalogues, however, are not classical security vulnerabilities. They are risks inherent to large language models themselves, carried by any application built on one rather than introduced by a defect in a particular vendor's code. Where those models are given tools and autonomy, the same risks extend into agent behaviour; see [Agentic Application Risks](./agentic-application-risks).
+
 Large language models are non-deterministic and steerable by their input. A model can be convinced, through a crafted prompt, injected content in a fetched web page or uploaded document, or adversarial conversation, to produce unsafe, misleading, or attacker-desired output: a jailbreak, a prompt injection, a hallucinated fact, an unsafe recommendation, or an attempt to use an available tool in a way the user did not intend.
 
 This unpredictability is a property of how language models work. It is **not a defect in Open WebUI's code**.
@@ -44,4 +46,5 @@ Those are Open WebUI defects and are fixed as such. See the [Security Policy](..
 ## References
 
 - [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- [Agentic Application Risks](./agentic-application-risks)
 - [Open WebUI Security Policy](../security-policy)

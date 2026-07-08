@@ -66,6 +66,20 @@ Administrators can change a user's role at any time via **Admin Panel > Users**.
 *   Promoting a user to `admin` grants them full control.
 *   Demoting an admin to `user` subjects them to the permission system again.
 
+## The Primary Administrator
+
+The first account created on an instance (see [Initial Setup](#initial-setup)) is the **primary administrator**. There is no special flag for it: internally it is simply the earliest-created account, determined by its creation timestamp.
+
+The primary administrator has one small piece of extra protection. The interface does not show a delete control for it, and the backend refuses to delete it through the user API. This exists purely to prevent the original bootstrap account from being removed by accident, which could otherwise leave an instance without its founding administrator or trigger an unwanted role reassignment.
+
+This is a convenience safeguard, not a security boundary. All administrators share full control of the system, so any administrator can still change or remove any account, including the primary one, at the data layer.
+
+### Swapping the Primary Administrator
+
+Sometimes the primary administrator legitimately needs to change, for example when the person who first set up the deployment leaves the organization. Because the role is decided purely by creation timestamp, the primary administrator is whichever administrator account is oldest, so reorganizing or removing accounts at the database level changes which one is treated as primary.
+
+This is deliberately a data-layer operation rather than a one-click button, so that changing the founding account stays an intentional, considered action. Back up your database before making the change, and perform it while the instance is idle. We do not list exact queries here because the database schema evolves between releases; work against your current schema, and reach out on our community channels if you need guidance for your version.
+
 ## Headless Admin Account Creation
 
 For **automated deployments** (Docker, Kubernetes, cloud platforms) where manual interaction is impractical, Open WebUI supports creating an admin account automatically on first startup using environment variables.

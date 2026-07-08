@@ -1,0 +1,50 @@
+---
+title: "Agentic Application Risks"
+---
+
+# Agentic Application Risks
+
+|  |  |
+| :--- | :--- |
+| **Class** | Inherent agentic-system behavior (goal hijack, tool misuse, memory and context poisoning, deceptive or rogue multi-agent behavior), mapped to the OWASP Top 10 for Agentic Applications |
+| **Status** | Inherent to autonomous AI agents; not a remediable application defect on its own; out of scope as a vulnerability unless proven as part of a chain with a legitimate Open WebUI vulnerability per the [Security Policy](../security-policy) |
+
+---
+
+## Summary
+
+Open WebUI respects and appreciates the [OWASP Top 10 for Agentic Applications](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/); it is a valuable framework for reasoning about how autonomous, tool-using AI systems fail. Many of the behaviours it catalogues, however, are not classical security vulnerabilities. They are risks inherent to giving a language model agency, carried by any application that lets a model plan, use tools and act, rather than introduced by a defect in a particular vendor's code. These risks build directly on the model-level behaviour covered in [LLM Output Unpredictability](./llm-output-unpredictability), and the two overlap heavily: an agent is a language model given tools and autonomy, so the same steerability that produces unsafe output can also drive unsafe actions.
+
+Agentic systems plan, decide, call tools and carry context across steps, and they do so on the basis of untrusted natural-language input. Because of that, an agent can be steered by a crafted prompt, a poisoned document or web page, a deceptive tool output, or a message from a peer agent into pursuing a hijacked goal, misusing a tool it was granted, acting on poisoned memory, or persuading a human to approve something they should not. These are properties of how autonomous LLM agents work. They are **not defects in Open WebUI's code**.
+
+## What we mitigate
+
+Open WebUI's role is to provide the platform and to control what an agent is *allowed* to do. Our meaningful controls are user-gated permissions, privilege limits, access control and isolation:
+
+- **Capability is gated, not granted by default.** An agent can only act through Tools and Functions. Tool use is governed by the `workspace.tools` permission, which is **disabled by default** for non-administrators, and Function authoring is restricted to administrators. Granting either is documented as equivalent to giving that user shell access to the server (see the [Security Policy](../security-policy), Rule 10).
+- **An agent cannot exceed the calling user's own privileges.** Acting on a user's behalf, it is bound by that user's role and RBAC permissions and by per-user data scoping; it cannot read or reach what the user could not.
+- **Isolation of execution.** Server-side code execution is opt-in and administrator-configured, and for production the [Terminals orchestrator](/features/open-terminal/terminals) runs execution in per-session, container-isolated environments with configurable [security-context and resource policies](/features/open-terminal/terminals/orchestration/policies).
+- **Operator guardrails.** [Filters](/features/extensibility/plugin/functions/filter), human-in-the-loop confirmation and content checks let a deployment add its own policy layer around what agents may do.
+
+These controls bound the *consequences* of a steered or misbehaving agent. They do not, and cannot, make an autonomous agent's decisions reliably safe in every case.
+
+## What remains, and why it is not treated as a vulnerability
+
+A risk whose entire impact is **the agent behaving as agents inherently can** (a hijacked goal, a poisoned memory, a tool used unsafely within the privileges it was already granted, a human persuaded by a confident agent) is **inherent to autonomous agents and is not, on its own, an Open WebUI vulnerability**. It is bounded by the state of the art in model and agent alignment, not by anything Open WebUI's code can patch.
+
+We therefore **do not accept reports as vulnerabilities when the whole impact is an agent being talked into misusing a capability it was already permitted to use, or producing undesirable output or actions within its granted scope.** That is an accepted, inherent property of running an autonomous agent.
+
+**This is a scoping statement about agent behavior, not a blanket exemption.** A report **is** in scope, and is treated as a real vulnerability, the moment crafted input crosses from "the agent was steered" into a concrete flaw in Open WebUI's own code or controls, for example:
+
+- an agent action that **escalates privilege, reaches another user's data or gains code execution through an Open WebUI code path** rather than through a capability the operator granted;
+- a **bypass of an access-control, permission, or isolation check** (for example a tool reaching data the calling user has no rights to); or
+- any flaw where the agent is merely the **trigger** for an underlying application bug.
+
+Those are Open WebUI defects and are fixed as such. The distinction mirrors the framework's own: an agent misusing a tool strictly within its granted privilege is inherent agentic risk, whereas privilege escalation or code execution through a platform flaw is a defect. See the [Security Policy](../security-policy) for the full reporting scope.
+
+## References
+
+- [OWASP Top 10 for Agentic Applications](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
+- [LLM Output Unpredictability](./llm-output-unpredictability)
+- [Tools and Functions security model](/features/extensibility/plugin/tools)
+- [Open WebUI Security Policy](../security-policy)
