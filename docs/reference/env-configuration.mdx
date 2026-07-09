@@ -1142,7 +1142,14 @@ when using OpenAI-compatible endpoints.
 
 - Type: `int`
 - Default: `80000`
-- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global maximum: an individual model can set a *lower* threshold of its own with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), but it cannot raise it above this value.
+- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CONTEXT_COMPACTION_TOKEN_CAP`
+
+- Type: `int`
+- Default: falls back to `CONTEXT_COMPACTION_TOKEN_THRESHOLD` when unset
+- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Admin Panel > Settings > Interface** (**Token Cap**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -7743,6 +7750,12 @@ bypassed when accessing documents from MIT.
 ### Install Required Python Packages
 
 Open WebUI provides environment variables to customize the pip installation process. Below are the environment variables used by Open WebUI for adjusting package installation behavior:
+
+#### `ENABLE_PLUGINS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Master switch for Open WebUI's built-in Tools and Functions. When set to `False`, the entire Tools and Functions surface is removed: the workspace **Tools** page and admin **Functions** page are hidden, their API endpoints return empty, and every plugin execution path (filters, actions, pipe functions, built-in native tool-calling and code-interpreter detection) is skipped. This is stronger than [`SAFE_MODE`](#safe_mode): `SAFE_MODE` deactivates all Functions while the feature stays in place, whereas `ENABLE_PLUGINS=False` gates off the whole execution surface. OpenAPI and MCP tool servers configured through connections are unaffected. Surfaced to clients as the `enable_plugins` config flag.
 
 #### `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`
 

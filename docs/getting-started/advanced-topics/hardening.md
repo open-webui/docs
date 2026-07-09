@@ -608,6 +608,17 @@ For details on the security model, see the [Security Policy](/security/security-
 
 Because Tools and Functions execute server-side code, any user with permission to create or import them effectively has the same level of access as the Open WebUI process itself. This is inherent to how extensibility works. By default, only administrators can create and import Tools and Functions. The settings below control these permissions.
 
+### Disabling the feature entirely
+
+If your deployment does not use Tools or Functions at all, remove the surface completely:
+
+```bash
+# Set to false to disable the built-in Tools and Functions execution surface
+ENABLE_PLUGINS=false
+```
+
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages, makes their endpoints return empty, and skips every plugin execution path (filters, actions, pipe functions, built-in native tool-calling and code-interpreter detection). OpenAPI and MCP tool servers configured through connections are unaffected. Setting this off removes the arbitrary-code-execution surface these features carry, so use it whenever the feature is not needed.
+
 ### Code execution
 
 Open WebUI has two code execution features enabled by default:
@@ -761,6 +772,7 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Enable audit logging](#audit-logging) | `NONE` | `METADATA` or higher |
 | [Restrict API key endpoints](#endpoint-restrictions) | All endpoints | `ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS=true` |
 | [Keep API passthrough disabled](#openai-api-passthrough) | Disabled | Keep `ENABLE_OPENAI_API_PASSTHROUGH=false` |
+| [Disable Tools and Functions if unused](#disabling-the-feature-entirely) | Enabled | `ENABLE_PLUGINS=false` |
 | [Disable auto pip install](#dependency-installation) | Enabled | `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` |
 | [Review community sharing](#data-sharing-and-export) | `true` | Disable if sensitive data |
 | [Review direct connections](#data-sharing-and-export) | `false` | Keep disabled unless needed |
