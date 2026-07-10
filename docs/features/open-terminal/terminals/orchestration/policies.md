@@ -26,6 +26,6 @@ In Open WebUI, go to **Admin Panel -> Settings -> Integrations -> Open Terminal*
 
 All fields are optional. If a field is omitted, the orchestrator uses its global default, such as `TERMINALS_IMAGE` or `TERMINALS_KUBERNETES_STORAGE_MODE`.
 
-Policy changes apply when a terminal is newly provisioned. Existing running terminals keep their current image and environment until they are stopped, refreshed, or cleaned up by idle timeout.
+Policy changes apply when a terminal is newly provisioned. Existing running terminals keep their current image and environment until they are stopped, refreshed, or cleaned up by idle timeout. Open WebUI is an admin client for this policy state; Terminals remains the source of truth for both policy and lifecycle configuration.
 
 Scheduled resets are configured through policy lifecycle, not policy fields. This keeps provisioning settings separate from ongoing maintenance.
