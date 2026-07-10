@@ -1,0 +1,10 @@
+{
+	"label": "Automations and integrations",
+	"position": 21,
+	"collapsible": true,
+	"collapsed": true,
+	"link": {
+		"type": "generated-index",
+		"description": "Bring a real Computer workspace to Open WebUI, schedules, notifications, messaging, and trusted external tools."
+	}
+}

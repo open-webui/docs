@@ -1,0 +1,10 @@
+{
+	"label": "Reference",
+	"position": 22,
+	"collapsible": true,
+	"collapsed": true,
+	"link": {
+		"type": "generated-index",
+		"description": "Commands, storage, permissions, compatibility, and the OpenAI-compatible gateway."
+	}
+}

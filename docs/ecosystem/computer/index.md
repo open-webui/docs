@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Open WebUI Computer
 
 <ThemedImage
-  alt="Open WebUI Computer workspace running on a desktop screen and a phone, the same session across devices, with optional AI"
+  alt="Open WebUI Computer showing a real workspace from a desktop and phone"
   sources={{
     light: useBaseUrl('/images/banners/computer-light.svg'),
     dark: useBaseUrl('/images/banners/computer-dark.svg'),
@@ -17,99 +17,69 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Your computer, in a browser tab. From anywhere.**
+**Your actual computer, available from the browser you have with you.**
 
-Open WebUI Computer runs on a machine you own and serves the whole thing to a browser: files, a code editor, a terminal and git, all in one tab. Open it from your phone on the train, your laptop at a cafe, or a tablet on the couch. Push a hotfix, check a deploy, stage and commit, or drop into the terminal and work the old way. Close the tab and come back tomorrow on any device; sessions survive disconnects and everything is where you left it.
+Open WebUI Computer runs on a machine you control and gives you its real workspaces: files, terminal sessions, git state, local services, and optional AI agents. It does not copy your project into a new cloud environment. When you open a workspace from another device, you are looking at the same checkout, branch, process, and agent work that were already there.
 
-AI is built in but optional. Bring your own key and it becomes an agent that can read, search, edit and run things in your project. Leave the key out and Open WebUI Computer is still a full computer, just without the assistant.
+New here? Start with [Is Open WebUI Computer right for me?](./is-it-right) before learning any product terms.
 
-[**View on GitHub →**](https://github.com/open-webui/computer) · [**Read the Manifesto →**](https://github.com/open-webui/computer/blob/main/MANIFESTO.md)
+## Start with the problem in front of you
 
-:::info Separate product
-Open WebUI Computer is a **separate product** from Open WebUI, not a plugin or an integration. The [GitHub repo](https://github.com/open-webui/computer) is the source of truth for the latest.
-:::
+| If this sounds like you | Start here | You will know it worked when |
+| --- | --- | --- |
+| **Avery** has never used a terminal or git, but a project already lives on her laptop and she wants to understand whether Computer is useful before changing anything. | [Is Open WebUI Computer right for me?](./is-it-right) | She opens her existing folder locally and sees that Computer did not make a copy somewhere else. |
+| **Mira** is a product designer with a live prototype and assets on her Mac; she wants to test it on a real phone and capture feedback without learning a terminal workflow. | [Preview a local app on another device](./use-cases/theo-real-device-preview) | She sees the live prototype on the device and sends a note or link into the same project. |
+| **Nora** has ten minutes on a train to investigate a bug in the dirty branch on her home iMac. | [Fix something away from your desk](./use-cases/nora-remote-fix) | Your phone shows the existing branch, terminal output, and changed diff. |
+| **Malik** needs to decide what a coding agent should do while he is away from his mini PC. | [Supervise an agent from anywhere](./use-cases/malik-agent-supervision) | You can inspect the existing chat and continue the same task. |
+| **Theo** needs to check a local app on a real iPad. | [Preview a local app on another device](./use-cases/theo-real-device-preview) | The live app opens while its original terminal keeps running. |
+| **Jules** already uses Open WebUI but needs an AI to work in a particular machine and repository. | [Open WebUI, Computer, or both?](./choose) | You know which product owns the job and why. |
+| **Elena** needs a private machine to run a repeatable check and alert her when it fails. | [Run and verify an automation](./integrations/automations-and-notifications) | A manual run creates a linked chat and a test alert arrives. |
+| **Ravi** already runs private infrastructure, coding agents, and Open WebUI; he is excited to compose them around his own machine without giving up control of the workspace. | [Connect Open WebUI to a Computer workspace](./integrations/open-webui-gateway) | A bounded workspace appears as a model, with its real activity visible in Computer. |
 
-## Open WebUI Computer vs Open Terminal
+## Try it locally first
 
-These two look related because both involve a terminal and an AI, but they sit on opposite sides of the same idea. The short version: **[Open Terminal](/features/open-terminal) gives the Open WebUI chat AI a computer to work on; Open WebUI Computer gives _you_ your computer, with AI as an optional helper.**
-
-| | [Open Terminal](/features/open-terminal) | Open WebUI Computer |
-| :--- | :--- | :--- |
-| **What it is** | A shell-execution backend you connect to Open WebUI as a tool | A standalone app: your machine (files, editor, terminal, git) in a browser |
-| **Who drives** | The AI runs commands for you during a chat | You operate the machine; the AI assists when asked |
-| **Center of gravity** | Chat first. The terminal is a tool the model calls | Computer first. Chat is one panel beside files, editor and git |
-| **Runs as** | A component connected to an Open WebUI instance | Its own app (`pip install cptr`), not connected to Open WebUI |
-| **Interface** | The Open WebUI chat UI | A mobile-first workspace: file browser, editor, terminal, git |
-| **AI** | Required (it exists for the chat model to use) | Optional (bring your own key; works without it) |
-| **License** | MIT | Open Use License (source-available) |
-
-If you want the model to build software for you inside a chat, that is Open Terminal. If you want to _be_ at your computer from your phone, with the model as an extra pair of hands, that is Open WebUI Computer.
-
-## What you can do
-
-Open WebUI Computer is a full workspace with an optional AI agent on top:
-
-- **The computer you operate.** A browser-based terminal, file browser, code editor and git across multiple project workspaces, with global search, live port previews and voice memos.
-- **An optional AI agent.** With your own key it reads, edits and runs code, browses the web, uses external MCP/OpenAPI tool servers and spins up sub-agents, following skills you define. Every change waits for your approval.
-- **Coding agents as backends.** Connect a coding agent you already subscribe to (Codex, Claude Code, Cursor, Grok, OpenCode) as a native backend, no API key needed. It shows up in the model picker and runs in the workspace with full tool access.
-- **Automation and reach.** Scheduled automations, messaging bots (Telegram, Discord, Slack, WhatsApp, Signal) and an OpenAI-compatible gateway that lets Open WebUI drive a workspace as a model.
-
-See the [**full capability list**](/ecosystem/computer/capabilities), and [**Connect to Open WebUI**](/ecosystem/computer/open-webui) to use an Open WebUI Computer workspace as a model from your own Open WebUI instance.
-
-## Install and run
-
-Open WebUI Computer is distributed as a Python package named `cptr` (Python 3.10 or newer):
+The quickest safe trial stays on the machine in front of you. Install the `cptr` package, start it on localhost, and open one existing project before thinking about remote access or AI providers.
 
 ```bash
 pip install cptr
-```
-
-To pull in every optional dependency (MCP tool servers, document support, PAM login) at once, install the `all` extra instead: `pip install cptr[all]`.
-
-Start the server and it opens in your browser:
-
-```bash
 cptr run
 ```
 
-By default `cptr run` listens on `127.0.0.1`, so it is reachable only from the machine it runs on. To open it to other devices on your network, bind to all interfaces:
+[Try Open WebUI Computer locally →](./getting-started/local-trial)
 
-```bash
-cptr run --host 0.0.0.0
-```
+**Verify it worked:** the command prints a one-time setup URL. Open it on the host, finish setup, choose an existing folder, and create a terminal. If you cannot reach the page, use [install and login troubleshooting](./troubleshooting/install-and-login) before changing network settings.
 
-`cptr run` prints a one-time setup URL with a token, for example `http://localhost:8000/?token=...`. Other flags: `--port` (default `8000`), `--headless` (do not auto-open a browser) and `--reload` (for development).
+## What Open WebUI Computer is—and is not
 
-State lives in `~/.cptr` by default; set `CPTR_DATA_DIR` to change it. After first-time setup you log in with a username and password, and sessions use JWTs.
+It is a persistent workstation surface and an optional agent harness for the machine where your work already lives. It is useful even with no AI configured.
 
-For operations, Open WebUI Computer can write structured logs and an audit trail. Set `CPTR_AUDIT_LOG_LEVEL` to log every mutating API request (POST, PUT, PATCH, DELETE) to a JSON file with passwords and API keys redacted, and `CPTR_LOG_UPSTREAM_REQUESTS=true` to log outgoing AI API calls (provider, model, endpoint) to a separate file for debugging and cost tracking.
+It is not a disposable cloud IDE, a sandbox around an untrusted user, or a service to expose directly to the public internet. An authenticated user can access the host filesystem and shell, so treat it like an SSH endpoint you own.
 
-### Docker
+[Read the security model →](./remote-access/security-model) · [Learn the core concepts →](./concepts) · [See who it is for →](./personas)
 
-```bash
-docker run --rm -it \
-  -p 8000:8000 \
-  -v cptr-data:/data \
-  -v "$PWD:/workspace" \
-  -w /workspace \
-  ghcr.io/open-webui/computer:latest
-```
+## Use it with Open WebUI
 
-State is stored in `/data`. Mount the project you want to work on into the container with `-v "$PWD:/workspace"` so Open WebUI Computer can reach it. A `:dev` image tracks the `main` branch.
+Many people should use both products. Keep Open WebUI as the place to choose models, organize AI conversations, and work with knowledge. Connect Open WebUI Computer when the request must inspect or change the selected workspace on your own machine. The [gateway guide](./integrations/open-webui-gateway) shows the combined workflow and its high-trust boundary.
 
-## Security model
+## Open WebUI Computer vs Open Terminal
 
-:::danger Treat a shared Open WebUI Computer instance like an open SSH port
-Once a user is authenticated, Open WebUI Computer gives them **full access to the host filesystem and shell**, the same as an SSH session. There is **no path sandboxing and no per-user isolation**. The AI's file read and edit tools are confined to the active workspace, but shell access (the terminal, and the AI's run-command tool) is not.
-:::
+Both products can put AI near a terminal, but the starting point is different. **Open Terminal** gives an Open WebUI chat model a computing environment to drive. **Open WebUI Computer** gives you the existing computer you operate—files, terminal, editor, git, and running sessions—with AI as an optional helper.
 
-Open WebUI Computer is designed as "your computer, served to you", so that level of access is the point, not a flaw. It is safe **only** when both of these hold:
+Choose Open Terminal when the chat AI needs an execution environment. Choose Open WebUI Computer when you need to reach the machine where the work already exists.
 
-- you are the only user, and
-- you control the network it is exposed on.
+## Explore the documentation
 
-It is **not** safe if untrusted users share the instance, it is reachable from the public internet, or a reverse proxy in front of it forwards spoofable authentication headers. By default Open WebUI Computer binds to localhost only, so reaching it from another machine is an explicit opt-in (`cptr run --host 0.0.0.0`, or publishing the Docker port). When you do open it up, put it behind a VPN or a tunnel rather than a public port, the same way you would treat SSH.
+- [Get started](./getting-started/local-trial): install, sign in, open a workspace, and return from another device.
+- [Is it right for me?](./is-it-right): understand the value in plain language and recognize a bad fit early.
+- [Use cases](./use-cases/nora-remote-fix): solve a real interruption, not a toy exercise.
+- [Your workspace](./workspace/workspace-paths): files, terminal, git, tabs, browser preview, search, and PWA behavior.
+- [AI and coding agents](./agents/models): choose, supervise, and continue agent work in a real workspace.
+- [Remote access and security](./remote-access/security-model): reach your machine without pretending it is safe for everyone.
+- [Automations and integrations](./integrations/open-webui-gateway): connect Open WebUI, notifications, bots, and external tools.
+- [Operate Open WebUI Computer](./operate/data-and-backups): keep state, logs, upgrades, and recovery under control.
+- [Reference](./reference/cli-and-storage): exact commands, configuration, permissions, and API contracts.
+- [Troubleshooting](./troubleshooting/install-and-login): diagnose a concrete failed verification.
 
-## License
+## Next step
 
-Open WebUI Computer is released under the **Open Use License**: the source is available, and all rights are reserved. [Commercial licenses](https://openwebui.com/computer/license) and [enterprise licenses](mailto:sales@openwebui.com) are available. See the [LICENSE](https://github.com/open-webui/computer/blob/main/LICENSE) file for the exact terms.
+Start with [Open WebUI, Open WebUI Computer, or both?](./choose) if you are choosing a product. Otherwise, [try it locally](./getting-started/local-trial) and prove that it can open the workspace you already use.

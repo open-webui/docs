@@ -1,0 +1,8 @@
+{
+	"label": "Operate Open WebUI Computer",
+	"position": 7,
+	"link": {
+		"type": "generated-index",
+		"description": "Keep a private, persistent single-host installation healthy and recoverable."
+	}
+}

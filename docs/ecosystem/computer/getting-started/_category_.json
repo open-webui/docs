@@ -1,0 +1,8 @@
+{
+	"label": "Get started",
+	"position": 1,
+	"link": {
+		"type": "generated-index",
+		"description": "Try Open WebUI Computer on the machine and workspace you already use."
+	}
+}

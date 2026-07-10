@@ -1,0 +1,8 @@
+{
+	"label": "Remote access and security",
+	"position": 5,
+	"link": {
+		"type": "generated-index",
+		"description": "Reach your own machine deliberately, with the same caution you would apply to SSH."
+	}
+}

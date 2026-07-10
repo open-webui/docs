@@ -1,0 +1,10 @@
+{
+	"label": "AI and coding agents",
+	"position": 20,
+	"collapsible": true,
+	"collapsed": true,
+	"link": {
+		"type": "generated-index",
+		"description": "Choose, connect, supervise, and safely use an AI agent in the workspace already on your machine."
+	}
+}

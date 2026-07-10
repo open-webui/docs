@@ -1,0 +1,8 @@
+{
+	"label": "Troubleshooting",
+	"position": 10,
+	"link": {
+		"type": "generated-index",
+		"description": "Diagnose the host, network, state, and access paths without guessing."
+	}
+}
