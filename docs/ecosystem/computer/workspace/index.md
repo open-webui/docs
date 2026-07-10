@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # Your workspace
 
-This is the part that makes Open WebUI Computer more than a chat window. A workspace is an existing folder on your machine, with its files, terminal, git state, local services, chats, and remembered layout kept together.
+This is the part that makes Open WebUI Computer more than a chat window. A workspace is an existing folder on your machine, with its files, terminal, git state, local services, chats, and remembered layout kept together. It is the visible source of truth for a task: before acting, confirm the path, branch, files, and running process match the work you mean to continue.
 
 ## Start with the thing you need to see
 

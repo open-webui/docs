@@ -5,7 +5,9 @@ sidebar_position: 1
 
 # API models or native coding agents
 
-Open WebUI Computer can run an agent through an API connection, or through a coding agent already installed and signed in on the host. Both work in the selected workspace. The choice is about credentials and control, not a different filesystem.
+Open WebUI Computer can run an agent through an API connection, or through a supported coding agent already installed and signed in on the host. Both work in the selected workspace. The choice is about credentials and control, not a different filesystem.
+
+A terminal can run any CLI that works on the host. Only the supported native backends become selectable Computer chat models with detection, streaming integration, and the surrounding workspace-chat controls.
 
 ## Use this when
 

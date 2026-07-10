@@ -5,9 +5,13 @@ sidebar_position: 1
 
 # Start with a moment where this would have helped
 
-Computer is most compelling when the work, context, or tools you need are already on one machine and you cannot or do not want to start again somewhere else. Pick a familiar situation below. Each guide starts with a small result you can see, not a feature tour.
+Computer is most compelling when the work, context, or tools you need are already on one machine and you cannot or do not want to start again somewhere else. That can be a folder of class material, a creative project, reports, a local app, a running terminal, or an agent task. Pick a familiar situation below. Each guide starts with a small result you can see, not a feature tour.
 
-Start locally first. Add private remote access only after seeing the existing work on the host feels useful.
+You do not need to be a developer or connect AI to try the useful part. Start locally first. Add private remote access only after seeing the existing work on the host feels useful.
+
+## I have a folder I care about, but I do not use coding tools
+
+[Open it locally first](/ecosystem/computer/getting-started/local-trial). The first proof is simply that the folder stays in its real location and opens in Computer, rather than being copied into a new cloud workspace.
 
 ## I need to keep feedback with a prototype or project
 
@@ -17,9 +21,9 @@ Start locally first. Add private remote access only after seeing the existing wo
 
 [Work with local documents and data](./research-documents-data) keeps the source files and a conclusion together in one real folder. It works without AI, with optional AI as a carefully bounded helper.
 
-## I am making a school, art, or personal project across devices
+## I am making a school, art, or maker project across devices
 
-[Keep a creative project together](./creative-student-project) keeps references, drafts, and captured ideas in the same workspace when you switch between a phone and computer.
+[Keep a creative, school, or maker project together](./creative-student-project) keeps references, drafts, and captured ideas in the same workspace when you switch between a phone and computer.
 
 ## I want to continue what I was already doing
 

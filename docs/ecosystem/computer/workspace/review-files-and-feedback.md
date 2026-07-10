@@ -5,7 +5,7 @@ sidebar_position: 2
 
 # Review files and keep feedback with the project
 
-When a prototype, document, image, or recording already belongs to a project on your machine, the useful feedback should stay there too. Computer lets you open the real file or local preview, then keep a note, shared link, uploaded file, or voice memo in the same workspace instead of losing the review in a separate chat app.
+When a prototype, document, image, or recording already belongs to a project on your machine, the useful feedback should stay there too. Computer lets you open the real file or local preview, then keep a note, shared link, uploaded file, or voice memo in the same workspace instead of losing the review in a separate chat app. The feedback remains connected to the real project, not a recreated attachment collection.
 
 ## Start with the review you actually have
 

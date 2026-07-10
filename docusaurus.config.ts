@@ -16,6 +16,9 @@ const shikiPlugin: [typeof rehypeShiki, RehypeShikiOptions] = [
 	},
 ];
 
+const shouldEnableGtag =
+	process.env.NODE_ENV === "production" && !process.argv.includes("start");
+
 const config: Config = {
 	title: "Open WebUI",
 	titleDelimiter: "/",
@@ -53,13 +56,13 @@ const config: Config = {
 		[
 			"classic",
 			{
-				...(process.env.NODE_ENV === "production"
+				...(shouldEnableGtag
 					? {
-						gtag: {
-							trackingID: "G-522JSJVWTB",
-							anonymizeIP: false,
-						},
-					}
+							gtag: {
+								trackingID: "G-522JSJVWTB",
+								anonymizeIP: false,
+							},
+						}
 					: {}),
 				docs: {
 					sidebarPath: "./sidebars.ts",

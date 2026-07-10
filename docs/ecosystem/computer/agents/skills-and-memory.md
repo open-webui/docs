@@ -5,7 +5,7 @@ sidebar_position: 6
 
 # Skills and memory
 
-Skills help an agent repeat a method you trust. Memory helps it retain durable facts about you or a project. They solve different problems: use a skill for a reusable procedure, and memory for information that should remain useful after the current chat ends.
+Skills help an agent repeat a method you trust. Memory helps it retain durable facts about you or a project. They solve different problems: use a skill for a reusable procedure, and memory for information that should remain useful after the current chat ends. Neither replaces a project file or a direct instruction when that is the source of truth.
 
 ## Choose the right kind of context
 

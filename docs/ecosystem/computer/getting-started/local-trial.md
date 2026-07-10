@@ -47,6 +47,10 @@ git status
 
 If `cptr` is not found, activate the Python environment where it was installed or run `python -m pip install cptr` there. If the page does not open, use [install and login troubleshooting](/ecosystem/computer/troubleshooting/install-and-login) before changing any network settings. If the wrong folder appears, continue with [your first workspace](./first-workspace).
 
+## Next, if you need it
+
+Once the folder check is convincing, choose one optional direction: ask an agent to explain a file through [AI and coding agents](/ecosystem/computer/agents), or keep working locally. Do not set up remote access or an integration merely to complete setup.
+
 ## Trust boundary
 
 Local mode still exposes the host filesystem and shell to anyone who can use the signed-in browser profile. Do not treat it as a sandbox; it is your real machine.

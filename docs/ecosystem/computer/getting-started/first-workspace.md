@@ -33,6 +33,10 @@ If the folder is a Git repository, open the Git view or a terminal tab and compa
 
 If the folder picker cannot reach the project, run the server under the OS account that owns or can read that folder. If the wrong folder opens, use the workspace picker to add the intended path instead of moving files into the data directory. If you cannot tell which folder is correct, stop here and choose a smaller folder you can recognize before adding AI or remote access.
 
+## Next, if you need it
+
+Keep using the workspace locally, or make the next small decision: [connect an AI or native coding agent](/ecosystem/computer/agents/models) and ask it to explain one file. Add remote access only after the local workspace and, if applicable, agent behavior are familiar.
+
 ## Trust boundary
 
 Adding a workspace makes its files available to the signed-in user and to any configured AI or integration acting in that workspace. It does not copy the project into a protected sandbox.

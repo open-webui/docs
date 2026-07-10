@@ -15,7 +15,7 @@ Understand the core boundary: Open WebUI Computer runs commands and accesses fil
 
 ## Do it
 
-Keep the default localhost binding for first use. If you need another device, put access behind a private network you control, such as Tailscale. Give every automation and messaging bot a narrowly selected workspace and constrained prompt. Bots use full approval; enter at least one exact Allowed sender ID because an empty list accepts every sender. Review configured AI providers and tool servers because they may receive workspace data or perform external actions.
+Keep the default localhost binding for first use. If you need another device, put access behind a private network you control, such as Tailscale. Before enabling a schedule, bot, gateway, MCP server, or OpenAPI server, verify the local workspace and interactive behavior first. Give every automation and messaging bot a narrowly selected workspace and constrained prompt. Those unattended paths use full tool approval; enter at least one exact Allowed sender ID because an empty list accepts every sender. Review configured AI providers and tool servers because they may receive workspace data or perform external actions.
 
 ## Verify it worked
 
@@ -27,4 +27,4 @@ If access works from a network or user you did not intend, stop the service or r
 
 ## Trust boundary
 
-The supported model is one trusted owner on a controlled network. The following are not supported safe deployments: untrusted multi-user instances, direct public-internet exposure, or a reverse proxy that passes spoofable identity headers. Do not use trusted-header authentication as a deployment recipe until you have independently validated its entire proxy boundary.
+The supported model is one trusted owner on a controlled network. The following are not supported safe deployments: untrusted multi-user instances, direct public-internet exposure, or a reverse proxy that passes spoofable identity headers. Do not use trusted-header authentication as a deployment recipe until you have independently validated its entire proxy boundary. A workspace name narrows what you intend an agent to work on; it does not impose an operating-system sandbox around terminal commands.

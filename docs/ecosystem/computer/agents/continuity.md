@@ -5,7 +5,7 @@ sidebar_position: 4
 
 # Plans, queues, resume, and context
 
-The useful part of remote work is continuity: you can leave a task, reconnect on another device, and see the chat, workspace layout, terminal output, and next action without reconstructing the situation.
+The useful part of remote work is continuity: you can leave a task, reconnect on another device, and see the chat, workspace layout, terminal output, and next action without reconstructing the situation. That does not mean every live operation is durable. Computer preserves the project record and can reconnect to live work while the server and process remain alive; it does not silently continue a provider call, browser session, or background worker through a restart.
 
 ## Use this when
 
@@ -22,7 +22,7 @@ Use this when you start an investigation before leaving the desk or need to stee
 1. Send the task; use the visible task list to track pending and in-progress work.
 2. Queue a concise follow-up instead of opening a duplicate chat. Cancel only when the present task should stop.
 3. Close the browser and reopen the same workspace/chat from another device. Reconnect to terminal or command-session output as needed.
-4. When the conversation becomes long, use the context indicator and compact the chat when necessary. Compaction summarizes older context so the agent can continue inside the selected model’s limit.
+4. When the conversation becomes long, use the context indicator and compact the chat when necessary. Compaction summarizes older context so the agent can continue inside the selected model’s limit while retaining the underlying chat record.
 5. Fork from a message when you want to explore an alternative without overwriting the original branch.
 
 ## Verify it worked
@@ -35,10 +35,10 @@ Refresh the chat or use the sidebar to reopen it; if a command is still running,
 
 | What happened | What to expect | Recover by |
 | --- | --- | --- |
-| Browser disconnect | Workspace layout, chats, and a running terminal can reconnect. | Reopen the same workspace and chat; open the existing terminal or command session. |
-| Host restart | Terminal and browser sessions end; in-flight work may have partial output only. | Inspect chat status and partial output, then resend a bounded continuation or restart the command deliberately. |
+| Browser disconnect | Saved workspace layout and chats remain available; a running terminal can reconnect. | Reopen the same workspace and chat; open the existing terminal or command session. |
+| Computer or host restart | Terminal, browser, and active background-session state end; in-flight work may have partial output only. | Inspect chat status and partial output, then resend a bounded continuation or restart the command deliberately. |
 | Provider interruption | The chat can retain the partial response, but the provider request does not resume itself. | Check the visible error, then resend a small continuation that names the next action. |
 
 ## Trust boundary
 
-Persistence is state continuity, not a backup or a guarantee that external providers, host processes, or browser sessions survive a reboot. Context compaction sends/uses a summary with the selected model; do not treat it as deletion of the underlying chat history.
+Persistence is state continuity, not a backup or a guarantee that external providers, host processes, browser sessions, or background sub-agents survive a reboot. Context compaction sends/uses a summary with the selected model; do not treat it as deletion of the underlying chat history.

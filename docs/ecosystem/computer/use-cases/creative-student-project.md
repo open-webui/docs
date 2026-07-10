@@ -1,9 +1,9 @@
 ---
-title: "Keep a creative or school project together"
+title: "Keep a creative, school, or maker project together"
 sidebar_position: 8
 ---
 
-# Keep a creative or school project together
+# Keep a creative, school, or maker project together
 
 Use this when your project is spread between a computer, a phone, reference images, a draft, and ideas you captured while away from your desk. Open WebUI Computer gives those materials one real folder you can reopen from another device. It is not a replacement for a drawing, video, or presentation app. It is the place that keeps the files, notes, and next steps from falling apart between them.
 

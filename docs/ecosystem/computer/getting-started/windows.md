@@ -26,7 +26,7 @@ Open the URL printed by the command and select an existing project folder in the
 
 ## Verify it worked
 
-Open a terminal tab and run `pwd` plus `git status` in the selected folder. In PowerShell on the host, run `Invoke-RestMethod http://127.0.0.1:8000/api/health`; it returns an object whose `status` is `ok`.
+The workspace sidebar and file browser show the folder you selected and one familiar file. In PowerShell on the host, run `Invoke-RestMethod http://127.0.0.1:8000/api/health`; it returns an object whose `status` is `ok`. If the folder is a Git repository, an optional terminal check with `pwd` and `git status` should match your usual tools.
 
 ## If it did not
 

@@ -13,6 +13,8 @@ Use this when you are at home with a phone or tablet and need the local app and 
 
 `cptr run` binds to `127.0.0.1` by default. Only use LAN access on a network you control. Know the host's private IP address and ensure the host firewall permits the chosen port only as broadly as intended.
 
+This is a network test, not a prerequisite for using Computer. Verify the local workspace first, and prefer the private Tailscale route for repeated access away from the LAN.
+
 ## Do it
 
 Start the service on all network interfaces:
@@ -33,4 +35,4 @@ If the second device cannot connect, confirm both devices are on the same privat
 
 ## Trust boundary
 
-`0.0.0.0` makes the service reachable by devices that can route to the host. It is not authentication, encryption, or a recommendation to forward the port from your router.
+`0.0.0.0` makes the service reachable by devices that can route to the host. It is not authentication, encryption, or a recommendation to forward the port from your router. Return to the default localhost binding when the LAN test is complete unless you intentionally operate it on that private network.

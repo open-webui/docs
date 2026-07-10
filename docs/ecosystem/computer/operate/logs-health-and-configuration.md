@@ -21,7 +21,7 @@ Check the instance:
 curl http://127.0.0.1:8000/api/health
 ```
 
-Set `CPTR_LOG_LEVEL=DEBUG` for more server detail or `CPTR_LOG_FORMAT=json` for structured stdout, then restart. Set `CPTR_AUDIT_LOG_LEVEL=METADATA` for a low-content mutation trail. `REQUEST` adds redacted request bodies and `REQUEST_RESPONSE` adds redacted response bodies; the default audit file is `~/.cptr/logs/audit.jsonl`, and `CPTR_AUDIT_LOG_PATH` changes it. Use `CPTR_DATA_DIR=/path/to/data` only before start, and make the selected directory persistent and writable.
+Set `CPTR_LOG_LEVEL=DEBUG` for more server detail or `CPTR_LOG_FORMAT=json` for structured stdout, then restart. Set `CPTR_AUDIT_LOG_LEVEL=METADATA` for a low-content mutation trail. `REQUEST` adds redacted request bodies and `REQUEST_RESPONSE` adds redacted response bodies; the default audit file is `~/.cptr/logs/audit.jsonl`, and `CPTR_AUDIT_LOG_PATH` changes it. By default, chat API paths are excluded, and terminal WebSocket activity is not an HTTP audit record, so use the linked chat and terminal output when you need evidence of a task. Use `CPTR_DATA_DIR=/path/to/data` only before start, and make the selected directory persistent and writable.
 
 ## Verify it worked
 
@@ -33,4 +33,4 @@ If health fails locally, inspect the server's stdout and verify the chosen port.
 
 ## Trust boundary
 
-`/api/health` intentionally does not require login, so do not place secrets or sensitive diagnostics in it. Debug and audit logs may contain operational data and need protected storage.
+`/api/health` intentionally does not require login, so do not place secrets or sensitive diagnostics in it. Debug and audit logs may contain operational data and need protected storage. Audit logging is a redacted HTTP mutation trail, not a complete forensic record of every agent, terminal, or external action.
