@@ -1,62 +1,69 @@
 ---
-title: "Open WebUI, Open WebUI Computer, or both?"
+title: "Open WebUI, Open Terminal, Computer, or a combination?"
 sidebar_position: 2
 ---
 
-# Open WebUI, Open WebUI Computer, or both?
+# Open WebUI, Open Terminal, Computer, or a combination?
 
-Choose the product that owns the thing you need to do, not the product with the longest feature list.
+Start with where the useful context lives and what kind of computer should do the work. These are complementary ways to work, not competing feature checklists.
 
-| Your starting point | Choose | Why |
-| --- | --- | --- |
-| “Which model, knowledge, prompt, tool, or AI workflow should I use?” | **Open WebUI** | Open WebUI is the AI interface and workflow platform, whether you use it alone or with a group. |
-| “The answer is in my machine’s checkout, dirty files, terminal, local service, credentials, or agent session.” | **Open WebUI Computer** | Computer gives one owner their existing machine and workspace in a browser. AI is optional. |
-| “I want Open WebUI as the familiar AI front door, but the work must happen in this particular repository.” | **Both** | This is the recommended combined workflow: the Computer gateway presents an accessible workspace as an OpenAI-compatible model to Open WebUI. |
+## Start in Open WebUI when the work begins as a conversation
 
-## Use both when the conversation needs a real machine
+Choose Open WebUI for model choice, knowledge, prompts, shared AI workflows, and conversations where the important context is already in the chat or connected knowledge sources. It works well for one person and grows naturally into shared workflows.
 
-Keep research and model selection in Open WebUI when it is the AI surface you prefer. If a machine has the repository, scripts, browser login, and local state that an AI must use, connect that Computer workspace through the gateway and choose it for a narrowly scoped local task.
+You can stop here when the task does not need a shell, a project folder, or a particular machine.
 
-Use both when you want Open WebUI's conversation interface while Computer's configured model or agent performs work in one real workspace. Open WebUI is the place to decide and converse; Open WebUI Computer is the place where the selected workspace, terminal, git state, and agent activity actually live. Open WebUI knowledge bases, model-agent tools, system prompts, users, and general configuration are not forwarded into Computer unless you configure equivalent capabilities in Computer.
+## Add Open Terminal when a chat needs a fresh place to execute
 
-| In a combined request | What it owns |
+Open Terminal is an Open WebUI feature. It gives an Open WebUI chat a computing environment where the model can write files, run commands, install packages, and return the result in the conversation.
+
+Use it for a self-contained job: analyze an uploaded dataset, build a small prototype, run a script, or give an agent a clean environment for a task. It is especially useful when the work does not depend on an existing machine's long-lived state. Run it in Docker when you want isolation, or configure bare-metal access when that is the deliberate choice.
+
+[Learn about Open Terminal](/features/open-terminal)
+
+## Start in Open WebUI Computer when the real machine is the point
+
+Choose Computer when the useful context is already alive on one machine: its existing project folders, documents, terminal, local service, browser session, installed tools, git state, or agent work.
+
+Computer is a private control surface for that machine. It lets you open the same workspace from another browser, see what is actually there, and continue or direct the work without recreating it somewhere else. AI is optional.
+
+Use it for the moments when the right answer starts with, “Let me check my computer.”
+
+[Try Computer locally](./getting-started/local-trial)
+
+## Use Open WebUI and Computer together when the conversation needs a real workspace
+
+Keep Open WebUI as the conversation interface you prefer. Connect Computer's gateway when a particular workspace must be the place where a configured model or agent works.
+
+In that request:
+
+- Open WebUI owns the conversation and interface.
+- The selected Computer workspace model identifies the real workspace.
+- Computer's configured model or agent performs the workspace work.
+
+Open WebUI knowledge bases, model-agent tools, system prompts, users, and general configuration are not forwarded into Computer automatically. Configure an equivalent capability in Computer when the workspace task needs it.
+
+[Connect Open WebUI to a Computer workspace](./integrations/open-webui-gateway)
+
+## Use all three when your work has more than one kind of context
+
+This is common. Keep Open WebUI as the place to ask, compare, and organize. Use Open Terminal for a disposable or isolated execution task. Use Computer for the existing machine where your personal project, local service, or ongoing agent work must remain continuous.
+
+The value is not forcing every job through one product. It is choosing the environment that matches the work in front of you.
+
+## A simple way to decide
+
+| If the first true sentence is… | Start with… |
 | --- | --- |
-| **Open WebUI** | The caller conversation and interface. |
-| **The workspace model** | The selected real Computer workspace. |
-| **Open WebUI Computer** | The configured model or agent that executes the task in that workspace. |
+| “I need to think through this, compare models, or work with shared AI knowledge.” | Open WebUI |
+| “I want an AI to run a self-contained task in a clean computing environment.” | Open WebUI with Open Terminal |
+| “The files, process, login, project, or agent I need already exist on my machine.” | Open WebUI Computer |
+| “I want an Open WebUI conversation to direct work in one existing workspace.” | Open WebUI with Computer |
 
-**Verify it worked:** the workspace appears in Open WebUI's model picker; the request creates visible activity in the selected Computer workspace; a follow-up continues that same Computer chat when the documented headers are configured.
+## If you already use an agent command-line tool
 
-**If it did not:** verify the gateway key and `/v1` base URL, confirm the workspace is available, then add the [header template and continuity checks](./integrations/open-webui-gateway).
+Computer can give an installed agent command a real terminal in the selected workspace. A command-line tool becomes a selectable native Computer backend only when it is listed in [supported coding-agent backends](./reference/agent-compatibility). The [compatibility guide](./reference/agent-compatibility) explains the current supported paths without asking you to switch tools.
 
-## Important boundary
+## Keep the trust model in view
 
-The gateway exposes workspaces as OpenAI-compatible models. It does **not** synchronize Open WebUI chats, knowledge bases, users, or general configuration into Open WebUI Computer. The products can work together without becoming the same application.
-
-## Shared AI space vs your personal computer
-
-Open WebUI is built around the question, “How do I use AI well?” It is where one person or a group can work with models, knowledge, prompts, tools, and AI workflows.
-
-Open WebUI is useful as a personal AI workspace, and its potential expands naturally when a team shares models, knowledge, and workflows. Open WebUI Computer is different by design: its full potential is personal continuity, with one owner reaching the particular machine where their work is already alive.
-
-Open WebUI Computer is built around the question, “How do I reach **my** real machine and direct work there?” Computer is a private control surface for work on one machine you operate. It keeps a chosen workspace, its files, terminal and git state, supported agents, and their review history together. It is intentionally high-trust and personal: an authenticated user can reach the host filesystem and shell. It does not provide a safe, isolated machine for each teammate.
-
-The loose mental model is **ChatGPT versus Codex**. A chat product is where you ask, compare, and organize AI help alone or with others. A coding-agent product works inside your project and environment. Open WebUI Computer is broader than coding, but it follows the second model: it is about doing work in the machine you already own, not moving that work into a chat surface.
-
-**Verify the fit:** if you would be comfortable giving the person access equivalent to an SSH login on the host, Computer may fit. If you need to give many people safely separated access, choose a team-oriented, isolated platform instead.
-
-## Can Computer manage the agent CLI I already use?
-
-If products such as Hermes Agent or OpenClaw have made you excited about AI that can actually do work, Open WebUI Computer answers a different but adjacent question: **where does that work live?**
-
-Computer is an agent platform, a workspace-centered control surface, and a personal machine workspace in one. It keeps the repository, installed tools, running processes, local browser state, terminal sessions, and review surface together. You can use an API model or supported native coding-agent backend, delegate work to sub-agents, schedule it, connect tools, and then see the real diff and process output instead of treating the agent as a detached conversation.
-
-Here, **meta-harness** means one place to choose, connect, and supervise several kinds of agent work. Each task uses its selected Computer workspace; bots, automations, and gateway models are configured separately, so check the workspace named by each integration before granting it trust.
-
-Only the [supported coding-agent backends](./agents/models) become selectable native Computer chat backends with Computer task, approval, and session integration. Hermes Agent and OpenClaw are not current native backends. You can operate an installed CLI in a Computer terminal, but it remains a terminal program rather than a first-class Computer agent. Choose Computer when you want a high-trust agent platform rooted in your own machine, and use [agent compatibility](./reference/agent-compatibility) for the current supported paths.
-
-## Choose your next guide
-
-- Need the machine itself? [Try Open WebUI Computer locally](./getting-started/local-trial).
-- Want the combined workflow? [Connect Open WebUI to a Computer workspace](./integrations/open-webui-gateway).
-- Need an agent in a real repository? [Choose an AI backend](./agents/models).
+Open Terminal can provide a managed execution environment. Computer deliberately reaches the real host account and its files, shell, and processes. That is what makes it useful for a trusted owner and why it should stay private. Read [the security model](./remote-access/security-model) before exposing it remotely or connecting unattended integrations.

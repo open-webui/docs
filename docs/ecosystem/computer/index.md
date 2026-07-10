@@ -69,18 +69,17 @@ You need permission to run one install command on the machine that holds the wor
 
 | You are here because… | Start here |
 | --- | --- |
-| You are new to self-hosting, terminals, and agents | [Is Computer right for me?](./is-it-right) |
 | You make or review visual work, school work, research, or independent projects | [Explore real jobs](./use-cases/) |
 | You use a coding agent or want an AI to work in a real project | [AI and coding agents](./agents/) |
-| You already use Open WebUI | [Open WebUI, Computer, or both?](./choose) |
-| You are evaluating personal-agent tools such as Hermes Agent or OpenClaw | [Can Computer manage the agent CLI I already use?](./choose#can-computer-manage-the-agent-cli-i-already-use) |
+| You already use Open WebUI or Open Terminal | [Choose the right execution environment](./choose) |
+| You already use an agent command-line tool | [Can Computer manage the agent CLI I already use?](./choose#if-you-already-use-an-agent-command-line-tool) |
 | You need remote access, backups, or a full security model before adopting it | [Remote access and security](./remote-access/) |
 
-## Open WebUI, Computer, or both?
+## Choose the computer that matches the work
 
-Open WebUI is an AI interface and workflow platform that works well for one person and scales naturally to shared models, knowledge, prompts, and workflows. Open WebUI Computer is for the particular machine where personal work is alive. Use both when you want Open WebUI's conversation interface while Computer's configured model or agent performs work in one real workspace.
+Open WebUI is the AI interface and workflow platform. Open Terminal gives an Open WebUI chat a computing environment. Computer is the particular machine where personal work is already alive. Use one or combine them when the job needs more than one kind of context.
 
-[Choose the right product for the job](./choose)
+[Choose the right execution environment](./choose)
 
 ## Open WebUI Computer vs Open Terminal
 
