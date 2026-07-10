@@ -31,7 +31,7 @@ Choose Open Terminal when you want Open WebUI's chat and file experience to driv
 
 Computer also gives you a terminal, files, previews, and agent work. Its distinct shape is the workspace itself: a chosen path on the host, with its file browser location, tabs, split layout, chats, Git status and diffs, browser tabs, terminals, and local previews kept together.
 
-Choose Computer when you want to personally return to that workspace from another browser, inspect its real state, and direct work there. It is especially strong for a personal machine with a project, local service, Git history, browser state, or supported coding agent already in motion.
+Choose Computer when you want to personally return to that workspace from another browser, inspect its real state, and direct work there. It is especially strong for a personal machine with a project, local service, Git history, configured Computer browser session, or supported coding agent already in motion.
 
 Computer saves workspace layout and chats. Live terminals, browser sessions, and running processes still depend on the host and Computer server remaining available.
 
