@@ -14,6 +14,8 @@ Start locally. The first useful proof is not an AI demo: open an existing projec
 | Install where internet access is unavailable | [Air-gapped installation](./air-gapped) |
 | Set up a Windows host | [Windows](./windows) |
 | Choose a real project and finish first-time setup | [Your first workspace](./first-workspace) |
-| Make it feel like an app or update safely | [PWA and updates](./pwa-and-updates) |
+| Update a trusted installation without losing state | [Updates](./pwa-and-updates) |
 
 Open WebUI Computer is deliberately useful without an AI connection. AI setup is covered separately in [AI and coding agents](/ecosystem/computer/agents/models).
+
+Install the browser app only after private browser access already works; its share, import, and device-specific behavior belongs in [PWA, sharing, and shortcuts](/ecosystem/computer/workspace/pwa-share-shortcuts).

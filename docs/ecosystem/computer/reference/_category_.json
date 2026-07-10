@@ -1,10 +1,10 @@
 {
 	"label": "Reference",
-	"position": 22,
+	"position": 11,
 	"collapsible": true,
 	"collapsed": true,
 	"link": {
-		"type": "generated-index",
-		"description": "Commands, storage, permissions, compatibility, and the OpenAI-compatible gateway."
+		"type": "doc",
+		"id": "ecosystem/computer/reference/index"
 	}
 }

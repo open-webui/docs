@@ -5,7 +5,7 @@ sidebar_position: 2
 
 # Files, editor, tabs, and splits
 
-**Useful for Nora.** The file browser is for the files already in the selected workspace: open a source file, inspect a Markdown or media preview, keep related files open, and arrange the view around the small decision you need to make.
+The file browser is for the files already in the selected workspace: open a source file, inspect a Markdown or media preview, keep related files open, and arrange the view around the small decision you need to make.
 
 ## Use this when
 

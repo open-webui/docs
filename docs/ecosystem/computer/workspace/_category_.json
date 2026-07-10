@@ -1,11 +1,10 @@
 {
 	"label": "Your workspace",
-	"position": 20,
+	"position": 5,
 	"collapsible": true,
 	"collapsed": true,
 	"link": {
-		"type": "generated-index",
-		"title": "Your workspace",
-		"description": "Use the files, terminal, git state, and running processes already on your machine."
+		"type": "doc",
+		"id": "ecosystem/computer/workspace/index"
 	}
 }

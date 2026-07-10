@@ -5,7 +5,7 @@ sidebar_position: 4
 
 # Git, branches, stashes, and worktrees
 
-**Useful for Nora and Malik.** The git bar reflects the repository in the selected workspace. It gives you a fast answer to the question that matters during remote work: what changed here, on which branch, and is this safe to continue?
+The git bar reflects the repository in the selected workspace. It gives you a fast answer to the question that matters during remote work: what changed here, on which branch, and is this safe to continue?
 
 ## Use this when
 

@@ -17,69 +17,73 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Your actual computer, available from the browser you have with you.**
+**Your project is on your computer. Open WebUI Computer lets you reach that same project from the browser in your hand.**
 
-Open WebUI Computer runs on a machine you control and gives you its real workspaces: files, terminal sessions, git state, local services, and optional AI agents. It does not copy your project into a new cloud environment. When you open a workspace from another device, you are looking at the same checkout, branch, process, and agent work that were already there.
+Imagine your website is running on the computer at home. Its files are there. A task may already be running. You only have your phone. Open WebUI Computer lets you open that **same computer** in a browser. It is not a copy of your project and it is not a blank cloud workspace.
 
-New here? Start with [Is Open WebUI Computer right for me?](./is-it-right) before learning any product terms.
+You can see the real files, the real app, the real terminal, and the real progress of an optional AI agent. Pick up the work, check it, guide it, or leave it alone until you are back at your desk.
 
-## Start with the problem in front of you
+## Why set up one more thing?
 
-| If this sounds like you | Start here | You will know it worked when |
+| Without Computer | With Computer |
 | --- | --- | --- |
-| **Avery** has never used a terminal or git, but a project already lives on her laptop and she wants to understand whether Computer is useful before changing anything. | [Is Open WebUI Computer right for me?](./is-it-right) | She opens her existing folder locally and sees that Computer did not make a copy somewhere else. |
-| **Mira** is a product designer with a live prototype and assets on her Mac; she wants to test it on a real phone and capture feedback without learning a terminal workflow. | [Preview a local app on another device](./use-cases/theo-real-device-preview) | She sees the live prototype on the device and sends a note or link into the same project. |
-| **Nora** has ten minutes on a train to investigate a bug in the dirty branch on her home iMac. | [Fix something away from your desk](./use-cases/nora-remote-fix) | Your phone shows the existing branch, terminal output, and changed diff. |
-| **Malik** needs to decide what a coding agent should do while he is away from his mini PC. | [Supervise an agent from anywhere](./use-cases/malik-agent-supervision) | You can inspect the existing chat and continue the same task. |
-| **Theo** needs to check a local app on a real iPad. | [Preview a local app on another device](./use-cases/theo-real-device-preview) | The live app opens while its original terminal keeps running. |
-| **Jules** already uses Open WebUI but needs an AI to work in a particular machine and repository. | [Open WebUI, Computer, or both?](./choose) | You know which product owns the job and why. |
-| **Elena** needs a private machine to run a repeatable check and alert her when it fails. | [Run and verify an automation](./integrations/automations-and-notifications) | A manual run creates a linked chat and a test alert arrives. |
-| **Ravi** already runs private infrastructure, coding agents, and Open WebUI; he is excited to compose them around his own machine without giving up control of the workspace. | [Connect Open WebUI to a Computer workspace](./integrations/open-webui-gateway) | A bounded workspace appears as a model, with its real activity visible in Computer. |
+| You recreate context: clone a repo, find the correct branch, restart a service, explain the task again. | You reopen the machine where that context already exists. |
+| You can use a chat AI, but it does not naturally have your local files, running app, or browser state. | An optional agent works in the selected real workspace, beside the files and tools you already use. |
+| You can SSH or remote-desktop into the host, but it is awkward to inspect a diff, preview an app, or guide an agent from a phone. | You get a mobile-first workspace for files, git, terminals, previews, and agent activity. |
+| You stop a small interruption until you can get back to the desk. | You can check the build, review a change, test the app, or answer an agent in a few minutes. |
 
-## Try it locally first
+## See a real job it can solve
 
-The quickest safe trial stays on the machine in front of you. Install the `cptr` package, start it on localhost, and open one existing project before thinking about remote access or AI providers.
+Open WebUI Computer is worth installing only if it removes a real interruption or keeps useful work continuous. Browse [real use cases](./use-cases/) before you install it:
 
-```bash
-pip install cptr
-cptr run
-```
+- Fix an issue, inspect a log, or check a dirty branch from another device.
+- Resume a workspace exactly where you left it.
+- Supervise an AI coding task in the actual repository.
+- Test a local app or prototype on a real phone or tablet.
+- Turn feedback, a note, a file, or a voice memo into context in the same project.
+- Triage an on-call interruption, run a recurring check, or use Open WebUI to direct work in a real workspace.
+
+## Start where you are
+
+| If you are... | Start here | What Computer adds |
+| --- | --- | --- |
+| New to terminals, agents, and self-hosting | [Is it right for me?](./is-it-right) | A local proof that you can see the project you already have, before networking or AI setup. |
+| A designer, student, or maker with a live prototype | [Test a local app on a real device](./use-cases/real-device-preview) | The real running prototype and its files, not a screenshot or recreated demo. |
+| A developer already using Codex, Claude Code, Cursor, Grok, OpenCode, Cline, or Pi | [AI and coding agents](./agents/) | A browser workspace around the same repository, terminal, git state, and agent session. |
+| An Open WebUI user | [Open WebUI, Computer, or both?](./choose) | An optional real-machine workspace behind the AI experience you already use. |
+| Comparing agent products such as Hermes Agent or OpenClaw | [What makes Computer different](./choose#for-agent-native-users) | An agent platform rooted in a personal machine and persistent workspace, not a detached agent conversation. |
+| A senior engineer or operator | [Remote access and security](./remote-access/) | The actual trust model, persistence, API, logging, and operational boundaries before you adopt it. |
+
+For advanced users, Computer is a workspace-centered control surface for the supported agents, tools, automations, and integrations you connect. You can call that a meta-harness, but the important boundary is simpler: **each task is attached to the Computer workspace selected for it.** Check that workspace before trusting an automation, bot, or gateway request.
+
+## Try the smallest useful version
+
+The first trial stays on the machine in front of you. It needs no remote network, AI key, agent, bot, or account with another service. Start it locally, open one existing folder, and decide whether seeing your real project this way is useful.
 
 [Try Open WebUI Computer locally →](./getting-started/local-trial)
 
-**Verify it worked:** the command prints a one-time setup URL. Open it on the host, finish setup, choose an existing folder, and create a terminal. If you cannot reach the page, use [install and login troubleshooting](./troubleshooting/install-and-login) before changing network settings.
+If you have never used a terminal or git, start with [is it right for me?](./is-it-right). It explains the value in plain language and tells you when to stop.
 
-## What Open WebUI Computer is—and is not
+## Run it on your terms
 
-It is a persistent workstation surface and an optional agent harness for the machine where your work already lives. It is useful even with no AI configured.
+Open WebUI Computer is self-hosted. It runs on a machine you control, and its core workspace does not require a managed cloud account, cloud control plane, or AI provider. Your application state stays on that machine in `~/.cptr` by default, or in the Docker `/data` volume.
 
-It is not a disposable cloud IDE, a sandbox around an untrusted user, or a service to expose directly to the public internet. An authenticated user can access the host filesystem and shell, so treat it like an SSH endpoint you own.
+You can add model APIs, coding-agent subscriptions, search, git remotes, messaging, and external tools when they are useful. Those services have their own network and data boundaries. The core value remains available without them: your files, terminal, git, editor, and local apps stay on your computer.
 
-[Read the security model →](./remote-access/security-model) · [Learn the core concepts →](./concepts) · [See who it is for →](./personas)
+## Use Open WebUI and Computer together
 
-## Use it with Open WebUI
+Use Open WebUI when you want an AI conversation, models, knowledge, prompts, or team workflows. Use Open WebUI Computer when the work must touch your personal machine. Use both when you want Open WebUI as the AI surface and Computer as the real workspace where the action happens.
 
-Many people should use both products. Keep Open WebUI as the place to choose models, organize AI conversations, and work with knowledge. Connect Open WebUI Computer when the request must inspect or change the selected workspace on your own machine. The [gateway guide](./integrations/open-webui-gateway) shows the combined workflow and its high-trust boundary.
+[Choose Open WebUI, Computer, or both →](./choose)
 
 ## Open WebUI Computer vs Open Terminal
 
-Both products can put AI near a terminal, but the starting point is different. **Open Terminal** gives an Open WebUI chat model a computing environment to drive. **Open WebUI Computer** gives you the existing computer you operate—files, terminal, editor, git, and running sessions—with AI as an optional helper.
+Both products can put AI near a terminal, but the starting point is different. **Open Terminal** gives an Open WebUI chat model a computing environment to drive. **Open WebUI Computer** gives you the existing computer you operate: files, terminal, editor, git, and running sessions, with AI as an optional helper.
 
 Choose Open Terminal when the chat AI needs an execution environment. Choose Open WebUI Computer when you need to reach the machine where the work already exists.
 
-## Explore the documentation
+## Is it for you?
 
-- [Get started](./getting-started/local-trial): install, sign in, open a workspace, and return from another device.
-- [Is it right for me?](./is-it-right): understand the value in plain language and recognize a bad fit early.
-- [Use cases](./use-cases/nora-remote-fix): solve a real interruption, not a toy exercise.
-- [Your workspace](./workspace/workspace-paths): files, terminal, git, tabs, browser preview, search, and PWA behavior.
-- [AI and coding agents](./agents/models): choose, supervise, and continue agent work in a real workspace.
-- [Remote access and security](./remote-access/security-model): reach your machine without pretending it is safe for everyone.
-- [Automations and integrations](./integrations/open-webui-gateway): connect Open WebUI, notifications, bots, and external tools.
-- [Operate Open WebUI Computer](./operate/data-and-backups): keep state, logs, upgrades, and recovery under control.
-- [Reference](./reference/cli-and-storage): exact commands, configuration, permissions, and API contracts.
-- [Troubleshooting](./troubleshooting/install-and-login): diagnose a concrete failed verification.
+It is a strong fit if the project, app, terminal, files, or AI work you care about already exists on a machine you control. It is not the right fit if you need a disposable cloud environment, safely isolated machines for untrusted people, or a public shell service.
 
-## Next step
-
-Start with [Open WebUI, Open WebUI Computer, or both?](./choose) if you are choosing a product. Otherwise, [try it locally](./getting-started/local-trial) and prove that it can open the workspace you already use.
+Read [the fit guide](./is-it-right) before exposing it remotely. An authenticated user can access the host filesystem and shell, so treat it like private SSH, not a public web app.

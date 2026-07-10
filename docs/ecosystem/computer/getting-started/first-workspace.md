@@ -5,7 +5,7 @@ sidebar_position: 6
 
 # Open your first workspace
 
-**Persona:** Nora needs a real answer to “am I looking at the checkout that has the bug?”, not a disposable cloud copy.
+Use this to answer the important question: “Am I looking at the actual checkout that has the issue, not a disposable cloud copy?”
 
 ## Use this when
 

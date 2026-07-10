@@ -1,8 +1,10 @@
 {
 	"label": "Remote access and security",
-	"position": 5,
+	"position": 7,
+	"collapsible": true,
+	"collapsed": true,
 	"link": {
-		"type": "generated-index",
-		"description": "Reach your own machine deliberately, with the same caution you would apply to SSH."
+		"type": "doc",
+		"id": "ecosystem/computer/remote-access/index"
 	}
 }

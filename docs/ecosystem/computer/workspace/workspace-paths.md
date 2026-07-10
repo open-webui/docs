@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # Workspace paths
 
-**Useful for Nora and Malik.** A workspace is a directory on the machine running Open WebUI Computer, not an uploaded project copy. Selecting a workspace determines the file browser, editor, git panel, chat context, and the starting context for work in that project.
+A workspace is a directory on the machine running Open WebUI Computer, not an uploaded project copy. Selecting a workspace determines the file browser, editor, git panel, chat context, and the starting context for work in that project.
 
 ## Use this when
 
@@ -13,7 +13,7 @@ Add a repository or project directory, switch between existing projects, or veri
 
 ## Before you start
 
-- Know the absolute path on the host, for example `/Users/nora/src/payments`, not a path from the phone or a cloud drive.
+- Know the absolute path on the host, for example `/Users/you/src/project`, not a path from the phone or a cloud drive.
 - The service account that runs Open WebUI Computer can read the directory and, if you intend to edit, write to it.
 - Review what is inside the path. Workspaces are convenience boundaries for the UI and AI file tools, not a sandbox for the terminal.
 

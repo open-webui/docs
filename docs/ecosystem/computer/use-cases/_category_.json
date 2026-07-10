@@ -1,11 +1,6 @@
 {
 	"label": "Use cases",
-	"position": 10,
+	"position": 4,
 	"collapsible": true,
-	"collapsed": true,
-	"link": {
-		"type": "generated-index",
-		"title": "Use cases",
-		"description": "Start with the job you need to finish on your real machine."
-	}
+	"collapsed": false
 }

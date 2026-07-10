@@ -1,8 +1,10 @@
 {
 	"label": "Operate Open WebUI Computer",
-	"position": 7,
+	"position": 9,
+	"collapsible": true,
+	"collapsed": true,
 	"link": {
-		"type": "generated-index",
-		"description": "Keep a private, persistent single-host installation healthy and recoverable."
+		"type": "doc",
+		"id": "ecosystem/computer/operate/index"
 	}
 }

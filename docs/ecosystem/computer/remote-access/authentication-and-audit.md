@@ -1,35 +1,29 @@
 ---
-title: Authentication and audit logging
+title: Authentication and audit boundaries
 sidebar_position: 5
 ---
 
-# Authentication and audit logging
+# Authentication and audit boundaries
 
 ## Use this when
 
-You operate a personal instance and need an evidence trail for configuration changes or a way to distinguish an access problem from a server problem.
+You operate a personal instance and need to confirm who can sign in, what a `401` means, and what audit logging can and cannot prove.
 
 ## Before you start
 
-The default password sign-in establishes JWT sessions. Configuration is stored under the data directory. Audit logging is off by default and records mutating HTTP requests, not a full terminal transcript.
+The default password sign-in establishes JWT sessions. Audit logging is off by default and records mutating HTTP requests, not a full terminal transcript or a complete record of terminal activity.
 
 ## Do it
 
-Start the server with an audit level appropriate to your privacy needs:
-
-```bash
-CPTR_AUDIT_LOG_LEVEL=METADATA cptr run
-```
-
-Use `REQUEST` to include redacted request bodies or `REQUEST_RESPONSE` to include redacted request and response bodies. The default file is `~/.cptr/logs/audit.jsonl`; set `CPTR_AUDIT_LOG_PATH` to store it elsewhere. Use a strong unique password at first setup and keep signup disabled unless you have a trusted-user workflow.
+Use a strong, unique password for the first account and keep sign-up disabled unless you have a deliberate trusted-user workflow. Keep the service on localhost or a private network. If you need audit records, configure the level, path, retention, and protected storage through [logs, health, and configuration](/ecosystem/computer/operate/logs-health-and-configuration).
 
 ## Verify it worked
 
-Make a harmless change such as opening a workspace or saving a preference, then inspect the last JSON line in the audit log. It contains the method, path, status, source IP, and authenticated user metadata. Passwords, API keys, tokens, authorization, cookies, and secrets are redacted.
+An unsigned-in browser receives `401` for protected API routes, while the intended account can sign in and reach only the instance you operate. If audit logging is enabled, make a harmless mutation and confirm a redacted entry appears using the [operations guide](/ecosystem/computer/operate/logs-health-and-configuration).
 
 ## If it did not
 
-Restart after changing environment variables; they are read when the process starts. If the file is absent, verify the process can create its parent directory and that the level is one of `METADATA`, `REQUEST`, or `REQUEST_RESPONSE`. A `401` means sign in again or inspect the configured auth mode; do not bypass it with proxy headers.
+A `401` means sign in again or inspect the configured auth mode; do not bypass it with proxy headers. If audit records are absent, follow the operations guide to verify the selected level, writable storage path, and restart requirement. If access works for an unintended network or user, stop the service, return it to localhost-only access, rotate affected credentials, and inspect the available audit records.
 
 ## Trust boundary
 

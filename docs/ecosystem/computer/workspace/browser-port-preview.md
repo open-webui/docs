@@ -5,7 +5,7 @@ sidebar_position: 5
 
 # Browser sessions and local-port previews
 
-**Useful for Theo.** Open WebUI Computer can show a local service that is already running on the host through a workspace preview tab. This is how Theo checks his app from an iPad while keeping the original terminal, logs, and source files in reach.
+Open WebUI Computer can show a local service that is already running on the host through a workspace preview tab. This lets you check an app from a phone or tablet while keeping the original terminal, logs, and source files in reach.
 
 ## Use this when
 

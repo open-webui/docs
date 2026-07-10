@@ -7,7 +7,7 @@ sidebar_position: 3
 
 ## Use this when
 
-Theo is at home with an iPad and needs the local app and terminal running on his Mac, or you are testing access before setting up a private remote network.
+Use this when you are at home with a phone or tablet and need the local app and terminal running on the host, or are testing access before setting up a private remote network.
 
 ## Before you start
 

@@ -1,6 +1,6 @@
 ---
 title: Use a Computer workspace from Open WebUI
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Use a Computer workspace from Open WebUI
@@ -15,7 +15,7 @@ Gateway requests run with **full tool approval**. Open WebUI cannot pause a file
 
 ## Use this when
 
-Elena already works in Open WebUI but needs an agent to inspect, edit, or run commands in the project on her Computer host. Choose Open WebUI alone for knowledge/chat work that does not need a specific machine. Choose Computer alone when you mainly need files, terminal, or git with optional AI.
+Use this when you already work in Open WebUI but need an agent to inspect, edit, or run commands in a project on a Computer host. Choose Open WebUI alone for knowledge/chat work that does not need a specific machine. Choose Computer alone when you mainly need files, terminal, or git with optional AI.
 
 ## Before you start
 
@@ -43,6 +43,14 @@ Elena already works in Open WebUI but needs an agent to inspect, edit, or run co
 4. Save, select the `cptr/<workspace>` model in Open WebUI, and ask a small read-only question about a file in that workspace.
 
 The lineage headers let Computer reuse the correct chat for subsequent turns, preserve edits/regenerations as branches, and avoid treating Open WebUI title/tag/follow-up utility requests as agent tasks.
+
+| In a combined request | What it owns |
+| --- | --- |
+| **Open WebUI** | The caller conversation and interface. |
+| **`cptr/<workspace>`** | The selected real Computer workspace. |
+| **Open WebUI Computer** | The configured model or agent that executes the task in that workspace. |
+
+Open WebUI knowledge bases, model-agent tools, system prompts, users, and general configuration are not forwarded into Computer unless you configure equivalent capabilities in Computer.
 
 ## Verify it worked
 

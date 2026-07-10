@@ -5,7 +5,7 @@ sidebar_position: 6
 
 # Search and chats
 
-**Useful for Malik.** A workspace chat is part of the project record: it holds the question, tool activity, decisions, and follow-ups for work in that actual directory. Global search lets you recover a chat or file without recreating the context from memory.
+A workspace chat is part of the project record: it holds the question, tool activity, decisions, and follow-ups for work in that actual directory. Global search lets you recover a chat or file without recreating the context from memory.
 
 ## Use this when
 

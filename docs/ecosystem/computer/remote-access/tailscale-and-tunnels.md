@@ -7,7 +7,7 @@ sidebar_position: 4
 
 ## Use this when
 
-Nora needs the real branch and terminal from a phone outside her home network, without opening a public router port.
+Use this when you need the real branch and terminal from a phone outside the home network, without opening a public router port.
 
 ## Before you start
 

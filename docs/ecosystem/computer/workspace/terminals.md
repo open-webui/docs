@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # Persistent terminals
 
-**Useful for Nora and Theo.** The terminal is a PTY-backed shell on the host. It is useful precisely because it sees the running services, credentials, checkout, and local tools you already use at the machine.
+The terminal is a PTY-backed shell on the host. It is useful precisely because it sees the running services, credentials, checkout, and local tools you already use at the machine.
 
 ## Use this when
 
@@ -20,7 +20,7 @@ Run a focused test, inspect logs, start a local development server, or resume a 
 ## Do it
 
 1. Open a terminal in the selected workspace and run `pwd` or an equivalent harmless command to confirm context.
-2. Run the narrow diagnostic or task. For Theo's app, start the usual development command and watch its port and output.
+2. Run the narrow diagnostic or task. For a local app, start the usual development command and watch its port and output.
 3. Leave the terminal open while you use another tab, a split, or another device. Return to the same workspace to review later output.
 4. Stop a server or long-running command deliberately when finished; do not assume closing the browser tab is the same as shutting it down.
 

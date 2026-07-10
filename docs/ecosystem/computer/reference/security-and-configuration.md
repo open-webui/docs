@@ -9,7 +9,7 @@ Open WebUI Computer is a private window into a real host. That is why it is usef
 
 ## Use this when
 
-Priya is deciding how to reach Computer from another device, set authentication/logging, or determine whether an instance is appropriate for a team or public network.
+Use this reference when deciding how to reach Computer from another device, set authentication/logging, or determine whether an instance is appropriate for a team or public network.
 
 ## Before you start
 

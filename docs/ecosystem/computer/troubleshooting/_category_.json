@@ -1,8 +1,10 @@
 {
 	"label": "Troubleshooting",
 	"position": 10,
+	"collapsible": true,
+	"collapsed": true,
 	"link": {
-		"type": "generated-index",
-		"description": "Diagnose the host, network, state, and access paths without guessing."
+		"type": "doc",
+		"id": "ecosystem/computer/troubleshooting/index"
 	}
 }

@@ -5,7 +5,7 @@ sidebar_position: 7
 
 # Install the app, share into a workspace, and use shortcuts
 
-**Useful for Nora and Theo.** Installing Open WebUI Computer as a PWA makes the private machine feel available from a phone or tablet: it opens in an app-like window, can receive a shared link or file, and keeps the first useful actions close at hand.
+Installing Open WebUI Computer as a PWA makes the private machine feel available from a phone or tablet: it opens in an app-like window, can receive a shared link or file, and keeps the first useful actions close at hand.
 
 ## Use this when
 

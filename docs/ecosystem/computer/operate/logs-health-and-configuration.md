@@ -21,15 +21,15 @@ Check the instance:
 curl http://127.0.0.1:8000/api/health
 ```
 
-Set `CPTR_LOG_LEVEL=DEBUG` for more server detail or `CPTR_LOG_FORMAT=json` for structured stdout, then restart. Use `CPTR_AUDIT_LOG_LEVEL=METADATA` for a low-content mutation trail. Use `CPTR_DATA_DIR=/path/to/data` only before start, and make the selected directory persistent and writable.
+Set `CPTR_LOG_LEVEL=DEBUG` for more server detail or `CPTR_LOG_FORMAT=json` for structured stdout, then restart. Set `CPTR_AUDIT_LOG_LEVEL=METADATA` for a low-content mutation trail. `REQUEST` adds redacted request bodies and `REQUEST_RESPONSE` adds redacted response bodies; the default audit file is `~/.cptr/logs/audit.jsonl`, and `CPTR_AUDIT_LOG_PATH` changes it. Use `CPTR_DATA_DIR=/path/to/data` only before start, and make the selected directory persistent and writable.
 
 ## Verify it worked
 
-Health returns JSON with `status`, `uptime_seconds`, and `pid`. Restart with the chosen log setting and observe the requested output format in the process log. When changing the data directory, confirm it contains `app.db` and `config.toml` after a clean start.
+Health returns JSON with `status`, `uptime_seconds`, and `pid`. Restart with the chosen log setting and observe the requested output format in the process log. After a harmless mutation, the selected audit file contains a redacted JSON entry. When changing the data directory, confirm it contains `app.db` and `config.toml` after a clean start.
 
 ## If it did not
 
-If health fails locally, inspect the server's stdout and verify the chosen port. If config changes do not appear, restart and confirm you changed the directory actually selected by `CPTR_DATA_DIR`. If the app cannot write data, correct ownership rather than running it with broader privileges.
+If health fails locally, inspect the server's stdout and verify the chosen port. If the audit file is absent, restart and confirm its selected level and parent directory are writable. If config changes do not appear, restart and confirm you changed the directory actually selected by `CPTR_DATA_DIR`. If the app cannot write data, correct ownership rather than running it with broader privileges.
 
 ## Trust boundary
 

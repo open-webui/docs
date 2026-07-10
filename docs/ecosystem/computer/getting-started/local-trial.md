@@ -5,7 +5,7 @@ sidebar_position: 2
 
 # Local trial
 
-**Persona:** Nora, a Rails consultant, wants to see the actual `payments` branch and terminal on her iMac before she entrusts it to another screen.
+Start by proving that Open WebUI Computer can show the existing project and terminal on your machine before you trust it from another screen.
 
 ## Use this when
 

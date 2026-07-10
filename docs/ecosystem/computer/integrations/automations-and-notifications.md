@@ -1,15 +1,17 @@
 ---
-title: Schedule trusted work and get notified
-sidebar_position: 2
+title: Automations, notifications, and webhooks
+sidebar_position: 3
 ---
 
-# Schedule trusted work and get notified
+# Automations, notifications, and webhooks
 
-Automations are useful when a repeated check belongs beside the repository and tools that actually perform it: run a test suite, inspect a build result, or prepare a report in a known workspace. They are not a safe way to accept arbitrary instructions from the internet.
+Automations are useful when a repeated check belongs beside the repository and tools that actually perform it: run a test suite, inspect a build result, or prepare a report in a known workspace. Notifications report what happened; authenticated webhooks trigger a known automation. They are not a safe way to accept arbitrary instructions from the internet.
+
+Use [Schedule trusted work](./automations) for the task itself and [Notifications and webhooks](./notifications-and-webhooks) for delivery and secret-trigger handling. This page explains the shared high-trust boundary.
 
 ## Use this when
 
-Priya wants a known prompt to run on a recurring schedule in one known workspace, then wants a browser, webhook, or bot notification when it finishes or fails.
+Use this when you need a known prompt to run on a recurring schedule in one known workspace, then want a browser, webhook, or bot notification when it finishes or fails.
 
 ## Before you start
 
@@ -19,16 +21,15 @@ Priya wants a known prompt to run on a recurring schedule in one known workspace
 
 ## Do it
 
-1. Open **Automations**, create an automation, select its workspace/model, write its prompt, and set its schedule.
-2. Save it, inspect the shown next run, then use **Run now** before relying on the schedule.
-3. In **Settings → Notifications**, create a browser, webhook, or bot target; select the finished/failed events it should receive.
-4. Review run history. Pause the automation before changing a broad prompt or replacing its model.
+1. Create and validate the task with [Schedule trusted work](./automations).
+2. Create and test its delivery or trigger with [Notifications and webhooks](./notifications-and-webhooks).
+3. Review run history before enabling a recurring schedule.
 
 Automations can also have an authenticated webhook trigger. Treat that URL as a secret trigger, revoke it when no longer needed, and do not place it in public clients or issue trackers.
 
 ## Verify it worked
 
-The automation displays an upcoming run and **Run now** creates a run-history entry with a linked chat. That proves the agent task launched; open the linked chat and confirm the terminal/test result before treating the run as a pass or failure. The notification target’s test succeeds before you rely on an automatic notification.
+The automation displays an upcoming run and **Run now** creates a run-history entry with a linked chat. Its notification target’s test succeeds before you rely on an automatic notification.
 
 ## If it did not
 

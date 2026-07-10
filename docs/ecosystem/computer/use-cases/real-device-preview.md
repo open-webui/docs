@@ -1,13 +1,13 @@
 ---
-title: "Preview your local app on a real device"
-sidebar_position: 3
+title: "Test a local app on a real device"
+sidebar_position: 5
 ---
 
-# Preview your local app on a real device
+# Test a local app on a real device
 
-**Persona: Theo, a mobile developer.** His Mac is already running a local app server. He needs to verify a touch interaction on an iPad without copying the project to another service or guessing from a desktop viewport.
+Your machine is already running a local app server. You need to verify a touch interaction on a phone or tablet without copying the project to another service or guessing from a desktop viewport.
 
-This is valuable because a phone or tablet can reveal problems a desktop browser hides. A **local app server** is the development copy of an app that is already running on Theo's Mac. Open WebUI Computer lets him open that same running app from an iPad, while keeping the source files and terminal logs from the original machine close by.
+This is valuable because a phone or tablet can reveal problems a desktop browser hides. A **local app server** is the development copy of an app that is already running on your machine. Open WebUI Computer lets you open that same running app from another device, while keeping the source files and terminal logs from the original machine close by.
 
 ## Use this when
 
@@ -17,7 +17,7 @@ Use this when a process in a workspace has opened a local port and you want to v
 
 - **Not set up yet?** Complete the [local trial](/ecosystem/computer/getting-started/local-trial), add [your first workspace](/ecosystem/computer/getting-started/first-workspace), then configure [private remote access](/ecosystem/computer/remote-access/tailscale-and-tunnels) before testing from the iPad.
 - The app is started from the intended workspace on the host. Note its usual port and command.
-- Theo can sign in to Open WebUI Computer from the test device through a private network path.
+- You can sign in to Open WebUI Computer from the test device through a private network path.
 - The app itself is safe to view in this context. A preview can expose whatever the local process serves to every user who can use this trusted instance.
 
 ## Do it
@@ -31,7 +31,7 @@ For the underlying terminal behavior, see [Persistent terminals](/ecosystem/comp
 
 ## Verify it worked
 
-The file browser lists the running port, the preview opens content served by Theo's existing process, and the terminal continues to show the same process output. Close and reopen the browser session: the process is still running unless Theo deliberately stopped it or the host changed state.
+The file browser lists the running port, the preview opens content served by the existing process, and the terminal continues to show the same process output. Close and reopen the browser session: the process is still running unless you deliberately stopped it or the host changed state.
 
 ## If it did not
 

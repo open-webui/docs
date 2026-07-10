@@ -13,7 +13,7 @@ Gateway-created tasks use `tool_approval_mode: full`. There is no per-tool appro
 
 ## Use this when
 
-Elena is connecting a trusted OpenAI-compatible client and needs the exact endpoints, authentication, and conversation-continuity semantics.
+Use this reference when connecting a trusted OpenAI-compatible client and you need the exact endpoints, authentication, and conversation-continuity semantics.
 
 ## Before you start
 

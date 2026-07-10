@@ -23,7 +23,7 @@ From an untrusted network or unsigned-in browser, protected API calls return `40
 
 ## If it did not
 
-If access works from a network or user you did not intend, stop the service or return it to `127.0.0.1`, revoke affected credentials, and inspect [audit logs](./authentication-and-audit). Do not solve an exposure problem by adding more application users.
+If access works from a network or user you did not intend, stop the service or return it to `127.0.0.1`, preserve [audit logs](./authentication-and-audit), and rotate credentials. Changing a password does not invalidate an existing browser JWT by itself. To sign every browser session out, replace the `[server]` `secret` in `~/.cptr/config.toml` with a new random value, restart Computer, then reset passwords and rotate gateway keys, bot tokens, and external credentials that may be affected. Do not solve an exposure problem by adding more application users.
 
 ## Trust boundary
 

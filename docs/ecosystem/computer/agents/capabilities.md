@@ -7,7 +7,7 @@ sidebar_position: 5
 
 ## Use this when
 
-Rina repeats a workflow, wants the agent to remember durable project facts, needs parallel investigation, or wants to supply web, voice, or image input rather than typing everything.
+Use this when you repeat a workflow, want the agent to remember durable project facts, need parallel investigation, or want to supply web, voice, or image input rather than typing everything.
 
 ## Before you start
 

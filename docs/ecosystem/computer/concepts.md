@@ -1,6 +1,6 @@
 ---
 title: "Core concepts"
-sidebar_position: 3
+unlisted: true
 ---
 
 # Core concepts
@@ -21,7 +21,7 @@ Open WebUI Computer is easiest to understand when you separate the machine from 
 
 ## The important mental model
 
-Open WebUI Computer does not reconstruct a project somewhere else. It reconnects you to the host and directory you chose. That is why Nora can see the same dirty branch from her phone, and why Malik can continue an agent session that started at his desk.
+Open WebUI Computer does not reconstruct a project somewhere else. It reconnects you to the host and directory you chose. That is why you can see the same dirty branch from a phone or continue an agent session that started at your desk.
 
 ## Verify it worked
 

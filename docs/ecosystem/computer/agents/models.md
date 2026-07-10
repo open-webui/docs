@@ -9,7 +9,7 @@ Open WebUI Computer can run an agent through an API connection, or through a cod
 
 ## Use this when
 
-Rina has an OpenAI, Anthropic, Ollama, or OpenAI-compatible endpoint and wants a model to inspect or change her project. Jules already pays for Codex or Claude Code and wants that subscription to work in the browser without adding an API key.
+Use this when you have an OpenAI, Anthropic, Ollama, or OpenAI-compatible endpoint and want a model to inspect or change a project, or already pay for Codex or Claude Code and want that subscription to work in the browser without adding an API key.
 
 ## Before you start
 

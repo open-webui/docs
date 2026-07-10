@@ -9,7 +9,7 @@ Native profiles connect the browser UI to a coding-agent command already present
 
 ## Use this when
 
-Jules has a Codex, Claude Code, Cursor, Grok, OpenCode, Cline, or Pi subscription and wants to use it from a Computer chat in the same repository.
+Use this when you have a Codex, Claude Code, Cursor, Grok, OpenCode, Cline, or Pi subscription and want to use it from a Computer chat in the same repository.
 
 ## Before you start
 

@@ -9,7 +9,7 @@ The product is named **Open WebUI Computer**; `cptr` is the package and command 
 
 ## Use this when
 
-Priya is installing or operating Computer on a workstation or private server and needs to know which command starts it, where its state lives, and what to preserve during an upgrade.
+Use this reference when installing or operating Computer on a workstation or private server and you need to know which command starts it, where its state lives, and what to preserve during an upgrade.
 
 ## Before you start
 

@@ -19,7 +19,7 @@ Native profiles run through their installed host command. Other terminal agents 
 
 ## Use this when
 
-Jules sees an empty model list, a “not found” status, or needs to decide whether a normal terminal workflow is sufficient.
+Use this reference when you see an empty model list, a “not found” status, or need to decide whether a normal terminal workflow is sufficient.
 
 ## Before you start
 

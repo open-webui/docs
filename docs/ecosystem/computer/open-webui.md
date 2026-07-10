@@ -1,6 +1,6 @@
 ---
 title: "Use Open WebUI with Open WebUI Computer"
-sidebar_position: 6
+unlisted: true
 ---
 
 # Use Open WebUI with Open WebUI Computer

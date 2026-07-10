@@ -9,7 +9,7 @@ Open WebUI Computer keeps the agent beside the files, terminal, git view, and ta
 
 ## Use this when
 
-Jules wants an agent to investigate a bug from a phone, while retaining the ability to inspect a diff, answer a question, or stop the task before it turns into a broad rewrite.
+Use this when you want an agent to investigate a bug from a phone while retaining the ability to inspect a diff, answer a question, or stop the task before it turns into a broad rewrite.
 
 ## Before you start
 

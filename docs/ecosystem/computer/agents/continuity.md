@@ -9,7 +9,7 @@ The useful part of remote work is continuity: you can leave a task, reconnect on
 
 ## Use this when
 
-Rina starts an investigation before leaving her desk, or Jules needs to steer a long-running agent task from a smaller screen.
+Use this when you start an investigation before leaving the desk or need to steer a long-running agent task from a smaller screen.
 
 ## Before you start
 
