@@ -1,13 +1,14 @@
 ---
 title: Automations, notifications, and webhooks
 sidebar_position: 3
+unlisted: true
 ---
 
 # Automations, notifications, and webhooks
 
 Automations are useful when a repeated check belongs beside the repository and tools that actually perform it: run a test suite, inspect a build result, or prepare a report in a known workspace. Notifications report what happened; authenticated webhooks trigger a known automation. They are not a safe way to accept arbitrary instructions from the internet.
 
-Use [Schedule trusted work](./automations) for the task itself and [Notifications and webhooks](./notifications-and-webhooks) for delivery and secret-trigger handling. This page explains the shared high-trust boundary.
+This legacy combined route remains for existing links. Start with [Schedule trusted work](./automations) for the task itself, then add [Notifications and webhooks](./notifications-and-webhooks) for delivery and secret-trigger handling.
 
 ## Use this when
 

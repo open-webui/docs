@@ -1,6 +1,6 @@
 ---
 title: "Use Open WebUI with a real workspace"
-sidebar_position: 9
+sidebar_position: 11
 ---
 
 # Use Open WebUI with a real workspace

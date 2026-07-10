@@ -1,6 +1,6 @@
 ---
 title: "Git, branches, stashes, and worktrees"
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # Git, branches, stashes, and worktrees

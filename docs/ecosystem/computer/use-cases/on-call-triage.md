@@ -1,6 +1,6 @@
 ---
 title: "Triage an on-call interruption"
-sidebar_position: 7
+sidebar_position: 9
 ---
 
 # Triage an on-call interruption

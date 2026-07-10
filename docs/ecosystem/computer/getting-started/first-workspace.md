@@ -5,27 +5,33 @@ sidebar_position: 6
 
 # Open your first workspace
 
-Use this to answer the important question: “Am I looking at the actual checkout that has the issue, not a disposable cloud copy?”
+This is where Computer becomes useful: you select a folder already on the machine and see that same folder, with its existing files, in the browser.
 
 ## Use this when
 
-The server is running and you need to complete first-time setup around an existing project.
+The server is running and you want to choose the folder that should appear in Computer. Do this even if the folder is notes, design files, or another non-code project.
 
 ## Before you start
 
-Know the folder you want to expose. Choose a small non-sensitive project first if you are learning the interface. An AI connection is optional and can be skipped in the setup wizard.
+- A **workspace** means an existing folder on the machine, not an uploaded copy.
+- Choose a small, non-sensitive folder you recognize while learning.
+- Connecting AI is optional. Skip it until the folder view itself is useful.
 
 ## Do it
 
-Use the wizard's **Open folder** step to select the project, then either connect an AI provider or choose **Skip**. Finish setup. Create a terminal tab, inspect a file, and open the Git view.
+In the setup wizard, choose **Open folder** and select the folder. Choose **Skip** when asked to connect AI, then finish setup. In the file browser, open one familiar file.
 
 ## Verify it worked
 
-The workspace path is visible in the sidebar. In its terminal, `pwd` identifies that path and `git status` shows the branch and changes you see in your regular shell. Close the browser tab, reopen the server URL, and verify the workspace remains available.
+The sidebar shows the folder you selected, and the file browser shows a familiar file with the same contents as the original. Close the browser tab, reopen the server URL, and confirm the same folder remains available.
+
+### Optional developer check
+
+If the folder is a Git repository, open the Git view or a terminal tab and compare its branch and changes with your usual development tools. This is an extra confirmation, not a requirement for using Computer.
 
 ## If it did not
 
-If the folder picker cannot reach the project, run the server under the OS account that owns or can read that folder. If the wrong workspace opens, use the workspace picker to add the intended path instead of moving files into the data directory.
+If the folder picker cannot reach the project, run the server under the OS account that owns or can read that folder. If the wrong folder opens, use the workspace picker to add the intended path instead of moving files into the data directory. If you cannot tell which folder is correct, stop here and choose a smaller folder you can recognize before adding AI or remote access.
 
 ## Trust boundary
 

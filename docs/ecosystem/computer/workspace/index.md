@@ -12,6 +12,7 @@ This is the part that makes Open WebUI Computer more than a chat window. A works
 | Need | Guide |
 | --- | --- |
 | Confirm you opened the real project, not a copy | [Workspace paths](./workspace-paths) |
+| Review a prototype, document, image, or shared file and keep feedback with it | [Review files and keep feedback with the project](./review-files-and-feedback) |
 | Read, edit, or preview files | [Files and editor](./files-editor) |
 | Resume a command or start a local service | [Terminals](./terminals) |
 | Review a branch or diff | [Git](./git) |

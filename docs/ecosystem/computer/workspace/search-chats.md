@@ -1,6 +1,6 @@
 ---
 title: "Search and chats"
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 # Search and chats

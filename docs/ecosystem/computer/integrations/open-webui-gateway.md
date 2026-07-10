@@ -9,6 +9,18 @@ Open WebUI is the place to organize AI conversations, models, knowledge, and sha
 
 It is valuable when you want Open WebUI as the front door without copying a repository or pretending a remote agent has your local machine context. It is not a general two-way sync product: it does not import Computer’s standalone chats into Open WebUI and does not make Open WebUI knowledge bases automatically available to Computer.
 
+## The first useful proof
+
+You may already use Open WebUI to organize research conversations while your docs checkout, local scripts, and browser login live on a Mac. You do not need another repository or a generic answer. You need one Open WebUI chat to inspect the real checkout.
+
+Connect one deliberately bounded workspace, then ask a harmless question such as:
+
+```text
+Read the README in this workspace. Do not change files. Tell me the command it gives for the local documentation preview.
+```
+
+If that answer is grounded in the file on the Computer host, the combination is useful. Save edits, deploys, and broad tasks for after this proof works.
+
 :::danger Gateway requests are unattended
 Gateway requests run with **full tool approval**. Open WebUI cannot pause a file edit, command, or external tool call for a per-tool confirmation round trip. Connect only trusted Open WebUI clients to deliberately bounded workspaces and models. For interactive approval, open the same workspace directly in Open WebUI Computer.
 :::
@@ -40,7 +52,7 @@ Use this when you already work in Open WebUI but need an agent to inspect, edit,
    ```
 
    `{{USER_MESSAGE_ID}}`, `{{USER_MESSAGE_PARENT_ID}}`, and `{{TASK}}` require Open WebUI 0.10.0 or newer. Without them, basic chat works, but edit/regeneration branches and background-task filtering do not.
-4. Save, select the `cptr/<workspace>` model in Open WebUI, and ask a small read-only question about a file in that workspace.
+4. Save, select the `cptr/<workspace>` model in Open WebUI, and ask the read-only question above about a file in that workspace.
 
 The lineage headers let Computer reuse the correct chat for subsequent turns, preserve edits/regenerations as branches, and avoid treating Open WebUI title/tag/follow-up utility requests as agent tasks.
 
@@ -54,7 +66,7 @@ Open WebUI knowledge bases, model-agent tools, system prompts, users, and genera
 
 ## Verify it worked
 
-The workspace appears as `cptr/<workspace>` in Open WebUI’s model picker. Its answer cites real workspace state, and the associated conversation appears in the Computer sidebar. Send a follow-up, then edit or regenerate a message: the Computer sidebar should show the related branch rather than an unrelated chat. Open WebUI title/tag requests should not create a workspace-agent chat.
+The workspace appears as `cptr/<workspace>` in Open WebUI’s model picker. Its answer identifies the real README command, and the associated conversation appears in the Computer sidebar. Send a follow-up, then edit or regenerate a message: the Computer sidebar should show the related branch rather than an unrelated chat. Open WebUI title/tag requests should not create a workspace-agent chat.
 
 ## If it did not
 

@@ -5,15 +5,19 @@ sidebar_position: 2
 
 # Local trial
 
-Start by proving that Open WebUI Computer can show the existing project and terminal on your machine before you trust it from another screen.
+Your first proof should be simple: choose a folder you recognize, open a familiar file, and confirm it is the same folder already on your machine. Nothing is copied to a cloud workspace.
 
 ## Use this when
 
-You want to prove Open WebUI Computer works with an existing machine and project before exposing it to another device, adding AI, or configuring Docker. Its value is continuity: instead of re-cloning a repo into a cloud IDE or reconstructing a terminal, you pick up the files, branch, process, and shell already on this computer.
+Choose this unless you already operate Docker or need an offline installation. It starts Computer only on this machine, so you can decide whether the real-folder view is useful before adding remote access or AI.
 
 ## Before you start
 
-Use Python 3.10 or newer on the host. Install into the Python environment you intend to keep. This command starts on `127.0.0.1`, so it is not reachable from another device.
+- Use Python 3.10 or newer on the machine that holds the folder.
+- Pick one small, non-sensitive folder you recognize. It does not need to be code or a Git repository.
+- A **workspace** is simply that folder. A **terminal** is an optional text command window for the machine.
+
+The server starts on this machine only (`127.0.0.1`), so another device cannot reach it yet.
 
 ## Do it
 
@@ -22,21 +26,26 @@ pip install cptr
 cptr run
 ```
 
-Open the one-time URL printed by the command. Complete the setup wizard, choose an existing project folder, and open a terminal tab. `cptr run --headless` is useful on a host that should not open a local browser.
+Open the one-time URL printed by the command. In the setup wizard, choose **Open folder**, select the folder you picked, and skip the optional AI connection for now. `cptr run --headless` is useful on a host that should not open a browser automatically.
 
 ## Verify it worked
 
-In a second terminal on the host, run:
+The sidebar shows the folder you chose. Open a file you recognize and confirm its name and contents match the file on the machine. Close the browser tab, open the same server URL again, and confirm the folder is still there.
+
+### Optional developer check
+
+If you use a terminal or Git, you can make a deeper comparison in a terminal tab:
 
 ```bash
-curl http://127.0.0.1:8000/api/health
+pwd
+git status
 ```
 
-It returns JSON with `"status":"ok"`. In the browser, the selected workspace shows its existing files; run `pwd` and `git status` in its terminal and compare them with your normal shell.
+`pwd` prints the current folder. Run `git status` only when the selected folder is a Git repository. For a server diagnostic, `curl http://127.0.0.1:8000/api/health` returns JSON with `"status":"ok"`.
 
 ## If it did not
 
-If `cptr` is not found, activate the Python environment where it was installed or run `python -m pip install cptr` there. If the port is occupied, choose another one: `cptr run --port 8001`. See [install and login troubleshooting](/ecosystem/computer/troubleshooting/install-and-login).
+If `cptr` is not found, activate the Python environment where it was installed or run `python -m pip install cptr` there. If the page does not open, use [install and login troubleshooting](/ecosystem/computer/troubleshooting/install-and-login) before changing any network settings. If the wrong folder appears, continue with [your first workspace](./first-workspace).
 
 ## Trust boundary
 

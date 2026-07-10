@@ -1,6 +1,6 @@
 ---
 title: "Persistent terminals"
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Persistent terminals

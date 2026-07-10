@@ -7,6 +7,8 @@ sidebar_position: 4
 
 The gateway exposes each workspace owned by the gateway-key user as an OpenAI-compatible model. It is intended for a trusted client such as Open WebUI, not as a public general-purpose API.
 
+If you are connecting Open WebUI, start with [Use a Computer workspace from Open WebUI](../integrations/open-webui-gateway). This page is the endpoint and behavior reference once the first read-only workspace task is working.
+
 :::danger Full approval only
 Gateway-created tasks use `tool_approval_mode: full`. There is no per-tool approval callback in the OpenAI-compatible API. Use only trusted clients, bounded workspaces, and models you intend to give host-capable tool access.
 :::

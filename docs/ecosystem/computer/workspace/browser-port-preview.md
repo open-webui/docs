@@ -1,6 +1,6 @@
 ---
 title: "Browser sessions and local-port previews"
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # Browser sessions and local-port previews

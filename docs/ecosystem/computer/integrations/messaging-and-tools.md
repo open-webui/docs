@@ -1,11 +1,12 @@
 ---
 title: Messaging bots and external tools
 sidebar_position: 6
+unlisted: true
 ---
 
 # Messaging bots and external tools
 
-Messaging bots are useful when the fastest way to ask your machine a question is the chat app already on your phone. MCP and OpenAPI tools are useful when the agent needs a declared bridge to another service. They have different trust boundaries, so configure and review them separately.
+This legacy combined route remains for existing links. Messaging bots are useful when the fastest way to ask your machine a question is the chat app already on your phone. MCP and OpenAPI tools are useful when the agent needs a declared bridge to another service. They have different trust boundaries, so configure and review them separately.
 
 | Need | Read this |
 | --- | --- |

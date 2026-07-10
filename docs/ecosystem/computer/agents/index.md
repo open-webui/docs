@@ -15,6 +15,6 @@ Start small. Choose a model, ask it to explain one real file, then decide whethe
 | Make a native agent available on the host | [Set up and detect a coding agent](./setup-and-detection) |
 | Review changes and control approval | [Supervise agent work safely](./supervise-work) |
 | Continue work across devices or recover after an interruption | [Plans, queues, resume, and context](./continuity) |
-| Give an agent reusable guidance or more input modes | [Skills, memory, sub-agents, web, voice, and images](./capabilities) |
+| Add reusable guidance, parallel work, web research, or media input | [Agent context and extensions](./capabilities) |
 
 Not a fit: use a normal chat product when you only need conversation, knowledge, or model comparison. Use a disposable environment when an untrusted agent or user must not reach the real host.

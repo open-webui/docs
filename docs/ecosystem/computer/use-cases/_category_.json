@@ -2,5 +2,9 @@
 	"label": "Use cases",
 	"position": 4,
 	"collapsible": true,
-	"collapsed": false
+	"collapsed": false,
+	"link": {
+		"type": "doc",
+		"id": "ecosystem/computer/use-cases/index"
+	}
 }
