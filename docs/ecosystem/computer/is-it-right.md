@@ -31,6 +31,12 @@ Computer runs on a machine you control. Its core workspace does not require a ma
 
 External services still need their own network access. For example, a hosted model API, web search provider, Git remote, bot, or tool server can receive the data required for that feature. The point is that they are optional connections to your computer, not the place your core workspace must live.
 
+## A cloud agent can be a better starting point
+
+Cloud agents are excellent when the job starts with a question, web research, a fresh deliverable, or material you are happy to upload. They provide a managed virtual computer, so you do not need to install or operate a machine first.
+
+Choose Computer when the value is in the machine you already own: a local project, an app that is already running, a signed-in browser, installed tools, a long-lived terminal, or files you do not want to copy into a hosted environment. The two approaches can complement each other. Use a cloud agent to research or create a new artifact, then use Computer when the work must meet the actual local project.
+
 ## Use Open WebUI Computer when
 
 | You have this problem | What Computer changes |
@@ -46,6 +52,7 @@ External services still need their own network access. For example, a hosted mod
 | Your actual need | Better starting point |
 | --- | --- |
 | You only want an AI chat, models, knowledge, prompts, or shared AI workflows. | [Open WebUI](https://docs.openwebui.com/) |
+| You want a managed agent to research the web or create a fresh artifact, and no local machine state matters. | A cloud agent or general AI workspace. |
 | You need a new, disposable, isolated development environment. | A cloud IDE, virtual machine, or container designed for isolation. |
 | Teammates or untrusted people need separate, safely isolated access to a host. | A multi-user platform with tenant isolation; Open WebUI Computer is not that. |
 | You want to publish a shell/filesystem interface on the public internet. | Do not use a direct public deployment; use a private network pattern instead. |
