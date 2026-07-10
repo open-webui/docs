@@ -50,6 +50,7 @@ const config: Config = {
 	markdown: {
 		mermaid: true,
 	},
+	clientModules: ["./src/clientModules/ensure-gtag.js"],
 	themes: ["@docusaurus/theme-mermaid"],
 
 	presets: [
