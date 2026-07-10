@@ -26,7 +26,7 @@ Use this reference when connecting a trusted OpenAI-compatible client and you ne
 ## Do it
 
 1. Request `GET /v1/models` with `Authorization: Bearer <gateway-key>`.
-2. Select a returned `cptr/<workspace>` model.
+2. Select a returned `cptr/your-workspace` model.
 3. Send `POST /v1/chat/completions` with `model`, `messages`, and optional `stream`.
 4. Send `X-Chat-Id` or `X-OpenWebUI-Chat-Id` to reuse a Computer chat across turns. Open WebUI should additionally send its message/task lineage headers.
 

@@ -21,7 +21,7 @@ You want Open WebUI as the AI front door and Open WebUI Computer as the place th
 ## Do it
 
 1. Add the Computer gateway as an OpenAI API connection in Open WebUI using the documented `/v1` base URL and gateway credential.
-2. Add the documented continuity headers, save the connection, and select the workspace model shown as `cptr/<workspace>`.
+2. Add the documented continuity headers, save the connection, and select the workspace model shown as `cptr/your-workspace`.
 3. Ask a small read-only question about a known file in that workspace.
 4. Open Computer and inspect the workspace chat and activity produced by the request before trying a task that edits files or runs commands.
 

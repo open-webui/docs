@@ -52,21 +52,21 @@ Use this when you already work in Open WebUI but need an agent to inspect, edit,
    ```
 
    `{{USER_MESSAGE_ID}}`, `{{USER_MESSAGE_PARENT_ID}}`, and `{{TASK}}` require Open WebUI 0.10.0 or newer. Without them, basic chat works, but edit/regeneration branches and background-task filtering do not.
-4. Save, select the `cptr/<workspace>` model in Open WebUI, and ask the read-only question above about a file in that workspace.
+4. Save, select the `cptr/your-workspace` model in Open WebUI, and ask the read-only question above about a file in that workspace.
 
 The lineage headers let Computer reuse the correct chat for subsequent turns, preserve edits/regenerations as branches, and avoid treating Open WebUI title/tag/follow-up utility requests as agent tasks.
 
 | In a combined request | What it owns |
 | --- | --- |
 | **Open WebUI** | The caller conversation and interface. |
-| **`cptr/<workspace>`** | The selected real Computer workspace. |
+| **`cptr/your-workspace`** | The selected real Computer workspace. |
 | **Open WebUI Computer** | The configured model or agent that executes the task in that workspace. |
 
 Open WebUI knowledge bases, model-agent tools, system prompts, users, and general configuration are not forwarded into Computer unless you configure equivalent capabilities in Computer.
 
 ## Verify it worked
 
-The workspace appears as `cptr/<workspace>` in Open WebUI’s model picker. Its answer identifies the real README command, and the associated conversation appears in the Computer sidebar. Send a follow-up, then edit or regenerate a message: the Computer sidebar should show the related branch rather than an unrelated chat. Open WebUI title/tag requests should not create a workspace-agent chat.
+The workspace appears as `cptr/your-workspace` in Open WebUI’s model picker. Its answer identifies the real README command, and the associated conversation appears in the Computer sidebar. Send a follow-up, then edit or regenerate a message: the Computer sidebar should show the related branch rather than an unrelated chat. Open WebUI title/tag requests should not create a workspace-agent chat.
 
 ## If it did not
 

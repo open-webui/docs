@@ -5,58 +5,62 @@ sidebar_position: 2
 
 # Open WebUI, Open Terminal, Computer, or a combination?
 
-Start with where the useful context lives and what kind of computer should do the work. These are complementary ways to work, not competing feature checklists.
+These tools can work together. The useful question is not which one has the longest feature list. It is whether you want to work through a conversation, an Open WebUI terminal connection, or a workspace that is organized around your personal machine.
 
 ## Start in Open WebUI when the work begins as a conversation
 
 Choose Open WebUI for model choice, knowledge, prompts, shared AI workflows, and conversations where the important context is already in the chat or connected knowledge sources. It works well for one person and grows naturally into shared workflows.
 
-You can stop here when the task does not need a shell, a project folder, or a particular machine.
+Stop here when the task does not need a shell, files, or another computer connection.
 
-## Add Open Terminal when a chat needs a fresh place to execute
+## Add Open Terminal when a chat needs a terminal and files
 
-Open Terminal is an Open WebUI feature. It gives an Open WebUI chat a computing environment where the model can write files, run commands, install packages, and return the result in the conversation.
+Open WebUI can connect to an Open Terminal server. The chat gets an interactive terminal, file browser, editor, uploads and downloads, running-process output, and local-port previews. The model can use the same environment as an always-on tool while you work in the chat.
 
-Use it for a self-contained job: analyze an uploaded dataset, build a small prototype, run a script, or give an agent a clean environment for a task. It is especially useful when the work does not depend on an existing machine's long-lived state. Run it in Docker for an isolated execution environment. Use bare-metal access only when direct host access is intentional.
+That environment can take several forms:
+
+- **Docker:** a container with its own toolchain. Its files can persist when the server uses a volume.
+- **Bare metal:** the terminal runs on a real machine and can start in an existing project directory.
+- **Per-user containers:** the Terminals service can provision a separate configured container for each Open WebUI user.
+
+Choose Open Terminal when you want Open WebUI's chat and file experience to drive a configured terminal environment. It can be a long-lived project environment, not only a temporary scratch space.
 
 [Learn about Open Terminal](/features/open-terminal)
 
-## Start in Open WebUI Computer when the real machine is the point
+## Start in Open WebUI Computer when you want to operate the machine as a workspace
 
-Choose Computer when the useful context is already alive on one machine: its existing project folders, documents, terminal, local service, browser session, installed tools, git state, or agent work.
+Computer also gives you a terminal, files, previews, and agent work. Its distinct shape is the workspace itself: a chosen path on the host, with its file browser location, tabs, split layout, chats, Git status and diffs, browser tabs, terminals, and local previews kept together.
 
-Computer is a private control surface for that machine. It lets you open the same workspace from another browser, see what is actually there, and continue or direct the work without recreating it somewhere else. AI is optional.
+Choose Computer when you want to personally return to that workspace from another browser, inspect its real state, and direct work there. It is especially strong for a personal machine with a project, local service, Git history, browser state, or supported coding agent already in motion.
 
-Use it for the moments when the right answer starts with, “Let me check my computer.”
+Computer saves workspace layout and chats. Live terminals, browser sessions, and running processes still depend on the host and Computer server remaining available.
 
 [Try Computer locally](./getting-started/local-trial)
 
-## Use Open WebUI and Computer together when the conversation needs a real workspace
+## Use Open WebUI and Computer together when a conversation needs a Computer workspace
 
-Keep Open WebUI as the conversation interface you prefer. Connect Computer's gateway when a particular workspace must be the place where a configured model or agent works.
+Keep Open WebUI as the conversation interface you prefer. Connect Computer's gateway when a particular Computer workspace should receive the work.
 
 In that request:
 
 - Open WebUI owns the conversation and interface.
-- The selected Computer workspace model identifies the real workspace.
-- Computer's configured model or agent performs the workspace work.
+- The selected Computer workspace model selects a registered Computer workspace.
+- Computer resolves its configured model or agent and runs the workspace task.
 
-Open WebUI knowledge bases, model-agent tools, system prompts, users, and general configuration are not forwarded into Computer automatically. Configure an equivalent capability in Computer when the workspace task needs it.
+Open WebUI knowledge bases, model-agent tools, system prompts, users, and general configuration are not automatically imported into Computer.
 
 [Connect Open WebUI to a Computer workspace](./integrations/open-webui-gateway)
 
-## Use all three when your work has more than one kind of context
+## Use all three when each serves a clear role
 
-This is common. Keep Open WebUI as the place to ask, compare, and organize. Use Open Terminal for a disposable or isolated execution task. Use Computer for the existing machine where your personal project, local service, or ongoing agent work must remain continuous.
-
-The value is not forcing every job through one product. It is choosing the environment that matches the work in front of you.
+You can use Open WebUI with an Open Terminal connection for chat-driven terminal work, and connect Open WebUI to Computer when you need Computer's personal workspace surface. They are separate services with their own chats, sessions, and stored state. Giving both access to the same host directory does not automatically merge their files, terminals, or conversations.
 
 ## A quick way to decide
 
 - Need to think, compare models, or use shared AI knowledge? Start in Open WebUI.
-- Need an AI to run a self-contained task in an isolated environment? Add Open Terminal in Docker.
-- Need the files, process, login, project, or agent that already exists on your machine? Start in Computer.
-- Need an Open WebUI conversation to direct work in one existing workspace? Connect Open WebUI to Computer.
+- Need an Open WebUI chat to work through a terminal and file environment? Add Open Terminal.
+- Need a browser workspace for personally operating a chosen machine and its project state? Start in Computer.
+- Need an Open WebUI conversation to send work into a registered Computer workspace? Connect Open WebUI to Computer.
 
 ## If you already use an agent command-line tool
 
@@ -64,4 +68,4 @@ Computer can give an installed agent command a real terminal in the selected wor
 
 ## Keep the trust model in view
 
-Open Terminal can run in an isolated Docker environment or, when you choose it, on a host. Computer deliberately reaches the real host account and its files, shell, and processes. That is what makes it useful for a trusted owner and why it should stay private. Read [the security model](./remote-access/security-model) before exposing it remotely or connecting unattended integrations.
+Docker creates a useful container boundary, but mounts and access to a host Docker socket change what that environment can reach. Bare-metal Open Terminal runs with the permissions of its host account. Computer deliberately exposes the host account's files, shell, and processes to an authenticated user. Read [Open Terminal security](/features/open-terminal/advanced/security) and [the Computer security model](./remote-access/security-model) before exposing either service or connecting unattended integrations.
