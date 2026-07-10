@@ -17,7 +17,7 @@ You can stop here when the task does not need a shell, a project folder, or a pa
 
 Open Terminal is an Open WebUI feature. It gives an Open WebUI chat a computing environment where the model can write files, run commands, install packages, and return the result in the conversation.
 
-Use it for a self-contained job: analyze an uploaded dataset, build a small prototype, run a script, or give an agent a clean environment for a task. It is especially useful when the work does not depend on an existing machine's long-lived state. Run it in Docker when you want isolation, or configure bare-metal access when that is the deliberate choice.
+Use it for a self-contained job: analyze an uploaded dataset, build a small prototype, run a script, or give an agent a clean environment for a task. It is especially useful when the work does not depend on an existing machine's long-lived state. Run it in Docker for an isolated execution environment. Use bare-metal access only when direct host access is intentional.
 
 [Learn about Open Terminal](/features/open-terminal)
 
@@ -51,14 +51,12 @@ This is common. Keep Open WebUI as the place to ask, compare, and organize. Use 
 
 The value is not forcing every job through one product. It is choosing the environment that matches the work in front of you.
 
-## A simple way to decide
+## A quick way to decide
 
-| If the first true sentence is… | Start with… |
-| --- | --- |
-| “I need to think through this, compare models, or work with shared AI knowledge.” | Open WebUI |
-| “I want an AI to run a self-contained task in a clean computing environment.” | Open WebUI with Open Terminal |
-| “The files, process, login, project, or agent I need already exist on my machine.” | Open WebUI Computer |
-| “I want an Open WebUI conversation to direct work in one existing workspace.” | Open WebUI with Computer |
+- Need to think, compare models, or use shared AI knowledge? Start in Open WebUI.
+- Need an AI to run a self-contained task in an isolated environment? Add Open Terminal in Docker.
+- Need the files, process, login, project, or agent that already exists on your machine? Start in Computer.
+- Need an Open WebUI conversation to direct work in one existing workspace? Connect Open WebUI to Computer.
 
 ## If you already use an agent command-line tool
 
@@ -66,4 +64,4 @@ Computer can give an installed agent command a real terminal in the selected wor
 
 ## Keep the trust model in view
 
-Open Terminal can provide a managed execution environment. Computer deliberately reaches the real host account and its files, shell, and processes. That is what makes it useful for a trusted owner and why it should stay private. Read [the security model](./remote-access/security-model) before exposing it remotely or connecting unattended integrations.
+Open Terminal can run in an isolated Docker environment or, when you choose it, on a host. Computer deliberately reaches the real host account and its files, shell, and processes. That is what makes it useful for a trusted owner and why it should stay private. Read [the security model](./remote-access/security-model) before exposing it remotely or connecting unattended integrations.

@@ -1,11 +1,13 @@
 ---
 title: "Work with local documents and data"
-sidebar_position: 7
+sidebar_position: 4
 ---
 
 # Work with local documents and data
 
-Use this when the report, spreadsheet, PDF, or source material you need is already on your computer and you want to understand it without scattering copies across chat uploads and download folders. Open WebUI Computer keeps the source files, a working note, and optional AI help in the same real project folder. A generic chat can summarize an attachment, but it does not naturally keep your original documents, your local data files, and your conclusion together.
+Open the report and data file you already have, then save one findings note beside them. That is the first useful result: the source material and your conclusion stay together in the real folder instead of becoming scattered uploads and downloads.
+
+Use this when the report, spreadsheet, PDF, or source material you need is already on your computer. Open WebUI Computer keeps the source files and working note together. A generic chat can summarize an attachment, but it does not naturally keep your original documents, local data files, and conclusion together.
 
 ## Use this when
 
@@ -14,7 +16,7 @@ You are reading reports, comparing a CSV or spreadsheet, organizing sources for 
 ## Before you start
 
 - Complete the [local trial](/ecosystem/computer/getting-started/local-trial) and create a workspace for the folder that holds the material.
-- Decide whether the documents are safe to place in that workspace and safe to send to an AI provider. Keep sensitive files local if you do not have a provider and data-handling arrangement you trust.
+- Decide whether the documents are safe to place in that workspace. Optional AI help sends relevant prompt and file context to its configured provider, so keep sensitive files local if you do not have a provider and data-handling arrangement you trust.
 - Use copies when the source material must remain unchanged. Open WebUI Computer shows the real files in the selected folder.
 
 ## Do it
@@ -22,7 +24,7 @@ You are reading reports, comparing a CSV or spreadsheet, organizing sources for 
 1. Open the workspace and use the file browser to open existing files or upload deliberate copies into a project subfolder.
 2. Open a report and a related data file in tabs or split panes. The editor can preview PDFs, CSV and TSV data, and common Office files such as DOCX and XLSX.
 3. Create a short Markdown note in the workspace, such as `findings.md`, and record the question, source filenames, and what you observed.
-4. If you have configured an AI model you trust, ask a bounded question in the workspace chat, such as “Read these two files and list differences I should check. Do not change files.” Review its answer against the open source files.
+4. Optional: if you have configured an AI model you trust, ask a bounded question in the workspace chat, such as “Read these two files and list differences I should check. Do not change files.” Review its answer against the open source files.
 5. Save the note beside the sources so the next session starts with the material and conclusion together.
 
 ## Verify it worked

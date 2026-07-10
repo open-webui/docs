@@ -1,6 +1,6 @@
 ---
 title: "Test a local app on a real device"
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # Test a local app on a real device
@@ -11,7 +11,7 @@ This is valuable because a phone or tablet can reveal problems a desktop browser
 
 ## Use this when
 
-Use this when a process in a workspace has opened a local port and you want to view that process through Open WebUI Computer from another signed-in device. This is especially useful for checking a real browser, touch layout, or a quick internal demo.
+Use this when a process in a workspace has opened a local port and you want to view that process through Open WebUI Computer from another signed-in device. This is especially useful for checking a real browser, touch layout, or a quick private preview.
 
 ## Before you start
 

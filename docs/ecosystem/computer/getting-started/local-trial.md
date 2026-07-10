@@ -5,7 +5,7 @@ sidebar_position: 2
 
 # Local trial
 
-Your first proof should be simple: choose a folder you recognize, open a familiar file, and confirm it is the same folder already on your machine. Nothing is copied to a cloud workspace.
+Start with a folder you recognize. Open a familiar file and see the same folder that is already on your machine. Nothing is copied to a cloud workspace.
 
 ## Use this when
 

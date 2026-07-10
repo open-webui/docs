@@ -1,6 +1,6 @@
 ---
 title: "Fix an issue from another device"
-sidebar_position: 2
+sidebar_position: 7
 ---
 
 # Fix an issue from another device

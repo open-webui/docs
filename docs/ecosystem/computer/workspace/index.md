@@ -12,11 +12,11 @@ This is the part that makes Open WebUI Computer more than a chat window. A works
 | Need | Guide |
 | --- | --- |
 | Confirm you opened the real project, not a copy | [Workspace paths](./workspace-paths) |
-| Review a prototype, document, image, or shared file and keep feedback with it | [Review files and keep feedback with the project](./review-files-and-feedback) |
+| Save a note, shared item, or import in the selected workspace | [Save notes, shares, and imports](./review-files-and-feedback) |
 | Read, edit, or preview files | [Files and editor](./files-editor) |
 | Resume a command or start a local service | [Terminals](./terminals) |
 | Review a branch or diff | [Git](./git) |
-| Open a running local app from another device | [Browser and port preview](./browser-port-preview) |
+| Open a website or inspect a running local app from another device | [Browser sessions and local-port previews](./browser-port-preview) |
 | Find an earlier chat, message, or file | [Search and chats](./search-chats) |
 | Make the workspace easy to reach from a phone | [PWA, sharing, and shortcuts](./pwa-share-shortcuts) |
 

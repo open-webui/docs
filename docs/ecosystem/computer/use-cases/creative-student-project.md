@@ -1,11 +1,13 @@
 ---
 title: "Keep a creative, school, or maker project together"
-sidebar_position: 8
+sidebar_position: 3
 ---
 
 # Keep a creative, school, or maker project together
 
-Use this when your project is spread between a computer, a phone, reference images, a draft, and ideas you captured while away from your desk. Open WebUI Computer gives those materials one real folder you can reopen from another device. It is not a replacement for a drawing, video, or presentation app. It is the place that keeps the files, notes, and next steps from falling apart between them.
+Put a project note and its reference files in one folder, then open that same folder from the computer or device you have with you. That is the first useful result: the next step, draft, and materials stay together instead of falling into separate apps and message threads.
+
+Use this when your project is spread between a computer, a phone, reference images, a draft, and ideas captured away from your desk. Open WebUI Computer gives those materials one real folder you can reopen from another device. It is not a replacement for a drawing, video, or presentation app.
 
 ## Use this when
 
@@ -15,15 +17,15 @@ You are making a school project, a portfolio piece, a club site, a zine, a small
 
 - Complete the [local trial](/ecosystem/computer/getting-started/local-trial) and choose a dedicated project folder as the workspace.
 - Use copies for photos, recordings, or references that must remain untouched in their original location.
-- If you plan to use the installed web app's Share action, confirm that your device and browser support it. You can always add files and notes directly in the workspace instead.
+- Optional: if you plan to use the installed web app's Share action, confirm that your device and browser support it. You can always add files and notes directly in the workspace instead.
 
 ## Do it
 
 1. In the file browser, create a few simple folders for the project, such as `references`, `drafts`, and `notes`.
 2. Add reference images, PDFs, text, or other project files by opening existing local files or uploading chosen copies into the relevant folder.
 3. Create a short Markdown note with the project goal and the next action. Reopen it whenever you return so the project explains itself.
-4. On a supported installed web app, share a link, text, or file from the device into the workspace and confirm the destination. If sharing is unavailable, create the note or upload the item from the workspace instead.
-5. If Voice Memos are enabled for the instance, record a quick idea and save it with a clear filename. When transcription is configured, review the saved transcript before treating it as the final wording.
+4. Optional: on a supported installed web app, share a link, text, or file from the device into the workspace and confirm the destination. If sharing is unavailable, create the note or upload the item from the workspace instead.
+5. Optional: if Voice Memos are enabled for the instance, record a quick idea and save it with a clear filename. When transcription is configured, review the saved transcript before treating it as the final wording.
 
 ## Verify it worked
 

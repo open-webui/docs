@@ -15,7 +15,7 @@ Decide whether the failure is local, LAN, or private-remote. `localhost` on a ph
 
 ## Do it
 
-On the host, run `curl http://127.0.0.1:8000/api/health`. For private remote use, keep the existing localhost-bound server running and follow [Tailscale or tunnels](/ecosystem/computer/remote-access/tailscale-and-tunnels).
+On the host, run `curl http://127.0.0.1:8000/api/health`. For private remote use, keep the existing localhost-bound server running and follow [private remote access with Tailscale](/ecosystem/computer/remote-access/tailscale-and-tunnels).
 
 For intentional LAN-only testing, stop the existing server first, restart it with `cptr run --host 0.0.0.0`, and use the host's private IP from the second device. Verify the host firewall limits the port to the intended private subnet, then restore the default localhost binding when the test is complete.
 

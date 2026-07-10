@@ -1,6 +1,6 @@
 ---
 title: "Review a prototype and capture feedback"
-sidebar_position: 6
+sidebar_position: 5
 ---
 
 # Review a prototype and capture feedback

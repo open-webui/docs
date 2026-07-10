@@ -5,35 +5,19 @@ sidebar_position: 6
 
 # Browser sessions and local-port previews
 
-Open WebUI Computer can show a local service that is already running on the host through a workspace preview tab. This lets you check an app from a phone or tablet while keeping the original terminal, logs, and source files in reach.
+Browser tabs and local-port previews look similar, but they answer different questions. Use a browser tab to visit a website. Use a local-port preview to inspect an app that is already listening from a terminal in this workspace.
 
-## Use this when
+| You need to | Use |
+| --- | --- |
+| Open an external or internal URL without leaving Computer | [Browser sessions](./browser-sessions) |
+| Check a development server beside its source and terminal logs | [Local-port previews](./local-port-previews) |
 
-Preview a development server, inspect a local web UI, or pair a browser view with terminal output. Use a normal deployment path for a public demo or an application that must be reached by people outside the trusted Computer instance.
+Neither is a deployment mechanism. Use a normal deployment path for a public demo or an application that must be reached by people outside the trusted Computer instance.
 
-## Before you start
+## Choose deliberately
 
-- Start the service in the intended workspace and confirm the listening port from its output.
-- Sign in to the same private Open WebUI Computer instance from the browser or device you will use for testing.
-- Know whether the local app assumes `localhost`, a particular origin, or its own authentication. The preview does not rewrite the app's security model.
+Browser sessions are temporary runtime sessions. Local-port previews depend on a process that is already running on the host. If Computer, its browser service, or the local process restarts, recover from the focused guide instead of assuming the tab preserved the working state.
 
-## Do it
+## Safety boundary
 
-1. Open the file browser in the workspace. When a process opens a port, its `:port` appears in the **Ports** row.
-2. Select the port to open a preview tab. Switch back to the terminal or arrange the preview beside source files as needed.
-3. Navigate through the app and inspect terminal logs while testing. Save source edits and let the development server reload, or refresh the preview when its toolchain requires it.
-4. Close the preview when finished; stop the server separately from the terminal if it should no longer run.
-
-## Verify it worked
-
-The preview displays content from the expected local process, and requests or logs appear in that process's terminal. A change made in the selected workspace is reflected after the normal reload path. Reopening the preview shows the same host service while it remains running.
-
-## If it did not
-
-- **There is no Ports row:** inspect the terminal for a failed start or a different port. Ensure the process is listening rather than merely compiling.
-- **The page fails to load:** try the displayed port again and check server logs. Some apps need their configured host or origin adjusted for proxying; fix the app deliberately rather than exposing the service publicly.
-- **A page works on desktop but not the test device:** check the device browser, app authentication, and responsive behavior. The preview proves the real-device request path, not every platform-specific behavior.
-
-## Trust boundary
-
-The preview is a private convenience for services on the host. It can make a development server visible to anyone able to use this instance. Do not use it as a public URL, and do not assume it protects a service that lacks its own authentication.
+Both surfaces can expose real, valuable state. A browser session may use a managed browser or, when configured, a personal Chrome source with signed-in websites. Treat it as access to the host browser: only use trusted Computer instances and operators, and do not share a tab or instance that can reach sensitive accounts. A port preview is a private convenience, not a public URL or an authentication layer for the local service.

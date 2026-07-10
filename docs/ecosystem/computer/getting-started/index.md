@@ -14,7 +14,7 @@ Build trust in one layer at a time. Each step has a result you can see before yo
 1. **Open a local folder.** Use [Local trial](./local-trial), then [open your first workspace](./first-workspace). Confirm a familiar file is the real file on the host.
 2. **Optionally add an agent.** Ask it to explain one real file, then decide whether to let it change anything. Start with [AI and coding agents](/ecosystem/computer/agents).
 3. **Optionally reach the host remotely.** Keep the service local by default; when you need another device, add a private route with [Remote access and security](/ecosystem/computer/remote-access).
-4. **Only then add unattended or external connections.** Schedules, bots, gateways, and external tool servers are high-trust paths. Start one at a time from [Automations and integrations](/ecosystem/computer/integrations), with a scoped workspace and a harmless proof.
+4. **Only then add unattended or external connections.** Schedules, bots, gateways, and external tool servers are high-trust paths. Start one at a time from [Automations and integrations](/ecosystem/computer/integrations), with a scoped workspace and a harmless read-only check.
 
 The sequence is intentional, not a required feature checklist. Stop after any step that solves the problem you have today.
 

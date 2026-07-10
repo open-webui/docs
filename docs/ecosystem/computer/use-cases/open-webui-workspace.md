@@ -15,7 +15,8 @@ You want Open WebUI as the AI front door and Open WebUI Computer as the place th
 
 - Complete the [local trial](/ecosystem/computer/getting-started/local-trial) and [first workspace](/ecosystem/computer/getting-started/first-workspace), then run both services where Open WebUI can reach Computer’s gateway over a private, trusted network.
 - Create the target workspace and configure its default agent or model in Computer.
-- Create a gateway key and follow the [combined setup guide](/ecosystem/computer/integrations/open-webui-gateway) for the exact connection and continuity headers.
+- Gateway requests use **full tool approval**. Computer does not pause for an interactive confirmation before each tool action, so connect only a trusted Open WebUI user and a workspace you are willing to let that request act in. Read the [detailed gateway guide](/ecosystem/computer/integrations/open-webui-gateway) before creating a key.
+- Create a gateway key and follow the detailed guide for the exact connection and continuity headers.
 
 ## Do it
 

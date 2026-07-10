@@ -1,6 +1,6 @@
 ---
 title: "Resume a workspace from another device"
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # Resume a workspace from another device

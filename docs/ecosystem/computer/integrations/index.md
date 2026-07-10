@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # Automations and integrations
 
-Integrations make a real Computer workspace reachable from another product or let it act without the browser open. That is valuable only when the workspace, sender, credentials, and side effects are all deliberate. Start with a read-only proof and add one connection at a time.
+Integrations make a real Computer workspace reachable from another product or let it act without the browser open. That is valuable only when the workspace, sender, credentials, and side effects are all deliberate. Start with a read-only check and add one connection at a time.
 
 | What you want | Read this |
 | --- | --- |

@@ -1,19 +1,20 @@
 ---
-title: Private remote access with Tailscale or a tunnel
+title: Private remote access with Tailscale
 sidebar_position: 4
 ---
 
-# Reach a machine away from home
+# Private remote access with Tailscale
 
 ## Use this when
 
-Use this when you need the real branch and terminal from a phone outside the home network, without opening a public router port.
+Use this when you need the real branch and terminal from a phone outside the home network, without opening a public router port. Tailscale Serve is the supported private-access route in this guide.
 
 ## Before you start
 
 - Complete the [local trial](/ecosystem/computer/getting-started/local-trial) and [first workspace](/ecosystem/computer/getting-started/first-workspace) on the host first.
 - Keep Open WebUI Computer on its default localhost binding (`127.0.0.1`).
 - Enrol only devices you control in a private Tailscale network. Tailscale Serve may prompt an administrator to enable HTTPS certificates for that network.
+- Do not use Tailscale Funnel or another public tunnel. Public-tunnel deployment is unsupported for Open WebUI Computer.
 
 ## Do it
 
@@ -40,8 +41,8 @@ Turn off Wi-Fi on the remote phone so it uses a different network. Open the URL 
 
 ## If it did not
 
-If Serve cannot reach Computer, first verify `http://127.0.0.1:8000/api/health` on the host. Then rerun `tailscale serve status` and confirm both devices are enrolled and allowed by the tailnet policy. Do not solve a private-access failure by opening a router port. To remove the proxy, run `tailscale serve reset`.
+If Serve cannot reach Computer, first verify `http://127.0.0.1:8000/api/health` on the host. Then rerun `tailscale serve status` and confirm both devices are enrolled and allowed by the tailnet policy. Do not solve a private-access failure by opening a router port or a public tunnel. To remove the proxy, run `tailscale serve reset`.
 
 ## Trust boundary
 
-Tailscale Serve limits reachability to enrolled devices and policy, but it does not reduce what a signed-in Computer user can do. A public tunnel URL has a different threat model: do not publish one without an independent access-control design. See [the Tailscale Serve documentation](https://tailscale.com/docs/reference/tailscale-cli/serve) for current command behavior.
+Tailscale Serve limits reachability to enrolled devices and tailnet policy, but it does not reduce what a signed-in Computer user can do. Public tunnel deployment, including Tailscale Funnel, is unsupported. Do not expose this service to the public internet. See [the Tailscale Serve documentation](https://tailscale.com/docs/reference/tailscale-cli/serve) for current command behavior.

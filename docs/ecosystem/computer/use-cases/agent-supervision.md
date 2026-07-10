@@ -1,6 +1,6 @@
 ---
 title: "Supervise a coding agent away from your desk"
-sidebar_position: 4
+sidebar_position: 8
 ---
 
 # Supervise a coding agent away from your desk

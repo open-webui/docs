@@ -7,7 +7,7 @@ sidebar_position: 8
 
 Use web tools when the answer is not on the machine: a current release note, a public page, or a site interaction that needs a real browser. This complements the workspace. It does not turn web output into a trusted source or make the browser's login state safe to share.
 
-## Pick the smallest useful web capability
+## Choose the web capability you need
 
 - Use search or URL reading for current facts and public pages.
 - Use browser work when the agent must navigate, click, type, or capture a page.
@@ -21,7 +21,7 @@ Use web tools when the answer is not on the machine: a current release note, a p
 
 ## Check the result
 
-The chat shows a search, read, or browser tool result with the expected page or answer. If it fails, check the configured endpoint or browser availability before retrying. If a page is wrong or stale, correct the source rather than treating the first result as proof.
+The chat shows a search, read, or browser tool result with the expected page or answer. If it fails, check the configured endpoint or browser availability before retrying. If a page is wrong or stale, correct the source rather than relying on the first result.
 
 ## What to trust
 

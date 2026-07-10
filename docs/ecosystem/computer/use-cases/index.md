@@ -11,7 +11,7 @@ You do not need to be a developer or connect AI to try the useful part. Start lo
 
 ## I have a folder I care about, but I do not use coding tools
 
-[Open it locally first](/ecosystem/computer/getting-started/local-trial). The first proof is simply that the folder stays in its real location and opens in Computer, rather than being copied into a new cloud workspace.
+[Open it locally first](/ecosystem/computer/getting-started/local-trial). The folder stays in its real location and opens in Computer, rather than being copied into a new cloud workspace.
 
 ## I need to keep feedback with a prototype or project
 

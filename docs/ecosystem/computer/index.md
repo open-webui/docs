@@ -45,21 +45,27 @@ For more paths, including recurring checks, on-call triage, local-device preview
 
 ## Why this is different
 
-| Without Computer | With Computer |
-| --- | --- |
-| Recreate context: find the right files, restart a service, locate the terminal, and explain the job again. | Reopen the machine where the useful context already exists. |
-| A chat AI can help, but it does not naturally have your local project or running application. | A configured agent can work in one selected real workspace beside the files and tools you already use. |
-| SSH and remote desktop can reach the host, but are clumsy for reviewing a diff, checking an app, or steering work from a phone. | A browser workspace brings together files, git, terminals, previews, chats, and agent activity. |
+### Keep the context you already built
+
+Open the machine where the right files, project, process, and terminal already exist. There is no second project to create and no context to retell.
+
+### See the work before you decide what to do
+
+The workspace brings files, git, terminals, previews, chats, and agent activity together in a browser that works from another computer or phone.
+
+### Add AI without moving the work away
+
+When you configure a model or supported agent, it works in the selected real workspace beside the tools you already use. You can also use Computer with no AI at all.
 
 ## What Open WebUI Computer is
 
-Computer is a private control surface for work on one machine you operate. It keeps a chosen workspace, its files, terminal and git state, supported agents, and their review history together. It is a self-hosted personal agent platform, not an adapter that turns every installed agent CLI into a first-class backend, and not a shared isolated computer service.
+Computer is a private control surface for work on one machine you operate. It keeps a chosen workspace, its files, terminal and git state, agent work, and review history together.
 
 It is useful with no AI at all. Add a model, coding-agent subscription, browser tool, automation, bot, or external tool only when that improves a job you actually have. Each extra connection brings its own data and trust boundary.
 
-## Your first proof should be small
+## Start with your own folder
 
-Run it locally, open one familiar folder, and confirm that you can see the real files. No remote access, AI provider, bot, or automation is required for this first check.
+Run it locally and open one familiar folder. You will see the real files that are already on the machine. No remote access, AI provider, bot, or automation is required.
 
 You need permission to run one install command on the machine that holds the work. If it is not your machine, ask its owner to do the local setup with you. You do not need to know git or use a terminal after the initial install.
 
@@ -67,23 +73,17 @@ You need permission to run one install command on the machine that holds the wor
 
 ## Choose the path that fits how you work
 
-| You are here because… | Start here |
-| --- | --- |
-| You make or review visual work, school work, research, or independent projects | [Explore real jobs](./use-cases/) |
-| You use a coding agent or want an AI to work in a real project | [AI and coding agents](./agents/) |
-| You already use Open WebUI or Open Terminal | [Choose the right execution environment](./choose) |
-| You already use an agent command-line tool | [Can Computer manage the agent CLI I already use?](./choose#if-you-already-use-an-agent-command-line-tool) |
-| You need remote access, backups, or a full security model before adopting it | [Remote access and security](./remote-access/) |
+- Making or reviewing visual work, school work, research, or an independent project? [Explore real jobs](./use-cases/).
+- Want an AI to work in a real project? [Set up an agent](./agents/).
+- Already use Open WebUI or Open Terminal? [Choose the right execution environment](./choose).
+- Already use an agent command-line tool? [See how it works with Computer](./choose#if-you-already-use-an-agent-command-line-tool).
+- Need remote access, backups, or a full security model first? [Read remote access and security](./remote-access/).
 
 ## Choose the computer that matches the work
 
 Open WebUI is the AI interface and workflow platform. Open Terminal gives an Open WebUI chat a computing environment. Computer is the particular machine where personal work is already alive. Use one or combine them when the job needs more than one kind of context.
 
 [Choose the right execution environment](./choose)
-
-## Open WebUI Computer vs Open Terminal
-
-Open Terminal gives an Open WebUI chat model a computing environment to drive. Open WebUI Computer gives you the existing computer you already operate, including its files, terminal, editor, git state, and running sessions. Choose Open Terminal when a chat needs somewhere to execute. Choose Computer when the machine with the useful context already exists.
 
 ## Keep it private
 

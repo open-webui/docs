@@ -53,7 +53,7 @@ For a test check, add a [notification target](./notifications-and-webhooks) only
 
 ## Read the first run like a rehearsal
 
-Open the new run-history entry and its linked chat. This is the proof that matters: you should be able to see the selected workspace, the task activity, and the terminal or tool output that supports the result.
+Open the new run-history entry and its linked chat. You should be able to see the selected workspace, the task activity, and the terminal or tool output that supports the result.
 
 If the report says the test passed, but the linked chat does not show the test command or its output, improve the prompt or model setup before you schedule it. A successful schedule is not enough. You need a result you can judge later in seconds.
 

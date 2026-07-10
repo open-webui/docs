@@ -1,17 +1,17 @@
 ---
-title: Agent context and extensions
+title: Choose an agent extension
 sidebar_position: 5
 ---
 
-# Agent context and extensions
+# Choose an agent extension
 
-The basic agent can work in a selected workspace. These additions answer four different questions: how do I make repeated work consistent, split independent research, use current web information, or give the workspace a voice, image, or memo?
+Use an extension only when the ordinary chat, workspace files, and terminal do not provide the missing capability. This is a chooser, not a second setup guide.
 
-| What you need | Start here |
-| --- | --- |
-| Repeat a project rule or remember a durable preference | [Skills and memory](./skills-and-memory) |
-| Investigate independent questions in parallel | [Sub-agents](./subagents) |
-| Research or inspect a web page through the agent | [Web search and browser work](./web-and-browser) |
-| Speak a request, save a voice memo, or work with image output | [Voice, images, and memos](./voice-images-and-memos) |
+| Missing capability | Choose | Do not use it when |
+| --- | --- | --- |
+| A repeatable project method or a fact worth retaining | [Skills and memory](./skills-and-memory) | The instruction only matters for this one chat or already lives clearly in a project file |
+| Independent work that can return a concise result to the parent task | [Sub-agents](./subagents) | The task needs continuous steering, shares mutable work, or must survive a server restart |
+| Current information from a site, or browser-only inspection | [Web search and browser work](./web-and-browser) | A workspace file, supplied link, or stable local source already answers the question |
+| Spoken input, a voice memo, or image generation | [Voice, images, and memos](./voice-images-and-memos) | Typed text is simpler or the material should not leave the machine for a configured provider |
 
-Choose only the capability that serves the task. Each one changes what data the agent can see or where it can send it.
+Each choice changes what data the agent can use or where it can send it. State the task, source, and desired result first, then add the smallest extension that closes the gap.

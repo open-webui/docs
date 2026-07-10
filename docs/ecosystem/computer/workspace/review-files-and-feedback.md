@@ -1,30 +1,29 @@
 ---
-title: Review files and keep feedback with the project
+title: Save notes, shares, and imports in a workspace
 sidebar_position: 2
 ---
 
-# Review files and keep feedback with the project
+# Save notes, shares, and imports in a workspace
 
-When a prototype, document, image, or recording already belongs to a project on your machine, the useful feedback should stay there too. Computer lets you open the real file or local preview, then keep a note, shared link, uploaded file, or voice memo in the same workspace instead of losing the review in a separate chat app. The feedback remains connected to the real project, not a recreated attachment collection.
+Use the selected workspace as the destination for project material you want Computer to keep: a note, an imported file, a shared link or text, or a chat message that records a decision. This page covers where each kind of material goes and what to check before you save it. For the end-to-end review workflow, see [Review a prototype and capture feedback](/ecosystem/computer/use-cases/review-and-share-feedback).
 
-## Start with the review you actually have
+## Choose the right destination
 
-- Open a file from the workspace when you need to inspect its source or a supported preview.
-- Open a local port preview when the thing to review is a running web prototype.
-- Use a workspace chat or note for written feedback.
-- Use the installed app's share flow when your browser and device support it, or upload/copy the item through the workspace when they do not.
+| Material | Keep it as | Check before saving |
+| --- | --- | --- |
+| A decision, question, or written feedback | A workspace chat message or note | The selected workspace path and the file or screen it refers to |
+| A file you want the project to own | An import in the chosen workspace folder | The destination folder and whether the file contains sensitive material |
+| A link or shared text from a supported installed web app | A chat draft or note, depending on the selected share action | The workspace chosen by the share flow and the resulting draft before you send it |
+| A voice or image input | The relevant chat or configured media workflow | The configured provider and what data it may receive |
 
-## Keep one piece of feedback with the right project
+Open real project files with the [file editor and browser](./files-editor). Open a running app with a [local-port preview](./local-port-previews). For voice, images, and memos, see [Voice, images, and memos](/ecosystem/computer/agents/voice-images-and-memos).
 
-1. Select the workspace and confirm its path before opening or sharing anything.
-2. Open the file, image, supported preview, or local app you want to review.
-3. Add a concise workspace chat message or note that names the file, screen, or decision. On a supported installed web app, share a link, file, or text into Computer and choose the workspace destination.
-4. If audio is easier, record a short voice memo after audio features are enabled. Keep the recording and, when configured, its transcript with the workspace.
+## Use the installed app's share flow
 
-## Check the result
+When the browser and device support the installed web app, you can share supported text, links, images, PDFs, or code into Computer. The share flow asks whether to create a chat draft or workspace note, or to import a file into a destination folder. It opens Computer with that pending item; review the destination and content before completing the action.
 
-Reopen the workspace from another device. The original file or local preview is still associated with the expected project, and the feedback appears as the intended chat, note, imported file, or memo. If an item arrived in the wrong place, stop before acting on it and use the workspace picker to locate it rather than resending it repeatedly.
+If sharing is unavailable on the device, copy the text into the workspace chat or note, or import the file through Computer instead. The share payload is held locally by the browser until it opens Computer; it is not a background sync service.
 
-## Limits and trust
+## Limits and recovery
 
-Computer can only preview formats and share behaviors supported by the current browser and device. A local app must already be running before it can appear as a port preview. Sharing or uploading writes real data into the selected workspace, and hosted speech or image features can send media to their configured provider. Keep the instance private and do not use a review note as a place for secrets.
+Computer can only preview formats and share behaviors supported by the current browser and device. Sharing or importing writes real data to the selected workspace. If an item appears in the wrong project, stop before acting on it, switch to the correct workspace, and move or import it deliberately rather than repeatedly resending it. Hosted speech or image features can send media to their configured provider, so keep the instance private and do not use notes or media input for secrets.

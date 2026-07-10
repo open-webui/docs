@@ -7,7 +7,7 @@ sidebar_position: 7
 
 A messaging bot can be convenient when your phone is the only screen you have and the answer is in a trusted Computer workspace. It is not a general customer-support bot: an inbound message can start host-capable agent work.
 
-## The first useful proof
+## Start with one harmless question
 
 If your client repositories live on a workstation and you already check Slack while commuting, the first useful bot question is not "fix whatever is wrong." It is: "Which branch is checked out in the selected client workspace?" You get a real answer from the machine without opening a laptop, while keeping the first request read-only.
 
