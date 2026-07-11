@@ -1,6 +1,6 @@
 ---
 title: "Computer, Open WebUI, or Open Terminal?"
-sidebar_position: 12
+sidebar_position: 13
 ---
 
 # Computer, Open WebUI, or Open Terminal?

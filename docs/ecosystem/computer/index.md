@@ -33,6 +33,7 @@ That's the install. It prints a one-time setup link, you create your account, op
 | I want to… | Go to |
 | --- | --- |
 | See it working in two minutes | [Quickstart](/ecosystem/computer/quickstart) |
+| See what people actually do with it | [Use cases](/ecosystem/computer/use-cases/) |
 | Use it from my phone, away from home | [Phone & remote access](/ecosystem/computer/phone-and-remote/) |
 | Keep terminals and agents running after I close the tab, or when the machine reboots | [Keep it running](/ecosystem/computer/phone-and-remote/keep-it-running) |
 | Use the Claude Code / Codex / Cursor subscription I already pay for | [Coding agents](/ecosystem/computer/ai/coding-agents) |
