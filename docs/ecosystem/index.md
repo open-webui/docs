@@ -21,5 +21,5 @@ Open WebUI is the core AI interface. The ecosystem is the set of separate Open W
 
 ## Projects
 
-- [**Open WebUI Computer**](/ecosystem/computer): your computer in a browser tab, with files, terminal, git, editor, and AI agents working inside your real projects. The newest capabilities ship here first and graduate into the stable Open WebUI platform where they fit. Connects to Open WebUI through an OpenAI-compatible gateway.
+- [**Open WebUI Computer**](/ecosystem/computer): your whole computer served to any browser (files, terminal, git, editor), with a full agent harness built in. The newest capabilities ship here first and graduate into the stable Open WebUI platform where they fit. Connects to Open WebUI through an OpenAI-compatible gateway.
 - [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync): mirror folders, repos, buckets, wikis, and other sources into Open WebUI Knowledge Bases with incremental sync.
