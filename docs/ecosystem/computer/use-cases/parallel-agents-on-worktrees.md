@@ -1,6 +1,6 @@
 ---
 title: "Run parallel agents on git worktrees"
-sidebar_position: 11
+sidebar_position: 14
 ---
 
 # Run parallel agents on git worktrees

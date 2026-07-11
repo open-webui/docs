@@ -1,6 +1,6 @@
 ---
 title: "Supervise a coding agent from anywhere"
-sidebar_position: 8
+sidebar_position: 11
 ---
 
 # Supervise a coding agent from anywhere

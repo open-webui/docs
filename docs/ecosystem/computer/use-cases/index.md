@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # What people actually do with it
 
-Ten real workflows, written as steps you can follow today, from "I've never opened a terminal" to "I'm running three agents in parallel." Each one says what to set up first and what you'll see when it works. Find your rung and climb from there.
+Thirteen real workflows, written as steps you can follow today, from "I've never opened a terminal" to "I'm running three agents in parallel." Each one says what to set up first and what you'll see when it works. Find your rung and climb from there.
 
 ## Start here (no coding needed)
 
@@ -27,9 +27,19 @@ You use a computer for real work and want it with you when you leave the desk. T
 | A bug report lands while you're on the train. The branch is on your desk machine. | [Ship a fix from your phone](./fix-from-your-phone) |
 | The layout looks fine in devtools' phone emulator. You've been burned by that before. | [Test your dev server on a real phone](./test-on-a-real-device) |
 
-## Working with agents
+## Your own personal assistant
 
-For developers putting AI to work on real projects: supervision, automation, and orchestration.
+The reason agents are having a moment: one that acts on its own, finishes whole jobs, and gets better the longer it works for you. All of it on your machine, with your keys, inspectable down to every tool call.
+
+| The moment | The walkthrough |
+| --- | --- |
+| 7:45am, your phone buzzes: it's your computer, with the morning brief. You didn't ask. | [An assistant that texts you first](./an-assistant-that-texts-first) |
+| Hand over "compare three cities for the offsite," come back to a report, a spreadsheet, and sources. | [Delegate a whole job, come back to a deliverable](./delegate-a-whole-job) |
+| The third time you explain your release process, it should stop needing the speech. | [An agent that learns how you work](./an-agent-that-learns-your-way) |
+
+## Working with agents on real code
+
+For developers putting AI to work on serious projects: supervision, automation, and orchestration.
 
 | The moment | The walkthrough |
 | --- | --- |

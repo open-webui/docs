@@ -1,6 +1,6 @@
 ---
 title: "Give Open WebUI real hands"
-sidebar_position: 10
+sidebar_position: 13
 ---
 
 # Give Open WebUI real hands

@@ -1,6 +1,6 @@
 ---
 title: "A morning check that reports to you"
-sidebar_position: 9
+sidebar_position: 12
 ---
 
 # A morning check that reports to you
