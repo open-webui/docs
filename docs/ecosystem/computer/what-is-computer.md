@@ -5,21 +5,19 @@ sidebar_position: 2
 
 # What is Computer?
 
-Computer (`cptr`) is one process that runs on the machine where your work already lives and serves the whole thing: to any browser you own, to your chat apps, and to an AI working inside it.
+Your computer has always been a *place*. You go to it, sit down, work, walk away, and everything on it sits frozen until you come back.
 
-All of it is self-hosted. The workstation, the agent loop, the chat history, the memory, the schedules run right there with your work. The only thing that ever leaves is the model calls you choose to send; with a local model, not even that.
+Computer changes what your computer *is*. Install one app on it, and that same machine becomes three new things at once:
 
-## One machine, three doors
+- **somewhere you can be from anywhere**: your files, editor, and terminal in a web page, on your phone or any browser
+- **someone you can message**: connect Telegram or WhatsApp and you text your computer, and it texts you back
+- **something you can hand work to**: add AI (an API key, a local model, or a coding-agent subscription you already have) and it works on the same files you're looking at, with your approval
 
-Your computer already has everything that matters: the files, the projects, a shell, git state, logins, running services. Computer opens three doors into that one machine:
+Your work doesn't move anywhere to make this happen. Everything runs on your machine; nothing is hosted anywhere else.
 
-**Door 1: you, at any screen.** A browser or the home-screen app gets the full workstation: file browser, editor, persistent terminals, git panel, live previews. Not streamed pixels; the real interfaces, built for the phone first. Close the tab on one device, open it on another, everything is where you left it.
+## One machine, one truth
 
-**Door 2: you, by message.** Connect Telegram, Discord, Slack, WhatsApp, or Signal and the machine becomes something you text, and something that texts you: scheduled tasks run on their own, results get delivered, webhooks let the outside world wake it up.
-
-**Door 3: an AI, inside.** Plug in an API key, a local model, or the coding-agent subscription you already pay for, and the AI works behind the same doors you do: same files, same shell, same git, gated by approval controls you set per chat.
-
-The trick, and really the whole product: **all three doors open onto the same state.** The file the agent edited is the file in your editor is the file on disk. The terminal you started at your desk is the one on your phone on the train. The chat where you decided something is a file in the project folder, greppable next year. There is no sync, no copy, no "connected account." One machine, one truth, three ways in.
+Those three faces share one property, and it's the whole product: **they all open onto the same state.** The file the AI edited is the file in your editor is the file on disk. The terminal you started at your desk is the one on your phone on the train. The chat where you decided something is a file in the project folder, findable next year. There is no sync, no copy, no "connected account." One machine, one truth, three ways in.
 
 ```mermaid
 flowchart LR
