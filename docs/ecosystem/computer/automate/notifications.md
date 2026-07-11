@@ -5,11 +5,19 @@ sidebar_position: 4
 
 # Notifications and webhooks
 
-Get told when a chat finishes or fails without keeping the tab open. Computer supports browser push notifications plus named targets (webhooks and messaging bots) configured in **Settings → Notifications**.
+Get pinged without keeping the tab open. Set up a target once in **Settings → Notifications** (a webhook or one of your messaging bots), and there are two ways for messages to reach it: the agent decides, or events fire automatically. Browser push notifications work too.
 
-## Events
+## The agent can notify you itself
 
-Two events exist:
+The agent has a **notify** tool, which makes notifications part of the instructions instead of plumbing:
+
+> Run the test suite. If anything fails, notify me with the failing test names. If everything passes, don't ping me.
+
+The agent composes the message and sends it to your default target only when the condition you described is met. This works in normal chats ("notify me when the build finishes") and especially in [scheduled tasks](./scheduled-tasks), where it turns a daily run into a zero-noise alarm that only fires with something to say.
+
+## Event notifications
+
+For blanket coverage, two automatic events exist:
 
 - **Chat finished**: a chat's task completed.
 - **Chat failed**: a chat's task errored.

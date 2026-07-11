@@ -11,17 +11,17 @@ Every morning you run the test suite on the side project before work, skim the o
 
 ## The walkthrough
 
-1. **Ask for it.** In the project workspace chat, say what you want:
+1. **Give it somewhere to reach you.** One-time setup: in **Settings → Notifications**, add a target: a webhook (Slack, Discord, Google Chat, and Teams URLs get formatted automatically) or one of your [messaging bots](/ecosystem/computer/automate/messaging-bots). Hit the test button once.
 
-   > Every weekday at 7:30, run the test suite in this workspace. Don't change any files. If everything passes, report "all green" with the test count; if anything fails, name the failing tests and include the relevant error output.
+2. **Ask for it.** In the project workspace chat, say what you want, including when to bother you:
 
-   The agent creates the scheduled task itself (approve the tool call and it's done). Be boring and specific in the instruction; the schedule inherits exactly what you said.
+   > Every weekday at 7:30, run the test suite in this workspace. Don't change any files. If anything fails, notify me with the failing test names and the relevant error output. If everything passes, don't ping me.
 
-2. **Rehearse it.** Open the **Scheduled** page: your new task is there with its next-run time. Hit **Run now** and read the run it creates. Every run is a real chat in the workspace, so you can see exactly what it did: the command it ran, the output it read, the summary it wrote. If the summary isn't judgeable at a glance, tell the agent to tighten the task's prompt now, not after a week of noise.
+   The agent creates the scheduled task itself (approve the tool call and it's done). The notify part isn't configuration; the agent has a notify tool and sends to your target only when your condition is met. Red tests buzz your phone; green mornings stay silent.
 
-3. **Wire up the ping.** In **Settings → Notifications**, add a target: a webhook (Slack, Discord, Google Chat, and Teams URLs get formatted automatically) or one of your [messaging bots](/ecosystem/computer/automate/messaging-bots). Pick the **chat failed** and **chat finished** events, set delivery to **away** so it only pings you when you're not already looking at Computer, and use the test button once.
+3. **Rehearse it.** Open the **Scheduled** page: your new task is there with its next-run time. Hit **Run now** and read the run it creates. Every run is a real chat in the workspace, so you can see exactly what it did: the command it ran, the output it read, the decision to notify or stay quiet. If any of that isn't judgeable at a glance, tell the agent to tighten the task now, not after a week of noise.
 
-4. **Let it run.** Run history keeps every morning's result with its linked chat, so "wait, when did that test start failing?" has an answer with receipts.
+4. **Let it run.** Run history keeps every morning's result with its linked chat, so "wait, when did that test start failing?" has an answer with receipts. (If you'd rather get a blanket ping for every run, event notifications on **chat finished** / **chat failed** exist too; see [notifications](/ecosystem/computer/automate/notifications).)
 
 The Scheduled page is also where you pause a task, tweak its schedule with the frequency builder, or write one by hand if you prefer forms to sentences.
 

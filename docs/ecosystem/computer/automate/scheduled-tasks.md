@@ -35,7 +35,7 @@ Every run creates:
 - a **real chat** in the selected workspace, visible in the sidebar with the full task activity, and
 - a **run-history entry** on the task showing success or error (with the error text).
 
-To get pinged when a run finishes or fails, add a notification target; see [notifications and webhooks](./notifications).
+Want a ping? Add a notification target once, then just put the condition in the task's prompt ("notify me only if it fails"): the agent has a notify tool and decides when to use it. Blanket event pings on every finished/failed run exist too. See [notifications and webhooks](./notifications).
 
 ## Trigger a task with a webhook
 

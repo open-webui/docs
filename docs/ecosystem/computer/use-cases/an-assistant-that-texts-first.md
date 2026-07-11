@@ -21,13 +21,13 @@ You didn't ask. That's the point. Chatbots wait; assistants show up. This walkth
 
 2. **Turn on memory.** Enable Memory in Settings. Now corrections stick: tell it once that you don't care about crypto news, and future briefings know. You can review and delete anything it has remembered.
 
-3. **Have it schedule its own briefing.** Tell the assistant, in its workspace chat:
+3. **Give it a line to you.** In **Settings → Notifications**, add a **bot** target pointing at your Telegram bot and test it once. This is the channel the assistant will use whenever it has something to say.
 
-   > Every day at 7:40, compile my morning brief: today's Berlin weather, top items from the news matching my interests (search the web), and the result of last night's test run in ~/code/sideproject. Write the full brief to briefs/today.md and reply with a 5-line summary. Set that up as a scheduled task.
+4. **Have it schedule its own briefing.** Tell the assistant, in its workspace chat:
 
-   It creates the task itself; approve the tool call, then glance at the **Scheduled** page to see it sitting there with a next-run time, and hit **Run now** once to rehearse.
+   > Every day at 7:40, compile my morning brief: today's Berlin weather, top items from the news matching my interests (search the web), and the result of last night's test run in ~/code/sideproject. Write the full brief to briefs/today.md, then send me the 5-line summary as a notification. Set that up as a scheduled task.
 
-4. **Make it reach your phone.** In **Settings → Notifications**, add a **bot** target pointing at your Telegram bot, subscribed to **chat finished**. When the scheduled run completes, the summary lands in Telegram. That's the buzz at 7:45.
+   It creates the task itself; approve the tool call, glance at the **Scheduled** page to see the next-run time, and hit **Run now** once to rehearse. The "send me" part is the agent's own notify tool doing the delivery, which means the assistant decides what's worth saying and can stay silent when nothing is: "only notify me if something needs my attention" is a valid standing order.
 
 5. **Talk back.** It's a real chat, so replying works: "expand on the SDK thing" continues the same conversation with the same context, from the same phone.
 
