@@ -11,22 +11,19 @@ Every morning you run the test suite on the side project before work, skim the o
 
 ## The walkthrough
 
-1. **Create the task.** Open the **Scheduled** page and create a task:
+1. **Ask for it.** In the project workspace chat, say what you want:
 
-   - **Workspace:** the project repo
-   - **Model:** whatever you'd use in chat
-   - **Schedule:** the builder covers daily/weekly/hourly; under the hood it's an RRULE like `RRULE:FREQ=DAILY;BYHOUR=7;BYMINUTE=30`
-   - **Prompt:** be boring and specific:
+   > Every weekday at 7:30, run the test suite in this workspace. Don't change any files. If everything passes, report "all green" with the test count; if anything fails, name the failing tests and include the relevant error output.
 
-   > Run the test suite in this workspace. Don't change any files. If everything passes, reply "all green" with the test count. If anything fails, name the failing tests and include the relevant error output.
+   The agent creates the scheduled task itself (approve the tool call and it's done). Be boring and specific in the instruction; the schedule inherits exactly what you said.
 
-2. **Rehearse it.** Hit **Run now** and open the run it creates. Every run is a real chat in the workspace, so you can see exactly what it did: the command it ran, the output it read, the summary it wrote. If the summary isn't judgeable at a glance, tighten the prompt now, not after a week of noise.
+2. **Rehearse it.** Open the **Scheduled** page: your new task is there with its next-run time. Hit **Run now** and read the run it creates. Every run is a real chat in the workspace, so you can see exactly what it did: the command it ran, the output it read, the summary it wrote. If the summary isn't judgeable at a glance, tell the agent to tighten the task's prompt now, not after a week of noise.
 
 3. **Wire up the ping.** In **Settings → Notifications**, add a target: a webhook (Slack, Discord, Google Chat, and Teams URLs get formatted automatically) or one of your [messaging bots](/ecosystem/computer/automate/messaging-bots). Pick the **chat failed** and **chat finished** events, set delivery to **away** so it only pings you when you're not already looking at Computer, and use the test button once.
 
 4. **Let it run.** Run history keeps every morning's result with its linked chat, so "wait, when did that test start failing?" has an answer with receipts.
 
-Bonus: you don't have to visit the Scheduled page at all. Ask the agent in chat to "run the tests every weekday at 7:30 and tell me only about failures" and it creates the task itself; review it on the Scheduled page after.
+The Scheduled page is also where you pause a task, tweak its schedule with the frequency builder, or write one by hand if you prefer forms to sentences.
 
 ## What makes this work
 

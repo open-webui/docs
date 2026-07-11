@@ -9,12 +9,13 @@ Run a prompt on a schedule: "run the tests every weekday at 9", "summarize new f
 
 ## Create a task
 
-1. Open the **Scheduled** page.
-2. Create a task with a name, the prompt to run, a model, and a workspace.
-3. Set the schedule with the frequency builder (hourly, daily, weekly, ...) or type a raw RRULE.
-4. Save, then click **Run now** to test it before trusting the schedule.
+The fastest way is to ask. In any chat, in the workspace where the work should happen:
 
-Schedules are iCalendar RRULEs. The builder covers common cases; the raw field takes anything RRULE supports:
+> Schedule a task that runs the test suite every weekday at 9 and reports failures with the error output.
+
+The agent has a tool for this; approve the tool call and the task exists, workspace and model already set from the chat. Then open the **Scheduled** page to check the next-run time and click **Run now** once before trusting the schedule.
+
+The Scheduled page is also where you create and manage tasks by hand: name, prompt, model, workspace, and a schedule from the frequency builder (hourly, daily, weekly, ...) or a raw RRULE. Schedules are iCalendar RRULEs; the raw field takes anything RRULE supports:
 
 | Schedule | RRULE |
 | --- | --- |
@@ -22,8 +23,6 @@ Schedules are iCalendar RRULEs. The builder covers common cases; the raw field t
 | Every Monday | `RRULE:FREQ=WEEKLY;BYDAY=MO` |
 | Every hour | `RRULE:FREQ=HOURLY;INTERVAL=1` |
 | Once, then never again | `RRULE:FREQ=DAILY;COUNT=1` |
-
-You can also just ask the agent in any chat ("schedule a task that runs the test suite every weekday morning"); it has a tool for creating scheduled tasks.
 
 :::info Runs are unattended
 Scheduled runs execute with full tool approval: nobody is there to click Allow. Give the task a workspace you're comfortable with and a prompt that says exactly what to do (and what not to).

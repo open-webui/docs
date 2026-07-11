@@ -21,9 +21,11 @@ You didn't ask. That's the point. Chatbots wait; assistants show up. This walkth
 
 2. **Turn on memory.** Enable Memory in Settings. Now corrections stick: tell it once that you don't care about crypto news, and future briefings know. You can review and delete anything it has remembered.
 
-3. **Write the briefing job.** On the **Scheduled** page, create a task in the assistant workspace, daily at 7:40, with a prompt that produces a *judgeable* message:
+3. **Have it schedule its own briefing.** Tell the assistant, in its workspace chat:
 
-   > Compile my morning brief: today's Berlin weather, top items from the news matching my interests (search the web), and the result of last night's test run in ~/code/sideproject. Write the full brief to briefs/today.md, and reply with a 5-line summary.
+   > Every day at 7:40, compile my morning brief: today's Berlin weather, top items from the news matching my interests (search the web), and the result of last night's test run in ~/code/sideproject. Write the full brief to briefs/today.md and reply with a 5-line summary. Set that up as a scheduled task.
+
+   It creates the task itself; approve the tool call, then glance at the **Scheduled** page to see it sitting there with a next-run time, and hit **Run now** once to rehearse.
 
 4. **Make it reach your phone.** In **Settings → Notifications**, add a **bot** target pointing at your Telegram bot, subscribed to **chat finished**. When the scheduled run completes, the summary lands in Telegram. That's the buzz at 7:45.
 
