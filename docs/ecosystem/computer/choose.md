@@ -30,4 +30,4 @@ Three tools, three different centers of gravity. Pick by where the work lives, a
 
 Computer doesn't replace it. Run any agent CLI in a [terminal tab](/ecosystem/computer/workspace/terminals) exactly as you do today. Or, for Codex, Claude Code, Cursor, Grok, OpenCode, Cline, and Pi, [add it as a native backend](/ecosystem/computer/ai/coding-agents) so it becomes a chat model with streaming, approvals, and session resume, using the subscription and login you already have.
 
-One trust note: Open Terminal can be an isolated sandbox; Computer deliberately is not. It's your real machine, and that's the point. See the [security model](/ecosystem/computer/phone-and-remote/security).
+One trust note: Open Terminal gives a chat a disposable execution environment. Computer serves a machine you own, and you choose its boundary: run it bare for the whole workstation, or [in Docker](/ecosystem/computer/install/docker) so it sees only the folders you mount. Either way, everyone you let sign in shares that boundary; see the [security model](/ecosystem/computer/phone-and-remote/security).

@@ -5,19 +5,23 @@ sidebar_position: 2
 
 # What is Computer?
 
-Is it a remote desktop? A web IDE? A chat app? One of those personal AI agents everyone's running? People ask because it genuinely doesn't fit one shelf, and every answer that starts from one shelf ("it's like VS Code in the browser, but...") undersells the rest. So here's the actual mental model.
+Every tool you've used made a trade you stopped noticing.
+
+The tools that can reach your machine (remote desktops, SSH) carry no intelligence: you get a screen or a socket, and everything else is up to you. The tools that carry intelligence (chatbots, cloud agents) can't reach your machine: they live somewhere else, working on uploads, copies, and guesses about your actual situation. Your best computer and your smartest tools have never been in the same place.
+
+Computer deletes the trade. `cptr` is one process that runs where your work already lives and serves the whole thing: to any browser you own, to your chat apps, and to an AI working inside it.
 
 ## One machine, three doors
 
-Your computer already has everything that matters: your files, your projects, a shell, git state, logins, running services. Open WebUI Computer (`cptr`) is one process that takes that machine and opens three doors into it:
+Your computer already has everything that matters: the files, the projects, a shell, git state, logins, running services. Computer opens three doors into that one machine:
 
-**Door 1: you, at any screen.** A browser (or the home-screen PWA) gets the full workstation: file browser, editor, persistent terminals, git panel, previews. Not streamed pixels like a remote desktop; the real interfaces, built mobile-first. Close the tab on one device, open it on another, everything is where you left it.
+**Door 1: you, at any screen.** A browser or the home-screen app gets the full workstation: file browser, editor, persistent terminals, git panel, live previews. Not streamed pixels; the real interfaces, built for the phone first. Close the tab on one device, open it on another, everything is where you left it.
 
-**Door 2: you, by message.** Connect Telegram, Discord, Slack, WhatsApp, or Signal and the machine becomes something you text, and something that texts you: scheduled tasks run on their own, notifications deliver results, webhook triggers let the outside world wake it up.
+**Door 2: you, by message.** Connect Telegram, Discord, Slack, WhatsApp, or Signal and the machine becomes something you text, and something that texts you: scheduled tasks run on their own, results get delivered, webhooks let the outside world wake it up.
 
-**Door 3: an AI, inside.** Plug in an API key, Ollama, or the coding-agent subscription you already pay for, and the AI works behind the same doors you do: same files, same shell, same git, gated by approval modes you set per chat.
+**Door 3: an AI, inside.** Plug in an API key, a local model, or the coding-agent subscription you already pay for, and the AI works behind the same doors you do: same files, same shell, same git, gated by approval controls you set per chat.
 
-The entire trick is that all three doors open onto the **same state**. The file the agent edited is the file in your editor is the file on disk. The terminal you started at your desk is the one on your phone. The chat is a file in the project folder. One machine, one truth, three ways in.
+Here is the part that should land: **all three doors open onto the same state.** The file the agent edited is the file in your editor is the file on disk. The terminal you started at your desk is the one on your phone on the train. The chat where you decided something is a file in the project folder, greppable next year. There is no sync, no copy, no "connected account." One machine, one truth, three ways in.
 
 ```mermaid
 flowchart LR
@@ -40,40 +44,46 @@ flowchart LR
     G --- T
 ```
 
-## "So it's like X?"
+And because everything is plain files on a machine you own, the whole system stays inspectable: chats, skills, memory, artifacts. Nothing is trapped in an app.
 
-Whatever you already use, Computer probably overlaps it in one direction and breaks the category in another:
+## The moment it clicks
 
-| If you're thinking of... | What's the same | What's different |
+Definitions only get you so far. These are the four moments where people actually get it. Pick the nearest one and go have it:
+
+1. Your terminal, still running, on your phone, on the train: [ship a fix from your phone](/ecosystem/computer/use-cases/fix-from-your-phone)
+2. An AI reorganized your files and asked permission for every single move: [clean up a messy folder](/ecosystem/computer/use-cases/clean-up-a-messy-folder)
+3. Your own computer texted you the morning brief before you asked: [an assistant that texts you first](/ecosystem/computer/use-cases/an-assistant-that-texts-first)
+4. You handed over a whole research job and came back to finished files: [delegate a whole job](/ecosystem/computer/use-cases/delegate-a-whole-job)
+
+## Coming from another world
+
+If you already live in one of these categories, here's the shortest honest bridge:
+
+| Coming from... | Keep this expectation | Update this one |
 | --- | --- | --- |
-| **SSH / VNC / remote desktop** | Reach your real machine from anywhere | Structured, not raw: files, git, and editor as first-class mobile UI; sessions persist across disconnects; an AI can work the machine too |
-| **code-server / cloud IDEs** | A workstation in a browser tab | The machine is *yours*: real state, real logins, real data, no cloud copy. And it's not only for code; folders, notes, and PDFs are equal citizens |
-| **ChatGPT / a chat UI** | A chat with a capable model | The model has hands and a home: it reads and edits real files, runs real commands, and the conversation itself is a file in your project, searchable forever |
-| **OpenClaw-style personal assistants** | Always-on, messaging-native, memory, proactive schedules | The full workstation is attached. When the assistant does something, you can open the diff, the terminal, and the file it touched, and take over yourself at any point |
-| **Manus-style cloud agents** | Delegate a whole job, get a finished deliverable | It runs on your hardware with your data (nothing uploaded), every step is replayable, and the wheel is always grabbable: the terminal and editor are one tab away |
-| **Claude Code / Codex / Cursor** | Serious coding agents on real repos | Not a competitor, a *home*: your existing subscriptions plug in as native backends with streaming, approvals, and cross-device session resume. Any other CLI still runs in the terminal |
+| A remote desktop or SSH | You reach your real machine from anywhere | It's structured (files, git, editor as first-class mobile UI), sessions survive disconnects, and an AI can work the machine too |
+| A cloud IDE | A full workstation in a browser tab | The machine is yours: real state, real logins, no cloud copy. And it isn't only for code; folders of PDFs and notes are equal citizens |
+| A chat assistant | A conversation with a capable model | The model has hands and a home: real files, real commands, and the conversation itself becomes part of the project |
+| A cloud agent that does tasks for you | Delegate a goal, get a finished deliverable | It runs on your hardware with your data, every step is replayable, and the wheel is always grabbable: terminal and editor are one tab away |
+| A terminal coding agent | Serious agents on real repos | Computer is a home for it, not a replacement: your existing subscription becomes a chat backend with approvals and cross-device resume, and any CLI still runs in the terminal |
 
-Notice the pattern: tools either give you **the machine without intelligence** (SSH, VNC, code-server) or **intelligence without your machine** (ChatGPT, cloud agents). Computer is the intersection, and the intersection is the product.
+## How much machine you give it is your call
+
+Run `cptr` directly on the host and it serves the whole machine. That's the point for a personal workstation: the value is precisely that nothing is walled off from you.
+
+Run it in [Docker](/ecosystem/computer/install/docker) and it serves exactly what you mount and nothing else: a bounded workstation with only the projects you chose to expose. Same product, different blast radius; the boundary is a decision you make at install time, not a limitation you discover later.
+
+What stays true either way: everyone you let sign in shares the same access inside that boundary. It's one trust domain, like SSH, so keep it private and read the [security model](/ecosystem/computer/phone-and-remote/security) before sharing it.
 
 ## What it is not
 
-- **Not a cloud service.** There is no account with anyone, no hosted anything. `pip install cptr` and it's yours; unplug the network and the core still works.
-- **Not multi-tenant.** Accounts exist, isolation doesn't. Every signed-in user has the run of the machine. One trust domain, like SSH. ([Security model](/ecosystem/computer/phone-and-remote/security))
-- **Not a sandbox.** It's deliberately your real machine; that's the value. If you want a disposable isolated environment, that's [Open Terminal](/ecosystem/computer/choose).
-- **Not a model.** It ships no AI of its own. Bring any provider, local or hosted, or none at all: the workstation is fully useful with zero AI configured.
-
-## Where it clicks
-
-Reading definitions only gets you so far. These four moments are where the model snaps into place, pick the nearest one:
-
-1. Your terminal, still running, on your phone, on the train: [Ship a fix from your phone](/ecosystem/computer/use-cases/fix-from-your-phone)
-2. An AI reorganized your files and asked permission for every single move: [Clean up a messy folder](/ecosystem/computer/use-cases/clean-up-a-messy-folder)
-3. Your own computer texted you the morning brief before you asked: [An assistant that texts you first](/ecosystem/computer/use-cases/an-assistant-that-texts-first)
-4. You handed over a whole research job and came back to finished files: [Delegate a whole job](/ecosystem/computer/use-cases/delegate-a-whole-job)
+- **Not a cloud service.** No account with anyone, nothing hosted, nothing phoning home. Unplug the network and the workstation still works.
+- **Not a model.** It ships no AI of its own. Bring any provider, local or hosted, or none: files, terminal, and git are fully useful with zero AI configured.
+- **Not multi-tenant.** Accounts exist; per-user isolation doesn't. Share it like you'd share SSH keys, which is to say: barely, and only inside one trust domain.
 
 ## How to say it in one sentence
 
 - To a developer: "Your dev machine in a browser tab, with your coding-agent subscription living inside it."
-- To a self-hoster: "The self-hosted answer to cloud AI agents: same delegation, your hardware, your data."
-- To a student: "Your school folder and an AI tutor, on your laptop at home, reachable from your phone."
+- To a self-hoster: "Cloud-agent delegation, except it's your hardware and your data."
+- To a student: "Your school folder and an AI tutor on your own laptop, reachable from your phone."
 - To anyone: "Your computer, from anywhere, with an AI that works inside it."

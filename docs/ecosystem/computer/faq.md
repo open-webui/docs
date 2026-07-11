@@ -97,7 +97,7 @@ Copy the data directory (at minimum `app.db`, `config.toml`, and `uploads/`) plu
 
 ### Can multiple people use it?
 
-Accounts and admin roles exist, but there is no isolation between users: every signed-in user gets full filesystem and shell access to the host. It's one trust domain, so share it only with people you'd give SSH access to.
+Accounts and admin roles exist, but there is no isolation between users: every signed-in user gets full filesystem and shell access within the boundary you installed it with (the whole host bare, or the mounted folders in Docker). It's one trust domain, so share it only with people you'd give SSH access to.
 
 ### Is HTTPS built in?
 

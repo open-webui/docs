@@ -5,7 +5,7 @@ sidebar_position: 7
 
 # Security model
 
-The model in one sentence: **a signed-in user has full access to the host filesystem and shell, equivalent to an SSH session.** There is no path sandboxing and no per-user isolation. Computer is built for one trusted owner (or a small set of people you'd give SSH access to), and everything below follows from that.
+The model in one sentence: **a signed-in user has full access to everything Computer can reach: filesystem and shell, equivalent to an SSH session.** How much that is, you decide at install time: bare on the host, it's the whole machine; [in Docker](/ecosystem/computer/install/docker), it's exactly the folders you mount. Inside that boundary there is no per-user isolation. Computer is built for one trusted owner (or a small set of people you'd give SSH access to), and everything below follows from that.
 
 That's why the [remote-access options](./index.md) all reduce to the same question: who can reach the login page?
 
