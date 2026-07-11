@@ -28,6 +28,8 @@ cptr run
 
 That's the install. It prints a one-time setup link, you create your account, open a folder, and you're looking at your real files in the browser. [Quickstart →](/ecosystem/computer/quickstart)
 
+Wondering what category this thing even is (remote desktop? IDE? AI assistant?): [What is Computer?](/ecosystem/computer/what-is-computer) gives you the mental model in two minutes.
+
 ## What do you want to do?
 
 | I want to… | Go to |
