@@ -1,39 +1,27 @@
 ---
-title: "Persistent terminals"
+title: "Terminals"
 sidebar_position: 4
 ---
 
-# Persistent terminals
+# Terminals
 
-The terminal is a PTY-backed shell on the host. It is useful precisely because it sees the running services, credentials, checkout, and local tools you already use at the machine.
+Open a terminal tab and you get a full PTY-backed shell on the host, starting in the workspace folder. It's your real shell: your PATH, your credentials, your tools. Anything you'd run over SSH runs here: tests, build scripts, `htop`, vim, docker.
 
-## Use this when
+## Sessions persist
 
-Run a focused test, inspect logs, start a local development server, or resume a command from another device. The terminal is often the quickest way to establish what is really happening, but it has the same power and risk as a direct host shell.
+Close the tab, close the browser, put your phone in your pocket; the shell and whatever it's running keep going on the host. Reconnect from any device and the session is still there, with its scrollback replayed, so you can start a long build at your desk and check its output from the train.
 
-## Before you start
+Open as many terminals as you need, in tabs or side-by-side splits: a dev server in one, logs in another, a shell for poking around in a third. The arrangement is saved with the workspace layout.
 
-- Confirm the selected workspace and the terminal's current directory before running a command.
-- Know whether the command reads, changes, or deletes data. Start with status, logs, or a focused test when diagnosing.
-- Keep the host awake and connected if the task must continue. Browser reconnection cannot recover a process after a host shutdown or sleep policy stops it.
+## Terminal coding agents
 
-## Do it
+Any CLI tool works, including terminal coding agents. Run Gemini CLI or any other agent in a terminal tab exactly as you would locally, and it survives disconnects like every other session. If you'd rather have Claude Code, Codex, and friends show up in the chat model selector instead, connect them as [native coding-agent backends](/ecosystem/computer/ai/coding-agents).
 
-1. Open a terminal in the selected workspace and run `pwd` or an equivalent harmless command to confirm context.
-2. Run the narrow diagnostic or task. For a local app, start the usual development command and watch its port and output.
-3. Leave the terminal open while you use another tab, a split, or another device. Return to the same workspace to review later output.
-4. Stop a server or long-running command deliberately when finished; do not assume closing the browser tab is the same as shutting it down.
+## What does not survive
 
-## Verify it worked
+Sessions live inside the `cptr` process. They end when:
 
-The terminal reports the expected working directory and command output. A running server remains visible in the terminal and its detected port appears in the file browser. Reconnecting to the workspace shows the existing session output unless the host or process itself changed state.
+- the `cptr` process itself stops or restarts
+- the host reboots, or goes to sleep and suspends its processes
 
-## If it did not
-
-- **The shell opens in an unexpected directory:** `cd` to the intended project and confirm with `pwd`; then check the workspace configuration before relying on it again.
-- **The session reconnects but a command is gone:** inspect the final output and host state. Rerun a safe diagnostic rather than assuming success.
-- **Input or display is awkward on mobile:** use a short command, keyboard accessory, or return to a desktop browser. Do not turn a risky one-liner into a longer one just to avoid review.
-
-## Trust boundary
-
-Terminal commands are not limited to AI file-tool restrictions or the workspace tree. They run with the host account's permissions. Never give an untrusted person access to the instance, and do not treat a private browser tab as a sandbox.
+If a long-running task has to outlive those, see [keep it running](/ecosystem/computer/phone-and-remote/keep-it-running) for preventing host sleep, or run the task under `tmux`/`nohup` so it detaches from the session entirely.

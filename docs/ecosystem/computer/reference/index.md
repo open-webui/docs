@@ -1,17 +1,15 @@
 ---
-title: Open WebUI Computer reference
+title: Reference
 sidebar_position: 1
 ---
 
 # Reference
 
-Use these pages when you already know the workflow you want and need exact operating facts: command names, state locations, security boundaries, compatibility, and API behavior.
+Exact flags, variables, config keys, and API behavior, for when you know what you're looking for.
 
-| Need | Read this |
+| Need | Page |
 | --- | --- |
-| Install, run, or preserve Computer state | [CLI, installation options, and stored state](./cli-and-storage) |
-| Decide whether a deployment or permission model is safe | [Security, permissions, and configuration](./security-and-configuration) |
-| Diagnose a native-agent model/profile | [Agent and feature compatibility](./agent-compatibility) |
-| Connect an OpenAI-compatible client programmatically | [OpenAI-compatible gateway API](./gateway-api) |
-
-If you are new to Computer, begin with [Get started](/ecosystem/computer/getting-started) instead of treating reference commands as a deployment recipe.
+| `cptr run` flags, install extras, what the CLI doesn't have | [CLI](/ecosystem/computer/reference/cli) |
+| Every environment variable with defaults | [Environment variables](/ecosystem/computer/reference/environment-variables) |
+| Server secret, auth modes, the config file format | [config.toml](/ecosystem/computer/reference/configuration) |
+| OpenAI-compatible endpoints, keys, headers, limits | [Gateway API](/ecosystem/computer/reference/gateway-api) |

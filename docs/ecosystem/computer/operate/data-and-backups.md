@@ -5,19 +5,38 @@ sidebar_position: 2
 
 # Data and backups
 
-## Use this when
+Everything Computer needs to survive a reinstall lives in one data directory: `~/.cptr` by default, `/data` in Docker, or wherever `CPTR_DATA_DIR` points. The one exception is chats: they live inside each workspace folder and travel with the project.
 
-Use this when you need to move or protect the persistent state of a private installation before an upgrade, host migration, or risky configuration change.
+## What lives where
 
-## Before you start
+Inside the data directory:
 
-By default, Open WebUI Computer stores its database and configuration in `~/.cptr`: `app.db` and `config.toml`. Change the location before startup with `CPTR_DATA_DIR`. Docker stores the equivalent state in `/data`, normally backed by the `cptr-data` volume.
+| Path | What it holds |
+| --- | --- |
+| `app.db` | SQLite database in WAL mode (`app.db-wal` and `app.db-shm` sit next to it). Users and auth, instance config, automations, chat/message records, upload metadata. |
+| `config.toml` | The server secret plus a mirror of app config. On startup the file is re-seeded into the database (**the file wins**), so it's safe to hand-edit while stopped, and config survives a lost database. See [config.toml](/ecosystem/computer/reference/configuration). |
+| `uploads/` | Uploaded file blobs. |
+| `logs/` | Audit and upstream-request logs, when enabled. |
+| `memory/` | Per-user AI memory. |
+| `skills/` | Managed global skills. |
 
-## Do it
+Inside each workspace, Computer keeps a `.cptr/` folder:
 
-Stop Open WebUI Computer cleanly. Copy the entire data directory, not only the database, to protected local or encrypted backup storage.
+| Path | What it holds |
+| --- | --- |
+| `<workspace>/.cptr/chats/<chat_id>.json` | Every chat for that workspace; move the folder and the chats come with it. |
+| `<workspace>/.cptr/artifacts/` | Artifacts produced in that workspace. |
+| `<workspace>/.cptr/task_logs/` | Logs from task runs. |
 
-For a Python installation, archive the default data directory while Computer is stopped:
+A data-directory backup does **not** include your workspaces. Project folders need their own backup (git remote, Time Machine, whatever you already use), and because chats live in `<workspace>/.cptr/`, that backup covers them too.
+
+## Back up the data directory
+
+:::warning Stop the server first
+`app.db` uses SQLite WAL mode. Copying it while the server is writing can produce a corrupt or inconsistent backup. Stop Computer, copy, then start it again.
+:::
+
+For a Python install, archive `~/.cptr`:
 
 ```bash
 tar -C "$HOME" -czf cptr-data-backup.tgz .cptr
@@ -32,17 +51,15 @@ docker run --rm \
   alpine tar -C /data -czf /backup/cptr-data-backup.tgz .
 ```
 
-Keep this state backup separate from the project workspaces; those files need their own backup policy.
-
-## Verify it worked
-
-List the backup and confirm it contains both `app.db` and `config.toml` (or the Docker volume contents):
+Confirm the archive contains the two files that matter most:
 
 ```bash
-tar -tzf cptr-data-backup.tgz | rg '(^|/)app\.db$|(^|/)config\.toml$'
+tar -tzf cptr-data-backup.tgz | grep -E '(^|/)app\.db$|(^|/)config\.toml$'
 ```
 
-For a restore drill, unpack a Python backup into a fresh test location and start a stopped test installation with `CPTR_DATA_DIR` pointing there:
+## Test a restore
+
+Don't wait for a disaster to find out the backup works. Unpack into a fresh directory and start a second instance on another port with `CPTR_DATA_DIR` pointing at it:
 
 ```bash
 mkdir -p /tmp/cptr-restore
@@ -50,7 +67,9 @@ tar -C /tmp/cptr-restore -xzf cptr-data-backup.tgz
 CPTR_DATA_DIR=/tmp/cptr-restore/.cptr cptr run --port 8001
 ```
 
-For Docker, restore into a new volume rather than overwriting the production volume:
+Sign in at `http://localhost:8001` and check that your account and settings are there.
+
+For Docker, restore into a **new** volume rather than overwriting production:
 
 ```bash
 docker volume create cptr-data-restore
@@ -60,12 +79,4 @@ docker run --rm \
   alpine tar -C /data -xzf /backup/cptr-data-backup.tgz
 ```
 
-Start a test container with `cptr-data-restore`, sign in, and confirm a known workspace and setting are present. Restore workspace files separately as well; the Computer data backup does not contain the project directory.
-
-## If it did not
-
-If SQLite reports locks or the backup is inconsistent, stop the process and retry; do not copy a live database while writes are in flight. If restoring loses access, restore the complete directory and verify file ownership before attempting account or config changes.
-
-## Trust boundary
-
-The data directory can contain account, configuration, workspace metadata, and service secrets. Treat backups as sensitive host data and encrypt them where your threat model requires it.
+Then start a test container with `-v cptr-data-restore:/data` and sign in. Remember that workspaces are restored separately: the data backup gets you accounts, config, and settings, not project files.

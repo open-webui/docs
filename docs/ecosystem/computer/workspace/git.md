@@ -1,41 +1,26 @@
 ---
-title: "Git, branches, stashes, and worktrees"
+title: "Git"
 sidebar_position: 5
 ---
 
-# Git, branches, stashes, and worktrees
+# Git
 
-The git bar reflects the repository in the selected workspace. It gives you a fast answer to the question that matters during remote work: what changed here, on which branch, and is this safe to continue?
+When the workspace is a git repository, a git status strip shows the current branch and the changed files, with added and removed line counts per file. Expand it to stage, diff, commit, branch, and push: the full daily git loop without a command line, which matters most when the device in your hand is a phone.
 
-## Use this when
+## Review changes
 
-Inspect a diff, stage and commit a small fix, switch branches with uncommitted work, recover a known stash, or move to a separate git worktree. Use a worktree when two tasks need separate checked-out files at the same time; it is safer than repeatedly switching a busy working tree.
+Open any changed file to see its diff in split or unified view. Word-level highlights mark what changed inside a line, and you can hide whitespace-only changes to cut noise in reformatted files. Images and other non-text files show a clear changed/added/deleted status instead of meaningless line counts.
 
-## Before you start
+Stage exactly the files you want; the staged set is what gets committed.
 
-- Select the workspace that contains the actual checkout and read the branch name and changed-file count.
-- Inspect the diff before staging. A dirty working tree may include work made earlier on the host.
-- Ensure you understand the repository's branch and push policy. The UI does not make a remote push or a migration review safe by itself.
+## Commit and sync
 
-## Do it
+Write a commit message, or take the suggested commit title and description generated from your staged changes and edit it before committing. The status strip shows how many commits you are ahead of or behind the remote, with push and pull one tap away.
 
-1. Expand the git bar to review changed files, diffs, staged state, and ahead/behind status.
-2. Stage only the paths that belong to the task, write a specific commit message, and commit after the focused test passes.
-3. Use the branch picker to create, find, rename, delete, or switch branches. When a switch needs a clean tree, review the offered stash behavior and name the stash so it is recoverable.
-4. Use the worktree picker to see existing worktrees or create a branch-backed worktree. Switch to it as its own workspace path; it contains a distinct checkout, not a magic view of the first branch.
-5. Use the stash view to inspect and restore the intended stash. Resolve conflicts in the real files and re-check the diff.
+## Branches and stashes
 
-## Verify it worked
+From the branch picker you can create, switch, rename, and delete branches. If switching requires a clean working tree, Computer offers to stash your changes as part of the switch, and the stash view lets you inspect and restore stashes later. Nothing is silently discarded.
 
-The git bar shows the intended branch or worktree path, the diff matches only the files you selected, and the commit appears in history. After a worktree switch, the file browser and terminal show that worktree's files and branch. After restoring a stash, the expected changes appear in the diff rather than silently disappearing.
+## Worktrees
 
-## If it did not
-
-- **A branch cannot switch:** inspect uncommitted changes and either commit, preserve them in a clearly named stash, or use a separate worktree. Do not discard work to force a switch.
-- **A worktree is missing:** refresh the worktree picker and confirm it exists in git. Add its target path as a workspace if it is not already available.
-- **A stash will not apply cleanly:** stop and resolve the conflict from the checkout. Keep the stash until the result is verified.
-- **The diff is surprising:** unstage first, inspect paths and history, and avoid pushing until you can explain every change.
-
-## Trust boundary
-
-Git commands alter the real checkout and may communicate with configured remotes. A worktree reduces collisions between tasks; it does not isolate credentials, hooks, or shell access. Treat every stage, commit, branch deletion, and push as a host and repository action.
+The worktree picker lists the repository's git worktrees and lets you create new ones. A worktree is its own directory with its own checked-out branch, so opening one opens it as its own workspace, with its own tabs, terminals, and layout. That's the way to work on two branches at once instead of bouncing a single checkout back and forth. See [add and switch workspaces](./workspaces) for how workspaces behave.

@@ -1,6 +1,6 @@
 {
-	"label": "Operate Open WebUI Computer",
-	"position": 9,
+	"label": "Operate",
+	"position": 8,
 	"collapsible": true,
 	"collapsed": true,
 	"link": {

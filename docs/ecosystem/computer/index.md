@@ -17,76 +17,44 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**A private browser workspace for the computer where your work already is.**
+**Your computer, from anywhere.**
 
-Your files, project, local app, terminal, and an agent already working on them do not disappear when you leave your desk. Open WebUI Computer lets you reach that same machine from another browser. You see the work as it is, not a copied project, a fresh cloud machine, or a chat that has to be brought up to speed.
+Open WebUI Computer (`cptr`) runs on your machine and serves the whole thing to any browser: files, editor, terminal, git, AI chat, and coding agents. Open it from your phone, a tablet, or another computer. Everything is exactly where you left it, because it *is* your machine, not a copy of it.
 
-## Start with the interruption you want to avoid
+```bash
+pip install cptr
+cptr run
+```
 
-### “The thing I need is on my computer, but I only have my phone.”
+That's the install. It prints a one-time setup link, you create your account, open a folder, and you're looking at your real files in the browser. [Quickstart →](/ecosystem/computer/quickstart)
 
-Open the existing folder, terminal, and running app from another device. Check what is true before you decide whether the interruption needs your full desk session.
+## What do you want to do?
 
-[See the remote-workspace path](./use-cases/remote-fix)
+| I want to… | Go to |
+| --- | --- |
+| See it working in two minutes | [Quickstart](/ecosystem/computer/quickstart) |
+| Use it from my phone, away from home | [Phone & remote access](/ecosystem/computer/phone-and-remote/) |
+| Keep terminals and agents running after I close the tab, or when the machine reboots | [Keep it running](/ecosystem/computer/phone-and-remote/keep-it-running) |
+| Use the Claude Code / Codex / Cursor subscription I already pay for | [Coding agents](/ecosystem/computer/ai/coding-agents) |
+| Connect OpenAI, Anthropic, Ollama, or any compatible API | [Connect a model](/ecosystem/computer/ai/connect-a-model) |
+| Message my computer from Telegram, Discord, Slack, WhatsApp, or Signal | [Messaging bots](/ecosystem/computer/automate/messaging-bots) |
+| Run AI tasks on a schedule ("run the tests every morning") | [Scheduled tasks](/ecosystem/computer/automate/scheduled-tasks) |
+| Use a Computer workspace as a model inside Open WebUI | [Open WebUI integration](/ecosystem/computer/automate/open-webui) |
+| Run it in Docker | [Docker](/ecosystem/computer/install/docker) |
+| Know where my data lives and how to back it up | [Data and backups](/ecosystem/computer/operate/data-and-backups) |
+| Look up a flag, env var, or the gateway API | [Reference](/ecosystem/computer/reference/) |
+| Fix something | [Troubleshooting](/ecosystem/computer/troubleshooting) · [FAQ](/ecosystem/computer/faq) |
 
-### “An agent is working, but it needs my judgment.”
+## What it is
 
-See its activity and the real changes in the selected workspace. Give it a narrow instruction, review the result, and continue the same work later.
+A workstation in a browser tab. Real files with a full editor. A shell that keeps running when you close the tab and is still there when you reconnect from another device. Git (status, diffs, staging, commits, branches) without touching the command line unless you want to. Workspaces for each project, with their chats, layout, and history kept together.
 
-[See agent supervision](./use-cases/agent-supervision)
+AI is optional and pluggable: bring an API key, point it at local models via Ollama, or plug in a coding agent you already subscribe to. The agent works in your real project: it reads files, edits, runs commands, and browses the web, with approval controls you set per chat. No AI configured? Everything else still works.
 
-### “I need to review something real, not a screenshot or a recreated demo.”
+## Where it fits
 
-Open the prototype, files, note, image, document, or recording already on the host. Keep feedback beside the work instead of scattering it across devices and chats.
+Open WebUI is the AI interface and workflow platform. Open Terminal gives an Open WebUI chat a clean execution environment. Computer serves the machine your work already lives on, and it can also [act as a model provider for Open WebUI](/ecosystem/computer/automate/open-webui). Not sure which you need? [Compare them](/ecosystem/computer/choose).
 
-[See file review and feedback](./use-cases/review-and-share-feedback)
+## Private by design
 
-For more paths, including recurring checks, on-call triage, local-device preview, and Open WebUI workflows, visit [real jobs Computer can solve](./use-cases/).
-
-## Why this is different
-
-### Keep the context you already built
-
-Open the machine where the right files, project, process, and terminal already exist. There is no second project to create and no context to retell.
-
-### See the work before you decide what to do
-
-The workspace brings files, git, terminals, previews, chats, and agent activity together in a browser that works from another computer or phone.
-
-### Add AI without moving the work away
-
-When you configure a model or supported agent, it works in the selected real workspace beside the tools you already use. You can also use Computer with no AI at all.
-
-## What Open WebUI Computer is
-
-Computer is a private control surface for work on one machine you operate. It keeps a chosen workspace, its files, terminal and git state, agent work, and review history together.
-
-It is useful with no AI at all. Add a model, coding-agent subscription, browser tool, automation, bot, or external tool only when that improves a job you actually have. Each extra connection brings its own data and trust boundary.
-
-## Start with your own folder
-
-Run it locally and open one familiar folder. You will see the real files that are already on the machine. No remote access, AI provider, bot, or automation is required.
-
-You need permission to run one install command on the machine that holds the work. If it is not your machine, ask its owner to do the local setup with you. You do not need to know git or use a terminal after the initial install.
-
-[Try it locally](./getting-started/local-trial)
-
-## Choose the path that fits how you work
-
-- Making or reviewing visual work, school work, research, or an independent project? [Explore real jobs](./use-cases/).
-- Want an AI to work in a real project? [Set up an agent](./agents/).
-- Already use Open WebUI or Open Terminal? [Choose the right execution environment](./choose).
-- Already use an agent command-line tool? [See how it works with Computer](./choose#if-you-already-use-an-agent-command-line-tool).
-- Need remote access, backups, or a full security model first? [Read remote access and security](./remote-access/).
-
-## Choose the computer that matches the work
-
-Open WebUI is the AI interface and workflow platform. Open Terminal gives an Open WebUI chat a computing environment. Computer is the particular machine where personal work is already alive. Use one or combine them when the job needs more than one kind of context.
-
-[Choose the right execution environment](./choose)
-
-## Keep it private
-
-Computer runs on a machine you control. Its core workspace needs no managed cloud account, cloud control plane, or AI provider. An authenticated user can access the host filesystem and shell, so treat remote access like private SSH, not a public web app. It is a strong fit for one trusted owner, not for giving untrusted people separate isolated machines.
-
-[Read the security model](./remote-access/security-model)
+Computer runs on hardware you control and talks to nothing unless you configure it to. One thing to internalize before you expose it anywhere: a signed-in user has the same power as someone at the keyboard, meaning full filesystem and shell access. Treat access like SSH, keep it on a private network path like [Tailscale](/ecosystem/computer/phone-and-remote/tailscale), and read the [security model](/ecosystem/computer/phone-and-remote/security) before sharing it with anyone.

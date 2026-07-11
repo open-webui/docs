@@ -1,10 +1,4 @@
 {
 	"label": "Your workspace",
-	"position": 5,
-	"collapsible": true,
-	"collapsed": true,
-	"link": {
-		"type": "doc",
-		"id": "ecosystem/computer/workspace/index"
-	}
+	"position": 5
 }

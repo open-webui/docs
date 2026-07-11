@@ -1,45 +1,63 @@
 ---
-title: OpenAI-compatible gateway API
-sidebar_position: 4
+title: Gateway API (OpenAI-compatible)
+sidebar_position: 5
 ---
 
-# OpenAI-compatible gateway API
+# Gateway API (OpenAI-compatible)
 
-The gateway exposes each workspace owned by the gateway-key user as an OpenAI-compatible model. It is intended for a trusted client such as Open WebUI, not as a public general-purpose API.
+The gateway exposes each of your workspaces as an OpenAI-compatible model, so any OpenAI-style client can run agent tasks in a real workspace.
 
-If you are connecting Open WebUI, start with [Use a Computer workspace from Open WebUI](../integrations/open-webui-gateway). This page is the endpoint and behavior reference once the first read-only workspace task is working.
+| Endpoint | Behavior |
+| --- | --- |
+| `GET /v1/models` | Lists the key owner's workspaces as models. |
+| `POST /v1/chat/completions` | Runs an agent task in the selected workspace. Streams SSE by default. |
 
-:::danger Full approval only
-Gateway-created tasks use `tool_approval_mode: full`. There is no per-tool approval callback in the OpenAI-compatible API. Use only trusted clients, bounded workspaces, and models you intend to give host-capable tool access.
+```bash
+curl http://localhost:8000/v1/chat/completions \
+  -H "Authorization: Bearer sk-cptr-..." \
+  -H "Content-Type: application/json" \
+  -d '{"model": "cptr/my-project", "messages": [{"role": "user", "content": "Summarize the README"}]}'
+```
+
+Connecting Open WebUI? Follow the walkthrough at [Use Computer from Open WebUI](/ecosystem/computer/automate/open-webui); this page is the endpoint reference.
+
+## API keys
+
+Create keys in **Settings → Admin → Gateway**. The `sk-cptr-...` value is shown once and stored hashed, so copy it immediately. Key management itself (creating, revoking) requires a browser session; you can't manage keys with a bearer key.
+
+## Workspaces as models
+
+Each workspace owned by the key's user appears as `cptr/<folder-name>`; duplicate folder names get a `-2` suffix. Which underlying model executes the task, in priority order:
+
+1. The model set in **Settings → Admin → Gateway**
+2. A `<workspace>/.cptr/model` override file
+3. The default chat model
+4. The first model of the first enabled connection
+
+## Conversation continuity
+
+Stateless requests create a new Computer chat each time. To continue a conversation, send `X-Chat-Id` (any client) or the Open WebUI header set:
+
+```json
+{
+  "X-OpenWebUI-Chat-Id": "{{CHAT_ID}}",
+  "X-OpenWebUI-Message-Id": "{{MESSAGE_ID}}",
+  "X-OpenWebUI-User-Message-Id": "{{USER_MESSAGE_ID}}",
+  "X-OpenWebUI-User-Message-Parent-Id": "{{USER_MESSAGE_PARENT_ID}}",
+  "X-OpenWebUI-Task": "{{TASK}}"
+}
+```
+
+`{{USER_MESSAGE_ID}}`, `{{USER_MESSAGE_PARENT_ID}}`, and `{{TASK}}` require Open WebUI 0.10.0 or newer. Without them, basic chat works, but edit/regeneration branches and utility-task filtering don't.
+
+Requests that Open WebUI marks as title, tag, or follow-up generation (via `X-OpenWebUI-Task`) are answered by the plain LLM without starting an agent task in the workspace.
+
+## Limits
+
+:::warning Gateway tasks run with full tool approval
+There is no per-action approval in the OpenAI-compatible API: the agent edits files, runs commands, and calls tools without asking. Treat a gateway key like an SSH credential and only hand it to clients you trust.
 :::
 
-## Use this when
-
-Use this reference when connecting a trusted OpenAI-compatible client and you need the exact endpoints, authentication, and conversation-continuity semantics.
-
-## Before you start
-
-- Create a gateway API key in Computer; raw keys are shown once and stored hashed.
-- Create the workspace and configure the model it should use.
-- Ensure the client can reach Computer privately.
-
-## Do it
-
-1. Request `GET /v1/models` with `Authorization: Bearer <gateway-key>`.
-2. Select a returned `cptr/your-workspace` model.
-3. Send `POST /v1/chat/completions` with `model`, `messages`, and optional `stream`.
-4. Send `X-Chat-Id` or `X-OpenWebUI-Chat-Id` to reuse a Computer chat across turns. Open WebUI should additionally send its message/task lineage headers.
-
-Computer accepts extra OpenAI-style request fields for compatibility, but the selected workspace’s configured agent/model runs the task. Utility requests that Open WebUI labels as title/tag/follow-up work are handled without starting a full workspace agent task.
-
-## Verify it worked
-
-`/v1/models` returns only the key owner’s workspaces. A streamed completion returns server-sent events, and repeating the same client chat header continues the same Computer conversation.
-
-## If it did not
-
-`401` means the bearer key is missing, malformed, revoked, or belongs to no valid key record. A missing model usually means the workspace was not created for that key user. A connection that can list models but cannot complete a task needs the workspace’s agent/model configuration fixed.
-
-## Trust boundary
-
-A gateway bearer key is a capability for the corresponding user’s agent workspaces. Protect it like an SSH credential. The gateway does not confer a sandbox, does not merge identity/RBAC semantics with the calling client, and cannot provide interactive approval for a request in progress.
+- `temperature`, `top_p`, and `max_tokens` are accepted but ignored; the workspace's configured model and settings apply.
+- `usage` token counts in responses are always 0.
+- Streams idle for 300 seconds are closed.
