@@ -58,7 +58,7 @@ If you already live in one of these categories, here's the shortest honest bridg
 | Coming from... | Keep this expectation | Update this one |
 | --- | --- | --- |
 | A remote desktop or SSH (VNC, RDP, tmux over SSH) | You reach your real machine from anywhere | It's structured (files, git, editor as first-class mobile UI), sessions survive disconnects, and an AI can work the machine too |
-| A cloud IDE (Codespaces, code-server) | A full workstation in a browser tab | The machine is yours: real state, real logins, no cloud copy. And it isn't only for code; folders of PDFs and notes are equal citizens |
+| A browser IDE (Codespaces, code-server) | A full workstation in a browser tab; code-server even self-hosts like Computer does | The phone is a first-class screen, not a desktop UI squeezed smaller; AI with approvals, messaging bots, and scheduled tasks are built in rather than bolted on; and it isn't code-only: PDFs, notes, and voice memos are equal citizens |
 | A chat assistant (ChatGPT, Open WebUI) | A conversation with a capable model | The conversation gets hands and a home: real files, real commands, and the chat itself becomes part of the project, on your disk |
 | A cloud agent that does whole tasks (e.g. Manus) | Delegate a goal, get a finished deliverable | The agent system itself runs on your hardware with your data, every step is replayable, and the wheel is always grabbable: terminal and editor are one tab away |
 | A terminal coding agent (Claude Code, Codex, Cursor) | Serious agents on real repos | Computer is a home for it, not a replacement: your existing subscription becomes a chat backend with approvals and cross-device resume, and any CLI still runs in the terminal |
