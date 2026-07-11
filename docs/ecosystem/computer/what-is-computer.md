@@ -5,11 +5,9 @@ sidebar_position: 2
 
 # What is Computer?
 
-Every tool you've used made a trade you stopped noticing.
+Computer (`cptr`) is one process that runs on the machine where your work already lives and serves the whole thing: to any browser you own, to your chat apps, and to an AI working inside it.
 
-The tools that can reach your machine (remote desktops, SSH) carry no intelligence: you get a screen or a socket, and everything else is up to you. The tools that carry intelligence (chatbots, cloud agents) can't reach your machine: they live somewhere else, working on uploads, copies, and guesses about your actual situation. Your best computer and your smartest tools have never been in the same place.
-
-Computer deletes the trade. `cptr` is one process that runs where your work already lives and serves the whole thing: to any browser you own, to your chat apps, and to an AI working inside it.
+All of it is self-hosted. The workstation, the agent loop, the chat history, the memory, the schedules run right there with your work. The only thing that ever leaves is the model calls you choose to send; with a local model, not even that.
 
 ## One machine, three doors
 
@@ -21,7 +19,7 @@ Your computer already has everything that matters: the files, the projects, a sh
 
 **Door 3: an AI, inside.** Plug in an API key, a local model, or the coding-agent subscription you already pay for, and the AI works behind the same doors you do: same files, same shell, same git, gated by approval controls you set per chat.
 
-Here is the part that should land: **all three doors open onto the same state.** The file the agent edited is the file in your editor is the file on disk. The terminal you started at your desk is the one on your phone on the train. The chat where you decided something is a file in the project folder, greppable next year. There is no sync, no copy, no "connected account." One machine, one truth, three ways in.
+The trick, and really the whole product: **all three doors open onto the same state.** The file the agent edited is the file in your editor is the file on disk. The terminal you started at your desk is the one on your phone on the train. The chat where you decided something is a file in the project folder, greppable next year. There is no sync, no copy, no "connected account." One machine, one truth, three ways in.
 
 ```mermaid
 flowchart LR
@@ -61,11 +59,11 @@ If you already live in one of these categories, here's the shortest honest bridg
 
 | Coming from... | Keep this expectation | Update this one |
 | --- | --- | --- |
-| A remote desktop or SSH | You reach your real machine from anywhere | It's structured (files, git, editor as first-class mobile UI), sessions survive disconnects, and an AI can work the machine too |
-| A cloud IDE | A full workstation in a browser tab | The machine is yours: real state, real logins, no cloud copy. And it isn't only for code; folders of PDFs and notes are equal citizens |
-| A chat assistant | A conversation with a capable model | The model has hands and a home: real files, real commands, and the conversation itself becomes part of the project |
-| A cloud agent that does tasks for you | Delegate a goal, get a finished deliverable | It runs on your hardware with your data, every step is replayable, and the wheel is always grabbable: terminal and editor are one tab away |
-| A terminal coding agent | Serious agents on real repos | Computer is a home for it, not a replacement: your existing subscription becomes a chat backend with approvals and cross-device resume, and any CLI still runs in the terminal |
+| A remote desktop or SSH (VNC, RDP, tmux over SSH) | You reach your real machine from anywhere | It's structured (files, git, editor as first-class mobile UI), sessions survive disconnects, and an AI can work the machine too |
+| A cloud IDE (Codespaces, code-server) | A full workstation in a browser tab | The machine is yours: real state, real logins, no cloud copy. And it isn't only for code; folders of PDFs and notes are equal citizens |
+| A chat assistant (ChatGPT, Open WebUI) | A conversation with a capable model | The conversation gets hands and a home: real files, real commands, and the chat itself becomes part of the project, on your disk |
+| A cloud agent that does whole tasks (e.g. Manus) | Delegate a goal, get a finished deliverable | The agent system itself runs on your hardware with your data, every step is replayable, and the wheel is always grabbable: terminal and editor are one tab away |
+| A terminal coding agent (Claude Code, Codex, Cursor) | Serious agents on real repos | Computer is a home for it, not a replacement: your existing subscription becomes a chat backend with approvals and cross-device resume, and any CLI still runs in the terminal |
 
 ## How much machine you give it is your call
 
