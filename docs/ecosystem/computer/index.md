@@ -26,7 +26,7 @@ pip install cptr
 cptr run
 ```
 
-That's the install. It prints a one-time setup link, you create your account, open a folder, and you're looking at your real files in the browser. [Quickstart →](/ecosystem/computer/quickstart)
+That's the install. It prints a one-time setup link, you create your account, open a folder, and you're looking at your real files in the browser. [Quickstart →](/ecosystem/computer/quickstart) · [View on GitHub →](https://github.com/open-webui/computer)
 
 Wondering what category this thing even is (remote desktop? IDE? AI assistant?): [What is Computer?](/ecosystem/computer/what-is-computer) gives you the mental model in two minutes.
 
