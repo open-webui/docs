@@ -1,6 +1,6 @@
 ---
 title: "A project folder that follows you"
-sidebar_position: 8
+sidebar_position: 3
 ---
 
 # A project folder that follows you

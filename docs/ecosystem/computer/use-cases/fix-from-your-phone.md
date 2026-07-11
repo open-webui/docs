@@ -1,6 +1,6 @@
 ---
 title: "Ship a fix from your phone"
-sidebar_position: 2
+sidebar_position: 6
 ---
 
 # Ship a fix from your phone
