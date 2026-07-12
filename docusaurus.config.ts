@@ -1,3 +1,5 @@
+import path from "path";
+import webpack from "webpack";
 import { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
@@ -50,8 +52,24 @@ const config: Config = {
 	markdown: {
 		mermaid: true,
 	},
+<<<<<<< Updated upstream
 	clientModules: ["./src/clientModules/ensure-gtag.js"],
 	themes: ["@docusaurus/theme-mermaid"],
+=======
+	themes: [
+		"@docusaurus/theme-mermaid",
+		[
+			require.resolve("@easyops-cn/docusaurus-search-local"),
+			{
+				hashed: true,
+				indexBlog: false,
+				docsRouteBasePath: "/",
+				highlightSearchTermsOnTargetPage: true,
+				explicitSearchResultPath: true,
+			},
+		],
+	],
+>>>>>>> Stashed changes
 
 	presets: [
 		[
@@ -198,7 +216,23 @@ const config: Config = {
 			},
 		},
 	} satisfies Preset.ThemeConfig,
-	plugins: [require.resolve("docusaurus-lunr-search")],
+
+	plugins: [
+		// Rank verbatim phrase matches above token results (see src/client/exactSearch.js).
+		() => ({
+			name: "docs-exact-search",
+			configureWebpack() {
+				return {
+					plugins: [
+						new webpack.NormalModuleReplacementPlugin(
+							/searchByWorker$/,
+							path.resolve(__dirname, "src/client/exactSearch.js")
+						),
+					],
+				};
+			},
+		}),
+	],
 };
 
 export default config;
