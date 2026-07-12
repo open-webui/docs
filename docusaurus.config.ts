@@ -52,10 +52,7 @@ const config: Config = {
 	markdown: {
 		mermaid: true,
 	},
-<<<<<<< Updated upstream
 	clientModules: ["./src/clientModules/ensure-gtag.js"],
-	themes: ["@docusaurus/theme-mermaid"],
-=======
 	themes: [
 		"@docusaurus/theme-mermaid",
 		[
@@ -69,7 +66,6 @@ const config: Config = {
 			},
 		],
 	],
->>>>>>> Stashed changes
 
 	presets: [
 		[
