@@ -86,6 +86,11 @@
 	--ifm-hover-overlay: rgb(255 255 255 / 4%);
 	--ifm-menu-color: #888;
 	--docusaurus-highlighted-code-line-bg: rgb(255 255 255 / 8%);
+
+	/* Search dropdown: marks and the selected row default to --ifm-color-primary
+	   (#ddd here), leaving white text on a light row. Invert the selected row. */
+	--search-local-highlight-color: #fff;
+	--search-local-hit-active-color: #111;
 }
 
 /* ─── Global typography ─── */
