@@ -1,0 +1,10 @@
+{
+	"label": "Operate",
+	"position": 10,
+	"collapsible": true,
+	"collapsed": true,
+	"link": {
+		"type": "doc",
+		"id": "ecosystem/computer/operate/index"
+	}
+}

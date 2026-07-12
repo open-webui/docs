@@ -26,7 +26,7 @@ This is where ideas become working software. Ask a question, get a running scrip
 ![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
 
 :::tip Looking for "your computer in a browser" instead?
-Open Terminal is a tool the **chat AI** drives. If you instead want to operate your own machine from any browser (files, editor, terminal and git, mobile-first), with AI as an optional helper, see [**Open WebUI Computer**](/ecosystem/computer), a separate Open WebUI project. [Compare the two](/ecosystem/computer#open-webui-computer-vs-open-terminal).
+Open Terminal is a tool the **chat AI** drives. If you instead want to operate your own machine from any browser (files, editor, terminal and git, mobile-first), with AI as an optional helper, see [**Open WebUI Computer**](/ecosystem/computer), a separate Open WebUI project. [Choose the right execution environment](/ecosystem/computer/choose).
 :::
 
 ---
