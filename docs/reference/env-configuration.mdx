@@ -1884,6 +1884,8 @@ So an OpenAI, Ollama or Pipelines request receives **five** of the six headers (
 
 If you set `FORWARD_USER_INFO_HEADER_JWT_SECRET`, the four `X-OpenWebUI-User-*` headers are replaced by a single signed JWT (see [`FORWARD_USER_INFO_HEADER_JWT_SECRET`](#forward_user_info_header_jwt_secret) below).
 
+To forward **arbitrary custom headers**, including per-request values such as the message ID, set them on the individual connection instead of globally: see [Custom Forwarded Headers](#custom-forwarded-headers-per-connection) below.
+
 #### `FORWARD_USER_INFO_HEADER_USER_NAME`
 
 - Type: `str`
@@ -1950,6 +1952,40 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 - Type: `int`
 - Default: `300`
 - Description: Lifetime in seconds of the forwarded-identity JWT (its `exp` claim). A fresh token is minted on every request, so this only needs to cover clock skew between Open WebUI and the upstream verifier.
+
+#### Custom Forwarded Headers (per connection)
+
+Beyond the fixed user and session headers above, each connection can forward **arbitrary custom headers** whose values may embed **template placeholders** that Open WebUI substitutes for each request. Unlike the variables above, this is configured **per connection, not through an environment variable**, and it works **independently of `ENABLE_FORWARD_USER_INFO_HEADERS`** (custom headers are sent even when that toggle is `false`). They are applied **last**, so a custom header takes precedence over a built-in forwarded header of the same name.
+
+Set them in **Admin Panel > Settings > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
+
+```json
+{
+  "X-Message-Id": "{{MESSAGE_ID}}",
+  "X-User-Email": "{{USER_EMAIL}}",
+  "X-Trace": "{{CHAT_ID}}/{{MESSAGE_ID}}"
+}
+```
+
+Available placeholders, substituted at request time (any placeholder that has no value for the current request becomes an empty string):
+
+| Placeholder | Value |
+|---|---|
+| `{{CHAT_ID}}` | Current chat/session ID |
+| `{{MESSAGE_ID}}` | Current (assistant) message ID |
+| `{{USER_MESSAGE_ID}}` | ID of the user message that triggered the request |
+| `{{USER_MESSAGE_PARENT_ID}}` | Parent ID of that user message, i.e. its position in the message tree |
+| `{{FILE_ID}}` | File ID, for file-scoped requests such as document processing |
+| `{{FILE_NAME}}` | File name, for file-scoped requests |
+| `{{FILE_CONTENT_TYPE}}` | File MIME type, for file-scoped requests |
+| `{{TASK}}` | Internal task name when the request is a background task, e.g. title or tag generation |
+| `{{USER_ID}}` | Signed-in user's ID |
+| `{{USER_NAME}}` | Signed-in user's display name |
+| `{{USER_EMAIL}}` | Signed-in user's email |
+| `{{USER_ROLE}}` | Signed-in user's role |
+| `{{USER_AGENT}}` | User-Agent of the originating browser request |
+
+Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections. Introduced in v0.10.0, which expanded the placeholder set (the message, file, task and user-agent placeholders) beyond the earlier chat and user variables.
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
