@@ -244,6 +244,35 @@ All models configured in Open WebUI are accessible through this endpoint, includ
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
 :::
 
+#### Counting Tokens
+
+A companion to the Messages API that reports how many input tokens a request would use, without running it. This mirrors Anthropic's own token-counting endpoint, so SDKs that pre-flight a request for budgeting or context-fitting work unchanged.
+
+- **Endpoints**: `POST /api/v1/messages/count_tokens`, `POST /api/message/count_tokens`
+- **Authentication**: same as the Messages API
+- **Returns**: `{"input_tokens": <int>}`
+
+```bash
+curl -X POST http://localhost:3000/api/v1/messages/count_tokens \
+-H "x-api-key: YOUR_API_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+      "model": "gpt-4o",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Why is the sky blue?"
+        }
+      ]
+    }'
+```
+
+The count is obtained from the upstream provider behind the resolved connection, so the provider must implement token counting. If it does not, or answers unexpectedly, the request fails with a `502`.
+
+:::info Reported `input_tokens` are now real
+The Messages API previously always reported `input_tokens: 0` in the streaming `message_start` block. Input tokens are now counted up front and reported in both streaming and non-streaming responses. If counting fails the request still succeeds, so clients should treat the value as best-effort rather than guaranteed.
+:::
+
 ### 🔧 Filter and Function Behavior with API Requests
 
 When using the API endpoints directly, filters (Functions) behave differently than when requests come from the web interface.

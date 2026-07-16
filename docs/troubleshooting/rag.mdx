@@ -11,7 +11,7 @@ This page covers the most common RAG problems and their solutions.
 
 ## Recommended Settings by Scenario
 
-RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Admin Panel > Settings > Documents**.
+RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Settings > Admin > Tools > Documents**.
 
 :::tip Agentic retrieval: enable kb_exec
 If your models use **native function calling**, set [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) for a noticeably better knowledge-base experience. It gives the model a filesystem-style interface (`ls`, `tree`, `grep`, `cat`, read-by-line) over your knowledge that capable models chain more reliably than the individual search tools. It has no effect in Legacy Mode. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
@@ -76,7 +76,7 @@ The embedding model determines retrieval quality. The right choice depends on yo
 | **Production, API budget available** | `text-embedding-3-small` via OpenAI | Best retrieval quality per dollar |
 | **Air-gapped / self-hosted** | `nomic-embed-text` or `mxbai-embed-large` via Ollama | No external API calls needed |
 
-After changing your embedding model, **reindex all existing documents** in **Admin Panel > Settings > Documents** for the new embeddings to take effect.
+After changing your embedding model, **reindex all existing documents** in **Settings > Admin > Tools > Documents** for the new embeddings to take effect.
 
 ---
 
@@ -199,9 +199,9 @@ After fixing the configuration, try re-embedding a document and verify no error 
 Open WebUI implements various limits to ensure system stability and prevent abuse. It is important to understand how these limits apply to different upload methods:
 
 *   **Chat Uploads:** Subject to global file size and count limits.
-    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Admin Panel > Settings > Documents > General > Max Upload Size**.
-    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Admin Panel > Settings > Documents > General > Max Upload Count**.
-    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Admin Panel > Settings > Documents > General > Allowed File Extensions**.
+    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Tools > Documents > General > Max Upload Size**.
+    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Tools > Documents > General > Max Upload Count**.
+    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Tools > Documents > General > Allowed File Extensions**.
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
@@ -363,7 +363,7 @@ Error generating embeddings: 429 Rate limit reached
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
-   Or configure it in the **Admin Panel > Settings > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
+   Or configure it in the **Settings > Admin > Tools > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
    Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
@@ -490,14 +490,14 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 ✅ **Solutions (check in order):**
 
 1. **Check Global Model Settings first**:
-   - Go to **Admin Panel > Settings > Models > ⚙️ (gear icon)**
+   - Go to **Settings > Admin > AI > Models > ⚙️ (gear icon)**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
    - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter, even if you never intended for a specific model to use native mode
    - Either change the global setting to `default`, or explicitly set `function_calling` in the per-model **Advanced Params** to override the global value
    - Also check the **Model Capabilities** section: if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
 
 :::warning Global Settings Override
-The most common cause of this issue is a global `Function Calling: native` setting in **Admin Panel > Settings > Models > ⚙️ > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
+The most common cause of this issue is a global `Function Calling: native` setting in **Settings > Admin > AI > Models > ⚙️ > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
 :::
 
 2. **Ensure Built-in Tools are enabled for the model** (if using native mode):

@@ -42,9 +42,9 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 
 This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results.
 
-The **Image Prompt Generation** toggle is located in **Admin Panel > Settings > Images** under the "Image Generation" section, **before** selecting the image generation engine.
+The **Image Prompt Generation** toggle is located in **Settings > Admin > Experience > Images** under the "Image Generation" section, **before** selecting the image generation engine.
 
-To customize the prompt template used for generation, go to **Admin Panel > Settings > Interface > Tasks**.
+To customize the prompt template used for generation, go to **Settings > Admin > Experience > Interface > Tasks**.
 
 ![Screenshot showing the Image Prompt Generation toggle location in Images settings](/images/image-generation-and-editing/image-prompt-generation-toggle.png)
 

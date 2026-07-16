@@ -1,0 +1,94 @@
+---
+sidebar_position: 13
+title: "Sub-agents"
+---
+
+# Sub-agents
+
+Sub-agents let a model hand a focused piece of work to a second agent that runs in parallel, then use the result to continue. The model decides when to delegate by calling the `delegate_task` builtin tool; you do not drive it manually.
+
+A sub-agent is a full chat completion of its own. It runs with the same model, tools, skills and filters as the chat that spawned it, works through the task on its own, and hands back its final answer as the tool result. The work happens in a separate chat that is kept out of your chat list, so the parent conversation stays readable.
+
+Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Admin > AI > Sub-agents** toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
+
+## Why Delegate
+
+Delegation buys focus and parallelism:
+
+- **A clean context per task.** The sub-agent gets the task and only the context handed to it, instead of the whole conversation, so a long chat does not dilute the work.
+- **Real parallelism.** When a model requests several delegations in one reply, they run at the same time rather than one after another.
+- **A short answer back.** Only the sub-agent's final result returns to the parent chat. The intermediate tool calls, searches and dead ends stay in the sub-agent's own chat.
+
+Typical uses are researching several questions at once, working through a task that needs many tool calls, and doing a self-contained job whose intermediate steps do not belong in the main thread.
+
+## Foreground and Background
+
+**Foreground** is the default. The parent chat waits for the sub-agent and receives its answer as the tool result, the same as any other tool call.
+
+**Background** must be enabled separately with [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled). The model gets an immediate handle instead of an answer and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible "Background sub-agent finished" row. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
+
+While background is disabled, the `background` option is stripped from the tool definition entirely, so the model cannot ask for it.
+
+## Enable Sub-agents
+
+Sub-agents need three things to line up:
+
+1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > AI > Sub-agents**.
+2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Workspace > Models > Edit**, on by default once the feature is on.
+3. **Native function calling in the UI**: builtin tools are only injected for chats started in the interface, and only in Native mode. Legacy function calling and direct API callers never receive `delegate_task`.
+
+There is no per-user permission for sub-agents. Once enabled for a model, anyone who can use that model can trigger delegation through it.
+
+## Admin Limits
+
+Configure these in **Settings > Admin > AI > Sub-agents**, or with the matching environment variables:
+
+| Setting | Variable | Default | Purpose |
+|---|---|---|---|
+| Max concurrent | [`SUBAGENTS_MAX_CONCURRENT`](/reference/env-configuration#subagents_max_concurrent) | `20` | Foreground sub-agents at once. Extra ones wait for a slot. `-1` is unlimited. |
+| Max background | [`SUBAGENTS_MAX_ASYNC`](/reference/env-configuration#subagents_max_async) | `20` | Background sub-agents at once. Extra ones are refused immediately. `-1` is unlimited. |
+| Max iterations | [`SUBAGENTS_MAX_ITERATIONS`](/reference/env-configuration#subagents_max_iterations) | `30` | Tool-call loops one sub-agent may run before it is stopped. |
+| Max output | [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output) | `30000` | Characters returned to the parent. Longer results are truncated. |
+| System prompt | [`SUBAGENTS_SYSTEM_PROMPT`](/reference/env-configuration#subagents_system_prompt) | Built-in | Added on top of the model's own system prompt. |
+
+Three limits are worth understanding before changing them:
+
+- **They count per worker process, not per deployment.** With multiple workers or replicas, the real ceiling is the limit multiplied by the number of processes.
+- **Max concurrent only takes effect at startup.** It is read when the first delegation runs and is not re-read afterwards, so changing it needs a restart. Max background applies immediately.
+- **`0` is not a way to switch delegation off.** Setting either concurrency limit to `0` falls back to the default of 20 rather than blocking anything. Use `-1` for unlimited, a positive number for a real limit, and [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) to turn the feature off.
+
+## What a Sub-agent Cannot Do
+
+Sub-agents are deliberately narrower than the chat that starts them:
+
+- **No recursion.** A sub-agent cannot delegate again, so delegation cannot fan out without bound.
+- **No memory writes.** It can read memories but cannot add, change or delete them, keeping delegated work from quietly rewriting your personalization.
+- **No direct connections.** Models served through a direct connection cannot delegate.
+- **No code interpreter in the background**, unless the engine is Jupyter, since the browser-based Pyodide engine needs a live session.
+- **No external tool servers in the background.** A foreground sub-agent inherits the chat's OpenAPI and MCP tool servers; a background one does not. If a delegated task depends on an external tool server, keep it in the foreground.
+
+## Cost
+
+Every delegation is another full chat completion, with the same model and tools, and may loop up to the iteration limit. One reply can start several at once, and each background result restarts the parent chat to process it, which is another turn.
+
+The defaults are permissive: 20 concurrent sub-agents, each allowed 30 tool-call loops. On a metered API, raise the limits deliberately rather than by habit.
+
+## Managing Sub-agents from Chat
+
+### Available tools
+
+| Tool | Purpose |
+|---|---|
+| `delegate_task` | Delegate a task to a parallel sub-agent and return its result. |
+
+`delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), and `background` when background sub-agents are enabled.
+
+### Requirements
+
+- [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled.
+- The **Sub-agents** builtin tools category enabled on the model.
+- Native function calling, in a chat started from the interface.
+
+:::info The Sub-agents category also controls timers
+The `timer` tool is injected by the same category and the same [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) toggle. Turning sub-agents off also removes timers.
+:::

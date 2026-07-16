@@ -14,7 +14,7 @@ For a complete list of all Open WebUI environment variables, see the [Environmen
 The following is a summary of the environment variables for speech to text (STT) and text to speech (TTS).
 
 :::tip UI Configuration
-Most of these settings can also be configured in the **Admin Panel → Settings → Audio** tab. Environment variables take precedence on startup but can be overridden in the UI.
+Most of these settings can also be configured in the **Settings → Admin → Experience → Audio** tab. Environment variables take precedence on startup but can be overridden in the UI.
 :::
 
 ## Speech To Text (STT) Environment Variables

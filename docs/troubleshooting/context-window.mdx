@@ -52,10 +52,10 @@ There is no single policy that is correct for every deployment, every user, and 
 
 Open WebUI ships an optional **Context Compaction** feature that handles the common case for you. When a chat's estimated context grows past a token threshold, it asks a model to summarize the older messages, then continues the conversation from that summary plus the most recent messages, so a long chat keeps going without overflowing the window.
 
-It is **disabled by default**. An administrator enables and tunes it in **Admin Panel > Settings > Interface**:
+It is **disabled by default**. An administrator enables and tunes it in **Settings > Admin > Experience > Interface**:
 
 - **Context Compaction**: the on/off toggle ([`ENABLE_CONTEXT_COMPACTION`](/reference/env-configuration#enable_context_compaction)).
-- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window. An individual model can compact sooner by setting a lower **Context Compaction Threshold** (`compact_token_threshold`) in its advanced parameters; the global value stays the ceiling.
+- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window. This is the global default: an individual model can set its own **Context Compaction Threshold** (`compact_token_threshold`) in its advanced parameters, either lower or higher, bounded by the **Token Cap** ([`CONTEXT_COMPACTION_TOKEN_CAP`](/reference/env-configuration#context_compaction_token_cap)), which defaults to the threshold. So a model can compact later than the global default only if you raise the cap.
 - **Context Compaction Prompt**: an optional custom summarization prompt ([`CONTEXT_COMPACTION_PROMPT_TEMPLATE`](/reference/env-configuration#context_compaction_prompt_template)); leave it empty for the built-in default. It supports `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
 
 This is the summarize-and-replace strategy (option 4 below), built in. If you need a different policy (hard caps, attachment-first trimming, per-model windows), use a filter Function instead.
@@ -67,6 +67,20 @@ This is the summarize-and-replace strategy (option 4 below), built in. If you ne
 - **The task model writes the summary.** It uses the same model selection as title and tag generation: your configured Task Model (`TASK_MODEL` / `TASK_MODEL_EXTERNAL`) if set, otherwise the chat's current model, with a fallback to the chat model when the task model is unavailable. Summary length is capped by the task model's `max_tokens` (default 1000).
 - **Your system prompt, tools, and skills are preserved.** Compaction only summarizes conversation messages. The model, workspace and folder system prompts, the available tools and their instructions, skills and any RAG, web search or memory context are all reassembled fresh on every request, after compaction runs, so they are never summarized away. The one exception is older **tool-call results** that live in the chat history: a past tool result inside the compacted block is condensed into the summary, though what the model can still call is unaffected.
 - **It fails safe.** If the summarizer returns nothing, Open WebUI falls back to a short mechanical summary (the previous summary plus truncated excerpts of the dropped messages). If compaction errors entirely, it is logged and the request proceeds with the full, uncompacted history.
+- **It splits at a user message, and can decline to split at all.** The cut is placed at a user message so a turn is never severed mid-exchange. If no suitable user message sits far enough back, for example a long conversation that is one enormous exchange rather than many turns, **compaction does not run for that request** and the full over-threshold history is sent. It is silent: there is no error, and it will try again on the next turn. So crossing the threshold does not guarantee compaction happened, and compaction is not a hard ceiling on what reaches the model. If you need a guaranteed bound, use a filter Function as below.
+- **You can read the current usage over the API.** `GET /api/v1/chats/{id}` and `POST /api/v1/chats/{id}/compact` include a `context_usage` object, so a client can show how close a chat is to compacting:
+
+  ```json
+  {
+    "tokens": 41234,
+    "estimated_tokens": 41234,
+    "threshold": 80000,
+    "percent": 52,
+    "source": "estimated"
+  }
+  ```
+
+  It is `null` when compaction is disabled or the chat has no messages. As `source` says, the count is **estimated**, not a tokenizer-exact figure, so treat it as a gauge rather than a billing number.
 
 ## The supported way: use a filter Function
 

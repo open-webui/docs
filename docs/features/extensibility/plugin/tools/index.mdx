@@ -132,10 +132,10 @@ Why it is legacy:
 Since v0.10.0 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
-    *   Navigate to **Admin Panel → Settings → Models**.
+    *   Navigate to **Settings → Admin → AI → Models**.
     *   Click the **Settings** button at the **top right** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   Under **Model Parameters**, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Admin Panel → Settings → Models** and set **Function Calling** to `Legacy` under **Model Parameters**. Overrides the global default for that model only.
+2.  **Per-Model Override**: edit a specific model in **Settings → Admin → AI → Models** and set **Function Calling** to `Legacy` under **Model Parameters**. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -167,12 +167,12 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 Native Mode is the **default** as of v0.10.0, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
-    *   Navigate to **Admin Panel → Settings → Models**.
+    *   Navigate to **Settings → Admin → AI → Models**.
     *   Click the **Settings** button at the **top right** of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
-    *   In **Admin Panel → Settings → Models**, pick a specific model and click its edit button.
+    *   In **Settings → Admin → AI → Models**, pick a specific model and click its edit button.
     *   Under **Model Parameters**, set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
@@ -180,7 +180,7 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-The **global model parameters** panel (the **Settings** button at the top right of **Admin Panel → Settings → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
+The **global model parameters** panel (the **Settings** button at the top right of **Settings → Admin → AI → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -280,11 +280,11 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `replace_memory_content` | Updates an existing memory record by its unique ID. |
 | `delete_memory` | Deletes a memory by its ID. |
 | `list_memories` | Lists all stored memories for the user with content and dates. |
-| **Notes** | *Requires `ENABLE_NOTES` AND per-model "Notes" category enabled (default: on).* |
+| **Notes** | *Requires `ENABLE_NOTES` AND per-model "Notes" category enabled (default: on) AND the user's `features.notes` permission. Inside a note-attached chat these three checks are skipped and the note tools are always injected; see the note below.* |
 | `search_notes` | Search the user's notes by title and content. |
 | `view_note` | Get the full markdown content of a specific note. |
 | `write_note` | Create a new private note for the user. |
-| `replace_note_content` | Update an existing note's content or title. |
+| `replace_note_content` | Update an existing note, replacing the whole content or applying range edits to part of it. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the full message history of a specific chat by ID. |
@@ -312,6 +312,11 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
+| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
+| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
+| `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
+| **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
+| `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
 
 #### Knowledge Tool Availability (At a Glance)
 
@@ -369,7 +374,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
 | `write_note` | `title` (required), `content` (required) | `{status: "success", id}` |
-| `replace_note_content` | `note_id` (required), `content` (required), `title` (optional) | `{status: "success", id, title}` |
+| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
 | **Chat History** | | |
 | `search_chats` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
@@ -397,6 +402,25 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
+| **Sub-agents** | | |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
+| **Notifications** | | |
+| `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
+
+:::warning Builtin tools behave differently inside a note-attached chat
+
+The chat opened from a note is an internal chat of type `note`, and builtin tools are gated differently there. Two separate overrides apply:
+
+**The note tools are always injected.** `search_notes`, `view_note`, `write_note` and `replace_note_content` load regardless of the `notes.enable` config, the model's **Notes** category, and the user's `features.notes` permission. Turning notes off by any of those three controls does not remove them there.
+
+**The whole builtin-tool surface is force-enabled.** A note chat activates builtin tools even when the request would not normally qualify: without a UI session, with `function_calling` set to legacy, and **even when the model's `builtin_tools` capability is switched off**. So a model an administrator deliberately configured without builtin tools still receives them (memory, web search, code interpreter, image generation and the rest, subject to each category's own gate) inside a note chat. If you rely on that capability toggle to keep tools away from a model, it does not hold in this one context.
+
+Separately, `view_note` and `replace_note_content` **short-circuit access control for admins**: an admin reads or rewrites any note without the owner or grant check other users are subject to. Consistent with admins being root-equivalent elsewhere, but worth knowing if you relied on the previous behaviour, where admins were checked like everyone else.
+
+Note attachments are also injected: every non-image file on the note is added as retrieval context on **every** message in that chat.
+
+:::
 
 :::info Automatic Timezone Detection
 Open WebUI automatically detects and stores your timezone when you log in. This allows time-related tools and features to provide accurate local times without any manual configuration. Your timezone is determined from your browser settings.
@@ -554,7 +578,7 @@ This means users can disable web search (or image generation, or code interprete
 :::
 
 :::tip Full Agentic Experience
-For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In the **Admin Panel > Settings > Models**, find the **Model Specific Settings** for your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
+For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In the **Settings > Admin > AI > Models**, find the **Model Specific Settings** for your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
 :::
 
 :::tip Builtin Tools vs File Context

@@ -164,7 +164,7 @@ Administrators can control sharing via environment variables or the Admin Panel:
 * `USER_PERMISSIONS_NOTES_ALLOW_SHARING` for internal sharing
 * `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING` for public links
 
-These can also be configured in **Admin Panel > Settings > Users > Default Permissions**.
+These can also be configured in **Admin Panel > Users > Groups > Default Permissions**.
 
 ### Quick creation
 

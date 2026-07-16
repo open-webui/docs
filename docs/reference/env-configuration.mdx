@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.10.0](https://github.com/open-webui/open-webui/releases/tag/v0.10.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.10.3](https://github.com/open-webui/open-webui/releases/tag/v0.10.3), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -311,7 +311,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `int`
 - Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Admin Panel > Settings > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > System > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
 #### `ENABLE_AUTOMATIONS`
 
@@ -352,11 +352,72 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 :::
 
+#### `ENABLE_SUBAGENTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same model, tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > AI > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SUBAGENTS_BACKGROUND_ENABLED`
+
+- Type: `bool`
+- Default: `False`
+- Description: Allows sub-agents to run in the **background**. The model then returns immediately with a dispatch handle instead of waiting, and when the sub-agent finishes, its result is posted back into the parent chat, which continues on its own without the user sending a message. When this is off, the `background` parameter is removed from the tool schema entirely, so the model cannot request it.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SUBAGENTS_MAX_CONCURRENT`
+
+- Type: `int`
+- Default: `20`
+- Description: Maximum number of foreground sub-agents running at once. Delegations beyond the limit **wait** for a slot rather than failing. Set `-1` for unlimited. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+:::warning `SUBAGENTS_MAX_CONCURRENT` needs a restart to change
+
+The foreground limit is applied to a semaphore created on the first delegation and never resized afterwards. Changing it in the Admin Panel or the environment has **no effect until Open WebUI restarts**. `SUBAGENTS_MAX_ASYNC` is not affected and applies immediately.
+
+:::
+
+#### `SUBAGENTS_MAX_ASYNC`
+
+- Type: `int`
+- Default: `20`
+- Description: Maximum number of background sub-agents running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Set `-1` for unlimited. Also counted per worker process.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SUBAGENTS_MAX_ITERATIONS`
+
+- Type: `int`
+- Default: `30`
+- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, keeping a delegated task from looping expensively. The sub-agent reports that it hit the limit rather than failing silently.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SUBAGENTS_MAX_OUTPUT`
+
+- Type: `int` (characters)
+- Default: `30000`
+- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. This caps only what is returned to the parent; the sub-agent's own chat keeps the full text.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SUBAGENTS_SYSTEM_PROMPT`
+
+- Type: `str`
+- Default: Empty string (falls back to the built-in sub-agent prompt)
+- Description: System prompt given to sub-agents. It is appended to the parent model's system prompt, so the sub-agent keeps the parent's instructions and adds these. Leave empty to use the built-in default.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `SCHEDULER_POLL_INTERVAL`
 
 - Type: `int` (seconds)
 - Default: `10`
-- Description: Sets the interval in seconds between scheduler ticks. The unified scheduler handles both automation execution and calendar event alerts. Accepts `AUTOMATION_POLL_INTERVAL` as a legacy fallback.
+- Description: Sets the interval in seconds between scheduler ticks for automations and calendar event alerts. Accepts `AUTOMATION_POLL_INTERVAL` as a legacy fallback. The scheduler loop itself now ticks at the faster [`TIMER_POLL_INTERVAL`](#timer_poll_interval) so timers stay punctual, and runs automations and calendar alerts on this slower interval.
+
+#### `TIMER_POLL_INTERVAL`
+
+- Type: `int` (seconds)
+- Default: `1`
+- Description: How often the scheduler checks for due timers set through the `timer` builtin tool. It is deliberately much shorter than [`SCHEDULER_POLL_INTERVAL`](#scheduler_poll_interval), since a timer is expected to fire close to its stated time, while automations run on a schedule measured in minutes. Raising it reduces idle polling at the cost of timers firing late.
 
 #### `CALENDAR_ALERT_LOOKAHEAD_MINUTES`
 
@@ -423,6 +484,10 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether the admin-panel **other-users-chats** access surface is available. When disabled, admins can no longer access other users' chats in the admin panel and the corresponding endpoints reject the request. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats and would re-open the same data on a different surface. Note that admin retains underlying database access regardless; this toggle controls the in-product surface, see the admin-posture-toggles note above.
+
+  **Exception for internal chats:** admins can still retrieve a chat marked internal even when this is `False`. Internal chats are the ones Open WebUI creates on a user's behalf rather than the user opening them: [sub-agent](/features/chat-conversations/chat-features/subagents) chats, [timer](/features/chat-conversations/chat-features/timers) chats and note-attached chats. This carve-out is what lets an admin retrieve one at all, because internal chats are **excluded from every listing surface**: they do not appear in chat lists, search, counts, exports, or the admin chat list. They are reachable only by id.
+
+  That matters for auditing rather than for privacy: a sub-agent chat holds real model work, done with the user's model and tools and counted against your quota, but it will not show up in an export or an admin listing that is meant to cover a user's activity. Do not treat those surfaces as a complete record while sub-agents or timers are in use.
 
 #### `ENABLE_ADMIN_ANALYTICS`
 
@@ -500,7 +565,7 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 - Type: `bool`
 - Default: `True`
 - Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Admin Panel > Settings > General > User Status**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > System > General > User Status**.
 
 #### `ENABLE_EASTER_EGGS`
 
@@ -1058,7 +1123,7 @@ By default, audit logging uses **blacklist mode**: all paths are logged except t
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables the use of OpenAI APIs.
+- Description: Enables the use of OpenAI APIs. When disabled, the model list is emptied and both `GET /openai/models` and `POST /openai/chat/completions` reject requests with `503 OpenAI API is disabled`, rather than the completions endpoint attempting the upstream call. Toggling this, or saving the OpenAI connection config, refreshes the model list immediately instead of waiting for the cache to expire.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OPENAI_API_BASE_URL`
@@ -1135,7 +1200,7 @@ when using OpenAI-compatible endpoints.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Admin Panel > Settings > Interface**.
+- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Experience > Interface**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
@@ -1149,7 +1214,7 @@ when using OpenAI-compatible endpoints.
 
 - Type: `int`
 - Default: falls back to `CONTEXT_COMPACTION_TOKEN_THRESHOLD` when unset
-- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Admin Panel > Settings > Interface** (**Token Cap**).
+- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Experience > Interface** (**Token Cap**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -1163,32 +1228,29 @@ when using OpenAI-compatible endpoints.
 
 - Type: `str`
 - Description: Prompt to use when generating chat titles.
-- Default: The value of `DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 
-`DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE`:
+Built-in template:
 
 ```
-
 ### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
-
+Generate a concise title summarizing the chat history.
 ### Guidelines:
 - The title should clearly represent the main theme or subject of the conversation.
-- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Keep it short: 2-4 words is best.
+- Do not use emojis, quotation marks, or special formatting.
 - Write the title in the chat's primary language; default to English if multilingual.
-- Prioritize accuracy over excessive creativity; keep it clear and simple.
-
+- Prioritize accuracy over creativity.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
 ### Output:
 JSON format: { "title": "your concise title here" }
-
 ### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
-- { "title": "Evolution of Music Streaming" },
-- { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
-
+- { "title": "Stock Trends" },
+- { "title": "Chocolate Chip Cookies" },
+- { "title": "Music Streaming" },
+- { "title": "Remote Work" }
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:2}}
@@ -1767,7 +1829,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Admin Panel > Settings > Connections > "Cache Base Model List".
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > AI > Connections > "Cache Base Model List".
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 **How the cache works:**
@@ -1777,7 +1839,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 - **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
 - **Cache Refresh**: The cache is refreshed when:
   - The application restarts
-  - The connection settings are saved in the **Admin Panel > Settings > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
+  - The connection settings are saved in the **Settings > Admin > AI > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
 - **No TTL**: There is no automatic time-based expiration.
 
 :::tip Performance Consideration
@@ -1957,7 +2019,7 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 
 Beyond the fixed user and session headers above, each connection can forward **arbitrary custom headers** whose values may embed **template placeholders** that Open WebUI substitutes for each request. Unlike the variables above, this is configured **per connection, not through an environment variable**, and it works **independently of `ENABLE_FORWARD_USER_INFO_HEADERS`** (custom headers are sent even when that toggle is `false`). They are applied **last**, so a custom header takes precedence over a built-in forwarded header of the same name.
 
-Set them in **Admin Panel > Settings > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
+Set them in **Settings > Admin > AI > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
 
 ```json
 {
@@ -3264,7 +3326,7 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Admin Panel → Settings → Documents**.
+- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Tools → Documents**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
@@ -3418,7 +3480,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `dict` (JSON object)
 - Default: `{}` (engine defaults)
-- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Admin Panel → Settings → Documents** when MinerU is the content-extraction engine.
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Tools → Documents** when MinerU is the content-extraction engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `PADDLEOCR_VL_BASE_URL`
@@ -4246,7 +4308,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Default: `auto`
 - Options: `auto` (Random), `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `wikipedia`, `yahoo`, `yandex`.
 - Description: Specifies the backend to be used by the DDGS engine.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Admin Panel > Settings > Web Search > DDGS Backend** when DDGS is selected as the search engine.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > DDGS Backend** when DDGS is selected as the search engine.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
@@ -4304,7 +4366,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `int`
 - Default: `8192`
-- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Admin Panel → Settings → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
+- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Admin → Tools → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.brave_search_context_tokens`.
 
 #### `KAGI_SEARCH_API_KEY`
@@ -4373,7 +4435,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str` (JSON object)
 - Default: `''` (parsed to `{}`; effective defaults are `{"url": "https://api.linkup.so/v1/search", "depth": "standard", "outputType": "sourcedAnswer"}`)
-- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Admin Panel → Settings → Web Search** when the `linkup` engine is selected.
+- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Admin → Tools → Web Search** when the `linkup` engine is selected.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.linkup_search_params`.
 
 #### `JINA_API_KEY`
@@ -4387,7 +4449,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Type: `str`
 - Default: `https://s.jina.ai/`
 - Description: Sets the Base URL for Jina Search API. Useful for specifying custom or regional endpoints (e.g., `https://eu-s-beta.jina.ai/`).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Admin Panel > Settings > Web Search > Jina API Base URL**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Jina API Base URL**.
 
 #### `BING_SEARCH_V7_ENDPOINT`
 
@@ -4707,7 +4769,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `int`
 - Default: `None`
 - Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Admin Panel > Settings > Web Search > Firecrawl Timeout**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Firecrawl Timeout**.
 
 #### `PLAYWRIGHT_TIMEOUT`
 
@@ -6688,6 +6750,12 @@ These settings control whether users can share workspace items **publicly**.
 - Default: `True`
 - Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Users**.
 
+#### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`
+
+- Type: `bool`
+- Default: `True`
+- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Groups**.
+
 ### Import / Export
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_IMPORT`
@@ -7794,7 +7862,11 @@ Open WebUI provides environment variables to customize the pip installation proc
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for Open WebUI's built-in Tools and Functions. When set to `False`, the entire Tools and Functions surface is removed: the workspace **Tools** page and admin **Functions** page are hidden, their API endpoints return empty, and every plugin execution path (filters, actions, pipe functions, built-in native tool-calling and code-interpreter detection) is skipped. This is stronger than [`SAFE_MODE`](#safe_mode): `SAFE_MODE` deactivates all Functions while the feature stays in place, whereas `ENABLE_PLUGINS=False` gates off the whole execution surface. OpenAPI and MCP tool servers configured through connections are unaffected. Surfaced to clients as the `enable_plugins` config flag.
+- Description: Turns **plugins** off entirely: the [Tools and Functions](/features/extensibility/plugin/) users write and upload, which run Python on the server. When set to `False`, the workspace **Tools** page and admin **Functions** page are hidden and plugins stop loading and running, so user tools are not offered to models and filters, actions and pipe functions are skipped. This is stronger than [`SAFE_MODE`](#safe_mode): `SAFE_MODE` deactivates all Functions while the feature stays in place, whereas `ENABLE_PLUGINS=False` removes the surface. Surfaced to clients as the `enable_plugins` config flag.
+- Not affected: things that are not plugins. The [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) are part of Open WebUI rather than uploaded code, and keep working, as do the code interpreter and any OpenAPI or MCP tool servers configured through connections; `GET /api/v1/tools/` still returns those servers. So this is not a way to stop a model using tools in general, and not an "execute no code" switch. For those, use the per-model **Builtin Tools** categories and the code-execution settings.
+- Note: the flag gates the **listing** endpoints, which return empty (`GET /api/v1/functions/`, `/functions/list`, `/functions/export`, `/tools/list`, and the local-tool half of `/tools/`). The create, update, delete and valves endpoints are **not** gated, so a plugin can still be written through the API while the execution surface is off. Treat this as a switch for whether plugins *run*, not as an authorization boundary over the plugin endpoints.
+- Also hidden while disabled: the **Functions** entry in the Admin Panel (navigating to it redirects back), the **Tools** workspace page (same), and the **Tools Access** permission and its Import/Export sub-toggles under **Users > Groups > Permissions**, since there is nothing left for them to govern.
+- Failure modes differ by surface, which is worth knowing when debugging: tools and filters simply come back empty, while installing a plugin or running an action raises an error naming `ENABLE_PLUGINS`.
 
 #### `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`
 

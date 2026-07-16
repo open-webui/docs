@@ -214,7 +214,7 @@ Models frequently:
 
 **To verify which model you're actually using:**
 1. Check the model selector in the Open WebUI interface
-2. Look at the **Admin Panel > Settings > Connections** to confirm your API endpoints
+2. Look at the **Settings > Admin > AI > Connections** to confirm your API endpoints
 3. Check your provider's dashboard/logs for the actual API calls being made
 
 Asking the model itself is **not** a valid way to diagnose routing issues. If you suspect a configuration problem, check your connection settings and API keys instead.
@@ -240,8 +240,8 @@ This is also why the same model accessed through different interfaces might give
 By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-4 or Claude), this can significantly increase your costs.
 
 **To reduce API costs:**
-1. Go to **Admin Panel > Settings > Interface** (for title/tag generation settings)
-2. Configure a **Task Model** under **Admin Panel > Settings > Models** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
+1. Go to **Settings > Admin > Experience > Interface** (for title/tag generation settings)
+2. Configure a **Task Model** under **Settings > Admin > AI > Models** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
 3. Disable features you don't need (auto-title, auto-tags, etc.)
 
 :::tip Cost-Saving Recommendation

@@ -734,7 +734,7 @@ class Filter:
 The hashed user UUID is added as a top-level body parameter and forwarded directly to OpenAI's API; no PII is sent, just an opaque hash.
 
 :::warning Cannot Inject HTTP Headers
-Filters can only modify the **request body** (`form_data`). Outbound HTTP headers are constructed separately and cannot be influenced from a filter. To add custom headers to API requests, use the **Admin Panel → Settings → Connections → OpenAI API** headers configuration.
+Filters can only modify the **request body** (`form_data`). Outbound HTTP headers are constructed separately and cannot be influenced from a filter. To add custom headers to API requests, use the **Settings → Admin → AI → Connections → OpenAI API** headers configuration.
 :::
 
 #### Injecting OpenAI-Style `tools` From a Filter

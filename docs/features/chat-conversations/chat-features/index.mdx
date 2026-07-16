@@ -45,7 +45,37 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **[✅ Task Management](./task-management.mdx)**: Let agentic models keep a structured task/todo list in chat for multi-step workflows and transparent progress tracking.
 
+- **[🤖 Sub-agents](./subagents.mdx)**: Let a model delegate focused work to parallel sub-agents that run the same model and tools, and report back.
+
+- **[⏰ Timers](./timers.mdx)**: One-shot timers that send a prompt back into the chat when they fire, so a model can pick something up later.
+
+- **[🔔 Notifications](./notifications.mdx)**: Per-user webhook targets that notify you when a chat finishes or fails, a channel message arrives, or a calendar alert triggers, plus a `notify` tool the model can call.
+
+- **[⌨️ Keyboard Shortcuts](./keyboard-shortcuts.mdx)**: Rebindable shortcuts for the common actions, managed in **Settings > Keyboard**.
+
 - **Skill Mentions**: Use `$` in the chat input to mention and activate [Skills](/features/workspace/skills) on-the-fly, injecting their manifests into the conversation.
+
+- **Chat Input Commands**: Typing a trigger character in the chat input opens a suggestion menu:
+
+  | Trigger | Offers |
+  |---|---|
+  | `/` | Built-in commands (below), plus your [Prompts](/features/workspace/prompts) and [Skills](/features/workspace/skills) |
+  | `@` | Models to switch to, plus attachable context: knowledge bases, collections, files, folders, and web or YouTube URLs |
+  | `#` | Attach knowledge and files |
+  | `$` | Mention and activate skills |
+  | `:` | Emoji |
+
+  `/` and `@` used to offer only prompts and only models respectively; both now cover much more.
+
+- **Built-in Slash Commands**: three commands act on the current chat. They only appear once the chat has messages, and are typed on their own rather than sent to the model:
+
+  | Command | What it does |
+  |---|---|
+  | `/compact` | Compacts the conversation now, instead of waiting for it to cross the threshold. Only offered when [Context Compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is enabled, and not while a response is generating. It reports what happened: the context was compacted, or it was skipped because the chat is too short, empty, or compaction is disabled. |
+  | `/status` | Opens a status panel for the chat showing **Context usage**, **Queued messages**, **Tasks** currently running, and the **Chat ID**. |
+  | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
+
+  `/fork` requires the **Chat Import** permission (`chat.import`, allowed by default; admins always pass). The command still appears in the menu without it, and reports **Access prohibited** when run.
 
 - **Writing & Content Blocks**: Responses from models that include colon-fence blocks (e.g., `:::writing`, `:::code_execution`, `:::search_results`) are automatically rendered as formatted content in a styled container with a copy button. This is commonly used by newer OpenAI models to distinguish different types of output (prose, code results, search results) from the main response text.
 

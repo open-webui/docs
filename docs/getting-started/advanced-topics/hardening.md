@@ -617,7 +617,7 @@ If your deployment does not use Tools or Functions at all, remove the surface co
 ENABLE_PLUGINS=false
 ```
 
-This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages, makes their endpoints return empty, and skips every plugin execution path (filters, actions, pipe functions, built-in native tool-calling and code-interpreter detection). OpenAPI and MCP tool servers configured through connections are unaffected. Setting this off removes the arbitrary-code-execution surface these features carry, so use it whenever the feature is not needed.
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages, makes their listing endpoints return empty, and stops those plugins loading and running, so filters, actions and pipe functions are skipped and user-authored tools are never offered to a model.
 
 ### Code execution
 

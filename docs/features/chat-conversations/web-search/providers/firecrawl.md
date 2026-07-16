@@ -36,7 +36,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 1. Get an API key:
    - **Hosted**: sign up at [firecrawl.dev](https://firecrawl.dev) and copy the key from your dashboard.
    - **Self-hosted**: use the key from your own Firecrawl instance.
-2. In Open WebUI, open **Admin Panel > Settings > Web Search**.
+2. In Open WebUI, open **Settings > Admin > Tools > Web Search**.
 3. Toggle **Enable Web Search** on.
 4. Select **Firecrawl** from the **Web Search Engine** dropdown (engine value `firecrawl`).
 5. Paste your key into the **Firecrawl API Key** field.

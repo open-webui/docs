@@ -100,12 +100,14 @@ Open WebUI emits **170+ events** spanning every subsystem. Each name is namespac
 | **System** | `system.startup.started`, `system.startup.completed`, `system.shutdown.started`, `system.shutdown.completed` |
 | **Auth** | `auth.signup`, `auth.login`, `auth.logout`, `auth.password_changed`, `auth.api_key.created` |
 | **Users & groups** | `user.created`, `user.deleted`, `user.role_updated`, `user.permissions_updated`, `group.member_added` |
-| **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `message.created`, `message.reaction_added` |
+| **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `chat.finished`, `chat.failed`, `message.created`, `message.reaction_added` |
 | **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `prompt.created` |
 | **Knowledge & files** | `knowledge.created`, `knowledge.file.added`, `knowledge.reindexed`, `file.uploaded`, `file.deleted` |
 | **Plugins** | `tool.created`, `function.enabled`, `function.valves_updated`, `tool.valves_updated`, `skill.created` |
 | **Config** | `config.updated`, `config.models.updated`, `config.connections.updated`, `config.webhook.updated` |
-| **Other** | `channel.*`, `calendar.*`, `automation.*`, `memory.*`, `note.*`, `image.*`, `audio.*`, `terminal.*`, `feedback.*` |
+| **Other** | `channel.*`, `calendar.*`, `automation.*`, `memory.*`, `note.*`, `image.*`, `audio.*`, `terminal.*`, `feedback.*`, `notification.*` |
+
+A subset of these also drive user-facing [Notifications](/features/chat-conversations/chat-features/notifications): `chat.finished`, `chat.failed`, `channel.message` and `calendar.alert` are the four events a user can subscribe a webhook target to.
 
 The authoritative, complete list is exposed by the backend event catalog and shown in **Admin Settings > Events** when configuring webhooks.
 

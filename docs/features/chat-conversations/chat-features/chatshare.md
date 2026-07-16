@@ -9,11 +9,11 @@ To enable community sharing, follow these steps:
 
 1. Navigate to the **Admin Panel** page as an **Admin**.
 2. Click on the **Settings** tab.
-3. Toggle on **Enable Community Sharing** within the **General** settings tab.
+3. Toggle on **Community Sharing** within the **General** settings tab.
 
 :::note
 
-**Note:** Only Admins can toggle the **Enable Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community.
+**Note:** Only Admins can toggle the **Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community.
 
 :::
 

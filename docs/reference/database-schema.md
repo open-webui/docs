@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.10.0.
+> This documentation reflects schema changes up to Open WebUI v0.10.3.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -246,6 +246,7 @@ The `chat_message` table is the **normalized per-message store** for chat conver
 | files           | JSON          | nullable                                 | Attached files                                           |
 | sources         | JSON          | nullable                                 | Retrieval/citation sources                              |
 | embeds          | JSON          | nullable                                 | Embedded artifacts                                       |
+| meta            | JSON          | nullable                                 | Message metadata; marks internal sub-agent and timer messages (added in v0.10.3) |
 | done            | Boolean       | default=True                             | Whether generation completed                             |
 | status_history  | JSON          | nullable                                 | Streamed status updates during generation                |
 | error           | JSON          | nullable                                 | Error payload when generation failed                     |
@@ -259,6 +260,7 @@ Things to know about the chat_message table:
 - Deleting a chat cascades to delete its messages (`chat_id` foreign key with `ON DELETE CASCADE`).
 - Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
 - `context_summary` was added in v0.10.0 (migration `4c5ce3d2f27f`) to store a summary of the message's context.
+- `meta` was added in v0.10.3 (migration `856c5b02fb54`). It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
 
 ## Automation Table
 

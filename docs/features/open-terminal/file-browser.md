@@ -56,6 +56,14 @@ Images display inline at a comfortable size.
 
 ![File browser displaying an image preview](/images/open-terminal-file-browser-home.png)
 
+### HTML
+
+HTML files render in a **sandboxed** iframe. Scripts and downloads work, but the page is given a unique origin of its own, so it cannot read cookies or `localStorage`, and same-origin requests back to Open WebUI fail.
+
+That isolation is the point: a previewed file is untrusted content, and giving it your origin would let it act as you. A page that needs same-origin behaviour will fail quietly rather than with an error, which is usually the explanation when a preview looks broken but the file is fine.
+
+If you understand the risk and need it, the per-user **Settings > Interface > iframe Sandbox Allow Same Origin** toggle grants it. It is **off by default** and applies to every embedded iframe, not just this preview. See [Rich UI](/features/extensibility/plugin/development/rich-ui#sandbox-and-security) for the full trade-off.
+
 ---
 
 ## Uploading files

@@ -133,7 +133,7 @@ You can also provide a semicolon-separated list of allowed domains. **Do not ski
 
 6. **Add your url to open-webui (otherwise getting HTTPS error):**
 
-- Go to your open-webui → Admin Panel → Settings → General
+- Go to your open-webui → Settings → Admin → System → General
 - In the **Webhook URL** text field, enter your URL through which you will connect to your open-webui via Nginx reverse proxy. Example: ``hello.duckdns.org`` (not essential with this one) or ``openwebui.hello.duckdns.org`` (essential with this one).
 
 #### Access the WebUI

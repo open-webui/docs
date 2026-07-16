@@ -28,7 +28,7 @@ In a Multi-Model Chat, your prompt is sent to two or more selected models at the
 
 Admins can control access to Multi-Model Chats on a per-role or per-group basis.
 
-*   **Location**: Admin Panel > Settings > General > User Permissions > Chat > **Multiple Models**
+*   **Location**: Settings > Admin > System > General > User Permissions > Chat > **Multiple Models**
 *   **Environment Variable**: `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS` (Default: `True`)
 
 If disabled, users will not see the "plus" button in the model selector and cannot initiate multi-model sessions.
@@ -59,7 +59,7 @@ Merging takes the outputs from all your active models and sends them (along with
 
 The merging process relies on the backend **Tasks** system.
 
-*   **Task Model**: The specific model used to perform the merger can be configured in **Admin Panel > Settings > Tasks**. We recommend using a highly capable model (like GPT-5.1 or Claude Sonnet 4.5) as the task model for the best results.
+*   **Task Model**: The specific model used to perform the merger can be configured in **Settings > Admin > Experience > Interface > Tasks**. We recommend using a highly capable model (like GPT-5.1 or Claude Sonnet 4.5) as the task model for the best results.
 *   **Prompt Template**: The system uses a specialized prompt template to instruct the AI on how to synthesize the answers.
 
 :::info Experimental

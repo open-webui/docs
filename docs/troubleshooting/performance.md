@@ -32,7 +32,7 @@ By default, Open WebUI automates background tasks like title generation, tagging
 **Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid using large reasoning models (like o1, r1, or Claude) as they are too slow and expensive for simple background tasks.
 
 **Configuration:**
-There are two separate settings in **Admin Panel > Settings > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
+There are two separate settings in **Settings > Admin > Experience > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
 *   **Task Model (External)**: Used when you are chatting with an external model (e.g., OpenAI).
 *   **Task Model (Local)**: Used when you are chatting with a locally hosted model (e.g., Ollama).
 

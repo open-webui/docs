@@ -150,7 +150,7 @@ docker run -d -p 8000:8000 -v voices:/app/voices -v config:/app/config --name op
 
 ![openedai-tts](https://github.com/silentoplayz/docs/assets/50341825/ea08494f-2ebf-41a2-bb0f-9b48dd3ace79)
 
-Open the Open WebUI settings and navigate to the TTS Settings under **Admin Panel > Settings > Audio**. Add the following configuration:
+Open the Open WebUI settings and navigate to the TTS Settings under **Settings > Admin > Experience > Audio**. Add the following configuration:
 
 - **API Base URL**: `http://host.docker.internal:8000/v1`
 - **API Key**: `sk-111111111` (Note that this is a dummy API key, as `openedai-speech` doesn't require an API key. You can use whatever you'd like for this field, as long as it is filled.)

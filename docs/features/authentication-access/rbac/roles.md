@@ -163,7 +163,7 @@ spec:
 - **Use Secrets Management**: Never hardcode `WEBUI_ADMIN_PASSWORD` in Docker Compose files or Dockerfiles. Use Docker secrets, Kubernetes secrets, or environment variable injection.
 - **Strong Passwords**: Use a strong, unique password for production deployments.
 - **Change After Setup**: Consider changing the admin password through the UI after initial deployment for enhanced security.
-- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Admin Panel > Settings > General** if needed.
+- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Settings > Admin > System > General** if needed.
 :::
 
 :::info Behavior Details

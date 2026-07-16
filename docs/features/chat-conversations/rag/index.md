@@ -109,7 +109,7 @@ When enabled, documents are first split by markdown headers (H1-H6). This preser
 
 :::tip
 
-Use the **Chunk Min Size Target** setting (found in **Admin Panel > Settings > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
+Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Tools > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
 
 :::
 
