@@ -21,11 +21,8 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::important
 
-This integration requires the first Speech Swift release containing
-[soniqo/speech-swift#415](https://github.com/soniqo/speech-swift/pull/415).
-Version 0.0.22 includes `speech-server` but not `POST /v1/audio/speech`. If
-Homebrew still installs 0.0.22, build Speech Swift from current source or wait
-for the updated formula before following the HTTP setup below.
+This integration requires Speech Swift 0.0.23 or later. If Homebrew already
+installed an older version, run `brew update && brew upgrade speech` first.
 
 :::
 
