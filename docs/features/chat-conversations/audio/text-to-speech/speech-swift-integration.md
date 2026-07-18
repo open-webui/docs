@@ -19,6 +19,16 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 - [Homebrew](https://brew.sh/)
 - Open WebUI installed and running
 
+:::important
+
+This integration requires the first Speech Swift release containing
+[soniqo/speech-swift#415](https://github.com/soniqo/speech-swift/pull/415).
+Version 0.0.22 includes `speech-server` but not `POST /v1/audio/speech`. If
+Homebrew still installs 0.0.22, build Speech Swift from current source or wait
+for the updated formula before following the HTTP setup below.
+
+:::
+
 ## Install and start Speech Swift
 
 Install the packaged command-line tools:
@@ -82,7 +92,6 @@ The local server does not validate the placeholder API key. It returns WAV audio
 | `magpie` | Magpie TTS MLX |
 | `magpie-coreml` | Magpie TTS Core ML |
 | `vibevoice` | VibeVoice Realtime MLX |
-| `vibevoice-1.5b` | VibeVoice 1.5B MLX |
 
 The first request for a model downloads its weights and therefore takes longer. Generic OpenAI voice names such as `alloy` select the chosen engine's default voice. Kokoro and Qwen3-TTS also accept their native voice names.
 
