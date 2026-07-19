@@ -42,7 +42,7 @@ As self-hosted software, Open WebUI is deployed and operated within your infrast
 
 General best-practice guidance is available in our [hardening documentation](/getting-started/advanced-topics/hardening). Enterprise customers on the appropriate tier receive hands-on support for deployment and configuration decisions.
 
-[**Contact Enterprise Sales for Compliance Guidance → sales@openwebui.com**](mailto:sales@openwebui.com)
+[**Contact Enterprise Sales for Compliance Guidance**](https://openwebui.com/contact/sales)
 :::
 
 ### Identity & Access Management
@@ -122,4 +122,4 @@ User management doesn't become another silo. Open WebUI works with your existing
 
 --- 
 
-[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+[**Contact Enterprise Sales**](https://openwebui.com/contact/sales)
