@@ -31,4 +31,4 @@ Please contact us directly with:
 2. The client's company name and official work email domain.
 3. The expected number of end users (seats) to be deployed.
 
-[**Contact Sales for Immediate Client Deployment**](https://openwebui.com/contact/sales)
+[**Contact Sales for Immediate Client Deployment →**](https://openwebui.com/contact/sales)
