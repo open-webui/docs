@@ -35,7 +35,7 @@ Run with: `docker compose up -d`
 
 ### 2. Connect OpenWebUI (30 Seconds)
 
-1. In OpenWebUI, go to `Admin Panel` → `Settings` → `Audio`
+1. In OpenWebUI, go to `Settings` → `Admin` → `Experience` → `Audio`
 2. Configure:
    - Text-to-Speech Engine: `OpenAI`
    - API Base URL: `http://localhost:3000/api/v1`

@@ -95,7 +95,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 ## RAG Template Customization
 
-Customize the RAG template from the `Admin Panel` > `Settings` > `Documents` menu.
+Customize the RAG template from the `Settings` > `Admin` > `Tools` > `Documents` menu.
 
 The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
 
@@ -201,7 +201,7 @@ Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size 
 
 ## RAG Embedding Support
 
-Change the RAG embedding model directly in the `Admin Panel` > `Settings` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
+Change the RAG embedding model directly in the `Settings` > `Admin` > `Tools` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -221,7 +221,7 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model in `Admin Panel` > `Settings` > `Documents`, navigate to `Admin Panel` > `Settings` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+After changing the embedding model in `Settings` > `Admin` > `Tools` > `Documents`, navigate to `Settings` > `Admin` > `Tools` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
@@ -332,7 +332,7 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 ## Google Drive Integration
 
-When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
+When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Tools` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
 
 ### Detailed Instructions
 

@@ -121,13 +121,23 @@ Controls access to broad platform capabilities.
 | **Channels** | Access to the "Channels" feature. |
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
-| **Image Generation** | Ability to use Image Generation tools. |
+| **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
 | **Memories** | Access to the Memories feature for persistent user context. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
 | **User Webhooks** | Ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default. |
+
+:::info Image Generation and the Active Model
+
+Some image backends, such as Automatic1111, keep a single image model loaded and generate with whichever one is active. On those backends, selecting a model is the same action as switching the loaded one, so a user with **Features > Image Generation** who picks a model changes the active image model for the whole instance. Later generations, including other users', use that model until it is changed again.
+
+Backends that accept a model with each request are not affected: a user's choice applies only to their own generation.
+
+If the shared active model should not be changeable by non-admin users, do not grant this permission to non-admins, or use an image backend that supports per-request model selection.
+
+:::
 
 :::info Automations Permission Scope
 

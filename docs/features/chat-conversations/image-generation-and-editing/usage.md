@@ -3,7 +3,7 @@ sidebar_position: 1
 title: "Usage"
 ---
 
-Before you can use image generation, you must ensure that the **Image Generation** toggle is enabled in the **Admin Panel** > **Settings** > **Images** menu.
+Before you can use image generation, you must ensure that the **Image Generation** toggle is enabled in the **Settings** > **Admin** > **Experience** > **Images** menu.
 
 ## Using Image Generation
 

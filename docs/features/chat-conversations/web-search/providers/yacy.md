@@ -25,7 +25,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 ### Setup
 
-1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
+1. Navigate to: `Settings` -> `Admin` -> `Tools` -> `Web Search`
 2. Toggle `Enable Web Search`
 3. Set `Web Search Engine` from dropdown menu to `yacy`
 4. Set `Yacy Instance URL` to one of the following examples:

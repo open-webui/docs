@@ -50,7 +50,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
 ## Create Image (Image Generation)
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Experience** > **Images**.
 
 2. **Enable and Configure ComfyUI:**
     - Ensure the **Image Generation** toggle at the top of the page is enabled.
@@ -116,7 +116,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Admin Panel** > **Settings** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Experience** > **Images**.
 
 2. **Configure Image Editing:**
     - Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.

@@ -35,7 +35,7 @@ Banners are best for short, high-visibility messages such as:
 This is the most straightforward way to manage banners:
 
 1. Log in to your Open WebUI instance as an administrator.
-2. Navigate to **Admin Panel** → **Settings** → **General**.
+2. Navigate to **Settings** → **Admin** → **System** → **General**.
 3. Locate the **Banners** section.
 4. Click the **+** icon to add a new banner.
 5. Click **Save** to apply your changes.

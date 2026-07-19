@@ -16,7 +16,7 @@ Open WebUI also supports image generation through [Lumenfall](https://lumenfall.
 
 ### Configuring Image Generation
 
-1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Open AI` (Lumenfall uses the same syntax as OpenAI).
 3. Change the API endpoint URL to `https://api.lumenfall.ai/openai/v1`.
 4. Enter your Lumenfall API key.

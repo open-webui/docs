@@ -327,7 +327,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 
 ## 4. GUI Configuration
 
-1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
+1. Navigate to: `Settings` -> `Admin` -> `Tools` -> `Web Search`
 2. Toggle `Enable Web Search`
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
