@@ -167,6 +167,12 @@ Multiple origins are separated with semicolons:
 CORS_ALLOW_ORIGIN=https://chat.yourcompany.com;https://internal.yourcompany.com
 ```
 
+If you want to disable CORS entirely, set it to an [invalid domain](https://en.wikipedia.org/wiki/.invalid):
+
+```bash
+CORS_ALLOW_ORIGIN=http://cors.invalid
+```
+
 If you use a desktop app with a custom URL scheme, add it via:
 
 ```bash
