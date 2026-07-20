@@ -82,4 +82,4 @@ For container basics, see the [Quick Start guide](/getting-started/quick-start).
 
 **Need help planning your enterprise deployment?** Our team works with organizations worldwide to design and implement production Open WebUI environments.
 
-[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+[**Contact Enterprise Sales →**](https://openwebui.com/contact/sales)

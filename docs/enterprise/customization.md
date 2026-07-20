@@ -33,4 +33,4 @@ White-labeling helps AI tools meet the same brand standards as every other inter
 
 --- 
 
-[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+[**Contact Enterprise Sales →**](https://openwebui.com/contact/sales)

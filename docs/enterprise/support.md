@@ -66,4 +66,4 @@ Enterprise support de-risks your AI investment. You have a direct relationship w
 
 --- 
 
-[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+[**Contact Enterprise Sales →**](https://openwebui.com/contact/sales)

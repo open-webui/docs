@@ -55,4 +55,4 @@ Open WebUI's plugin and pipeline architecture allows you to add functionality wi
 
 --- 
 
-[**Contact Enterprise Sales → sales@openwebui.com**](mailto:sales@openwebui.com)
+[**Contact Enterprise Sales →**](https://openwebui.com/contact/sales)
