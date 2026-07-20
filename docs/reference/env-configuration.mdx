@@ -1350,6 +1350,10 @@ The format for the JSON response is strictly:
 
 ### Code Execution
 
+:::info Legacy feature
+Code execution and both of its engines are **legacy**. `pyodide` (browser/WebAssembly) and `jupyter` (server) are legacy execution engines, so every variable in this section is legacy configuration. For full Python and shell access, use [Open Terminal](/features/open-terminal) instead, which runs code in an isolated container. The variables below still work and are documented for existing deployments.
+:::
+
 #### `ENABLE_CODE_EXECUTION`
 
 - Type: `bool`
@@ -1408,6 +1412,10 @@ The format for the JSON response is strictly:
 
 ### Code Interpreter
 
+:::info Legacy feature
+The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines as [Code Execution](#code-execution) above, so every variable in this section is legacy configuration. New deployments that need code or shell execution should use [Open Terminal](/features/open-terminal). The variables below still work and are documented for existing deployments.
+:::
+
 #### `ENABLE_CODE_INTERPRETER`
 
 - Type: `bool`
@@ -1422,11 +1430,12 @@ The format for the JSON response is strictly:
 - Description: Specifies the code interpreter engine to use. `pyodide` and `jupyter` are **legacy** engines; for full Python and shell access use [Open Terminal](/features/open-terminal) instead.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-#### `CODE_INTERPRETER_BLACKLISTED_MODULES`
+#### `CODE_INTERPRETER_BLOCKED_MODULES`
 
 - Type: `str` (comma-separated list of module names)
-- Default: None
-- Description: Specifies a comma-separated list of Python modules that are blacklisted and cannot be imported or used within the code interpreter. This enhances security by preventing access to potentially sensitive or system-level functionalities.
+- Default: Empty string (nothing blocked)
+- Description: A comma-separated list of Python module names the code interpreter refuses to import. Empty by default, in which case the blocking hook is never installed and every module is importable. When set, it intercepts only **direct, top-level `import <name>` statements in the executed code's main scope**; it does not remove the modules from the runtime, so imports reached indirectly (through a helper module, `importlib`, `__import__`, or `sys.modules`) still succeed. Treat it as an opt-in convenience filter for discouraging casual use of specific modules, not as a security boundary: the actual isolation is the execution engine, the browser sandbox for `pyodide` or your own server for a `jupyter` kernel, not this list.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `CODE_INTERPRETER_PROMPT_TEMPLATE`
 

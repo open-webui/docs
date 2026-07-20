@@ -50,7 +50,7 @@ These settings can be configured at **Settings → Admin → Tools → Code Exec
 | `ENABLE_CODE_INTERPRETER` | `true` | Enable/disable code interpreter globally |
 | `CODE_INTERPRETER_ENGINE` | `pyodide` | Engine to use: `pyodide` (browser, legacy) or `jupyter` (server, legacy). For full Python and shell access, use [Open Terminal](/features/open-terminal) instead. |
 | `CODE_INTERPRETER_PROMPT_TEMPLATE` | (built-in) | Custom prompt template for code interpreter |
-| `CODE_INTERPRETER_BLACKLISTED_MODULES` | `""` | Comma-separated list of blocked Python modules |
+| `CODE_INTERPRETER_BLOCKED_MODULES` | `""` | Comma-separated module names to refuse importing. Empty by default. Blocks only direct top-level imports and is an opt-in convenience filter, not a security boundary; see the [reference](/reference/env-configuration#code_interpreter_blocked_modules). |
 
 For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/dev-tools/jupyter) tutorial.
 
