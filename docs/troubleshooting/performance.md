@@ -214,6 +214,8 @@ By default, Open WebUI compresses HTTP responses (JSON API responses and the sta
 
 - **Env Var**: `ENABLE_COMPRESSION_MIDDLEWARE=false`
 
+*   **Recommended companion**: When you disable app-side compression in favor of the proxy, also have the proxy **cache the static assets aggressively**. Open WebUI's JS/CSS bundles live under `/_app/immutable/` with content-hashed filenames, so they can be cached with `Cache-Control: public, max-age=31536000, immutable` and served from the proxy cache without ever hitting a worker — which eliminates the "larger first page load" downside for every visit after the first. See [Scaling → Pair It with Static Asset Caching at the Proxy](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for a ready-made Nginx snippet.
+
 See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
 #### Thread Pool Size

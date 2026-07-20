@@ -161,6 +161,37 @@ By default every Open WebUI worker compresses its own HTTP responses (JSON API r
 
 WebSocket traffic and streaming chat responses (SSE) are never compressed by this middleware anyway, so disabling it has no effect on the chat streaming path. If nothing in front of Open WebUI compresses responses, the main cost of disabling is a larger first (uncached) page load — several megabytes of JavaScript/CSS — and larger big-JSON payloads (long chat histories, large model lists), which matters mostly on slow or mobile links. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
+#### Pair It with Static Asset Caching at the Proxy
+
+Disabling app-side compression works best when the proxy also **caches the static assets aggressively**, so the "larger first page load" downside effectively disappears: each browser downloads the (proxy-compressed) bundles once and then never asks for them again.
+
+Open WebUI's frontend is a SvelteKit app: all of its JavaScript/CSS lives under `/_app/immutable/` with **content-hashed filenames**. A given URL never changes content — an upgrade produces new filenames — so these files are safe to cache essentially forever. The HTML shell and `/_app/version.json` are the opposite: they must stay short-lived, because they are how browsers discover a new build (Open WebUI polls `version.json` to detect upgrades and reload).
+
+Example for Nginx:
+
+```nginx
+proxy_cache_path /var/cache/nginx/openwebui levels=1:2 keys_zone=OPENWEBUI_STATIC:10m
+                 max_size=1g inactive=7d use_temp_path=off;
+
+# Content-hashed SvelteKit bundles — immutable by construction, cache "forever"
+location ^~ /_app/immutable/ {
+    proxy_pass http://openwebui;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Connection "";
+    proxy_buffering on;
+    proxy_cache OPENWEBUI_STATIC;
+    proxy_cache_valid 200 7d;
+    proxy_cache_lock on;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+}
+```
+
+- The `immutable` keyword stops browsers from revalidating on reload/F5 — `max-age` alone doesn't. If a year feels uncomfortable, 30 days (`max-age=2592000, immutable`) gives nearly the same effect; the hashed filenames make staleness impossible either way.
+- **Do not** apply long caching to the HTML shell or `/_app/version.json` — leave those uncached or at a few minutes at most, or users won't pick up upgrades.
+- `proxy_cache` means each asset is fetched from a worker once per cache lifetime instead of once per user, removing the static file serving load from the Python workers entirely.
+- If Nginx compresses on the fly, note that it compresses on **every response** (its proxy cache stores the uncompressed body), so prefer moderate levels — `gzip_comp_level 4;` / brotli quality 4–5 gets ~95% of the ratio of level 6 at roughly half the CPU — and set `gzip_min_length 1000;` so tiny responses skip the compressor.
+
 ---
 
 ## Step 4: Switch to an External Vector Database
