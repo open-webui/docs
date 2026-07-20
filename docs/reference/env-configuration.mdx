@@ -1949,11 +1949,11 @@ Settings for the experimental long-term memory system (**Settings → Personaliz
 - Default: `False`
 - Description: When `true`, Open WebUI attaches the signed-in user's identity to its outbound requests, plus the chat and message session IDs where applicable. This enables per-user authorization, auditing, rate limiting and request tracing on external services.
 
-The four **user-info** headers are forwarded to nearly every outbound backend. The two **session** headers are narrower:
+The four (_and optionnal fifth_) **user-info** headers are forwarded to nearly every outbound backend. The two **session** headers are narrower:
 
 | Header | Forwarded to |
 |---|---|
-| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio and image services |
+| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role`, _`X-OpenWebUI-User-Groups`_ | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio and image services |
 | `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers (not Anthropic) |
 | `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP) |
 
@@ -1998,6 +1998,18 @@ To forward **arbitrary custom headers**, including per-request values such as th
 - Type: `str`
 - Default: `X-OpenWebUI-Message-Id`
 - Description: Customizes the header name used to forward the current message ID. This header is required for [external tool event emitting](/features/extensibility/plugin/development/events#-external-tool-events).
+
+#### `ENABLE_FORWARD_USER_INFO_HEADER_USER_GROUPS`
+
+- Type: `bool`
+- Default: `False`
+- Description: When `true`, Open WebUI also adds the user groups to the outbounds requests, enabling groups to be used for authorization, rate-limiting or other purposes.
+
+#### `FORWARD_USER_INFO_HEADER_USER_GROUPS`
+
+- Type: `str`
+- Default: `X-OpenWebUI-User-Groups`
+- Description: Customizes the header name used to forward the user's groups. Only useful if [`ENABLE_FORWARD_USER_INFO_HEADER_USER_GROUPS`](#enable_forward_user_info_header_user_groups) is used.
 
 :::tip Custom Header Prefix
 Use these variables when integrating with services that require specific header naming conventions. For example, AWS Bedrock AgentCore requires headers prefixed with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-`:
