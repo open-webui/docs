@@ -293,6 +293,10 @@ While Open WebUI is designed to be stateless with proper Redis configuration, en
 - **Nginx Ingress:** `nginx.ingress.kubernetes.io/affinity: "cookie"`
 - **AWS ALB:** Enable Target Group Stickiness.
 
+### Compress at the Load Balancer, Not in the App
+
+By default each Open WebUI worker compresses its own HTTP responses, which profiling shows costs roughly 3–4% CPU per worker — multiplied across all replicas. In multi-replica deployments there is always a load balancer or ingress in front, so enable compression there and disable it in the app with `ENABLE_COMPRESSION_MIDDLEWARE=false`. WebSocket and SSE streaming traffic is never compressed by this middleware, so chat streaming is unaffected. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) and [Scaling → Offload HTTP Compression](/getting-started/advanced-topics/scaling#offload-http-compression-to-the-load-balancer).
+
 ---
 
 ## Related Documentation

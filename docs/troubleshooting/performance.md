@@ -205,6 +205,17 @@ Increasing the chunk size buffers these updates, sending them to the client in l
 - **Env Var**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7`
   *   *Recommendation*: Set to **5-10** for high-concurrency instances.
 
+#### HTTP Response Compression
+By default, Open WebUI compresses HTTP responses (JSON API responses and the static JS/CSS assets of the web UI) with ZStd/Brotli/Gzip inside the application itself. This costs CPU on every worker: profiling (py-spy) of production deployments shows roughly **3–4% of worker CPU time** spent in the compression middleware. Disabling it frees that CPU and slightly reduces response latency.
+
+*   **What it does NOT affect**: WebSocket (Socket.IO) traffic and streaming chat responses (SSE) are **never** compressed by this middleware, so the chat streaming hot path is unaffected either way. Only regular HTTP responses larger than 500 bytes with compressible content types are involved.
+*   **When to disable**: Your reverse proxy / load balancer / CDN already compresses responses (preferred: enable it there and turn it off in the app), or your users reach the instance over a fast/local network where the extra transfer size doesn't matter.
+*   **When to keep it on**: The backend is directly internet-facing with nothing in front of it that compresses, and users connect over slow or mobile links. Uncompressed, the first (uncached) page load transfers several megabytes more, and large payloads like long chat histories or big model lists grow 5–10×.
+
+- **Env Var**: `ENABLE_COMPRESSION_MIDDLEWARE=false`
+
+See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
+
 #### Thread Pool Size
 Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count. Threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
 *   **Default**: 40 (the AnyIO default, far too low for production)
@@ -498,6 +509,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 9.  **Task Model**: External/Hosted (Offload compute).
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
+12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
 
 #### Redis Tuning
 
@@ -561,6 +573,7 @@ For detailed information on all available variables, see the [Environment Config
 | `DATABASE_URL` | [Database URL](/reference/env-configuration#database_url) |
 | `ENABLE_REALTIME_CHAT_SAVE` | [Realtime Chat Save](/reference/env-configuration#enable_realtime_chat_save) |
 | `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
+| `ENABLE_COMPRESSION_MIDDLEWARE` | [HTTP Response Compression](/reference/env-configuration#enable_compression_middleware) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
 | `CONTENT_EXTRACTION_ENGINE` | [Content Extraction Engine](/reference/env-configuration#content_extraction_engine) |

@@ -149,6 +149,18 @@ This spawns multiple application processes inside a single container. You still 
 Container orchestration is generally preferred because it provides automatic restarts, rolling updates, and more granular resource control. Multiple workers inside a single container is a simpler alternative when orchestration isn't available.
 :::
 
+### Offload HTTP Compression to the Load Balancer
+
+Once a load balancer, ingress, or CDN sits in front of Open WebUI, let **it** handle HTTP response compression and disable the application-level compression middleware:
+
+```
+ENABLE_COMPRESSION_MIDDLEWARE=false
+```
+
+By default every Open WebUI worker compresses its own HTTP responses (JSON API responses and static assets) with ZStd/Brotli/Gzip. Profiling shows this costs roughly **3–4% CPU per worker** — multiplied across every replica in a scaled deployment. Enabling compression at the proxy layer instead (e.g. Nginx `gzip on;`, Traefik's compress middleware, Cloudflare's default compression) keeps responses just as small on the wire while freeing that CPU on every worker, and lets CDNs cache static assets in pre-compressed form.
+
+WebSocket traffic and streaming chat responses (SSE) are never compressed by this middleware anyway, so disabling it has no effect on the chat streaming path. If nothing in front of Open WebUI compresses responses, the main cost of disabling is a larger first (uncached) page load — several megabytes of JavaScript/CSS — and larger big-JSON payloads (long chat histories, large model lists), which matters mostly on slow or mobile links. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
+
 ---
 
 ## Step 4: Switch to an External Vector Database
@@ -405,6 +417,10 @@ ENABLE_DB_MIGRATIONS=false
 # Concurrency & DB write throttling (REQUIRED at scale — see note below)
 THREAD_POOL_SIZE=2000
 DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300
+
+# HTTP compression — disable in the app IF your LB/ingress/CDN compresses
+# responses instead (saves ~3-4% CPU on every worker; see Step 3)
+# ENABLE_COMPRESSION_MIDDLEWARE=false
 ```
 
 :::warning Two settings people forget, and then their scaled deployment stalls
