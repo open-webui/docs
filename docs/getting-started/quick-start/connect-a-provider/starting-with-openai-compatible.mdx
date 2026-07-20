@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 ## Overview
 
-Open WebUI connects to **any server or provider that implements the OpenAI-compatible API**. This guide covers how to set up connections for popular cloud providers and local servers.
+Open WebUI connects to **any server or provider that implements the OpenAI-compatible API**. This guide covers how to set up connections for popular cloud providers, gateways, and local servers.
 
 For OpenAI itself (or Azure OpenAI), see the dedicated **[OpenAI guide](/getting-started/quick-start/connect-a-provider/starting-with-openai)**.
 
@@ -45,6 +45,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Perplexity | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
 | MiniMax | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes, but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| Vercel AI Gateway | Yes | Auto-detection works; filtering is recommended if you only want specific gateway models |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
@@ -206,6 +207,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   Select **MiniMax-M2.5** from the model dropdown and start chatting. Reasoning and thinking work by default without any additional configuration.
 
   ![MiniMax Chat interface](/images/tutorials/minimax/minimax-chat.png)
+
+  </TabItem>
+  <TabItem value="vercel-ai-gateway" label="Vercel AI Gateway">
+
+  **Vercel AI Gateway** provides a single OpenAI-compatible endpoint for models across multiple providers, with Vercel-side routing, spend monitoring, and provider management.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://ai-gateway.vercel.sh/v1` |
+  | **API Key** | Your AI Gateway API key from the [Vercel dashboard](https://vercel.com/docs/ai-gateway/authentication/api-keys) |
+  | **Model IDs** | Auto-detected; optionally filter to specific gateway model IDs such as `anthropic/claude-opus-4.8` |
+
+  :::tip
+  Vercel AI Gateway implements the OpenAI Chat Completions API, including `/models` and `/chat/completions`, so you can add it as a normal OpenAI-compatible connection in Open WebUI. Use the model IDs shown in the [AI Gateway model catalog](https://vercel.com/ai-gateway/models).
+  :::
 
   </TabItem>
   <TabItem value="openrouter" label="OpenRouter">
