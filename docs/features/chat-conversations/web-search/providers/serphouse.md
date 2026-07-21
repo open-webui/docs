@@ -71,5 +71,5 @@ The same fields are exposed in the Admin UI when the `serphouse` engine is selec
 
 ## Additional Resources
 
-- [SERPHouse Documentation](https://www.serphouse.com/docs): API reference and advanced options.
+- [SERPHouse Documentation](https://docs.serphouse.com/): API reference and advanced options.
 - [Open WebUI Features](https://docs.openwebui.com/features): Details on RAG and web search.
