@@ -34,7 +34,7 @@ Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** applic
 - **Administrators** are trusted actors with full system control.
 - Reports are assessed against **default or stricter** configurations.
 
-A residual whose practical impact is dominated by network and scheduling noise, or that is only observable under conditions the threat model already excludes, is accepted rather than treated as a remediable defect. For the full model, see the [Security Policy](../security-policy).
+A residual whose practical impact is dominated by network and scheduling noise, or that is only observable under conditions the threat model already excludes, is accepted rather than treated as a remediable defect. For the full model, see the [Security Policy](../security-policy.mdx).
 
 ---
 
@@ -44,6 +44,6 @@ A residual whose practical impact is dominated by network and scheduling noise, 
 
 | Risk | Class | Mitigation | Status |
 | :--- | :--- | :--- | :--- |
-| [Agentic application risks](./agentic-application-risks) | Inherent agentic-system behavior (OWASP Top 10 for Agentic Applications) | Capability gated by permissions; agent bound by caller's privileges; isolated execution | Inherent to autonomous agents; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy)) |
-| [LLM output unpredictability](./llm-output-unpredictability) | Inherent model behavior (OWASP LLM Top 10) | System hardened around the model; model bound by caller's privileges | Inherent to LLMs; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy)) |
-| [Authentication timing side-channel](./auth-timing) | CWE-208, Observable Timing Discrepancy | bcrypt cost equalised across all sign-in paths | Mitigated, residual accepted |
+| [Agentic application risks](./agentic-application-risks.mdx) | Inherent agentic-system behavior (OWASP Top 10 for Agentic Applications) | Capability gated by permissions; agent bound by caller's privileges; isolated execution | Inherent to autonomous agents; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy.mdx)) |
+| [LLM output unpredictability](./llm-output-unpredictability.mdx) | Inherent model behavior (OWASP LLM Top 10) | System hardened around the model; model bound by caller's privileges | Inherent to LLMs; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy.mdx)) |
+| [Authentication timing side-channel](./auth-timing.mdx) | CWE-208, Observable Timing Discrepancy | bcrypt cost equalised across all sign-in paths | Mitigated, residual accepted |

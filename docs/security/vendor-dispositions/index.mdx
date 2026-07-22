@@ -7,10 +7,10 @@ title: "Vendor Dispositions"
 
 **Open WebUI's formal assessments of externally reported CVEs and security claims.**
 
-When a CVE is filed against Open WebUI, we evaluate the report against our [Security Policy](../security-policy), our documented [threat model](#threat-model), and the actual behavior of the software. If a report is inaccurate, mischaracterized, or does not represent a genuine vulnerability, we publish a vendor disposition here explaining our assessment.
+When a CVE is filed against Open WebUI, we evaluate the report against our [Security Policy](../security-policy.mdx), our documented [threat model](#threat-model), and the actual behavior of the software. If a report is inaccurate, mischaracterized, or does not represent a genuine vulnerability, we publish a vendor disposition here explaining our assessment.
 
 :::note Automated scanner flags
-For our position on automated supply-chain scanner indicators (socket.dev and similar) rather than specific CVEs, see [Supply Chain and Security Scanners](../supply-chain-security).
+For our position on automated supply-chain scanner indicators (socket.dev and similar) rather than specific CVEs, see [Supply Chain and Security Scanners](../supply-chain-security.mdx).
 :::
 
 ---
@@ -36,7 +36,7 @@ Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** applic
 
 Reports that ignore these architectural assumptions, for example, claiming a vulnerability that requires admin-level access, intentionally weakened settings, or misconfigured deployments, may be disputed.
 
-For a full overview, see the [Security Policy](../security-policy).
+For a full overview, see the [Security Policy](../security-policy.mdx).
 
 ## All Dispositions
 
@@ -44,15 +44,15 @@ For a full overview, see the [Security Policy](../security-policy).
 
 | CVE | Title | Vendor Disposition | Official Resolution | Published |
 | :--- | :--- | :--- | :--- | :--- |
-| [CVE-2025-15603](./cve-2025-15603) | Insufficiently Random Values in start_windows.bat | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2026-03-09 |
-| [CVE-2026-0765](./cve-2026-0765) | PIP install_frontmatter_requirements Command Injection | Rejected | In progress | 2026-01-23 |
-| [CVE-2026-0766](./cve-2026-0766) | load_tool_module_by_id Code Injection | Rejected | In progress | 2026-01-23 |
-| [CVE-2026-0767](./cve-2026-0767) | Cleartext Transmission of Credentials | Rejected | In progress | 2026-01-23 |
-| [CVE-2025-63391](./cve-2025-63391) | Authentication Bypass in /api/config | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-12-18 |
-| [CVE-2024-7040](./cve-2024-7040) | Cross-Admin Chat Access via user_id Parameter | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-10-15 |
-| [CVE-2025-29446](./cve-2025-29446) | SSRF in verify_connection | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-04-21 |
-| [CVE-2024-7033](./cve-2024-7033) | Path Traversal in Model Download | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
-| [CVE-2024-7034](./cve-2024-7034) | Path Traversal in Model Upload | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
-| [CVE-2024-7038](./cve-2024-7038) | Path Oracle in Embedding-Model Update | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2024-10-09 |
-| [CVE-2024-7039](./cve-2024-7039) | Cross-Admin User Deletion | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
-| [CVE-2024-7959](./cve-2024-7959) | SSRF via Admin-Configured OpenAI URL | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
+| [CVE-2025-15603](./cve-2025-15603.mdx) | Insufficiently Random Values in start_windows.bat | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2026-03-09 |
+| [CVE-2026-0765](./cve-2026-0765.mdx) | PIP install_frontmatter_requirements Command Injection | Rejected | In progress | 2026-01-23 |
+| [CVE-2026-0766](./cve-2026-0766.mdx) | load_tool_module_by_id Code Injection | Rejected | In progress | 2026-01-23 |
+| [CVE-2026-0767](./cve-2026-0767.mdx) | Cleartext Transmission of Credentials | Rejected | In progress | 2026-01-23 |
+| [CVE-2025-63391](./cve-2025-63391.mdx) | Authentication Bypass in /api/config | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-12-18 |
+| [CVE-2024-7040](./cve-2024-7040.mdx) | Cross-Admin Chat Access via user_id Parameter | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-10-15 |
+| [CVE-2025-29446](./cve-2025-29446.mdx) | SSRF in verify_connection | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-04-21 |
+| [CVE-2024-7033](./cve-2024-7033.mdx) | Path Traversal in Model Download | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
+| [CVE-2024-7034](./cve-2024-7034.mdx) | Path Traversal in Model Upload | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
+| [CVE-2024-7038](./cve-2024-7038.mdx) | Path Oracle in Embedding-Model Update | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2024-10-09 |
+| [CVE-2024-7039](./cve-2024-7039.mdx) | Cross-Admin User Deletion | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
+| [CVE-2024-7959](./cve-2024-7959.mdx) | SSRF via Admin-Configured OpenAI URL | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
