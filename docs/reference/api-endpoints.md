@@ -396,6 +396,28 @@ curl -X POST http://localhost:3000/ollama/v1/responses \
 
 This allows API consumers (Codex, Claude Code, etc.) to use the Responses API directly with Ollama-hosted models without configuring a separate OpenAI-compatible connection.
 
+#### 🧩 Embeddings API (OpenAI-Compatible)
+
+Ollama also supports the OpenAI-compatible `/v1/embeddings` format. Open WebUI proxies this through the Ollama router with the same model resolution, access control, and prefix handling used by chat completions and the Responses API above, so `openai.embeddings.create()` works out of the box against an Ollama-backed model instead of requiring the native `/ollama/api/embed` format shown earlier.
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/embeddings \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "nomic-embed-text",
+  "input": "Why is the sky blue?"
+}'
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="http://localhost:3000/ollama/v1", api_key="YOUR_API_KEY")
+response = client.embeddings.create(model="nomic-embed-text", input="Why is the sky blue?")
+print(response.data[0].embedding[:5])
+```
+
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
 
 ### 🧩 Retrieval Augmented Generation (RAG)
