@@ -150,6 +150,10 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
 
 - **Endpoints**: `POST /api/message`, `POST /api/v1/messages`
 - **Authentication**: Supports both `Authorization: Bearer YOUR_API_KEY` and Anthropic's `x-api-key: YOUR_API_KEY` header
+- **Extended thinking**: reasoning output from the underlying model is returned as Anthropic `thinking` content blocks, in both streaming and non-streaming responses.
+- **Reasoning effort**: `reasoning_effort`, and `output_config.effort`, are mapped to the underlying model's reasoning-effort setting.
+- **Structured outputs**: `output_config.format` (`json_schema` or `json_object`) is mapped to the model's response-format setting.
+- **Passing extra parameters**: parameters outside the standard conversion are dropped by default. Set **Passthrough params** on the connection (`passthrough_params`, a comma-separated list of parameter names, or `*` for every non-standard parameter) to forward them verbatim to the upstream provider.
 
 - **Curl Example** (non-streaming):
 
@@ -426,6 +430,22 @@ curl -X POST http://localhost:3000/ollama/v1/responses \
 This allows API consumers (Codex, Claude Code, etc.) to use the Responses API directly with Ollama-hosted models without configuring a separate OpenAI-compatible connection.
 
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
+
+#### 🔤 Embeddings (OpenAI-Compatible)
+
+Alongside the native `/ollama/api/embed` route above, Open WebUI proxies an OpenAI-compatible embeddings endpoint, so clients that already speak the OpenAI embeddings format can use Ollama-hosted embedding models without configuring a separate connection. It applies the same model resolution, access control, and prefix handling as the other proxied routes.
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/embeddings \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "llama3.2",
+  "input": "Open WebUI is great!"
+}'
+```
+
+A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The endpoint returns `503` if the Ollama integration is disabled.
 
 ### 🧩 Retrieval Augmented Generation (RAG)
 

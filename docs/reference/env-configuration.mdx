@@ -1962,7 +1962,7 @@ The four **user-info** headers are forwarded to nearly every outbound backend. T
 
 | Header | Forwarded to |
 |---|---|
-| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio and image services |
+| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio, image and document-loader services (including Mistral OCR) |
 | `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers (not Anthropic) |
 | `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP) |
 
@@ -6316,21 +6316,21 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the group management feature.
+- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_LDAP_GROUP_CREATION`
 
 - Type: `bool`
 - Default: `False`
-- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically.
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_GROUPS`
 
 - Type: `str`
 - Default: `memberOf`
-- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments.
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > Authentication**, where group management cannot be saved while this is left empty.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ## SCIM

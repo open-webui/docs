@@ -131,11 +131,11 @@ Controls access to broad platform capabilities.
 
 :::info Image Generation and the Active Model
 
-Some image backends, such as Automatic1111, keep a single image model loaded and generate with whichever one is active. On those backends, selecting a model is the same action as switching the loaded one, so a user with **Features > Image Generation** who picks a model changes the active image model for the whole instance. Later generations, including other users', use that model until it is changed again.
+Some image backends, such as Automatic1111, keep a single image model loaded and generate with whichever one is active, so selecting a model is the same action as switching the loaded one.
+
+On Automatic1111 that switch is restricted to administrators. A non-admin with **Features > Image Generation** cannot change the instance-wide model: their model selection is ignored and the image is generated on the currently configured checkpoint. Only an administrator's request changes the active model, and when it does, it changes it for everyone until it is changed again.
 
 Backends that accept a model with each request are not affected: a user's choice applies only to their own generation.
-
-If the shared active model should not be changeable by non-admin users, do not grant this permission to non-admins, or use an image backend that supports per-request model selection.
 
 :::
 
