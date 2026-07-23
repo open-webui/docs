@@ -50,27 +50,27 @@ Visit [http://localhost:3000](http://localhost:3000).
 
 `:dev` is the same idea for the `dev` branch (upcoming features), also rolling.
 
-Version tags, `:v0.10.2` and the shorter `:0.10.2` and `:0.10`, are **pinned** to one stable release and never change. `:git-<commit-sha>` pins one exact commit.
+Version tags, such as `:vX.Y.Z` and the shorter `:X.Y.Z` and `:X.Y`, are **pinned** to one stable release and never change. `:git-<commit-sha>` pins one exact commit.
 
-This is why `:main` and a release such as `:v0.10.2` can show different image digests at the same time: `:main` already includes everything merged since that release, while the version tag stays frozen at it.
+This is why `:main` and a specific release tag can show different image digests at the same time: `:main` already includes everything merged since that release, while the version tag stays frozen at it.
 
 | Tag | Points to | Immutable? |
 | :--- | :--- | :--- |
 | `:main`, `:latest` | Newest build of the `main` branch | No (rolling) |
 | `:dev` | Newest build of the `dev` branch | No (rolling) |
-| `:v0.10.2`, `:0.10.2`, `:0.10` | A specific stable release | Yes |
+| `:vX.Y.Z`, `:X.Y.Z`, `:X.Y` | A specific stable release | Yes |
 | `:git-<sha>` | One exact commit | Yes |
 
 For reproducible or production deployments, pin a version tag. For the newest build, use `:main` (or the identical `:latest`).
 
 ### Specific release versions
 
-For production environments, pin a specific version instead of using floating tags:
+For production environments, pin a specific version instead of using floating tags. Replace `X.Y.Z` with a version from the [releases page](https://github.com/open-webui/open-webui/releases):
 
 ```bash
-docker pull ghcr.io/open-webui/open-webui:v0.10.2
-docker pull ghcr.io/open-webui/open-webui:v0.10.2-cuda
-docker pull ghcr.io/open-webui/open-webui:v0.10.2-ollama
+docker pull ghcr.io/open-webui/open-webui:vX.Y.Z
+docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
+docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
 ```
 
 ---
