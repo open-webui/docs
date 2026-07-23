@@ -44,6 +44,25 @@ Visit [http://localhost:3000](http://localhost:3000).
 | `:cuda` | Nvidia GPU support (add `--gpus all` to `docker run`) |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
 
+### How the tags update
+
+`:main` and `:latest` are the **same rolling image**: both point to the newest build from the `main` branch and are rebuilt every time a change lands there, so their digest moves forward as development continues. Note that `:latest` follows `main`; it does **not** point to the newest stable release.
+
+`:dev` is the same idea for the `dev` branch (upcoming features), also rolling.
+
+Version tags, `:v0.10.2` and the shorter `:0.10.2` and `:0.10`, are **pinned** to one stable release and never change. `:git-<commit-sha>` pins one exact commit.
+
+This is why `:main` and a release such as `:v0.10.2` can show different image digests at the same time: `:main` already includes everything merged since that release, while the version tag stays frozen at it.
+
+| Tag | Points to | Immutable? |
+| :--- | :--- | :--- |
+| `:main`, `:latest` | Newest build of the `main` branch | No (rolling) |
+| `:dev` | Newest build of the `dev` branch | No (rolling) |
+| `:v0.10.2`, `:0.10.2`, `:0.10` | A specific stable release | Yes |
+| `:git-<sha>` | One exact commit | Yes |
+
+For reproducible or production deployments, pin a version tag. For the newest build, use `:main` (or the identical `:latest`).
+
 ### Specific release versions
 
 For production environments, pin a specific version instead of using floating tags:
