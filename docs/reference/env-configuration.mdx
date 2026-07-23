@@ -6316,21 +6316,21 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
+- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_LDAP_GROUP_CREATION`
 
 - Type: `bool`
 - Default: `False`
-- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_GROUPS`
 
 - Type: `str`
 - Default: `memberOf`
-- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > Authentication**, where group management cannot be saved while this is left empty.
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**, where group management cannot be saved while this is left empty.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ## SCIM
