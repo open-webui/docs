@@ -30,7 +30,7 @@ The Code Interpreter is a model capability that enables LLMs to write and execut
 ### Enabling Code Interpreter
 
 **Per-Model Setup (Admin):**
-1. Go to **Admin Panel → Models**
+1. Go to **Settings > Admin > AI > Models**
 2. Select the model you want to configure
 3. Under **Capabilities**, enable **Code Interpreter**
 4. Save changes
