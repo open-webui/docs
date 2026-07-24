@@ -87,6 +87,49 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 :::
 
+## Chat Variables
+
+Chat variables turn a model's system prompt into a short form. An administrator writes placeholders into the system prompt, and Open WebUI asks whoever opens a chat with that model to fill them in. The answers are saved on that chat and reused for every message in it.
+
+Declare one in a model's system prompt:
+
+```txt
+{{chat.variables.key_name}}
+```
+
+That produces a single-line text field. Add a definition after the pipe for a typed field:
+
+```txt
+{{chat.variables.project_name | text:placeholder="Which project?":required}}
+{{chat.variables.tone | select:options=["Formal","Casual"]:default="Formal"}}
+```
+
+The grammar and the available field types are the same ones used by [prompt input variables](/features/workspace/prompts#available-input-types). Keys must be lowercase snake case: start with a letter, then letters, digits, or underscores.
+
+### Filling them in
+
+When a selected model declares chat variables, a control appears next to the chat input, and opens the **Chat Variables** form. Sending the first message opens the form on its own if nothing has been filled in yet, or if a required field is still empty. The values can be changed from the same control later, and take effect for messages sent after the change.
+
+They are stored on the chat, so reopening it keeps them, and forking or cloning a chat carries them over. In temporary chats they are sent with the request instead of being stored, so they last only as long as the chat does.
+
+A variable with no value is replaced with an empty string rather than blocking the request, so a partly filled form still sends. `required` is enforced when you send from the chat interface, not at the point the prompt is assembled.
+
+A single value can be up to 20,000 characters, and all of a chat's variables together up to 100,000 characters.
+
+:::warning Editing a definition can blank existing chats
+
+Values are validated against the current definitions when the prompt is assembled, and if any of them fails, every chat variable in that prompt renders empty rather than just the offending one. Removing an option from a `select` therefore silently blanks the whole set for chats that were storing the removed value, so re-open affected chats and re-fill the form after changing a definition.
+
+:::
+
+### Several models in one chat
+
+Selecting more than one model merges their variables. Identical definitions collapse into one field, which is required if any of the models marks it required. If two selected models define the same key differently, sending is blocked and the conflicting keys are listed along with the models that define them, so deselect one of them or make the definitions match.
+
+### Authoring checks
+
+The model editor lists what it found under **Detected Variables**, split into **Chat Variables** and **User Variables**. It warns about a key that is not lowercase snake case, a `select` with no `options=[...]`, the same key defined two different ways, and a user variable given a definition, since those are configured by each user and a definition has no effect on them.
+
 ## User Variables
 
 User variables let one shared system prompt produce a different result for each person using it. An administrator writes a placeholder into a model's system prompt, and every user fills in their own value.
@@ -107,10 +150,18 @@ For example, a single shared model can carry `Address the user as {{user.variabl
 - Values are plain text. A single value can be up to 20,000 characters, and all of a user's variables together up to 100,000 characters.
 - Values are stored per user and are only ever substituted into that user's own requests.
 
-:::note User variables are not chat variables
-
-`{{user.variables.*}}` is filled in by the person sending the message, from their account settings. It does not support the `{{chat.variables.key | default}}` syntax used by chat variables, which are prompted for per chat. Using the `|` default form with a user variable is flagged as a warning in the model editor, where the **Detected Variables** panel lists chat and user variables separately.
-
-:::
-
 Values are personal, so treat them as user-supplied text rather than a place for secrets: anything put in a variable is inserted into the prompt sent to the model configured for that chat.
+
+### User variables or chat variables?
+
+Both are written into a model's system prompt and both are filled in by users rather than administrators. The difference is who is asked and how long the answer lasts.
+
+| | Chat variables | User variables |
+| --- | --- | --- |
+| Written as | `{{chat.variables.key}}` | `{{user.variables.key}}` |
+| Who fills them in | whoever opens the chat, in a form | each user, once, in **Settings > Account** |
+| How long they last | that one conversation | every request that user sends |
+| Field types | typed, defined after the pipe | plain text only |
+| When they are asked for | when the chat starts | never, they are set ahead of time |
+
+Definitions after the pipe only apply to chat variables. Writing one on a user variable has no effect, and the model editor flags it, since each user configures their own value in settings rather than being prompted for it.

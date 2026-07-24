@@ -203,6 +203,7 @@ Things to know about the channel_file table:
 | summary         | Text          | nullable                | Optional chat summary text |
 | last_read_at    | BigInteger    | nullable                | Last read timestamp used for unread indicators |
 | current_message_id | Text       | nullable                | Current (active leaf) message of the chat's history |
+| variables       | JSON          | nullable                | Values filled in for the model's chat variables |
 
 Things to know about the chat table:
 
@@ -210,6 +211,7 @@ Things to know about the chat table:
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
 - `current_message_id` was added in v0.10.3 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
+- `variables` was added in v0.10.3 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when a chat is forked or cloned. Temporary chats keep their values in the request instead, so nothing is stored.
 - A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
