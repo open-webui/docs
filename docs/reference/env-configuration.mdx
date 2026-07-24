@@ -941,6 +941,12 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 - Default: `10`
 - Description: Sets the timeout in seconds for retrieving tool server metadata/configuration (for example, loading server data/spec information).
 
+#### `AIOHTTP_FILE_STREAM_CHUNK_SIZE`
+
+- Type: `int`
+- Default: `1048576` (1 MiB)
+- Description: Chunk size in bytes used when streaming files to and from external services, including audio transcription uploads, Ollama model blob uploads and downloads, and pipeline uploads. Files are sent and written in chunks of this size instead of being read into memory in full, so the value trades memory use against the number of round trips. Any value that is not a positive integer falls back to 1 MiB.
+
 #### `AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`
 
 - Type: `bool` or `str`
