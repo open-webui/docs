@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.10.3.
+> This documentation reflects schema changes up to Open WebUI v0.11.0.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -210,8 +210,8 @@ Things to know about the chat table:
 - `tasks` and `summary` support structured planning/status UX in chat sessions.
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
-- `current_message_id` was added in v0.10.3 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
-- `variables` was added in v0.10.3 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when a chat is forked or cloned. Temporary chats keep their values in the request instead, so nothing is stored.
+- `current_message_id` was added in v0.11.0 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
+- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when a chat is forked or cloned. Temporary chats keep their values in the request instead, so nothing is stored.
 - A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
@@ -250,7 +250,7 @@ The `chat_message` table is the **normalized per-message store** for chat conver
 | files           | JSON          | nullable                                 | Attached files                                           |
 | sources         | JSON          | nullable                                 | Retrieval/citation sources                              |
 | embeds          | JSON          | nullable                                 | Embedded artifacts                                       |
-| meta            | JSON          | nullable                                 | Message metadata; marks internal sub-agent and timer messages (added in v0.10.3) |
+| meta            | JSON          | nullable                                 | Message metadata; marks internal sub-agent and timer messages (added in v0.11.0) |
 | done            | Boolean       | default=True                             | Whether generation completed                             |
 | status_history  | JSON          | nullable                                 | Streamed status updates during generation                |
 | error           | JSON          | nullable                                 | Error payload when generation failed                     |
@@ -264,7 +264,7 @@ Things to know about the chat_message table:
 - Deleting a chat cascades to delete its messages (`chat_id` foreign key with `ON DELETE CASCADE`).
 - Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
 - `context_summary` was added in v0.10.0 (migration `4c5ce3d2f27f`) to store a summary of the message's context.
-- `meta` was added in v0.10.3 (migration `856c5b02fb54`). It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
+- `meta` was added in v0.11.0 (migration `856c5b02fb54`). It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
 
 ## Automation Table
 
@@ -584,7 +584,7 @@ Things to know about the memory table:
 
 - `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
 - `path` and `meta` (added in a later v0.10.0 migration) back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
-- A covering index on `(id, user_id)` was added in v0.10.3 (migration `55f1302ac17c`) to speed up per-user memory lookups.
+- A covering index on `(id, user_id)` was added in v0.11.0 (migration `55f1302ac17c`) to speed up per-user memory lookups.
 
 ## Message Table
 
@@ -771,7 +771,7 @@ Things to know about the user table:
 - Uses UUID for primary key
 - One-to-One relationship with `auth` table (shared id)
 - One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
-- `variables` was added in v0.10.3 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
+- `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 
 The `scim` field's expected structure:
 
