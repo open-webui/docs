@@ -86,3 +86,31 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 - As an administrator, you should assign your LLM parameters on a per-model basis using **Models** section for optimal flexibility. For both of these secondary System Prompts, ensure to set them in a manner that maximizes flexibility and minimizes required adjustments across different per-account or per-chat instances. It is essential for both your Admin account as well as all User accounts to understand the priority order by which system prompts within **Chat Controls** and the **Models** section will be applied to the **LLM**.
 
 :::
+
+## User Variables
+
+User variables let one shared system prompt produce a different result for each person using it. An administrator writes a placeholder into a model's system prompt, and every user fills in their own value.
+
+Each user manages their own values under **Settings > Account > User Variables**, as a list of key and value pairs. Reference them in a system prompt with:
+
+```txt
+{{user.variables.key_name}}
+```
+
+At request time each placeholder is replaced with that user's value for the key. A key the user has not set is replaced with an empty string, so the prompt never shows the raw placeholder.
+
+For example, a single shared model can carry `Address the user as {{user.variables.preferred_name}} and answer in {{user.variables.language}}.` and behave correctly for everyone, without an administrator maintaining a model per person.
+
+### Rules for keys and values
+
+- Keys must be lowercase snake case: start with a letter, then letters, digits, or underscores (`preferred_name`, `team2`). Keys that do not match are rejected.
+- Values are plain text. A single value can be up to 20,000 characters, and all of a user's variables together up to 100,000 characters.
+- Values are stored per user and are only ever substituted into that user's own requests.
+
+:::note User variables are not chat variables
+
+`{{user.variables.*}}` is filled in by the person sending the message, from their account settings. It does not support the `{{chat.variables.key | default}}` syntax used by chat variables, which are prompted for per chat. Using the `|` default form with a user variable is flagged as a warning in the model editor, where the **Detected Variables** panel lists chat and user variables separately.
+
+:::
+
+Values are personal, so treat them as user-supplied text rather than a place for secrets: anything put in a variable is inserted into the prompt sent to the model configured for that chat.

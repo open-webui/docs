@@ -582,6 +582,7 @@ Things to know about the memory table:
 
 - `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
 - `path` and `meta` (added in a later v0.10.0 migration) back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
+- A covering index on `(id, user_id)` was added in v0.10.3 (migration `55f1302ac17c`) to speed up per-user memory lookups.
 
 ## Message Table
 
@@ -759,6 +760,7 @@ Things to know about the tag table:
 | api_key           | String        | UNIQUE, nullable | API authentication key     |
 | settings          | JSON          | nullable         | User preferences           |
 | info              | JSON          | nullable         | Additional user info       |
+| variables         | JSON          | nullable         | User variables substituted into system prompts |
 | oauth_sub         | Text          | UNIQUE           | OAuth subject identifier   |
 | scim              | JSON          | nullable         | SCIM provisioning data     |
 
@@ -767,6 +769,7 @@ Things to know about the user table:
 - Uses UUID for primary key
 - One-to-One relationship with `auth` table (shared id)
 - One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
+- `variables` was added in v0.10.3 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 
 The `scim` field's expected structure:
 
