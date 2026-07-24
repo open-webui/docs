@@ -1238,6 +1238,13 @@ when using OpenAI-compatible endpoints.
 - Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Experience > Interface** (**Token Cap**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `CONTEXT_COMPACTION_RETENTION_PERCENTAGE`
+
+- Type: `int`
+- Default: `40`
+- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Compaction always splits on a user message, so the retained portion begins at a turn boundary rather than mid-exchange. Can also be set in **Settings > Admin > Experience > Interface** (**Retained Messages**).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
 
 - Type: `str`
