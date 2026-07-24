@@ -21,7 +21,7 @@ Before running any commands, decide how you want to track releases. The right ch
 | Scenario | Recommended approach |
 |---|---|
 | **Personal / homelab** | Use the `:main` tag and pull manually when you want the latest |
-| **Shared / team instance** | Pin a specific version (e.g. `:v0.8.6`) and use [Diun](#diun) for update notifications |
+| **Shared / team instance** | Pin a specific version (e.g. `:vX.Y.Z`) and use [Diun](#diun) for update notifications |
 | **Production / critical** | Pin a version, review [release notes](https://github.com/open-webui/open-webui/releases) before upgrading, test in staging first |
 
 ### `:main` vs. Pinned Versions
@@ -31,9 +31,9 @@ The `:main` tag always points to the **latest build**. It's convenient but can i
 For stability, pin a specific release tag:
 
 ```
-ghcr.io/open-webui/open-webui:v0.10.1
-ghcr.io/open-webui/open-webui:v0.10.1-cuda
-ghcr.io/open-webui/open-webui:v0.10.1-ollama
+ghcr.io/open-webui/open-webui:vX.Y.Z
+ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
+ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
 ```
 
 Browse all available tags on the [GitHub releases page](https://github.com/open-webui/open-webui/releases).
