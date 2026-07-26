@@ -108,11 +108,24 @@ The grammar and the available field types are the same ones used by [prompt inpu
 
 ### Filling them in
 
-When a selected model declares chat variables, a control appears next to the chat input, and opens the **Chat Variables** form. Sending the first message opens the form on its own if nothing has been filled in yet, or if a required field is still empty. The values can be changed from the same control later, and take effect for messages sent after the change.
+When a selected model declares chat variables, a control appears next to the chat input and opens the **Chat Variables** form. Selecting the model does not open it: nothing is shown until you either press that control or try to send a message. The values can be changed from the same control later, and take effect for messages sent after the change.
 
-They are stored on the chat, so reopening it keeps them, and forking or cloning a chat carries them over. In temporary chats they are sent with the request instead of being stored, so they last only as long as the chat does.
+Sending a message opens the form instead of sending only when there is nothing usable to send with, which means one of:
 
-A variable with no value is replaced with an empty string rather than blocking the request, so a partly filled form still sends. `required` is enforced when you send from the chat interface, not at the point the prompt is assembled.
+- a `required` field has neither a value nor a `default`, or
+- **every** field is without a value and without a `default`.
+
+Otherwise the message goes straight to the model and any unfilled variable is substituted as an empty string.
+
+:::warning Only `required` actually forces the form
+
+Because a field carrying a `default` counts as usable, a single default is enough to stop the form appearing for **all** the other fields. A model whose variables are all optional, where at least one has a `default`, never prompts: the defaults are used, the rest render empty, and the user is never told the fields existed.
+
+Mark a field `required` whenever the answer has to come from the user. Treat `default` as a value you are happy to ship unattended, not as a suggestion the user will be shown and asked to confirm.
+
+:::
+
+Values are stored on the chat, so reopening it keeps them, and forking or cloning a chat carries them over. In temporary chats they are sent with the request instead of being stored, so they last only as long as the chat does.
 
 A single value can be up to 20,000 characters, and all of a chat's variables together up to 100,000 characters.
 
