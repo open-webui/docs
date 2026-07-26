@@ -30,7 +30,30 @@ To share a chat:
 
 :::info Sharing scope is controlled by RBAC
 
-After generating a share link, the modal shows an **Access Control** selector for who can open it. The **Public** option makes the link reachable by any signed-in user of this instance, so a visitor who is not logged in is still sent to the login page. It is gated by the **Chats Public Sharing** permission. When disabled, non-admin users only see options to grant access to specific users or groups. Admins always retain access to all options. See [RBAC Permissions](/features/authentication-access/rbac/permissions) and [`USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_chat_allow_public_sharing) for configuration.
+After generating a share link, the modal shows an **Access Control** selector for who can open it, offering **Private**, **Public** and **Open**.
+
+**Public** makes the link reachable by any signed-in user of this instance, so a visitor who is not logged in is still sent to the login page. It is gated by the **Chats Public Sharing** permission. When disabled, non-admin users only see options to grant access to specific users or groups. Admins always retain access to all options. See [RBAC Permissions](/features/authentication-access/rbac/permissions) and [`USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_chat_allow_public_sharing) for configuration.
+
+**Open** removes the login requirement entirely and is covered in [Open links](#open-links-no-sign-in) below.
+
+:::
+
+### Open links (no sign-in)
+
+**Open** is the only setting that makes a chat readable without an Open WebUI account. Anyone holding the link can read the conversation straight from the internet, with no login and no record of who viewed it.
+
+It is off by default. A non-admin needs the **Chats Open Sharing** permission ([`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](/reference/env-configuration#user_permissions_chat_allow_open_sharing), default `False`) before the option appears at all. Without it the dropdown shows only **Private** and **Public**, and an open grant submitted directly to the API is dropped rather than saved.
+
+What an open link does and does not allow:
+
+- It is read-only. Open access exists only as a read grant, so the write toggle is not offered and a write grant for it is rejected.
+- It applies to chats only. No other resource type accepts this kind of grant, so knowledge bases, models, prompts, tools, notes and calendars cannot be shared this way.
+- Copying the conversation into an account still requires signing in and holding the **Chat Import** permission.
+- The page asks search engines not to index it (`noindex,nofollow`). That is a request to well-behaved crawlers, not access control: the link still works for anyone who receives it.
+
+:::warning An open link is public to the internet
+
+Treat the URL itself as the only protection. It cannot be revoked selectively, so if it leaks, the way to cut access is to delete the share link (see [Deleting Shared Chats](#deleting-shared-chats)) or switch the chat back to **Private**. Shared chats are snapshots, so anything in the conversation at the moment the link was generated stays visible, including any file contents, names or internal details quoted in the messages.
 
 :::
 
@@ -60,16 +83,14 @@ When you select `Copy Link`, a unique share link is generated that can be shared
 
 - The shared chat will only include messages that existed at the time the link was created. Any new messages sent within the chat after the link is generated will not be included, unless the link is deleted and updated with a new link.
 - The generated share link acts as a static snapshot of the chat at the time the link was generated.
-- To view the shared chat, users must:
-  1. Have an account on the Open WebUI instance where the link was generated.
-  2. Be signed in to their account on that instance.
-- If a user tries to access the shared link without being signed in, they will be redirected to the login page to log in before they can view the shared chat.
+- Unless the chat is set to **Open**, viewing it requires an account on the Open WebUI instance where the link was generated, and being signed in to that account. A visitor who is not signed in is redirected to the login page first.
+- A chat set to **Open** skips both requirements and is readable by anyone with the link. See [Open links](#open-links-no-sign-in).
 
 ### Viewing Shared Chats
 
 To view a shared chat:
 
-1. Ensure you are signed in to an account on the Open WebUI instance where the chat was shared.
+1. Ensure you are signed in to an account on the Open WebUI instance where the chat was shared. This step does not apply to a chat shared as **Open**, which anyone can read without an account.
 2. Click on the shared link provided to you.
 3. The chat will be displayed in a read-only format.
 4. If the Admin of the Open WebUI instance from which the shared link was shared has Text-to-Speech set up, there may be an audio button for messages to be read aloud to you (situational).

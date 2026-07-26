@@ -6797,7 +6797,14 @@ These settings control whether users can share workspace items **publicly**.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
+- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. For links that work without an account, see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Allows non-admin users to mark a chat share link **Open**, meaning it can be read by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and no resource type other than chats accepts this kind of grant. When disabled, the "Open" option is hidden for non-admin users and any open grant sent directly to the API is stripped before saving. Admins are always exempt. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`

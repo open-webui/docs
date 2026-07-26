@@ -110,7 +110,7 @@ Now that we have all the tables, let's understand the structure of each table.
 | id              | Integer       | PRIMARY KEY, AUTOINCREMENT | Unique identifier                                   |
 | resource_type   | Text          | NOT NULL                | Type of resource (e.g., `model`, `knowledge`, `tool`)  |
 | resource_id     | Text          | NOT NULL                | ID of the specific resource                            |
-| principal_type  | Text          | NOT NULL                | Type of grantee: `user` or `group`                     |
+| principal_type  | Text          | NOT NULL                | Type of grantee: `user`, `group` or `anyone`           |
 | principal_id    | Text          | NOT NULL                | ID of the user or group (or `*` for public)            |
 | permission      | Text          | NOT NULL                | Permission level: `read` or `write`                    |
 | created_at      | BigInteger    | nullable                | Grant creation timestamp                               |
@@ -120,7 +120,8 @@ Things to know about the access_grant table:
 - Unique constraint on (`resource_type`, `resource_id`, `principal_type`, `principal_id`, `permission`) to prevent duplicate grants
 - Indexed on (`resource_type`, `resource_id`) and (`principal_type`, `principal_id`) for efficient lookups
 - Replaces the former `access_control` JSON column that was previously embedded in each resource table
-- `principal_type` of `user` with `principal_id` of `*` represents public (open) access
+- `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
+- `principal_type` of `anyone` (added in v0.11.0) is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
 
 ## Auth Table
