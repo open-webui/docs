@@ -80,7 +80,7 @@ Controls what users can share with the community or make public.
 | **Share Notes** | **(Parent)** Ability to share Notes. |
 | **Public Notes** | *(Requires Share Notes)* Ability to make Notes public. |
 | **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
-| **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by anyone (including unauthenticated visitors). When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
+| **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
 
 ### 3. Chat Permissions
