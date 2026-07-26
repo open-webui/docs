@@ -148,6 +148,14 @@ Open WebUI provides an Anthropic Messages API compatible endpoint. This allows t
 
 Internally, the endpoint converts the Anthropic request format to OpenAI Chat Completions format, routes it through the existing chat completion pipeline, and converts the response back to Anthropic format. Both streaming and non-streaming requests are supported.
 
+:::info Native Anthropic connections skip the conversion
+
+When the target connection already speaks the Anthropic Messages API, the request is forwarded as-is instead of being converted to OpenAI format and back. Nothing is lost in translation, so provider-specific fields survive the round trip without needing `passthrough_params`.
+
+This applies when the connection's base URL is an Anthropic one, or when its **Provider** is set to **LiteLLM** in the connection's settings (alongside **Default**, **Azure OpenAI** and **llama.cpp**), since LiteLLM exposes an Anthropic-compatible route of its own. Every other connection keeps the conversion behaviour described above.
+
+:::
+
 - **Endpoints**: `POST /api/message`, `POST /api/v1/messages`
 - **Authentication**: Supports both `Authorization: Bearer YOUR_API_KEY` and Anthropic's `x-api-key: YOUR_API_KEY` header
 - **Extended thinking**: reasoning output from the underlying model is returned as Anthropic `thinking` content blocks, in both streaming and non-streaming responses.

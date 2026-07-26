@@ -30,6 +30,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 |---------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `WEBUI_URL`                           | *(none)*           | **Required.** Your public WebUI address, e.g., `http://localhost:8080`. |
 | `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `false`            | Load OAuth settings from the database (when persistent config is on). Default `false` keeps environment variables authoritative for OAuth; set `true` to manage OAuth in the Admin Panel. |
+| `ENABLE_OAUTH`                        | `true`             | Master switch for provider sign-in. Set `false` to turn SSO off while keeping the client ID, secret and endpoints configured. Also a toggle in **Settings > Admin > System > Authentication**, next to the LDAP one. |
 | `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`). |
 | `OAUTH_AUTO_REDIRECT`                 | `false`            | Send unauthenticated users at `/auth` straight to the provider login, skipping the "Continue with SSO" screen. Requires exactly one provider, `ENABLE_LOGIN_FORM=false` and no LDAP; visit `/auth?form=true` for the local login form. |
 | `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails). |

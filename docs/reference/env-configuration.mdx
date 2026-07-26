@@ -4361,6 +4361,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Description: Bypasses the web loader when performing web search. When enabled, only snippets from the search engine are used, and the full page content is not fetched.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `OPENSERP_BASE_URL`
+
+- Type: `str`
+- Default: `http://localhost:7000`
+- Description: Base URL of a self-hosted [OpenSERP](https://github.com/karust/openserp) instance, used when the web search engine is set to `openserp`. Open WebUI calls its `/mega/search` endpoint, which returns results from Google, Bing, Yandex, Baidu, DuckDuckGo and Ecosia together. No API key is involved, the base URL is the only required setting. See the [OpenSERP provider guide](/features/chat-conversations/web-search/providers/openserp).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `SEARXNG_QUERY_URL`
 
 - Type: `str`
@@ -5603,11 +5610,18 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 :::
 
+#### `ENABLE_OAUTH`
+
+- Type: `bool`
+- Default: `True`
+- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Admin > System > Authentication**, alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables account creation when signing up via OAuth. Distinct from `ENABLE_SIGNUP`.
+- Description: Enables account creation when signing up via OAuth. Distinct from `ENABLE_SIGNUP`, and from [`ENABLE_OAUTH`](#enable_oauth), which turns provider sign-in off entirely rather than just new account creation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_AUTO_REDIRECT`
