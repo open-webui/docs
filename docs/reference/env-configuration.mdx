@@ -5752,6 +5752,18 @@ curl -X POST "http://localhost:8080/api/v1/oauth/oidc/token/exchange" \
 }
 ```
 
+#### `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT`
+
+- Type: `int`
+- Default: *(unset, no limit)*
+- Description: Caps how many token-exchange attempts are accepted per window. Unset, or the literal `none`, leaves the endpoint unthrottled. Set an integer to enable throttling, for example `15`. This is a best-effort brake only: the caller has no established identity before the provider validates the token, so requests are bucketed by client address, which is unreliable behind a proxy that lets clients influence the forwarded address. Treat it as noise reduction, not as the control that keeps the endpoint safe. That remains `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`.
+
+#### `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT_WINDOW`
+
+- Type: `int`
+- Default: `180`
+- Description: Length of the token-exchange rate-limit window in seconds. Only has an effect when `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT` is set.
+
 **Requirements:**
 - The user must already exist in Open WebUI (they must have signed in via the web interface at least once)
 - The OAuth provider must be properly configured, and must implement RFC 7662 token introspection
