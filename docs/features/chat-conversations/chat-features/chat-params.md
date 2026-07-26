@@ -117,11 +117,13 @@ Sending a message opens the form instead of sending only when there is nothing u
 
 Otherwise the message goes straight to the model and any unfilled variable is substituted as an empty string.
 
-:::warning Only `required` actually forces the form
+:::tip Choosing between `required` and `default`
 
-Because a field carrying a `default` counts as usable, a single default is enough to stop the form appearing for **all** the other fields. A model whose variables are all optional, where at least one has a `default`, never prompts: the defaults are used, the rest render empty, and the user is never told the fields existed.
+The form is an input gate rather than a confirmation step, so it only interrupts when the chat cannot sensibly proceed without an answer. A field carrying a `default` already has one, which is why a model whose variables all have defaults starts the chat immediately.
 
-Mark a field `required` whenever the answer has to come from the user. Treat `default` as a value you are happy to ship unattended, not as a suggestion the user will be shown and asked to confirm.
+That also means one `default` is enough to stop the form appearing for the other optional fields alongside it. They stay reachable from the control next to the chat input, they are just not asked for.
+
+So: mark a field `required` when the answer has to come from the user, and give a `default` when you are happy for the chat to start without asking.
 
 :::
 
