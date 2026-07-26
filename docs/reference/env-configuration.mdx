@@ -5704,19 +5704,23 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Type: `bool`
 - Default: `False`
 - Description: Enables the OAuth token exchange endpoint, allowing external applications to exchange an OAuth provider's access token for an Open WebUI JWT session token. This enables programmatic authentication for external tools and services that already have OAuth tokens from your identity provider.
-- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token.
+- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token. You must also set `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`, or every exchange is rejected.
 
-:::warning
+:::danger
 
-**Security Note**: This feature should only be enabled when you have external applications that need to authenticate with Open WebUI using OAuth tokens from your identity provider. Ensure proper access controls are in place for any external applications using this endpoint.
+**This endpoint issues a session as whichever user the presented token belongs to.**
+
+An access token is a bearer credential. Your provider's userinfo endpoint confirms that a token is valid, but it does not reveal which OAuth client the token was issued to. Unless the issuing client is checked, a token minted for any client registered with your provider is accepted, including applications you do not control. Someone who obtains an access token for one of your users, for example by having them sign in to an unrelated OAuth application, could exchange it for a session as that user, inheriting that user's role.
+
+`OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES` is what restricts this to clients you have chosen to trust. `OAUTH_ALLOWED_DOMAINS` does not: it governs which user identities may sign in, and an impersonated user is a legitimate member of an allowed domain.
 
 :::
 
 **Request Example:**
 ```bash
-curl -X POST "http://localhost:8080/api/v1/oauth/google/token/exchange" \
+curl -X POST "http://localhost:8080/api/v1/oauth/oidc/token/exchange" \
   -H "Content-Type: application/json" \
-  -d '{"token": "ya29.a0AfH6SMB..."}'
+  -d '{"token": "<access token issued to a trusted client>"}'
 ```
 
 **Response:**
@@ -5736,8 +5740,32 @@ curl -X POST "http://localhost:8080/api/v1/oauth/google/token/exchange" \
 
 **Requirements:**
 - The user must already exist in Open WebUI (they must have signed in via the web interface at least once)
-- The OAuth provider must be properly configured
+- The OAuth provider must be properly configured, and must implement RFC 7662 token introspection
+- `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES` must name the OAuth client the token was issued to
 - The token exchange uses the same user lookup logic as regular OAuth login (by OAuth `sub` claim first, then by email if `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is enabled)
+
+#### `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`
+
+- Type: `str` (comma-separated list)
+- Default: empty
+- Description: The OAuth client IDs whose tokens the token exchange endpoint will accept. Open WebUI resolves which client a presented token was issued to using RFC 7662 token introspection, and rejects any token minted for a client that is not listed.
+- Usage: `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES=internal-cli,reporting-service`
+
+:::warning
+
+An empty value means no client is trusted, so every exchange is rejected. This is deliberate. There is no safe default, because the set of clients permitted to act on your users' behalf is specific to your deployment.
+
+Only the `client_id` reported by token introspection is honoured. The `aud` field is ignored, because it names intended resource servers rather than the issuing client, and some identity providers allow any client to place another client's identifier there.
+
+This is a deploy-time environment variable and cannot be changed from the admin interface, so a compromised administrator session cannot widen the trust boundary at runtime.
+
+:::
+
+:::info
+
+**Provider support.** Resolving the issuing client requires RFC 7662 token introspection. Google, Microsoft Entra ID and GitHub do not implement it, so token exchange cannot be used with those providers and rejections are recorded in the server log. Providers that do implement it include Keycloak, Authentik, Okta and Zitadel.
+
+:::
 
 #### `ENABLE_OAUTH_BACKCHANNEL_LOGOUT`
 
