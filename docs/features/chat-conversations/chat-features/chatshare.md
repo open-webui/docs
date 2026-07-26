@@ -30,7 +30,7 @@ To share a chat:
 
 :::info Sharing scope is controlled by RBAC
 
-After generating a share link, the modal shows an **Access Control** selector for who can open it. The **Public** option (anyone with the link, including unauthenticated visitors) is gated by the **Chats Public Sharing** permission. When disabled, non-admin users only see options to grant access to specific users or groups. Admins always retain access to all options. See [RBAC Permissions](/features/authentication-access/rbac/permissions) and [`USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_chat_allow_public_sharing) for configuration.
+After generating a share link, the modal shows an **Access Control** selector for who can open it. The **Public** option makes the link reachable by any signed-in user of this instance, so a visitor who is not logged in is still sent to the login page. It is gated by the **Chats Public Sharing** permission. When disabled, non-admin users only see options to grant access to specific users or groups. Admins always retain access to all options. See [RBAC Permissions](/features/authentication-access/rbac/permissions) and [`USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_chat_allow_public_sharing) for configuration.
 
 :::
 

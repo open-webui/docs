@@ -6797,7 +6797,7 @@ These settings control whether users can share workspace items **publicly**.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of chat conversations. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by anyone with the link. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
+- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`

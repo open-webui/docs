@@ -684,6 +684,16 @@ div.special_table + table tr td {
 	padding-top: 0.45rem;
 	padding-bottom: 0.45rem;
 }
+
+@media screen and (width <= 996px) {
+	.responsive-table {
+		overflow-x: auto;
+	}
+
+	.responsive-table > table {
+		min-width: 48rem;
+	}
+}
 /* stylelint-enable no-descending-specificity */
 
 /* ─── Custom tags ─── */
