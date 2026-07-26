@@ -205,6 +205,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets a default Language Model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `MODEL_ORDER_LIST`
+
+- Type: `str` (JSON array)
+- Default: `[]`
+- Description: Sets the order models are listed in, as a JSON array of model IDs, for example `["gpt-4o","llama3.1:latest"]`. Models named here appear first in that order, and anything left out follows behind. Previously this could only be arranged in the admin interface, which meant the arrangement was lost on restart wherever configuration is not persisted, so setting it here makes the order survive. Invalid JSON is logged and ignored rather than stopping startup.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `DEFAULT_PINNED_MODELS`
 
 - Type: `str`
@@ -6102,7 +6109,7 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 - Options:
   - `S256`: Hash `code_verifier` with SHA-256.
 - Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the code challenge method for OAuth authentication. Set to `S256` when PKCE is required by the provider.
+- Description: Specifies the code challenge method for OAuth authentication. Set to `S256` when PKCE is required by the provider. This now applies to **every** sign-in provider, Google, Microsoft and GitHub as well as generic OpenID Connect, where it previously took effect on the OIDC provider alone. Any value other than `S256` is rejected at startup.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_PROVIDER_NAME`
