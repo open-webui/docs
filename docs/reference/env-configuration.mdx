@@ -7756,6 +7756,18 @@ If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be 
 
 :::
 
+#### `REDIS_SOCKET_TIMEOUT`
+
+- Type: `float` (seconds) or empty string for None
+- Default: None (no timeout, uses redis-py library default)
+- Description: Sets the read/write timeout on all Redis client connections, the companion to [`REDIS_SOCKET_CONNECT_TIMEOUT`](#redis_socket_connect_timeout), which only bounds the initial connect. It applies to plain, Cluster and Sentinel modes, sync and async alike.
+
+:::warning Not for the subscriber connections
+
+Leave this unset unless you have a reason. A timeout here also lands on connections that sit idle by design, above all the pub/sub subscriber that carries stop requests and configuration changes between instances: it waits quietly for messages, and a socket timeout ends that wait as an error. If you do set it, keep it comfortably longer than the quiet periods you expect, and check that stopping a reply from another instance still works.
+
+:::
+
 #### `REDIS_SOCKET_KEEPALIVE`
 
 - Type: `bool`

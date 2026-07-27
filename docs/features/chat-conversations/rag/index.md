@@ -274,6 +274,8 @@ When File Context is disabled, file content is **not automatically extracted or 
 
 :::tip Per-File Retrieval Mode
 Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+
+To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
 
 :::info
