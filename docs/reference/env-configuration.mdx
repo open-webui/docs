@@ -3652,6 +3652,41 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
 
   **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** (the default; it is a native-mode builtin tool); for models set to Legacy it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 
+#### `KB_EXEC_MAX_OUTPUT_CHARS`
+
+- Type: `int`
+- Default: `30000`
+- Description: Caps the total output of a single `kb_exec` call, whatever command produced it. Output beyond the cap is cut and the model is told to narrow the command with a path, glob, `head`/`tail`/`sed` or `grep`. This is one budget for the whole pipeline, so a `cat` of a huge file and a broad `grep` are bounded the same way. Raise it if your models handle long tool output well and you would rather they read more per call; lower it to keep tool results from crowding the context window. Values below `1` fall back to the default.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `KB_EXEC_MAX_GREP_FILES`
+
+- Type: `int`
+- Default: `200`
+- Description: How many files a single `kb_exec` `grep` may scan. Past this the command is refused with a suggestion to scope the search to a directory or glob rather than searching a whole knowledge base at once. Raise it for a deployment where broad searches over large knowledge bases are worth the time they take.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `KNOWLEDGE_GREP_MAX_MATCHES`
+
+- Type: `int`
+- Default: `50`
+- Description: How many matching lines a knowledge search returns before the rest are summarized as a count. It applies to both `grep_knowledge_files` and `kb_exec`'s `grep`, so the two behave alike.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `VIEW_FILE_MAX_CHARS`
+
+- Type: `int`
+- Default: `100000`
+- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `VIEW_FILE_DEFAULT_MAX_CHARS`
+
+- Type: `int`
+- Default: `10000`
+- Description: How much `view_file` and `view_knowledge_file` return when the model does not ask for a size, bounded by [`VIEW_FILE_MAX_CHARS`](#view_file_max_chars). Raising it means fewer round trips through a long document at the cost of a larger first read.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `RAG_HYBRID_BM25_WEIGHT`
 
 - Type: `float`
