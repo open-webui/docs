@@ -72,6 +72,12 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 :::
 </details>
 
+:::note `top_k` takes whole numbers
+
+`top_k` counts candidate tokens, so it accepts integers from 0 to 1000 and nothing else. Both its slider and its number box step by 1, and typing a fraction, a negative number or any other non-integer leaves the previous value in place instead of accepting it. This applies wherever the parameter is edited, per chat, per account or per model.
+
+:::
+
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 
 :::tip
