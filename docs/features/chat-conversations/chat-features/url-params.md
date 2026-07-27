@@ -30,6 +30,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**:
   - `/?models=model1,model2`: This initializes the chat with `model1` and `model2`.
   - `/?model=model1`: This sets `model1` as the sole model for the chat.
+- **Note**: Without either parameter, a new chat falls back to the configured [`DEFAULT_MODELS`](/reference/env-configuration#default_models) when nothing valid is selected, for instance when the model used last has since been removed or hidden. Passing one of these parameters suppresses that fallback, so the chat waits for the model you named rather than being switched to a default.
 
 ### 2. **YouTube Transcription**
 

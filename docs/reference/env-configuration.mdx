@@ -202,7 +202,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model.
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params) takes precedence and is left alone.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
