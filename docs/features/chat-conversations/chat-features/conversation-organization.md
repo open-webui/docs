@@ -52,7 +52,12 @@ A folder shows a count of the chats inside it you have not read yet, next to its
 - Unread state is about your own reading. Shared folders carry no badge, and chats belonging to someone else never show as unread to you, however recently they were touched.
 - A title generated automatically for a chat does not make it unread again.
 
-The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. The list keeps itself current while you look at it — a chat that starts or finishes generating updates in place, a chat that arrives in the folder brings the list back to the first page, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
+The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. Unread chats are listed first, each group ordered by recent activity, so what is waiting for you sits at the top of the folder rather than wherever its timestamp puts it. The list keeps itself current while you look at it — a chat that starts or finishes generating updates in place and re-sorts, a chat that arrives in the folder is inserted rather than triggering a full reload, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
+
+#### Marking Read and Unread
+
+- **Mark a chat unread**: open a chat's three-dot menu in the sidebar and choose **Mark as unread**. The chat gets its dot back, moves up with the other unread chats, and the folder count goes up again. Use it to keep a conversation on your radar after skimming it.
+- **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it; on a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
 
 ### Starting a Chat in a Folder
 
