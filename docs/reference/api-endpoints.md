@@ -76,6 +76,17 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 
+:::warning Reading `usage` from a reply that used tools
+
+A reply can involve several model calls, one per round of tool use, and the `usage` block distinguishes the two things you might want from that:
+
+- `prompt_tokens` and `completion_tokens` report the **most recent model call** only.
+- `input_tokens`, `output_tokens` and `total_tokens` report the **whole reply**, every call added up.
+
+Earlier releases put the running total in `prompt_tokens` / `completion_tokens` as well. If you bill or meter on those two fields, read `input_tokens` / `output_tokens` instead, or a tool-using reply will now be undercounted. The split exists because a context-window gauge needs the size of the latest request, while billing needs the sum, and one pair of fields cannot be both.
+
+:::
+
 #### Using Open WebUI tools, including MCP, from the API
 
 The chat completions endpoint can run server-side tools when you pass Open WebUI tool IDs in the request body. This includes native Python tools, OpenAPI tool servers, and MCP tool servers that are already configured and enabled in Open WebUI.
