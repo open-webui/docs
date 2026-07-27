@@ -15,6 +15,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Trigger a run manually with **Run Now**
 - Pause/resume automations without deleting them
 - Review execution history for each automation
+- Optionally file the chats a schedule creates into one of your [folders](/features/chat-conversations/chat-features/conversation-organization)
 - Optionally attach a terminal server and working directory for runs that need terminal context
 
 ## Access Control
@@ -23,6 +24,8 @@ Automations are permission-gated for non-admin users.
 
 - **Admins**: always have access to Automations
 - **Users**: require the **Features > Automations** permission
+
+Automations are private to the user who created them. Only the owner can open, edit, run, or delete one; every other request, including one from an administrator, is answered as if the automation did not exist. The **Features > Automations** permission decides whether someone may have automations at all, not whose automations they may reach.
 
 See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
 
@@ -60,8 +63,9 @@ Administrators can set global limits on automation usage for non-admin users. Th
    - **Instructions** (prompt)
    - **Model**
    - **Schedule**
-4. (Optional) Select a **Terminal** server and **Working Directory**
-5. Click **Create**
+4. (Optional) Choose a **Folder** for the chats the automation creates
+5. (Optional) Select a **Terminal** server and **Working Directory**
+6. Click **Create**
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
 
@@ -79,6 +83,17 @@ On the editor page, you can:
 - Review execution logs and open run chats
 
 Execution logs are paginated with infinite scroll in the editor, so large run histories load incrementally.
+
+## Folders
+
+An automation can be assigned a folder, and every chat it creates from then on is filed there instead of landing loose in the chat list. This keeps a recurring report or digest out of the way, and lets the folder's unread badge tell you how many runs you have not read yet.
+
+- Only your own folders can be chosen. A folder shared with you belongs to someone else and is not offered, and naming one anyway is rejected the same way an unknown folder is.
+- The folder is a filing destination, not a project context: the chat is placed in the folder, and the folder's system prompt and attached knowledge apply to it as they do to any other chat there.
+- The automation list can be filtered by folder, and each entry shows its folder as a small label.
+- Clearing the folder is a normal edit. The automation keeps running and its future chats go back to the ungrouped list; chats already created stay where they are.
+- Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running. The same happens if a folder disappears between two runs: the run notices, clears the setting, and creates its chat outside any folder rather than failing.
+- Imported automations keep their folder only if a folder with that ID exists in your account; otherwise they are imported without one.
 
 ## Scheduling
 
@@ -107,9 +122,9 @@ When using **Native Function Calling Mode** with a capable model, automations ca
 
 | Tool | What it does |
 |------|-------------|
-| `create_automation` | Create a new scheduled automation with a name, prompt, and RRULE schedule. Uses the current chat model. |
-| `update_automation` | Update an existing automation's name, prompt, schedule, or model |
-| `list_automations` | List your scheduled automations with status, schedule, and next runs |
+| `create_automation` | Create a new scheduled automation with a name, prompt, and RRULE schedule, and optionally a folder for its chats. Uses the current chat model. |
+| `update_automation` | Update an existing automation's name, prompt, schedule, model, or folder |
+| `list_automations` | List your scheduled automations with status, folder, schedule, and next runs |
 | `toggle_automation` | Pause or resume a scheduled automation |
 | `delete_automation` | Delete a scheduled automation and all its run history |
 
@@ -122,5 +137,7 @@ For chat-based automation tools to be available:
 3. **Automations** category must be enabled in the model's Builtin Tools settings (enabled by default)
 4. **`ENABLE_AUTOMATIONS`** must be enabled globally (enabled by default)
 5. The user must have the **Features > Automations** permission (admins always pass)
+
+The folder argument these tools accept is a folder ID, and it is checked against the folders you own: a folder that is not yours, or no longer exists, comes back as an error instead of being applied. On `update_automation` and `list_automations`, leaving the argument out keeps the automation's current folder or lists across all folders, while passing an empty string clears the folder or the filter.
 
 See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for full details on all builtin tools.

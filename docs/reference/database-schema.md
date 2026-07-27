@@ -273,6 +273,7 @@ Things to know about the chat_message table:
 | --------------- | ------------- | ----------------------- | --------------- |
 | id              | Text          | PRIMARY KEY             | Unique identifier (UUID) |
 | user_id         | Text          | NOT NULL                | Owner of the automation |
+| folder_id       | Text          | nullable                | Folder the runs' chats are created in |
 | name            | Text          | NOT NULL                | Automation display name |
 | data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional terminal config) |
 | meta            | JSON          | nullable                | Optional metadata |
@@ -286,6 +287,7 @@ Things to know about the automation table:
 
 - `next_run_at` is indexed for efficient due-run polling.
 - `data.rrule` defines recurrence and drives scheduler calculations.
+- `folder_id` was added in v0.11.0 (migration `959eaac8f909`) together with a (`user_id`, `folder_id`) index, so an owner's automations can be listed per folder. It is not a foreign key: deleting a folder clears the column on that owner's automations instead of deleting the automation, and a run whose folder has disappeared in the meantime clears the column and files its chat outside any folder.
 
 ## Automation Run Table
 

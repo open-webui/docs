@@ -42,6 +42,17 @@ Folders can be nested within other folders to create hierarchical organization:
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
+### Unread Badge
+
+A folder shows a count of the chats inside it you have not read yet, next to its name in the sidebar.
+
+- The count includes the folder's own chats and everything in its subfolders, so a collapsed parent still shows what is waiting below it.
+- A chat counts as unread when it has changed since you last opened it. Archived chats never count, and a chat whose reply is still being generated is not counted until the response has finished.
+- Opening a chat clears it from the count immediately, in every window you have open.
+- Shared folders do not show the badge.
+
+The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming.
+
 ### Starting a Chat in a Folder
 
 When you click on a folder in the sidebar, it becomes your **active workspace**:
