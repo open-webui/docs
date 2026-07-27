@@ -190,6 +190,8 @@ For a `llama.cpp` connection it looks like:
 
 In streaming mode (`stream: true`), Open WebUI processes tokens as they arrive and can detect reasoning blocks in real-time. This generally works well without additional configuration.
 
+Providers that send reasoning metadata alongside the answer rather than before it are handled too: reasoning that arrives after the response has started is folded into the thinking block above the answer instead of appearing beneath it, and metadata carrying no actual reasoning text no longer opens an empty thinking block.
+
 ### Non-Streaming Mode
 
 In non-streaming mode (`stream: false`), the entire response is returned at once. **This is where most parsing issues occur** because:
