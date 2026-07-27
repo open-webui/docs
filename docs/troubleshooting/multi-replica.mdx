@@ -92,6 +92,8 @@ Set `REDIS_URL` to point to your shared Redis instance. This enables the Pub/Sub
 REDIS_URL=redis://your-redis-host:6379/0
 ```
 
+For Ollama specifically, a chat sent to a model the replica has not seen no longer fails outright: the replica clears its model cache, re-reads the model list from the Ollama servers, and only reports the model as unknown if it is still missing. A model pulled or added while a replica was holding a stale list therefore becomes usable on the next request instead of after the cache expires.
+
 ### 4. Database Corruption / "Locked" Errors
 
 **Symptoms:**

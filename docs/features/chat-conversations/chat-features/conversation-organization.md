@@ -48,8 +48,9 @@ A folder shows a count of the chats inside it you have not read yet, next to its
 
 - The count includes the folder's own chats and everything in its subfolders, so a collapsed parent still shows what is waiting below it.
 - A chat counts as unread when it has changed since you last opened it. Archived chats never count, and a chat whose reply is still being generated is not counted until the response has finished.
-- Opening a chat clears it from the count immediately, in every window you have open.
-- Shared folders do not show the badge.
+- Opening a chat clears it from the count immediately, in every window you have open: the server recalculates your folder counts on the spot and pushes them to your other sessions rather than waiting for the next reload.
+- Unread state is about your own reading. Shared folders carry no badge, and chats belonging to someone else never show as unread to you, however recently they were touched.
+- A title generated automatically for a chat does not make it unread again.
 
 The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. The list keeps itself current while you look at it — a chat that starts or finishes generating updates in place, a chat that arrives in the folder brings the list back to the first page, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
 
