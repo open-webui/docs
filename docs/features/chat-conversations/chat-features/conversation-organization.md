@@ -107,6 +107,12 @@ Link **knowledge bases and files** to your folder:
 - This enables RAG (Retrieval Augmented Generation) for all folder conversations.
 - Knowledge is optional. Folders work for organization without any attached files.
 
+**Whose access decides what is attached.** A folder's knowledge is measured against the **folder owner**, not against whoever is editing or reading it:
+
+- Attaching a file, collection or note to a folder requires the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves — including their own private ones. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
+- Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being fed into the folder's chats, rather than continuing to serve content through the folder to everyone who can see it.
+- Entries that are not a file, collection or note, or that carry no ID, are ignored rather than passed through, since there is nothing to check them against.
+
 ## Sharing Folders
 
 Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
