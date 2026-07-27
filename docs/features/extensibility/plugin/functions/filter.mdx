@@ -1125,6 +1125,12 @@ async def stream(self, event: dict) -> dict:
 📖 **Before:** `"Hi 😊"`
 📖 **After:** `"Hi"`
 
+:::note Valves are resolved once per response, not once per chunk
+
+`stream()` runs for every fragment, so its valves are read from the database once when the response starts and reused for the rest of it, rather than being re-read thousands of times. Both `self.valves` and `__user__["valves"]` are therefore stable for the whole of one streamed reply: a valve edited while a reply is streaming takes effect on the next reply, not partway through the current one. `inlet()` and `outlet()` are unaffected, as each runs once anyway.
+
+:::
+
 ---
 
 #### **`outlet` Function (Output Post-Processing)**

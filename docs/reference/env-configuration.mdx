@@ -1045,6 +1045,12 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Default: Not set (plain-text logging)
 - Description: Controls the log output format. Set to `json` to switch all stdout logging to single-line JSON objects, suitable for log aggregators like Loki, Fluentd, CloudWatch, and Datadog. When set to `json`, the ASCII startup banner is also suppressed to keep the log stream parseable. Any other value (or unset) uses the default plain-text format. See the [JSON Logging documentation](/getting-started/advanced-topics/logging#structured-json-logging) for details on log fields and examples.
 
+#### `LOGURU_DIAGNOSE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Adds variable values to the tracebacks Open WebUI logs when an exception is caught. It is off by default because those annotations print the local variables at each frame, which in a request handler routinely means tokens, keys, prompts and user content ending up in your logs. Turn it on only while debugging a specific failure, on an instance whose logs you would treat as sensitive, and turn it off afterwards.
+
 #### `ENABLE_AUDIT_STDOUT`
 
 - Type: `bool`

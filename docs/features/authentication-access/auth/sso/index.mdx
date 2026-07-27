@@ -73,6 +73,8 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
 5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 
+**When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning names the provider in the logs. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
+
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
 For more information, check out the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/).
