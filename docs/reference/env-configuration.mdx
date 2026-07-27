@@ -4127,6 +4127,7 @@ When disabled (default), Open WebUI blocks web fetch requests to URLs that resol
 
 - IPv4 private ranges (`10.x.x.x`, `172.16.x.x`-`172.31.x.x`, `192.168.x.x`, `127.x.x.x`)
 - IPv6 private ranges
+- IPv6 addresses that carry a private IPv4 address inside them, whatever the wrapper: IPv4-mapped (`::ffff:127.0.0.1`), IPv4-compatible (`::10.0.0.1`), 6to4 (`2002::/16`), Teredo (`2001::/32`), and NAT64 (`64:ff9b::/96` and `64:ff9b:1::/48`). These forms are globally routable as IPv6 while pointing at a loopback, RFC 1918 or metadata address, so each embedded address is extracted and checked on its own
 
 This is a **Server-Side Request Forgery (SSRF) protection**. Without this safeguard, a malicious user could provide URLs that appear external but resolve to internal addresses, potentially exposing internal services, cloud metadata endpoints, or other sensitive resources.
 

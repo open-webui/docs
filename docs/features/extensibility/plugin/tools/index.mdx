@@ -329,6 +329,15 @@ The **Files** category is the agentic alternative to putting an uploaded file's 
 
 The model then works the file the way it works a knowledge base: `list_chat_files` to see what is there, `query_chat_files` for meaning, `grep_chat_files` for literal strings and line numbers, `view_file` to read a passage. Chunks returned by `query_chat_files` are rendered as citations, the same as knowledge results. Every file is still re-checked against the user's own access before it is read, so an attachment they can no longer open is skipped rather than searched.
 
+#### Images in Tool Results
+
+A tool can return images as well as text — `generate_image` and `edit_image` do, and so can a custom tool. How that reaches the model depends on the provider:
+
+- On the **Responses API**, the image rides along inside the tool result, where it belongs.
+- On **Chat Completions**, a tool message may only carry text. The image is therefore split off: the tool result is delivered as plain text, and the images that came with it follow in a short user message that hands them to the model for analysis.
+
+The effect is that a model on a Chat Completions provider can actually look at what a tool produced — generate an image and then critique or edit it — instead of receiving a result it cannot open. Nothing extra is shown in the conversation; the images were already rendered from the tool result itself.
+
 #### Knowledge Tool Availability (At a Glance)
 
 Use this quick matrix instead of memorizing per-row caveats.
