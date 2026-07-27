@@ -25,6 +25,8 @@ The model uses two built-in tools to manage the list:
 - `create_tasks`: called once at the start of multi-step work to lay out the full checklist.
 - `update_task`: called after finishing each step, to mark a single task by id as `pending`, `in_progress`, `completed`, or `cancelled`.
 
+Because the list is stored on the chat itself, both tools need a saved chat. In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) or a [channel](/features/channels) there is no chat record to write to, so the tools are not offered to the model at all and it plans in plain text instead.
+
 When these tools are used:
 
 - Tasks are stored at the chat level

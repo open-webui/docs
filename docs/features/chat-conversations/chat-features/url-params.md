@@ -80,6 +80,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?temporary-chat=true`
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
   - **Note**: Document processing in temporary chats is frontend-only for privacy. Complex files requiring backend parsing (e.g., DOCX) may not be fully supported.
+  - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so nothing the run produces — messages, generated images, status updates, titles, or tags — is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), are unavailable there. Chats in [channels](/features/channels) are treated the same way.
 
 ### 9. **Code Interpreter**
 

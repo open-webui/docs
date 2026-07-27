@@ -51,7 +51,7 @@ A folder shows a count of the chats inside it you have not read yet, next to its
 - Opening a chat clears it from the count immediately, in every window you have open.
 - Shared folders do not show the badge.
 
-The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming.
+The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. The list keeps itself current while you look at it — a chat that starts or finishes generating updates in place, a chat that arrives in the folder brings the list back to the first page, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
 
 ### Starting a Chat in a Folder
 
