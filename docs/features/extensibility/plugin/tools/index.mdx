@@ -348,6 +348,14 @@ Use this quick matrix instead of memorizing per-row caveats.
 
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
+"Attached knowledge" is not only what the model carries. Three sources are pooled, de-duplicated, and treated the same by the matrix above:
+
+- knowledge attached to the model in its editor,
+- knowledge attached to the [folder](/features/chat-conversations/chat-features/conversation-organization) the chat sits in,
+- knowledge bases and notes attached to the chat itself — counted only when the model's **File Context** capability is off, since with it on the content is already in the conversation.
+
+When the **Knowledge Base** category is enabled and any of these are present, the model's system prompt gains an `<attached_knowledge>` block listing each item's type, ID, name, and which of the three it came from. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
+
 :::info `kb_exec` replaces the matrix when enabled
 When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI injects `kb_exec` instead of the file-oriented tools listed above. Still injected alongside it: `query_knowledge_files` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
 :::

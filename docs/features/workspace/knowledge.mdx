@@ -95,6 +95,8 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | `view_knowledge_file` | ✅ | ✅ | Read file content from any accessible KB |
 | `view_note` | ✅ | ❌ | Read attached notes |
 
+"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, so it can point a query at one knowledge base rather than searching blind.
+
 The key split: `list_knowledge` and `list_knowledge_bases` are mutually exclusive. Attaching a KB scopes the model to only those documents. Leaving it unscoped lets the model discover everything the user has access to.
 
 #### When to prefer `grep_knowledge_files` over `query_knowledge_files`
