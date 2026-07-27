@@ -89,7 +89,7 @@ For example, granting the "Marketing" group read access and a specific editor us
 
 When access grants span many groups and resources, it's easy to lose track of who can see what. Open WebUI ships an admin-only **Preview Access** view that resolves every access grant for a specific user or group and lists the result in one place, no need to crawl through individual resource pages.
 
-**For a user**: In **Admin Panel > Users**, hover over a non-admin user row and click the eye-style **Preview Access** button. The modal shows every model, knowledge base, and tool the user can read, aggregated across all of their group memberships and any direct user grants.
+**For a user**: In **Admin Panel > Users**, hover over a non-admin user row and click the eye-style **Preview Access** button. The modal shows every model, knowledge base, and tool the user can read, aggregated across all of their group memberships and any direct user grants, **plus the resources they own themselves**, which they can always read without a grant existing for them. Models that have been deactivated are left out, since nobody reaches them.
 
 **For a group**: In **Admin Panel > Users > Groups**, open the group editor and use the **Preview Group Access** panel. The output is the same shape (models, knowledge, tools), scoped to just that group's grants.
 

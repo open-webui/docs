@@ -108,6 +108,14 @@ Supported schedule modes:
 
 Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
 
+A few rules about how a custom rule is read:
+
+- **Sub-daily rules snap to the clock.** A `SECONDLY`, `MINUTELY` or `HOURLY` rule with no `DTSTART` is anchored to the clock, so every 5 minutes means `:00`, `:05`, `:10` rather than five minutes after you happened to save it.
+- **A `DTSTART` is honored where it is still meaningful.** Give the rule a start time and the schedule counts from there, keeping any phase you intended. If that start lies so far in the past that following it literally would mean walking through more than 100,000 occurrences to reach now, the rule falls back to clock alignment instead of stalling.
+- **`INTERVAL` must be a positive whole number.** Zero or a negative value is rejected rather than quietly treated as one.
+- **One rule per schedule.** Multiple `RRULE` lines are rejected, and `EXRULE` is not supported at all; build the exclusion into the rule itself.
+- Property names are read case-insensitively, so `freq=daily` behaves like `FREQ=DAILY`.
+
 ## Notes
 
 - Automations run in the background worker loop on a polling interval.
