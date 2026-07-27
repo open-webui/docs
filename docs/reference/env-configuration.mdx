@@ -106,6 +106,12 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Description: Toggles user account creation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_INITIAL_ADMIN_SIGNUP`
+
+- Type: `bool`
+- Default: `False`
+- Description: Allows the **first** account to be created through `POST /api/v1/auths/signup` on an instance whose login form is turned off. It applies only while no user exists; once there is one, ordinary signup rules take over and this has no further effect. Without it, an instance configured for SSO only (`ENABLE_LOGIN_FORM=false`) has no way to create its first administrator through the API, which is awkward after a database reset. Leave it off unless you are bootstrapping such an instance, and turn it off again afterwards.
+
 #### `ENABLE_SIGNUP_PASSWORD_CONFIRMATION`
 
 - Type: `bool`
@@ -1096,6 +1102,12 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
 - Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses.
+
+#### `ENABLE_AUDIT_GET_REQUESTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Also audit `GET` requests. By default only the methods that change something (`PUT`, `PATCH`, `POST`, `DELETE`) are recorded, since reads are far more numerous and would dominate the log. Turn it on when you need to see who **read** what, accepting a much larger volume, and note that at `REQUEST_RESPONSE` level it means response bodies for every read as well.
 
 #### `MAX_BODY_LOG_SIZE`
 
@@ -6581,6 +6593,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to edit chats.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_CHAT_EXPORT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file. Shown as **Export Chat** in the group permission list.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
