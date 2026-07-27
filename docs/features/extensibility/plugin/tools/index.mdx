@@ -269,6 +269,11 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, optional `line_numbers`). |
 | `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
+| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases.* |
+| `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
+| `query_chat_files` | Semantic / RAG search across the attached files, or one file when given its ID. Results are returned as cited chunks. |
+| `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. |
+| `view_file` | Read one of the attached files by ID, with character pagination or a line range. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
@@ -317,6 +322,12 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
+
+#### Attached Chat Files
+
+The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but does **not** use file context — when file context is on, the content is already in the conversation and the tools would be redundant — and only while the chat actually has attachments.
+
+The model then works the file the way it works a knowledge base: `list_chat_files` to see what is there, `query_chat_files` for meaning, `grep_chat_files` for literal strings and line numbers, `view_file` to read a passage. Chunks returned by `query_chat_files` are rendered as citations, the same as knowledge results. Every file is still re-checked against the user's own access before it is read, so an attachment they can no longer open is skipped rather than searched.
 
 #### Knowledge Tool Availability (At a Glance)
 

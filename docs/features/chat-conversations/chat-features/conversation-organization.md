@@ -58,6 +58,7 @@ The folder's chat list marks the same state per chat: a dot for an unread conver
 
 - **Mark a chat unread**: open a chat's three-dot menu in the sidebar and choose **Mark as unread**. The chat gets its dot back, moves up with the other unread chats, and the folder count goes up again. Use it to keep a conversation on your radar after skimming it.
 - **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it; on a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
+- **Mark everything read**: the **Chats** section header in the sidebar has its own menu with **Mark all as read**, which clears every unread chat you own — loose chats and chats in folders alike — and zeroes all the folder badges at once. Archived chats are again left alone.
 
 ### Starting a Chat in a Folder
 

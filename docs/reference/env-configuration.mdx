@@ -871,6 +871,18 @@ allowing the client to wait indefinitely.
 
 :::
 
+#### `AIOHTTP_CLIENT_STREAM_IDLE_TIMEOUT`
+
+- Type: `int`
+- Default: unset (no idle cap)
+- Description: Maximum number of seconds a **streaming** request may go without receiving a chunk before it is aborted. This is an idle cap between chunks, not a cap on the whole response, so a long answer that keeps producing tokens is never cut off — only a stream that has gone silent is. `AIOHTTP_CLIENT_TIMEOUT` still bounds the total duration.
+
+:::info
+
+Leave it unset to keep the previous behavior, where a provider that stops sending data mid-stream holds the connection until the total timeout expires. Set it to something a little above your slowest expected gap between tokens (for example `60`) to fail fast on a stalled upstream. Non-numeric values and anything zero or below are treated as unset.
+
+:::
+
 #### `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST`
 
 - Type: `int`
