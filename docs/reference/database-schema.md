@@ -774,6 +774,7 @@ Things to know about the user table:
 - Uses UUID for primary key
 - One-to-One relationship with `auth` table (shared id)
 - One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
+- `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
 - `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 
 The `scim` field's expected structure:

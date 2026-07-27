@@ -452,6 +452,42 @@ This will apply all pending migrations, including creating any missing tables. A
 
 If you see additional errors during the manual migration (such as ["table already exists"](#table-already-exists-errors)), check the other troubleshooting sections below for specific error messages.
 
+### "Duplicate Emails" Migration Failure
+
+**Symptom:** Upgrading stops with:
+
+```
+RuntimeError: Cannot add unique normalized user email index because duplicate emails exist:
+someone@example.com (x2). Merge or remove the duplicate users and rerun migrations.
+```
+
+**Cause:** Open WebUI now enforces one account per email address, compared case-insensitively, through a unique index on the lower-cased `email` column of the `user` table. Older versions did not, so an instance can have arrived at `Someone@Example.com` and `someone@example.com` as two separate accounts, typically from a mix of sign-in methods. Rather than picking a winner for you, the migration refuses to run and names every address involved.
+
+**Resolution:** Decide which account survives for each address listed, then move anything worth keeping onto it before removing the others.
+
+1. List the affected accounts, so you can see which is which:
+
+   ```sql
+   SELECT id, email, name, role, created_at, last_active_at
+   FROM "user"
+   WHERE lower(email) IN (SELECT lower(email) FROM "user" GROUP BY lower(email) HAVING count(*) > 1)
+   ORDER BY lower(email), created_at;
+   ```
+
+2. Check what each duplicate owns before deleting it, since chats, folders, notes, files and workspace items all reference the owner's `id`:
+
+   ```sql
+   SELECT (SELECT count(*) FROM chat WHERE user_id = '<id>') AS chats,
+          (SELECT count(*) FROM folder WHERE user_id = '<id>') AS folders,
+          (SELECT count(*) FROM note WHERE user_id = '<id>') AS notes;
+   ```
+
+3. Either reassign that content to the surviving account by updating `user_id`, or accept its loss, then delete the duplicate through the **Admin Panel > Users** list, which removes the matching `auth` row along with it.
+
+4. Rerun the upgrade.
+
+Keeping an emptied duplicate around is not an option: the index covers every row where `email` is not null, so the migration keeps failing until one account per address remains.
+
 ### "Table Already Exists" Errors
 
 **Symptom:** Running `alembic upgrade head` fails with:
