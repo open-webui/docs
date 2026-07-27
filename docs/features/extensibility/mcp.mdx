@@ -157,8 +157,12 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 | `{{USER_NAME}}` | The calling user's display name. |
 | `{{USER_EMAIL}}` | The calling user's email address. |
 | `{{USER_ROLE}}` | The calling user's role (e.g. `admin`, `user`). |
+| `{{USER_GROUPS}}` | Comma-separated names of the groups the caller belongs to (empty if none). |
+| `{{USER_GROUP_IDS}}` | Comma-separated IDs of those same groups. |
 | `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |
 | `{{MESSAGE_ID}}` | The current message ID (empty in non-chat contexts). |
+
+The group tokens are resolved with a membership lookup that only runs when a header value actually contains one of them, so connections that do not use them are unaffected. Use them to let a tool server authorize by group instead of by individual user.
 
 Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 

@@ -30,14 +30,14 @@ The Code Interpreter is a model capability that enables LLMs to write and execut
 ### Enabling Code Interpreter
 
 **Per-Model Setup (Admin):**
-1. Go to **Admin Panel → Models**
+1. Go to **Settings > Admin > AI > Models**
 2. Select the model you want to configure
 3. Under **Capabilities**, enable **Code Interpreter**
 4. Save changes
 
 **Global Configuration (Admin Panel):**
 
-These settings can be configured at **Admin Panel → Settings → Code Execution**:
+These settings can be configured at **Settings → Admin → Tools → Code Execution**:
 - Enable/disable code interpreter
 - Select engine: **Pyodide (legacy)** or **Jupyter (legacy)** (for full Python and shell access, use [Open Terminal](/features/open-terminal) instead)
 - Configure Jupyter connection settings
@@ -50,7 +50,7 @@ These settings can be configured at **Admin Panel → Settings → Code Executio
 | `ENABLE_CODE_INTERPRETER` | `true` | Enable/disable code interpreter globally |
 | `CODE_INTERPRETER_ENGINE` | `pyodide` | Engine to use: `pyodide` (browser, legacy) or `jupyter` (server, legacy). For full Python and shell access, use [Open Terminal](/features/open-terminal) instead. |
 | `CODE_INTERPRETER_PROMPT_TEMPLATE` | (built-in) | Custom prompt template for code interpreter |
-| `CODE_INTERPRETER_BLACKLISTED_MODULES` | `""` | Comma-separated list of blocked Python modules |
+| `CODE_INTERPRETER_BLOCKED_MODULES` | `""` | Comma-separated module names to refuse importing. Empty by default. Blocks only direct top-level imports and is an opt-in convenience filter, not a security boundary; see the [reference](/reference/env-configuration#code_interpreter_blocked_modules). |
 
 For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/dev-tools/jupyter) tutorial.
 

@@ -71,7 +71,8 @@ export function prepareDoc(doc) {
 
 export function normalizeQuery(input) {
 	let query = input.trim();
-	const quoted = query.length > 2 && query.startsWith('"') && query.endsWith('"');
+	const quoted =
+		query.length > 2 && query.startsWith('"') && query.endsWith('"');
 	if (quoted) {
 		query = query.slice(1, -1);
 	}
@@ -118,7 +119,10 @@ function makeSnippet(text, index, length) {
 	const prefix = start > 0 ? "… " : "";
 	const suffix = end < text.length ? " …" : "";
 	const body = text.slice(start, end).replace(/\n/g, " ");
-	return { snippet: prefix + body + suffix, matchStart: prefix.length + (index - start) };
+	return {
+		snippet: prefix + body + suffix,
+		matchStart: prefix.length + (index - start),
+	};
 }
 
 export function searchExact(docs, query, limit) {
@@ -130,13 +134,19 @@ export function searchExact(docs, query, limit) {
 			continue;
 		}
 		let count = 0;
-		for (let i = firstIndex; i !== -1 && count < 50; i = doc.matchable.indexOf(q, i + q.length)) {
+		for (
+			let i = firstIndex;
+			i !== -1 && count < 50;
+			i = doc.matchable.indexOf(q, i + q.length)
+		) {
 			count += 1;
 		}
 		const titleHit = doc.title.toLowerCase().includes(q);
 		hits.push({ doc, firstIndex, score: count + (titleHit ? 100 : 0) });
 	}
-	hits.sort((a, b) => b.score - a.score || a.doc.path.length - b.doc.path.length);
+	hits.sort(
+		(a, b) => b.score - a.score || a.doc.path.length - b.doc.path.length
+	);
 
 	return hits.slice(0, limit).map(({ doc, firstIndex }) => {
 		const { anchor, heading } = nearestHeadingAnchor(doc.text, firstIndex);
@@ -182,5 +192,7 @@ export async function searchByWorker(baseUrl, searchContext, input, limit) {
 	}
 	const routeKey = (r) => r.document.u.split("?")[0] + (r.document.h || "");
 	const seen = new Set(exact.map(routeKey));
-	return exact.concat(tokenResults.filter((r) => !seen.has(routeKey(r)))).slice(0, limit);
+	return exact
+		.concat(tokenResults.filter((r) => !seen.has(routeKey(r))))
+		.slice(0, limit);
 }

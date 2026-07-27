@@ -17,7 +17,7 @@ Open WebUI is multi-user from day one. Even if you are the only person using it,
 
 | | |
 | :--- | :--- |
-| **Location** | Profile avatar > **Admin Settings**, or **Admin Panel > Settings** |
+| **Location** | Profile avatar > **Settings**, then the **Admin** section |
 | **Access** | Administrators only |
 | **Scope** | The entire instance and all users |
 

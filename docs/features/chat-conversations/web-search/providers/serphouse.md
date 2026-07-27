@@ -41,7 +41,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 ### 2. Configure Open WebUI
 
 1. Log in to Open WebUI with an admin account.
-2. Open **Admin Panel → Settings → Web Search**.
+2. Open **Settings → Admin → Tools → Web Search**.
 3. Enable **Web Search** by toggling it **On**.
 4. Select **serphouse** from the **Web Search Engine** dropdown.
 5. Paste your SERPHouse API key into the **SERPHouse API Key** field.

@@ -40,7 +40,7 @@ Obtain an API key for the Microsoft Web IQ API from your Microsoft API provider 
 ### 2. Configure Open WebUI
 
 1. Log in to Open WebUI with an admin account.
-2. Open **Admin Panel → Settings → Web Search**.
+2. Open **Settings → Admin → Tools → Web Search**.
 3. Enable **Web Search** by toggling it **On**.
 4. Select **microsoft_web_iq** from the **Web Search Engine** dropdown.
 5. Paste your API key into the **Microsoft Web IQ API Key** field.

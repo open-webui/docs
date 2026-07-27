@@ -38,6 +38,20 @@ All analytics data is derived from the message history stored in your instance's
 
 ---
 
+## Personal Usage
+
+The dashboard described here is the instance-wide admin view. Separately, **every user has a personal usage view of their own activity** at **Settings > Usage**. It requires no admin role and no configuration.
+
+It is scoped strictly to the signed-in user's own data:
+
+- Token totals (input and output), both lifetime and for the selected period
+- Message and chat counts, and the number of days they were active
+- An activity heatmap, viewable by day, by week, or as a cumulative total
+- Current and longest activity streaks
+- Their most-used models and tools
+
+The period is selectable, and the data is bucketed in the user's own timezone. Because it only ever reports the requesting user's own activity, it exposes nothing about anyone else's.
+
 ## Dashboard Features
 
 ### Time Period Selection
@@ -321,6 +335,12 @@ GET /api/v1/analytics/tokens
 GET /api/v1/analytics/models/{model_id}/chats    # Get chats using this model
 GET /api/v1/analytics/models/{model_id}/overview # Get feedback history and tags
 ```
+
+**Personal Usage Endpoint** (any signed-in user, returns only their own data):
+```
+GET /api/v1/users/usage
+```
+Accepts either `days` (7-732) or an explicit `start_date` / `end_date` range, and buckets results in the requesting user's timezone. This one is not admin-gated, because it reports nothing beyond the caller's own activity.
 
 **Common Query Parameters:**
 

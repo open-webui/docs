@@ -50,7 +50,7 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
 | **Prompts Import** | *(Requires Prompts Access)* Ability to import prompts. |
 | **Prompts Export** | *(Requires Prompts Access)* Ability to export prompts. |
-| **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. |
+| **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) is `false`, since the Tools workspace does not exist in that case. |
 | **Tools Import** | *(Requires Tools Access)* Ability to import tools. |
 | **Tools Export** | *(Requires Tools Access)* Ability to export tools. |
 
@@ -81,7 +81,10 @@ Controls what users can share with the community or make public.
 | **Public Notes** | *(Requires Share Notes)* Ability to make Notes public. |
 | **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
 | **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
+| **Chats Open Sharing** | *(Requires Share Chat)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
+| **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, individual-user grants are stripped from create/update payloads; group and public sharing are unaffected. Admins are always exempt. |
+| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. Set this per group: the global default currently does not persist, see the [note in the reference](/reference/env-configuration#user_permissions_access_grants_allow_groups). |
 
 ### 3. Chat Permissions
 Controls the features available to the user inside the chat interface.
@@ -119,13 +122,23 @@ Controls access to broad platform capabilities.
 | **Channels** | Access to the "Channels" feature. |
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
-| **Image Generation** | Ability to use Image Generation tools. |
+| **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
 | **Memories** | Access to the Memories feature for persistent user context. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
 | **User Webhooks** | Ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default. |
+
+:::info Image Generation and the Active Model
+
+Some image backends, such as Automatic1111, keep a single image model loaded and generate with whichever one is active, so selecting a model is the same action as switching the loaded one.
+
+On Automatic1111 that switch is restricted to administrators. A non-admin with **Features > Image Generation** cannot change the instance-wide model: their model selection is ignored and the image is generated on the currently configured checkpoint. Only an administrator's request changes the active model, and when it does, it changes it for everyone until it is changed again.
+
+Backends that accept a model with each request are not affected: a user's choice applies only to their own generation.
+
+:::
 
 :::info Automations Permission Scope
 
@@ -160,7 +173,7 @@ Controls access to user settings areas.
 
 For API key creation:
 
-1.  **Global Toggle Required**: The feature must be enabled globally in **Admin Settings > General > Enable API Keys**. If this is off, *no one* can generate keys.
+1.  **Global Toggle Required**: The feature must be enabled globally in **Admin Settings > General > API Keys**. If this is off, *no one* can generate keys.
 2.  **Permission Check for Non-Admins**: Users with the `user` role must have the `features.api_keys` permission.
 3.  **Admins Are Exempt from `features.api_keys`**: Users with the `admin` role can generate API keys when API keys are globally enabled, even without that specific permission.
 

@@ -120,7 +120,7 @@ services:
 
 ## Response Splitting
 
-When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Admin Panel > Settings > Audio** under **Response Splitting**.
+When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Admin > Experience > Audio** under **Response Splitting**.
 
 | Option | Description |
 |--------|-------------|

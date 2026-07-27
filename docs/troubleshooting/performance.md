@@ -32,7 +32,7 @@ By default, Open WebUI automates background tasks like title generation, tagging
 **Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid using large reasoning models (like o1, r1, or Claude) as they are too slow and expensive for simple background tasks.
 
 **Configuration:**
-There are two separate settings in **Admin Panel > Settings > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
+There are two separate settings in **Settings > Admin > Experience > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
 *   **Task Model (External)**: Used when you are chatting with an external model (e.g., OpenAI).
 *   **Task Model (Local)**: Used when you are chatting with a locally hosted model (e.g., Ollama).
 
@@ -51,7 +51,7 @@ Drastically reduces startup time and API calls to external providers.
 If you are using **OpenRouter** or any provider with hundreds/thousands of models, enabling model caching is **highly recommended**. Without caching, initial page loads can take **10-15+ seconds** as the application queries all available models. Enabling the cache reduces this to near-instant.
 :::
 
-- **Admin Panel**: `Settings > Connections > Cache Base Model List`
+- **Admin Panel**: `Settings > Admin > AI > Connections > Cache Base Model List`
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
   *   *Note*: Caches the list of models in memory. Only refreshes on App Restart or when clicking **Save** in Connections settings.
 
@@ -204,6 +204,19 @@ Increasing the chunk size buffers these updates, sending them to the client in l
 
 - **Env Var**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7`
   *   *Recommendation*: Set to **5-10** for high-concurrency instances.
+
+#### HTTP Response Compression
+By default, Open WebUI compresses HTTP responses (JSON API responses and the static JS/CSS assets of the web UI) with ZStd/Brotli/Gzip inside the application itself. This costs CPU on every worker: profiling (py-spy) of production deployments shows roughly **3–4% of worker CPU time** spent in the compression middleware. Disabling it frees that CPU and slightly reduces response latency.
+
+*   **What it does NOT affect**: WebSocket (Socket.IO) traffic and streaming chat responses (SSE) are **never** compressed by this middleware, so the chat streaming hot path is unaffected either way. Only regular HTTP responses larger than 500 bytes with compressible content types are involved.
+*   **When to disable**: Your reverse proxy / load balancer / CDN already compresses responses (preferred: enable it there and turn it off in the app), or your users reach the instance over a fast/local network where the extra transfer size doesn't matter.
+*   **When to keep it on**: The backend is directly internet-facing with nothing in front of it that compresses, and users connect over slow or mobile links. Uncompressed, the first (uncached) page load transfers several megabytes more, and large payloads like long chat histories or big model lists grow 5–10×.
+
+- **Env Var**: `ENABLE_COMPRESSION_MIDDLEWARE=false`
+
+*   **Recommended companion**: When you disable app-side compression in favor of the proxy, also have the proxy **cache the static assets aggressively**. Open WebUI's JS/CSS bundles live under `/_app/immutable/` with content-hashed filenames, so they can be cached with `Cache-Control: public, max-age=31536000, immutable` and served from the proxy cache without ever hitting a worker — which eliminates the "larger first page load" downside for every visit after the first. See [Scaling → Pair It with Static Asset Caching at the Proxy](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for a ready-made Nginx snippet.
+
+See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
 #### Thread Pool Size
 Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count. Threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
@@ -401,7 +414,7 @@ Open WebUI loads local ML models for features like RAG and STT. **This section i
     *   **Option B (Best Performance)**: Use an **External API** (OpenAI/Cloud).
 
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Documents > Embedding Model Engine`
+    *   **Admin Panel**: `Settings > Admin > Tools > Documents > Embedding Model Engine`
     *   **Env Var**: `RAG_EMBEDDING_ENGINE=openai` (to offload completely)
 
 #### Speech-to-Text (STT)
@@ -498,6 +511,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 9.  **Task Model**: External/Hosted (Offload compute).
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
+12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
 
 #### Redis Tuning
 
@@ -561,6 +575,7 @@ For detailed information on all available variables, see the [Environment Config
 | `DATABASE_URL` | [Database URL](/reference/env-configuration#database_url) |
 | `ENABLE_REALTIME_CHAT_SAVE` | [Realtime Chat Save](/reference/env-configuration#enable_realtime_chat_save) |
 | `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
+| `ENABLE_COMPRESSION_MIDDLEWARE` | [HTTP Response Compression](/reference/env-configuration#enable_compression_middleware) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
 | `CONTENT_EXTRACTION_ENGINE` | [Content Extraction Engine](/reference/env-configuration#content_extraction_engine) |

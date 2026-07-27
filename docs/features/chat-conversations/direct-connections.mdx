@@ -36,7 +36,7 @@ With **Direct Connections**, the browser communicates directly with the API prov
 ## Prerequisites
 
 1.  **Admin Enablement**: The administrator must enable this feature globally.
-    *   **Admin Panel > Settings > Connections > Direct Connections**: Toggle **On**.
+    *   **Settings > Admin > AI > Connections > Direct Connections**: Toggle **On**.
     *   Alternatively, set the environment variable: `ENABLE_DIRECT_CONNECTIONS=true`.
 2.  **CORS Configuration**: Since the browser is making the request, the API provider must have **Cross-Origin Resource Sharing (CORS)** configured to allow requests from your Open WebUI domain.
     *   *Note: Many strict providers (like official OpenAI) might block direct browser requests due to CORS policies. This feature is often best used with flexible providers or internal API gateways.*

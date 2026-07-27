@@ -53,7 +53,7 @@ User settings override admin defaults. If you're having issues, check both locat
 
 If you have an OpenAI API key, this is the simplest setup:
 
-**In Admin Panel → Settings → Audio:**
+**In Settings → Admin → Experience → Audio:**
 - **STT Engine:** `OpenAI` | **Model:** `whisper-1`
 - **TTS Engine:** `OpenAI` | **Model:** `tts-1` | **Voice:** `alloy`
 - Enter your OpenAI API key in both sections
@@ -75,7 +75,7 @@ environment:
 
 If you prefer Mistral's audio stack:
 
-**In Admin Panel → Settings → Audio:**
+**In Settings → Admin → Experience → Audio:**
 - **STT Engine:** `MistralAI` | **Model:** `voxtral-mini-latest` (or leave empty)
 - **TTS Engine:** `MistralAI` | **Model:** `mistral-tts-latest` (or leave empty) | **Voice:** choose from list
 - Enter your Mistral API key in both sections
@@ -240,7 +240,7 @@ services:
 ### TTS Voice Not Found / No Audio Output
 
 **Checklist:**
-1. Verify the TTS engine is correctly configured in **Admin Panel → Settings → Audio**
+1. Verify the TTS engine is correctly configured in **Settings → Admin → Experience → Audio**
 2. Check that the voice name matches an available voice for your chosen engine
 3. For external TTS services, verify the API Base URL is accessible from the Open WebUI container
 4. Check container logs for any error messages
@@ -356,7 +356,7 @@ If your STT or TTS engine is hosted behind a self-signed certificate or an inter
 
 ElevenLabs is natively supported in Open WebUI. To configure:
 
-1. Go to **Admin Panel → Settings → Audio**
+1. Go to **Settings → Admin → Experience → Audio**
 2. Select **ElevenLabs** as the TTS engine
 3. Enter your ElevenLabs API key
 4. Select the voice and model

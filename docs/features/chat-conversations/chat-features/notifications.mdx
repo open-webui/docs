@@ -1,0 +1,93 @@
+---
+sidebar_position: 15
+title: "Notifications"
+---
+
+# Notifications
+
+Notifications send a webhook to somewhere you actually watch, such as Slack, Discord or your own endpoint, when something happens in Open WebUI that you care about. Each user sets up their own **targets** and chooses which events reach them, so a long answer, a channel message or a calendar alert can find you after you have moved on.
+
+Notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
+
+This is **outbound webhooks only**. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated, and handled by your browser.
+
+:::note "Always Play Notification Sound" no longer has a toggle
+A separate **Always Play Notification Sound** setting used to sit under **Settings > Interface**. Its control is gone, but the setting is still honoured: if you had it switched on, sounds keep playing always rather than only when you are away, and there is currently no way to switch it back off from the interface.
+:::
+
+## Enabling Notifications
+
+| Requirement | Where |
+|---|---|
+| [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) | **Settings > Admin > System > General**, the **User Webhooks** toggle |
+| The `features.webhooks` permission ([`USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`](/reference/env-configuration#user_permissions_features_user_webhooks), default: off) | **Admin Panel > Users > Groups > Permissions** |
+
+Admins always hold the permission. While the feature is off, the endpoints report the feature as absent rather than forbidden, so it stays hidden rather than looking blocked.
+
+## Targets
+
+A target is a webhook URL plus the events it should receive. Set them up in **Settings > Notifications**. You can have several, for example a work Slack for channel messages and a personal endpoint for finished chats, and one is marked the default.
+
+Each target has:
+
+- **A URL**, validated when saved. It is **masked when read back**, showing only the scheme, host and the last few characters, so a stored webhook secret is not handed out again by the API or shown in full in the interface. Saving a masked URL unchanged keeps the stored one.
+- **Events** it subscribes to.
+- **Enabled**, to pause a target without deleting it.
+- **Automatic Delivery**, either `away` or `always`.
+
+Use **Send Test** to fire a test notification and confirm the endpoint works.
+
+### Events
+
+Four events can be subscribed to:
+
+| Event | Fires when |
+|---|---|
+| `chat.finished` | A chat response finishes generating. |
+| `chat.failed` | A chat response fails. |
+| `channel.message` | A message arrives in a channel you receive notifications for. |
+| `calendar.alert` | A calendar event alert triggers. |
+
+### Delivery: away or always
+
+- **`away`** (the default) only sends when you are **not currently active**, so you are not pinged about things you are already watching. You count as active if you have used Open WebUI in roughly the last three minutes.
+- **`always`** sends regardless.
+
+`channel.message` is the exception: it does not check activity and is delivered either way, since a message from someone else is worth having even while you are online.
+
+## The `notify` Tool
+
+When the **Notifications** builtin tools category is enabled on a model, the model can send you a notification itself by calling `notify`, with a message, an optional title, and an optional target id. Leaving the target empty uses your default target.
+
+This is deliberately separate from event subscriptions:
+
+:::info `notify` ignores events and delivery mode
+A notification the model sends goes to an enabled target whether or not that target subscribes to any event, and whether or not you are currently active. Event subscriptions and `away` delivery only govern **automatic** notifications. If you do not want the model notifying you, disable the target or turn off the **Notifications** category for the model.
+:::
+
+Pairing this with [Timers](/features/chat-conversations/chat-features/timers) is the usual way to be told about something later: the timer fires a prompt back into the chat, and the model calls `notify` when it has an answer.
+
+## Upgrading From the Old Notification Webhook
+
+Earlier versions had a single **Notification Webhook** URL under **Settings > Account** that fired on chat responses. That field is replaced by targets, and an existing URL is **migrated automatically** into a target subscribed to all four events, so notifications keep arriving without any action.
+
+Two changes are worth knowing about:
+
+- Channel and calendar notifications are no longer sent straight from those features. They now flow through the notification system, so a target's event subscriptions and delivery mode decide whether they reach you.
+- Notification settings now live in **Settings > Notifications** rather than **Settings > Account**.
+
+## Managing Notifications from Chat
+
+### Available tools
+
+| Tool | Purpose |
+|---|---|
+| `notify` | Send a notification to one of your configured targets. |
+
+### Requirements
+
+- [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled.
+- The `features.webhooks` permission (admins always pass).
+- The **Notifications** builtin tools category enabled on the model.
+- Native function calling, in a chat started from the interface.
+- At least one enabled target.

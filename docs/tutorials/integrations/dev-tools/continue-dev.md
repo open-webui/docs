@@ -129,7 +129,7 @@ provider: openai
 
 ### Model
 
-This is the actual name of your model in Open WebUI. Navigate to `Admin Panel` > `Settings` > `Models`, and then click on your preferred LLM.
+This is the actual name of your model in Open WebUI. Navigate to `Settings` > `Admin` > `AI` > `Models`, and then click on your preferred LLM.
 Below the user-given name, you'll find the actual model name.
 
 ```yaml

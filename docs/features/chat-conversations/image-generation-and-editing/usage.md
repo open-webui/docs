@@ -3,7 +3,7 @@ sidebar_position: 1
 title: "Usage"
 ---
 
-Before you can use image generation, you must ensure that the **Image Generation** toggle is enabled in the **Admin Panel** > **Settings** > **Images** menu.
+Before you can use image generation, you must ensure that the **Image Generation** toggle is enabled in the **Settings** > **Admin** > **Experience** > **Images** menu.
 
 ## Using Image Generation
 
@@ -19,7 +19,7 @@ If your model is configured with **Native Function Calling** (see the [**Central
 
 ### How it works:
 - **Requirements**: 
-  - **Image Generation** must be enabled globally in **Admin Panel → Settings → Images**
+  - **Image Generation** must be enabled globally in **Settings → Admin → Experience → Images**
   - The model must have the **Image Generation** capability enabled
 - **No Chat Toggle Needed**: With Native Mode, the `generate_image` tool is automatically included when the model has the `image_generation` capability. You don't need to manually toggle it on per chat.
 - **Natural Language**: You can simply ask the model: *"Generate an image of a cybernetic forest."*

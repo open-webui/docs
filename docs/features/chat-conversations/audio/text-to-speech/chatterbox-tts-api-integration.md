@@ -214,7 +214,7 @@ To use Chatterbox TTS API with Open WebUI, follow these steps:
   - API Key: `none`
   - TTS Model: `tts-1` or `tts-1-hd`
   - TTS Voice: Name of the voice you've cloned (can also include aliases, defined in the frontend)
-  - Response splitting: `Paragraphs`
+  - Response Splitting: `Paragraphs`
 
 :::info
 

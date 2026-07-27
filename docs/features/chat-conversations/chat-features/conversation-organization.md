@@ -42,6 +42,24 @@ Folders can be nested within other folders to create hierarchical organization:
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
+### Unread Badge
+
+A folder shows a count of the chats inside it you have not read yet, next to its name in the sidebar.
+
+- The count includes the folder's own chats and everything in its subfolders, so a collapsed parent still shows what is waiting below it.
+- A chat counts as unread when it has changed since you last opened it. Archived chats never count, and a chat whose reply is still being generated is not counted until the response has finished.
+- Opening a chat clears it from the count immediately, in every window you have open: the server recalculates your folder counts on the spot and pushes them to your other sessions rather than waiting for the next reload.
+- Unread state is about your own reading. Shared folders carry no badge, and chats belonging to someone else never show as unread to you, however recently they were touched.
+- A title generated automatically for a chat does not make it unread again.
+
+The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. Unread chats are listed first, each group ordered by recent activity, so what is waiting for you sits at the top of the folder rather than wherever its timestamp puts it. The list keeps itself current while you look at it — a chat that starts or finishes generating updates in place and re-sorts, a chat that arrives in the folder is inserted rather than triggering a full reload, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
+
+#### Marking Read and Unread
+
+- **Mark a chat unread**: open a chat's three-dot menu in the sidebar and choose **Mark as unread**. The chat gets its dot back, moves up with the other unread chats, and the folder count goes up again. Use it to keep a conversation on your radar after skimming it.
+- **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it; on a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
+- **Mark everything read**: the **Chats** section header in the sidebar has its own menu with **Mark all as read**, which clears every unread chat you own — loose chats and chats in folders alike — and zeroes all the folder badges at once. Archived chats are again left alone.
+
 ### Starting a Chat in a Folder
 
 When you click on a folder in the sidebar, it becomes your **active workspace**:
@@ -88,6 +106,12 @@ Link **knowledge bases and files** to your folder:
 - All attached files and knowledge bases are automatically included as **context** for every chat in the folder.
 - This enables RAG (Retrieval Augmented Generation) for all folder conversations.
 - Knowledge is optional. Folders work for organization without any attached files.
+
+**Whose access decides what is attached.** A folder's knowledge is measured against the **folder owner**, not against whoever is editing or reading it:
+
+- Attaching a file, collection or note to a folder requires the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves — including their own private ones. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
+- Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being fed into the folder's chats, rather than continuing to serve content through the folder to everyone who can see it.
+- Entries that are not a file, collection or note, or that carry no ID, are ignored rather than passed through, since there is nothing to check them against.
 
 ## Sharing Folders
 

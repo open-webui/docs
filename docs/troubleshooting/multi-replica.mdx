@@ -92,6 +92,8 @@ Set `REDIS_URL` to point to your shared Redis instance. This enables the Pub/Sub
 REDIS_URL=redis://your-redis-host:6379/0
 ```
 
+For Ollama specifically, a chat sent to a model the replica has not seen no longer fails outright: the replica clears its model cache, re-reads the model list from the Ollama servers, and only reports the model as unknown if it is still missing. A model pulled or added while a replica was holding a stale list therefore becomes usable on the next request instead of after the cache expires.
+
 ### 4. Database Corruption / "Locked" Errors
 
 **Symptoms:**
@@ -292,6 +294,10 @@ While Open WebUI is designed to be stateless with proper Redis configuration, en
 
 - **Nginx Ingress:** `nginx.ingress.kubernetes.io/affinity: "cookie"`
 - **AWS ALB:** Enable Target Group Stickiness.
+
+### Compress at the Load Balancer, Not in the App
+
+By default each Open WebUI worker compresses its own HTTP responses, which profiling shows costs roughly 3–4% CPU per worker — multiplied across all replicas. In multi-replica deployments there is always a load balancer or ingress in front, so enable compression there and disable it in the app with `ENABLE_COMPRESSION_MIDDLEWARE=false`. WebSocket and SSE streaming traffic is never compressed by this middleware, so chat streaming is unaffected. Pair this with proxy-side caching of the content-hashed static bundles under `/_app/immutable/` so they are served from the proxy cache instead of the workers. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) and [Scaling → Offload HTTP Compression](/getting-started/advanced-topics/scaling#offload-http-compression-to-the-load-balancer).
 
 ---
 

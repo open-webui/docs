@@ -9,12 +9,13 @@ Open WebUI allows you to archive conversations to declutter your sidebar while p
 
 1. Click on your **profile name** or avatar in the bottom-left corner of the sidebar.
 2. Select **Settings** from the menu.
-3. Navigate to the **Data Controls** tab.
-4. Locate the **Archived Chats** row and click the **Manage** button.
+3. Open the **Archived Chats** tab, under **Data**.
+
+Archived chats used to sit behind a **Manage** button on the **Data Controls** tab. They now have a tab of their own in the same **Data** group.
 
 ## Dashboard Features
 
-The **Archived Chats** modal provides tools to manage your archived conversations:
+The **Archived Chats** view provides tools to manage your archived conversations:
 
 - **Search**: Quickly find archived chats by title using the search bar.
 - **Restore**: Bring an archived chat back to your main sidebar.

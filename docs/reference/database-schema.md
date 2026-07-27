@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.10.0.
+> This documentation reflects schema changes up to Open WebUI v0.11.0.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -110,7 +110,7 @@ Now that we have all the tables, let's understand the structure of each table.
 | id              | Integer       | PRIMARY KEY, AUTOINCREMENT | Unique identifier                                   |
 | resource_type   | Text          | NOT NULL                | Type of resource (e.g., `model`, `knowledge`, `tool`)  |
 | resource_id     | Text          | NOT NULL                | ID of the specific resource                            |
-| principal_type  | Text          | NOT NULL                | Type of grantee: `user` or `group`                     |
+| principal_type  | Text          | NOT NULL                | Type of grantee: `user`, `group` or `anyone`           |
 | principal_id    | Text          | NOT NULL                | ID of the user or group (or `*` for public)            |
 | permission      | Text          | NOT NULL                | Permission level: `read` or `write`                    |
 | created_at      | BigInteger    | nullable                | Grant creation timestamp                               |
@@ -120,7 +120,8 @@ Things to know about the access_grant table:
 - Unique constraint on (`resource_type`, `resource_id`, `principal_type`, `principal_id`, `permission`) to prevent duplicate grants
 - Indexed on (`resource_type`, `resource_id`) and (`principal_type`, `principal_id`) for efficient lookups
 - Replaces the former `access_control` JSON column that was previously embedded in each resource table
-- `principal_type` of `user` with `principal_id` of `*` represents public (open) access
+- `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
+- `principal_type` of `anyone` (added in v0.11.0) is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
 
 ## Auth Table
@@ -202,12 +203,16 @@ Things to know about the channel_file table:
 | tasks           | JSON          | nullable                | Chat-level task/todo list used by agentic workflows |
 | summary         | Text          | nullable                | Optional chat summary text |
 | last_read_at    | BigInteger    | nullable                | Last read timestamp used for unread indicators |
+| current_message_id | Text       | nullable                | Current (active leaf) message of the chat's history |
+| variables       | JSON          | nullable                | Values filled in for the model's chat variables |
 
 Things to know about the chat table:
 
 - `tasks` and `summary` support structured planning/status UX in chat sessions.
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
+- `current_message_id` was added in v0.11.0 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
+- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when a chat is forked or cloned. Temporary chats keep their values in the request instead, so nothing is stored.
 - A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
@@ -246,6 +251,7 @@ The `chat_message` table is the **normalized per-message store** for chat conver
 | files           | JSON          | nullable                                 | Attached files                                           |
 | sources         | JSON          | nullable                                 | Retrieval/citation sources                              |
 | embeds          | JSON          | nullable                                 | Embedded artifacts                                       |
+| meta            | JSON          | nullable                                 | Message metadata; marks internal sub-agent and timer messages (added in v0.11.0) |
 | done            | Boolean       | default=True                             | Whether generation completed                             |
 | status_history  | JSON          | nullable                                 | Streamed status updates during generation                |
 | error           | JSON          | nullable                                 | Error payload when generation failed                     |
@@ -259,6 +265,7 @@ Things to know about the chat_message table:
 - Deleting a chat cascades to delete its messages (`chat_id` foreign key with `ON DELETE CASCADE`).
 - Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
 - `context_summary` was added in v0.10.0 (migration `4c5ce3d2f27f`) to store a summary of the message's context.
+- `meta` was added in v0.11.0 (migration `856c5b02fb54`). It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
 
 ## Automation Table
 
@@ -266,6 +273,7 @@ Things to know about the chat_message table:
 | --------------- | ------------- | ----------------------- | --------------- |
 | id              | Text          | PRIMARY KEY             | Unique identifier (UUID) |
 | user_id         | Text          | NOT NULL                | Owner of the automation |
+| folder_id       | Text          | nullable                | Folder the runs' chats are created in |
 | name            | Text          | NOT NULL                | Automation display name |
 | data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional terminal config) |
 | meta            | JSON          | nullable                | Optional metadata |
@@ -279,6 +287,7 @@ Things to know about the automation table:
 
 - `next_run_at` is indexed for efficient due-run polling.
 - `data.rrule` defines recurrence and drives scheduler calculations.
+- `folder_id` was added in v0.11.0 (migration `959eaac8f909`) together with a (`user_id`, `folder_id`) index, so an owner's automations can be listed per folder. It is not a foreign key: deleting a folder clears the column on that owner's automations instead of deleting the automation, and a run whose folder has disappeared in the meantime clears the column and files its chat outside any folder.
 
 ## Automation Run Table
 
@@ -578,6 +587,7 @@ Things to know about the memory table:
 
 - `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
 - `path` and `meta` (added in a later v0.10.0 migration) back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
+- A covering index on `(id, user_id)` was added in v0.11.0 (migration `55f1302ac17c`) to speed up per-user memory lookups.
 
 ## Message Table
 
@@ -755,6 +765,7 @@ Things to know about the tag table:
 | api_key           | String        | UNIQUE, nullable | API authentication key     |
 | settings          | JSON          | nullable         | User preferences           |
 | info              | JSON          | nullable         | Additional user info       |
+| variables         | JSON          | nullable         | User variables substituted into system prompts |
 | oauth_sub         | Text          | UNIQUE           | OAuth subject identifier   |
 | scim              | JSON          | nullable         | SCIM provisioning data     |
 
@@ -763,6 +774,8 @@ Things to know about the user table:
 - Uses UUID for primary key
 - One-to-One relationship with `auth` table (shared id)
 - One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
+- `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
+- `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 
 The `scim` field's expected structure:
 
