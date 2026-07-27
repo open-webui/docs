@@ -254,6 +254,8 @@ This applies when the connection's base URL is an Anthropic one, or when its **P
 All models configured in Open WebUI are accessible through this endpoint, including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
 
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
+
+**Usage reporting:** On a streaming request, the closing `message_delta` carries whatever usage the upstream model reported. Prompt-cache counters (`cache_creation_input_tokens`, `cache_read_input_tokens`), `output_tokens_details` and `server_tool_use` are passed through when the provider sends them, so a client that tracks cache hits or reasoning tokens sees the real figures rather than losing them in translation. `input_tokens` is reported only when it is actually known: a provider that never reports it leaves the field out instead of showing a fabricated zero.
 :::
 
 #### Counting Tokens
