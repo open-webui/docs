@@ -48,6 +48,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Vercel AI Gateway | Yes | Auto-detection works; filtering is recommended if you only want specific gateway models |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
+| GreenPT | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
 
@@ -116,6 +117,19 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **URL** | `https://api.deepseek.com/v1` |
   | **API Key** | Your API key from [platform.deepseek.com](https://platform.deepseek.com/) |
   | **Model IDs** | Auto-detected (e.g., `deepseek-chat`, `deepseek-reasoner`) |
+
+  </TabItem>
+  <TabItem value="greenpt" label="GreenPT">
+
+  **GreenPT** is a European AI provider with an OpenAI-compatible API, optimized infrastructure, and data centers powered by 100% renewable energy.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.greenpt.ai/v1` |
+  | **API Key** | Your API key from [account.greenpt.ai/api/keys](https://account.greenpt.ai/api/keys) |
+  | **Model IDs** | Auto-detected; start with `glm-5.2` or the coding-focused `kimi-k2.7-code` |
+
+  GreenPT implements `/models`, so Open WebUI discovers the models available to your API key. Leave **Model IDs (Filter)** empty to use live discovery, or add an allowlist if you only want selected models to appear.
 
   </TabItem>
   <TabItem value="mistral" label="Mistral">
