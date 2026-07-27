@@ -255,7 +255,9 @@ All models configured in Open WebUI are accessible through this endpoint, includ
 
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
 
-**Usage reporting:** On a streaming request, the closing `message_delta` carries whatever usage the upstream model reported. Prompt-cache counters (`cache_creation_input_tokens`, `cache_read_input_tokens`), `output_tokens_details` and `server_tool_use` are passed through when the provider sends them, so a client that tracks cache hits or reasoning tokens sees the real figures rather than losing them in translation. `input_tokens` is reported only when it is actually known: a provider that never reports it leaves the field out instead of showing a fabricated zero.
+**Usage reporting:** Responses carry whatever usage the upstream model reported, in the closing `message_delta` when streaming and in `usage` when not. Prompt-cache counters (`cache_creation_input_tokens`, `cache_read_input_tokens`), `output_tokens_details`, `server_tool_use` and `service_tier` are passed through when the provider sends them, so a client that tracks cache hits or reasoning tokens sees the real figures rather than losing them in translation. An OpenAI-style provider that reports cached tokens as `prompt_tokens_details.cached_tokens` has them mapped to `cache_read_input_tokens`, and `input_tokens` is reported the way Anthropic clients expect it: the uncached prompt tokens, with cache creation and cache read counted separately rather than a second time. On a streaming request `input_tokens` is reported only when it is actually known, so a provider that never reports it leaves the field out instead of showing a fabricated zero.
+
+Usage from the upstream provider is requested only when the model has the **Usage** capability enabled in its editor. Without it the provider is not asked to include usage in a stream, and the token counts a client receives fall back to what Open WebUI can determine on its own.
 :::
 
 #### Counting Tokens
