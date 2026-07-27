@@ -1249,6 +1249,13 @@ when using OpenAI-compatible endpoints.
 - Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Experience > Interface**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `CONTEXT_COMPACTION_MODEL`
+
+- Type: `str`
+- Default: Empty string (follow the task model)
+- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Experience > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
 
 - Type: `int`
