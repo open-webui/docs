@@ -4406,6 +4406,24 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Description: This variable is used in the request to searxng as the "search language" (arguement "language").
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `SEARXNG_CLIENT_CERT_FILE`
+
+- Type: `str`
+- Default: unset
+- Description: Path to a client certificate (PEM) presented when connecting to SearXNG, for an instance that requires mutual TLS. When set, Open WebUI builds a dedicated TLS context for SearXNG requests instead of using the shared outbound one; other outbound requests are unaffected and keep following [`AIOHTTP_CLIENT_SESSION_SSL`](#aiohttp_client_session_ssl). Leave unset for a SearXNG instance that does not ask for a client certificate.
+
+#### `SEARXNG_CLIENT_KEY_FILE`
+
+- Type: `str`
+- Default: unset
+- Description: Path to the private key for [`SEARXNG_CLIENT_CERT_FILE`](#searxng_client_cert_file). Omit it when the certificate file already contains the key. It has no effect unless the certificate variable is also set.
+
+:::info
+
+Both paths must be readable inside the container, so mount them in (for example `-v /path/to/certs:/certs:ro`) and point the variables at the mounted location. The certificate is loaded once and cached for the process, so changing the files on disk needs a restart to take effect.
+
+:::
+
 #### `GOOGLE_PSE_API_KEY`
 
 - Type: `str`
