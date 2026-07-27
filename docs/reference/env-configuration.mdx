@@ -2089,7 +2089,11 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{USER_NAME}}` | Signed-in user's display name |
 | `{{USER_EMAIL}}` | Signed-in user's email |
 | `{{USER_ROLE}}` | Signed-in user's role |
+| `{{USER_GROUPS}}` | Comma-separated names of the groups the user belongs to |
+| `{{USER_GROUP_IDS}}` | Comma-separated IDs of the same groups |
 | `{{USER_AGENT}}` | User-Agent of the originating browser request |
+
+The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
 Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections. Introduced in v0.10.0, which expanded the placeholder set (the message, file, task and user-agent placeholders) beyond the earlier chat and user variables.
 
@@ -3391,7 +3395,7 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 
 - Type: `str` (JSON object)
 - Default: `{}`
-- Description: Custom HTTP headers sent to the external document loader service, as a JSON object (for example `{"X-Tenant": "acme"}`). Header values support placeholder templating with the file placeholders `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}` and the same user placeholders as other custom headers (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`). Useful for per-request authentication or routing on your loader service. Invalid JSON is ignored and falls back to `{}`.
+- Description: Custom HTTP headers sent to the external document loader service, as a JSON object (for example `{"X-Tenant": "acme"}`). Header values support placeholder templating with the file placeholders `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}` and the same user placeholders as other custom headers (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{USER_GROUPS}}`, `{{USER_GROUP_IDS}}`). Useful for per-request authentication or routing on your loader service. Invalid JSON is ignored and falls back to `{}`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TIKA_SERVER_URL`
