@@ -33,6 +33,8 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **⬇️ Response Auto-Scroll**: The view follows a response down the page as it is generated. Turn it off with **Response Auto-Scroll** in **Settings > Interface** to keep the scroll position where you put it, which is useful when you want to read earlier parts of a long answer while the rest is still streaming.
 
+- **📎 Default Upload Mode**: How a file you attach in a chat is handled before you touch anything. **Settings > Interface > File > Default Upload Mode** switches between **Using Focused Retrieval**, the default, where the file is chunked and searched by relevance, and **Using Entire Document**, where its whole content goes into the conversation. It sets the starting point for each new attachment; you can still change an individual file's mode by clicking it after it is attached. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) for what the two modes mean.
+
 - **🍴 Fork a Chat**: Branch a conversation into an independent copy from any assistant response. The **Fork chat** action on a message copies the history from the start of the conversation up to that point into a new chat titled `<original title> (fork)`, keeping the original's folder and pinned state, so you can take a different direction without touching the original. Forking requires the chat-import permission, and is unavailable while a response is still streaming.
 
 - **[🔍 History & Search](./history-search.mdx)**: Navigate and search your previous conversations, or allow models to search them autonomously via native tools.

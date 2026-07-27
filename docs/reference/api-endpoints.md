@@ -76,6 +76,17 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 
+:::warning Reading `usage` from a reply that used tools
+
+A reply can involve several model calls, one per round of tool use, and the `usage` block distinguishes the two things you might want from that:
+
+- `prompt_tokens` and `completion_tokens` report the **most recent model call** only.
+- `input_tokens`, `output_tokens` and `total_tokens` report the **whole reply**, every call added up.
+
+Earlier releases put the running total in `prompt_tokens` / `completion_tokens` as well. If you bill or meter on those two fields, read `input_tokens` / `output_tokens` instead, or a tool-using reply will now be undercounted. The split exists because a context-window gauge needs the size of the latest request, while billing needs the sum, and one pair of fields cannot be both.
+
+:::
+
 #### Using Open WebUI tools, including MCP, from the API
 
 The chat completions endpoint can run server-side tools when you pass Open WebUI tool IDs in the request body. This includes native Python tools, OpenAPI tool servers, and MCP tool servers that are already configured and enabled in Open WebUI.
@@ -254,6 +265,10 @@ This applies when the connection's base URL is an Anthropic one, or when its **P
 All models configured in Open WebUI are accessible through this endpoint, including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
 
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
+
+**Usage reporting:** Responses carry whatever usage the upstream model reported, in the closing `message_delta` when streaming and in `usage` when not. Prompt-cache counters (`cache_creation_input_tokens`, `cache_read_input_tokens`), `output_tokens_details`, `server_tool_use` and `service_tier` are passed through when the provider sends them, so a client that tracks cache hits or reasoning tokens sees the real figures rather than losing them in translation. An OpenAI-style provider that reports cached tokens as `prompt_tokens_details.cached_tokens` has them mapped to `cache_read_input_tokens`, and `input_tokens` is reported the way Anthropic clients expect it: the uncached prompt tokens, with cache creation and cache read counted separately rather than a second time. On a streaming request `input_tokens` is reported only when it is actually known, so a provider that never reports it leaves the field out instead of showing a fabricated zero.
+
+Usage from the upstream provider is requested only when the model has the **Usage** capability enabled in its editor. Without it the provider is not asked to include usage in a stream, and the token counts a client receives fall back to what Open WebUI can determine on its own.
 :::
 
 #### Counting Tokens

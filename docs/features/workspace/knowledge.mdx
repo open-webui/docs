@@ -95,6 +95,8 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | `view_knowledge_file` | ✅ | ✅ | Read file content from any accessible KB |
 | `view_note` | ✅ | ❌ | Read attached notes |
 
+"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, so it can point a query at one knowledge base rather than searching blind.
+
 The key split: `list_knowledge` and `list_knowledge_bases` are mutually exclusive. Attaching a KB scopes the model to only those documents. Leaving it unscoped lets the model discover everything the user has access to.
 
 #### When to prefer `grep_knowledge_files` over `query_knowledge_files`
@@ -106,7 +108,7 @@ The two search tools complement each other:
 | **How it matches** | Semantic / vector retrieval (with optional BM25 + rerank when [`ENABLE_RAG_HYBRID_SEARCH`](/reference/env-configuration#enable_rag_hybrid_search) is on) | Exact string match, regex auto-detected (e.g. `error\|warn`, `version \d+`) |
 | **Returns** | Relevant chunks of content | Matching lines with file ID, filename, and 1-indexed line number |
 | **Use when** | "What does the documentation say about X?" for paraphrased questions, conceptual lookups | "Find every place we mention `OPENAI_API_KEY`" for literal identifiers, error strings, version numbers |
-| **Result cap** | Top K (default 5) | 50 matches |
+| **Result cap** | Top K (default 5) | 50 matches ([`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | **Flags** | (none) | `case_insensitive`, `count_only`, `file_id` (single-file mode) |
 
 In agentic flows, a typical pattern is: `query_knowledge_files` to locate the relevant document, then `grep_knowledge_files` to pinpoint exact lines, then `view_file` (line-range mode below) to read the surrounding context.
@@ -115,7 +117,7 @@ In agentic flows, a typical pattern is: `query_knowledge_files` to locate the re
 
 `view_file` supports two addressing modes:
 
-- **Character pagination**: `offset` + `max_chars` (default `10000`, hard cap `100000`). Best for streaming through a long document; the response includes `next_offset` when the file is truncated.
+- **Character pagination**: `offset` + `max_chars` (default `10000`, hard cap `100000`; both configurable with [`VIEW_FILE_DEFAULT_MAX_CHARS`](/reference/env-configuration#view_file_default_max_chars) and [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars)). Best for streaming through a long document; the response includes `next_offset` when the file is truncated.
 - **Line range**: `start_line` + optional `end_line` (1-indexed, inclusive). Overrides `offset`/`max_chars` when set; pairs naturally with `grep_knowledge_files`' line numbers. Pass `line_numbers: true` to also get a `<n>: <line>` prefix on each returned line.
 
 The line-range response includes `total_lines`, `showing_lines`, and `next_start_line` for follow-up reads.
@@ -174,6 +176,8 @@ Files can be addressed three ways, pick whichever is unambiguous:
 **Behavior notes**
 
 - `kb_exec` respects the same access control as the other knowledge tools: files the user can't read are silently excluded from results.
+- **Output is bounded per call.** One command returns at most 30,000 characters ([`KB_EXEC_MAX_OUTPUT_CHARS`](/reference/env-configuration#kb_exec_max_output_chars)), whatever produced them, and the model is told to narrow the command when it hits the limit. This is a single budget for the whole pipeline, so a `cat` of a large file and a wide `grep` are capped the same way.
+- **A wide `grep` is refused rather than run.** Searching more than 200 files ([`KB_EXEC_MAX_GREP_FILES`](/reference/env-configuration#kb_exec_max_grep_files)) returns a prompt to scope the search to a directory or glob, and `grep` returns at most 50 matching lines ([`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)), the same cap `grep_knowledge_files` uses.
 - The model still has `query_knowledge_files` for semantic search; reach for it when literal commands won't find a paraphrased concept.
 - Built on top of the directory model. `kb_exec` is the only tool that fully reflects the directory structure created in the UI.
 

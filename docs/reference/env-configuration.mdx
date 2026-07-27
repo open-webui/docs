@@ -106,6 +106,12 @@ Failure to set WEBUI_URL before using OAuth/SSO will result in failure to log in
 - Description: Toggles user account creation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_INITIAL_ADMIN_SIGNUP`
+
+- Type: `bool`
+- Default: `False`
+- Description: Allows the **first** account to be created through `POST /api/v1/auths/signup` on an instance whose login form is turned off. It applies only while no user exists; once there is one, ordinary signup rules take over and this has no further effect. Without it, an instance configured for SSO only (`ENABLE_LOGIN_FORM=false`) has no way to create its first administrator through the API, which is awkward after a database reset. Leave it off unless you are bootstrapping such an instance, and turn it off again afterwards.
+
 #### `ENABLE_SIGNUP_PASSWORD_CONFIRMATION`
 
 - Type: `bool`
@@ -202,7 +208,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model.
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params) takes precedence and is left alone.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
@@ -304,6 +310,14 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables channel support.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CHANNEL_MODEL_RESPONSE_MODE`
+
+- Type: `str`
+- Options: `thread` (default), `channel`
+- Default: `thread`
+- Description: Where a model's reply goes when it is mentioned in a message posted at the top level of a channel. `thread` starts a thread under that message, keeping a long answer out of the main timeline. `channel` posts the reply straight into the channel, where everyone reads it without opening anything. A mention **inside** an existing thread always answers in that thread, whichever mode is set. Can also be set in **Settings > Admin > General** (**Model Response Mode**), which appears once channels are enabled; an unrecognised value is ignored and the current setting is kept.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_FOLDERS`
@@ -709,7 +723,7 @@ It is recommended to set this to a high single-digit or low double-digit value i
 - Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The pre-v0.9.6 name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (old default `30`) is still honored as a fallback if this is unset; prefer the new name.
 
 :::info Hitting the limit is visible (since v0.9.6)
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. A continuation request that fails outright — the provider erroring while the loop is fetching the model's next turn — is now reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -868,6 +882,18 @@ such as connections to Ollama and OpenAI endpoints.
 This is the maximum amount of time the client will wait for a response before timing out.
 If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
 allowing the client to wait indefinitely.
+
+:::
+
+#### `AIOHTTP_CLIENT_STREAM_IDLE_TIMEOUT`
+
+- Type: `int`
+- Default: unset (no idle cap)
+- Description: Maximum number of seconds a **streaming** request may go without receiving a chunk before it is aborted. This is an idle cap between chunks, not a cap on the whole response, so a long answer that keeps producing tokens is never cut off — only a stream that has gone silent is. `AIOHTTP_CLIENT_TIMEOUT` still bounds the total duration.
+
+:::info
+
+Leave it unset to keep the previous behavior, where a provider that stops sending data mid-stream holds the connection until the total timeout expires. Set it to something a little above your slowest expected gap between tokens (for example `60`) to fail fast on a stalled upstream. Non-numeric values and anything zero or below are treated as unset.
 
 :::
 
@@ -1033,6 +1059,12 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Default: Not set (plain-text logging)
 - Description: Controls the log output format. Set to `json` to switch all stdout logging to single-line JSON objects, suitable for log aggregators like Loki, Fluentd, CloudWatch, and Datadog. When set to `json`, the ASCII startup banner is also suppressed to keep the log stream parseable. Any other value (or unset) uses the default plain-text format. See the [JSON Logging documentation](/getting-started/advanced-topics/logging#structured-json-logging) for details on log fields and examples.
 
+#### `LOGURU_DIAGNOSE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Adds variable values to the tracebacks Open WebUI logs when an exception is caught. It is off by default because those annotations print the local variables at each frame, which in a request handler routinely means tokens, keys, prompts and user content ending up in your logs. Turn it on only while debugging a specific failure, on an instance whose logs you would treat as sensitive, and turn it off afterwards.
+
 #### `ENABLE_AUDIT_STDOUT`
 
 - Type: `bool`
@@ -1070,6 +1102,12 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
 - Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses.
+
+#### `ENABLE_AUDIT_GET_REQUESTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Also audit `GET` requests. By default only the methods that change something (`PUT`, `PATCH`, `POST`, `DELETE`) are recorded, since reads are far more numerous and would dominate the log. Turn it on when you need to see who **read** what, accepting a much larger volume, and note that at `REQUEST_RESPONSE` level it means response bodies for every read as well.
 
 #### `MAX_BODY_LOG_SIZE`
 
@@ -1229,6 +1267,13 @@ when using OpenAI-compatible endpoints.
 - Type: `bool`
 - Default: `False`
 - Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Experience > Interface**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `CONTEXT_COMPACTION_MODEL`
+
+- Type: `str`
+- Default: Empty string (follow the task model)
+- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Experience > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
@@ -2089,7 +2134,11 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{USER_NAME}}` | Signed-in user's display name |
 | `{{USER_EMAIL}}` | Signed-in user's email |
 | `{{USER_ROLE}}` | Signed-in user's role |
+| `{{USER_GROUPS}}` | Comma-separated names of the groups the user belongs to |
+| `{{USER_GROUP_IDS}}` | Comma-separated IDs of the same groups |
 | `{{USER_AGENT}}` | User-Agent of the originating browser request |
+
+The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
 Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections. Introduced in v0.10.0, which expanded the placeholder set (the message, file, task and user-agent placeholders) beyond the earlier chat and user variables.
 
@@ -3352,6 +3401,13 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Description: Sets the content extraction engine to use for document ingestion.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `CONTENT_EXTRACTION_SUPPORTED_MEDIA_MIME_TYPES`
+
+- Type: `str` (comma-separated MIME types, wildcards allowed)
+- Default: unset
+- Description: Which uploaded **images and videos** are handed to the content extraction engine instead of being stored without text extraction. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. Leaving it unset keeps the old behavior: media goes to the extraction engine only when the engine is `external`, and every other engine stores images as-is and rejects unsupported types. Setting it to an empty list disables media extraction for every engine, `external` included. Video types count too, so `video/*` sends video uploads to the engine if yours can handle them; anything not matched is stored as-is, and an unmatched type that is neither image nor video is rejected as before. Audio is unaffected, since it follows the speech-to-text settings instead. Can also be set in **Settings > Admin > Documents** (**Supported Media MIME Types**).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `MISTRAL_OCR_API_KEY`
 
 - Type: `str`
@@ -3391,7 +3447,7 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 
 - Type: `str` (JSON object)
 - Default: `{}`
-- Description: Custom HTTP headers sent to the external document loader service, as a JSON object (for example `{"X-Tenant": "acme"}`). Header values support placeholder templating with the file placeholders `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}` and the same user placeholders as other custom headers (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`). Useful for per-request authentication or routing on your loader service. Invalid JSON is ignored and falls back to `{}`.
+- Description: Custom HTTP headers sent to the external document loader service, as a JSON object (for example `{"X-Tenant": "acme"}`). Header values support placeholder templating with the file placeholders `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}` and the same user placeholders as other custom headers (`{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{USER_GROUPS}}`, `{{USER_GROUP_IDS}}`). Useful for per-request authentication or routing on your loader service. Invalid JSON is ignored and falls back to `{}`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TIKA_SERVER_URL`
@@ -3607,6 +3663,41 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
   - `query_knowledge_bases` and `search_knowledge_bases`, when no knowledge is attached, so the model can still discover KBs by name/description
 
   **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** (the default; it is a native-mode builtin tool); for models set to Legacy it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+
+#### `KB_EXEC_MAX_OUTPUT_CHARS`
+
+- Type: `int`
+- Default: `30000`
+- Description: Caps the total output of a single `kb_exec` call, whatever command produced it. Output beyond the cap is cut and the model is told to narrow the command with a path, glob, `head`/`tail`/`sed` or `grep`. This is one budget for the whole pipeline, so a `cat` of a huge file and a broad `grep` are bounded the same way. Raise it if your models handle long tool output well and you would rather they read more per call; lower it to keep tool results from crowding the context window. Values below `1` fall back to the default.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `KB_EXEC_MAX_GREP_FILES`
+
+- Type: `int`
+- Default: `200`
+- Description: How many files a single `kb_exec` `grep` may scan. Past this the command is refused with a suggestion to scope the search to a directory or glob rather than searching a whole knowledge base at once. Raise it for a deployment where broad searches over large knowledge bases are worth the time they take.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `KNOWLEDGE_GREP_MAX_MATCHES`
+
+- Type: `int`
+- Default: `50`
+- Description: How many matching lines a knowledge search returns before the rest are summarized as a count. It applies to both `grep_knowledge_files` and `kb_exec`'s `grep`, so the two behave alike.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `VIEW_FILE_MAX_CHARS`
+
+- Type: `int`
+- Default: `100000`
+- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+#### `VIEW_FILE_DEFAULT_MAX_CHARS`
+
+- Type: `int`
+- Default: `10000`
+- Description: How much `view_file` and `view_knowledge_file` return when the model does not ask for a size, bounded by [`VIEW_FILE_MAX_CHARS`](#view_file_max_chars). Raising it means fewer round trips through a long document at the cost of a larger first read.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `RAG_HYBRID_BM25_WEIGHT`
 
@@ -4111,6 +4202,7 @@ When disabled (default), Open WebUI blocks web fetch requests to URLs that resol
 
 - IPv4 private ranges (`10.x.x.x`, `172.16.x.x`-`172.31.x.x`, `192.168.x.x`, `127.x.x.x`)
 - IPv6 private ranges
+- IPv6 addresses that carry a private IPv4 address inside them, whatever the wrapper: IPv4-mapped (`::ffff:127.0.0.1`), IPv4-compatible (`::10.0.0.1`), 6to4 (`2002::/16`), Teredo (`2001::/32`), and NAT64 (`64:ff9b::/96` and `64:ff9b:1::/48`). These forms are globally routable as IPv6 while pointing at a loopback, RFC 1918 or metadata address, so each embedded address is extracted and checked on its own
 
 This is a **Server-Side Request Forgery (SSRF) protection**. Without this safeguard, a malicious user could provide URLs that appear external but resolve to internal addresses, potentially exposing internal services, cloud metadata endpoints, or other sensitive resources.
 
@@ -4388,6 +4480,24 @@ the search query. Example: `http://searxng.local/search?q=<query>`
 - Default: `all`
 - Description: This variable is used in the request to searxng as the "search language" (arguement "language").
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SEARXNG_CLIENT_CERT_FILE`
+
+- Type: `str`
+- Default: unset
+- Description: Path to a client certificate (PEM) presented when connecting to SearXNG, for an instance that requires mutual TLS. When set, Open WebUI builds a dedicated TLS context for SearXNG requests instead of using the shared outbound one; other outbound requests are unaffected and keep following [`AIOHTTP_CLIENT_SESSION_SSL`](#aiohttp_client_session_ssl). Leave unset for a SearXNG instance that does not ask for a client certificate.
+
+#### `SEARXNG_CLIENT_KEY_FILE`
+
+- Type: `str`
+- Default: unset
+- Description: Path to the private key for [`SEARXNG_CLIENT_CERT_FILE`](#searxng_client_cert_file). Omit it when the certificate file already contains the key. It has no effect unless the certificate variable is also set.
+
+:::info
+
+Both paths must be readable inside the container, so mount them in (for example `-v /path/to/certs:/certs:ro`) and point the variables at the mounted location. The certificate is loaded once and cached for the process, so changing the files on disk needs a restart to take effect.
+
+:::
 
 #### `GOOGLE_PSE_API_KEY`
 
@@ -5725,7 +5835,7 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Type: `bool`
 - Default: `False`
 - Description: Enables the OAuth token exchange endpoint, allowing external applications to exchange an OAuth provider's access token for an Open WebUI JWT session token. This enables programmatic authentication for external tools and services that already have OAuth tokens from your identity provider.
-- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token. You must also set `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`, or every exchange is rejected.
+- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token. Set [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](#oauth_token_exchange_trusted_client_ids) alongside it: **leaving it empty performs no client check at all**, so any token your provider recognises is accepted.
 
 :::danger
 
@@ -5733,7 +5843,7 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 An access token is a bearer credential. Your provider's userinfo endpoint confirms that a token is valid, but it does not reveal which OAuth client the token was issued to. Unless the issuing client is checked, a token minted for any client registered with your provider is accepted, including applications you do not control. Someone who obtains an access token for one of your users, for example by having them sign in to an unrelated OAuth application, could exchange it for a session as that user, inheriting that user's role.
 
-`OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES` is what restricts this to clients you have chosen to trust. `OAUTH_ALLOWED_DOMAINS` does not: it governs which user identities may sign in, and an impersonated user is a legitimate member of an allowed domain.
+`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` is what restricts this to clients you have chosen to trust. `OAUTH_ALLOWED_DOMAINS` does not: it governs which user identities may sign in, and an impersonated user is a legitimate member of an allowed domain.
 
 :::
 
@@ -5763,7 +5873,7 @@ curl -X POST "http://localhost:8080/api/v1/oauth/oidc/token/exchange" \
 
 - Type: `int`
 - Default: *(unset, no limit)*
-- Description: Caps how many token-exchange attempts are accepted per window. Unset, or the literal `none`, leaves the endpoint unthrottled. Set an integer to enable throttling, for example `15`. This is a best-effort brake only: the caller has no established identity before the provider validates the token, so requests are bucketed by client address, which is unreliable behind a proxy that lets clients influence the forwarded address. Treat it as noise reduction, not as the control that keeps the endpoint safe. That remains `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`.
+- Description: Caps how many token-exchange attempts are accepted per window. Unset, or the literal `none`, leaves the endpoint unthrottled. Set an integer to enable throttling, for example `15`. This is a best-effort brake only: the caller has no established identity before the provider validates the token, so requests are bucketed by client address, which is unreliable behind a proxy that lets clients influence the forwarded address. Treat it as noise reduction, not as the control that keeps the endpoint safe. That remains `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`.
 
 #### `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT_WINDOW`
 
@@ -5773,20 +5883,20 @@ curl -X POST "http://localhost:8080/api/v1/oauth/oidc/token/exchange" \
 
 **Requirements:**
 - The user must already exist in Open WebUI (they must have signed in via the web interface at least once)
-- The OAuth provider must be properly configured, and must implement RFC 7662 token introspection
-- `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES` must name the OAuth client the token was issued to
+- The OAuth provider must be properly configured, and must implement RFC 7662 token introspection if you restrict the issuing client
+- `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` must name the OAuth client the token was issued to
 - The token exchange uses the same user lookup logic as regular OAuth login (by OAuth `sub` claim first, then by email if `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is enabled)
 
-#### `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`
+#### `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`
 
 - Type: `str` (comma-separated list)
 - Default: empty
-- Description: The OAuth client IDs whose tokens the token exchange endpoint will accept. Open WebUI resolves which client a presented token was issued to using RFC 7662 token introspection, and rejects any token minted for a client that is not listed.
-- Usage: `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES=internal-cli,reporting-service`
+- Description: The OAuth client IDs whose tokens the token exchange endpoint will accept. When set, Open WebUI resolves which client a presented token was issued to using RFC 7662 token introspection, and rejects any token minted for a client that is not listed, or whose issuing client it cannot determine.
+- Usage: `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS=internal-cli,reporting-service`
 
-:::warning
+:::danger
 
-An empty value means no client is trusted, so every exchange is rejected. This is deliberate. There is no safe default, because the set of clients permitted to act on your users' behalf is specific to your deployment.
+**An empty value means the issuing client is not checked at all.** The exchange then accepts any token the provider's userinfo endpoint validates, whichever application obtained it, so any app your users sign into with the same provider can trade its token for an Open WebUI session as that user. Set this whenever the endpoint is enabled.
 
 Only the `client_id` reported by token introspection is honoured. The `aud` field is ignored, because it names intended resource servers rather than the issuing client, and some identity providers allow any client to place another client's identifier there.
 
@@ -5796,7 +5906,7 @@ This is a deploy-time environment variable and cannot be changed from the admin 
 
 :::info
 
-**Provider support.** Resolving the issuing client requires RFC 7662 token introspection. Google, Microsoft Entra ID and GitHub do not implement it, so token exchange cannot be used with those providers and rejections are recorded in the server log. Providers that do implement it include Keycloak, Authentik, Okta and Zitadel.
+**Provider support.** Resolving the issuing client requires RFC 7662 token introspection. Google, Microsoft Entra ID and GitHub do not implement it, so the client restriction cannot be used with those providers: every exchange is refused while it is set, and the reason is recorded in the server log. Providers that do implement it include Keycloak, Authentik, Okta and Zitadel.
 
 :::
 
@@ -6483,6 +6593,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to edit chats.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_CHAT_EXPORT`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file. Shown as **Export Chat** in the group permission list.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
@@ -7655,6 +7772,18 @@ WEBSOCKET_REDIS_OPTIONS='{"socket_connect_timeout": 5}'
 ```
 
 If `WEBSOCKET_REDIS_OPTIONS` is not set, `REDIS_SOCKET_CONNECT_TIMEOUT` will be applied to websocket connections automatically.
+
+:::
+
+#### `REDIS_SOCKET_TIMEOUT`
+
+- Type: `float` (seconds) or empty string for None
+- Default: None (no timeout, uses redis-py library default)
+- Description: Sets the read/write timeout on all Redis client connections, the companion to [`REDIS_SOCKET_CONNECT_TIMEOUT`](#redis_socket_connect_timeout), which only bounds the initial connect. It applies to plain, Cluster and Sentinel modes, sync and async alike.
+
+:::warning Not for the subscriber connections
+
+Leave this unset unless you have a reason. A timeout here also lands on connections that sit idle by design, above all the pub/sub subscriber that carries stop requests and configuration changes between instances: it waits quietly for messages, and a socket timeout ends that wait as an error. If you do set it, keep it comfortably longer than the quiet periods you expect, and check that stopping a reply from another instance still works.
 
 :::
 

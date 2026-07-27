@@ -42,8 +42,8 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server, used for OAuth 2.1 authentication for MCP servers. |
 | `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. |
-| `ENABLE_OAUTH_TOKEN_EXCHANGE`         | `false`            | Enables the token exchange endpoint for external apps to exchange OAuth tokens for Open WebUI JWTs. Requires `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`. |
-| `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES` | *empty*         | Comma-separated OAuth client IDs whose tokens the exchange endpoint accepts. Empty rejects every exchange. |
+| `ENABLE_OAUTH_TOKEN_EXCHANGE`         | `false`            | Enables the token exchange endpoint for external apps to exchange OAuth tokens for Open WebUI JWTs. Pair it with `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`. |
+| `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` | *empty*        | Comma-separated OAuth client IDs whose tokens the exchange endpoint accepts. Empty performs no client check, accepting any token the provider validates. |
 | `ENABLE_OAUTH_BACKCHANNEL_LOGOUT`     | `false`            | Enables OIDC Back-Channel Logout endpoint (`POST /oauth/backchannel-logout`) for IdP-initiated logout. Requires Redis for JWT revocation. |
 | `OAUTH_MAX_SESSIONS_PER_USER`         | `10`               | Maximum concurrent OAuth sessions per user per provider. Prevents unbounded growth while allowing multi-device usage. |
 
@@ -73,6 +73,8 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
 5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 
+**When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning names the provider in the logs. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
+
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
 For more information, check out the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/).
@@ -83,13 +85,13 @@ Open WebUI also supports **OAuth Token Exchange**, allowing external application
 
 **Example use case:** A CLI tool that has obtained an OAuth access token from your identity provider can exchange it for an Open WebUI token to make API calls to Open WebUI.
 
-To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true` and list the OAuth clients you trust in `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
+To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true` and list the OAuth clients you trust in `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
 
 :::danger
 
-A successful exchange issues a session as the user the token identifies, with that user's role. Because a provider's userinfo endpoint cannot reveal which OAuth client a token was issued to, the endpoint must be told which clients you trust. Without `OAUTH_TOKEN_EXCHANGE_ALLOWED_AUDIENCES` every exchange is rejected, and listing a client means any holder of a token that client issued can obtain a session as the corresponding user. `OAUTH_ALLOWED_DOMAINS` does not constrain this, because it filters user identities rather than the applications vouching for them.
+A successful exchange issues a session as the user the token identifies, with that user's role. Because a provider's userinfo endpoint cannot reveal which OAuth client a token was issued to, the endpoint must be told which clients you trust. With `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` unset the issuing client is not checked at all, so a token from any application your users authorise is accepted; with it set, any holder of a token from a listed client can obtain a session as the corresponding user. `OAUTH_ALLOWED_DOMAINS` does not constrain this, because it filters user identities rather than the applications vouching for them.
 
-Resolving the issuing client requires RFC 7662 token introspection, which Google, Microsoft Entra ID and GitHub do not implement.
+Resolving the issuing client requires RFC 7662 token introspection, which Google, Microsoft Entra ID and GitHub do not implement, so the restriction cannot be applied on those providers.
 
 :::
 
@@ -303,6 +305,8 @@ For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing 
 
 Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
 If `WEBUI_AUTH_TRUSTED_NAME_HEADER` is not set, the email address is used as user name.
+
+The account created on a person's first request is given an identifier derived from their email address rather than a random one, so several requests arriving together for someone who has never signed in before all resolve to the same account. Previously each of those requests could create its own, leaving duplicate users for the same person, which is a realistic way for a first visit to begin when a page loads several resources at once.
 
 #### Group Management
 

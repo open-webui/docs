@@ -543,6 +543,8 @@ ENABLE_RAG_LOCAL_WEB_FETCH=false
 
 Setting this to `true` allows the web loader to fetch content from private IP ranges, which may be necessary in some environments but introduces SSRF risk.
 
+The private-address check looks inside IPv6 as well as at it. An address such as `::ffff:169.254.169.254`, or a 6to4, Teredo or NAT64 address wrapping an RFC 1918 or loopback target, is globally routable as IPv6 while still resolving to somewhere internal; Open WebUI extracts the embedded IPv4 address and blocks the fetch on that basis. This applies both when a URL is validated and again at connection time, so a DNS answer that returns one of these forms is rejected too.
+
 Open WebUI also blocks cloud provider metadata endpoints by default (AWS `169.254.169.254`, GCP `metadata.google.internal`, Azure `metadata.azure.com`, and Alibaba Cloud `100.100.100.200`). You can extend this blocklist with additional domains or IPs:
 
 ```bash

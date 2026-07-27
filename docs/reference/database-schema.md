@@ -273,6 +273,7 @@ Things to know about the chat_message table:
 | --------------- | ------------- | ----------------------- | --------------- |
 | id              | Text          | PRIMARY KEY             | Unique identifier (UUID) |
 | user_id         | Text          | NOT NULL                | Owner of the automation |
+| folder_id       | Text          | nullable                | Folder the runs' chats are created in |
 | name            | Text          | NOT NULL                | Automation display name |
 | data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional terminal config) |
 | meta            | JSON          | nullable                | Optional metadata |
@@ -286,6 +287,7 @@ Things to know about the automation table:
 
 - `next_run_at` is indexed for efficient due-run polling.
 - `data.rrule` defines recurrence and drives scheduler calculations.
+- `folder_id` was added in v0.11.0 (migration `959eaac8f909`) together with a (`user_id`, `folder_id`) index, so an owner's automations can be listed per folder. It is not a foreign key: deleting a folder clears the column on that owner's automations instead of deleting the automation, and a run whose folder has disappeared in the meantime clears the column and files its chat outside any folder.
 
 ## Automation Run Table
 
@@ -772,6 +774,7 @@ Things to know about the user table:
 - Uses UUID for primary key
 - One-to-One relationship with `auth` table (shared id)
 - One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
+- `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
 - `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 
 The `scim` field's expected structure:

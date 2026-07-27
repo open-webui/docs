@@ -516,7 +516,7 @@ class Filter:
 ```
 
 :::warning Synthesizing `chat_id` / `message_id` in `inlet()` Is Not a Reliable Workaround
-Older versions of this page suggested synthesizing a `local:<uuid>` `chat_id` and a random `message_id` inside `inlet()` to force `outlet()` to run for pure API callers. Do not rely on that pattern. In current backend code the chat ownership check runs before the filter pipeline, and the inline outlet handler does not rewrite the HTTP response body even when it does run. If you need `outlet()` output over HTTP for an API caller, use `/api/chat/completed` instead.
+Older versions of this page suggested synthesizing a temporary-chat `chat_id` (`temporary:<uuid>`, or `local:<uuid>` in older releases) and a random `message_id` inside `inlet()` to force `outlet()` to run for pure API callers. Do not rely on that pattern. In current backend code the chat ownership check runs before the filter pipeline, and the inline outlet handler does not rewrite the HTTP response body even when it does run. If you need `outlet()` output over HTTP for an API caller, use `/api/chat/completed` instead.
 :::
 
 #### Running outlet() for API Callers: `/api/chat/completed`
@@ -1124,6 +1124,12 @@ async def stream(self, event: dict) -> dict:
 ```
 📖 **Before:** `"Hi 😊"`
 📖 **After:** `"Hi"`
+
+:::note Valves are resolved once per response, not once per chunk
+
+`stream()` runs for every fragment, so its valves are read from the database once when the response starts and reused for the rest of it, rather than being re-read thousands of times. Both `self.valves` and `__user__["valves"]` are therefore stable for the whole of one streamed reply: a valve edited while a reply is streaming takes effect on the next reply, not partway through the current one. `inlet()` and `outlet()` are unaffected, as each runs once anyway.
+
+:::
 
 ---
 

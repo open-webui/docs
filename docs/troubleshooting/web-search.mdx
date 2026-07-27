@@ -106,4 +106,6 @@ Key variables:
 | `WEB_LOADER_CONCURRENT_REQUESTS` | Concurrent page fetches |
 | `WEB_LOADER_ENGINE` | Content extraction engine |
 
+All of these are persisted settings, so **Settings > Admin > Tools > Web Search** is the live source of truth for them. The page fetcher reads proxy trust, loader concurrency and SSL verification from that saved configuration on each search, so a change you save there applies to the next search without a restart, and matches what the same settings do elsewhere. If a change you made in the admin panel appears not to have taken effect, re-check it there rather than assuming the environment variable is still in charge: the variable seeds the initial value, and the saved setting wins afterwards.
+
 ---
