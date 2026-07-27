@@ -82,6 +82,10 @@ Channels are **passive by default**. AI doesn't jump into every conversation. Wh
 
 This means your team can discuss freely without AI interrupting, and call on exactly the right model when it's needed.
 
+#### Where the reply appears
+
+By default a model answering a top-level mention replies **in a thread** under your message, so a long answer does not push the channel's conversation off the screen. An administrator can change this in **Settings > Admin > General** (**Model Response Mode**, or [`CHANNEL_MODEL_RESPONSE_MODE`](/reference/env-configuration#channel_model_response_mode)): set it to **Channel** and the reply is posted into the timeline instead, where the team reads it without opening a thread. Mentioning a model from inside a thread always answers in that thread either way.
+
 ### Full chat-completion pipeline
 
 Mentioning a model in a channel runs through the same chat-completion pipeline as a standard chat. The reply is **streamed in real time** as the model generates it, and the model has access to the full set of capabilities its configuration grants:
