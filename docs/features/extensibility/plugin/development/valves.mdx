@@ -228,6 +228,35 @@ class Tools:
             ]
 ```
 
+### Multi-Select Input
+
+When a field should hold **several** of the offered options rather than one, declare it as a list and use the multiselect input type. It renders a dropdown of checkboxes, with the chosen labels shown in the closed field:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class Valves(BaseModel):
+        enabled_regions: list[str] = Field(
+            default=["eu-west-1"],
+            description="Regions to query",
+            json_schema_extra={
+                "input": {
+                    "type": "multiselect",
+                    "options": [
+                        {"value": "eu-west-1", "label": "Europe (Ireland)"},
+                        {"value": "us-east-1", "label": "US East (N. Virginia)"},
+                        {"value": "ap-south-1", "label": "Asia Pacific (Mumbai)"}
+                    ]
+                }
+            }
+        )
+```
+
+Options are declared exactly as for a select: a plain list of strings, or `{"value": ..., "label": ...}` pairs, or the name of a method that returns them.
+
+The value stays a real list end to end. Other `list` valves are edited as comma-separated text and split back apart on save, which makes any option containing a comma impossible to express; a multiselect field skips that round trip entirely, so your code receives the selected values as a list exactly as they were defined.
+
 :::tip
 Dynamic options are particularly useful for:
 - Fetching available API models from connected providers
