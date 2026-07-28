@@ -140,8 +140,8 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 **Solutions:**
 
 - **For Ollama Models**: Extend the model's context length:
-  - Navigate to: **Settings > Admin > AI > Models > Settings** (of the model you want to edit)
-  - Go to **Advanced Parameters**
+  - Navigate to: **Settings > Admin > AI > Models**, then click the pencil (**Edit**) on the model you want to change
+  - Go to **Advanced Params**
   - Modify the context length (e.g., increase to 8192+ or ideally beyond 16000 tokens if supported by your model)
 
 - **For OpenAI and Other Integrated Models**: These models typically have their own context limits that cannot be modified through Open WebUI settings. Ensure you're using a model with sufficient context length.
@@ -490,14 +490,14 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 ✅ **Solutions (check in order):**
 
 1. **Check Global Model Settings first**:
-   - Go to **Settings > Admin > AI > Models > ⚙️ (gear icon)**
+   - Go to **Settings > Admin > AI > Models > Model Defaults > Configure**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
    - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter, even if you never intended for a specific model to use native mode
    - Either change the global setting to `default`, or explicitly set `function_calling` in the per-model **Advanced Params** to override the global value
    - Also check the **Model Capabilities** section: if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
 
 :::warning Global Settings Override
-The most common cause of this issue is a global `Function Calling: native` setting in **Settings > Admin > AI > Models > ⚙️ > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
+The most common cause of this issue is a global `Function Calling: native` setting in **Settings > Admin > AI > Models > Model Defaults > Configure > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
 :::
 
 2. **Ensure Built-in Tools are enabled for the model** (if using native mode):

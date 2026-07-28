@@ -36,3 +36,19 @@ Each has its own page, so start anywhere. Most people begin with a custom **Mode
 The **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists, along with **Notes** and the admin **Functions** list, can be ordered by clicking the **Title** or **Updated at** column heading. Clicking the heading you are already sorted by reverses the direction. Each list opens on **Updated at**, newest first.
 
 :::
+
+## Creating, importing and exporting
+
+Everything that adds or moves workspace items runs through one **Create** button, at the right of the Workspace header next to the section tabs. The individual pages do not carry their own **+ New Model**, **+ New Prompt** or similar buttons. The button acts on the section you are currently looking at, and the chevron beside it opens the rest of that section's actions (the menu repeats **Create** as its first entry).
+
+| Section | Create | Also in the menu |
+| :--- | :--- | :--- |
+| **Models** | Opens the model editor on its own page | Import JSON, Export JSON |
+| **Knowledge** | Opens a dialog on top of the list | none |
+| **Prompts** | Opens a dialog on top of the list | Import JSON, Export JSON |
+| **Skills** | Opens the skill editor on its own page | Import JSON, Export JSON |
+| **Tools** | Opens the tool editor on its own page | Import From Link (admins only), Import JSON, Export JSON |
+
+When a section has only one action available, the chevron is dropped and **Create** is a plain button. That is always the case for Knowledge, and it happens elsewhere when the import and export permissions are withheld: each menu entry is gated by the matching `workspace` permission (`models_import`, `prompts_export` and so on), and admins always see all of them. Export writes the section's items to a JSON file, which the matching Import reads back.
+
+The old create URLs still resolve. `/workspace/prompts/create` and `/workspace/knowledge/create` open the list with the create dialog already open, and closing it returns you to the list.

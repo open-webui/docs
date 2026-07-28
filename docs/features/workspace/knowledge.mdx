@@ -177,7 +177,7 @@ Files can be addressed three ways, pick whichever is unambiguous:
 
 - `kb_exec` respects the same access control as the other knowledge tools: files the user can't read are silently excluded from results.
 - **Output is bounded per call.** One command returns at most 30,000 characters ([`KB_EXEC_MAX_OUTPUT_CHARS`](/reference/env-configuration#kb_exec_max_output_chars)), whatever produced them, and the model is told to narrow the command when it hits the limit. This is a single budget for the whole pipeline, so a `cat` of a large file and a wide `grep` are capped the same way.
-- **A wide `grep` is refused rather than run.** Searching more than 200 files ([`KB_EXEC_MAX_GREP_FILES`](/reference/env-configuration#kb_exec_max_grep_files)) returns a prompt to scope the search to a directory or glob, and `grep` returns at most 50 matching lines ([`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)), the same cap `grep_knowledge_files` uses.
+- **A wide `grep` is refused rather than run.** Searching more than 200 files ([`KB_EXEC_MAX_GREP_FILES`](/reference/env-configuration#kb_exec_max_grep_files)) returns a prompt to scope the search to a directory or glob, and `grep` returns at most 50 matching lines ([`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)), the same cap `grep_knowledge_files` and `grep_chat_files` use.
 - The model still has `query_knowledge_files` for semantic search; reach for it when literal commands won't find a paraphrased concept.
 - Built on top of the directory model. `kb_exec` is the only tool that fully reflects the directory structure created in the UI.
 
@@ -212,7 +212,7 @@ When native function calling is enabled, attached knowledge is **not automatical
 ## Setting Up a Knowledge Base
 
 1. Click **Workspace** in the sidebar, then select **Knowledge**.
-2. Click **+ New Knowledge** and give it a name and description.
+2. Click **Create** in the Workspace header and give it a name and description.
 3. Upload files or add existing documents.
 4. Attach the knowledge base to a model in **Workspace > Models > Edit**, or reference it in chat with `#`.
 

@@ -84,7 +84,7 @@ This means many skills can be attached to a model without consuming context wind
 
 ## Creating a Skill
 
-Navigate to **Workspace > Skills** and click **+ New Skill**.
+Navigate to **Workspace > Skills** and click **Create** in the Workspace header.
 
 | Field | Description |
 | :--- | :--- |

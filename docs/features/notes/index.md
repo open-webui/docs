@@ -29,7 +29,7 @@ Unlike standard chats, which are linear and ephemeral, Notes are persistent docu
 
 ### AI-assisted writing, built in
 
-Highlight text and click **Enhance** to let the AI rewrite it in place. Or open the **Chat sidebar** to brainstorm, critique, or expand on your content in a focused conversation without leaving the editor.
+Open the **Chat sidebar** to brainstorm, critique, expand or rewrite your content without leaving the editor. It is the full chat interface, so you keep the model picker, tools and attachments, and you can hold several separate conversations per note. Highlight a passage first and the model rewrites just that part, in place.
 
 ### Precise context injection
 
@@ -50,9 +50,10 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | | |
 | :--- | :--- |
 | ✍️ **Rich editor** | Markdown and Rich Text with a floating formatting toolbar |
-| 🤖 **AI Enhance** | Rewrite or improve selected text in place |
-| 💬 **Chat sidebar** | Have a focused AI conversation about your note's content |
+| 🤖 **AI Enhance** | Ask the note's chat to rewrite or improve selected text in place |
+| 💬 **Chat sidebar** | The full chat interface inside the note, with as many conversations per note as you want |
 | 📎 **Context injection** | Attach notes to any chat for full-fidelity context |
+| 📄 **Attachments** | Upload files onto the note itself, listed above the note body |
 | 📌 **Pin to sidebar** | Pin frequently used notes for quick access from the sidebar |
 | 🔍 **Agentic access** | Models can search, read, and update notes autonomously |
 | 📤 **Export** | Download as `.txt`, `.md`, or `.pdf` |
@@ -77,15 +78,39 @@ This editor can also be enabled for standard chats: **Settings > Interface > Ric
 
 ## AI Integration
 
-Click the **AI button** (bottom right) to access:
+Open the note's chat with the **speech bubble** button in the editor toolbar, at the top of the note next to Undo/Redo. Everything the AI does to a note now runs through that chat.
 
 ### Enhance
 
-Select text (or leave nothing selected for the whole note) and click **Enhance**. The AI rewrites it in place using the model selected in the note's controls.
+Rewriting happens in the chat, there is no separate **Enhance** button. Select the passage you want reworked, open the chat and either use the **Rewrite the selected text.** suggestion or say what you want. The model rewrites the note in place through `replace_note_content`, and the change appears in the editor as it happens. Leave nothing selected to talk about the whole note.
 
 ### Chat Sidebar
 
-Opens a dedicated conversation focused on the note's content. Ask the AI to summarize, extract data, critique, or rewrite specific sections. Use the **Edit toggle** to manually modify the context sent to the AI before submitting.
+Opens the full chat interface in a pane beside the note. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and everything else the chat input offers. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+
+**Insert a response into the note.** Every assistant response carries an **Insert** button that drops that response into the note at the cursor. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
+
+**Several conversations per note.** The panel header is a dropdown listing every chat attached to this note. Use it to switch between them, start a new one or delete one. A new conversation is only stored once you send its first message, so opening one and walking away leaves nothing behind. Deleting the last remaining chat immediately recreates an empty one.
+
+**Suggested prompts.** While a conversation is still empty, four prompts are offered: enhance the note and update it, summarize it, extract action items, rewrite the selected text. They disappear as soon as the conversation has messages, and they are also suppressed if you set **Settings > Interface > Landing Page Mode** to **Chat**.
+
+**Selected text is passed along.** If you have text selected in the note, that selection is appended to whatever you send as the target for a rewrite. Selecting nothing sends the message on its own.
+
+:::info How the model actually sees the note
+
+The note is not pasted into the conversation. The chat carries a system prompt with the note's id, and the model reads the note with `view_note` and edits it with `replace_note_content`. Edits land in the editor as the model makes them, without a reload.
+
+Two consequences. A model that cannot call tools will not see the note content at all. And builtin tools behave differently in this chat than anywhere else: the note tools are always injected, and the whole builtin-tool surface is force-enabled even for models an administrator configured without it. See [Builtin tools in a note-attached chat](/features/extensibility/plugin/tools#tool-reference).
+
+Non-image files attached to the note are injected as retrieval context on every message in the note's chats.
+
+:::
+
+:::info Note chats are separate from your chat history
+
+Chats opened from a note are internal chats. They do not appear in the sidebar chat list or in search, and they are per user: on a shared note, each collaborator has their own set of conversations and cannot see anyone else's. Read access on the note is enough to open one.
+
+:::
 
 All AI changes are tracked by **Undo/Redo** (top right), so you can always revert.
 
@@ -166,6 +191,15 @@ Administrators can control sharing via environment variables or the Admin Panel:
 
 These can also be configured in **Admin Panel > Users > Groups > Default Permissions**.
 
+### Attachments
+
+Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either.
+
+Two things to know:
+
+* **Images uploaded from the menu are invisible.** They are stored on the note but are neither shown as a chip nor placed in the text. To get an image into the note, paste it into the editor, which inserts it where the cursor is. Dropping files onto a note does nothing in this release.
+* Attached files feed the note's chat. Every non-image attachment is added as retrieval context on every message you send in a chat opened from this note.
+
 ### Quick creation
 
 * Navigate to `/notes/new` to open a blank note
@@ -187,7 +221,7 @@ Notes are workspace items. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), admi
 
 ### Living drafts
 
-Draft something in Notes, use **Enhance** to expand bullet points into paragraphs, and use the **Chat sidebar** to brainstorm titles. The Note is the final product, not just a reference.
+Draft something in Notes, select the bullet points and ask the note's chat to expand them into paragraphs, then keep a second conversation open for brainstorming titles. The Note is the final product, not just a reference.
 
 ### High-fidelity code context
 
@@ -195,7 +229,7 @@ RAG uses vector search, which is probabilistic and might miss a crucial line. Pa
 
 ### Data sanitization
 
-Paste server logs containing sensitive data into a Note, redact the keys (or use Enhance to "Anonymize this text"), then attach the sanitized Note to a chat. This prevents leaking sensitive data into your chat history.
+Paste server logs containing sensitive data into a Note, redact the keys (or ask the note's chat to anonymize the text), then attach the sanitized Note to a chat. This prevents leaking sensitive data into your chat history.
 
 ---
 

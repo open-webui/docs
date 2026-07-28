@@ -82,7 +82,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 :::warning
 **Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 2048 tokens available, you're getting less than half the page content, often missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
-**To Fix This:** Navigate to **Settings > Admin > AI > Models > Settings** (of your Ollama model) > **Advanced Parameters** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-4 Turbo with 128k tokens).
+**To Fix This:** Navigate to **Settings > Admin > AI > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-4 Turbo with 128k tokens).
 :::
 
 For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can.
@@ -265,7 +265,7 @@ The **File Context** capability controls whether Open WebUI performs RAG (Retrie
 
 **When to disable File Context:**
 - **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
-- **Using Builtin Tools only**: If you prefer the model to retrieve file content on-demand via tools like `query_knowledge_bases` rather than having content pre-injected.
+- **Using Builtin Tools only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling File Context is also what injects the builtin **Files** tools, which let the model list, search and read the chat's attachments itself.
 - **Debugging/testing**: To isolate whether issues are related to RAG processing.
 
 :::warning File Context Disabled = No Pre-Injected Content
@@ -303,7 +303,7 @@ These capabilities work independently, giving you fine-grained control:
 |--------------|---------------|--------|
 | ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
 | ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
-| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content, but model can use tools to query knowledge bases or retrieve attached files on-demand |
+| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
 | ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
 :::tip Choosing the Right Configuration

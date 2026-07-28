@@ -8,7 +8,7 @@ title: "Analytics"
 The **Analytics** feature in Open WebUI provides administrators with comprehensive insights into usage patterns, token consumption, and model performance across their instance. This powerful tool helps you understand how your users are interacting with AI models and make data-driven decisions about resource allocation and model selection.
 
 :::info Admin-Only Feature
-Analytics is only accessible to users with **admin** role. Access it via **Admin Panel > Analytics**.
+Analytics is only accessible to users with **admin** role. Access it via **Settings > Admin > Analytics**.
 :::
 
 :::tip Disabling Analytics
@@ -33,8 +33,10 @@ All analytics data is derived from the message history stored in your instance's
 ## Accessing Analytics
 
 1. Log in with an **admin** account
-2. Navigate to **Admin Panel** (click your profile icon → Admin Panel)
-3. Click on the **Analytics** tab in the admin navigation
+2. Click your profile icon and open **Settings**
+3. Open the **Admin** section and select **Analytics**, listed under **Quality**
+
+The dashboard is no longer a separate page. It opens in the settings window next to your personal settings, and the old `/admin/analytics` URL redirects there. If [`ENABLE_ADMIN_ANALYTICS`](/reference/env-configuration#enable_admin_analytics) is off, that URL redirects to the Admin Panel user list instead and the Analytics entry is not listed.
 
 ---
 

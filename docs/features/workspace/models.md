@@ -63,7 +63,7 @@ Use Jinja2-style variables like `{{ USER_NAME }}` and `{{ CURRENT_DATE }}` so th
 
 ## Creating a Model
 
-Click **+ New Model** in **Workspace > Models**, or click the ellipsis (**...**) on an existing model and select **Edit**.
+Click **Create** in the **Workspace** header while the **Models** tab is selected, or click the ellipsis (**...**) on an existing model and select **Edit**.
 
 ### Core configuration
 
@@ -155,7 +155,7 @@ To download new base models, go to **Settings > Connections > Ollama** or type `
 
 ## Global Model Defaults (Admin)
 
-Administrators can set baseline capabilities and parameters that apply to all models via **Settings > Admin > AI > Models > ⚙️ (gear icon)**.
+Administrators can set baseline capabilities and parameters that apply to all models via **Settings > Admin > AI > Models > Model Defaults > Configure**.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
@@ -176,7 +176,65 @@ See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-atta
 
 ### Bulk management
 
-Filter the admin model list by status (Enabled, Disabled, Visible, Hidden) and use **Bulk Actions** to enable or disable all models in the current view at once. Useful when external providers expose hundreds of models.
+Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Manual drag-to-reorder is only available with no search text and no filter applied.
+
+---
+
+## Selected and Pinned Models (Admin)
+
+These are the two instance-wide settings that decide which model or models a user starts out with. They were previously called **default models**; the interface now calls them **Selected** and **Pinned** models. The configuration keys behind them are unchanged, so existing environment configuration keeps working.
+
+| Setting | Menu action | What it does | Config key |
+| :--- | :--- | :--- | :--- |
+| **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
+| **Pinned Model** | **Set as Pinned Model** | Pre-fills the model shortcuts in the sidebar for users who have not pinned any models themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
+
+Both accept more than one model, so you can hand users a small starting set rather than a single model.
+
+:::info Not the same as Model Defaults
+The **Model Defaults** panel at the top of the same page is a different feature: it sets baseline capabilities, parameters and prompt suggestions for all models. See [Global Model Defaults](#global-model-defaults-admin).
+:::
+
+### Setting a selected or pinned model
+
+1. Go to **Settings > Admin > AI > Models**.
+2. Find the model with **Search Models**, or narrow the list with the view filter.
+3. Click the ellipsis (**...**) at the end of the model's row.
+4. Choose **Set as Selected Model** or **Set as Pinned Model**.
+
+![Set as Selected Model and Set as Pinned Model in a model's ellipsis menu](/images/features/models/model-row-menu.png)
+
+The change is saved immediately, no separate save step, and the row picks up a **Selected** or **Pinned** label next to the model name. Repeat on as many models as you want. To take one back out, open the same menu and choose **Remove Selected Model** or **Remove Pinned Model**.
+
+:::tip Faster toggling
+Hold **Shift** while the model list is open and every row exposes inline icon buttons for the same actions: the eye toggles visibility, the check toggles Selected, the pin toggles Pinned, the globe or lock toggles public access, and the pencil opens the model. A model that is already pinned shows a crossed-out pin, because clicking it removes the pin. Releasing Shift hides the icons again.
+
+![Inline quick-action icons revealed by holding Shift](/images/features/models/model-quick-actions.png)
+:::
+
+### Reviewing what is configured
+
+Open the view filter (the **All** dropdown next to **Actions**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by Enabled, Disabled, Visible, Hidden, Public and Private.
+
+![The view filter with the Selected and Pinned options](/images/features/models/model-view-filter.png)
+
+### How a selected model resolves for a user
+
+For a new chat, Open WebUI takes the first of these that yields a model the user can actually use:
+
+1. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params).
+2. The models bound to the folder the chat is started in, if any.
+3. The user's own default model, saved from the model selector in a chat with **Set as default**.
+4. The instance's **Selected Models**.
+5. The first available model in the list.
+
+Models that have been hidden or removed are dropped at every step, so a user whose last-used model disappeared lands on a working one instead of an empty selector.
+
+**Pinned Models** work differently: they seed the user's sidebar shortcuts once, only when the user has no pinned models of their own. From then on the user's own pins win, and pins pointing at hidden or deleted models are cleaned up automatically.
+
+:::warning Selected is a starting point, not a restriction
+Setting a model as Selected does not stop anyone from switching to another model they have access to. To control what a user can reach, use per-model access control or **Hide**, described in [Curated-Interface Deployments](#curated-interface-deployments).
+:::
 
 ---
 
@@ -252,4 +310,4 @@ Model presets configure behavior through system prompts and tool bindings. They 
 
 ### Fallback requires configuration
 
-If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and a default model is configured in Settings > Admin > AI > Models.
+If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Admin > AI > Models**. The fallback uses the first Selected Model.

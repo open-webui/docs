@@ -91,12 +91,10 @@ When using `UVICORN_WORKERS` greater than 1 with the default `LocalOrchestrator`
 
 ### Step 3: Configure Picture Description (Optional)
 
-To enable AI-powered image description within documents:
+To enable AI-powered image description within documents, add the picture description options to the **Docling Parameters** JSON field in the **Documents** tab. Two modes are available:
 
-1. In the **Documents** tab, activate **Describe Pictures in Documents**
-2. Choose a description mode: `local` or `API`
-   - **local**: Vision model runs within the Docling container itself
-   - **API**: Docling calls an external service (e.g., Ollama, OpenAI-compatible endpoint)
+- **local**: Vision model runs within the Docling container itself, configured via `picture_description_local`
+- **API**: Docling calls an external service (e.g., Ollama, OpenAI-compatible endpoint), configured via `picture_description_api`
 
 :::danger Required for API Mode
 
@@ -114,16 +112,18 @@ Without this, Docling will reject requests to external services with an `Operati
 
 Make sure your configuration is **valid JSON**!
 
+:::warning Nested objects must be written as JSON strings
+
+Open WebUI forwards the Docling Parameters values to docling-serve as multipart form fields exactly as you enter them, without re-encoding. Docling parses its nested options (`picture_description_local`, `picture_description_api`, `picture_description_custom_config`) from a JSON **string**, so an object written inline is not transmitted correctly and the upload fails with an `Invalid JSON for field ...` error on the docling-serve side. Write these values as escaped JSON strings, as shown below. Plain values, booleans and lists need no escaping.
+
+:::
+
 **Local Model Configuration:**
 
 ```json
 {
-  "repo_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
-  "generation_config": {
-    "max_new_tokens": 200,
-    "do_sample": false
-  },
-  "prompt": "Describe this image in a few sentences."
+  "do_picture_description": true,
+  "picture_description_local": "{\"repo_id\": \"HuggingFaceTB/SmolVLM-256M-Instruct\", \"generation_config\": {\"max_new_tokens\": 200, \"do_sample\": false}, \"prompt\": \"Describe this image in a few sentences.\"}"
 }
 ```
 
@@ -131,12 +131,8 @@ Make sure your configuration is **valid JSON**!
 
 ```json
 {
-  "url": "http://host.docker.internal:11434/v1/chat/completions",
-  "params": {
-    "model": "llava:7b"
-  },
-  "timeout": 60,
-  "prompt": "Describe this image in great detail."
+  "do_picture_description": true,
+  "picture_description_api": "{\"url\": \"http://host.docker.internal:11434/v1/chat/completions\", \"params\": {\"model\": \"llava:7b\"}, \"timeout\": 60, \"prompt\": \"Describe this image in great detail.\"}"
 }
 ```
 
@@ -211,6 +207,12 @@ Configure via `DOCLING_PARAMS` JSON in **Admin Settings > Documents** or via env
 **Solution**: 
 - Update Open WebUI to the latest version (uses `/v1/convert/file`)
 - Update docling-serve to v1.0+ (uses `/v1` API)
+
+### "Invalid JSON for field ..." in the docling-serve logs
+
+**Cause**: A nested Docling parameter was written as an inline object. Open WebUI passes Docling Parameters through as form fields unchanged, so Docling receives the object's keys instead of the object.
+
+**Solution**: Write nested values such as `picture_description_api` as escaped JSON strings. See [JSON Configuration Examples](#json-configuration-examples).
 
 ### Timeout errors on large documents
 

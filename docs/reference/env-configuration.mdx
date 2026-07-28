@@ -208,7 +208,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params) takes precedence and is left alone.
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > AI > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
@@ -222,7 +222,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Comma-separated list of model IDs to pin by default for new users who haven't customized their pinned models. This provides a pre-selected set of frequently used models in the model selector for new accounts.
+- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Admin > AI > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Example: `gpt-4,claude-3-opus,llama-3-70b`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -855,6 +855,13 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 :::tip Best of both worlds: compress at the reverse proxy
 If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloudflare, ...) sits in front of Open WebUI, enable compression **there** and set `ENABLE_COMPRESSION_MIDDLEWARE=false`. Clients still receive compressed responses, while the compression work moves off the Python workers onto infrastructure built for it — CDNs and proxies can additionally cache static assets in pre-compressed form. Pair this with aggressive proxy-side caching of the content-hashed frontend bundles under `/_app/immutable/` (`Cache-Control: public, max-age=31536000, immutable`), which removes the larger-first-page-load downside for every visit after the first. This is the recommended setup for scaled deployments; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for details and an Nginx example.
 :::
+
+#### `ENABLE_ORJSON`
+
+- Type: `bool`
+- Default: `False`
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, upstream provider responses including streamed chunks, and Socket.IO payloads. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
+- Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
 
@@ -3506,6 +3513,8 @@ The old individual environment variables (`DOCLING_OCR_ENGINE`, `DOCLING_OCR_LAN
   - `picture_description_api` (str): API endpoint configuration object for picture descriptions.
   - `vlm_pipeline_model_api` (str): Vision-language model API configuration. (e.g., `openai://gpt-4o`).
 
+  **Note:** these values are forwarded to the Docling server as form fields exactly as entered, without re-encoding. Parameters whose value is a nested object (such as `picture_description_local` and `picture_description_api`) must therefore be written as JSON strings, for example `"picture_description_api": "{\"url\": \"...\", \"params\": {\"model\": \"llava:7b\"}}"`. Plain values, booleans and lists are entered directly.
+
 - Example:
 ```json
 {
@@ -3594,11 +3603,13 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `str`
 - Default: `""` (empty)
-- Description: Authentication token for the PaddleOCR-vl server. Sent as `Authorization: token <value>` on every layout-parsing request. **The PaddleOCR-vl engine is skipped at runtime if this value is empty**: the loader falls back to the default PyPDFLoader for the current document even when `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` is set. Set this to activate the engine.
+- Description: Authentication token for the PaddleOCR-vl server. Sent as `Authorization: token <value>` on every layout-parsing request. **The PaddleOCR-vl engine is skipped at runtime if this value is empty**: the loader falls back to the default loader chain for the current document even when `CONTENT_EXTRACTION_ENGINE=paddleocr_vl` is set. Set this to activate the engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info Supported file types
-PaddleOCR-vl handles both documents and images. Extensions treated as images and dispatched with `fileType=1`: `png`, `jpg`, `jpeg`, `bmp`, `tiff`, `webp`. Everything else is dispatched with `fileType=0` (document, e.g. PDFs). Output is per-page Markdown, so downstream chunking behaves the same as other engines.
+As of v0.11.0, PaddleOCR-vl only receives `pdf`, `png`, `jpg`, `jpeg`, `bmp`, `tiff` and `webp` files. Every other extension (`txt`, `md`, `docx`, `xlsx`, `csv` and the rest) skips the engine entirely and goes to the default loader chain, so those files are still parsed and indexed, just by the built-in loaders. Size and provision your PaddleOCR-vl server for PDFs and images only. Before v0.11.0 all file types were sent to the server, and unsupported ones failed to index.
+
+Of the files it does receive, images are dispatched with `fileType=1` and PDFs with `fileType=0`. Output is per-page Markdown, so downstream chunking behaves the same as other engines.
 :::
 
 ## Retrieval Augmented Generation (RAG)
@@ -3682,21 +3693,21 @@ PaddleOCR-vl handles both documents and images. Extensions treated as images and
 
 - Type: `int`
 - Default: `50`
-- Description: How many matching lines a knowledge search returns before the rest are summarized as a count. It applies to both `grep_knowledge_files` and `kb_exec`'s `grep`, so the two behave alike.
+- Description: How many matching lines a text search returns before the rest are summarized as a count. Despite the name it governs every builtin grep: `grep_knowledge_files`, `kb_exec`'s `grep`, and `grep_chat_files` over the files attached to a chat, so all three behave alike.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `VIEW_FILE_MAX_CHARS`
 
 - Type: `int`
 - Default: `100000`
-- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset`.
+- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset`. `view_file` reads knowledge files and files attached to a chat alike, so this bounds both.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `VIEW_FILE_DEFAULT_MAX_CHARS`
 
 - Type: `int`
 - Default: `10000`
-- Description: How much `view_file` and `view_knowledge_file` return when the model does not ask for a size, bounded by [`VIEW_FILE_MAX_CHARS`](#view_file_max_chars). Raising it means fewer round trips through a long document at the cost of a larger first read.
+- Description: How much `view_file` and `view_knowledge_file` return when the model does not ask for a size, bounded by [`VIEW_FILE_MAX_CHARS`](#view_file_max_chars), and applying to chat attachments as well as knowledge files. Raising it means fewer round trips through a long document at the cost of a larger first read.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `RAG_HYBRID_BM25_WEIGHT`

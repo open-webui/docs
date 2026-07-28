@@ -218,6 +218,19 @@ By default, Open WebUI compresses HTTP responses (JSON API responses and the sta
 
 See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
+#### JSON Encoder
+
+Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chunk of a streamed completion arriving from the provider, and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
+
+*   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
+*   **Where it is not**: a single-user instance. The saving is real but too small to notice against model latency.
+*   **Why it is opt-in**: orjson is stricter than the standard library. Payloads it rejects (non-string dictionary keys, integers beyond 64 bits, `NaN`/`Infinity` literals) fall back to the standard-library path automatically, so nothing breaks, but the default stays on the standard library to keep behaviour byte-for-byte identical to earlier releases. The one behaviour change to be aware of: `NaN` and `Infinity` floats in a JSON response now serialize as `null` instead of raising.
+
+- **Env Var**: `ENABLE_ORJSON=True`
+  *   *Recommendation*: enable on any Redis-backed multi-worker or multi-replica deployment. Requires a restart. Available from v0.11.0.
+
+See [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full breakdown, and [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself.
+
 #### Thread Pool Size
 Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count. Threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
 *   **Default**: 40 (the AnyIO default, far too low for production)
@@ -512,6 +525,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
+13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of encoding Socket.IO events and parsing streamed provider chunks, which is the heaviest JSON work in a clustered deployment. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 
@@ -576,6 +590,7 @@ For detailed information on all available variables, see the [Environment Config
 | `ENABLE_REALTIME_CHAT_SAVE` | [Realtime Chat Save](/reference/env-configuration#enable_realtime_chat_save) |
 | `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
 | `ENABLE_COMPRESSION_MIDDLEWARE` | [HTTP Response Compression](/reference/env-configuration#enable_compression_middleware) |
+| `ENABLE_ORJSON` | [JSON Encoder](/reference/env-configuration#enable_orjson) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
 | `CONTENT_EXTRACTION_ENGINE` | [Content Extraction Engine](/reference/env-configuration#content_extraction_engine) |

@@ -272,8 +272,8 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases.* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
 | `query_chat_files` | Semantic / RAG search across the attached files, or one file when given its ID. Results are returned as cited chunks. |
-| `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. |
-| `view_file` | Read one of the attached files by ID, with character pagination or a line range. |
+| `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. Capped at 50 matches by default, the same [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches) limit the knowledge greps use. |
+| `view_file` | Read one of the attached files by ID, with character pagination or a line range. Same tool, and the same [`VIEW_FILE_DEFAULT_MAX_CHARS`](/reference/env-configuration#view_file_default_max_chars) / [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars) sizing, as when it reads a knowledge file. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
@@ -606,7 +606,7 @@ This means users can disable web search (or image generation, or code interprete
 :::
 
 :::tip Full Agentic Experience
-For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In the **Settings > Admin > AI > Models**, find the **Model Specific Settings** for your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
+For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In **Settings > Admin > AI > Models**, click the pencil (**Edit**) on your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
 :::
 
 :::tip Builtin Tools vs File Context

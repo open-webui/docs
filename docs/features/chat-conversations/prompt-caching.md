@@ -39,7 +39,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | Source | What it does | Cache impact |
 |---|---|---|
 | **File Context (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High — injected content changes per query |
-| **Citations** | Wraps retrieved sources in a citation/RAG-template instruction | High — varies with the retrieved sources |
+| **Citations** | Rewrites the **system message and the last user message** with the RAG template plus the source list, after every tool-calling round that produced sources | Very high, see the warning below |
 | **Memory (system context)** | Injects stored user memories into the system message | High — changes whenever memories change |
 | **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high — but a **File Context sub-mode**; only fires while File Context is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low — constant while voice mode is on |
@@ -47,6 +47,12 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 
 :::info
 The attachment metadata block is intentionally **metadata only** (no file content), so it stays stable across turns and does not meaningfully hurt caching. The content-injecting rows above are the ones to watch.
+:::
+
+:::danger Citations are the biggest cache-breaker in an agentic setup
+It is tempting to assume that moving retrieval into tools makes citations harmless, because tool results are appended at the end. It does not. When the **Citations** capability is on and a tool round returns sources (`query_chat_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file`, `search_web`, `fetch_url`), Open WebUI restores the pre-RAG system and user messages and then **re-applies the RAG template with the accumulated source list into the system message and the last user message**. That happens **after every tool-calling iteration**, and the source list grows as the model calls more tools.
+
+The practical effect: the cached prefix is invalidated on every single tool round, which is exactly the thing an agentic setup does most. Turning File Context off but leaving Citations on gives you most of the cost of the old setup with none of the benefit.
 :::
 
 ## The cache-optimal setup
@@ -57,11 +63,26 @@ The goal is a **static prefix** (system prompt + tools) with **append-only** gro
 
 Configure a fixed system prompt on the model and avoid anything that regenerates it per turn. This is the single most valuable cacheable block — put your instructions (including how to cite, see below) here once.
 
-### 2. Turn File Context off
+### 2. Turn File Context off (this is what switches the file tools on)
 
-Disable the **File Context** capability on the model. Attached files, knowledge bases, collections and referenced chats are still **surfaced to the model as stable metadata**, but their **content is no longer auto-retrieved or injected**. See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+Disable the **File Context** capability on the model, and leave **File Upload** enabled. Attached files, knowledge bases, collections and referenced chats are still **surfaced to the model as stable metadata** in an `<attached_files>` block on the message that carried them, but their **content is no longer auto-retrieved or injected**. See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+
+From v0.11 this is not only a subtraction. **File Context being off is the condition that injects the builtin Files tools**, which let the model read and search chat attachments itself:
+
+| Tool | What the model does with it |
+|---|---|
+| `list_chat_files` | See which files are attached, with ids, filenames, content types and sizes |
+| `query_chat_files` | Semantic search across the attachments, or one file by id |
+| `grep_chat_files` | Exact text search, returning matching lines with file ids and line numbers |
+| `view_file` | Read a passage by character offset or line range |
+
+Turning File Context back on removes these tools again, on the grounds that the content would already be in the conversation. The two are deliberately exclusive, so there is no configuration where you pay for injection and agentic access at once.
 
 Retrieval then becomes **on-demand**: the model decides what to fetch and calls a tool. Tool results are appended at the **end** of the conversation, so they never rewrite the cached prefix.
+
+:::info Chat-attached collections and notes are not orphaned
+Turning File Context off also re-routes any knowledge collections or notes attached to the chat into the knowledge tool path, so they stay searchable through `query_knowledge_files` and friends rather than becoming invisible. Nothing you attach loses its route to the model, only the automatic injection goes away.
+:::
 
 :::info "Using Entire Document" is a File Context sub-mode
 The per-file/per-knowledge **Full Context** ("Using Entire Document") mode injects a complete document into every message — the heaviest cache-breaker of all. But it runs **inside** File Context, so turning File Context off (this step) **already disables it** — enabling Full Context while File Context is off does nothing. Just don't re-enable File Context + Full Context as a retrieval workaround; use on-demand tools instead. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
@@ -69,7 +90,9 @@ The per-file/per-knowledge **Full Context** ("Using Entire Document") mode injec
 
 ### 3. Turn Citations off and move citation rules into the system prompt
 
-With **Citations** disabled, Open WebUI stops wrapping retrieved sources in the dynamic citation/RAG template. Keep citations anyway by adding **static citation instructions to your system prompt**, for example:
+This matters more than it used to, not less. With **Citations** disabled, Open WebUI stops re-applying the RAG template and source list into the system and last user message after each tool round, so the prefix survives an agentic conversation intact. What you give up is the source pills rendered under the reply in the UI; the model still receives the tool results themselves, which is where the content was all along.
+
+Keep citations in the answer text anyway by adding **static citation instructions to your system prompt**, for example:
 
 - Cite retrieved passages using the source id returned in the tool result (e.g. `[1]`, `[2]`).
 - Cite web pages as markdown links, e.g. `[example.com](https://example.com/...)`.
@@ -78,13 +101,30 @@ Because the instruction lives in the (cached) system prompt, you get citations *
 
 ### 4. Keep retrieval agentic
 
-Enable **Builtin Tools** and/or provide your own workspace tool so the model can fetch content only when it needs it:
+Enable **Builtin Tools** on the model and leave the categories you need switched on. As of v0.11 every resource type a chat can carry has a first-class tool, so custom workspace tools are no longer needed to fill gaps:
 
-- **Knowledge bases, collections, notes** → built-in knowledge tools (e.g. `query_knowledge_bases`).
-- **Files attached directly to the chat** → a file-scoped retrieval tool (a built-in tool where available, or a small custom workspace tool).
-- **Referenced chats** → the chat-viewing tool.
+| Resource | Tools | Category |
+|---|---|---|
+| Files attached to the chat | `list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file` | **Files** |
+| Knowledge bases and collections | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
+| Notes | `search_notes`, `view_note` | **Notes** |
+| Referenced chats | `search_chats`, `view_chat` | **Chat History** |
 
-Each tool re-resolves and access-checks the resource server-side, so nothing enters the context that the model didn't explicitly request. See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
+This requires **Native** function calling. Builtin tools are a native-mode feature and are not injected for models set to Legacy.
+
+The **Files** category has the tightest conditions of the four. All five must hold, or the tools are silently absent:
+
+1. The **Files** builtin category is enabled on the model (default: on).
+2. The model's **File Upload** capability is on.
+3. The model's **File Context** capability is **off**.
+4. The chat actually has at least one attached file.
+5. The user holds the `chat.file_upload` permission (admins always pass).
+
+Each tool re-resolves and access-checks the resource server-side on every call, so nothing enters the context that the model didn't explicitly request, and an attachment the user can no longer open is skipped rather than read. See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
+
+:::tip Keep the tool list itself stable
+Tool definitions sit in the cached prefix alongside the system prompt, so toggling categories, attaching a skill, or enabling web search mid-conversation invalidates the cache from that point. Decide the tool set per model, not per turn. Note that the Files tools appear the moment the first file is attached to a chat, which is a one-time change within that conversation rather than per-turn churn.
+:::
 
 ### 5. Handle Memory deliberately
 
@@ -118,9 +158,12 @@ In every case the requirement is the same: **don't rewrite the beginning of the 
 
 ## Summary checklist
 
+Set on the model, under **Settings > Admin > AI > Models**, click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
+
 - [ ] Static system prompt (no per-turn regeneration)
-- [ ] **File Context** off — no automatic content injection (this also disables "Using Entire Document" / Full Context)
+- [ ] **File Upload** on, **File Context** off, no automatic content injection (this also disables "Using Entire Document" / Full Context) **and** it is what injects the Files tools
 - [ ] **Citations** off — citation rules moved into the system prompt
-- [ ] **Builtin / custom retrieval tools** on — agentic, on-demand fetching
+- [ ] **Builtin Tools** on, with the **Files**, **Knowledge Base**, **Notes** and **Chat History** categories left enabled
+- [ ] Function calling set to **Native** (builtin tools do not exist in Legacy mode)
 - [ ] **Memory** stable, or `ENABLE_MEMORY_SYSTEM_CONTEXT=false` + on-demand retrieval
 - [ ] Keep the tool list stable across turns

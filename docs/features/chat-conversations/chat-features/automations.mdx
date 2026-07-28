@@ -84,6 +84,21 @@ On the editor page, you can:
 
 Execution logs are paginated with infinite scroll in the editor, so large run histories load incrementally.
 
+## Export and Import
+
+The Automations list header has a split **Create** button. Its dropdown holds **Import JSON** and **Export JSON**, which move automations between instances or accounts.
+
+**Export JSON** downloads every automation you own as `automations-export-<timestamp>.json`, regardless of the search box or the status filter. Each entry keeps its name, schedule and other settings, folder assignment and enabled state. IDs, timestamps and run history are not written to the file, so an export is a copy of your definitions, not a backup of past runs.
+
+**Import JSON** accepts a `.json` file holding either a bare array of automations or an object with an `automations` key. Anything else is rejected as invalid JSON format.
+
+What import does and does not do:
+
+- Every entry becomes a **new** automation. Nothing is matched against what you already have, so importing the same file twice leaves you with duplicates.
+- Entries are **created active** unless the file sets `is_active` to `false`. Importing can therefore start scheduled runs on the target instance right away; disable them first if that is not what you want.
+- A folder is kept only if a folder with that ID exists in your own account. Otherwise it is dropped and the automation is imported without one.
+- Each entry goes through the normal create path, so schedule validation and the [admin limits](#admin-limits) still apply. The first entry that is rejected, an invalid `RRULE` or a hit against [`AUTOMATION_MAX_COUNT`](/reference/env-configuration#automation_max_count) for example, aborts the rest of the import; entries created before it stay.
+
 ## Folders
 
 An automation can be assigned a folder, and every chat it creates from then on is filed there instead of landing loose in the chat list. This keeps a recurring report or digest out of the way, and lets the folder's unread badge tell you how many runs you have not read yet.

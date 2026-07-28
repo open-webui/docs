@@ -61,7 +61,7 @@ Share prompts with specific users or groups. Public prompts appear in everyone's
 
 ## Creating a Prompt
 
-Navigate to **Workspace > Prompts** and click **+ New Prompt**.
+Navigate to **Workspace > Prompts** and click **Create** in the Workspace header.
 
 | Field | Description |
 | :--- | :--- |

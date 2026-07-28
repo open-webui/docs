@@ -1,0 +1,168 @@
+---
+sidebar_position: 11
+title: "Open WebUI vs LobeHub"
+sidebar_label: "Open WebUI & LobeHub"
+description: "Open WebUI vs LobeHub (LobeChat) compared. Two self-hostable AI workspaces, with different licences and different paid lines."
+keywords: ["Open WebUI vs LobeHub", "LobeChat alternative", "LobeHub alternative", "LobeChat vs Open WebUI", "self-hosted AI chat", "open webui alternative", "open webui comparison"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do LobeHub and Open WebUI compare?", "acceptedAnswer": {"@type": "Answer", "text": "Both are self-hostable AI workspaces that connect to many model providers. LobeHub puts agents at the centre, with agent groups, scheduled runs and a large skill and plugin marketplace. Open WebUI is a full agentic platform: builtin tools, MCP, sub-agents, automations, a terminal and code execution, with knowledge bases, channels, notes and identity management alongside them."}}, {"@type": "Question", "name": "Is LobeChat open source?", "acceptedAnswer": {"@type": "Answer", "text": "It is source available, as is Open WebUI. LobeChat is published under the LobeHub Community License, LobeHub's own licence, which is not OSI open source. Unmodified commercial use as a service is permitted, but distributing a derivative work requires a commercial licence from LobeHub."}}, {"@type": "Question", "name": "Is LobeChat free to self-host?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The community build is free to self-host, in a single-user client database mode or a multi-user server database mode that needs PostgreSQL, S3-compatible storage and an authentication provider. LobeHub Cloud is a separate paid product, and an Enterprise Edition covers private deployment, brand theming and user management."}}, {"@type": "Question", "name": "Which one includes access control without paying?", "acceptedAnswer": {"@type": "Answer", "text": "Both. Open WebUI includes SSO, LDAP, groups, RBAC, SCIM 2.0 and audit logging in the free edition for unlimited users. LobeChat's community build includes SSO, workspaces with members, four built-in workspace roles, per-resource grants and a workspace audit log, despite its pricing page listing user management under Enterprise. LobeChat does not implement LDAP or SCIM 2.0 at all, which is the real difference."}}]})}</script>
+</Head>
+
+
+# Open WebUI & LobeHub
+
+*Last updated: July 2026*
+
+[LobeHub](https://lobehub.com/) (the project is [LobeChat](https://github.com/lobehub/lobe-chat)) is one of the most opinionated AI workspaces you can self-host, and it has taken a clear position: agents are the unit of work. You assemble agents, group them so they collaborate on a task, give them an editable memory, and schedule runs so work happens while you are away. Around that sits a large marketplace of MCP-compatible skills. If that model matches how you think, it is a strong pick.
+
+:::info How to check this page
+
+Everything claimed here about Open WebUI is verifiable in our own documentation, linked throughout. Everything about LobeHub comes from its own repository, licence, configuration reference and pricing page, all linked below, and describes their project as of the date above. Where its marketing and its source code disagree, we went with the source code and say so on the page. LobeHub ships quickly, so treat anything undated as possibly out of date and check their sources before deciding.
+
+If something here is wrong or has aged badly, including in LobeHub's favour, [tell us](https://github.com/open-webui/docs/issues) and we will correct it.
+
+:::
+
+[GitHub](https://github.com/lobehub/lobe-chat) · [Source Available](https://github.com/lobehub/lobe-chat/blob/main/LICENSE) (LobeHub Community License) · [Pricing](https://lobehub.com/pricing)
+
+---
+
+## What LobeHub Does Well
+
+- **Agent-centric workflow** with an agent builder, agent groups that work a task in parallel, and shared projects and pages
+- **Scheduled agent runs**, so work can happen on a timetable rather than only when you are typing
+- **Editable, structured memory** you can inspect and correct
+- **Large skill and plugin marketplace**, MCP-compatible, [10,000+ by LobeHub's count](https://github.com/lobehub/lobe-chat)
+- **Any major provider plus local models**, including OpenAI, Anthropic, Google, DeepSeek and [Ollama](/alternatives/ollama)
+- **One-click deploys** to Vercel, Zeabur, Sealos and others, alongside Docker Compose
+
+---
+
+## What Open WebUI Does Well
+
+- **Full agentic platform** with [builtin system tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) the model calls itself, covering files, knowledge, notes, chats, channels, memory, task lists and the web
+- **Agentic work delegation** with [sub-agents](/features/chat-conversations/chat-features/subagents), [timers](/features/chat-conversations/chat-features/timers) and [automations](/features/chat-conversations/chat-features/automations), so scheduled and parallel work is part of the product rather than a separate one
+- **Real execution surfaces**, including [code interpreter](/features/chat-conversations/chat-features/code-execution/python), Open Terminal and image generation
+- **Customise practically everything**, from per-model prompts, tools, knowledge and parameters to [filters, pipes, actions and event functions](/features/extensibility/plugin/functions) that change behaviour anywhere in the pipeline, plus theming, banners and per-group permissions
+- **Python extensibility** with custom [tools](/features/extensibility/plugin/tools), [MCP](/features/extensibility/mcp) servers, OpenAPI integration, pipelines, and a [community marketplace](/features/extensibility/community)
+- **Knowledge & RAG** with 13 vector databases, 8 content extraction engines, and hybrid BM25 + vector search with cross-encoder reranking
+- **Any model, any provider** including Ollama, OpenAI, Anthropic, Google, Azure, Bedrock, and any OpenAI-compatible API
+- **Deploy anywhere** on your own infrastructure, fully air-gapped if needed
+- **Free community edition** with unlimited users, OIDC/OAuth SSO, LDAP, RBAC, SCIM 2.0 and audit logging included
+
+---
+
+## Licensing, and Where Each Project Draws the Paid Line
+
+Both projects are free to self-host and both sell a paid tier. They differ in **which** capabilities sit behind the paid tier and in **what you may do with the code**, and the second difference is the sharper one here.
+
+**Open WebUI** is source available under the [Open WebUI License](https://github.com/open-webui/open-webui/blob/main/LICENSE), a BSD-3 clause licence with one addition: you may not remove or replace Open WebUI branding once a deployment exceeds 50 users in a rolling 30 day period, unless you hold an enterprise licence. Modifying, forking and redistributing the code is otherwise unrestricted. That is the restriction, stated plainly.
+
+**LobeChat** is published under the [LobeHub Community License](https://github.com/lobehub/lobe-chat/blob/main/LICENSE), LobeHub's own licence, written by them and changeable by them. It is source available and not open source under the [OSI definition](https://opensource.org/osd), the same category Open WebUI is in. Judge it by its own conditions rather than by any familiar licence name attached to it, and two of those conditions matter when you plan a deployment:
+
+- **Using it as-is commercially is fine.** You may run the unmodified project as a frontend or backend service for commercial purposes.
+- **Distributing a derivative work is not.** If you modify LobeChat and want to distribute the result, the licence requires a commercial licence obtained from LobeHub. The licence also reserves LobeHub's right to change the open-source terms and to use contributed code commercially, including in its cloud product.
+
+So the licences restrict opposite things. Ours constrains **branding** above a user threshold and leaves forking alone. LobeHub's leaves branding alone in the community terms and constrains **derivative distribution**. If your plan is to patch the product and ship your own build, that difference decides it. If your plan is to run either project unmodified, neither licence gets in your way.
+
+### What each free self-hosted edition includes
+
+Open WebUI's free edition against LobeChat's community build. The LobeChat column was checked against the [repository itself](https://github.com/lobehub/lobe-chat) at the date above, not only its marketing pages, because the two do not always agree. Where we say a capability is absent, we mean we looked for it in the source and did not find it.
+
+| Capability | Open WebUI (free) | LobeChat (free, self-hosted) |
+| :--- | :--- | :--- |
+| Multi-user deployment | ✅ Included | ✅ Included |
+| OIDC / OAuth single sign-on | ✅ Included | ✅ Included |
+| SAML single sign-on | ⚠️ Via a [trusted-header proxy](/features/authentication-access/auth/sso#trusted-header) | ⚠️ Same proxy pattern |
+| LDAP / Active Directory | ✅ [Included](/features/authentication-access/auth/ldap) | ❌ Not implemented |
+| Role-based access control | ✅ Included | ✅ Included |
+| Per-resource access grants | ✅ Included | ✅ Included |
+| SCIM 2.0 provisioning | ✅ [Included](/features/authentication-access/auth/scim) | ❌ Not implemented |
+| Audit logging | ✅ Included | ✅ Included |
+| Restricting who may sign in | ✅ Included | ✅ Included |
+| User limit before paying | ✅ None | ✅ None |
+| Removing product branding | ℹ️ Up to 50 users | ❌ Enterprise Edition |
+| Distributing a modified build | ✅ Permitted | ❌ Commercial licence required |
+| Dedicated support and SLAs | ❌ [Enterprise licence](/enterprise/support) | ❌ Enterprise Edition |
+
+Nothing in Open WebUI's ✅ rows needs a licence key, a seat count or a paid plan. They are configurable settings.
+
+One correction worth making, because the obvious reading of LobeHub's pricing page is wrong: it lists "user management" as an Enterprise Edition item, which suggests the free build has no access control. The source says otherwise, and the ✅ rows above reflect the code rather than the marketing.
+
+The real identity gap is narrower: **LDAP** and **SCIM 2.0** appear nowhere in LobeChat's source. Both projects give you SSO, roles and per-resource permissions for free, so the question is directory integration. If users arrive from Active Directory, or accounts must be provisioned and deprovisioned automatically from your IdP, Open WebUI does that in the free edition and LobeChat does not do it at all. If you add people by hand or by invitation, this will not decide anything.
+
+Two differences the table deliberately does not score, because they are shape rather than presence: LobeChat partitions an instance into workspaces with their own members, where Open WebUI keeps one instance and attaches groups to resources; and their grants cover agents, agent groups and documents, where ours cover models, knowledge bases, prompts and tools. Each follows from what the product is.
+
+### Cloud and Enterprise pricing
+
+The two paid products are aimed at different buyers, which makes a direct price comparison misleading.
+
+[LobeHub Cloud](https://lobehub.com/pricing) as of July 2026 sells **credit bundles to individuals**: a free tier with 500,000 credits per month, then Starter at $12.9, Premium at $24.9 and Ultimate at $49.9 per month, each with progressively larger credit, file storage and vector storage allowances (roughly 20% cheaper billed annually). Credits are consumed by model usage at published per-million-token rates, so the model bill and the subscription are the same bill. Private deployment, brand theming, user management and a commercial licence sit in the **Enterprise Edition**, which is a contact-us. Read that "user management" line the way LobeHub's own code reads it: workspace roles and permissions are in the free build, and what Enterprise adds around them is not spelled out publicly.
+
+Open WebUI's [enterprise plan](/enterprise) is a support and licensing agreement layered on the same product, not a usage bundle: you bring your own provider keys and pay them directly, and the free edition already includes the identity and access features above for unlimited users.
+
+:::note Check both before you decide
+
+Pricing and tiers change. These figures come from each project's own published terms on the date at the top of this page. Verify against [LobeHub's pricing](https://lobehub.com/pricing) and our [licence](https://github.com/open-webui/open-webui/blob/main/LICENSE) rather than trusting either vendor's summary, including this one.
+
+:::
+
+---
+
+## At a Glance
+
+| | Open WebUI | LobeHub |
+| :--- | :--- | :--- |
+| **Primary focus** | Full agentic AI platform, deployed and governed by you | Agent-centric AI workspace |
+| **Agentic model** | Builtin tools, MCP and native function calling, with sub-agents, timers and automations for delegated and scheduled work | Agents as the unit of work, assembled into groups with shared projects and scheduled runs |
+| **Self-hosting** | Docker, Kubernetes, pip, desktop app | Docker Compose, one-click cloud deploys; server database mode for multi-user |
+| **Identity and access** | SSO, LDAP, groups, RBAC, SCIM 2.0 and audit logging in the free edition | SSO, workspace roles, per-resource grants and audit logging in the free build; no LDAP or SCIM |
+| **Extensibility** | Python tools and functions, MCP, OpenAPI, pipelines | Large MCP-compatible skill and plugin marketplace |
+| **Collaboration** | Channels, Notes, shared conversations, sub-agents | Agent groups, projects, pages, scheduled runs |
+| **Knowledge** | Knowledge bases, 13 vector DBs, 8 extraction engines, hybrid search | File and vector storage, sized per cloud plan |
+| **License** | Open WebUI License (BSD-3 plus a branding clause above 50 users) | LobeHub Community License (distributing a derivative work needs a commercial licence) |
+
+For which identity and access features each free edition includes, see [the table above](#what-each-free-self-hosted-edition-includes) rather than this summary.
+
+---
+
+## When to Use Each
+
+**Choose LobeHub if** the agent model is how you want to work. Agent groups collaborating on one task, scheduled runs, projects and pages as containers, and an editable memory are coherent parts of one idea that LobeHub has committed to further than most. Running it unmodified as a commercial service is explicitly allowed.
+
+**Choose Open WebUI if** you want a full agentic platform an organisation can standardise on: models that call builtin and MCP tools, execute code, drive a terminal, delegate to sub-agents and run on a schedule, on infrastructure you control. The deciding factors are usually directory integration (LDAP and SCIM 2.0, which LobeChat does not implement), the breadth of the retrieval stack when documents matter, Python extensibility for anything the product does not do yet, and the freedom to fork and ship your own build without asking anyone. Note that plain SSO, roles and per-resource permissions are **not** a reason to pick us over them: both include those for free.
+
+We are not a neutral party, so treat the one area where LobeHub is clearly ahead as stated by an interested competitor: its agent-group and scheduling model is more developed than anything we ship under one roof. Pick the tool whose shape matches your problem, not the one whose comparison page you are reading.
+
+---
+
+*LobeHub bets on agents as the unit of work. Open WebUI is a general platform you can deploy, govern and extend. Both are free to self-host, and the licences restrict different things, so read both before you standardise.*
+
+**Ready to try Open WebUI?** [Get started →](/getting-started)
+
+---
+
+## Frequently Asked Questions
+
+**How do LobeHub and Open WebUI compare?**
+Both are self-hostable AI workspaces that connect to many model providers. LobeHub puts agents at the centre, with agent groups, scheduled runs and a large skill and plugin marketplace. Open WebUI is a full agentic platform: builtin tools, MCP, sub-agents, automations, a terminal and code execution, with knowledge bases, channels, notes and identity management alongside them.
+
+**Is LobeChat open source?**
+It is source available, as is Open WebUI. LobeChat is published under the [LobeHub Community License](https://github.com/lobehub/lobe-chat/blob/main/LICENSE), LobeHub's own licence, which is not OSI open source whatever licence name a repository badge may show. Read its conditions rather than the badge. In practice: running it unmodified for commercial purposes is permitted, and distributing a derivative work requires a commercial licence from LobeHub. Open WebUI's licence restricts the other thing: forking and redistribution are unrestricted, while removing our branding above 50 users needs an enterprise licence.
+
+**Is LobeChat free to self-host?**
+Yes. The community build is free, either in a single-user client database mode or a multi-user server database mode that needs PostgreSQL, S3-compatible storage and an authentication provider. LobeHub Cloud is a separate paid product, and private deployment with brand theming and a commercial licence is the Enterprise Edition. Note that workspace roles, per-resource permissions and audit logging are already in the free build, whatever the pricing page's "user management" line suggests.
+
+**Which one gives me access control without paying?**
+Both, more than LobeHub's pricing page suggests. Open WebUI includes SSO, LDAP, groups, RBAC, SCIM 2.0 and audit logging in the free edition for unlimited users. LobeChat's community build includes SSO, workspace roles, per-resource grants and a workspace audit log, despite its pricing page listing "user management" under Enterprise. It does not implement **LDAP** or **SCIM 2.0** at all, so if accounts must come from Active Directory or be provisioned automatically from your IdP, that is the difference.
+
+**Can I use both?**
+Yes, and they will happily point at the same model providers and the same Ollama instance. Some teams run Open WebUI as the governed platform for everyone and let individuals use whatever else they like on top.
+
+---
+
+**Related:** [Open WebUI & LibreChat](/alternatives/librechat) · [Open WebUI & Dify](/alternatives/dify) · [Open WebUI & Onyx](/alternatives/onyx)

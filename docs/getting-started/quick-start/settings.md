@@ -27,7 +27,7 @@ Admin Settings control everything about the Open WebUI instance itself: API conn
 
 - Connections to Ollama, OpenAI, and other providers
 - Enabling or disabling web search, image generation, and code execution
-- Default model selection and parameter presets
+- [Selected and pinned models](/features/workspace/models#selected-and-pinned-models-admin) and parameter presets
 - RBAC policies, SSO configuration, and signup restrictions
 
 ---
