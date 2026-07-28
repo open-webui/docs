@@ -66,16 +66,16 @@ Both projects are free to self-host and both sell a paid tier. They differ in **
 
 ### What each free self-hosted edition includes
 
-Open WebUI's free edition against Onyx's Community Edition, the part carrying the MIT licence. Onyx's column follows its [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) and [access control](https://docs.onyx.app/security/architecture/access_controls) documentation.
+Open WebUI's free edition against Onyx's Community Edition, the part carrying the MIT licence. Onyx's column follows its [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) and [access control](https://docs.onyx.app/security/architecture/access_controls) documentation, and the per-tier gating in its own `license_enforcement_config.py`. Onyx's paid tiers are available self-hosted as well as on its cloud, so the crosses below mean "needs a paid licence", not "cloud only".
 
 | Capability | Open WebUI (free) | Onyx Community Edition (free) |
 | :--- | :--- | :--- |
 | OIDC / OAuth single sign-on | ✅ Included | ❌ Enterprise Edition |
 | SAML single sign-on | ⚠️ No native SAML; works via a [trusted-header proxy](/features/authentication-access/auth/sso#trusted-header) that terminates SAML | ❌ Enterprise Edition (native) |
 | LDAP / Active Directory | ✅ Included | Not documented |
-| User groups and role-based access control | ✅ Included | ❌ Enterprise Edition |
-| Per-resource access grants (users and groups) | ✅ Included | ❌ Enterprise Edition |
-| SCIM 2.0 provisioning | ✅ Included | Not documented |
+| User groups and role-based access control | ✅ Included | ❌ Business tier or above |
+| Per-resource access grants (users and groups) | ✅ Included | ❌ Business tier or above |
+| SCIM 2.0 provisioning | ✅ Included | ❌ Enterprise tier |
 | Audit logging | ✅ Included | Not documented |
 | User limit before paying | ✅ None | ✅ None |
 | Giving different teams access to different documents | ✅ Separate knowledge bases, each granted to the users or groups you choose | ❌ Enterprise Edition |
