@@ -327,7 +327,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 
 ## 4. GUI Configuration
 
-1. Navigate to: `Admin Panel` -> `Settings` -> `Web Search`
+1. Navigate to: `Settings` -> `Admin` -> `Tools` -> `Web Search`
 2. Toggle `Enable Web Search`
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
@@ -342,6 +342,17 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 
 5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
 6. Save changes
+
+### Mutual TLS
+
+If your SearXNG instance sits behind a proxy that requires a client certificate, point Open WebUI at one with these environment variables:
+
+```bash
+SEARXNG_CLIENT_CERT_FILE=/certs/searxng-client.pem
+SEARXNG_CLIENT_KEY_FILE=/certs/searxng-client.key
+```
+
+Drop `SEARXNG_CLIENT_KEY_FILE` if the certificate file already contains the key. Mount the files into the container (`-v /path/to/certs:/certs:ro`) so the paths resolve inside it. Only SearXNG requests use this certificate; every other outbound connection keeps its normal TLS settings. The certificate is read once at first use, so replacing it on disk requires a restart.
 
 ![SearXNG GUI Configuration](/images/tutorial_searxng_config.png)
 

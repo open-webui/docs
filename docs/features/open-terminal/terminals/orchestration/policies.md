@@ -7,7 +7,7 @@ title: "Policies"
 
 A policy describes what a user's Open Terminal container should look like. It controls the image, resources, storage, environment variables, and idle timeout.
 
-In Open WebUI, go to **Admin Panel -> Settings -> Integrations -> Open Terminal**, add an orchestrator connection, verify it, then edit the policy fields.
+In Open WebUI, go to **Settings** -> **Admin** -> **Tools** -> **Integrations** -> Open Terminal**, add an orchestrator connection, verify it, then edit the policy fields.
 
 ## Policy Fields
 

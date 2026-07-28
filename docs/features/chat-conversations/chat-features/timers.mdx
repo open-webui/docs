@@ -1,0 +1,77 @@
+---
+sidebar_position: 14
+title: "Timers"
+---
+
+# Timers
+
+Timers let a model come back to you later. The model calls the `timer` builtin tool with a prompt and a time, and when that time arrives the prompt is sent back into the same chat and answered, as if you had typed it yourself.
+
+They are useful for anything with a natural wait in it: checking on a long-running job in ten minutes, following up on a decision tomorrow, or reminding you about something the conversation already has the context for. Because the timer replays into the original chat, the model still has the whole conversation to work from.
+
+Timers are **one-shot**. For anything recurring, use [Automations](/features/chat-conversations/chat-features/automations), which are built for schedules.
+
+## Enabling Timers
+
+Timers have **no toggle of their own**. They are part of the **Sub-agents** feature and are enabled by [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), which is off by default.
+
+:::warning Timers are enabled by the Sub-agents setting
+The `timer` tool is injected alongside `delegate_task` and shares its gate: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) plus the per-model **Sub-agents** builtin tools category. There is no separate Timers category or permission, so **turning Sub-agents off also removes timers**, and turning timers on means turning Sub-agents on.
+:::
+
+As with other builtin tools, they also require native function calling in a chat started from the interface, and they are unavailable for direct connections and inside sub-agent chats.
+
+## Setting a Timer
+
+The model sets a timer with a prompt, a time, and optionally the events that should cancel it. Times are given either as a **relative offset** or as an **RFC 3339 timestamp that must include an explicit timezone**. A timestamp without a timezone is rejected rather than guessed at, and the time must be in the future.
+
+Relative offsets are forgiving about phrasing: `10s`, `5m`, `1h`, `2d` all work, as do `+10s`, `in 10 seconds`, `5 minutes` and `2 hours`. Units are seconds, minutes, hours and days.
+
+Timers fire close to their stated time: the scheduler checks every second. [`TIMER_POLL_INTERVAL`](/reference/env-configuration#timer_poll_interval) can raise that interval, trading punctuality for less idle polling, but it cannot go below one second.
+
+## What Happens When a Timer Fires
+
+The prompt is appended to the original chat as a message, the chat reloads on its own, and the model answers using the model, workspace tools, skills, filters and settings the chat had when the timer was set. That configuration is captured up front, so later changes to the chat do not alter what a pending timer does.
+
+One gap to know about: **external tool servers (OpenAPI and MCP) are not carried across**. They are not part of what a timer captures, so a fired timer runs without them even if the chat had them attached. Keep that in mind for a prompt whose whole job depends on an external tool server.
+
+A timer never interrupts you: if the chat is busy generating when the timer comes due, it waits and fires once the chat is free.
+
+Firing a timer does **not** notify you by itself. It produces a reply in the chat. To be told about it elsewhere, pair timers with [Notifications](/features/chat-conversations/chat-features/notifications), so the timer's prompt leads the model to call `notify`.
+
+## Cancelling a Timer
+
+A timer can carry `cancel_on` events, and is cancelled if one happens first:
+
+| Event | Meaning |
+|---|---|
+| `chat.read` | You open and read the chat. |
+| `chat.user_message` | You send a message in the chat yourself. |
+
+This is what makes "remind me in an hour unless I get to it" work: if you come back on your own, the reminder never arrives.
+
+:::info There is no UI for pending timers
+Timers cannot be listed, inspected or cancelled from the interface. A timer without `cancel_on` events will fire. The only visible trace is the collapsible **Timer** row that appears in the chat when it goes off.
+:::
+
+## Operator Notes
+
+- **Timers survive restarts.** They are stored in the database, not in memory, and the scheduler resumes on boot. A timer whose time passed while the server was down fires shortly after startup rather than being skipped, so it arrives late rather than never.
+- **Pending timers still fire if Sub-agents is later disabled.** The setting gates *creating* timers, not the scheduler. Turning it off stops new timers, it does not cancel ones already set.
+- **The scheduler claims up to 10 due timers per poll.** This is a batching limit rather than a per-user cap, so a backlog drains a few at a time.
+- **There is no limit on how many timers a user can set**, how far ahead, or how close together. Automations have [`AUTOMATION_MAX_COUNT`](/reference/env-configuration#automation_max_count) and [`AUTOMATION_MIN_INTERVAL`](/reference/env-configuration#automation_min_interval); timers have no equivalent.
+- **Each fired timer costs a model call**, since it produces a real reply in the chat.
+
+## Managing Timers from Chat
+
+### Available tools
+
+| Tool | Purpose |
+|---|---|
+| `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires. |
+
+### Requirements
+
+- [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled.
+- The **Sub-agents** builtin tools category enabled on the model.
+- Native function calling, in a chat started from the interface.

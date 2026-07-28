@@ -77,7 +77,7 @@ You can read more about the Iterm2 prompt in the [Iterm2 documentation](https://
 ### Select Your LLM
 
 Since the iTerm2 AI plugin does not automatically list your custom models, you'll need to add your preferred one manually.
-In your Open WebUI instance, navigate to `Admin Panel` > `Settings` > `Models`, and then click on your preferred LLM.
+In your Open WebUI instance, navigate to `Settings` > `Admin` > `AI` > `Models`, and then click on your preferred LLM.
 Below the user-given name, you'll find the actual model name that you need to enter into iTerm2 (e.g., name: Gemma3 - model name: `/models/gemma3-27b-it-Q4_K_M.gguf`).
 
 ---

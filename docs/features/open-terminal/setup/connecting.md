@@ -141,7 +141,7 @@ If it prints `{"status": "ok"}`, the connection works. If it errors, the contain
 ### Terminal shows up but AI doesn't use it
 
 Make sure:
-- The toggle switch next to the connection is **turned on**
+- The toggle switch next to the connection is **turned on**. Turning it off takes the terminal server out of service completely: the model is not given its tools, the terminal and file browser refuse to connect, and any proxied request to it is rejected. It is a working off switch, not just a hint to the model, so use it to retire a server without deleting the connection.
 - You've **refreshed the page** after adding the connection
 - Your model supports tool calling (most modern models do)
 

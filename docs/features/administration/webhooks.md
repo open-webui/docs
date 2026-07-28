@@ -28,7 +28,7 @@ You can configure the admin webhook in two ways:
 #### Option 1: Through the Admin Panel
 
 1.  Log in as an administrator.
-2.  Navigate to **Admin Panel > Settings > General**.
+2.  Navigate to **Settings > Admin > System > General**.
 3.  Locate the **"Webhook URL"** field.
 4.  Enter the webhook URL provided by your external service (e.g., Discord, Slack).
 5.  Click **"Save"**.
@@ -53,9 +53,13 @@ When a new user signs up, Open WebUI will send a `POST` request to the configure
 }
 ```
 
-## 2. User Webhook: Chat Response Notifications
+## 2. User Webhook: Notification Targets
 
-This webhook allows individual users to receive a notification when a model has finished generating a response to their prompt. It's particularly useful for long-running tasks where you might navigate away from the Open WebUI tab.
+This webhook lets individual users be notified when something they care about happens, such as a model finishing a long response, a channel message arriving, or a calendar alert firing. It is useful when you have navigated away from the Open WebUI tab.
+
+Each user configures one or more **notification targets** in **Settings > Notifications**, and chooses per target which events it receives and whether it fires only while they are away or always. The model can also send a notification itself through the `notify` tool.
+
+See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the four subscribable events, delivery modes, URL masking, and the `notify` tool.
 
 ### Use Case
 
@@ -63,7 +67,7 @@ This webhook allows individual users to receive a notification when a model has 
 
 ### How it Works
 
-The notification is only sent if you are **not actively using the WebUI**. If you have the tab open and focused, the webhook will not be triggered, preventing unnecessary notifications.
+With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**, so you are not pinged about something you are already watching. Setting a target to **always** sends regardless. Channel messages are always delivered, since they come from someone else.
 
 ### Enabling/Disabling User Webhooks
 
@@ -72,36 +76,24 @@ User webhooks are disabled by default. Administrators can enable this feature fo
 This can be done in two ways:
 
 1.  **Directly in the Admin Panel:**
-    - Go to **Admin Panel > Settings > General > Features**.
+    - Go to **Settings > Admin > System > General > Features**.
     - Toggle the switch for **"User Webhooks"**.
 
 2.  **Using Environment Variables:**
     - Set the environment variable `ENABLE_USER_WEBHOOKS` to `False` in your backend configuration. This will globally disable the feature and hide the setting from user profiles.
 
+Users also need the `features.webhooks` permission ([`USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`](/reference/env-configuration#user_permissions_features_user_webhooks)); admins always have it.
+
 ### Configuration
 
 1.  Click on your profile picture in the bottom-left corner to open the settings menu.
-2.  Navigate to **Settings > Account**.
-3.  Locate the **"Notification Webhook"** field.
-4.  Enter your personal webhook URL.
-5.  Click **"Save"**.
+2.  Navigate to **Settings > Notifications**.
+3.  Add a target with your webhook URL, and pick the events it should receive.
+4.  Use **Send Test** to confirm it works.
 
-### Payload Format
-
-When a chat response is ready and you are inactive, Open WebUI will send a `POST` request to your webhook URL with a JSON payload containing details about the chat.
-
-**Payload Example:**
-
-```json
-{
-  "event": "chat_response",
-  "chat": {
-    "id": "abc-123-def-456",
-    "title": "My Awesome Conversation",
-    "last_message": "This is the prompt I submitted."
-  }
-}
-```
+:::info Upgrading from the old Notification Webhook field
+The single **Notification Webhook** field under **Settings > Account** has been replaced by targets. An existing URL is migrated automatically into a target subscribed to all events, so notifications keep arriving without any action.
+:::
 
 ## 3. Channel Webhooks: External Message Integration
 

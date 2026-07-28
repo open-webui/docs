@@ -84,7 +84,7 @@ When using `UVICORN_WORKERS` greater than 1 with the default `LocalOrchestrator`
 ### Step 2: Configure Open WebUI
 
 1. Log in to your Open WebUI instance
-2. Navigate to **Admin Panel** → **Settings** → **Documents**
+2. Navigate to **Settings** → **Admin** → **Tools** → **Documents**
 3. Change the **Default** content extraction engine dropdown to **Docling**
 4. Set the extraction engine URL to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native)
 5. Save the changes

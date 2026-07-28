@@ -15,7 +15,7 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Open AI`.
 3. Enter your OpenAI API key.
 4. Choose the model you wish to use. Note that image size options will depend on the selected model:
@@ -29,7 +29,7 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 
 Image generation with Azure OpenAI (DALL·E or GPT-Image) is supported. Configure the Image Generation as follows:
 
-1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Open AI` (Azure OpenAI uses the same syntax as OpenAI).
 3. Change the API endpoint URL to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Set the instance and model id as you find it in the settings of the Azure AI Foundry.
 4. Configure the API version to the value you find in the settings of the Azure AI Foundry.
@@ -57,7 +57,7 @@ For example, if your Target URI is `https://test.openai.azure.com/openai/deploym
 
 Image generation with a LiteLLM proxy using OpenAI endpoints is supported with Open WebUI. Configure the Image Generation as follows:
 
-1. In Open WebUI, navigate to the **Admin Panel** > **Settings** > **Images** menu.
+1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Open AI`.
 3. Change the API endpoint URL to `https://<your-litellm-url>:<port>/v1`.
 4. Enter your LiteLLM API key.
@@ -67,7 +67,7 @@ Image generation with a LiteLLM proxy using OpenAI endpoints is supported with O
 
 :::tip
 
-To find your LiteLLM connection information, navigate to the **Admin Panel** > **Settings** > **Connections** menu.
+To find your LiteLLM connection information, navigate to the **Settings** > **Admin** > **AI** > **Connections** menu.
 Your connection information will be listed under the OpenAI API connection.
 
 :::

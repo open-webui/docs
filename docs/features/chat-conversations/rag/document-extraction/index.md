@@ -27,6 +27,14 @@ With proper document extraction, Open WebUI can help you:
 In **Temporary Chat** mode, document extraction is performed **exclusively in the browser** to prevent data from being stored or processed on the backend. This strict privacy measure means that some complex file formats (like certain DOCX files) that rely on backend parsers may not be processed correctly.
 :::
 
+:::info Sending images and video to your extraction engine
+
+An uploaded image or video is normally stored as-is for vision models to look at, rather than being run through the extraction engine. Only the `external` engine received media, and only because it was special-cased.
+
+[`CONTENT_EXTRACTION_SUPPORTED_MEDIA_MIME_TYPES`](/reference/env-configuration#content_extraction_supported_media_mime_types), or **Supported Media MIME Types** in **Settings > Admin > Documents**, makes that a choice rather than a rule: list the MIME types your engine can actually read, for instance `image/*` for an OCR engine, and matching uploads are extracted whichever engine you run. Leave it empty to keep the previous behavior.
+
+:::
+
 ## Available Extraction Methods
 
 Open WebUI supports multiple document extraction engines to accommodate different needs and document types. Each extraction method has its own strengths and is suitable for different scenarios.

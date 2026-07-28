@@ -49,7 +49,7 @@ Open WebUI provides several built-in settings to configure reasoning model behav
 
 - **Chat Controls** (sidebar) → **Advanced Parameters**: per-chat settings
 - **Workspace** → **Models** → **Edit Model** → **Advanced Parameters**: per-model settings (Admin only)
-- **Admin Panel** → **Settings** → **Models** → select a model → **Advanced Parameters**: alternative per-model settings location
+- **Settings** → **Admin** → **AI** → **Models** → select a model → **Advanced Parameters**: alternative per-model settings location
 
 ### Reasoning Tags Setting
 
@@ -189,6 +189,8 @@ For a `llama.cpp` connection it looks like:
 ### Streaming Mode (Default)
 
 In streaming mode (`stream: true`), Open WebUI processes tokens as they arrive and can detect reasoning blocks in real-time. This generally works well without additional configuration.
+
+Providers that send reasoning metadata alongside the answer rather than before it are handled too: reasoning that arrives after the response has started is folded into the thinking block above the answer instead of appearing beneath it, and metadata carrying no actual reasoning text no longer opens an empty thinking block.
 
 ### Non-Streaming Mode
 

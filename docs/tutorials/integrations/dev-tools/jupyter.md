@@ -82,7 +82,7 @@ When accessing the Jupyter service, you will need the `JUPYTER_TOKEN` defined ab
 
 # Step 2: Configure Code Execution for Jupyter
 
-Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI's Code Execution to use Jupyter under Admin Panel -> Settings -> Code Execution. Since Open-WebUI is constantly releasing and improving this feature, I recommend always reviewing the possible configuraitons in the [`configs.py` file](https://github.com/open-webui/open-webui/blob/6fedd72e3973e1d13c9daf540350cd822826bf27/backend/open_webui/routers/configs.py#L72) for the latest and greatest. As of v0.5.16, this includes the following:
+Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI's Code Execution to use Jupyter under Settings -> Admin -> Tools -> Code Execution. Since Open-WebUI is constantly releasing and improving this feature, I recommend always reviewing the possible configuraitons in the [`configs.py` file](https://github.com/open-webui/open-webui/blob/6fedd72e3973e1d13c9daf540350cd822826bf27/backend/open_webui/routers/configs.py#L72) for the latest and greatest. As of v0.5.16, this includes the following:
 
 | Open-WebUI Env Var | Value |
 | ------------------------------------- | -------------------------------- |

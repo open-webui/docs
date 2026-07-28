@@ -43,9 +43,9 @@ Name each key descriptively (e.g., "CI Pipeline", "Monitoring Bot") to track usa
 ### Step 1: Enable API Keys Globally (Admin)
 
 1. Log in as an **administrator**
-2. Open **Admin Panel > Settings > General**
+2. Open **Settings > Admin > System > General**
 3. Scroll to the **Authentication** section
-4. Toggle **Enable API Keys** on
+4. Toggle **API Keys** on
 5. Click **Save**
 
 :::info
@@ -154,7 +154,7 @@ Periodically delete old keys and generate new ones, especially for long-lived in
 
 **Can't see the API Keys section in Settings > Account?**
 
-- **Check the global toggle:** Verify that an admin has enabled API keys in **Admin Panel > Settings > General > Enable API Keys**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
+- **Check the global toggle:** Verify that an admin has enabled API keys in **Settings > Admin > System > General > API Keys**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
 - **Check your permissions (non-admin users):** Verify that your account or group has the **API Keys** feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
 
 **Getting `401 Unauthorized` responses?**

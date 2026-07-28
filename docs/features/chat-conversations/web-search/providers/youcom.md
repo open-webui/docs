@@ -47,7 +47,7 @@ services:
 ### Admin Panel Setup
 
 1. Log in to Open WebUI with an admin account.
-2. Navigate to **Admin Panel** → **Settings** → **Web Search**.
+2. Navigate to **Settings** → **Admin** → **Tools** → **Web Search**.
 3. Enable **Web Search** by toggling it **On**.
 4. Select **youcom** from the **Web Search Engine** dropdown.
 5. Paste your You.com API key into the **You.com API Key** field.

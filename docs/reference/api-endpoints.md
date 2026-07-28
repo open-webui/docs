@@ -76,6 +76,17 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
 
+:::warning Reading `usage` from a reply that used tools
+
+A reply can involve several model calls, one per round of tool use, and the `usage` block distinguishes the two things you might want from that:
+
+- `prompt_tokens` and `completion_tokens` report the **most recent model call** only.
+- `input_tokens`, `output_tokens` and `total_tokens` report the **whole reply**, every call added up.
+
+Earlier releases put the running total in `prompt_tokens` / `completion_tokens` as well. If you bill or meter on those two fields, read `input_tokens` / `output_tokens` instead, or a tool-using reply will now be undercounted. The split exists because a context-window gauge needs the size of the latest request, while billing needs the sum, and one pair of fields cannot be both.
+
+:::
+
 #### Using Open WebUI tools, including MCP, from the API
 
 The chat completions endpoint can run server-side tools when you pass Open WebUI tool IDs in the request body. This includes native Python tools, OpenAPI tool servers, and MCP tool servers that are already configured and enabled in Open WebUI.
@@ -148,8 +159,20 @@ Open WebUI provides an Anthropic Messages API compatible endpoint. This allows t
 
 Internally, the endpoint converts the Anthropic request format to OpenAI Chat Completions format, routes it through the existing chat completion pipeline, and converts the response back to Anthropic format. Both streaming and non-streaming requests are supported.
 
+:::info Native Anthropic connections skip the conversion
+
+When the target connection already speaks the Anthropic Messages API, the request is forwarded as-is instead of being converted to OpenAI format and back. Nothing is lost in translation, so provider-specific fields survive the round trip without needing `passthrough_params`.
+
+This applies when the connection's base URL is an Anthropic one, or when its **Provider** is set to **LiteLLM** in the connection's settings (alongside **Default**, **Azure OpenAI** and **llama.cpp**), since LiteLLM exposes an Anthropic-compatible route of its own. Every other connection keeps the conversion behaviour described above.
+
+:::
+
 - **Endpoints**: `POST /api/message`, `POST /api/v1/messages`
 - **Authentication**: Supports both `Authorization: Bearer YOUR_API_KEY` and Anthropic's `x-api-key: YOUR_API_KEY` header
+- **Extended thinking**: reasoning output from the underlying model is returned as Anthropic `thinking` content blocks, in both streaming and non-streaming responses.
+- **Reasoning effort**: `reasoning_effort`, and `output_config.effort`, are mapped to the underlying model's reasoning-effort setting.
+- **Structured outputs**: `output_config.format` (`json_schema` or `json_object`) is mapped to the model's response-format setting.
+- **Passing extra parameters**: parameters outside the standard conversion are dropped by default. Set **Passthrough params** on the connection (`passthrough_params`, a comma-separated list of parameter names, or `*` for every non-standard parameter) to forward them verbatim to the upstream provider.
 
 - **Curl Example** (non-streaming):
 
@@ -242,6 +265,39 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
 All models configured in Open WebUI are accessible through this endpoint, including Ollama models, OpenAI models, and any custom function models. The `model` field should use the model ID as it appears in Open WebUI. Filters (inlet/stream) apply to these requests just as they do for the OpenAI-compatible endpoint.
 
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
+
+**Usage reporting:** Responses carry whatever usage the upstream model reported, in the closing `message_delta` when streaming and in `usage` when not. Prompt-cache counters (`cache_creation_input_tokens`, `cache_read_input_tokens`), `output_tokens_details`, `server_tool_use` and `service_tier` are passed through when the provider sends them, so a client that tracks cache hits or reasoning tokens sees the real figures rather than losing them in translation. An OpenAI-style provider that reports cached tokens as `prompt_tokens_details.cached_tokens` has them mapped to `cache_read_input_tokens`, and `input_tokens` is reported the way Anthropic clients expect it: the uncached prompt tokens, with cache creation and cache read counted separately rather than a second time. On a streaming request `input_tokens` is reported only when it is actually known, so a provider that never reports it leaves the field out instead of showing a fabricated zero.
+
+Usage from the upstream provider is requested only when the model has the **Usage** capability enabled in its editor. Without it the provider is not asked to include usage in a stream, and the token counts a client receives fall back to what Open WebUI can determine on its own.
+:::
+
+#### Counting Tokens
+
+A companion to the Messages API that reports how many input tokens a request would use, without running it. This mirrors Anthropic's own token-counting endpoint, so SDKs that pre-flight a request for budgeting or context-fitting work unchanged.
+
+- **Endpoints**: `POST /api/v1/messages/count_tokens`, `POST /api/message/count_tokens`
+- **Authentication**: same as the Messages API
+- **Returns**: `{"input_tokens": <int>}`
+
+```bash
+curl -X POST http://localhost:3000/api/v1/messages/count_tokens \
+-H "x-api-key: YOUR_API_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+      "model": "gpt-4o",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Why is the sky blue?"
+        }
+      ]
+    }'
+```
+
+The count is obtained from the upstream provider behind the resolved connection, so the provider must implement token counting. If it does not, or answers unexpectedly, the request fails with a `502`.
+
+:::info Reported `input_tokens` are now real
+The Messages API previously always reported `input_tokens: 0` in the streaming `message_start` block. Input tokens are now counted up front and reported in both streaming and non-streaming responses. If counting fails the request still succeeds, so clients should treat the value as best-effort rather than guaranteed.
 :::
 
 ### 🔧 Filter and Function Behavior with API Requests
@@ -397,6 +453,22 @@ curl -X POST http://localhost:3000/ollama/v1/responses \
 This allows API consumers (Codex, Claude Code, etc.) to use the Responses API directly with Ollama-hosted models without configuring a separate OpenAI-compatible connection.
 
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
+
+#### 🔤 Embeddings (OpenAI-Compatible)
+
+Alongside the native `/ollama/api/embed` route above, Open WebUI proxies an OpenAI-compatible embeddings endpoint, so clients that already speak the OpenAI embeddings format can use Ollama-hosted embedding models without configuring a separate connection. It applies the same model resolution, access control, and prefix handling as the other proxied routes.
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/embeddings \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "llama3.2",
+  "input": "Open WebUI is great!"
+}'
+```
+
+A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The endpoint returns `503` if the Ollama integration is disabled.
 
 ### 🧩 Retrieval Augmented Generation (RAG)
 

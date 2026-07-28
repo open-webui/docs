@@ -100,12 +100,14 @@ Open WebUI emits **170+ events** spanning every subsystem. Each name is namespac
 | **System** | `system.startup.started`, `system.startup.completed`, `system.shutdown.started`, `system.shutdown.completed` |
 | **Auth** | `auth.signup`, `auth.login`, `auth.logout`, `auth.password_changed`, `auth.api_key.created` |
 | **Users & groups** | `user.created`, `user.deleted`, `user.role_updated`, `user.permissions_updated`, `group.member_added` |
-| **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `message.created`, `message.reaction_added` |
+| **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `chat.finished`, `chat.failed`, `message.created`, `message.reaction_added` |
 | **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `prompt.created` |
 | **Knowledge & files** | `knowledge.created`, `knowledge.file.added`, `knowledge.reindexed`, `file.uploaded`, `file.deleted` |
-| **Plugins** | `tool.created`, `function.enabled`, `function.valves_updated`, `tool.valves_updated`, `skill.created` |
+| **Plugins** | `tool.created`, `function.enabled`, `function.enable_started`, `function.disable_started`, `function.valves_updated`, `tool.valves_updated`, `skill.created` |
 | **Config** | `config.updated`, `config.models.updated`, `config.connections.updated`, `config.webhook.updated` |
-| **Other** | `channel.*`, `calendar.*`, `automation.*`, `memory.*`, `note.*`, `image.*`, `audio.*`, `terminal.*`, `feedback.*` |
+| **Other** | `channel.*`, `calendar.*`, `automation.*`, `memory.*`, `note.*`, `image.*`, `audio.*`, `terminal.*`, `feedback.*`, `notification.*` |
+
+A subset of these also drive user-facing [Notifications](/features/chat-conversations/chat-features/notifications): `chat.finished`, `chat.failed`, `channel.message` and `calendar.alert` are the four events a user can subscribe a webhook target to.
 
 The authoritative, complete list is exposed by the backend event catalog and shown in **Admin Settings > Events** when configuring webhooks.
 
@@ -126,6 +128,41 @@ async def event(self, event: dict, __event_name__: str = None, __app__=None, **k
 ```
 
 This is what makes Event functions a good fit for **self-applying configuration**: run the same setup on every startup using values your admin set in [Valves](#configuration-with-valves), so the whole configuration lives inside Open WebUI rather than in external scripts.
+
+### Being switched on and off
+
+Startup and shutdown only cover the server's lifecycle. A function can also be toggled while the server keeps running, and two further events cover that:
+
+| Event | Fires when |
+| :--- | :--- |
+| `function.enable_started` | A function is about to be enabled |
+| `function.disable_started` | A function is about to be disabled |
+
+Both fire **before** the change is written, which is what the `_started` suffix marks. Inside the handler the function's previous state is still in effect, so `function.disable_started` is the last moment a function can tidy up while it is still active.
+
+Every active event function is told about every toggle, including toggles of other plugins, so check the subject before acting. The event's `subject` holds `{"type": "function", "id": ...}`, and `__id__` is your own function's ID:
+
+```python
+async def event(self, event: dict, __event_name__: str = None, __id__: str = None, **kwargs):
+    about_me = (event.get("subject") or {}).get("id") == __id__
+
+    if __event_name__ == "function.enable_started" and about_me:
+        # Register routes, open connections, apply Valves.
+        ...
+    elif __event_name__ == "function.disable_started" and about_me:
+        # Still active here: flush state, close connections, deregister.
+        ...
+```
+
+The event's `data` carries the function's `type` and `name` alongside it.
+
+A function is delivered its **own** `function.enable_started` even though it is not active yet at that point, which is the only case where an inactive function receives an event. Everything else still follows the usual rule that only active event functions are dispatched to.
+
+:::warning Enabling is not the same as starting up
+
+Toggling a function on does not replay `system.startup.completed`, and a server restart does not replay `function.enable_started`. A plugin that only sets itself up on startup will sit idle until the next restart after being enabled. If your setup has to run in both situations, handle both events, and make that setup safe to run twice, since nothing prevents an enable following a startup.
+
+:::
 
 ---
 

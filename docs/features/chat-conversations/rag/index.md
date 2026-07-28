@@ -82,7 +82,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 :::warning
 **Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 2048 tokens available, you're getting less than half the page content, often missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
-**To Fix This:** Navigate to **Admin Panel > Models > Settings** (of your Ollama model) > **Advanced Parameters** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-4 Turbo with 128k tokens).
+**To Fix This:** Navigate to **Settings > Admin > AI > Models > Settings** (of your Ollama model) > **Advanced Parameters** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-4 Turbo with 128k tokens).
 :::
 
 For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can.
@@ -95,7 +95,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 ## RAG Template Customization
 
-Customize the RAG template from the `Admin Panel` > `Settings` > `Documents` menu.
+Customize the RAG template from the `Settings` > `Admin` > `Tools` > `Documents` menu.
 
 The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
 
@@ -109,7 +109,7 @@ When enabled, documents are first split by markdown headers (H1-H6). This preser
 
 :::tip
 
-Use the **Chunk Min Size Target** setting (found in **Admin Panel > Settings > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
+Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Tools > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
 
 :::
 
@@ -201,7 +201,7 @@ Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size 
 
 ## RAG Embedding Support
 
-Change the RAG embedding model directly in the `Admin Panel` > `Settings` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
+Change the RAG embedding model directly in the `Settings` > `Admin` > `Tools` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -221,7 +221,7 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model in `Admin Panel` > `Settings` > `Documents`, navigate to `Admin Panel` > `Settings` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+After changing the embedding model in `Settings` > `Admin` > `Tools` > `Documents`, navigate to `Settings` > `Admin` > `Tools` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
@@ -274,6 +274,8 @@ When File Context is disabled, file content is **not automatically extracted or 
 
 :::tip Per-File Retrieval Mode
 Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+
+To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
 
 :::info
@@ -332,7 +334,7 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 ## Google Drive Integration
 
-When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Admin Panel` > `Settings` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
+When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Tools` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
 
 ### Detailed Instructions
 

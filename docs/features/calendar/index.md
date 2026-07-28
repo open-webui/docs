@@ -263,7 +263,7 @@ The global alert polling window is configurable via [`CALENDAR_ALERT_LOOKAHEAD_M
 | [`SCHEDULER_POLL_INTERVAL`](/reference/env-configuration#scheduler_poll_interval) | `10` | Seconds between scheduler ticks (shared with automations) |
 | [`CALENDAR_ALERT_LOOKAHEAD_MINUTES`](/reference/env-configuration#calendar_alert_lookahead_minutes) | `10` | Default alert window in minutes for upcoming events |
 
-Calendar can also be toggled from **Admin Panel > Settings > General** under the Features section.
+Calendar can also be toggled from **Settings > Admin > System > General** under the Features section.
 
 ---
 

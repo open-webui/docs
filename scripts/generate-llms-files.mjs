@@ -91,4 +91,6 @@ for (const doc of docs) {
 
 fs.writeFileSync(LLMS_FULL_PATH, `${fullLines.join("\n")}\n`);
 
-console.log(`Generated llms.txt and llms-full.txt for ${docs.length} docs pages.`);
+console.log(
+	`Generated llms.txt and llms-full.txt for ${docs.length} docs pages.`
+);
