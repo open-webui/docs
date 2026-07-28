@@ -85,13 +85,15 @@ Open WebUI's free edition against Onyx's Community Edition, the part carrying th
 | Dedicated support and SLAs | ❌ [Enterprise licence](/enterprise/support) | ❌ Enterprise Edition |
 | Priority on feature requests | ❌ Enterprise licence | ❌ Enterprise Edition |
 
-Nothing in Open WebUI's ✅ rows needs a licence key, a seat count or a paid plan. They are environment variables.
+Nothing in Open WebUI's ✅ rows needs a licence key, a seat count or a paid plan. They are configurable settings.
 
 Two rows deserve care, because the distinction is easy to blur. Open WebUI can absolutely give separate teams access to separate document sets, for free, by putting them in different knowledge bases and granting each to the right groups. What it cannot do is vary access **within** a single knowledge base, or pick permissions up automatically from Slack, Drive or Confluence. Onyx can do both, but only on its Enterprise Edition, and its free Community Edition has no user groups at all, so it cannot do the simpler thing either.
 
 Dedicated support and priority on the roadmap are paid on both sides, which is how each project is funded, and neither pretends otherwise.
 
-On [Onyx Cloud](https://onyx.app/pricing) as of July 2026 the line falls elsewhere again, with role-based access control and permission inheritance included from the Business tier at $20 per user per month, and single sign-on reserved for the Enterprise tier.
+On [Onyx Cloud](https://onyx.app/pricing) as of July 2026 the line falls elsewhere again, with role-based access control and permission inheritance included from the Business tier at $20 per user per month, and single sign-on in the Enterprise tier.
+
+On what each project publishes: Onyx lists a price for its Business tier and quotes its Enterprise tier on request. Open WebUI does not publish enterprise pricing at all, and directs you to [contact sales](https://openwebui.com/contact/sales). Neither of us puts an enterprise figure in public, so budget for a conversation either way. The difference that survives that is what you get before any conversation happens, which is the table above.
 
 So the summary is this. If you are self-hosting and need managed identity, Open WebUI includes it for any number of users while Onyx's free edition does not include group-based access control at all. If you need per-document permissions mirrored from Slack or Drive, Open WebUI cannot do it and Onyx can, for a fee. If you intend to fork or redistribute, Onyx's core carries the more permissive licence.
 
@@ -109,16 +111,13 @@ Pricing and tiers change. These figures come from each project's own published t
 | :--- | :--- | :--- |
 | **Primary focus** | General-purpose AI platform | Enterprise search and knowledge discovery |
 | **Knowledge approach** | Document upload, knowledge bases, 13 vector DBs, 8 extraction engines | 40+ enterprise connectors with automatic syncing |
-| **Permission handling** | RBAC, groups, per-resource access controls | Permission-aware retrieval from source systems |
+| **Permission handling** | Groups, roles and per-resource access grants, in the free edition | Permission-aware retrieval mirrored from source systems, on the paid tiers |
 | **Multi-provider** | Any OpenAI-compatible API + Ollama | Multiple LLM provider support |
 | **Extensibility** | Python tools, MCP, OpenAPI, pipelines | Focused on connector and search ecosystem |
 | **Collaboration** | Channels, Notes, shared conversations | AI-powered search and Q&A |
 | **License** | Open WebUI License (BSD-3 plus a branding clause above 50 users) | MIT for the Community Edition core; separate terms for Enterprise features, see [self-host terms](https://onyx.app/legal/self-host) |
-| **SSO** | OIDC and OAuth in the free edition, unlimited users; no SAML | OIDC and SAML, [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) self-hosted or Enterprise tier on Cloud |
-| **User groups and RBAC** | Free edition, unlimited users | [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) self-hosted; Business tier on Cloud |
-| **Per-document access differences** | Per knowledge base, not per document | [Enterprise Edition only](https://docs.onyx.app/security/architecture/access_controls), and can inherit from the source system |
-| **SCIM 2.0 provisioning** | Free edition, unlimited users | Not listed on the pricing page |
-| **Pricing** | Free community edition for unlimited users; Enterprise plans for branding removal and support | Free self-hosted Community Edition, plus Business and Enterprise tiers |
+
+For which identity and access features each free edition includes, see [the table above](#what-each-free-self-hosted-edition-includes) rather than this summary.
 
 ---
 
