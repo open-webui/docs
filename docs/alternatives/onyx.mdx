@@ -9,15 +9,23 @@ keywords: ["Open WebUI vs Onyx", "Onyx alternative", "Danswer alternative", "Ony
 import Head from '@docusaurus/Head';
 
 <Head>
-<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do Onyx and Open WebUI compare?", "acceptedAnswer": {"@type": "Answer", "text": "Onyx leans into enterprise search with 40+ connectors and permission-aware retrieval. Open WebUI comes at it from a more general angle with chat, knowledge bases, team collaboration, and extensibility. Different tools for different needs."}}, {"@type": "Question", "name": "Is Onyx open source?", "acceptedAnswer": {"@type": "Answer", "text": "Onyx's core is MIT licensed. Enterprise features like SAML SSO and advanced permissions are in `ee/` directories under a separate Onyx Enterprise License."}}, {"@type": "Question", "name": "Is Onyx free?", "acceptedAnswer": {"@type": "Answer", "text": "The community edition is free to self-host. Onyx Cloud and Enterprise plans are available for teams that want managed hosting or additional features."}}, {"@type": "Question", "name": "Can I use both Onyx and Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. They solve different problems. Onyx connects AI to your existing enterprise tools. Open WebUI also has knowledge management, team features, and extensibility built in."}}]})}</script>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do Onyx and Open WebUI compare?", "acceptedAnswer": {"@type": "Answer", "text": "Onyx leans into enterprise search with 40+ connectors and permission-aware retrieval. Open WebUI comes at it from a more general angle with chat, knowledge bases, team collaboration, and extensibility. Different tools for different needs."}}, {"@type": "Question", "name": "Is Onyx open source?", "acceptedAnswer": {"@type": "Answer", "text": "Onyx Community Edition core is MIT licensed, which is more permissive than Open WebUI license. Enterprise features are under separate terms. Licence and pricing are separate questions: single sign-on and access control sit in Onyx paid tiers, while Open WebUI includes SSO, RBAC and SCIM 2.0 free for unlimited users."}}, {"@type": "Question", "name": "Is Onyx free?", "acceptedAnswer": {"@type": "Answer", "text": "The community edition is free to self-host. Onyx Cloud and Enterprise plans are available for teams that want managed hosting or additional features."}}, {"@type": "Question", "name": "Can I use both Onyx and Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. They solve different problems. Onyx connects AI to your existing enterprise tools. Open WebUI also has knowledge management, team features, and extensibility built in."}}]})}</script>
 </Head>
 
 
 # Open WebUI & Onyx
 
-*Last updated: May 2026*
+*Last updated: July 2026*
 
-[Onyx](https://onyx.app/) (formerly Danswer) focuses on a specific and important problem: connecting AI to your organization's internal knowledge across Slack, Google Drive, Confluence, Jira, GitHub, and dozens of other tools, with permission-aware retrieval. If your team's knowledge is scattered across 40+ tools and you need AI to search across all of them while respecting access controls, that's Onyx's sweet spot.
+[Onyx](https://onyx.app/) (formerly Danswer) focuses on a specific and important problem: connecting AI to your organization's internal knowledge across Slack, Google Drive, Confluence, Jira, GitHub, and dozens of other tools, with permission-aware retrieval. If your team's knowledge is scattered across many tools and you need AI to search across all of them while respecting access controls, that's Onyx's sweet spot.
+
+:::info How to check this page
+
+Everything claimed here about Open WebUI is verifiable in our own documentation, linked throughout. Everything about Onyx comes from Onyx's own documentation, repository and licence terms, all linked below, and describes their project as of the date above. Onyx ships quickly, so treat anything undated as possibly out of date and check their sources before deciding.
+
+If something here is wrong or has aged badly, including in Onyx's favour, [tell us](https://github.com/open-webui/docs/issues) and we will correct it.
+
+:::
 
 [GitHub](https://github.com/onyx-dot-app/onyx) · [Source Available](https://github.com/onyx-dot-app/onyx/blob/main/LICENSE) (MIT core + Onyx Enterprise License for `ee/` directories) · [Self-Host Terms](https://onyx.app/legal/self-host)
 
@@ -25,7 +33,7 @@ import Head from '@docusaurus/Head';
 
 ## What Onyx Does Well
 
-- **40+ enterprise connectors** with native integrations for Slack, Google Drive, Confluence, Jira, GitHub, Notion, and more
+- **Enterprise connectors**, [40+ by Onyx's count](https://docs.onyx.app/connectors/overview), with native integrations for Slack, Google Drive, Confluence, Jira, GitHub, Notion, and more
 - **Automatic syncing** that keeps connected sources up to date without manual re-ingestion
 - **Permission-aware retrieval** that respects source system access controls when returning search results
 - **Enterprise search** purpose-built for searching across your organization's internal knowledge
@@ -42,8 +50,50 @@ import Head from '@docusaurus/Head';
 - **Deploy anywhere** on your own infrastructure, fully air-gapped if needed
 - **Free community edition** with unlimited users, SSO/OIDC/LDAP, RBAC, and SCIM 2.0 included
 - **Any model, any provider** including Ollama, OpenAI, Anthropic, Google, Azure, Bedrock, and any OpenAI-compatible API
-- **Knowledge & RAG** with 9 vector databases, 5 extraction engines, and hybrid BM25 + vector search with cross-encoder reranking
+- **Knowledge & RAG** with 13 vector databases, 8 content extraction engines, and hybrid BM25 + vector search with cross-encoder reranking
 - **Python extensibility** with custom tools, MCP servers, OpenAPI integration, pipelines, and a community marketplace
+
+---
+
+## Where Onyx Is The Better Fit
+
+Two things Onyx is built for do not have an equivalent in Open WebUI, and configuration will not close the gap.
+
+**Native connectors to your existing tools.** Open WebUI populates knowledge bases by upload, by directory sync or through the API. There is no built-in, continuously syncing integration with Slack, Confluence, Jira or Google Drive. [oikb](/ecosystem/knowledge-base-sync) covers part of this, mirroring folders, repositories, buckets and wikis on a schedule, but it is a separate tool you run yourself rather than a connector catalogue inside the product.
+
+**Permission-aware retrieval from the source system.** Open WebUI's access control decides who may use a knowledge base inside Open WebUI. It does not inherit per-document permissions from wherever the document came from. If a file is in a knowledge base, everyone with access to that knowledge base can retrieve from it, regardless of what the source system would have allowed. Onyx's retrieval respects the source system's access controls per document, which is a materially different guarantee and the reason it exists.
+
+If either of those is a hard requirement, choose Onyx.
+
+---
+
+## Licensing, and Where Each Project Draws the Paid Line
+
+Both projects are free to self-host and both sell a paid tier. They differ in **which** capabilities sit behind the paid tier, which matters more than the licence name when you are budgeting a rollout.
+
+**Open WebUI** is source available under the [Open WebUI License](https://github.com/open-webui/open-webui/blob/main/LICENSE), a BSD-3 clause licence with one addition: you may not remove or replace Open WebUI branding once a deployment exceeds 50 users in a rolling 30 day period, unless you hold an enterprise licence. That is the restriction, stated plainly, and it is worth knowing before you standardise on it.
+
+What that restriction does **not** touch is identity and access. In the free edition, for unlimited users:
+
+- OIDC and OAuth single sign-on
+- LDAP and Active Directory authentication
+- Role-based access control, groups and per-resource permissions
+- [SCIM 2.0](/reference/env-configuration#enable_scim) user and group provisioning
+- Audit logging
+
+None of these require a licence key, a seat count or a paid plan. They are environment variables.
+
+**Onyx** licences its Community Edition under MIT, which is a more permissive licence than ours and covers its core chat, RAG, agents and actions. The MIT grant is not repository-wide: Onyx's own [LICENSE](https://github.com/onyx-dot-app/onyx/blob/main/LICENSE) carves out everything under `ee` directories and places it under the Onyx Enterprise License instead.
+
+Its identity and access features are sold separately. Per [Onyx's pricing page](https://onyx.app/pricing) as of July 2026, role-based access control and permission inheritance are part of the Business tier at $20 per user per month, and OIDC and SAML single sign-on are part of the Enterprise tier, priced on request.
+
+So the honest summary is that Onyx's core carries the more permissive licence, and Open WebUI includes single sign-on, RBAC and SCIM at no cost for any number of users. Which of those matters more depends entirely on whether your constraint is redistribution or budget.
+
+:::note Check both before you decide
+
+Pricing and tiers change. These figures come from each project's own published terms on the date at the top of this page. Verify against [Onyx's pricing](https://onyx.app/pricing) and our [licence](https://github.com/open-webui/open-webui/blob/main/LICENSE) rather than trusting either vendor's summary, including this one.
+
+:::
 
 ---
 
@@ -52,13 +102,16 @@ import Head from '@docusaurus/Head';
 | | Open WebUI | Onyx |
 | :--- | :--- | :--- |
 | **Primary focus** | General-purpose AI platform | Enterprise search and knowledge discovery |
-| **Knowledge approach** | Document upload, knowledge bases, 9 vector DBs, 5 extraction engines | 40+ enterprise connectors with automatic syncing |
+| **Knowledge approach** | Document upload, knowledge bases, 13 vector DBs, 8 extraction engines | 40+ enterprise connectors with automatic syncing |
 | **Permission handling** | RBAC, groups, per-resource access controls | Permission-aware retrieval from source systems |
 | **Multi-provider** | Any OpenAI-compatible API + Ollama | Multiple LLM provider support |
 | **Extensibility** | Python tools, MCP, OpenAPI, pipelines | Focused on connector and search ecosystem |
 | **Collaboration** | Channels, Notes, shared conversations | AI-powered search and Q&A |
-| **License** | Open WebUI License | Source Available (MIT core + Onyx Enterprise License for `ee/`); see [self-host terms](https://onyx.app/legal/self-host) |
-| **Pricing** | Free community edition; Enterprise plans available | Free (self-hosted community), Cloud, and Enterprise plans |
+| **License** | Open WebUI License (BSD-3 plus a branding clause above 50 users) | MIT for the Community Edition core; separate terms for Enterprise features, see [self-host terms](https://onyx.app/legal/self-host) |
+| **SSO (OIDC/SAML)** | Free edition, unlimited users | Enterprise tier, [priced on request](https://onyx.app/pricing) |
+| **RBAC and permissions** | Free edition, unlimited users | Business tier, [$20/user/month](https://onyx.app/pricing) |
+| **SCIM 2.0 provisioning** | Free edition, unlimited users | Not listed on the pricing page |
+| **Pricing** | Free community edition for unlimited users; Enterprise plans for branding removal and support | Free self-hosted Community Edition, plus Business and Enterprise tiers |
 
 ---
 
@@ -66,7 +119,7 @@ import Head from '@docusaurus/Head';
 
 **Choose Onyx if** you want to connect AI to your organization's existing tools. If your team's knowledge lives in Slack, Confluence, Jira, Google Drive, and GitHub, Onyx's 40+ connectors with automatic syncing and permission-aware retrieval were built for that.
 
-**Choose Open WebUI if** you need a general-purpose AI platform with chat, knowledge bases, team collaboration, Python extensibility, and support for any model provider. Open WebUI includes SSO, RBAC, and SCIM in the free community edition.
+**Choose Open WebUI if** you need a general-purpose AI platform with chat, knowledge bases, team collaboration, Python extensibility, and support for any model provider. Open WebUI includes SSO, LDAP, RBAC, SCIM 2.0 and audit logging in the free community edition, for unlimited users, which is the deciding factor for organisations that need managed identity without a per-seat contract.
 
 **They solve different problems.** Onyx excels at enterprise search and connecting AI to your existing tools. Open WebUI excels as a general AI platform. Many organizations could use both.
 
@@ -84,7 +137,10 @@ import Head from '@docusaurus/Head';
 Onyx leans into enterprise search with 40+ connectors and permission-aware retrieval. Open WebUI comes at it from a more general angle with chat, knowledge bases, team collaboration, and extensibility. Different tools for different needs.
 
 **Is Onyx open source?**
-Onyx's core is MIT licensed. Enterprise features are under a separate Onyx Enterprise License. Additional [self-host terms](https://onyx.app/legal/self-host) may also apply.
+Onyx's Community Edition core is MIT licensed, which is more permissive than Open WebUI's licence. Enterprise features are under separate terms, and additional [self-host terms](https://onyx.app/legal/self-host) may also apply. Note that the licence and the pricing are separate questions: MIT covers the core, while single sign-on and access control sit in Onyx's paid tiers.
+
+**Which one gives me SSO and RBAC without paying?**
+Open WebUI. OIDC and OAuth single sign-on, LDAP, RBAC, SCIM 2.0 provisioning and audit logging are all in the free edition, for unlimited users, with no licence key. On Onyx, [per their pricing page](https://onyx.app/pricing), RBAC is in the Business tier and SSO is in the Enterprise tier. If you are self-hosting for a team and identity management is a requirement, this is usually the difference that decides it.
 
 **Is Onyx free?**
 The community edition is free to self-host. Additional [self-host terms](https://onyx.app/legal/self-host) may apply. Onyx Cloud and Enterprise plans are available for teams that want managed hosting or additional features.

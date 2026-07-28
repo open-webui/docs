@@ -5504,6 +5504,24 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 :::
 
+#### `ENABLE_SCIM`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables the SCIM 2.0 endpoints at `/api/v1/scim/v2`, so an identity provider can create, update and deactivate users and groups in Open WebUI automatically. Included in the free edition with no licence key and no user limit. Also accepts the older name `SCIM_ENABLED`.
+
+#### `SCIM_TOKEN`
+
+- Type: `str`
+- Default: Empty string
+- Description: Bearer token your identity provider must present on SCIM requests. Treat it as a credential with user and group management rights, and set it whenever SCIM is enabled.
+
+#### `SCIM_AUTH_PROVIDER`
+
+- Type: `str`
+- Default: Empty string
+- Description: Name of the OAuth provider that SCIM-provisioned identities correspond to, for example `microsoft` or `oidc`, which lets Open WebUI store the provider's `externalId` against each user. Leaving it unset while SCIM is enabled logs a warning at startup and skips `externalId` storage, so provisioned accounts may not line up with the same users signing in through SSO.
+
 #### `ENABLE_OAUTH_SIGNUP`
 
 - Type: `bool`
