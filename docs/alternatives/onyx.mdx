@@ -49,7 +49,7 @@ If something here is wrong or has aged badly, including in Onyx's favour, [tell 
 - **Full AI platform** with Chat, Notes, Channels, Automations, Open Terminal, voice/video calls, and image generation
 - **Cloud storage in chat** with Google Drive, OneDrive (personal and business) and SharePoint file pickers
 - **Deploy anywhere** on your own infrastructure, fully air-gapped if needed
-- **Free community edition** with unlimited users, SSO/OIDC/LDAP, RBAC, and SCIM 2.0 included
+- **Free community edition** with unlimited users, OIDC/OAuth SSO, LDAP, RBAC, and SCIM 2.0 included
 - **Any model, any provider** including Ollama, OpenAI, Anthropic, Google, Azure, Bedrock, and any OpenAI-compatible API
 - **Knowledge & RAG** with 13 vector databases, 8 content extraction engines, and hybrid BM25 + vector search with cross-encoder reranking
 - **Python extensibility** with custom tools, MCP servers, OpenAPI integration, pipelines, and a community marketplace
@@ -62,25 +62,35 @@ Both projects are free to self-host and both sell a paid tier. They differ in **
 
 **Open WebUI** is source available under the [Open WebUI License](https://github.com/open-webui/open-webui/blob/main/LICENSE), a BSD-3 clause licence with one addition: you may not remove or replace Open WebUI branding once a deployment exceeds 50 users in a rolling 30 day period, unless you hold an enterprise licence. That is the restriction, stated plainly, and it is worth knowing before you standardise on it.
 
-What that restriction does **not** touch is identity and access. In the free edition, for unlimited users:
+**Onyx** licenses its Community Edition core under MIT, covering chat, RAG, agents and actions. That grant is not repository-wide: Onyx's own [LICENSE](https://github.com/onyx-dot-app/onyx/blob/main/LICENSE) carves out everything under `ee` directories and places it under the Onyx Enterprise License instead. Taken on its own, MIT is a more permissive licence than ours, and that matters if you intend to redistribute or fork the core.
 
-- OIDC and OAuth single sign-on
-- LDAP and Active Directory authentication
-- Role-based access control, groups and per-resource permissions
-- [SCIM 2.0](/reference/env-configuration#enable_scim) user and group provisioning
-- Audit logging
+### What each free self-hosted edition includes
 
-None of these require a licence key, a seat count or a paid plan. They are environment variables.
+Open WebUI's free edition against Onyx's Community Edition, the part carrying the MIT licence. Onyx's column follows its [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) and [access control](https://docs.onyx.app/security/architecture/access_controls) documentation.
 
-**Onyx** sells its identity and access features separately, and this reaches further than single sign-on. Per Onyx's [Enterprise Edition documentation](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition), user groups, role-based access control, group-based permissions on connectors, document sets and agents, permission-sync connectors and OIDC/SAML SSO are all Enterprise Edition features. Onyx's [access control documentation](https://docs.onyx.app/security/architecture/access_controls) states that differentiated access to documents is Enterprise Edition only.
+| Capability | Open WebUI (free) | Onyx Community Edition (free) |
+| :--- | :--- | :--- |
+| OIDC / OAuth single sign-on | ✅ Included | ❌ Enterprise Edition |
+| SAML single sign-on | ❌ Not supported at any tier | ❌ Enterprise Edition |
+| LDAP / Active Directory | ✅ Included | Not documented |
+| User groups and role-based access control | ✅ Included | ❌ Enterprise Edition |
+| Per-resource access grants (users and groups) | ✅ Included | ❌ Enterprise Edition |
+| SCIM 2.0 provisioning | ✅ Included | Not documented |
+| Audit logging | ✅ Included | Not documented |
+| User limit before paying | ✅ None | ✅ None |
+| Differentiated access per document | ❌ Per knowledge base only | ❌ Enterprise Edition |
+| Permission inheritance from the source system | ❌ Not supported at any tier | ❌ Enterprise Edition |
+| Removing product branding | ❌ Enterprise licence above 50 users | ❌ Enterprise Edition |
+| Dedicated support and SLAs | ❌ [Enterprise licence](/enterprise/support) | ❌ Enterprise Edition |
+| Priority on feature requests | ❌ Enterprise licence | ❌ Enterprise Edition |
 
-On [Onyx Cloud](https://onyx.app/pricing) as of July 2026 the line falls in a different place, with role-based access control and permission inheritance included from the Business tier at $20 per user per month and single sign-on reserved for the Enterprise tier.
+Nothing in Open WebUI's ✅ rows needs a licence key, a seat count or a paid plan. They are environment variables.
 
-The practical consequence for a self-hosted evaluation: the free Community Edition is the part licensed under MIT, and group-based access control is not in it. A team that self-hosts Onyx for free and later needs to give two groups different access to different documents is looking at the Enterprise Edition, not a configuration change.
+Read the bottom half of the table as carefully as the top. Open WebUI cannot express per-document access differences or inherit permissions from a source system at all, and Onyx can, once you are on its Enterprise Edition. Both projects reserve branding removal, dedicated support and priority on the roadmap for paying customers, which is how each is funded, and neither pretends otherwise.
 
-On licensing, its Community Edition covers the core chat, RAG, agents and actions under MIT. That grant is not repository-wide: Onyx's own [LICENSE](https://github.com/onyx-dot-app/onyx/blob/main/LICENSE) carves out everything under `ee` directories and places it under the Onyx Enterprise License instead. Taken on its own, MIT is a more permissive licence than ours, and that is worth knowing if you intend to redistribute or fork the core.
+On [Onyx Cloud](https://onyx.app/pricing) as of July 2026 the line falls elsewhere again, with role-based access control and permission inheritance included from the Business tier at $20 per user per month, and single sign-on reserved for the Enterprise tier.
 
-So the summary is this. Open WebUI includes single sign-on, RBAC and SCIM at no cost for any number of users, and restricts only branding removal above 50 users. Onyx applies a more permissive licence to its core, and charges per seat for the access control and single sign-on features. Which matters more depends on whether your constraint is redistribution or budget.
+So the summary is this. If you are self-hosting and need managed identity, Open WebUI includes it for any number of users while Onyx's free edition does not include group-based access control at all. If you need per-document permissions mirrored from Slack or Drive, Open WebUI cannot do it and Onyx can, for a fee. If you intend to fork or redistribute, Onyx's core carries the more permissive licence.
 
 :::note Check both before you decide
 
@@ -101,7 +111,7 @@ Pricing and tiers change. These figures come from each project's own published t
 | **Extensibility** | Python tools, MCP, OpenAPI, pipelines | Focused on connector and search ecosystem |
 | **Collaboration** | Channels, Notes, shared conversations | AI-powered search and Q&A |
 | **License** | Open WebUI License (BSD-3 plus a branding clause above 50 users) | MIT for the Community Edition core; separate terms for Enterprise features, see [self-host terms](https://onyx.app/legal/self-host) |
-| **SSO (OIDC/SAML)** | Free edition, unlimited users | [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) self-hosted; Enterprise tier on Cloud |
+| **SSO** | OIDC and OAuth in the free edition, unlimited users; no SAML | OIDC and SAML, [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) self-hosted or Enterprise tier on Cloud |
 | **User groups and RBAC** | Free edition, unlimited users | [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) self-hosted; Business tier on Cloud |
 | **Per-document access differences** | Per knowledge base, not per document | [Enterprise Edition only](https://docs.onyx.app/security/architecture/access_controls), and can inherit from the source system |
 | **SCIM 2.0 provisioning** | Free edition, unlimited users | Not listed on the pricing page |
