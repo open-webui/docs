@@ -19,13 +19,13 @@ flowchart LR
     B["Provider API<br/>(cloud / local)"]
     C["Model<br/>(LLM / VLM)"]
 
-![Provider connections in admin settings](/images/admin/admin-connections.png)
-
     A -- HTTP --> B
     B -- Inference --> C
     C -- Tokens --> B
     B -- Stream --> A
 ```
+
+![Provider connections in admin settings](/images/admin/admin-connections.png)
 
 1. **You type a message** in Open WebUI
 2. Open WebUI sends it to your provider's API endpoint
