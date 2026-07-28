@@ -47,23 +47,12 @@ If something here is wrong or has aged badly, including in Onyx's favour, [tell 
 ## What Open WebUI Does Well
 
 - **Full AI platform** with Chat, Notes, Channels, Automations, Open Terminal, voice/video calls, and image generation
+- **Cloud storage in chat** with Google Drive, OneDrive (personal and business) and SharePoint file pickers
 - **Deploy anywhere** on your own infrastructure, fully air-gapped if needed
 - **Free community edition** with unlimited users, SSO/OIDC/LDAP, RBAC, and SCIM 2.0 included
 - **Any model, any provider** including Ollama, OpenAI, Anthropic, Google, Azure, Bedrock, and any OpenAI-compatible API
 - **Knowledge & RAG** with 13 vector databases, 8 content extraction engines, and hybrid BM25 + vector search with cross-encoder reranking
 - **Python extensibility** with custom tools, MCP servers, OpenAPI integration, pipelines, and a community marketplace
-
----
-
-## Where Onyx Is The Better Fit
-
-Two things Onyx is built for do not have an equivalent in Open WebUI, and configuration will not close the gap.
-
-**Native connectors to your existing tools.** Open WebUI populates knowledge bases by upload, by directory sync or through the API. There is no built-in, continuously syncing integration with Slack, Confluence, Jira or Google Drive. [oikb](/ecosystem/knowledge-base-sync) covers part of this, mirroring folders, repositories, buckets and wikis on a schedule, but it is a separate tool you run yourself rather than a connector catalogue inside the product.
-
-**Permission-aware retrieval from the source system.** Open WebUI's access control decides who may use a knowledge base inside Open WebUI. It does not inherit per-document permissions from wherever the document came from. If a file is in a knowledge base, everyone with access to that knowledge base can retrieve from it, regardless of what the source system would have allowed. Onyx's retrieval respects the source system's access controls per document, which is a materially different guarantee and the reason it exists.
-
-If either of those is a hard requirement, choose Onyx.
 
 ---
 
@@ -118,6 +107,13 @@ Pricing and tiers change. These figures come from each project's own published t
 ## When to Use Each
 
 **Choose Onyx if** you want to connect AI to your organization's existing tools. If your team's knowledge lives in Slack, Confluence, Jira, Google Drive, and GitHub, Onyx's 40+ connectors with automatic syncing and permission-aware retrieval were built for that.
+
+Two parts of that are worth being precise about, because they are the areas where Onyx is ahead and configuration will not close the gap:
+
+- **Continuous sync into the knowledge base.** Open WebUI connects to cloud storage at the point of use: users can pull files from [Google Drive](/features/chat-conversations/rag#google-drive-integration), OneDrive and SharePoint straight into a chat. What it does not do is keep a knowledge base continuously in step with those sources. Knowledge bases are populated by upload, by directory sync or through the API, and [oikb](/ecosystem/knowledge-base-sync) extends that to repositories, buckets and wikis on a schedule, but as a separate tool rather than a connector catalogue inside the product.
+- **Permission-aware retrieval from the source system.** Open WebUI's access control decides who may use a knowledge base. It does not inherit per-document permissions from wherever a document came from, so anyone with access to a knowledge base can retrieve from everything in it. Onyx's retrieval respects the source system's own access controls per document, which is a materially different guarantee and the reason the product exists.
+
+If either is a hard requirement, Onyx is the better fit.
 
 **Choose Open WebUI if** you need a general-purpose AI platform with chat, knowledge bases, team collaboration, Python extensibility, and support for any model provider. Open WebUI includes SSO, LDAP, RBAC, SCIM 2.0 and audit logging in the free community edition, for unlimited users, which is the deciding factor for organisations that need managed identity without a per-seat contract.
 
