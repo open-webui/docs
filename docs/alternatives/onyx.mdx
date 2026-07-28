@@ -71,22 +71,25 @@ Open WebUI's free edition against Onyx's Community Edition, the part carrying th
 | Capability | Open WebUI (free) | Onyx Community Edition (free) |
 | :--- | :--- | :--- |
 | OIDC / OAuth single sign-on | ✅ Included | ❌ Enterprise Edition |
-| SAML single sign-on | ❌ Not supported at any tier | ❌ Enterprise Edition |
+| SAML single sign-on | ⚠️ No native SAML; works via a [trusted-header proxy](/features/authentication-access/auth/sso#trusted-header) that terminates SAML | ❌ Enterprise Edition (native) |
 | LDAP / Active Directory | ✅ Included | Not documented |
 | User groups and role-based access control | ✅ Included | ❌ Enterprise Edition |
 | Per-resource access grants (users and groups) | ✅ Included | ❌ Enterprise Edition |
 | SCIM 2.0 provisioning | ✅ Included | Not documented |
 | Audit logging | ✅ Included | Not documented |
 | User limit before paying | ✅ None | ✅ None |
-| Differentiated access per document | ❌ Per knowledge base only | ❌ Enterprise Edition |
-| Permission inheritance from the source system | ❌ Not supported at any tier | ❌ Enterprise Edition |
-| Removing product branding | ❌ Enterprise licence above 50 users | ❌ Enterprise Edition |
+| Giving different teams access to different documents | ✅ Separate knowledge bases, each granted to the users or groups you choose | ❌ Enterprise Edition |
+| Different access to individual files **inside one** collection | ❌ Access applies to a knowledge base as a whole | ❌ Enterprise Edition |
+| Permissions mirrored automatically from Slack, Drive or Confluence | ❌ Not supported at any tier | ❌ Enterprise Edition |
+| Removing product branding | ✅ Up to 50 users, enterprise licence beyond that | ❌ Enterprise Edition |
 | Dedicated support and SLAs | ❌ [Enterprise licence](/enterprise/support) | ❌ Enterprise Edition |
 | Priority on feature requests | ❌ Enterprise licence | ❌ Enterprise Edition |
 
 Nothing in Open WebUI's ✅ rows needs a licence key, a seat count or a paid plan. They are environment variables.
 
-Read the bottom half of the table as carefully as the top. Open WebUI cannot express per-document access differences or inherit permissions from a source system at all, and Onyx can, once you are on its Enterprise Edition. Both projects reserve branding removal, dedicated support and priority on the roadmap for paying customers, which is how each is funded, and neither pretends otherwise.
+Two rows deserve care, because the distinction is easy to blur. Open WebUI can absolutely give separate teams access to separate document sets, for free, by putting them in different knowledge bases and granting each to the right groups. What it cannot do is vary access **within** a single knowledge base, or pick permissions up automatically from Slack, Drive or Confluence. Onyx can do both, but only on its Enterprise Edition, and its free Community Edition has no user groups at all, so it cannot do the simpler thing either.
+
+Dedicated support and priority on the roadmap are paid on both sides, which is how each project is funded, and neither pretends otherwise.
 
 On [Onyx Cloud](https://onyx.app/pricing) as of July 2026 the line falls elsewhere again, with role-based access control and permission inheritance included from the Business tier at $20 per user per month, and single sign-on reserved for the Enterprise tier.
 
@@ -126,7 +129,7 @@ Pricing and tiers change. These figures come from each project's own published t
 Two parts of that are worth being precise about, because they are the areas where Onyx is ahead and configuration will not close the gap:
 
 - **Continuous sync into the knowledge base.** Open WebUI connects to cloud storage at the point of use: users can pull files from [Google Drive](/features/chat-conversations/rag#google-drive-integration), OneDrive and SharePoint straight into a chat. What it does not do is keep a knowledge base continuously in step with those sources. Knowledge bases are populated by upload, by directory sync or through the API, and [oikb](/ecosystem/knowledge-base-sync) extends that to repositories, buckets and wikis on a schedule, but as a separate tool rather than a connector catalogue inside the product.
-- **Permission inheritance from the source system.** Open WebUI grants access to a knowledge base as a whole. It does not read per-document permissions back from wherever a document came from, so anyone who can use a knowledge base can retrieve from everything in it. Onyx can mirror a source system's own access control list and enforce it at retrieval time, which is a genuinely different capability that Open WebUI has no equivalent for at any price.
+- **Permission inheritance from the source system.** Open WebUI grants access per knowledge base, so you separate what different teams may read by putting it in different knowledge bases. What it will not do is read permissions back out of Slack, Drive or Confluence and apply them per document automatically. Onyx can mirror a source system's access control list and enforce it at retrieval time, on its Enterprise Edition. If you are indexing a large shared Drive whose permissions already encode who may see what, that difference is the whole decision.
 
 If either is a hard requirement, Onyx is the better fit. Note that both are [Enterprise Edition features](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) on Onyx's side, so the comparison to make is against a paid Onyx deployment rather than the free Community Edition.
 
