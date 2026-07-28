@@ -15,6 +15,8 @@ Sub-agents are disabled by default. An administrator enables them with the [`ENA
 
 Delegation buys focus and parallelism:
 
+![Sub-agent settings](/images/admin/admin-subagents.png)
+
 - **A clean context per task.** The sub-agent gets the task and only the context handed to it, instead of the whole conversation, so a long chat does not dilute the work.
 - **Real parallelism.** When a model requests several delegations in one reply, they run at the same time rather than one after another.
 - **A short answer back.** Only the sub-agent's final result returns to the parent chat. The intermediate tool calls, searches and dead ends stay in the sub-agent's own chat.

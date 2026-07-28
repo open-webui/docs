@@ -29,6 +29,8 @@ If Open WebUI feels slow or unresponsive, especially during chat generation or h
 
 By default, Open WebUI automates background tasks like title generation, tagging, and autocomplete. These run in the background and can slow down your main chat model if they share the same resources.
 
+![Task model settings under Admin > Interface](/images/admin/admin-interface.png)
+
 **Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid using large reasoning models (like o1, r1, or Claude) as they are too slow and expensive for simple background tasks.
 
 **Configuration:**

@@ -28,6 +28,8 @@ Mention a skill with `$` in chat to inject its full content immediately. Or bind
 
 ## Why Skills?
 
+![Skills in the workspace](/images/workspace/skills-list.png)
+
 ### Instructions without code
 
 Write guidelines in Markdown. No Python, no API calls, no deployment. If you can write a document, you can create a skill.

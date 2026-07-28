@@ -27,6 +27,8 @@ Every change is tracked with full version history. Roll back to a previous versi
 
 ## Why Prompts?
 
+![Saved prompts in the workspace](/images/workspace/prompts-list.png)
+
 ### Stop retyping the same instructions
 
 Save the prompt once, use it with `/command`. Bug report templates, meeting minutes, code reviews, content briefs: anything you type more than twice should be a prompt.

@@ -76,6 +76,8 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 | **Tags** | Organize models in the dropdown |
 | **Visibility** | Private (specific users/groups) or public |
 
+![The model editor with base model, description and system prompt](/images/workspace/model-editor.png)
+
 ### System prompt and variables
 
 The system prompt defines the behavior and persona. Use dynamic variables for context-aware instructions:
@@ -99,6 +101,8 @@ The current date is {{ CURRENT_DATE }}.
 ### Capabilities and bindings
 
 Toggle what the model can do and bind resources:
+
+![Capabilities and builtin tool categories in the model editor](/images/workspace/model-editor-capabilities.png)
 
 | Setting | What it controls |
 | :--- | :--- |
@@ -130,6 +134,8 @@ Clickable starter chips that appear when a user opens a fresh chat with this mod
 ## Model Management
 
 From the model list, click the ellipsis (**...**) on any model:
+
+![The model list in Workspace > Models](/images/workspace/models-list.png)
 
 | Action | Description |
 | :--- | :--- |
@@ -241,6 +247,8 @@ Setting a model as Selected does not stop anyone from switching to another model
 ## Model Switching in Chat
 
 Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
+
+![The model selector, searchable and showing pinned models](/images/features/chat/model-selector.png)
 
 ---
 

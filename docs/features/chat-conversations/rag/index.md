@@ -29,6 +29,8 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 To use a local document in RAG, upload it from the Documents section in the Workspace area. In a chat, type `#` before your query and select the uploaded document from the suggestion box that appears above the message input. Once selected, a document icon appears above `Send a message`, indicating that the document has been attached for retrieval.
 
+![Document and retrieval settings](/images/admin/admin-documents.png)
+
 :::tip Bulk File Management
 Need to clean up multiple uploaded documents or audit your storage? You can now use the centralized **[File Manager](/features/chat-conversations/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
 :::

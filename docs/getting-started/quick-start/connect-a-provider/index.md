@@ -19,6 +19,8 @@ flowchart LR
     B["Provider API<br/>(cloud / local)"]
     C["Model<br/>(LLM / VLM)"]
 
+![Provider connections in admin settings](/images/admin/admin-connections.png)
+
     A -- HTTP --> B
     B -- Inference --> C
     C -- Tokens --> B

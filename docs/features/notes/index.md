@@ -27,6 +27,8 @@ Unlike standard chats, which are linear and ephemeral, Notes are persistent docu
 
 ## Why Notes?
 
+![The notes list](/images/features/notes/notes-list.png)
+
 ### AI-assisted writing, built in
 
 Open the **Chat sidebar** to brainstorm, critique, expand or rewrite your content without leaving the editor. It is the full chat interface, so you keep the model picker, tools and attachments, and you can hold several separate conversations per note. Highlight a passage first and the model rewrites just that part, in place.

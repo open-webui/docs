@@ -64,6 +64,8 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 
 When attaching files or knowledge bases to a model, click on the attached item to toggle between modes:
 
+![The knowledge base list](/images/workspace/knowledge-list.png)
+
 ### 🔍 Focused Retrieval (default)
 
 Uses RAG to find and inject the most relevant chunks based on the user's query. When hybrid search is enabled (`ENABLE_RAG_HYBRID_SEARCH`), retrieval combines BM25 keyword search with vector search, plus reranking for accuracy.
@@ -81,6 +83,8 @@ Best for short reference documents, style guides, or context that's always relev
 ## Agentic Knowledge Tools
 
 With [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) enabled, models interact with your knowledge bases using built-in tools. Which tools appear depends on whether specific knowledge is attached to the model:
+
+![Files inside a knowledge base, with search and sort](/images/workspace/knowledge-detail.png)
 
 | Tool | Attached KB | No KB attached | Description |
 |------|:-----------:|:--------------:|-------------|
