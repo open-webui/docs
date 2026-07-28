@@ -25,16 +25,6 @@ Open WebUI is **a home for AI**, a self-hosted platform that's **[extensible](ht
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-<img
-  alt="Open WebUI running a live analysis: Claude Opus 5 reads a spreadsheet through Open Terminal and renders an interactive revenue dashboard inline in the chat"
-  src={useBaseUrl('/images/landing/hero.png')}
-  style={{ width: '100%', borderRadius: 12, margin: '0.25rem 0 0.5rem' }}
-/>
-
-<p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1.75rem' }}>
-  Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
-</p>
-
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
 [![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
@@ -53,10 +43,14 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 Then open [http://localhost:3000](http://localhost:3000).
 
 <img
-  alt="Open WebUI chat screen after startup"
-  src={useBaseUrl('/images/demo.png')}
-  style={{ width: '100%', maxWidth: 760, margin: '0.75rem 0 1rem' }}
+  alt="Open WebUI running a live analysis: Claude Opus 5 reads a spreadsheet through Open Terminal and renders an interactive revenue dashboard inline in the chat"
+  src={useBaseUrl('/images/landing/hero.png')}
+  style={{ width: '100%', borderRadius: 12, margin: '0.75rem 0 0.5rem' }}
 />
+
+<p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
+  Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
+</p>
 
 For GPU support, Docker Compose, and more → [Full Docker guide](/getting-started/quick-start)
 
