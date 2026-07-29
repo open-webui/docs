@@ -135,8 +135,8 @@ Since v0.10.0 Native is the default, so you never need to "turn Native on". The 
 
 1.  **Every model at once (global default, fastest)**:
     *   Navigate to **Settings → Admin → AI → Models**.
-    *   Click the **Settings** button at the **top right** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
-    *   Under **Model Parameters**, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
+    *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
+    *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
 2.  **Per-Model Override**: edit a specific model in **Settings → Admin → AI → Models** and set **Function Calling** to `Legacy` under **Model Parameters**. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
 
