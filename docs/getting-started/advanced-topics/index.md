@@ -31,7 +31,7 @@ Set up a local development environment with hot-reloading frontend and backend, 
 
 | | |
 | :--- | :--- |
-| 🚀 **[Scaling Open WebUI](scaling)** | Move from SQLite to PostgreSQL, add Redis, run multiple replicas, configure external vector databases, and set up shared storage and observability |
-| 🪵 **[Logging Open WebUI](logging)** | Configure log levels, enable debug output, and switch to structured JSON logging for production log aggregators |
-| 🛠️ **[Developing Open WebUI](development)** | Clone the repo, run the frontend and backend side by side, test on other devices, and submit pull requests |
-| 🔒 **[Hardening Open WebUI](hardening)** | Lock down authentication, secrets, CORS, security headers, audit logging, and network access for production deployments |
+| 🚀 **[Scaling Open WebUI](./scaling.md)** | Move from SQLite to PostgreSQL, add Redis, run multiple replicas, configure external vector databases, and set up shared storage and observability |
+| 🪵 **[Logging Open WebUI](./logging.md)** | Configure log levels, enable debug output, and switch to structured JSON logging for production log aggregators |
+| 🛠️ **[Developing Open WebUI](./development.md)** | Clone the repo, run the frontend and backend side by side, test on other devices, and submit pull requests |
+| 🔒 **[Hardening Open WebUI](./hardening.md)** | Lock down authentication, secrets, CORS, security headers, audit logging, and network access for production deployments |
