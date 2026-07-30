@@ -1,0 +1,397 @@
+---
+sidebar_position: 16
+title: Open WebUI vs Batuk
+sidebar_label: Open WebUI & Batuk
+description: Open WebUI vs Batuk compared. Two open-source, self-hosted AI workspaces for local models, cloud LLMs, RAG, teams, APIs, and enterprise deployment.
+keywords:
+  - Open WebUI vs Batuk
+  - Batuk alternative
+  - Open WebUI alternative
+  - self-hosted AI chat
+  - sovereign AI platform
+  - enterprise AI chat
+  - Ollama web interface
+  - multi-provider AI workspace
+  - private RAG platform
+  - OpenAI compatible gateway
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+  <meta property="og:title" content="Open WebUI vs Batuk" />
+  <meta
+    property="og:description"
+    content="Compare Open WebUI and Batuk for self-hosted AI chat, local and cloud models, document RAG, enterprise identity, API access, and private deployment."
+  />
+</Head>
+
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Batuk?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Batuk is an open-source, self-hosted AI workspace for teams. It combines local and cloud models, document RAG, personal and shared workspaces, enterprise identity, audit and compliance workflows, and an OpenAI-compatible model gateway."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do Batuk and Open WebUI compare?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Both provide self-hosted, browser-based access to local and cloud language models. Open WebUI has a larger ecosystem and deeper community extensibility. Batuk emphasizes organization-scoped privacy, enterprise administration, user-issued API keys, model routing, audit evidence, and deployment flexibility."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can Batuk use Ollama?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Batuk supports Ollama for local inference and can also connect to OpenAI, OpenRouter, Anthropic, xAI, Together AI, Mistral, Kimi, DeepSeek, Qwen, Perplexity, Sarvam AI, and custom OpenAI-compatible servers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Batuk open source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Batuk is available on GitHub under the MIT License."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which should I choose, Batuk or Open WebUI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Choose Open WebUI for its mature community, broad extension ecosystem, tools, functions, and established local-AI experience. Consider Batuk when you want an enterprise-oriented workspace with personal and shared data scopes, built-in API-key management, model gateway controls, audit evidence, whitelabeling, and multiple product and vector storage options."
+      }
+    }
+  ]
+})}</script>
+
+# Open WebUI & Batuk
+
+Last updated: July 2026
+
+[Batuk](https://github.com/suhasbhairav/sb-chat) is an open-source, self-hosted AI workspace created by [Suhas Bhairav](https://suhasbhairav.com). It brings local models, frontier LLMs, document RAG, team workspaces, enterprise identity, audit evidence, and an OpenAI-compatible model gateway into one browser-based platform.
+
+Batuk is local-first but not local-only. It can run with Ollama, JSON storage, SQLite, and local vectors on a developer machine, or use SQL databases, ChromaDB, Pinecone, Qdrant Cloud, Supabase, enterprise identity providers, private file storage, and Docker-based deployment for team environments.
+
+[GitHub](https://github.com/suhasbhairav/sb-chat) · [MIT License](https://github.com/suhasbhairav/sb-chat/blob/main/LICENSE) · [Demo](https://app.arcade.software/share/videos/UZnHQSj8q0OA8UurPFvW)
+
+---
+
+## What Batuk Does Well
+
+- **Local and cloud model access:** Use Ollama alongside OpenAI, OpenRouter, Anthropic Claude, xAI Grok, Together AI, Mistral AI, Kimi, DeepSeek, Qwen, Perplexity, Sarvam AI, and custom OpenAI-compatible endpoints.
+- **Enterprise-oriented workspace privacy:** Personal chats, documents, folders, memories, and vectors are scoped to the signed-in user. Shared workspace data uses a separate workspace scope and is only available to authorized members.
+- **OpenAI-compatible model gateway:** Administrators can expose approved internal models under stable public model IDs. Users can generate personal Batuk API keys and call enabled models through `/api/v1/models` and `/api/v1/chat/completions`.
+- **User-scoped API access:** API secrets are shown once, stored only as SHA-256 hashes, associated with their owner, and can be revoked by the user or an administrator.
+- **Document RAG:** Upload PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX files, then retrieve relevant context during chat.
+- **Multiple vector-store choices:** Start with local JSON vectors, or use ChromaDB, Pinecone, Qdrant Cloud, or Supabase Postgres with pgvector.
+- **Private and shared document knowledge:** Personal RAG remains private to the user, while shared workspace RAG is limited to explicitly authorized workspace members.
+- **Enterprise identity:** Better Auth provides email/password authentication, users, roles, organizations, teams, invitations, OAuth/OIDC, SSO, and SCIM-oriented provisioning flows.
+- **Administration:** Admins can manage users, organizations, roles, invitations, shared workspaces, model routes, API access, branding, and deployment configuration.
+- **Audit and compliance evidence:** Batuk includes an audit trail, hash-chain integrity evidence, GDPR request workflows, CSV evidence export, retention notes, and ISO 27001/SOC 2 control registers.
+- **Usage separation:** Token usage distinguishes interactive chat, API gateway requests, and API search traffic, with reporting by user, provider, model, API key, day, month, and year.
+- **Whitelabeling:** Organizations can configure product name, tagline, accent color, initials, and logo while preserving Batuk attribution.
+- **Flexible storage:** Run locally with JSON and SQLite, or use SQLite, MySQL, PostgreSQL, Supabase Storage, and configurable container paths for more durable deployments.
+- **Deployment options:** Run through Node.js, Docker Compose, Vercel, Render, or Railway. Docker profiles are available for PostgreSQL, MySQL, ChromaDB, and Ollama.
+- **Skills and agent workflows:** Create reusable instruction packages and saved sequential multi-agent workflows with documents, traces, and final output returned to chat.
+- **MCP experimentation:** Batuk includes an alpha MCP dashboard for custom Streamable HTTP, SSE, and stdio servers, capability discovery, resource context, and selected connector workflows.
+- **MIT licensed:** Batuk can be inspected, modified, self-hosted, and incorporated into internal or commercial deployments under the MIT License.
+
+---
+
+## What Open WebUI Does Well
+
+- **Mature self-hosted AI platform:** Open WebUI has a large community, extensive documentation, broad adoption, and a well-established deployment ecosystem.
+- **Local AI experience:** It integrates naturally with Ollama and supports OpenAI-compatible model servers and cloud providers.
+- **Deep extensibility:** Tools, functions, filters, pipelines, actions, model configuration, knowledge, prompts, and community extensions allow extensive customization.
+- **Agentic capabilities:** Open WebUI supports built-in tools, MCP integrations, sub-agents, timers, automations, and model-driven workflows.
+- **Knowledge and retrieval:** It offers mature knowledge-base functionality, multiple extraction engines, multiple vector-database integrations, hybrid search, and reranking options.
+- **Team collaboration:** Multi-user access, channels, notes, role-based access, SSO/OIDC/LDAP, SCIM, permissions, and group-oriented administration support larger deployments.
+- **Model customization:** Administrators and users can configure models with instructions, tools, knowledge, parameters, and visibility controls.
+- **Developer ecosystem:** Its Python-oriented extension model and community marketplace make it attractive for teams that want to build or install reusable AI capabilities.
+- **Deployment scale:** Open WebUI can serve individuals, teams, and larger installations across Docker and Kubernetes environments.
+- **Integrated computing options:** Open Terminal and related components can provide sandboxed execution and a broader AI-computing environment.
+
+---
+
+## At a Glance
+
+| | Open WebUI | Batuk |
+| --- | --- | --- |
+| Primary approach | Extensible self-hosted AI and agentic platform | Sovereign, enterprise-oriented AI workspace and model gateway |
+| Interface | Browser-based, multi-user | Browser-based, multi-user |
+| Local models | Native Ollama and OpenAI-compatible endpoints | Ollama and custom OpenAI-compatible endpoints |
+| Cloud providers | Broad provider support through native and compatible APIs | OpenAI, OpenRouter, Claude, Grok, Together, Mistral, Kimi, DeepSeek, Qwen, Perplexity, Sarvam, and compatible gateways |
+| Document RAG | Mature knowledge platform with multiple extraction and vector options | Personal/shared scoped RAG with local JSON, ChromaDB, Pinecone, Qdrant, or Supabase |
+| Workspace privacy | User, group, and permission-oriented controls | Explicit personal, organization, user, and shared-workspace storage scopes |
+| API gateway | API and compatibility capabilities | User-issued API keys, admin-controlled public model routes, OpenAI-compatible endpoints |
+| API-key administration | Platform-dependent API access controls | User self-service keys plus admin visibility and revocation |
+| Identity | Multi-user, RBAC, SSO/OIDC/LDAP, SCIM | Better Auth users, roles, organizations, teams, OAuth/OIDC, SSO, and SCIM flows |
+| Administration | Mature admin and group-management capabilities | User CRUD, organizations, teams, shared workspaces, model routes, branding, API management |
+| Audit and compliance | Enterprise administration and audit capabilities | Audit events, hash-chain evidence, GDPR workflows, CSV exports, ISO 27001/SOC 2 evidence register |
+| Token reporting | Usage and analytics capabilities | Channel-separated chat, API, and search usage by user, model, provider, and API key |
+| Whitelabeling | Theming and enterprise branding options | Organization-level name, tagline, accent, initials, and logo |
+| Agents | Tools, functions, sub-agents, automations, pipelines | Saved sequential agent workflows, skills, attached documents, and run traces |
+| MCP | Broad MCP and tool ecosystem | Alpha MCP connection, discovery, context, and selected tool-call flows |
+| Product storage | Platform-managed database and storage | Local JSON, SQLite, MySQL, PostgreSQL, and configurable file storage |
+| Vector stores | Broad vector-database ecosystem | Local JSON, ChromaDB, Pinecone, Qdrant Cloud, Supabase pgvector |
+| Deployment | Docker, Kubernetes, desktop, and other supported methods | Node.js, Docker Compose, Vercel, Render, Railway |
+| License | Open WebUI code is distributed under multiple applicable licenses | MIT |
+
+---
+
+## When to Use Each
+
+Choose **Open WebUI** when you want a mature, widely adopted self-hosted AI platform with a large community, a broad extension ecosystem, sophisticated knowledge features, tools, functions, pipelines, automations, and an established path from local Ollama chat to a highly customized AI environment.
+
+Choose **Batuk** when you want an enterprise-oriented AI workspace where local and cloud models, document RAG, user and shared-workspace privacy, model routing, personal API keys, audit evidence, token reporting, organization branding, and flexible storage are designed as parts of the same system.
+
+Open WebUI is likely the stronger fit when community scale, plugin breadth, agentic extensibility, and ecosystem maturity are the highest priorities.
+
+Batuk may be a good fit when you want to:
+
+- give every user a private workspace while also creating controlled shared workspaces;
+- expose only administrator-approved models through stable internal model IDs;
+- let users create and revoke their own API keys;
+- report chat and API consumption separately;
+- retain original document files while controlling the scope of chunks and vectors;
+- deploy with local JSON and SQLite first, then move product data to MySQL or PostgreSQL;
+- combine local Ollama inference with cloud providers in one organization-managed interface;
+- maintain audit evidence, privacy-request workflows, and control registers inside the product;
+- create a branded internal AI workspace without building the identity, RAG, gateway, usage, and administration layers separately.
+
+Both projects aim to give users control over how and where AI runs. Open WebUI emphasizes a broad, community-driven and deeply extensible platform. Batuk emphasizes a cohesive sovereign workspace with enterprise controls and an internal model-access layer.
+
+---
+
+## Local and Cloud Models
+
+Both Open WebUI and Batuk can sit between users and multiple model backends.
+
+Batuk supports Ollama as its primary local inference option. It also supports hosted providers and private gateways, including:
+
+- OpenAI
+- OpenRouter
+- Anthropic Claude
+- xAI Grok
+- Together AI
+- Mistral AI
+- Kimi
+- DeepSeek
+- Qwen
+- Perplexity
+- Sarvam AI
+- LM Studio
+- vLLM
+- llama.cpp
+- LiteLLM
+- LocalAI
+- private OpenAI-compatible servers
+
+Administrators can configure provider credentials at the deployment level and expose selected models through public route names such as `company/support-large`. This allows internal applications to use a stable Batuk model ID even when the upstream provider or underlying model changes.
+
+---
+
+## API Gateway
+
+Batuk includes an OpenAI-compatible API layer intended for internal applications, approved automation, evaluation tools, and user-owned integrations.
+
+A signed-in user can create a Batuk API key and call enabled models:
+
+```bash
+curl -H "Authorization: Bearer batuk_..." \
+  http://localhost:3000/api/v1/models
+```
+
+```bash
+curl -X POST http://localhost:3000/api/v1/chat/completions \
+  -H "Authorization: Bearer batuk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "batuk/qwen3-8b",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain sovereign AI in two sentences."
+      }
+    ]
+  }'
+```
+
+Administrators decide which routes are enabled and which provider, model, and base URL sit behind each public model ID. Raw Batuk API secrets are never retained after creation.
+
+Batuk also provides a Perplexity-backed search endpoint when configured:
+
+```bash
+curl -X POST http://localhost:3000/api/v1/search \
+  -H "Authorization: Bearer batuk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": [
+      "What changed in the latest product release?",
+      "Summarize the relevant sources."
+    ]
+  }'
+```
+
+---
+
+## Document RAG and Data Scope
+
+Batuk treats retrieval scope as an explicit part of the workspace model.
+
+Personal uploads, chunks, vectors, chats, folders, and memories belong to the signed-in user. Organization membership does not automatically make a user's personal documents visible to other members.
+
+Shared knowledge is placed inside an admin-created shared workspace. Only administrators and users added to that workspace can see its chats, files, chunks, and retrieved context.
+
+When Batuk uses ChromaDB, Pinecone, Qdrant Cloud, or Supabase, vector metadata includes the relevant organization, user, and workspace scope. Retrieval filters are applied before document context is sent to the selected model.
+
+Supported document types include PDF, TXT, Markdown, JSON, LOG, CSV, XLS, XLSX, and DOCX.
+
+---
+
+## Enterprise Identity and Administration
+
+Batuk uses Better Auth as its identity layer. Depending on deployment configuration, it can provide:
+
+- email and password authentication;
+- user and role administration;
+- organizations and teams;
+- invitations and membership management;
+- OAuth 2.1 and OIDC provider support;
+- enterprise SSO flows;
+- SCIM-oriented user provisioning;
+- password resets, bans, unbans, and user deletion;
+- active-organization switching;
+- admin-managed shared workspaces.
+
+The first owner can be bootstrapped when a deployment has no existing owner or administrator.
+
+Batuk's admin interface also covers model routes, organization branding, API-key revocation, token reporting, shared workspace membership, audit events, privacy requests, and control evidence.
+
+---
+
+## Audit, Privacy, and Compliance
+
+Batuk includes product features intended to help teams collect operational evidence:
+
+- audit events for access denials, administrative changes, document operations, chat mutations, privacy requests, and control changes;
+- hash-chain integrity evidence for audit records;
+- GDPR export, request, and erasure workflows;
+- data inventory and retention notes;
+- ISO 27001 and SOC 2 control evidence registers;
+- CSV export for review and audit preparation.
+
+These features support evidence collection and operational workflows. They do not by themselves make a deployment GDPR compliant, ISO 27001 certified, or SOC 2 compliant. Certification and legal compliance also depend on organizational policies, contracts, infrastructure, operating procedures, and independent review.
+
+---
+
+## Deployment and Storage
+
+Batuk can begin as a lightweight local deployment and move to more durable infrastructure without changing its core product experience.
+
+A minimal local setup can use:
+
+- Next.js;
+- SQLite for authentication;
+- local JSON for product data;
+- local file storage;
+- local JSON vectors;
+- Ollama for inference.
+
+A larger deployment can use:
+
+- PostgreSQL or MySQL for product data;
+- ChromaDB, Pinecone, Qdrant Cloud, or Supabase pgvector;
+- Supabase Storage or controlled filesystem paths for original files;
+- enterprise identity and SSO;
+- Docker Compose profiles;
+- private model servers or hosted providers.
+
+Batuk includes deployment paths for Docker, Vercel, Render, and Railway. Docker Compose is the intended option for private SQL services, local ChromaDB, Compose-managed Ollama, controlled filesystem storage, and air-gapped environments.
+
+---
+
+## Can Batuk and Open WebUI Be Used Together?
+
+They are usually alternative interface and workspace layers, so most teams will choose one as the primary user-facing platform.
+
+They can still coexist in the same environment. For example, both can connect to a shared Ollama, vLLM, LiteLLM, or other OpenAI-compatible model gateway. A team could evaluate both interfaces against the same model infrastructure while keeping its inference layer independent.
+
+Batuk's OpenAI-compatible gateway may also be usable by external applications that expect standard model-listing and chat-completions endpoints, provided the required route and authentication configuration is enabled.
+
+---
+
+## Frequently Asked Questions
+
+### What is Batuk?
+
+Batuk is an open-source, browser-based AI workspace for local and cloud models. It combines multi-provider chat, document RAG, private and shared workspaces, enterprise identity, administrative controls, API access, audit evidence, and deployment-oriented storage.
+
+### Is Batuk an Open WebUI fork?
+
+No. Batuk is a separate project with its own Next.js-based architecture, data model, identity layer, API gateway, storage options, workspace privacy model, and administration experience.
+
+### Is Batuk free?
+
+Batuk is open source under the MIT License. Infrastructure, hosted model APIs, managed databases, vector services, and enterprise operations may still create costs for the organization running it.
+
+### Can Batuk run fully locally?
+
+Yes. Batuk can use Ollama, SQLite, local JSON product storage, local files, and local vector storage. Fully offline deployment still requires operators to mirror the required application, container, package, and model assets into their environment.
+
+### Does Batuk require Ollama?
+
+No. Ollama is supported for local inference, but Batuk can also use hosted providers and custom OpenAI-compatible model servers.
+
+### Does Batuk support multiple users?
+
+Yes. Batuk supports users, administrators, roles, organizations, teams, invitations, personal workspaces, and membership-controlled shared workspaces.
+
+### Does Batuk support SSO?
+
+Batuk's Better Auth integration includes OAuth/OIDC provider support, enterprise SSO capabilities, and SCIM-oriented provisioning flows. Exact provider configuration depends on the deployment and identity provider.
+
+### Can users create API keys?
+
+Yes. Signed-in users can generate and revoke their own Batuk API keys. Administrators can inspect key metadata, revoke individual keys, or disable a user's active API access.
+
+### Are raw API keys stored?
+
+No. Batuk stores a SHA-256 hash, a short preview, owner metadata, status, timestamps, and usage metadata. The raw secret is shown only when it is created.
+
+### Which vector databases does Batuk support?
+
+Batuk supports local JSON vectors, ChromaDB, Pinecone, Qdrant Cloud, and Supabase Postgres with pgvector.
+
+### Does Batuk support MCP?
+
+Batuk has an alpha, proof-of-concept MCP dashboard for saving connections, discovering tools, resources, and prompts, selecting an active connector, and supporting selected discovery or tool-call flows. Full automatic tool execution in ordinary chat is still under development.
+
+### Which project has the larger ecosystem?
+
+Open WebUI has the larger community, broader extension ecosystem, and greater adoption. Batuk is a newer project focused on a cohesive enterprise workspace, explicit data scopes, model gateway access, and deployment flexibility.
+
+### Which project should enterprises choose?
+
+It depends on the architecture and operating model. Open WebUI is compelling for organizations prioritizing ecosystem maturity, extensibility, agentic tools, and broad community adoption. Batuk is worth evaluating for teams prioritizing explicit personal/shared workspace isolation, user-scoped API access, approved model routing, audit evidence, configurable storage, and organization-level branding.
+
+---
+
+Batuk and Open WebUI share an important goal: making self-hosted AI useful beyond a single model or provider. Open WebUI approaches that goal through a mature, highly extensible platform and community ecosystem. Batuk approaches it through a sovereign team workspace that combines chat, RAG, identity, model access, usage, and audit controls.
+
+Explore Batuk on [GitHub](https://github.com/suhasbhairav/sb-chat).
+
+Ready to try Open WebUI? [Get started →](/getting-started/)
+
+---
+
+Related: [Open WebUI & Ollama](./ollama) · [Open WebUI & LibreChat](./librechat) · [Open WebUI & AnythingLLM](./anythingllm)
