@@ -27,6 +27,19 @@ Despite the name, Open Terminal is not just a terminal panel. It is the computer
 
 ![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
 
+## The Right Mental Model
+
+Modern agentic workflows are not one prompt in, one answer out. They are stateful loops:
+
+1. Understand the goal.
+2. Inspect the workspace.
+3. Choose an action.
+4. Run the action.
+5. Observe the result.
+6. Repair, continue, or verify.
+
+Open WebUI coordinates that loop. Open Terminal gives the loop a real place to happen.
+
 :::tip Looking for "your computer in a browser" instead?
 Open Terminal is the computer substrate an **AI agent** drives from chat. If you want to operate your own machine from any browser, with files, editor, terminal, git, and AI as an optional helper, see [**Open WebUI Computer**](/ecosystem/computer), a separate Open WebUI project. [Choose the right execution environment](/ecosystem/computer/choose).
 :::
@@ -54,15 +67,24 @@ Different teams describe this stack with different language. Open Terminal fits 
 | Term people use | What it means here |
 | :--- | :--- |
 | **Agentic AI** | A model that can take multi-step actions, observe results, and keep going |
+| **Agentic workflow** | A goal-driven process where the agent plans, acts, observes results, and adapts |
 | **AI agent** | The model plus instructions, tools, memory/context, and an execution loop |
 | **Agent harness** | The surrounding system that gives the model tools, context, permissions, state, and feedback |
 | **Agent runtime** | The place where agent actions actually run: files, code, commands, servers, documents, and processes |
+| **Action runtime** | A runtime focused on executing real-world actions reliably, with authorization and auditability |
+| **Agentic infrastructure** | The compute, state, orchestration, tools, security, and observability needed to run agents in production |
 | **Computer substrate** | A real working environment the agent can modify, execute within, and observe |
+| **Stateful session** | A task or workspace that persists across many model/tool turns instead of one stateless request |
 | **Tool calling / function calling** | The model choosing a structured tool action instead of only writing text |
+| **Tool result / context return** | The output from an action being returned to the model so it can decide the next step |
+| **Action tools** | Tools that modify an external environment, such as editing files, posting messages, or changing records |
 | **Computer use** | An agent operating a computer-like environment through files, commands, UI, or browser actions |
 | **Code interpreter** | A narrower execution surface for running code; Open Terminal is broader because it includes the filesystem, shell, packages, processes, and previews |
 | **MCP / tool servers** | Standard or API-backed ways to expose capabilities to the model |
 | **Orchestration** | The loop of choosing tools, sequencing steps, handling failures, and verifying results |
+| **Human-in-the-loop** | A human approval or review point inside an otherwise agent-driven workflow |
+| **Guardrails / governance** | Policy, permission, and safety controls around what the agent can see and do |
+| **Observability / auditability** | Logs, traces, and records that show what the agent did and why |
 | **Sandbox** | The isolation boundary around the agent's filesystem, processes, and network access |
 
 The practical point is simple: models got good enough to use tools, but agents need a computer-shaped place to do real work. Open Terminal gives Open WebUI that place.

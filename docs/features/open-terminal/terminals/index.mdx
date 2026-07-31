@@ -15,6 +15,8 @@ import Kubernetes from './tab-deployment/Kubernetes.md';
 
 Open Terminal gives one chat an agent workspace where AI can do real work. Terminals turns that into managed fleet infrastructure, so every user or policy can get the right workspace without sharing state or hand-wiring containers.
 
+Open WebUI is where agents are prompted, governed, and observed. Terminals is where their workspaces are provisioned, isolated, reused, refreshed, and reset.
+
 :::tip Quick navigation
 - **Need to operate per-user terminal environments?** → [Orchestration](/features/open-terminal/terminals/orchestration)
 :::
@@ -62,6 +64,8 @@ Terminals is what makes agent computer substrates operable for teams. It lets ad
 | Lifecycle | Reuse, idle cleanup, refresh, and scheduled resets |
 | Scale | Docker for a single host, Kubernetes/operator mode for larger deployments |
 | Supportability | Admin UI, logs, status, policy APIs, and predictable routing |
+
+In agentic-infrastructure terms, Terminals owns the workspace lifecycle: provision, route, persist, reap, refresh, and reset.
 
 :::info Admin UI (new in 0.0.4)
 The orchestrator serves a built-in minimal admin UI at `/` for viewing terminal status, active sessions, and policies. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
