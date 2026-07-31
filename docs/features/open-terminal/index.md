@@ -21,7 +21,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 Open WebUI gives you the agent front door: models, chats, knowledge, prompts, users, permissions, builtin tools, MCP connections, automations, and shared workflows. Open Terminal adds the missing computer substrate: a working environment with a filesystem, shell, package manager, running processes, document and data handling, generated artifacts, and live previews.
 
-This is the difference between a chatbot with tools and an agentic AI workspace. The model can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
+That means the agent can do real work. Not just answer questions about a task, and not just emit code you run somewhere else. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
 
 Despite the name, Open Terminal is not just a terminal panel. It is the computer-like workspace the agent acts inside. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
 
@@ -43,7 +43,7 @@ Open Terminal is the computer substrate an **AI agent** drives from chat. If you
 | Feedback loop | Tool calls and chat state | Observe the workspace, change it, run it, inspect the result, fix, retry, verify |
 | Boundary | Open WebUI permissions and configuration | Docker sandbox or direct host access |
 
-Open WebUI is the control plane. Open Terminal is the agent's computer substrate for work that needs an operating system, not just a prompt.
+Open WebUI is the control plane. Open Terminal is the agent's computer substrate for real work that needs an operating system, not just a prompt.
 
 ---
 
@@ -65,7 +65,7 @@ Different teams describe this stack with different language. Open Terminal fits 
 | **Orchestration** | The loop of choosing tools, sequencing steps, handling failures, and verifying results |
 | **Sandbox** | The isolation boundary around the agent's filesystem, processes, and network access |
 
-The practical point is simple: models got good enough to use tools, but agents need a computer-shaped place to do work. Open Terminal gives Open WebUI that place.
+The practical point is simple: models got good enough to use tools, but agents need a computer-shaped place to do real work. Open Terminal gives Open WebUI that place.
 
 ---
 
