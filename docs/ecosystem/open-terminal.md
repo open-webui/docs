@@ -17,28 +17,31 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Turn Open WebUI into an agentic workbench: tool use plus a stateful computer substrate where the model can write files, run commands, observe results, recover from errors, and return artifacts.**
+**Turn Open WebUI into a full agent harness: the control layer, the action layer, and the feedback loop between them.**
 
-[Open Terminal](/features/open-terminal) is the computer substrate for Open WebUI agents: files, shell, package manager, running processes, document and data handling, generated artifacts, and live previews. It is named after the terminal, but the point is broader than a shell panel. It gives the model a stateful workspace where it can create, run, inspect, repair, and hand back something usable.
+[Open Terminal](/features/open-terminal) is the action layer that completes Open WebUI's harness. Open WebUI already has the model, chat, prompts, knowledge, tools, MCP connections, memory, users, permissions, automations, and workflow controls. Open Terminal adds the computer substrate: files, shell, package manager, running processes, document and data handling, generated artifacts, and live previews.
+
+It is named after the terminal, but the point is broader than a shell panel. It gives the model a stateful workspace where it can create, run, inspect, repair, and hand back something usable.
 
 Use it when a chat needs more than a text answer: analyze a spreadsheet, write a script, build a small app, render a report, inspect logs, run tests, organize files, or start a server and preview the result. Open WebUI stays the interface; Open Terminal gives the agent a workspace where those results can actually be produced.
 
 [Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate workspaces per user and policy, controlled images, resource limits, storage, environment variables, security context, idle cleanup, refreshes, and scheduled resets.
 
 :::tip Looking for your own machine in a browser?
-Open Terminal gives **AI** an execution workspace inside Open WebUI. [Open WebUI Computer](/ecosystem/computer) gives **you** your real machine in a browser: files, editor, terminal, git, and optional AI. See [Computer, Open WebUI, or Open Terminal?](/ecosystem/computer/choose) for the short comparison.
+Open Terminal gives **AI** a computer substrate inside Open WebUI's harness. [Open WebUI Computer](/ecosystem/computer) gives **you** your real machine in a browser: files, editor, terminal, git, and optional AI. See [Computer, Open WebUI, or Open Terminal?](/ecosystem/computer/choose) for the short comparison.
 :::
 
 ## The Familiar Words
 
-If you have heard people talk about agentic workflows, tool use, computer use, runtimes, guardrails, and orchestration, this is where Open Terminal and Terminals fit.
+If you have heard people talk about agent harnesses, agentic workflows, tool use, computer use, runtimes, guardrails, and orchestration, this is where Open Terminal and Terminals fit.
 
 | Term people use | What it means here |
 | :--- | :--- |
+| **Agent harness** | Open WebUI plus Open Terminal: control/context/tooling from Open WebUI, real action and observation in Open Terminal |
 | **Agentic workflow** | The model plans, takes an action, observes the result, and keeps going instead of returning one static answer |
 | **Tool use / function calling** | Open WebUI lets the model call tools; Open Terminal gives those tools a real filesystem, shell, and process environment |
 | **Computer use** | The agent works inside a computer-like workspace: files, commands, packages, previews, and generated artifacts |
-| **Agent runtime** | Open Terminal is the execution runtime where stateful, tool-heavy work happens between model calls |
+| **Agent runtime** | The loop and state around the model; Open Terminal supplies the OS-level action workspace inside it |
 | **Stateful session** | The workspace keeps files, output, processes, and task context around long enough for multi-step work |
 | **Guardrails / human review** | Open WebUI controls the user, model, tool, and approval layer; Terminals controls the workspace boundary by policy |
 | **Orchestration** | Terminals provisions, routes, isolates, refreshes, and cleans up Open Terminal workspaces for teams |
@@ -79,7 +82,7 @@ Use Terminals when agent workspaces need to be provisioned, isolated, reused, re
 
 ## How To Think About It
 
-Open WebUI is the front door for models, chats, prompts, knowledge, users, permissions, automations, tools, approvals, and shared workflows. Open Terminal supplies the missing operating-system-shaped runtime behind the chat.
+Open WebUI is the control side of the harness: models, chats, prompts, knowledge, users, permissions, automations, tools, approvals, and shared workflows. Open Terminal supplies the missing operating-system-shaped action layer behind the chat.
 
 That one addition changes what Open WebUI can be used for. A model can move from explaining the next step to taking the next step: create the file, run the command, inspect the failure, fix it, and return the finished artifact.
 
@@ -104,7 +107,7 @@ For teams, the same model becomes infrastructure:
 | Open Terminal workspace | Files, shell, processes, packages, code execution, previews, and artifacts |
 | Policy | Image, tools, limits, storage, env vars, security context, and idle timeout |
 
-In agentic-infrastructure terms: Open WebUI is the control plane, Open Terminal is the computer substrate, and Terminals is the fleet manager for those substrates.
+In harness-engineering terms: Open WebUI plus Open Terminal is the full harness, Open Terminal is the computer substrate inside it, and Terminals is the fleet manager for those substrates.
 
 ## Operate It Safely
 

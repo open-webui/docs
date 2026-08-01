@@ -13,9 +13,9 @@ import Kubernetes from './tab-deployment/Kubernetes.md';
 
 **Terminals** is the enterprise orchestration layer for [Open Terminal](/features/open-terminal). It provisions a dedicated computer substrate for every Open WebUI user: separate files, processes, package environment, resource limits, network boundary, and optional persistent storage.
 
-Open Terminal gives one chat an agent workspace where AI can do real work. Terminals turns that into managed fleet infrastructure, so every user or policy can get the right workspace without sharing state or hand-wiring containers.
+Open Terminal turns one Open WebUI chat into a full agent harness with a real workspace for action. Terminals turns that into managed fleet infrastructure, so every user or policy can get the right workspace without sharing state or hand-wiring containers.
 
-Open WebUI is where agents are prompted, governed, and observed. Terminals is where their workspaces are provisioned, isolated, reused, refreshed, and reset.
+Open WebUI is where the harness is configured, governed, and observed. Terminals is the workspace lifecycle layer inside that harness: it provisions, isolates, reuses, refreshes, and resets the computer substrates agents use to do real work.
 
 :::tip Quick navigation
 - **Need to operate per-user terminal environments?** → [Orchestration](/features/open-terminal/terminals/orchestration)
@@ -54,7 +54,7 @@ The orchestrator exposes the same OpenAPI-based tool interface as Open Terminal,
 
 ## Why It Matters
 
-Terminals is what makes agent computer substrates operable for teams. It lets admins give agents enough environment to do real work while still controlling the boundary:
+Terminals is what makes the full agent harness operable for teams. It lets admins give agents enough environment to do real work while still controlling the boundary:
 
 | Need | What Terminals provides |
 | :--- | :--- |
@@ -65,7 +65,7 @@ Terminals is what makes agent computer substrates operable for teams. It lets ad
 | Scale | Docker for a single host, Kubernetes/operator mode for larger deployments |
 | Supportability | Admin UI, logs, status, policy APIs, and predictable routing |
 
-In agentic-infrastructure terms, Terminals owns the workspace lifecycle: provision, route, persist, reap, refresh, and reset.
+In harness-engineering terms, Terminals owns the workspace lifecycle: provision, route, persist, reap, refresh, and reset.
 
 :::info Admin UI (new in 0.0.4)
 The orchestrator serves a built-in minimal admin UI at `/` for viewing terminal status, active sessions, and policies. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.

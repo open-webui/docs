@@ -17,13 +17,13 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Give your agents a real computer substrate.**
+**Turn Open WebUI into a full agent harness.**
 
-Open WebUI gives you the agent front door: models, chats, knowledge, prompts, users, permissions, builtin tools, MCP connections, automations, and shared workflows. Open Terminal adds the missing computer substrate: a working environment with a filesystem, shell, package manager, running processes, document and data handling, generated artifacts, and live previews.
+An agent harness is the system around a model that lets it do real work: instructions, context, tools, state, permissions, feedback loops, observability, and an execution environment. Open WebUI already gives you the control side of that harness: models, chats, knowledge, prompts, tools, MCP connections, memory, users, permissions, automations, and shared workflow controls. Open Terminal completes it with the part most chat products are still missing: a real computer substrate where actions run and evidence comes back.
 
 That means the agent can do real work. Not just answer questions about a task, and not just emit code you run somewhere else. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
 
-Despite the name, Open Terminal is not just a terminal panel. It is the computer-like workspace the agent acts inside. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
+Despite the name, Open Terminal is not just a terminal panel. It is the computer-like workspace that makes Open WebUI's agent loop capable of acting on files, code, packages, servers, documents, and generated artifacts. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
 
 ![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
 
@@ -38,7 +38,7 @@ Modern agentic workflows are not one prompt in, one answer out. They are statefu
 5. Observe the result.
 6. Repair, continue, or verify.
 
-Open WebUI coordinates that loop. Open Terminal gives the loop a real place to happen.
+Open WebUI coordinates that loop. Open Terminal gives the loop a real place to happen: files to inspect, code to run, outputs to verify, and artifacts to hand back. Together, they form the full harness: model, context, tools, state, action, observation, and verification.
 
 :::tip Looking for "your computer in a browser" instead?
 Open Terminal is the computer substrate an **AI agent** drives from chat. If you want to operate your own machine from any browser, with files, editor, terminal, git, and AI as an optional helper, see [**Open WebUI Computer**](/ecosystem/computer), a separate Open WebUI project. [Choose the right execution environment](/ecosystem/computer/choose).
@@ -46,17 +46,17 @@ Open Terminal is the computer substrate an **AI agent** drives from chat. If you
 
 ---
 
-## What Open WebUI Adds, and What Open Terminal Adds
+## How the Harness Fits Together
 
 | | Open WebUI | Open Terminal |
 | :--- | :--- | :--- |
-| Agent interface | Chat, models, prompts, knowledge, users, permissions, and workflow UI | A computer-like workspace the model can act inside |
+| Harness role | Control layer: prompts, context, tools, state, permissions, users, and workflow UI | Action layer: a computer-like workspace the model can act inside |
 | Context | Conversations, uploaded files, knowledge bases, memories, notes, channels | Files, folders, terminal output, logs, previews, documents, and generated artifacts |
 | Action | Builtin tools, MCP/OpenAPI tools, automations, sub-agents | Create files, run commands, install packages, execute code, start servers, use Git, process documents |
-| Feedback loop | Tool calls and chat state | Observe the workspace, change it, run it, inspect the result, fix, retry, verify |
+| Feedback loop | Tool calls, conversation state, model routing, and workflow progression | Observe the workspace, change it, run it, inspect the result, fix, retry, verify |
 | Boundary | Open WebUI permissions and configuration | Docker sandbox or direct host access |
 
-Open WebUI is the control plane. Open Terminal is the agent's computer substrate for real work that needs an operating system, not just a prompt.
+Open WebUI plus Open Terminal is the full agent harness: the control layer, the action layer, and the feedback loop between them.
 
 ---
 
@@ -69,11 +69,11 @@ Different teams describe this stack with different language. Open Terminal fits 
 | **Agentic AI** | A model that can take multi-step actions, observe results, and keep going |
 | **Agentic workflow** | A goal-driven process where the agent plans, acts, observes results, and adapts |
 | **AI agent** | The model plus instructions, tools, memory/context, and an execution loop |
-| **Agent harness** | The surrounding system that gives the model tools, context, permissions, state, and feedback |
+| **Agent harness** | The whole system around the model that turns reasoning into action: instructions, context, tools, state, permissions, feedback loops, evaluation, observability, and execution environments |
 | **Agent runtime** | The place where agent actions actually run: files, code, commands, servers, documents, and processes |
 | **Action runtime** | A runtime focused on executing real-world actions reliably, with authorization and auditability |
 | **Agentic infrastructure** | The compute, state, orchestration, tools, security, and observability needed to run agents in production |
-| **Computer substrate** | A real working environment the agent can modify, execute within, and observe |
+| **Computer substrate** | The filesystem, shell, packages, processes, previews, and artifacts the harness gives the agent so it can do work |
 | **Stateful session** | A task or workspace that persists across many model/tool turns instead of one stateless request |
 | **Tool calling / function calling** | The model choosing a structured tool action instead of only writing text |
 | **Tool result / context return** | The output from an action being returned to the model so it can decide the next step |
@@ -87,7 +87,7 @@ Different teams describe this stack with different language. Open Terminal fits 
 | **Observability / auditability** | Logs, traces, and records that show what the agent did and why |
 | **Sandbox** | The isolation boundary around the agent's filesystem, processes, and network access |
 
-The practical point is simple: models got good enough to use tools, but agents need a computer-shaped place to do real work. Open Terminal gives Open WebUI that place.
+The practical point is simple: models got good enough to use tools, but a harness is only as useful as the environment it can act on. Open Terminal gives Open WebUI the computer-shaped action layer that makes the harness complete.
 
 ---
 

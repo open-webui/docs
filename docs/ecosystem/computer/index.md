@@ -56,7 +56,7 @@ AI is optional and pluggable: bring an API key, point it at local models via Oll
 
 ## Where it fits
 
-Open WebUI is the AI interface and workflow platform. Open Terminal gives an Open WebUI chat a clean execution environment. Computer serves the machine your work already lives on, and it can also [act as a model provider for Open WebUI](/ecosystem/computer/automate/open-webui). Not sure which you need? [Compare them](/ecosystem/computer/choose).
+Open WebUI is the AI interface and control layer. Open Terminal gives Open WebUI the action layer that turns it into a full agent harness. Computer serves the machine your work already lives on, with its own files, terminal, git, editor, AI, and agent backends, and it can also [act as a model provider for Open WebUI](/ecosystem/computer/automate/open-webui). Not sure which you need? [Compare them](/ecosystem/computer/choose).
 
 ## Private by design
 

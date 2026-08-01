@@ -17,7 +17,7 @@ Python 3.10+ on macOS, Linux, or Windows (`pip install cptr`), or Docker (`ghcr.
 
 ### How is this different from Open WebUI or Open Terminal?
 
-Open WebUI is a chat interface for models; Open Terminal shares a terminal; Computer serves your whole machine to any browser: files, editor, terminal, git, AI, agents. Full comparison: [which tool do I need?](/ecosystem/computer/choose)
+Open WebUI is the AI interface and control layer. Open Terminal gives Open WebUI the action layer that turns it into a full agent harness. Computer serves your whole machine to any browser: files, editor, terminal, git, AI, agents. Full comparison: [which tool do I need?](/ecosystem/computer/choose)
 
 ### What's the license? Does it cost anything?
 
