@@ -7,11 +7,14 @@ sidebar_position: 14
 
 Three tools, three different centers of gravity. Pick by where the work lives, and combine them freely; they're built to.
 
+The short version: **Open WebUI** is the shared AI control layer. **Open Terminal** adds the action layer that turns Open WebUI into a full agent harness. **Computer** is the cutting-edge real-machine surface: your actual workstation in a browser, with its own agent runtime and the newest AI-workspace ideas landing there first.
+
 | | **Open WebUI** | **Open Terminal** | **Open WebUI Computer** |
 | --- | --- | --- | --- |
 | Center of gravity | The conversation and control layer | The action layer that completes the harness | Your actual machine |
-| Best for | Model choice, knowledge, prompts, users, permissions, shared AI workflows | Self-contained agent work: analyze an upload, build a prototype, run a script, return an artifact | The project, terminal, services, and logins already on one computer |
-| Environment | n/a | Fresh, isolated (Docker) or host | The real host: existing files, state, tools |
+| Best for | Model choice, knowledge, prompts, users, permissions, shared AI workflows | Self-contained agent work: analyze an upload, build a prototype, run a script, return an artifact | Cutting-edge agent work on the real project, terminal, services, and logins already on one computer |
+| Environment | n/a | Fresh, isolated (Docker) or host | The real host: existing files, state, tools, running agents |
+| Product shape | Stable shared AI interface | Stable in-Open WebUI agent action substrate | Faster-moving personal AI workstation and agent runtime |
 | Users | One to many | Follows Open WebUI | One trusted owner |
 | AI required | Yes | Yes | No; files, terminal, and git work without it |
 
@@ -19,13 +22,13 @@ Three tools, three different centers of gravity. Pick by where the work lives, a
 
 **Add [Open Terminal](/features/open-terminal)** when Open WebUI needs to become a full agent harness: write files, install packages, run code, observe output, verify work, and return the result. Fresh environment per job unless you configure persistence.
 
-**Start in Computer** when the answer begins with "let me check my computer": the branch you left dirty, the dev server that's running, the folder of PDFs, the agent mid-task. Computer opens that same machine from any browser instead of recreating the work somewhere else.
+**Start in Computer** when the work belongs on your actual machine or you want the newest agent-workspace experience: the branch you left dirty, the dev server that's running, the folder of PDFs, the agent mid-task, the coding-agent subscription already logged in. Computer opens that same machine from any browser instead of recreating the work somewhere else.
 
 ## Using them together
 
 - **Open WebUI plus Open Terminal as the full harness.** Open WebUI provides the control layer; Open Terminal provides the computer substrate where actions run and evidence comes back.
 - **Open WebUI as the front door, Computer as the real machine.** Connect the [gateway](/ecosystem/computer/automate/open-webui) and each Computer workspace shows up in Open WebUI's model picker as `cptr/<workspace>`. The chat happens in Open WebUI; the file edits, commands, and tools happen on the Computer host. Knowledge bases, prompts, and users don't transfer between the two, so configure what the workspace needs on the Computer side.
-- **All three at once** is normal: Open WebUI to govern the workflow, Open Terminal for disposable harness execution, Computer for the machine where ongoing work must stay continuous.
+- **All three at once** is normal: Open WebUI to govern the workflow, Open Terminal for stable harness execution inside Open WebUI, Computer for the cutting-edge real-machine workspace where ongoing work must stay continuous.
 
 ## Already using a coding-agent CLI?
 
