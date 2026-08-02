@@ -5864,7 +5864,7 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Type: `bool`
 - Default: `False`
 - Description: Enables the OAuth token exchange endpoint, allowing external applications to exchange an OAuth provider's access token for an Open WebUI JWT session token. This enables programmatic authentication for external tools and services that already have OAuth tokens from your identity provider.
-- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token. Set [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](#oauth_token_exchange_trusted_client_ids) alongside it: **leaving it empty performs no client check at all**, so any token your provider recognises is accepted.
+- Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token. Set [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](#oauth_token_exchange_trusted_client_ids) alongside it: **leaving it empty performs no client check at all**, so any token your provider recognises is accepted. Neither setting is per-provider: the same trusted client list applies whichever provider the request names, so a provider without introspection support is refused entirely once the list is set.
 
 :::danger
 
@@ -5935,7 +5935,7 @@ This is a deploy-time environment variable and cannot be changed from the admin 
 
 :::info
 
-**Provider support.** Resolving the issuing client requires RFC 7662 token introspection. Google, Microsoft Entra ID and GitHub do not implement it, so the client restriction cannot be used with those providers: every exchange is refused while it is set, and the reason is recorded in the server log. Providers that do implement it include Keycloak, Authentik, Okta and Zitadel.
+**Provider support.** Resolving the issuing client requires RFC 7662 token introspection. Google, Microsoft Entra ID, GitHub and Feishu do not implement it, so the client restriction cannot be used with those providers: every exchange is refused while it is set, and the reason is recorded in the server log. Providers that do implement it include Keycloak, Authentik, Okta and Zitadel.
 
 :::
 
