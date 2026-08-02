@@ -3,40 +3,40 @@ sidebar_position: 1
 title: "Usage"
 ---
 
-Before you can use image generation, you must ensure that the **Image Generation** toggle is enabled in the **Settings** > **Admin** > **Experience** > **Images** menu.
+Image generation is only available in a chat when all of the following are true:
+
+- **Image Generation** is enabled in **Settings** > **Admin** > **Experience** > **Images**.
+- Your role has the **Image Generation** feature permission. Admins always pass this check.
+- The model has the **Image Generation** capability checked in **Workspace** > **Models** > **Edit**. Outside Legacy mode its **Builtin Tools** capability and the **Image Generation** builtin tool category must stay enabled too. All of these are on by default.
+- The **Image** toggle is on for that chat, in the **Integrations** menu of the message input. Tick **Image Generation** under **Default Features** in the model editor to have it active in every new chat.
+
+If **Image** is missing from the **Integrations** menu entirely, then either image generation is off globally, the **Image Generation** capability is off on one of the selected models, or your role lacks the permission. The engine's own URL and key are a separate matter. Get those wrong and the toggle still appears, generation just fails once it runs.
 
 ## Using Image Generation
 
-1. Toggle the `Image Generation` switch to on.
+1. Switch **Image** on in the **Integrations** menu of the message input.
 2. Enter your image generation prompt.
 3. Click `Send`.
 
 ![Image Generation Tutorial](/images/tutorial_image_generation_2.png)
 
+What happens next depends on the **Function Calling** mode. It can be set per chat in **Chat Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.
+
+**Native** takes the tool path described below. In **Legacy** mode every message you send while the toggle is on goes straight to the image engine, whatever you asked for. It edits instead of creating when the recent conversation carries images and **Image Edit** is on. On the create path a task model rewrites your message into the image prompt first, unless you switch **Image Prompt Generation** off in the admin settings.
+
 ## Native Tool-Based Generation (Agentic)
 
-If your model is configured with **Native Function Calling** (see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)), it can invoke image generation directly as a tool.
+With **Native Function Calling** (see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)), the model invokes image generation directly as a tool.
 
 ### How it works:
-- **Requirements**: 
-  - **Image Generation** must be enabled globally in **Settings → Admin → Experience → Images**
-  - The model must have the **Image Generation** capability enabled
-- **No Chat Toggle Needed**: With Native Mode, the `generate_image` tool is automatically included when the model has the `image_generation` capability. You don't need to manually toggle it on per chat.
 - **Natural Language**: You can simply ask the model: *"Generate an image of a cybernetic forest."*
-- **Action**: If **Native Mode** is active and the model has the capability, it will invoke the `generate_image` tool.
+- **Model Dependent**: A model that does not call tools reliably will simply never call `generate_image`, so try a stronger model before suspecting your engine configuration.
 - **Display**: The generated image is displayed directly in the chat interface.
-- **Editing**: This also supports **Image Editing** (inpainting) via the `edit_image` tool (e.g., *"Make the sky in this image red"*).
+- **Editing**: The `edit_image` tool (e.g., *"Make the sky in this image red"*) is handed over as well, but only when **Image Edit** is enabled in the admin settings.
 
 This approach allows the model to "reason" about the prompt before generating, or even generate multiple images as part of a complex request.
 
 
-
-:::tip
-
-You can also edit the LLM's response and enter your image generation prompt as the message to send off for image generation instead of using the actual response provided by the LLM.
-
-
-:::
 
 :::info
 **Legacy "Generate Image" Button:**
@@ -55,7 +55,7 @@ This action adds a "Generate Image" icon to the message action bar, allowing you
 
 
 :::info
-**Requirement:** To use **Image Editing** or **Image+Image Generation**, you must have an **Image Generation Model** configured in the Admin Settings that supports these features (e.g., OpenAI DALL-E, or a ComfyUI/Automatic1111 model with appropriate inpainting/img2img capabilities).
+**Requirement:** Image editing runs through the same conditions listed at the top of this page. To use **Image Editing** or **Image+Image Generation**, also turn on **Image Edit** in the **Edit Image** section of **Settings** > **Admin** > **Experience** > **Images**, with an edit engine (`Default (Open AI)`, `ComfyUI` or `Gemini`) and a model that supports inpainting or img2img.
 :::
 
 ## Image Editing (Inpainting)

@@ -16,7 +16,7 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 ### Configuring Open WebUI
 
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
-2. Set the `Image Generation Engine` field to `Open AI`.
+2. Set the `Image Generation Engine` field to `Default (Open AI)`.
 3. Enter your OpenAI API key.
 4. Choose the model you wish to use. Note that image size options will depend on the selected model:
    - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
@@ -30,12 +30,12 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 Image generation with Azure OpenAI (DALL·E or GPT-Image) is supported. Configure the Image Generation as follows:
 
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
-2. Set the `Image Generation Engine` field to `Open AI` (Azure OpenAI uses the same syntax as OpenAI).
-3. Change the API endpoint URL to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Set the instance and model id as you find it in the settings of the Azure AI Foundry.
+2. Set the `Image Generation Engine` field to `Default (Open AI)` (Azure OpenAI uses the same syntax as OpenAI).
+3. Change the `API Base URL` to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Set the instance and model id as you find it in the settings of the Azure AI Foundry.
 4. Configure the API version to the value you find in the settings of the Azure AI Foundry.
 5. Enter your Azure OpenAI API key.
 
-![Screenshot of the Open WebUI Images settings page with Open AI selected and the API endpoint URL, API version, and API key fields highlighted for Azure OpenAI configuration.](/images/image-generation-and-editing/azure-openai-settings.png)
+![Screenshot of the Open WebUI Images settings page with Open AI selected and the API Base URL, API version and API key fields highlighted for Azure OpenAI configuration.](/images/image-generation-and-editing/azure-openai-settings.png)
 
 :::tip Azure GPT-Image-1.5 Configuration
 For Azure OpenAI **gpt-image-1.5**, use the following settings for successful generation:
@@ -48,9 +48,9 @@ If you encounter the error `[ERROR: azure-openai error: Unknown parameter: 'resp
 :::
 
 :::tip
-Alternative API endpoint URL tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` - you can find your endpoint name on https://ai.azure.com/resource/overview, and model name on https://ai.azure.com/resource/deployments.
+Alternative `API Base URL` tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` - you can find your endpoint name on https://ai.azure.com/resource/overview, and model name on https://ai.azure.com/resource/deployments.
 You can also copy Target URI from your deployment detailed page, but remember to delete strings after model name.
-For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the API endpoint URL in Open WebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
+For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the `API Base URL` in Open WebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
 :::
 
 ### LiteLLM Proxy with OpenAI Endpoints
@@ -58,8 +58,8 @@ For example, if your Target URI is `https://test.openai.azure.com/openai/deploym
 Image generation with a LiteLLM proxy using OpenAI endpoints is supported with Open WebUI. Configure the Image Generation as follows:
 
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
-2. Set the `Image Generation Engine` field to `Open AI`.
-3. Change the API endpoint URL to `https://<your-litellm-url>:<port>/v1`.
+2. Set the `Image Generation Engine` field to `Default (Open AI)`.
+3. Change the `API Base URL` to `https://<your-litellm-url>:<port>/v1`.
 4. Enter your LiteLLM API key.
 5. The API version can be left blank.
 6. Enter the image model name as it appears in your LiteLLM configuration.

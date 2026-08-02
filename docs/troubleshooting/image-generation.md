@@ -7,8 +7,10 @@ title: "Image Generation"
 
 ### General Issues
 
-- **Image Not Generating** (clicking generate produces no result, or an error appears in the chat):
+- **Image Not Generating** (asking for an image produces no image, or an error appears in the chat):
     - Check the **Images** settings in the **Settings** > **Admin** > **Experience** > **Images**. Ensure "Image Generation" is toggled **ON**.
+    - Ensure the **Image** toggle is on in the **Integrations** menu of the message input. Nothing image-related happens without it, in any function calling mode.
+    - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.

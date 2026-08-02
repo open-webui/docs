@@ -40,11 +40,11 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 
 ## Image Prompt Generation
 
-This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results.
+This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results. It only applies to Legacy function calling; in the default Native mode the model writes the prompt itself when it calls the tool.
 
-The **Image Prompt Generation** toggle is located in **Settings > Admin > Experience > Images** under the "Image Generation" section, **before** selecting the image generation engine.
+The **Image Prompt Generation** toggle is located in the **Create Image** section of **Settings > Admin > Experience > Images**.
 
-To customize the prompt template used for generation, go to **Settings > Admin > Experience > Interface > Tasks**.
+To customize the prompt template used for generation, go to **Settings > Admin > Experience > Interface**, in the **Generation** section.
 
 ![Screenshot showing the Image Prompt Generation toggle location in Images settings](/images/image-generation-and-editing/image-prompt-generation-toggle.png)
 
@@ -58,9 +58,9 @@ To customize the prompt template used for generation, go to **Settings > Admin >
     - **Model**: Select the base model to be used for generating the image.
     - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
     - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
-    - In the **ComfyUI Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
+    - In the **Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
     - Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
-    - If your ComfyUI instance requires an API key, enter it in the **ComfyUI API Key** field.
+    - If your ComfyUI instance requires an API key, enter it in the **API Key** field.
 
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
 
@@ -112,6 +112,10 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
 ![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
 
+:::info
+There is no "Generate Image" button underneath messages any more. Generation happens from the chat itself: switch **Image** on in the **Integrations** menu of the message input, then ask for the image. See [Usage](/features/chat-conversations/image-generation-and-editing/usage) for the conditions that have to be met and for the community action that brings the old button back.
+:::
+
 ## Edit Image
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
@@ -119,10 +123,11 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
 1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Experience** > **Images**.
 
 2. **Configure Image Editing:**
-    - Under the **Edit Image** section, set the **Image Edit Engine** to `ComfyUI`.
+    - Under the **Edit Image** section, switch **Image Edit** on. It is off by default, and without it the edit engine is never used.
+    - Set the **Image Edit Engine** to `ComfyUI`.
     - **Model**: Select the model to be used for the editing task.
     - **Image Size**: Specify the desired resolution for the output image.
-    - **ComfyUI Base URL** and **API Key**: These fields are shared with the image generation settings.
+    - **Base URL** and **API Key**: The **Edit Image** section has its own fields for these. They do not fall back to the generation settings, so fill them in even when the same ComfyUI instance serves both.
     - **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
     - **Map Workflow Nodes**: Image editing has five configurable parameters with different defaults than generation:
 
@@ -370,9 +375,9 @@ This section provides a supplementary guide on setting up the FLUX.1 models for 
 
 ## Configuring with SwarmUI
 
-SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `ComfyUI Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for ComfyUI image generation outlined above.
+SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for ComfyUI image generation outlined above.
 ![Install SwarmUI with LAN Access](https://github.com/user-attachments/assets/a6567e13-1ced-4743-8d8e-be526207f9f6)
 
 ### SwarmUI API URL
 
-The address you will input as the ComfyUI Base URL will look like: `http://<your_swarmui_address>:7801/ComfyBackendDirect`
+The address you will input as the **Base URL** will look like: `http://<your_swarmui_address>:7801/ComfyBackendDirect`

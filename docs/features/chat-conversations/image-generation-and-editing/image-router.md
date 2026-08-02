@@ -16,9 +16,9 @@ Open WebUI also supports image generation through the **Image Router APIs**. Ima
 ### Configuring Open WebUI
 
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
-2. Set the `Image Generation Engine` field to `Open AI` (Image Router uses the same syntax as OpenAI).
-3. Change the API endpoint URL to `https://api.imagerouter.io/v1/openai`
+2. Set the `Image Generation Engine` field to `Default (Open AI)` (Image Router uses the same syntax as OpenAI).
+3. Change the `API Base URL` to `https://api.imagerouter.io/v1/openai`
 4. Enter your Image Router API key.
 5. Enter the model you wish to use. Do not use the dropdown to select models, enter the model name instead. For more information, [see all models](https://imagerouter.io/models).
 
-![Screenshot of the Open WebUI Images settings page with Open AI selected and the API endpoint URL, API key, and model fields highlighted for Image Router configuration.](/images/image-generation-and-editing/image-router-settings.png)
+![Screenshot of the Open WebUI Images settings page with Open AI selected and the API Base URL, API key and model fields highlighted for Image Router configuration.](/images/image-generation-and-editing/image-router-settings.png)

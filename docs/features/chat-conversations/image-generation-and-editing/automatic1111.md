@@ -27,10 +27,10 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOM
 ### Setting Up Open WebUI with AUTOMATIC1111
 
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Experience** > **Images** menu.
-2. Set the `Image Generation Engine` field to `Default (Automatic1111)`.
-3. In the API URL field, enter the address where AUTOMATIC1111's API is accessible:
+2. Set the `Image Generation Engine` field to `Automatic1111`.
+3. In the `Base URL` field, enter the address where AUTOMATIC1111's API is accessible:
 
-![Screenshot of the Open WebUI Images settings page with Default (Automatic1111) selected and the API URL field highlighted.](/images/image-generation-and-editing/automatic1111-settings.png)
+![Screenshot of the Open WebUI Images settings page configured for AUTOMATIC1111.](/images/image-generation-and-editing/automatic1111-settings.png)
 
 ```txt
 http://<your_automatic1111_address>:7860/
