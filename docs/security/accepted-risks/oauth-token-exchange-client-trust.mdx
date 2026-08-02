@@ -1,0 +1,48 @@
+---
+title: "OAuth Token Exchange Client Trust"
+---
+
+# OAuth Token Exchange Client Trust
+
+|  |  |
+| :--- | :--- |
+| **Class** | CWE-287, Improper Authentication |
+| **Status** | Control available since 0.11.0, opt-in, residual accepted |
+| **Tracked as** | [GHSA-rq84-p6rr-vf89](https://github.com/open-webui/open-webui/security/advisories/GHSA-rq84-p6rr-vf89) |
+
+---
+
+## Summary
+
+The OAuth token exchange endpoint accepts a provider access token and issues an Open WebUI session for the user that token identifies. A provider's userinfo endpoint confirms that a token is valid but never reveals which OAuth client it was issued to, so without an additional check the endpoint accepts a token minted for any client registered with the same provider, including applications the operator does not control.
+
+The endpoint is off unless an operator sets [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) to `True`, which is not the default, so no default deployment is affected. Everything below concerns deployments that have deliberately turned it on.
+
+## What we mitigated
+
+0.11.0 added `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`. When set, Open WebUI resolves the issuing client through RFC 7662 token introspection and rejects any token minted for a client that is not listed, or whose issuing client it cannot determine. Only the introspected `client_id` is honoured. The `aud` field is ignored, because it names intended resource servers rather than the issuing client and several providers allow any client to place another client's identifier there. It is a deploy-time environment variable, so a compromised administrator session cannot widen the trust boundary at runtime.
+
+## What remains, and why we accept it
+
+The control shipped in 0.11.0 and is applied once an operator configures it. With the variable unset, the endpoint accepts any token the provider validates, exactly as it did before. That is deliberate, for two reasons.
+
+**Some deployments rely on the existing behaviour, and legitimately want it.** Accepting tokens from more than one client is the point of the feature for operators fronting Open WebUI with several of their own applications, each registered as its own OAuth client on the same identity provider: an internal CLI, a reporting or automation service, a departmental portal, a public-facing assistant or chat bot that signs users in through that provider. Where the operator's intended access boundary is "anyone my provider authenticates, within an allowed domain" rather than "only these named applications", a mandatory client check adds a restriction they never asked for and breaks their deployment the moment they upgrade.
+
+**On several providers the control cannot be satisfied at all.** Resolving the issuing client requires RFC 7662 token introspection, which Google, Microsoft Entra ID, GitHub and Feishu do not implement, so no value of `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` lets a token through on them.
+
+Had the check shipped enforced by default, every application built on the endpoint would have stopped authenticating on upgrade, at the same moment, surfacing to the operator as users unable to log in rather than as a security control that was switched on. On a provider that does implement introspection, such as Keycloak, Authentik, Okta or Zitadel, every exchange is rejected until the operator lists their client IDs, with a `403` whenever introspection resolves the issuing client, so service can be restored once they work out why. On the four above the rejection is a `400` and there is nothing to configure. Their only options would be to pin to the release before the change, which means declining every security fix that ships after it, or to drop a working feature outright because a setting they cannot satisfy was made mandatory. Neither is a remediation.
+
+The fix therefore ships as a control operators turn on, on any provider able to support it, rather than as a default that would break working authentication and, for a whole class of providers, leave nothing to configure that restores it.
+
+Unlike the other entries on this page, this residual is not a technical limit, it is a compatibility decision. What bounds it is configuration rather than exploitability: the endpoint ships off, and the control is available to every operator whose provider supports introspection.
+
+Deployments running token exchange should set [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](/reference/env-configuration#oauth_token_exchange_trusted_client_ids). The list is global rather than per-provider, so setting it refuses every exchange on a configured provider that publishes no introspection endpoint, even when another one supports it. Where no configured provider supports introspection, enable token exchange only if the domain allowlist is an acceptable boundary on its own. Setup is documented under [OAuth Token Exchange for External Applications](/features/authentication-access/auth/sso#oauth-token-exchange-for-external-applications).
+
+## References
+
+- [CWE-287: Improper Authentication](https://cwe.mitre.org/data/definitions/287.html)
+- [RFC 7662: OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662)
+- [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange)
+- [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](/reference/env-configuration#oauth_token_exchange_trusted_client_ids)
+- [SSO (OAuth, OIDC, Trusted Header)](/features/authentication-access/auth/sso)
+- [Open WebUI Security Policy](../security-policy)
