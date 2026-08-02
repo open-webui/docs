@@ -5,11 +5,13 @@ title: "Accepted Risks"
 
 # Known &amp; Accepted Risks
 
-**Residual risks that Open WebUI has assessed, mitigated as far as is technically possible, and then formally accepted.**
+**Residual risks that Open WebUI has assessed, mitigated as far as is technically possible or operationally sensible, and then formally accepted.**
 
 Some weaknesses cannot be fully eliminated in application code. They are bounded by the programming language, the runtime, compiler and interpreter optimisations, the operating system, the CPU or the network, not by a defect Open WebUI can patch. For these we reduce the exploitable portion as far as application-level code allows, and then document the remainder here as a known, accepted risk.
 
-Each entry records what the risk is, what we changed to shrink it, why the remainder is not fixable by us, and how it sits within our [threat model](#threat-model).
+A smaller number could be eliminated in code, but only at a cost to deployments that legitimately depend on the current behaviour, so those are offered as configuration instead.
+
+Each entry records what the risk is, what we changed to shrink it, why the remainder is not fixable, or fixable only at a cost to working deployments, and how it sits within our [threat model](#threat-model).
 
 ---
 
@@ -17,7 +19,7 @@ Each entry records what the risk is, what we changed to shrink it, why the remai
 
 Accepting a residual risk is a deliberate engineering decision, not an oversight. A weakness is listed here only when both of the following hold:
 
-- The **exploitable portion has been mitigated** as far as application-level code allows, and the **residual that remains is bounded** and not reliably exploitable in practice.
+- The **exploitable portion has been addressed**, either as far as application-level code allows or through a control the operator can apply, and the **residual that remains is bounded**, either because it is not reliably exploitable in practice, or because it exists only where an operator has deliberately enabled the affected feature, leaving default deployments unaffected.
 - **Eliminating that residual is not warranted**, for at least one of the following reasons:
   - it is **not technically fixable** by us, arising from the language, runtime, operating system, CPU or network rather than from Open WebUI's own logic; or
   - a further fix would carry a **real and disproportionate cost**, degrading or removing functionality that users legitimately depend on, or harming performance or correctness, in exchange for a marginal or illusory security benefit.
@@ -44,6 +46,7 @@ A residual whose practical impact is dominated by network and scheduling noise, 
 
 | Risk | Class | Mitigation | Status |
 | :--- | :--- | :--- | :--- |
+| [OAuth token exchange client trust](./oauth-token-exchange-client-trust.mdx) | CWE-287, Improper Authentication | Issuing client verified through RFC 7662 token introspection when `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` is set | Control available since 0.11.0, opt-in, residual accepted |
 | [Agentic application risks](./agentic-application-risks.mdx) | Inherent agentic-system behavior (OWASP Top 10 for Agentic Applications) | Capability gated by permissions; agent bound by caller's privileges; isolated execution | Inherent to autonomous agents; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy.mdx)) |
 | [LLM output unpredictability](./llm-output-unpredictability.mdx) | Inherent model behavior (OWASP LLM Top 10) | System hardened around the model; model bound by caller's privileges | Inherent to LLMs; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy.mdx)) |
 | [Authentication timing side-channel](./auth-timing.mdx) | CWE-208, Observable Timing Discrepancy | bcrypt cost equalised across all sign-in paths | Mitigated, residual accepted |
