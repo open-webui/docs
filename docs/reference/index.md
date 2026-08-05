@@ -59,6 +59,22 @@ Open WebUI exposes a full REST API authenticated via Bearer tokens or JWTs. Use 
 
 ---
 
+## 🤖 Server-Side Tool Calling
+
+**Send a prompt, have Open WebUI run the tools, get the finished answer back.**
+
+Every request you need to make the model call built-in tools, workspace tools, MCP servers and Open Terminal on the server, with your user's own permissions. Streaming and non-streaming, with and without saving the chat, ending in a reusable script.
+
+| | |
+| :--- | :--- |
+| 🔁 **Full agentic loop** | Multi-round native tool calling, result read back from the chat |
+| ⚡ **Single-request mode** | One HTTP call in, one completion out, tool results already applied |
+| 🧭 **Field-by-field** | `chat_id`, `id`, `session_id`, `tool_ids`, `terminal_id`, `features` |
+
+[**Run tools server-side →**](/reference/server-side-tool-calling)
+
+---
+
 ## 🔒 HTTPS Configuration
 
 **Terminate TLS in front of Open WebUI with Nginx, Caddy, or HAProxy.**

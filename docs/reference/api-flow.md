@@ -30,6 +30,10 @@ Before following this tutorial, ensure you have:
 
 This tutorial describes a comprehensive 6-step process that enables server-side orchestration of Open WebUI conversations while ensuring that assistant replies appear properly in the frontend UI.
 
+:::tip Looking for tool calling specifically?
+If your goal is to have the model use tools (built-in tools, workspace tools, MCP servers or a terminal) and have Open WebUI execute them server-side, see [Server-Side Tool Calling (API)](/reference/server-side-tool-calling). It builds on the chat structures documented here and adds the fields that switch tool execution on.
+:::
+
 ### Process Flow
 
 The essential steps are:

@@ -112,6 +112,10 @@ Open WebUI checks the caller's access to each selected tool server before resolv
 
 If your external client sends its own OpenAI-style `tools` array, Open WebUI forwards those caller-provided tool definitions to the model instead of resolving `tool_ids` server-side.
 
+:::tip Want the model to actually run those tools, in a loop, with the built-in tools too?
+Which fields you send decides whether Open WebUI executes tool calls for you or hands them back for your client to run, and whether the answer arrives in the HTTP body or in the chat record. [Server-Side Tool Calling (API)](/reference/server-side-tool-calling) walks through every call for both approaches, streaming and non-streaming, with and without saving the chat, and ends in a reusable script.
+:::
+
 - **Curl Example**:
 
   ```bash
