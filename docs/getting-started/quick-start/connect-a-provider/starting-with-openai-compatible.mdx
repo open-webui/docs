@@ -633,6 +633,25 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   See the [Docker Model Runner docs](https://docs.docker.com/ai/model-runner/) for setup instructions.
 
   </TabItem>
+  <TabItem value="qvac" label="QVAC">
+
+  **QVAC** is an end-to-end platform for local AI. It ships an OpenAI-compatible HTTP server via its CLI that you can use as a local model provider.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:11434/v1` |
+  | **API Key** | Leave blank |
+
+  **Quick start:**
+
+  ```bash
+  npm i -g @qvac/cli
+  qvac serve openai
+  ```
+
+  See the [QVAC docs](https://docs.qvac.tether.io/cli/http-server/connection) for how to register models under `serve.models` and for the full endpoint list.
+
+  </TabItem>
 </Tabs>
 
 :::tip Connection Timeout Configuration
