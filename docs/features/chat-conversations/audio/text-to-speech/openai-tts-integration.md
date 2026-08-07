@@ -112,6 +112,62 @@ services:
 | `AUDIO_TTS_MODEL` | TTS model (`tts-1` or `tts-1-hd`) | `tts-1` |
 | `AUDIO_TTS_VOICE` | Voice to use | `alloy` |
 
+## Using OpenRouter as a Text-to-Speech Provider
+
+Open WebUI's `OpenAI` TTS engine is compatible with any service that implements the OpenAI Audio API, including [OpenRouter](https://openrouter.ai). This section explains how to configure OpenRouter as your TTS provider and how to avoid a common `400 Bad Request` error.
+
+### Why the 400 Error Happens
+
+OpenRouter's [`/audio/speech` endpoint](https://openrouter.ai/docs/guides/overview/multimodal/tts) defaults `response_format` to `pcm` when the field is omitted. Open WebUI does not send `response_format` in its request payload, so OpenRouter returns raw PCM audio, which Open WebUI cannot play back — resulting in a `400 Bad Request`.
+
+The fix is to explicitly request MP3 by adding `{"response_format": "mp3"}` to the **OpenAI Params** field (extra parameters) in the TTS settings.
+
+### Quick Setup (UI)
+
+1. Click your **profile icon** (bottom-left corner)
+2. Select **Admin Panel**
+3. Click **Settings** → **Audio** tab → **Text-to-Speech Settings**
+4. Configure the following:
+
+| Setting | Value |
+|---------|-------|
+| **Text-to-Speech Engine** | `OpenAI` |
+| **API Base URL** | `https://openrouter.ai/api/v1` |
+| **API Key** | Your OpenRouter API key (`sk-or-...`) |
+| **TTS Model** | Any OpenRouter TTS model, e.g. `openai/tts-1` |
+| **TTS Voice** | Choose from available voices |
+| **OpenAI Params** | `{"response_format": "mp3"}` |
+
+:::important
+
+The **OpenAI Params** field must contain `{"response_format": "mp3"}`. Without it, OpenRouter defaults to `pcm`, and speech requests fail with a `400 Bad Request` error.
+:::
+
+5. Click **Save**
+
+### Environment Variables Setup
+
+If you prefer to configure via environment variables, add the parameters JSON via `AUDIO_TTS_OPENAI_PARAMS`:
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - AUDIO_TTS_ENGINE=openai
+      - AUDIO_TTS_OPENAI_API_BASE_URL=https://openrouter.ai/api/v1
+      - AUDIO_TTS_OPENAI_API_KEY=sk-or-...
+      - AUDIO_TTS_MODEL=openai/tts-1
+      - AUDIO_TTS_VOICE=alloy
+      - AUDIO_TTS_OPENAI_PARAMS={"response_format":"mp3"}
+    # ... other configuration
+```
+
+:::info
+
+OpenRouter supports `mp3` and `pcm` output formats. Always select `mp3` in Open WebUI — PCM output is intended for real-time streaming pipelines and cannot be played back by Open WebUI.
+:::
+
 ## Testing TTS
 
 1. Start a new chat
