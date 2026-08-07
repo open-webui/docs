@@ -1,0 +1,56 @@
+---
+title: OptionsAhoy (MCP)
+sidebar_label: OptionsAhoy MCP Integration
+sidebar_position: 51
+description: Connect Open WebUI to OptionsAhoy's hosted MCP endpoint for US equity-compensation tax planning. Streamable HTTP, no authentication, no extra containers.
+keywords: [optionsahoy, mcp, model context protocol, integration, finance, equity compensation, taxes, tools, streamable http]
+---
+
+:::warning Community Contribution
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/tutorials/contributing-tutorial/).
+
+:::
+
+OptionsAhoy hosts a remote MCP server at `https://optionsahoy.com/mcp` that Open WebUI
+connects to natively via **Streamable HTTP**. It provides eight tools for US
+equity-compensation planning: incentive stock option (ISO) exercise schedules with
+alternative minimum tax (AMT) calculations, non-qualified stock option (NSO) exercise
+math, restricted stock unit (RSU) sell-vs-hold and lot ordering, qualified small
+business stock (QSBS) checks, concentration analysis, hedge pricing, and multi-year
+sale plans to fund a cash goal by a deadline. No authentication, no API tokens,
+no proxies.
+
+## Setup
+
+### 1. Add the tool
+
+An administrator adds it under **Admin Settings → External Tools** with **+ (Add Server)**
+(MCP servers are admin-only by design):
+
+| Field | Value |
+|-------|-------|
+| **Type** | MCP (Streamable HTTP) |
+| **URL** | `https://optionsahoy.com/mcp` |
+| **Auth** | None |
+| **ID** | `optionsahoy` |
+| **Name** | `OptionsAhoy` |
+
+Click **Save**. Requires Open WebUI 0.6.31 or newer.
+
+### 2. Use it
+
+Enable the tool in a chat and ask, for example:
+
+- "I have 10,000 ISOs at a $2 strike, current price $40, married filing jointly in
+  California with $350K income. How many can I exercise this year before AMT?"
+- "Price a zero-cost collar on a $500K single-stock position."
+
+The server asks for missing inputs rather than guessing, so expect follow-up
+questions when a share count, strike, income, or state is not stated.
+
+## Notes
+
+- The tax engine covers federal plus all 50 states and DC, over multi-year horizons.
+- Documentation for agents: [optionsahoy.com/for-agents](https://optionsahoy.com/for-agents)
+- Source (MIT): [github.com/AlvisoOculus/optionsahoy-mcp](https://github.com/AlvisoOculus/optionsahoy-mcp)
