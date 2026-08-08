@@ -42,6 +42,46 @@ Reports that ignore these architectural assumptions, for example, claiming a vul
 
 For a full overview, see the [Security Policy](../security-policy.mdx).
 
+---
+
+## The CVE System and Why This Page Exists
+
+We use the CVE system and we believe in it. When a report against Open WebUI is valid we request an identifier for it ourselves, publish an advisory with the affected and fixed versions, and credit the person who found it. A CVE record is how an operator who has never heard of us learns that they need to upgrade, and that is worth protecting. Nothing on this page is an argument against the CVE Program.
+
+What this page documents is the opposite: records that work against the purpose the system exists to serve. In recent years a substantial share of the identifiers minted against Open WebUI have not survived scrutiny, and several were produced in ways that cannot be reconciled with coordinated disclosure at all. The pattern is consistent enough to describe plainly.
+
+**Records filed against the wrong product.** More than one identifier describes an impact that occurs in software Open WebUI does not ship, does not run and does not control, while naming Open WebUI as the affected product. Identifying the affected product is the primary function of a CVE record.
+
+**Records describing code that is not there.** Several rest on a mechanism the cited code rules out, in the very lines the report itself quotes. These are not judgement calls. Reading the quoted code is enough to disprove them.
+
+**Publication without ever contacting us.** Some records were published without the report ever reaching our security channels, or in other words, without anyone informing us at any point before the CVE went public. This is the most serious of the six, because advance notice to the vendor is the entire premise of coordinated disclosure. Publishing a finding, with a proof of concept, for an issue the maintainers have never seen does not protect anyone. It maximises the window of exposure rather than closing it. Had any of those findings been real, the result would have been a zero day: a live, unpatched vulnerability with a working proof of concept, disclosed to attackers and defenders at the same moment, and published by an organisation whose stated purpose is to prevent exactly that.
+
+**Response times measured in months.** Once a record is disputed, the correction rests with the CNA that issued it, and no deadline obliges it to act. Disputes routinely pass through the issuing CNA, the CVE Program Secretariat and the Program Root before anything moves, and a record can remain published for months after its own CNA has agreed in writing that it should be marked rejected. The timeline on each page below records where that particular dispute stands.
+
+**Databases that never process rejections.** A withdrawal at cve.org only helps if downstream databases act on it. Several do not reprocess reject transitions at all, so a record the issuing CNA has formally withdrawn keeps displaying as a live finding to their customers, indefinitely. See [Rejected CVEs in Vulnerability Databases](/security/supply-chain-security/vulnerability-databases).
+
+**Vendors who cannot be reached about their own data.** Correcting those entries means reaching whoever runs the database, and in some cases no working route to do so exists. Some publish no contact address of any kind: no security contact, no `security.txt`, not even a sales form, leaving a telephone number as the only listed way to reach them. Others publish a security address that rejects mail outright. Where a channel does answer, it is often built for sales enquiries or for reports about the vendor's own software, with no path at all for telling them that their published data is wrong. There is a plain contradiction in a security vendor being uncontactable about security. These are the organisations telling their customers which findings to act on, and several of them have provided no way to be told that one of those findings is wrong.
+
+### The asymmetry is the problem
+
+A CVE identifier can be minted in days. Getting one formally rejected takes months of correspondence across the issuing CNA, the Secretariat, the Program Root and every downstream database that mirrored it. That imbalance is the single fact that explains this page. The effort required to place an inaccurate record in the public feed is a fraction of the effort required to remove it, and all of that latter effort falls on the party that did nothing wrong.
+
+Nobody gains from this. The CNA spends its reviewers' time defending records that do not hold up. The reporter ultimately loses both the identifier and the credit attached to it. Our maintainers spend months on correspondence and public documentation instead of on the software. Most importantly, the people the system exists for lose the most: an operator evaluating Open WebUI cannot tell a real finding from a withdrawn one at a glance, and every invalid record makes the genuine advisories harder to take seriously. The CVE Program itself pays that price too. Its authority rests entirely on records being accurate, and every identifier that does not hold up spends a little of the credibility the whole system runs on.
+
+### Which is why we document everything here
+
+We cannot delete a record from someone else's database. What we will not do is treat an invalid finding as though it were valid. We will not ship a token fix so that we can point at a commit and call the matter closed. Invalid is invalid, and no amount of time spent disputing a record changes what it is.
+
+The CVE Program already provides the mechanism for records that should not exist, and that mechanism is rejection. It is the route we use, every time, for every record on this page. Quietly patching something that was never broken would be far faster and would make each of these disappear, but it would put a false statement into the public record and confirm a finding we know to be wrong. That is compliance in form and dishonesty in substance, and it is worth less than nothing to the people who rely on this data.
+
+It also matters for the corpus itself. A rejected record leaves circulation, and every consumer of the feed is better off for it. A record a vendor quietly patches instead stays in the corpus permanently, marked valid, mirrored by databases and counted by scanners as a real vulnerability that never existed. Rejecting invalid records is the only one of the two options that raises the quality of CVE data. Pretending a finding is real, and shipping a fix to match the pretence, leaves a bad record standing and certifies it as a good one. Every record handled that way lowers the quality of every active CVE around it, because the feed a defender trusts is only as good as the worst record nobody removed.
+
+What we do instead is answer every one of them in public, in detail, against the actual code, and leave that answer standing next to the record for anyone who goes looking.
+
+That is what follows. Every externally filed CVE against Open WebUI that we contest has a page below, setting out what the record claims, what the software actually does, which policy rules apply, and where the dispute currently stands.
+
+---
+
 ## All Dispositions
 
 <!-- Order matches the sidebar (ascending sidebar_position of each disposition page). -->

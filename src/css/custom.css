@@ -1072,3 +1072,70 @@ html[data-theme="dark"] .navbar {
 	text-decoration-color: #333;
 }
 /* stylelint-enable no-descending-specificity */
+
+/* Timeline row marking the event where a CVE was officially rejected. */
+table tr:has(.cve-rejected) {
+	background-color: rgb(0 164 78 / 12%);
+}
+
+[data-theme="dark"] table tr:has(.cve-rejected) {
+	background-color: rgb(0 164 78 / 18%);
+}
+
+/* Headline refutation block at the top of a disputed-CVE page. Deliberately
+   louder than a normal admonition: it is the page's whole argument in one box. */
+.cve-refutation .theme-admonition {
+	border: 1px solid rgb(220 53 69 / 40%);
+	border-left-width: 6px;
+	border-radius: 6px;
+	background-color: rgb(220 53 69 / 6%);
+	box-shadow: none;
+}
+
+.cve-refutation [class*="admonitionHeading"] {
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+}
+
+.cve-refutation [class*="admonitionContent"] > :last-child {
+	margin-bottom: 0;
+	padding-top: 0.85rem;
+	border-top: 1px solid rgb(220 53 69 / 25%);
+}
+
+[data-theme="dark"] .cve-refutation .theme-admonition {
+	border-color: rgb(220 53 69 / 55%);
+	background-color: rgb(220 53 69 / 10%);
+}
+
+[data-theme="dark"] .cve-refutation [class*="admonitionContent"] > :last-child {
+	border-top-color: rgb(220 53 69 / 35%);
+}
+
+/* Counterpart to .cve-refutation: the CVE is withdrawn and the record agrees
+   with us. Same weight, opposite colour, so the outcome reads at a glance. */
+.cve-resolved .theme-admonition {
+	border: 1px solid rgb(0 164 78 / 40%);
+	border-left-width: 6px;
+	border-radius: 6px;
+	background-color: rgb(0 164 78 / 6%);
+	box-shadow: none;
+}
+
+.cve-resolved [class*="admonitionHeading"] {
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+}
+
+.cve-resolved [class*="admonitionContent"] > :last-child {
+	margin-bottom: 0;
+}
+
+[data-theme="dark"] .cve-resolved .theme-admonition {
+	border-color: rgb(0 164 78 / 55%);
+	background-color: rgb(0 164 78 / 10%);
+}
