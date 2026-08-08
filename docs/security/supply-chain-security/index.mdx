@@ -7,6 +7,10 @@ title: "Supply Chain and Security Scanners"
 
 Automated software-composition and supply-chain scanners (for example socket.dev) periodically flag the Open WebUI PyPI packages and container images with risk indicators. This page is the Open WebUI team's official position on those indicators, so that security teams evaluating Open WebUI can interpret them accurately.
 
+:::note Looking for a specific CVE rather than a scanner flag?
+If a database or scan report shows a CVE against Open WebUI, check whether the identifier is still live before acting on it. Several vulnerability databases do not reprocess CVE withdrawals, so records the issuing CNA has formally rejected keep displaying as active findings. See [Rejected CVEs in Vulnerability Databases](/security/supply-chain-security/vulnerability-databases) for the cases we are chasing and how to verify any record yourself in seconds.
+:::
+
 :::info The short version
 None of the indicators these scanners raise against Open WebUI correspond to a named vulnerability, a CVE or confirmed malicious code. Most are automated behavioral heuristics that flag capabilities the software has by design. Some go further and publish alarming, unsubstantiated claims, most notably a "potential malware" banner, without identifying any specific file, function or line and without providing any evidence for the claim. No malicious code has been identified in Open WebUI. Because every published artifact is built from the public source in [open-webui/open-webui](https://github.com/open-webui/open-webui) and is reproducible from it, every one of these claims can be checked against the code directly.
 :::
@@ -58,7 +62,7 @@ Evaluators often ask whether Open WebUI executes code "without enforced sandboxi
 - **Authoring server-side Tools and Functions is treated as equivalent to granting server code execution.** It is restricted by the `workspace.tools` permission, which is **disabled by default** for non-administrators, and granting it is documented as equivalent to giving that user shell access to the server.
 - **Isolating the execution environment is a documented deployment responsibility.** Where an administrator enables a server-side execution engine, running it within appropriate container, network and filesystem boundaries is covered in our [hardening guidance](/getting-started/advanced-topics/hardening).
 
-This is intentional, layered design: server-side code execution is gated behind explicit administrator configuration and an off-by-default permission, rather than available to every user. See the [Tools and Functions security model](/features/extensibility/plugin/tools) and the [Security Policy](./security-policy) for the full model.
+This is intentional, layered design: server-side code execution is gated behind explicit administrator configuration and an off-by-default permission, rather than available to every user. See the [Tools and Functions security model](/features/extensibility/plugin/tools) and the [Security Policy](/security/security-policy) for the full model.
 
 ## For enterprise evaluators
 
@@ -67,15 +71,15 @@ Open WebUI is actively maintained by a core team that runs a defined, hands-on s
 - **Every report is reviewed by a person.** Incoming security reports are triaged and validated by hand against the actual code. Nothing is auto-closed or auto-classified.
 - **Valid findings are fixed and disclosed properly.** We patch confirmed issues as quickly as we reasonably can, request CVE identifiers for valid findings and publish the outcome openly as a GitHub Security Advisory once a fix ships.
 - **The record is public and auditable.** Our full history of accepted, fixed and published issues is visible on the [Open WebUI Security Advisories page](https://github.com/open-webui/open-webui/security/advisories). Anyone can see what was found, how it was resolved and which release contains the fix.
-- **Invalid or mischaracterized claims are answered, not ignored.** Where an external CVE misrepresents the software or our threat model, we publish a reasoned [Vendor Disposition](./vendor-dispositions) rather than leaving the public record unchallenged.
+- **Invalid or mischaracterized claims are answered, not ignored.** Where an external CVE misrepresents the software or our threat model, we publish a reasoned [Vendor Disposition](/security/vendor-dispositions) rather than leaving the public record unchallenged.
 - **One authoritative channel.** All vulnerability handling runs through GitHub Security Advisories, with the team owning validation, remediation and disclosure timing.
 
 Taken together, that is a materially stronger signal than an automated risk score: a public, auditable trail of found, fixed and published issues, produced by a process a person runs end to end. We are glad to support your evaluation directly.
 
 Useful starting points:
 
-- [Security Policy](./security-policy): the reporting process, threat model and what is and is not treated as a vulnerability.
-- [Vendor Dispositions](./vendor-dispositions): our formal assessments of specific externally reported CVEs.
+- [Security Policy](/security/security-policy): the reporting process, threat model and what is and is not treated as a vulnerability.
+- [Vendor Dispositions](/security/vendor-dispositions): our formal assessments of specific externally reported CVEs.
 - [Tools and Functions](/features/extensibility/plugin/tools): the code-execution and permission model.
 
 If you believe a scanner flag corresponds to a genuine security issue rather than a behavioral heuristic, please report it through [GitHub Security Advisories](https://github.com/open-webui/open-webui/security) so it can be validated and, if confirmed, published.
