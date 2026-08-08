@@ -64,7 +64,7 @@ curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/models | jq '.data[].
 curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/v1/tools/ | jq '.[] | {id, name}'
 
 # Terminal servers you have access to (use .id as terminal_id)
-curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/v1/terminals/ | jq '.[] | {id, name}'
+curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/v1/terminals/ | jq '.[] | {id, name, contexts}'
 ```
 
 MCP servers are addressed as tool IDs of the form `server:mcp:<server-id>`. See [Using Open WebUI tools, including MCP, from the API](/reference/api-endpoints#using-open-webui-tools-including-mcp-from-the-api).
@@ -74,6 +74,22 @@ When you pick a model in the browser, the frontend reads `meta.terminalId` off t
 
 You can read a model's configured terminal with `GET /api/v1/models/model?id=<model-id>` and use `meta.terminalId`, or just pick one from `/api/v1/terminals/`, which already lists only the terminals your user is allowed to use.
 :::
+
+### Terminal contexts
+
+Terminals backed by the orchestrator (a connection with `server_type: orchestrator`, or any connection carrying a `policy_id`) can be scoped per context by an administrator. That scoping is returned in the `contexts` field of `/api/v1/terminals/`, and it decides whether your request can use the terminal at all:
+
+| `contexts.chat` | Meaning for an API caller |
+| :--- | :--- |
+| absent, or `{}` | Shared terminal. Usable from any request, including one with no chat. |
+| `{"context_id": "chat_id"}` | Scoped per chat. The request **must** carry a saved `chat_id`, and each chat gets its own runtime context upstream. |
+| `false` | Not available in chats at all. Requesting it fails. |
+
+An automation-initiated request is scoped the same way through `contexts.automation`, keyed on `automation_id` instead.
+
+Connections that are not orchestrator-backed have no `contexts` entry and are always usable, which is the behaviour every earlier release had.
+
+Practically: read `contexts.chat` before choosing a terminal. If it is `false`, pick another. If it is `{"context_id": "chat_id"}`, you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one.
 
 ---
 
@@ -145,7 +161,7 @@ Field by field:
 | `session_id` | **The built-in tools switch.** Any non-empty string works. Without it, built-in tools are not offered to the model. It also makes the request asynchronous (you get `task_ids` instead of blocking). |
 | `features` | Turns on the four togglable built-in groups: `web_search`, `code_interpreter`, `image_generation`, `memory`. The other built-ins (knowledge, files, notes, channels, calendar, automations, chats, time, tasks, sub-agents) need no flag and are offered whenever their global setting, your permission and the model's category allow it. |
 | `tool_ids` | Workspace tools and MCP servers. Optional. |
-| `terminal_id` | Open Terminal server. Optional, and independent of `session_id`. |
+| `terminal_id` | Open Terminal server. Optional, and independent of `session_id`. A chat-scoped orchestrator terminal additionally requires that `chat_id` be a saved chat, which Path A already satisfies. |
 | `background_tasks` | Turn title, tag and follow-up generation off unless you want the extra model calls. |
 
 :::danger Do not send your own `tools` array
@@ -214,6 +230,7 @@ Limits, in exchange for the simplicity:
 
 - **One round of tool calls.** The model cannot look at a result and decide to call something else.
 - **No built-in tools.** No web search, no code interpreter, no knowledge browsing, no terminal-driven agentic work.
+- **No chat-scoped terminals.** A request in this mode carries no `chat_id`, so an orchestrator terminal configured with `contexts.chat.context_id = "chat_id"` cannot be used. Shared terminals work normally.
 - Legacy mode is **deprecated** and depends on a task model that reliably emits JSON. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 ---
@@ -422,6 +439,8 @@ To adapt it:
 | `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Admin > Tools > Code Interpreter**, or drop `code_interpreter` from `features` |
 | File tools (`view_file`, `grep_chat_files`, ...) missing | They need `files` in the request body, the model's **File Upload** capability on, and **File Context** off | See [Prompt Caching and Context Optimization](/features/chat-conversations/prompt-caching) |
 | `503 Terminal unavailable` | The terminal server is unreachable, disabled, or your user has no access grant | Confirm the ID appears in `GET /api/v1/terminals/` for that key |
+| `503`, terminal not available for chat | The terminal's `contexts.chat` is `false`, so an administrator has taken it out of chats | Pick a terminal whose `contexts.chat` is not `false` |
+| `503`, terminal requires a saved chat context | The terminal is scoped with `contexts.chat.context_id = "chat_id"` and the request had no saved `chat_id` | Use Path A with a saved chat, or pick a shared terminal |
 | MCP tool connection fails | An OAuth-protected MCP server the API key's user has not authorised | Complete the OAuth flow once in the browser as that user |
 | The chat is created but stays empty in the UI | Broken message tree | `currentId` is camelCase, and every message needs `parentId` and `childrenIds`. See [Backend-Controlled API Flow](/reference/api-flow) |
 
