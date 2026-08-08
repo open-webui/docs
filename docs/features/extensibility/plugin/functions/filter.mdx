@@ -261,7 +261,7 @@ To make a filter global:
 
 **API Endpoint:**
 ```http
-POST /functions/id/{filter_id}/toggle/global
+POST /api/v1/functions/id/{filter_id}/toggle/global
 ```
 
 **Visual Indicators:**
@@ -545,23 +545,17 @@ On `dev` this endpoint is labeled deprecated in favor of inline execution, but b
 
 #### Detecting API vs WebUI Requests
 
-You can detect whether a request originates from the WebUI or a direct API call by checking the `__metadata__` argument:
+There is no field that names the caller, so use the chat context instead. A request from the WebUI always carries a `chat_id` and a `session_id`; a plain API call gets an empty `chat_id` and a `null` `session_id`. Both keys always exist, so test their values, not their presence:
 
 ```python
 async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
-    # Check if request is from WebUI
-    interface = __metadata__.get("interface") if __metadata__ else None
-    
-    if interface == "open-webui":
-        print("Request from WebUI")
+    metadata = __metadata__ or {}
+
+    if metadata.get("chat_id") and metadata.get("session_id"):
+        print("Request from a chat session")
     else:
-        print("Direct API request")
-    
-    # You can also check for presence of chat context
-    chat_id = __metadata__.get("chat_id") if __metadata__ else None
-    if not chat_id:
-        print("No chat context - likely a direct API call")
-    
+        print("No chat context, likely a direct API call")
+
     return body
 ```
 
@@ -626,12 +620,11 @@ class Filter:
     async def inlet(self, body: dict, __user__: dict = None, __metadata__: dict = None) -> dict:
         user_email = __user__.get("email", "unknown") if __user__ else "anonymous"
         model = body.get("model", "unknown")
-        interface = __metadata__.get("interface", "api") if __metadata__ else "api"
-        chat_id = __metadata__.get("chat_id") if __metadata__ else None
+        chat_id = (__metadata__ or {}).get("chat_id")
         
         self.logger.info(
             f"Request: user={user_email}, model={model}, "
-            f"interface={interface}, chat_id={chat_id or 'none'}"
+            f"chat_id={chat_id or 'none'}"
         )
         
         return body
@@ -801,7 +794,7 @@ Filters can declare any of these parameters in their function signature to recei
 |-----------|-----------------|
 | `__model__` | Full model dict (including `info.base_model_id` for workspace models) |
 | `__user__` | User data (`id`, `email`, `name`, `role`) |
-| `__metadata__` | Request metadata (`chat_id`, `session_id`, `interface`, etc.) |
+| `__metadata__` | Request metadata (`chat_id`, `session_id`, `user_id`, `files`, `features`, `params`, etc.) |
 | `__event_emitter__` | Function to send status updates, embeds, etc. to the client |
 | `__chat_id__` | Chat session ID |
 | `__request__` | The raw FastAPI `Request` object |
@@ -1125,6 +1118,67 @@ async def stream(self, event: dict) -> dict:
 📖 **Before:** `"Hi 😊"`
 📖 **After:** `"Hi"`
 
+##### Streamed Events on Responses API Connections
+
+The events above are **Chat Completions** chunks, which is what you get from everything except a connection whose **API Type** is set to `Responses`. Those forward the provider's own event stream unchanged, so `stream()` receives typed Responses API events instead. The stream opens with bookkeeping events that carry no text, so trimmed to the ones that do:
+
+```jsonl
+{"type": "response.output_text.delta", "delta": "Hi"}
+{"type": "response.output_text.delta", "delta": " 😊"}
+{"type": "response.output_text.done", "text": "Hi 😊"}
+{"type": "response.content_part.done", "part": {"type": "output_text", "text": "Hi 😊"}}
+{"type": "response.output_item.done", "item": {"type": "message", "content": [{"type": "output_text", "text": "Hi 😊"}]}}
+{"type": "response.completed", "response": {"output": [{"type": "message", "content": [{"type": "output_text", "text": "Hi 😊"}]}], "usage": {"input_tokens": 9, "output_tokens": 3}}}
+```
+
+:::warning Rewriting the deltas alone is not enough
+The deltas are what the user watches arrive, but the later events repeat the **full text**, and Open WebUI rebuilds the message from them and pushes the rebuild to the browser. An edit applied only to `response.output_text.delta` is undone on screen the moment `response.output_text.done` arrives, and `response.completed` then replaces the whole thing with the provider's copy, which is what gets saved when the response ends.
+
+The example below covers the assistant message text. Reasoning is a separate output item type with text of its own, and refusals sit in a `refusal` field rather than a `text` one, so neither is touched by it.
+:::
+
+##### Example: Filtering Out Emojis on Responses API Connections
+
+```python
+async def stream(self, event: dict) -> dict:
+    def clean(value):
+        # Non-string values turn up, and raising here would drop the whole event
+        return value.replace("😊", "") if isinstance(value, str) else value
+
+    def clean_message(item):
+        if (item or {}).get("type") != "message":
+            return
+        for part in item.get("content") or []:
+            if "text" in part:
+                part["text"] = clean(part["text"])
+
+    # Chat Completions chunks
+    for choice in event.get("choices") or []:
+        delta = choice.get("delta") or {}
+        if "content" in delta:
+            delta["content"] = clean(delta["content"])
+
+    # Responses API events
+    event_type = event.get("type", "")
+    if event_type == "response.output_text.delta" and "delta" in event:
+        event["delta"] = clean(event["delta"])
+    elif event_type == "response.output_text.done" and "text" in event:
+        event["text"] = clean(event["text"])
+    elif event_type == "response.content_part.done":
+        part = event.get("part") or {}
+        if "text" in part:
+            part["text"] = clean(part["text"])
+    elif event_type == "response.output_item.done":
+        clean_message(event.get("item"))
+    elif event_type == "response.completed":
+        for item in (event.get("response") or {}).get("output") or []:
+            clean_message(item)
+
+    return event
+```
+
+If `stream()` raises, Open WebUI drops that whole event, and losing `response.completed` costs the reply its token usage figures and its response id.
+
 :::note Valves are resolved once per response, not once per chunk
 
 `stream()` runs for every fragment, so its valves are read from the database once when the response starts and reused for the rest of it, rather than being re-read thousands of times. Both `self.valves` and `__user__["valves"]` are therefore stable for the whole of one streamed reply: a valve edited while a reply is streaming takes effect on the next reply, not partway through the current one. `inlet()` and `outlet()` are unaffected, as each runs once anyway.
@@ -1156,7 +1210,7 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring**: Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-`outlet()` does **not** run reliably for direct `/api/chat/completions` calls. On tagged releases it is never invoked by that endpoint. On `dev` it can run inline, but only when the caller supplies `chat_id` + `id`, owns the chat, and uses a non-streaming request, and even then the filtered content is not returned in the HTTP response. For direct API integrations that need `outlet()`, follow `/api/chat/completions` with `POST /api/chat/completed`. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
+On tagged releases `outlet()` is never invoked by `/api/chat/completions`, so a direct API integration has to follow it with `POST /api/chat/completed`. On `dev` it runs by default for direct callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:

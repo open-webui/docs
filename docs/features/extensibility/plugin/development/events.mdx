@@ -88,7 +88,7 @@ result = await __event_call__(
 ```
 
 :::tip Configurable Timeout
-By default, `__event_call__` waits up to **300 seconds** (5 minutes) for a user response before timing out with an exception. This timeout is configurable via the [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) environment variable. Increase this value if your users need more time to fill out forms, make decisions, or complete complex interactions.
+By default `__event_call__` waits **forever** for a user response, so a prompt nobody answers holds that call open indefinitely. Set [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) to a number of seconds to bound it, and wrap the call in `try`/`except`, because a timeout raises. A call to a browser that has already disconnected is different: it returns `{"error": "Client session disconnected."}` instead, so check the result as well.
 :::
 
 ---
@@ -271,11 +271,11 @@ await __event_emitter__(
 
 #### Append vs. replace
 
-By default the new entries are **appended** to whatever is already on the message, and repeated emits stack up. For a single live widget you want to update in place, set `data.replace: True`; the entire `embeds` array on the message is overwritten with the payload's array. (Pass an empty list with `replace: True` to clear all embeds for the message.)
+By default the new entries are merged with whatever is already stored on the message, so repeated emits stack up in the saved chat, with the newest batch first. The live view is not cumulative: the browser replaces what it is showing with each payload, and the stacked array only appears after a reload. For a single live widget you want to update in place, set `data.replace: True`; the entire `embeds` array on the message is overwritten with the payload's array. (Pass an empty list with `replace: True` to clear all embeds for the message.)
 
 | Mode | Behavior | Typical use |
 | :--- | :--- | :--- |
-| `replace` omitted / `False` | Each new payload's items are appended to `message.embeds`. | One-shot tools / actions that emit a single embed at the end. |
+| `replace` omitted / `False` | Each new payload's items are merged into `message.embeds`, newest first. | One-shot tools / actions that emit a single embed at the end. |
 | `replace: True` | The message's `embeds` array is replaced with the payload's array. | Long-running pipes that keep refreshing one widget (progress bar, live dashboard, polling status card). |
 
 The `replace` flag was added so that re-emitting an embed doesn't leave stale copies stacked in the conversation when the user reloads. Only the latest version is persisted.
@@ -345,7 +345,7 @@ await __event_emitter__(
 #### Notes
 
 - **Persistence requires the short name.** Emit `"embeds"` (or `"chat:message:embeds"`) but be aware only the short name `"embeds"` is persisted to the database. See the [persistence table](#which-event-types-are-persisted-to-the-database) below. The `replace` flag has no effect on the unpersisted alias.
-- **Sandbox and sizing.** Each embed is rendered inside a sandboxed iframe with `allow-scripts`, `allow-popups`, and `allow-downloads` enabled by default. Same-origin and form submissions are user-toggled. For auto-resize behavior, height reporting, and the Chart.js / Alpine auto-injection details, see [Rich UI Embedding → Sandbox and Security](/features/extensibility/plugin/development/rich-ui#sandbox-and-security).
+- **Sandbox and sizing.** Each embed is rendered inside a sandboxed iframe with `allow-scripts` and `allow-downloads` enabled, plus `allow-popups` for embeds attached to an assistant message. Same-origin access is user-toggled; form submissions are always allowed on that surface, whatever the user setting says. For auto-resize behavior, height reporting, and the Chart.js / Alpine auto-injection details, see [Rich UI Embedding → Sandbox and Security](/features/extensibility/plugin/development/rich-ui#sandbox-and-security).
 - **External tools.** External-tool callers can post the same `embeds` payload (including `replace: true`) to `/api/v1/chats/{chatId}/messages/{messageId}/event`. See [External Tools below](#external-tools-openapi--mcp).
 
 ---
@@ -465,8 +465,7 @@ While this event can technically be emitted from any plugin type (tools, pipes, 
 :::
 
 **Where it appears:**
-*   **Message Toolbar**: When set to `True`, the "Heart" icon beneath the message will fill in, indicating it is favorited.
-*   **Chat Overview**: Favorited messages (pins) are highlighted in the conversation overview, making it easier for users to locate key information later.
+*   **Chat Overview**: The message's node in the conversation overview shows a filled heart, making it easier for users to locate key information later. There is no favorite control in the message toolbar itself.
 
 #### Example: "Pin Message" Action
 For a practical implementation of this event in a real-world plugin, see the **[Pin Message Action on Open WebUI Community](https://openwebui.com/posts/143594d1-0838-4f9a-9af2-b94d2952f7ba)**. This action demonstrates how to toggle the favorite status in the database and immediately sync the UI using the `chat:message:favorite` event.
@@ -757,7 +756,7 @@ response = await __event_call__({
     }
 })
 
-# response will be: {"value": "user's answer"}
+# response is the raw string the user typed
 ```
 
 ### Q: What event types are available for `__event_call__`?
@@ -788,7 +787,7 @@ To receive the chat and message ID headers, you must enable header forwarding by
 ENABLE_FORWARD_USER_INFO_HEADERS=True
 ```
 
-Without this, Open WebUI will not include the identification headers in requests to external tools, and event emitting will not work.
+Without this, Open WebUI does not include the identification headers. The endpoint itself stays available, and for a global tool server there is a narrower alternative: a per-connection custom header using the `{{CHAT_ID}}` and `{{MESSAGE_ID}}` placeholders is interpolated regardless of this setting, and unlike the flag it does not also ship the user's email, name and role to every external backend. Custom headers are not sent for user-added tool servers, which the browser calls directly.
 
 ### Headers Provided by Open WebUI
 
@@ -927,7 +926,7 @@ When you send a chat request, Open WebUI creates a background `asyncio` task tha
 :::info No Execution Timeout
 There is **no timeout** on pipe, tool, or action execution. Your code can run for minutes or hours, and nothing in Open WebUI will kill it automatically. The only things that can stop a running task are:
 - The function itself returning or raising an exception
-- Manual cancellation via `POST /api/tasks/stop/{task_id}` (the stop button in the UI)
+- Manual cancellation. The stop button in the UI calls `POST /api/tasks/chat/{chat_id}/stop`; the per-task `POST /api/tasks/stop/{task_id}` is admin-only and is the fallback when there is no chat id
 - The Open WebUI server process restarting
 :::
 
@@ -942,11 +941,11 @@ The event emitter writes certain event types directly to the database **regardle
 | `status` | Appended to the message's `statusHistory` array |
 | `message` | Appended to the message's `content` field |
 | `replace` | Overwrites the message's `content` field |
-| `embeds` | Appended to the message's `embeds` array (Rich UI HTML), or replaced when `data.replace: true` is set. See [`embeds`](#embeds-or-chatmessageembeds) for the full payload shape and a live-progress example. |
-| `files` | Appended to the message's `files` array |
-| `source` / `citation` | Appended to the message's `sources` array |
+| `embeds` | Merged into the message's `embeds` array (Rich UI HTML) newest first, or replaced when `data.replace: true` is set. See [`embeds`](#embeds-or-chatmessageembeds) for the full payload shape and a live-progress example. |
+| `files` | Merged into the message's `files` array, newest first |
+| `source` / `citation` | Appended to the message's `sources` array, but only when the payload has no `type` field of its own. A typed source such as `code_execution` is not written by the event emitter; it reaches the browser, which stores it on the message when it saves the chat. |
 
-These 6 types always write to the database inside the event emitter function itself, completely independent of `ENABLE_REALTIME_CHAT_SAVE`.
+These 6 types write to the database inside the event emitter function itself, completely independent of `ENABLE_REALTIME_CHAT_SAVE`.
 
 :::warning Use Short Names for Persistence
 The backend event emitter only recognizes the short names above for DB writes. If you emit `"chat:message:embeds"` instead of `"embeds"`, the frontend handles it identically, but the **backend won't persist it**. Always use the short names (`"status"`, `"message"`, `"replace"`, `"embeds"`, `"files"`, `"source"`) if you need persistence.
@@ -980,16 +979,16 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
 :::
 
-#### ⚠️ Requires live connection (will error on tab close)
+#### ⚠️ Requires live connection (raises or errors on tab close)
 
 | Type | Why |
 |------|-----|
-| `confirmation` | Uses `sio.call()`, waits for client response, will timeout |
-| `input` | Uses `sio.call()`, waits for client response, will timeout |
-| `execute` via `__event_call__` | Uses `sio.call()`, waits for client response, will timeout |
+| `confirmation` | Uses `sio.call()`, waits for a client response and raises if the timeout elapses |
+| `input` | Uses `sio.call()`, waits for a client response and raises if the timeout elapses |
+| `execute` via `__event_call__` | Uses `sio.call()`, waits for a client response and raises if the timeout elapses |
 | `execute` via `__event_emitter__` | Fires and forgets, **will not error**, but JS may not run if no browser is connected |
 
-`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed, `sio.call()` will timeout and raise an exception in your function code. The timeout is configurable via the [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) environment variable (default: 300 seconds).
+`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed the session is gone, so the call returns `{"error": "Client session disconnected."}` straight away. If the tab is merely inactive the call waits for [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout). That is unset by default, so it waits indefinitely; set it to a number of seconds and the call raises once it elapses.
 
 `execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value, particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 
@@ -1020,13 +1019,14 @@ The return value takes precedence over event-emitted content. If your pipe emits
 
 #### Actions
 
-Actions go through the same return handling as tools. The same persistence rules apply:
+Actions are the exception to the rules above. Only an inline `HTMLResponse` is written server-side; everything else is handed back to the browser, which decides what to do with it:
 
 | Return type | What happens | Persisted? |
 |-------------|-------------|-----------|
 | `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
-| `HTMLResponse` (without inline) | Body decoded as plain text result | ✅ Yes |
-| `str` / `dict` | Used as action result text | ✅ Yes |
+| `HTMLResponse` (without inline) | Body decoded to a string, then handled as any other return below | ❌ No |
+| `{"messages": [...]}` | The browser merges each entry into the message with that `id` and saves the chat | ⚠️ Only if the tab is still open |
+| any other `str` / `dict` | Returned to the caller and dropped, the chat is not touched | ❌ No |
 
 #### Filters
 
@@ -1045,7 +1045,7 @@ Filters transform `form_data` in the pipeline, so they don't return results to t
 
 If you want your function's output to **survive a closed browser tab**, follow these rules:
 
-1. **Always return your final answer** from your `pipe()`, tool, or action function. The return value is always saved
+1. **Always return your final answer** from your `pipe()` or tool function, where the return value is saved. Actions are the exception: only a `{"messages": [...]}` return reaches the chat, and only the open tab writes it, so use an inline `HTMLResponse` or an event if it has to survive a tab close
 2. **Use short event type names** (`"status"`, `"message"`, `"embeds"`, `"files"`, `"source"`) for DB persistence
 3. **Avoid relying on** `"notification"`, `"confirmation"`, `"input"`, or `"execute"` for critical workflows. These require a live browser connection
 4. Rich UI HTML embeds (`"embeds"` type or `HTMLResponse` return) **are persisted** and will render when the user reopens the chat

@@ -22,7 +22,7 @@ A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/ope
 1. The plugin's Python source is read from the database.
 2. A fresh `types.ModuleType` is created and registered in `sys.modules` as `function_{id}` (or `tool_{id}`).
 3. The source is fed to `exec(content, module.__dict__)`. Anything at module top level runs at this point.
-4. The loader looks for **one** entry-point class: `Tools`, `Pipe`, `Filter`, or `Action`. That class becomes the handle Open WebUI calls into.
+4. The loader looks for **one** entry-point class: `Tools`, `Pipe`, `Filter`, `Action` or `Event`. That class becomes the handle Open WebUI calls into.
 5. The module stays in `sys.modules` for the life of the process. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
 
 The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
@@ -49,7 +49,7 @@ Practical consequences:
 
 From any hook (and from module top level):
 
-- The full `open_webui.*` package. Examples: `from open_webui.models.chats import Chats`, `from open_webui.utils.middleware import process_chat_payload`, `from open_webui.config import ConfigVar`.
+- The full `open_webui.*` package. Examples: `from open_webui.models.chats import Chats`, `from open_webui.utils.middleware import process_chat_payload`, `from open_webui.models.config import Config`.
 - The live FastAPI `Request` via `__request__`, which carries `__request__.app` (the FastAPI app), `__request__.app.state` (config, caches, handlers), and `__request__.state` (per-request scratch).
 - The reserved dunder args documented in [Reserved Arguments](./reserved-args): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
 - Events documented in [Events](./events): emit anything to the frontend, or solicit a response from the user with `event_call`.
@@ -192,7 +192,7 @@ A `Tools` class's methods are exposed to the model as callable tools (their docs
 
 ### 10. Actions as arbitrary one-shot operations
 
-`Action` renders a button on an assistant message. The handler runs server-side with the same dunder surface as Filters and Tools, against the chat that the message belongs to. Use for "approve this", "re-run with...", "send to external system", or any one-off operation a user should be able to trigger from a specific message.
+`Action` renders a button on an assistant message. The handler runs server-side against the chat that the message belongs to, with a narrower dunder surface than Filters and Tools: `__model__`, `__id__`, `__event_emitter__`, `__event_call__`, `__request__` and `__user__`, and nothing else. Use for "approve this", "re-run with...", "send to external system", or any one-off operation a user should be able to trigger from a specific message.
 
 ---
 

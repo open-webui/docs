@@ -205,18 +205,16 @@ When `allowSameOrigin` is **on** (via the user setting `iframeSandboxAllowSameOr
 
 ## Sandbox and Security
 
-Embedded iframes run inside a [sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox). The following sandbox flags are always enabled by default:
+Embedded iframes run inside a [sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox). `allow-scripts` and `allow-downloads` are always on. `allow-popups` is on for tool call results, for embeds inside a grouped details block and for embeds attached to an assistant message, but not for embeds opened from a citation in the Embeds panel.
 
-- `allow-scripts`: JavaScript execution
-- `allow-popups`: Popups (e.g. window.open)
-- `allow-downloads`: File downloads
-
-Two additional flags can be toggled by the user in **Settings → Interface**:
+Two more flags can be toggled by the user in **Settings → Interface**:
 
 | Setting | Default | Description |
 |---|---|---|
-| Allow Iframe Same-Origin Access | ❌ Off | Allows the iframe to access parent page context |
-| Allow Iframe Form Submissions | ❌ Off | Allows form submissions within embedded content |
+| iframe Sandbox Allow Same Origin | ❌ Off | Allows the iframe to access parent page context |
+| iframe Sandbox Allow Forms | ❌ Off | Allows form submissions within embedded content |
+
+Two caveats on those toggles. Embeds attached to an assistant message always allow forms regardless of the setting, and embeds opened from a citation ignore both toggles entirely, so their sandbox is only `allow-scripts allow-downloads`.
 
 ### allowSameOrigin
 
@@ -234,7 +232,7 @@ This is the most important flag to be aware of. It is **off by default** for sec
 - Chart.js and Alpine.js dependencies are automatically injected if detected
 - ⚠️ **Use with caution**: only enable this when you trust the embedded content
 
-Users can toggle this setting in **Settings → Interface → Iframe Same-Origin Access**.
+Users can toggle this setting in **Settings → Interface → iframe Sandbox Allow Same Origin**.
 
 :::caution Practical Impact of Sandbox Settings
 When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandboxed. This means:
@@ -242,7 +240,7 @@ When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandb
 - **JavaScript in the embed cannot interact with Open WebUI itself**: the iframe has no access to the parent page's DOM, cookies, localStorage, or any Open WebUI APIs
 - **Cross-frame communication** is limited to `postMessage` only. However, [prompt submission](#prompt-submission) works cross-origin with a user confirmation dialog
 
-If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → Iframe Same-Origin Access**.
+If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → iframe Sandbox Allow Same Origin**.
 
 As an alternative for ephemeral interactions that need full page access, consider using the [`execute` event](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__) instead, which runs unsandboxed in the main page context.
 :::
@@ -335,7 +333,7 @@ If you need to pass dynamic data into an embed rendered via either of the ❌ pa
 
 When `allowSameOrigin` is enabled, the iframe component auto-detects usage of certain libraries in your HTML and injects them automatically, with no CDN `<script>` tags needed:
 
-- **Alpine.js**: Detected when any `x-data`, `x-init`, `x-show`, `x-bind`, `x-on`, `x-text`, `x-html`, `x-model`, `x-for`, `x-if`, `x-effect`, `x-transition`, `x-cloak`, `x-ref`, `x-teleport`, or `x-id` directives are found
+- **Alpine.js**: Detected when any `x-data`, `x-init`, `x-show`, `x-bind`, `x-on`, `x-text`, `x-html`, `x-model`, `x-modelable`, `x-for`, `x-if`, `x-effect`, `x-ignore`, `x-transition`, `x-cloak`, `x-ref`, `x-teleport`, or `x-id` directives are found
 - **Chart.js**: Detected when `new Chart(` or `Chart.` appears in the HTML
 
 This means you can write Alpine or Chart.js code directly in your HTML and it will just work when same-origin is enabled, without importing scripts.

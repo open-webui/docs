@@ -7,9 +7,9 @@ title: "Valves"
 
 Valves and UserValves are used to allow users to provide dynamic details such as an API key or a configuration option. These will create a fillable field or a bool switch in the GUI menu for the given function. They are always optional, but HIGHLY encouraged.
 
-Hence, Valves and UserValves class can be defined in either a `Pipe`, `Pipeline`, `Filter` or `Tools` class.
+Hence, Valves and UserValves class can be defined in a `Pipe`, `Filter`, `Action` or `Tools` class. An `Event` class can carry `Valves` too, but never `UserValves`, since event handlers run without a user.
 
-Valves are configurable by admins alone via the Tools or Functions menus. On the other hand UserValves are configurable by any users directly from a chat session.
+Function Valves are configurable by admins alone, since Functions are admin-only. Tool Valves can also be edited by the tool's owner and by anyone holding a write grant on it, so treat a tool's valves as readable by everyone you share write access with. UserValves are configurable by any user directly from a chat session.
 
 <details>
 <summary>Commented example</summary>
@@ -19,59 +19,55 @@ Valves are configurable by admins alone via the Tools or Functions menus. On the
 from pydantic import BaseModel, Field
 from typing import Literal
 
-# Define and Valves
+# Define Valves and UserValves
 class Filter:
-   # Notice the current indentation: Valves and UserValves must be declared as
-   # attributes of a Tools, Filter or Pipe class. Here we take the
-   # example of a Filter.
+    # Notice the indentation: Valves and UserValves are declared as
+    # attributes of a Tools, Filter or Pipe class. Here we take the
+    # example of a Filter.
     class Valves(BaseModel):
-       # Valves and UserValves inherit from pydantic's BaseModel. This
-       # enables complex use cases like model validators etc.
-       test_valve: int = Field(  # Notice the type hint: it is used to
-           # choose the kind of UI element to show the user (buttons,
-           # texts, etc).
-           default=4,
-           description="A valve controlling a numberical value"
-           # required=False,  # you can enforce fields using True
-       )
-       # To give the user the choice between multiple strings, you can use Literal from typing:
-       choice_option: Literal["choiceA", "choiceB"] = Field(
-           default="choiceA",
-           description="An example of a multi choice valve",
-       )
-       priority: int = Field(
-           default=0,
-           description="Priority level for the filter operations. Lower values are passed through first"
-       )
-       # The priority field is optional but if present will be used to
-       # order the Filters.
-       pass
-       # Note that this 'pass' helps for parsing and is recommended.
+        # Valves and UserValves inherit from pydantic's BaseModel. This
+        # enables complex use cases like model validators etc.
+        test_valve: int = Field(  # Notice the type hint: it is used to
+            # choose the kind of UI element to show the user (buttons,
+            # texts, etc).
+            default=4,
+            description="A valve controlling a numerical value",
+        )
+        # To give the user the choice between multiple strings, you can use Literal from typing:
+        choice_option: Literal["choiceA", "choiceB"] = Field(
+            default="choiceA",
+            description="An example of a multi choice valve",
+        )
+        # The priority field is optional but if present will be used to
+        # order the Filters.
+        priority: int = Field(
+            default=0,
+            description="Priority level for the filter operations. Lower values are passed through first",
+        )
 
-   # UserValves are defined the same way.
+    # UserValves are defined the same way.
     class UserValves(BaseModel):
         test_user_valve: bool = Field(
             default=False, description="A user valve controlling a True/False (on/off) switch"
-       )
-       pass
+        )
 
-   def __init__(self):
-       self.valves = self.Valves()
-       # Because they are set by the admin, they are accessible directly
-       # upon code execution.
-       pass
+    def __init__(self):
+        self.valves = self.Valves()
+        # Because they are set by the admin, they are accessible directly
+        # upon code execution.
 
-   # The inlet method is only used for Filter but the __user__ handling is the same
-   def inlet(self, body: dict, __user__: dict):
-       # Because UserValves are defined per user they are only available
-       # on use.
-       # Note that although __user__ is a dict, __user__["valves"] is a
-       # UserValves object. Hence you can access values like that:
-       test_user_valve = __user__["valves"].test_user_valve
-       # Or:
-       test_user_valve = dict(__user__["valves"])["test_user_valve"]
-       # But this will return the default value instead of the actual value:
-       # test_user_valve = __user__["valves"]["test_user_valve"]  # Do not do that!
+    # The inlet method is only used for Filter but the __user__ handling is the same
+    def inlet(self, body: dict, __user__: dict):
+        # Because UserValves are defined per user they are only available
+        # on use.
+        # Note that although __user__ is a dict, __user__["valves"] is a
+        # UserValves object. Hence you can access values like that:
+        test_user_valve = __user__["valves"].test_user_valve
+        # Or:
+        test_user_valve = dict(__user__["valves"])["test_user_valve"]
+        # But this raises TypeError, a pydantic model is not subscriptable:
+        # test_user_valve = __user__["valves"]["test_user_valve"]  # Do not do that!
+        return body
 ```
 
 </details>
@@ -107,7 +103,7 @@ Use password input types for any credential or secret that users configure in th
 Password input only masks values **in the UI**, it does not change how they are stored. By default, Valve values (including secrets) are saved as plaintext JSON in the database. To encrypt them at rest, an administrator can set [`ENABLE_VALVE_ENCRYPTION=true`](/reference/env-configuration#enable_valve_encryption), which encrypts Tool and Function Valve values with Fernet (AES-128) using a key derived from [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key).
 
 :::warning
-When encryption is enabled, `WEBUI_SECRET_KEY` must be a valid 44-character url-safe base64 Fernet key, and rotating it makes previously encrypted Valve values unreadable (they must be re-entered). See [`ENABLE_VALVE_ENCRYPTION`](/reference/env-configuration#enable_valve_encryption) for details.
+A `WEBUI_SECRET_KEY` of any length is hashed into a valid Fernet key, with one exception: a key exactly 44 characters long is used verbatim and must therefore be url-safe base64 that decodes to 32 bytes. What matters most is that it stays stable, since rotating it makes previously encrypted Valve values unreadable and they have to be re-entered. See [`ENABLE_VALVE_ENCRYPTION`](/reference/env-configuration#enable_valve_encryption) for details.
 :::
 
 ### Select Dropdown Input

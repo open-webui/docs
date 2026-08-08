@@ -10,7 +10,7 @@ This page covers `mcpo`, the MCP-to-OpenAPI bridge. If you want Open WebUI's nat
 :::
 
 :::danger Critical for Persistence
-If you connect Open WebUI to this proxy using an API Key or Auth Token, you **MUST** set `WEBUI_SECRET_KEY` in your Open WebUI Docker config. If this key changes (e.g., on container restart), Open WebUI will fail to decrypt the stored credentials for your tool.
+Set `WEBUI_SECRET_KEY` in your Open WebUI Docker config and keep it stable. If you connect this proxy with OAuth, its stored client info and session tokens are encrypted with a key derived from `WEBUI_SECRET_KEY`, so a key that changes on container restart makes them undecryptable and the connection has to be re-authorised. A static API key is stored as-is and is unaffected.
 :::
 
 ### 📌 What is the MCP Proxy Server?
@@ -50,7 +50,7 @@ So even though adding mcpo might at first seem like "just one more layer", in re
 ✨ With mcpo, your local-only AI tools become cloud-ready, UI-friendly, and instantly interoperable, typically without changing your tool server code.
 
 :::tip
-**Events Supported**: While mcpo exposes MCP tools as OpenAPI endpoints, they can still emit events (status updates, notifications) via Open WebUI's [event REST endpoint](/features/extensibility/plugin/development/events#-external-tool-events). Open WebUI automatically passes the required `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to your tool. However, interactive events requiring user input are only available for native Python tools.
+**Events Supported**: While mcpo exposes MCP tools as OpenAPI endpoints, they can still emit events (status updates, notifications) via Open WebUI's [event REST endpoint](/features/extensibility/plugin/development/events#-external-tool-events). Open WebUI passes the required `X-OpenWebUI-Chat-Id` and `X-OpenWebUI-Message-Id` headers to your tool when [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) is turned on, which it is not by default. However, interactive events requiring user input are only available for native Python tools.
 :::
 
 ### ✅ Quickstart: Running the Proxy Locally

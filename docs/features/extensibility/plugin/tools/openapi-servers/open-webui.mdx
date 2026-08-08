@@ -42,8 +42,8 @@ Once running, this will host a local OpenAPI server at http://localhost:8000, wh
 Next, connect your running tool server to Open WebUI:
 
 1. Open WebUI in your browser.
-2. Open ⚙️ **Settings**.
-3. Click on ➕ **Tools** to add a new tool server.
+2. Open ⚙️ **Settings → Integrations**.
+3. Click ➕ in the **Tools** section to add a new tool server.
 4. Enter the URL where your OpenAPI tool server is running (e.g., http://localhost:8000).
 5. Click "Save".
 
@@ -58,12 +58,13 @@ There are two ways to register tool servers in Open WebUI:
 - Only accessible to the user who registered the tool server.
 - The connection is made directly from the browser (client-side) by the user.
 - Perfect for personal workflows or when testing custom/local tools.
+- Admins see this section by default. For everyone else an admin has to grant the **Direct Tool Servers** permission first, which is off by default; without it the whole Integrations tab of Settings is hidden.
 
 #### 2. Global Tool Servers (added via Admin Settings)
 
 Admins can manage shared tool servers available to all or selected users across the entire deployment:
 
-- Go to 🛠️ **Admin Settings > Tools**.
+- Go to 🛠️ **Admin Settings → Integrations**, **Tools** section.
 - Add the tool server URL just as you would in user settings.
 - These tools are treated similarly to Open WebUI's built-in tools.
 
@@ -138,7 +139,7 @@ Clicking this icon opens a popup where you can:
 
 - View connected tool server information
 - See which tools are available and which server they're provided by
-- Debug or disconnect any tool if needed
+- Check whether each server is connected or still needs authentication, and disconnect OAuth for an MCP server
 
 🔍 Here's what the tool information modal looks like:
 
@@ -168,21 +169,17 @@ This is ideal for team setups or shared environments, where commonly-used tools 
 
 ---
 
-## (Optional) Step 4: Use "Native" Function Calling (ReACT-style) Tool Use 🧠
+## (Optional) Step 4: Choosing the Function Calling Mode 🧠
 
-:::info
+Native function calling is the default, so there is nothing to switch on for it. The model uses its own built-in tool calling, which needs a model that genuinely supports it. Some local models claim support and produce poor results, so prefer a model with solid native tool calling if you have the choice.
 
-For this to work effectively, **your selected model must support native tool calling**. Some local models claim support but often produce poor results. We strongly recommend using GPT-4o or another OpenAI model that supports function calling natively for the best experience.
+`Legacy` is the alternative: Open WebUI injects the tool definitions into the prompt and calls tools once before generating. It works with a much wider range of models, at the cost of being limited to that single tool-calling round, where Native keeps calling tools until the model is done.
 
-:::
-
-Want to enable ReACT-style (Reasoning + Acting) native function calls directly inside your conversations? You can switch Open WebUI to use native function calling.
-
-✳️ How to enable native function calling:
+✳️ How to switch modes:
 
 1. Open the chat window.
 2. Go to ⚙️ **Chat Controls > Advanced Params**.
-3. Change the **Function Calling** parameter from `Default` to `Native`.
+3. Set the **Function Calling** parameter. `Default` and `Native` behave identically, `Legacy` selects prompt injection.
 
 ![Native Tool Call](/images/openapi-servers/open-webui/native.png)
 
@@ -206,7 +203,7 @@ You can run any of these in the same way and connect them to Open WebUI by repea
 
 ### Connection fails immediately after adding the URL
 
-**Check the protocol (HTTP vs HTTPS).** The "Add Tool Server" modal may pre-fill `https://` in the URL field. Most local tool servers don't use TLS, so you need plain `http://`. Change the URL to `http://localhost:8000` (or whichever port your server uses).
+**Check the protocol (HTTP vs HTTPS).** Most local tool servers don't use TLS, so the URL needs to be plain `http://`, for example `http://localhost:8000`.
 
 **Check the port number.** The default port varies by server. For example, uvicorn defaults to `8000`, while Open Terminal defaults to `8888`. Make sure the port in your URL matches the port your tool server is actually listening on.
 

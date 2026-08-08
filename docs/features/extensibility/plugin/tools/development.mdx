@@ -71,7 +71,7 @@ Valves and UserValves are used for specifying customizable settings of the Tool,
 ### Optional Arguments
 Below is a list of optional arguments your tools can depend on:
 - `__event_emitter__`: Emit events (see following section)
-- `__event_call__`: Same as event emitter but can be used for user interactions. The server-side timeout for event calls is configurable via [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) (default: 300s).
+- `__event_call__`: Same as event emitter but can be used for user interactions. It waits for the browser to answer, with no timeout unless [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) is set to a number of seconds.
 - `__user__`: A dictionary with user information. It also contains the `UserValves` object in `__user__["valves"]`.
 - `__metadata__`: Dictionary with chat metadata
 - `__messages__`: List of previous messages
@@ -720,19 +720,8 @@ await __event_emitter__({
 })
 ```
 
-**Important Citation Setup:**
-When implementing custom citations, you **must** disable automatic citations in your `Tools` class:
-
-```python
-def __init__(self):
-    self.citation = False  # REQUIRED - prevents automatic citations from overriding custom ones
-```
-
-:::warning
-
-**⚠️ Critical Citation Warning:**
-If you set `self.citation = True` (or don't set it to `False`), automatic citations will replace any custom citations you send. Always disable automatic citations when using custom citation events.
-
+:::info `self.citation` no longer does anything
+Older guides tell you to set `self.citation = False` to stop automatic citations overriding your custom ones. The flag is still read off the module, but nothing acts on it any more. In Legacy mode every tool result becomes a source regardless of the flag; in Native mode only a fixed set of builtin tools produces sources, and a Python tool's result never does. Setting it is harmless and leaving it out changes nothing.
 :::
 
 <details>
@@ -740,9 +729,6 @@ If you set `self.citation = True` (or don't set it to `False`), automatic citati
 
 ```python
 class Tools:
-    def __init__(self):
-        self.citation = False  # Disable automatic citations
-
     async def research_tool(
             self, topic: str, __event_emitter__=None
         ) -> str:
@@ -1029,7 +1015,7 @@ await __event_emitter__({
 ```python
 await __event_emitter__({
     "type": "files", # or "chat:message:files"
-    "data": {"files": [{"name": "report.pdf", "url": "/files/report.pdf"}]}
+    "data": {"files": [{"type": "file", "name": "report.pdf", "url": "/files/report.pdf"}]}
 })
 ```
 
@@ -1069,27 +1055,29 @@ await __event_emitter__({
 })
 ```
 
+The next two, `confirmation` and `input`, wait for the browser to answer, so they need `__event_call__`; through `__event_emitter__` the reply has nowhere to go. `execute` works with either: `__event_call__` when you want the result back, `__event_emitter__` for fire and forget.
+
 **Confirmation Events**
 ```python
-await __event_emitter__({
+confirmed = await __event_call__({
     "type": "confirmation",
-    "data": {"message": "Are you sure you want to continue?"}
+    "data": {"title": "Please confirm", "message": "Are you sure you want to continue?"}
 })
 ```
 
 **Input Request Events**
 ```python
-await __event_emitter__({
+answer = await __event_call__({
     "type": "input",
-    "data": {"prompt": "Please enter additional information:"}
+    "data": {"title": "More detail needed", "message": "Please enter additional information:", "placeholder": "..."}
 })
 ```
 
 **Code Execution Events**
 ```python
-await __event_emitter__({
+result = await __event_call__({
     "type": "execute",
-    "data": {"code": "print('Hello from tool-generated code!')"}
+    "data": {"code": "return document.title;"}  # runs in the browser, so JavaScript
 })
 ```
 
@@ -1153,10 +1141,6 @@ Common rewrites when moving a Legacy-Mode tool to Native:
 **Issue: Events not firing at all**
 - **Cause**: `__event_emitter__` parameter missing or None
 - **Solution**: Ensure parameter is included in tool method signature
-
-**Issue: Citations being overwritten**
-- **Cause**: `self.citation = True` (or not set to False)
-- **Solution**: Set `self.citation = False` in `__init__` method
 
 **Diagnostic Tool:**
 ```python

@@ -5,7 +5,7 @@ title: "FAQ"
 
 #### 🌐 Q: Why isn't my local OpenAPI tool server accessible from the WebUI interface?
 
-**A:** If your tool server is running locally (e.g., http://localhost:8000), browser-based clients may be restricted from accessing it due to CORS (Cross-Origin Resource Sharing) policies.
+**A:** If you added the server under your own **Settings → Integrations**, the browser calls it directly, so a tool server on `http://localhost:8000` is subject to CORS (Cross-Origin Resource Sharing). Global tool servers added in Admin Settings are called by the Open WebUI backend instead, and CORS never applies to them.
 
 Make sure to explicitly enable CORS headers in your OpenAPI server. For example, if you're using FastAPI, you can add:
 

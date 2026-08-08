@@ -15,7 +15,7 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 ## 🚀 Quick start 
 
-1. Open **⚙️ Admin Settings → External Tools**.
+1. Open **⚙️ Admin Settings → Integrations**.
 2. Click **+ (Add Server)**.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your **Server URL** and **Auth** details (OAuth 2.1, if required).
@@ -36,9 +36,9 @@ Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI con
 
 ## 🔒 MCP servers are admin-only {#mcp-servers-are-admin-only}
 
-MCP servers can only be added by **administrators**, under **Admin Settings → External Tools**. Regular users cannot register their own, by design.
+MCP servers can only be added by **administrators**, under **Admin Settings → Integrations**. Regular users cannot register their own, by design.
 
-This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings → Tools**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
+This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings → Integrations**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
 
 The difference is capability. A user-supplied OpenAPI server is a stateless HTTP URL exposing a fixed set of declared endpoints. An MCP server is far more powerful: it is stateful and capability-rich (sampling, elicitation, persistent sessions and arbitrary host command execution over stdio transports), and it runs inside Open WebUI's trust boundary with the connecting user's full scope. In practice a malicious or compromised MCP server could execute code and read or exfiltrate data with that user's access, so the capability stays admin-gated. Open WebUI's own MCP support is Streamable HTTP only, but the protocol's privileged nature is why adding one is reserved for admins.
 
@@ -105,7 +105,7 @@ With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open W
 
 Use this when you already have a client ID/client secret from your identity provider.
 
-1. Open **Admin Settings → External Tools**.
+1. Open **Admin Settings → Integrations**.
 2. Click **+ (Add Server)**.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your MCP server **URL**.
@@ -200,7 +200,7 @@ After adding an External Tool connection, the frontend gets stuck on a loading s
 You likely configured an **MCP server** using the **OpenAPI** connection type, or entered MCP-style JSON (containing `mcpServers`) into an OpenAPI connection.
 
 **Solution**:
-1.  Open **Admin Settings → External Tools** (the sidebar still loads)
+1.  Open **Admin Settings → Integrations** (the sidebar still loads)
 2.  **Disable** or **delete** the problematic tool connection
 3.  Refresh the page (Ctrl+F5)
 4.  Re-add the connection with the correct **Type** set to **MCP (Streamable HTTP)**
@@ -225,4 +225,4 @@ Yes. Many deployments do both.
 
 **Can users add their own MCP servers?**
 
-No. Adding MCP servers is admin-only (**Admin Settings → External Tools**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.
+No. Adding MCP servers is admin-only (**Admin Settings → Integrations**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.

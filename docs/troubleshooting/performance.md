@@ -447,7 +447,7 @@ Local Whisper models are heavy (~500MB+ RAM).
 Prevent the application from loading **local** models you don't use.
 
 -   **Image Generation**: `ENABLE_IMAGE_GENERATION=False` (Admin: `Settings > Images`)
--   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Tools`)
+-   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Code Execution`)
 
 ### 3. Disable Background Tasks
 

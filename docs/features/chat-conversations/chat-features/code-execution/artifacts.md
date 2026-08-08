@@ -126,7 +126,7 @@ If you encounter an issue where the code preview in the chat interface does not 
 **Solution:**
 
 1. Go to **Settings > Interface**.
-2. Toggle on **Allow Iframe Sandbox Same-Origin Access**.
+2. Toggle on **iframe Sandbox Allow Same Origin**.
 3. Save your settings.
 
 ### Artifact Preview Is Blank After Setting a CSP

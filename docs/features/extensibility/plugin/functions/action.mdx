@@ -50,20 +50,24 @@ class Action:
 
     async def action(self, body: dict, __user__=None, __event_emitter__=None, __event_call__=None):
         # Action implementation
-        return {"content": "Modified message content"}
+        return {"messages": [{"id": body["id"], "content": "Modified message content"}]}
 ```
 
 ### Action Method Parameters
 
 The `action` method receives several parameters that provide access to the execution context:
 
-- **`body`**: Dictionary containing the message data and context
+- **`body`**: The request the chat sent, with `messages` (the conversation so far, each entry carrying `id`, `role`, `content`, `timestamp`), `model`, `chat_id`, `session_id` and `id`, which is the id of the message the button was pressed on
 - **`__user__`**: Current user object with permissions and settings
 - **`__event_emitter__`**: Function to send real-time updates to the frontend
 - **`__event_call__`**: Function for bidirectional communication (confirmations, inputs)
 - **`__model__`**: Model information that triggered the action
 - **`__request__`**: FastAPI request object for accessing headers, etc.
 - **`__id__`**: Action ID (useful for multi-action functions)
+
+### Return Value
+
+To change what the chat shows, return `{"messages": [...]}`, where each entry carries the `id` of an existing message plus the fields to overwrite on it. Anything else is returned to the caller and dropped, so a bare `{"content": "..."}` silently does nothing. The one exception is an `HTMLResponse` with `Content-Disposition: inline`, which becomes a [Rich UI embed](/features/extensibility/plugin/development/rich-ui). Returning nothing at all is fine for actions whose only job is a side effect or an event emitter update.
 
 ## Event System Integration
 
@@ -123,7 +127,7 @@ Standard actions with one `action` method:
 ```python
 async def action(self, body: dict, **kwargs):
     # Single action implementation
-    return {"content": "Action result"}
+    return {"messages": [{"id": body["id"], "content": "Action result"}]}
 ```
 
 ### Multi-Actions
@@ -146,10 +150,10 @@ actions = [
 async def action(self, body: dict, __id__=None, **kwargs):
     if __id__ == "summarize":
         # Summarization logic
-        return {"content": "Summary: ..."}
+        return {"messages": [{"id": body["id"], "content": "Summary: ..."}]}
     elif __id__ == "translate":
         # Translation logic
-        return {"content": "Translation: ..."}
+        return {"messages": [{"id": body["id"], "content": "Translation: ..."}]}
 ```
 
 ### Global vs Model-Specific Actions
@@ -185,36 +189,11 @@ async def action(self, body: dict, __event_emitter__=None):
     # Perform time-consuming operation
     result = await some_long_running_function()
 
-    return {"content": f"Processing completed: {result}"}
+    return {"messages": [{"id": body["id"], "content": f"Processing completed: {result}"}]}
 ```
 
 ### File and Media Handling
-Actions can work with uploaded files and generate new media:
-
-```python
-async def action(self, body: dict):
-    message = body
-
-    # Access uploaded files
-    if message.get("files"):
-        for file in message["files"]:
-            # Process file based on type
-            if file["type"] == "image":
-                # Image processing logic
-                pass
-
-    # Return new files
-    return {
-        "content": "Analysis complete",
-        "files": [
-            {
-                "type": "image",
-                "url": "generated_chart.png",
-                "name": "Analysis Chart"
-            }
-        ]
-    }
-```
+The payload an action receives carries the conversation's messages, not their attachments, and returning a `files` list does nothing. To reach a chat's files, use `body["chat_id"]` with the chat and file APIs, and surface anything you produce through `__event_emitter__` or by rewriting the message content.
 
 ### User Context and Permissions
 Actions can access user information and respect permissions:
@@ -222,10 +201,10 @@ Actions can access user information and respect permissions:
 ```python
 async def action(self, body: dict, __user__=None):
     if __user__["role"] != "admin":
-        return {"content": "This action requires admin privileges"}
+        return {"messages": [{"id": body["id"], "content": "This action requires admin privileges"}]}
 
     user_name = __user__["name"]
-    return {"content": f"Hello {user_name}, admin action completed"}
+    return {"messages": [{"id": body["id"], "content": f"Hello {user_name}, admin action completed"}]}
 ```
 
 ## Example: Specifying Action Frontmatter
@@ -298,13 +277,13 @@ class Action:
         })
 
         if not response:
-            return {"content": "Action cancelled by user"}
+            return None
 
-        # Process the message
-        original_content = body.get("content", "")
-        enhanced_content = f"Enhanced: {original_content}"
+        # Process the message the button was pressed on
+        message = body["messages"][-1]
+        enhanced_content = f"Enhanced: {message.get('content', '')}"
 
-        return {"content": enhanced_content}
+        return {"messages": [{"id": body["id"], "content": enhanced_content}]}
 ```
 
 </details>
@@ -319,13 +298,13 @@ async def action(self, body: dict, __event_emitter__=None):
     try:
         # Action logic here
         result = perform_operation()
-        return {"content": f"Success: {result}"}
+        return {"messages": [{"id": body["id"], "content": f"Success: {result}"}]}
     except Exception as e:
         await __event_emitter__({
             "type": "notification",
             "data": {"type": "error", "content": f"Action failed: {str(e)}"}
         })
-        return {"content": "Action encountered an error"}
+        return {"messages": [{"id": body["id"], "content": "Action encountered an error"}]}
 ```
 
 ### Performance Considerations

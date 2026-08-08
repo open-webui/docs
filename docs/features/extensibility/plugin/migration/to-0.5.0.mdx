@@ -93,11 +93,11 @@ To clarify the special case of the main app (`webui`), here’s a simple rule of
 - For example:
     - **Before (0.4):**
       ```python
-      from open_webui.apps.webui.models import SomeModel
+      from open_webui.apps.webui.models.chats import Chats
       ```
     - **After (0.5):**
       ```python
-      from open_webui.models import SomeModel
+      from open_webui.models.chats import Chats
       ```
 
 In general, **just replace `open_webui.apps` with `open_webui.routers`, except for `webui`, which is now `open_webui.main`!**

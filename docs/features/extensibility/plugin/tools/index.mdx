@@ -137,7 +137,7 @@ Since v0.10.0 Native is the default, so you never need to "turn Native on". The 
     *   Navigate to **Settings → Admin → AI → Models**.
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Settings → Admin → AI → Models** and set **Function Calling** to `Legacy` under **Model Parameters**. Overrides the global default for that model only.
+2.  **Per-Model Override**: edit a specific model in **Settings → Admin → AI → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -170,19 +170,19 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
     *   Navigate to **Settings → Admin → AI → Models**.
-    *   Click the **Settings** button at the **top right** of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
+    *   Click the **Model Defaults** button at the top of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
     *   In **Settings → Admin → AI → Models**, pick a specific model and click its edit button.
-    *   Under **Model Parameters**, set **Function Calling** to `Native`. This value overrides the global default for that model only.
+    *   Under **Model Params**, expand **Advanced Params** and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
     *   Inside a chat, open **Chat Controls** (right sidebar).
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-The **global model parameters** panel (the **Settings** button at the top right of **Settings → Admin → AI → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
+The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → AI → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -281,10 +281,13 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `execute_code` | Executes code in a sandboxed environment and returns the output. |
 | **Memory** | *Requires Memory feature enabled AND per-model "Memory" category enabled (default: on).* |
 | `search_memories` | Searches the user's personal memory/personalization bank. |
+| `list_memory_paths` | Lists the paths memories are filed under. |
+| `read_memory_path` | Reads the memories stored under one path. |
+| `list_memories` | Lists all stored memories for the user. |
+| `update_memory` | Applies a batch of `add`, `replace`, `move` or `remove` operations. |
 | `add_memory` | Stores a new fact in the user's personalization memory. |
 | `replace_memory_content` | Updates an existing memory record by its unique ID. |
 | `delete_memory` | Deletes a memory by its ID. |
-| `list_memories` | Lists all stored memories for the user with content and dates. |
 | **Notes** | *Requires `ENABLE_NOTES` AND per-model "Notes" category enabled (default: on) AND the user's `features.notes` permission. Inside a note-attached chat these three checks are skipped and the note tools are always injected; see the note below.* |
 | `search_notes` | Search the user's notes by title and content. |
 | `view_note` | Get the full markdown content of a specific note. |
@@ -302,8 +305,8 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `create_tasks` | Create a structured task checklist for the current chat. Called once at the start of multi-step work to define all steps. |
 | `update_task` | Update the status of a single task by id (`pending`, `in_progress`, `completed`, `cancelled`). Called after finishing each step. |
 | **Automations** | *Requires per-model "Automations" category enabled (default: on) AND `ENABLE_AUTOMATIONS` enabled AND user has `features.automations` permission (admins always pass).* |
-| `create_automation` | Create a scheduled automation with a name, prompt, and RRULE schedule. Uses the current chat model. |
-| `update_automation` | Update an existing automation's name, prompt, schedule, or model. |
+| `create_automation` | Create a scheduled automation with a name, prompt, and RRULE schedule, optionally filed into a folder. Uses the current chat model. |
+| `update_automation` | Update an existing automation's name, prompt, schedule, folder, or model. |
 | `list_automations` | List the user's scheduled automations with status, schedule, and next runs. |
 | `toggle_automation` | Pause or resume a scheduled automation. |
 | `delete_automation` | Delete a scheduled automation and all its run history. |
@@ -375,9 +378,9 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 |------|------------|--------|
 | **Search & Web** | | |
 | `search_web` | `query` (required), `count` (default: admin-configured `WEB_SEARCH_RESULT_COUNT`; capped at admin maximum when provided) | Array of `{title, link, snippet}` |
-| `fetch_url` | `url` (required) | Plain text content (max 50,000 chars) |
+| `fetch_url` | `url` (required) | Plain text content, untruncated unless the admin sets `WEB_FETCH_MAX_CONTENT_LENGTH` |
 | **Knowledge Base** | | |
-| `list_knowledge` | None | `{knowledge_bases: [{id, name, description, file_count, files: [{id, filename}]}], files: [{id, filename}], notes: [{id, title}]}` |
+| `list_knowledge` | `knowledge_id` (optional, pages into one base's files), `skip` (default: 0), `count` (default: 50, capped at 200) | `{knowledge_bases: [{id, name, description, file_count, files: [{id, filename}]}], files: [{id, filename, updated_at}], notes: [{id, title}]}`, and with `knowledge_id` set the base also carries `files_skip`, `files_count`, `files_total` and `has_more` |
 | `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_bases` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` by similarity |
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
@@ -393,11 +396,14 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Code Interpreter** | | |
 | `execute_code` | `code` (required) | `{status, stdout, stderr, result}` |
 | **Memory** | | |
-| `search_memories` | `query` (required), `count` (default: 5) | Array of `{id, date, content}` |
-| `add_memory` | `content` (required) | `{status: "success", id}` |
-| `replace_memory_content` | `memory_id` (required), `content` (required) | `{status: "success", id, content}` |
+| `search_memories` | `query` (default: `""`), `count` (default: 5), `type` (default: `all`), `path`, `memory_id` | Array of `{id, type, path, content, created_at, updated_at}` |
+| `list_memory_paths` | `query` (default: `""`), `count` (default: 100), `type` (default: `all`) | The paths memories are filed under |
+| `read_memory_path` | `path` (required), `count` (default: 50), `type` (default: `all`), `include_children` (default: `true`) | The memories stored under that path |
+| `update_memory` | `operations` (required, a list of `add`, `replace`, `move` or `remove` entries) | Per-operation results |
+| `add_memory` | `content` (required), `type` (default: `user`), `path` | `{status: "success", id, type, path}` |
+| `replace_memory_content` | `memory_id` (required), `content` (required), `type`, `path` | `{status: "success", id, type, path, content}` |
 | `delete_memory` | `memory_id` (required) | `{status: "success", message}` |
-| `list_memories` | None | Array of `{id, content, created_at, updated_at}` |
+| `list_memories` | None | Array of `{id, type, path, content, created_at, updated_at}` |
 | **Notes** | | |
 | `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
@@ -415,8 +421,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `create_tasks` | `tasks` (required): list of `{content (required), status (default: pending), id (optional, auto-generated)}` | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | `update_task` | `id` (required), `status` (default: `completed`; one of `pending`, `in_progress`, `completed`, `cancelled`) | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | **Automations** | | |
-| `create_automation` | `name` (required), `prompt` (required), `rrule` (required) | `{status, id, name, model_id, is_active, next_runs}` |
-| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id` (all optional; only provided fields are changed) | `{status, id, name, model_id, is_active, next_runs}` |
+| `create_automation` | `name` (required), `prompt` (required), `rrule` (required), `folder_id` (optional, files the generated chats into one of the user's folders) | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
+| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id`, `folder_id` (all optional; only provided fields are changed) | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
 | `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
 | `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
 | `delete_automation` | `automation_id` (required) | `{status, message}` |
@@ -537,7 +543,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | Category | Tools Included | Description |
 |----------|----------------|-------------|
 | **Time & Calculation** | `get_current_timestamp`, `calculate_timestamp` | Get current time and perform date/time calculations |
-| **Memory** | `search_memories`, `add_memory`, `replace_memory_content`, `delete_memory`, `list_memories` | Search and manage user memories |
+| **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
 | **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file` (or `kb_exec` + `query_knowledge_files` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |

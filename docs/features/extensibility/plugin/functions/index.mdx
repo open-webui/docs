@@ -37,7 +37,7 @@ A Pipe registers itself as a new "model" in Open WebUI. When a user selects it a
 - **Non-LLM interfaces**: Create a smart home controller, a database query tool, a search engine, a calculator, or a code executor. Anything that takes user input and returns a response.
 - **Proxies & routers**: Route requests through your own logic, add caching, load balancing, or cost tracking.
 
-A single Pipe can also expose **multiple models** (called a "manifold") by defining a `pipes()` method that returns a list of model identifiers.
+A single Pipe can also expose **multiple models** (called a "manifold") by defining a `pipes()` method that returns a list of `{"id": ..., "name": ...}` dictionaries, one per model.
 
 → **[Pipe Function Guide](./pipe)**
 
@@ -93,7 +93,16 @@ class Filter:
 
 ### Module Loading & Caching
 
-The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Import statements in your code are automatically rewritten to resolve within the Open WebUI package namespace.
+The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Four legacy prefixes are rewritten on the way in, `from utils`, `from apps`, `from main` and `from config`, each gaining an `open_webui.` prefix. The rewrite is a plain text replacement over the whole file, so those strings are also changed inside docstrings and prompt text, and the rewritten source is saved back to the database.
+
+### When a Function Fails to Load
+
+If the code raises while it is being executed, Open WebUI switches the function to **inactive** rather than leaving it to fail on every request. That covers a syntax error, an `import` that fails, an exception raised while the class is constructed and a file with no `Pipe`, `Filter`, `Action` or `Event` class in it. A failed `requirements` install is separate: it rejects the save and leaves the function's state alone.
+
+- **Saving over an existing function** executes the code before storing it. The save is rejected and your new source is never written, so what ends up deactivated is the version already in the database. The browser only shows a generic error, the Python error goes to the server log as `Error loading module: <function id>: <the error>`.
+- **Outside the editor**, the same execution happens every time the module is loaded again, so a function can turn itself off with nobody touching it in the admin panel. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart.
+
+Fix the code, then switch the function back on in **Admin Panel → Functions**.
 
 ### Frontmatter
 
@@ -121,7 +130,7 @@ requirements: requests, beautifulsoup4
 | `requirements` | Comma-separated list of pip packages to auto-install |
 
 :::tip Automatic Dependency Installation
-When `requirements` is specified in the frontmatter, Open WebUI automatically installs the listed packages via `pip` the first time the function loads. This is controlled by the `PIP_INSTALL_FRONTMATTER_REQUIREMENTS` environment variable (enabled by default).
+When `requirements` is specified in the frontmatter, Open WebUI automatically installs the listed packages via `pip` the first time the function loads. This is controlled by the [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) environment variable (enabled by default).
 :::
 
 ---
@@ -143,7 +152,7 @@ Always review the source code before importing. Community functions are user-con
 ### From a URL
 
 1. Go to **Admin Panel → Functions**.
-2. Click **Import from URL** and paste a link to the Python file.
+2. Click **Import From Link** and paste a link to the Python file.
    - GitHub URLs are automatically converted to raw file URLs.
 3. Review and save.
 
@@ -197,7 +206,7 @@ Functions support a two-tier configuration system built on [Pydantic](https://do
 
 **Valves** are ideal for API keys, model endpoints, and global behavior settings. **UserValves** let individual users customize behavior (e.g., their preferred language, output format, or personal API key).
 
-Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Filter`, or `Action` class. The admin-configured values are stored in the database and loaded automatically at runtime. When Valves hold secrets, an administrator can [encrypt them at rest](/features/extensibility/plugin/development/valves#encrypting-valve-values-at-rest).
+Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Filter` or `Action` class. An `Event` class can carry `Valves` too, but never `UserValves`, since event handlers run without a user. The admin-configured values are stored in the database and loaded automatically at runtime. When Valves hold secrets, an administrator can [encrypt them at rest](/features/extensibility/plugin/development/valves#encrypting-valve-values-at-rest).
 
 → **[Valves Development Guide](/features/extensibility/plugin/development/valves)**
 

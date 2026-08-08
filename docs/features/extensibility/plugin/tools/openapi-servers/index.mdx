@@ -11,7 +11,7 @@ This repository provides reference OpenAPI Tool Server implementations making it
 By leveraging OpenAPI, we eliminate the need for a proprietary or unfamiliar communication protocol, ensuring you can quickly and confidently build or integrate servers. This means less time spent figuring out custom interfaces and more time building powerful tools that enhance your AI applications.
 
 :::tip A first-party example
-The [oikb](/ecosystem/knowledge-base-sync) sync daemon is a ready-made OpenAPI tool server. Run it, add its URL under **Settings → Tools**, and a model can trigger Knowledge Base syncs and check their status from chat. See [Let the model trigger syncs](/ecosystem/knowledge-base-sync/daemon#let-the-model-trigger-syncs).
+The [oikb](/ecosystem/knowledge-base-sync) sync daemon is a ready-made OpenAPI tool server. Run it, add its URL under **Settings → Integrations**, and a model can trigger Knowledge Base syncs and check their status from chat. See [Let the model trigger syncs](/ecosystem/knowledge-base-sync/daemon#let-the-model-trigger-syncs).
 :::
 
 ## ☝️ Why OpenAPI?
@@ -30,7 +30,7 @@ The [oikb](/ecosystem/knowledge-base-sync) sync daemon is a ready-made OpenAPI t
 
 While OpenAPI tools are powerful for extending Open WebUI with external services, they have some constraints compared to native Python tools:
 
-- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/extensibility/plugin/development/events#-external-tool-events) via the REST endpoint. Open WebUI passes `X-Open-WebUI-Chat-Id` and `X-Open-WebUI-Message-Id` headers to enable this. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
+- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/extensibility/plugin/development/events#-external-tool-events) via the REST endpoint. Open WebUI passes the `X-OpenWebUI-Chat-Id` and `X-OpenWebUI-Message-Id` headers to enable this, but only when [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) is turned on, which it is not by default. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
 - **No streaming output**: Tool responses are returned as complete results, not streamed token-by-token.
 
 If you need interactive UI feedback (confirmations, user input prompts), consider implementing your tool as a [native Python Tool](/features/extensibility/plugin/tools/development) instead.
