@@ -51,7 +51,7 @@ Each object in the array should have a `chat` key containing the conversation da
   {
     "chat": {
       "title": "My Conversation",
-      "models": ["llama3.2"],
+      "models": ["qwen3.6:27b"],
       "history": {
         "currentId": "message-id-2",
         "messages": {
@@ -69,7 +69,7 @@ Each object in the array should have a `chat` key containing the conversation da
             "childrenIds": [],
             "role": "assistant",
             "content": "I'm doing well, thank you!",
-            "model": "llama3.2",
+            "model": "qwen3.6:27b",
             "done": true,
             "timestamp": 1700000005
           }
@@ -95,7 +95,7 @@ If the objects in the array do **not** have a `chat` key, the entire object is t
 [
   {
     "title": "My Conversation",
-    "models": ["llama3.2"],
+    "models": ["qwen3.6:27b"],
     "history": {
       "currentId": "message-id-2",
       "messages": {
@@ -112,7 +112,7 @@ If the objects in the array do **not** have a `chat` key, the entire object is t
           "childrenIds": [],
           "role": "assistant",
           "content": "Hi there!",
-          "model": "llama3.2",
+          "model": "qwen3.6:27b",
           "done": true
         }
       }

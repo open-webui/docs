@@ -204,10 +204,10 @@ For complete workflow examples, see the **[API Endpoints documentation](/referen
 
 ### Q: I asked the model what it is and it gave the wrong answer. Is Open WebUI routing to the wrong model?
 
-**A:** No. **LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-4?", the response is not a system diagnostic. It's simply the model generating text based on patterns in its training data.
+**A:** No. **LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-5.6?", the response is not a system diagnostic. It's simply the model generating text based on patterns in its training data.
 
 Models frequently:
-- Claim to be a different model (e.g., a Llama model claiming to be ChatGPT)
+- Claim to be a different model (e.g., an open-weight model claiming to be ChatGPT)
 - Give outdated information about themselves
 - Hallucinate version numbers or capabilities
 - Change their answer depending on how you phrase the question
@@ -223,7 +223,7 @@ Asking the model itself is **not** a valid way to diagnose routing issues. If yo
 
 **A:** Because the provider **injects a system prompt** that explicitly tells the model what it is. When you use ChatGPT, OpenAI's interface includes a hidden system message like "You are ChatGPT, a large language model trained by OpenAI..." before your conversation begins.
 
-The model isn't "aware" of itself; it's simply been instructed to claim a specific identity. You can do the same thing in Open WebUI by adding a system prompt to your model configuration (e.g., "You are Llama 3.3 70B..."). The model will then confidently repeat whatever identity you've told it to claim.
+The model isn't "aware" of itself; it's simply been instructed to claim a specific identity. You can do the same thing in Open WebUI by adding a system prompt to your model configuration (e.g., "You are Qwen 3.6 27B..."). The model will then confidently repeat whatever identity you've told it to claim.
 
 This is also why the same model accessed through different interfaces might give different answers about its identity; it depends entirely on what system prompt (if any) was provided.
 
@@ -237,11 +237,11 @@ This is also why the same model accessed through different interfaces might give
 - **Web Search Queries**: Generating search terms when web search is enabled
 - **Autocomplete Suggestions**: If enabled
 
-By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-4 or Claude), this can significantly increase your costs.
+By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-5.6 Sol or Claude Opus 5), this can significantly increase your costs.
 
 **To reduce API costs:**
 1. Go to **Settings > Admin > Experience > Interface** (for title/tag generation settings)
-2. Configure a **Task Model** under **Settings > Admin > Experience > Interface > Tasks** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
+2. Configure a **Task Model** under **Settings > Admin > Experience > Interface > Tasks** to use a smaller, cheaper model (like GPT-5.6 Luna) or a local model for background tasks
 3. Disable features you don't need (auto-title, auto-tags, etc.)
 
 :::tip Cost-Saving Recommendation

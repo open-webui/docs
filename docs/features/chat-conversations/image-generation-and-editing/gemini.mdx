@@ -37,10 +37,10 @@ import TabItem from '@theme/TabItem';
 ### Example Minimal Setup
 
 <Tabs>
-  <TabItem value="gemini-3-pro" label="Gemini 3.0 Pro (aka Nano Banana Pro)" default>
+  <TabItem value="gemini-3-pro" label="Gemini 3 Pro Image (aka Nano Banana Pro)" default>
 
 **Create Image**
-- **Model**: `gemini-3-pro-image-preview`
+- **Model**: `gemini-3-pro-image`
 - **Image Size**: (not sent to Gemini, can be left empty)
 - **Image Prompt Generation**: on (Legacy function calling only)
 - **Image Generation Engine**: `Gemini`
@@ -51,16 +51,16 @@ import TabItem from '@theme/TabItem';
 **Edit Image**
 - **Image Edit**: on
 - **Image Edit Engine**: `Gemini`
-- **Model**: `gemini-3-pro-image-preview`
+- **Model**: `gemini-3-pro-image`
 - **Image Size**: (not sent to Gemini, can be left empty)
 - **Base URL**: `https://generativelanguage.googleapis.com/v1beta`
 - **API Key**: Enter your API Key
 
 </TabItem>
-  <TabItem value="gemini-2.5-flash" label="Gemini 2.5 Flash (aka Nano Banana)">
+  <TabItem value="gemini-3.1-flash" label="Gemini 3.1 Flash Image (aka Nano Banana 2)">
 
 **Create Image**
-- **Model**: `gemini-2.5-flash-image`
+- **Model**: `gemini-3.1-flash-image`
 - **Image Size**: (not sent to Gemini, can be left empty)
 - **Image Prompt Generation**: on (Legacy function calling only)
 - **Image Generation Engine**: `Gemini`
@@ -71,7 +71,7 @@ import TabItem from '@theme/TabItem';
 **Edit Image**
 - **Image Edit**: on
 - **Image Edit Engine**: `Gemini`
-- **Model**: `gemini-2.5-flash-image`
+- **Model**: `gemini-3.1-flash-image`
 - **Image Size**: (not sent to Gemini, can be left empty)
 - **Base URL**: `https://generativelanguage.googleapis.com/v1beta`
 - **API Key**: Enter your API Key
@@ -92,12 +92,12 @@ Imagen models use `predict`:
 
 Gemini models use `generateContent`:
 
-- `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent`.
+- `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image:generateContent`.
 - [Documentation for Gemini models](https://ai.google.dev/gemini-api/docs/image-generation)
 
-Leaving the method empty falls back to `predict`, so a Gemini model such as `gemini-3-pro-image-preview` fails until you switch it to `generateContent`.
+Leaving the method empty falls back to `predict`, so a Gemini model such as `gemini-3-pro-image` fails until you switch it to `generateContent`.
 
-`400: [ERROR: models/gemini-3-pro-image-preview is not found for API version v1beta, or is not supported for predict. Call ListModels to see the list of available models and their supported methods.]`
+`400: [ERROR: models/gemini-3-pro-image is not found for API version v1beta, or is not supported for predict. Call ListModels to see the list of available models and their supported methods.]`
 
 :::
 

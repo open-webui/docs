@@ -27,7 +27,7 @@ See the companion guide: [Using Mistral for Text-to-Speech](/features/chat-conve
 |---------|-------|
 | **Speech-to-Text Engine** | `MistralAI` |
 | **API Key** | Your Mistral API key |
-| **STT Model** | `voxtral-mini-latest` (or leave empty for default) |
+| **STT Model** | `voxtral-mini-2602` (or leave empty for the built-in default) |
 
 5. Click **Save**
 
@@ -35,7 +35,11 @@ See the companion guide: [Using Mistral for Text-to-Speech](/features/chat-conve
 
 | Model | Description |
 |-------|-------------|
-| `voxtral-mini-latest` | Default transcription model (recommended) |
+| `voxtral-mini-2602` | Voxtral Mini Transcribe 2 — current transcription model (recommended) |
+
+:::caution Set the model explicitly
+Mistral no longer publishes `-latest` alias names such as `voxtral-mini-latest`. Use a dated ID from the [Mistral models overview](https://docs.mistral.ai/getting-started/models/models_overview/).
+:::
 
 ## Environment Variables Setup
 
@@ -48,7 +52,7 @@ services:
     environment:
       - AUDIO_STT_ENGINE=mistral
       - AUDIO_STT_MISTRAL_API_KEY=your-mistral-api-key
-      - AUDIO_STT_MODEL=voxtral-mini-latest
+      - AUDIO_STT_MODEL=voxtral-mini-2602
     # ... other configuration
 ```
 
@@ -60,7 +64,7 @@ services:
 | `AUDIO_STT_MISTRAL_API_KEY` | Your Mistral API key | empty |
 | `AUDIO_STT_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
 | `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS` | Use chat completions endpoint | `false` |
-| `AUDIO_STT_MODEL` | STT model | `voxtral-mini-latest` |
+| `AUDIO_STT_MODEL` | STT model | `voxtral-mini-2602` |
 
 ## Transcription Methods
 
@@ -117,7 +121,7 @@ For more troubleshooting, see the [Audio Troubleshooting Guide](/troubleshooting
 |---------|-----------------|----------------|---------------|
 | **Cost** | Per-minute pricing | Per-minute pricing | Free |
 | **Privacy** | Audio sent to Mistral | Audio sent to OpenAI | Audio stays local |
-| **Model Options** | voxtral-mini-latest | whisper-1 | tiny → large |
+| **Model Options** | `voxtral-mini-2602` | `gpt-transcribe`, `whisper-1` | tiny → large |
 | **GPU Required** | No | No | Recommended |
 
 ## Cost Considerations

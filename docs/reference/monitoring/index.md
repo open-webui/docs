@@ -87,8 +87,8 @@ Create a **non-admin user** (e.g., `monitoring-bot`), generate an API key from t
 | Goal | Query |
 | :--- | :--- |
 | At least one Ollama model | `$count(data[owned_by='ollama'])>0` |
-| Specific model exists | `$exists(data[id='gpt-4o'])` |
-| Multiple models exist | `$count(data[id in ['gpt-4o', 'gpt-4o-mini']]) = 2` |
+| Specific model exists | `$exists(data[id='gpt-5.6-sol'])` |
+| Multiple models exist | `$count(data[id in ['gpt-5.6-sol', 'gpt-5.6-luna']]) = 2` |
 
 Test queries at [jsonata.org](https://try.jsonata.org/) with a sample API response.
 
@@ -104,7 +104,7 @@ curl -X POST http://your-open-webui-instance:8080/api/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Respond with the word HEALTHY"}],
-    "model": "llama3.1",
+    "model": "qwen3.6:27b",
     "temperature": 0
   }'
 ```

@@ -62,7 +62,7 @@ When the Pyodide engine is selected, Open WebUI automatically appends a filesyst
 
 ### Native Function Calling (Native Mode)
 
-When using **Native function calling mode** with a capable model (e.g., GPT-5, Claude 4.5, MiniMax M2.5), the code interpreter is available as a builtin tool called `execute_code`. This provides a more integrated experience:
+When using **Native function calling mode** with a current model (at minimum GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally), the code interpreter is available as a builtin tool called `execute_code`. This provides a more integrated experience:
 
 - **No XML tags required**: The model calls `execute_code(code)` directly
 - **Same image handling**: Base64 image URLs in output are replaced with file URLs; model embeds via markdown

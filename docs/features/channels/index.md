@@ -29,7 +29,7 @@ Open WebUI is where knowledge is found, created, and shared. Channels make that 
 
 ### AI as a participant, not a separate tool
 
-Tag `@gpt-4o` to draft a plan, then tag `@claude` to critique it. Your whole team sees both responses in the same timeline with full context. No tab-switching, no copy-pasting between tools.
+Tag `@gpt-5.6` to draft a plan, then tag `@claude` to critique it. Your whole team sees both responses in the same timeline with full context. No tab-switching, no copy-pasting between tools.
 
 ### Persistent shared context
 
@@ -74,9 +74,9 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 
 Channels are **passive by default**. AI doesn't jump into every conversation. When you need input from a model, just tag it:
 
-> **You:** `@gpt-4o` Here's our Q3 revenue data. What trends stand out?
+> **You:** `@gpt-5.6` Here's our Q3 revenue data. What trends stand out?
 >
-> *(GPT-4o analyzes the data and responds with key insights)*
+> *(GPT-5.6 analyzes the data and responds with key insights)*
 >
 > **You:** `@claude` Do you agree with that analysis? What's missing?
 
@@ -158,11 +158,11 @@ Your team discusses architecture decisions throughout the week. Someone tags `@c
 
 ### Multi-model war room (`#incident-response`)
 
-Paste logs and error traces. Tag `@gpt-4o` to analyze the stack trace. Tag `@deepseek-coder` to suggest a fix. Tag `@claude` to draft the postmortem. Three models, one shared context, one timeline.
+Paste logs and error traces. Tag `@gpt-5.6` to analyze the stack trace. Tag `@qwen3.6` to suggest a fix. Tag `@claude` to draft the postmortem. Three models, one shared context, one timeline.
 
 ### Project strategy (`#product-launch`)
 
-Twenty messages of human brainstorming. Then: `@gpt-4o` Read the conversation above and create a prioritized action plan with owners and deadlines. The AI synthesizes everything discussed into a structured deliverable.
+Twenty messages of human brainstorming. Then: `@gpt-5.6` Read the conversation above and create a prioritized action plan with owners and deadlines. The AI synthesizes everything discussed into a structured deliverable.
 
 ### Creative collaboration (`#story-mode`)
 

@@ -28,7 +28,7 @@ See the companion guide: [Using Mistral Voxtral for Speech-to-Text](/features/ch
 | **Text-to-Speech Engine** | `MistralAI` |
 | **API Base URL** | `https://api.mistral.ai/v1` |
 | **API Key** | Your Mistral API key |
-| **TTS Model** | `mistral-tts-latest` (or leave empty for default) |
+| **TTS Model** | `voxtral-tts-26-03` (or leave empty for the built-in default) |
 | **TTS Voice** | Choose from available voices |
 
 5. Click **Save**
@@ -37,10 +37,14 @@ See the companion guide: [Using Mistral Voxtral for Speech-to-Text](/features/ch
 
 | Model | Description |
 |-------|-------------|
-| `mistral-tts-latest` | Default model used for Mistral TTS |
+| `voxtral-tts-26-03` | Voxtral TTS — current Mistral text-to-speech model, with zero-shot voice cloning |
 
 :::info
-If `AUDIO_TTS_MODEL` is empty, Open WebUI defaults to `mistral-tts-latest` for Mistral TTS.
+If `AUDIO_TTS_MODEL` is empty, Open WebUI falls back to `mistral-tts-latest`.
+:::
+
+:::caution Set the model explicitly
+Mistral no longer publishes `-latest` alias names, so the built-in `mistral-tts-latest` fallback may be rejected. Set **TTS Model** to a current ID such as `voxtral-tts-26-03` rather than leaving the field empty. See the [Mistral models overview](https://docs.mistral.ai/getting-started/models/models_overview/) for the current list.
 :::
 
 ## Environment Variables Setup
@@ -55,7 +59,7 @@ services:
       - AUDIO_TTS_ENGINE=mistral
       - AUDIO_TTS_MISTRAL_API_KEY=your-mistral-api-key
       - AUDIO_TTS_MISTRAL_API_BASE_URL=https://api.mistral.ai/v1
-      - AUDIO_TTS_MODEL=mistral-tts-latest
+      - AUDIO_TTS_MODEL=voxtral-tts-26-03
       - AUDIO_TTS_VOICE=<voice-id>
     # ... other configuration
 ```
@@ -67,7 +71,7 @@ services:
 | `AUDIO_TTS_ENGINE` | Set to `mistral` | empty (uses browser-only TTS) |
 | `AUDIO_TTS_MISTRAL_API_KEY` | Your Mistral API key | empty |
 | `AUDIO_TTS_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
-| `AUDIO_TTS_MODEL` | TTS model | `mistral-tts-latest` (effective default for Mistral engine) |
+| `AUDIO_TTS_MODEL` | TTS model | `mistral-tts-latest` (built-in fallback; set `voxtral-tts-26-03` explicitly) |
 | `AUDIO_TTS_VOICE` | Voice ID | empty |
 
 ## Choosing Voices
@@ -101,7 +105,7 @@ If voices are not listed:
 ### TTS request fails
 
 1. Verify `AUDIO_TTS_ENGINE=mistral`
-2. Try leaving the model empty (uses `mistral-tts-latest`)
+2. Set the model explicitly to a current ID such as `voxtral-tts-26-03`
 3. Try another voice ID from the fetched list
 
 For broader audio debugging, see the [Audio Troubleshooting Guide](/troubleshooting/audio).

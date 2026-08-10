@@ -35,7 +35,7 @@ The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool ser
 These are deeply integrated into Open WebUI and generally don't require external scripts.
 - **Web Search**: Integrated via engines like SearXNG, Google, or Tavily.
 - **URL Fetching**: Extract text content directly from websites using `#` or native tools.
-- **Image Generation**: Integrated with DALL-E, ComfyUI, or Automatic1111.
+- **Image Generation**: Integrated with the OpenAI images API, ComfyUI, or Automatic1111.
 - **Memory**: The ability for models to remember facts about you across chats.
 - **RAG (Knowledge)**: The ability to query uploaded documents (`#`).
 
@@ -154,7 +154,7 @@ DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** as of v0.10.0 and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
-**Agentic tool calling requires high-quality models to work reliably.** While small local models may technically support function calling, they often struggle with the complex reasoning required for multi-step tool usage. For best results, use frontier models like **GPT-5**, **Claude 4.5 Sonnet**, **Gemini 3 Flash**, or **MiniMax M2.5**. Small local models may produce malformed JSON or fail to follow the strict state management required for agentic behavior.
+**Agentic tool calling needs a model that is current, not one that is expensive.** Very small or older models often struggle with the multi-step reasoning and strict state management involved, and may produce malformed JSON. A cheap, fast, current model is plenty: **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B**.
 :::
 
 #### Why use Native Mode (Agentic Mode)?
@@ -199,17 +199,19 @@ Leaving `function_calling` unset (or `"native"`) keeps the default, Native.
 
 #### Model Requirements & Caveats
 
-:::tip Recommended Models for Agentic Mode
-For reliable agentic tool calling, use high-tier frontier models:
-- **GPT-5** (OpenAI)
-- **Claude 4.5 Sonnet** (Anthropic)
-- **Gemini 3 Flash** (Google)
-- **MiniMax M2.5**
+:::tip Minimum model tier (not a maintained list)
+Reliable agentic tool calling does not require a frontier model — it requires a *current* one. Any of these is a solid **minimum**, each verified working at the time of writing:
 
-These models excel at multi-step reasoning, proper JSON formatting, and autonomous tool selection.
+- **GPT-5.6 Luna** (OpenAI) — cheap, fast, and genuinely strong at tool calling
+- **Gemini 3.5 Flash-Lite** or **Gemini 3.1 Flash-Lite** (Google)
+- **MiniMax M3**
+- **DeepSeek V4 Flash**
+- **Muse Glimmer 30B** or **Qwen 3.6 27B** (local, open-weight)
+
+**This list is not continuously updated** — chasing every model release is impossible and adds no value. Use whatever current model your provider offers; you don't need the latest *and greatest*, just something recent.
 :::
 
-- **Large Local Models**: Large local models (e.g., Qwen 3 32B, Llama 3.3 70B, DeepSeek V3/R1) work well with Native Mode; results scale with model quality.
+- **Capable Local Models**: Open-weight models built for agentic work (e.g., **Muse Glimmer 30B**, **Qwen 3.6 27B**, **Gemma 4 12B**, **gpt-oss 120B**) work well with Native Mode. Muse Glimmer in particular is Apache 2.0, runs agentic loops reliably on a single 24 GB GPU, and is a good default for local tool calling.
 - **Small Local Models**: Small local models (under ~30B parameters) often produce malformed JSON or fail multi-step tool chains even in Native Mode. **The fix is to use a stronger model for tool-calling workloads**, not to fall back to Legacy Mode (Legacy is unsupported). If your hardware forces you to use a small model, accept that tool calling will be unreliable at this tier, or offload only tool-using conversations to a cloud model.
 
 #### Known Model-Specific Issues
@@ -230,7 +232,7 @@ These models excel at multi-step reasoning, proper JSON formatting, and autonomo
 - Complex multi-step workflows (15-30 tool calls) may cause "schema drift" where argument formats degrade
 
 **Workarounds**:
-- **Use a different model for agentic workloads.** Claude 4.5 Sonnet, GPT-5, Gemini 3 Flash, and MiniMax M2.5 are all reliable in Native Mode and are the recommended choice when DeepSeek V3.2 misbehaves.
+- **Use a different model for agentic workloads.** GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, and DeepSeek V4 Flash are all reliable in Native Mode and are the recommended choice when DeepSeek V3.2 misbehaves.
 - Lower temperature when using tool calling with DeepSeek V3.2.
 - Limit multi-round tool-calling sessions.
 
@@ -251,7 +253,7 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 
 ### Built-in System Tools (Native/Agentic Mode)
 
-🛠️ These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where capable models (like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, or MiniMax M2.5) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
+🛠️ These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
 
 | Tool | Purpose |
 |------|---------|
@@ -629,7 +631,7 @@ See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-contex
 🧠 When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
 
 :::info Quality Models Required
-Interleaved thinking requires models with strong reasoning capabilities. This feature works best with frontier models (GPT-5, Claude 4.5+, Gemini 3+) that can maintain context across multiple tool calls and make intelligent decisions about which tools to use when.
+Interleaved thinking requires a model that can maintain context across multiple tool calls and choose tools sensibly. Current reasoning-capable models handle this — GPT-5.6, Claude Sonnet 5, Gemini 3.6 Flash, or MiniMax M3 are a reasonable minimum. Older or very small models will not.
 :::
 
 This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
