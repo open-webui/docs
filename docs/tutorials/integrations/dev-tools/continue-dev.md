@@ -39,16 +39,16 @@ We can still setup continue.dev to use the openai provider which will allow us t
 
 ### Example config
 
-Below you find an example config for Llama3 as the model with a local Open WebUI setup.
+Below you find an example config for a local Open WebUI setup.
 
 ```yaml
 name: Local Assistant
 version: 1.0.0
 schema: v1
 models:
-  - name: LLama3
+  - name: Qwen3.6
     provider: openai
-    model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+    model: qwen3.6:27b
     env:
       useLegacyCompletionsEndpoint: false
     apiBase: http://localhost:3000/api
@@ -110,7 +110,7 @@ models:
 Sets the name for the model you want to use. This will be displayed within the chat input of the extension.
 
 ```yaml
-name: LLama3
+name: Qwen3.6
 ```
 
 ![continue.dev chat input](/images/tutorials/continue-dev/continue_dev_extension_input_field.png)
@@ -133,7 +133,7 @@ This is the actual name of your model in Open WebUI. Navigate to `Settings` > `A
 Below the user-given name, you'll find the actual model name.
 
 ```yaml
-model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+model: qwen3.6:27b
 ```
 
 ---

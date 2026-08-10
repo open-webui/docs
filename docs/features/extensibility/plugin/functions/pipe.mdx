@@ -311,7 +311,7 @@ class Pipe:
     ) -> str:
         # Use the unified endpoint with the updated signature
         user = await Users.get_user_by_id(__user__["id"])
-        body["model"] = "llama3.2:latest"
+        body["model"] = "qwen3.6:27b"
         return await generate_chat_completion(__request__, body, user)
 ```
 

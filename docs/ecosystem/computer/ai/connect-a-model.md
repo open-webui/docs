@@ -16,7 +16,7 @@ Go to **Settings → Admin → Connections** and add a connection. There are exa
 | **API Type** | OpenAI only: Chat Completions or Responses |
 | **Base URL** | Required. E.g. `https://api.openai.com/v1`, `http://localhost:11434/v1` |
 | **API Key** | Required. Ollama ignores the value, but the field must be non-empty |
-| **Prefix ID** | Optional namespace prepended to model ids, e.g. `openrouter/gpt-4o` |
+| **Prefix ID** | Optional namespace prepended to model ids, e.g. `openrouter/gpt-5.6-sol` |
 | **Models** | Optional comma-separated list. Leave empty to auto-discover |
 
 ## Ollama
@@ -33,7 +33,7 @@ Your pulled models are auto-discovered and appear in the model selector.
 - **Base URL:** `https://openrouter.ai/api/v1`
 - **API Key:** your OpenRouter key
 
-OpenRouter exposes many models; set a **Prefix ID** like `openrouter` so its models are namespaced (`openrouter/gpt-4o`) and don't collide with models from other connections.
+OpenRouter exposes many models; set a **Prefix ID** like `openrouter` so its models are namespaced (`openrouter/gpt-5.6-sol`) and don't collide with models from other connections.
 
 ## Anthropic
 

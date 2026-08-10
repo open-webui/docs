@@ -36,7 +36,7 @@ With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 t
 
 ### Cloud models with large context (32K+ tokens)
 
-Typical for OpenAI (GPT-4o, GPT-5), Anthropic (Claude), Google (Gemini), DeepSeek, and other API providers where context windows are 32K to 1M+ tokens.
+Typical for OpenAI (GPT-5.6), Anthropic (Claude), Google (Gemini), DeepSeek, and other API providers where context windows are 32K to 1M+ tokens.
 
 | Setting | Value | Why |
 |---------|-------|-----|
@@ -148,7 +148,7 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 
 The 2048-token default is a significant limiter for web search. For better RAG results with web content, use at least 8192 tokens, with 16384+ being ideal for complex web pages.
 
-**Alternative:** Use an external LLM with larger context capacity (e.g., GPT-4o, Claude, Gemini with 8k+ context). Comparing results with a large-context model is a good way to isolate whether token limits are the bottleneck.
+**Alternative:** Use an external LLM with larger context capacity (e.g., GPT-5.6, Claude, Gemini with 8k+ context). Comparing results with a large-context model is a good way to isolate whether token limits are the bottleneck.
 
 :::tip
 

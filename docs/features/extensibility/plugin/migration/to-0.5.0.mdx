@@ -195,7 +195,7 @@ class Pipe:
     async def pipe(self, body: dict, __user__: dict) -> str:
         # Calls OpenAI endpoint
         user = User(**__user__)
-        body["model"] = "llama3.2:latest"
+        body["model"] = "qwen3.6:27b"
         return await ollama.generate_chat_completion(body, user)
 ```
 
@@ -224,7 +224,7 @@ class Pipe:
     ) -> str:
         # Uses the unified endpoint with updated signature
         user = User(**__user__)
-        body["model"] = "llama3.2:latest"
+        body["model"] = "qwen3.6:27b"
         return await generate_chat_completion(__request__, body, user)
 ```
 
