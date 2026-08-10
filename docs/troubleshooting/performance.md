@@ -39,8 +39,8 @@ There are two separate settings in **Settings > Admin > Experience > Interface**
 *   **Task Model (Local)**: Used when you are chatting with a locally hosted model (e.g., Ollama).
 
 **Best Options (2025):**
-*   **External/Cloud**: `gpt-5-nano`, `gemini-2.5-flash-lite`, `llama-3.1-8b-instant` (OpenAI/Google/Groq/OpenRouter).
-*   **Local**: `qwen3:1b`, `gemma3:1b`, `llama3.2:3b`.
+*   **External/Cloud**: `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `deepseek-v4-flash` (OpenAI/Google/DeepSeek/OpenRouter).
+*   **Local**: `qwen3.5:2b`, `qwen3.5:0.8b`.
 
 ### 2. Caching & Latency Optimization
 
@@ -498,7 +498,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 
 1.  **Embeddings**: Default (SentenceTransformers). *Runs on CPU, lightweight.*
 2.  **Audio**: `AUDIO_STT_ENGINE=webapi`. *Zero server load.*
-3.  **Task Model**: Disable or use tiny model (`llama3.2:1b`).
+3.  **Task Model**: Disable, or use a tiny model (`qwen3.5:0.8b`).
 4.  **Scaling**: Keep default `THREAD_POOL_SIZE` (40).
 5.  **Disable**: Image Gen, Code Interpreter, Autocomplete, Follow-ups.
 6.  **Database**: SQLite is fine, but cap its memory: `DATABASE_POOL_SIZE=8`, `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000`, `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`. The unset SQLite pool default is large (512); see [SQLite Memory Footprint on Constrained Containers](#4-sqlite-memory-footprint-on-constrained-containers).
@@ -507,7 +507,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 *Target: Max Quality & Speed, Local + External APIs.*
 
 1.  **Embeddings**: `RAG_EMBEDDING_ENGINE=openai` (or `ollama` with `nomic-embed-text` on a fast server).
-2.  **Task Model**: `gpt-5-nano` or `llama-3.1-8b-instant`.
+2.  **Task Model**: `gpt-5.6-luna` or `gemini-3.5-flash-lite`.
 3.  **Caching**: `MODELS_CACHE_TTL=300`.
 4.  **Database**: `ENABLE_REALTIME_CHAT_SAVE=False` (Keeping this disabled is recommended even for single users to ensure maximum stability).
 5.  **Vector DB**: PGVector (recommended) or ChromaDB (either is fine unless dealing with massive data).

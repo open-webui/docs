@@ -73,7 +73,7 @@ Almost everything else on this page (Web Search, Knowledge retrieval, Memory, Co
 
 **Native is now the default.** Every model that has not explicitly picked a mode uses **Native (Agentic) Mode**, which relies on the model's own built-in function-calling. This is what lets the model decide on its own when to search the web, look something up in a knowledge base or save a memory, instead of you toggling each tool by hand. It is faster, keeps the KV cache warm and is the only mode that unlocks the built-in system tools (Memory, Notes, Knowledge, Channels, Agentic Research).
 
-**Legacy is the opt-out.** The old prompt-injection approach (previously called "Default") is renamed **Legacy** and is unsupported. Any model that depended on the old behavior now runs Native unless you switch it back. If a model struggles with Native, the right fix is a stronger tool-calling model, not Legacy. For reliable tool use, prefer frontier models like GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash or MiniMax M2.5.
+**Legacy is the opt-out.** The old prompt-injection approach (previously called "Default") is renamed **Legacy** and is unsupported. Any model that depended on the old behavior now runs Native unless you switch it back. If a model struggles with Native, the right fix is a better tool-calling model, not Legacy. You don't need a frontier model for this — GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally are all reliable and are a reasonable minimum.
 
 More detail, including how to switch one model or your whole instance to Legacy:
 - [Tool Calling Modes: Native vs. Legacy](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)
@@ -98,8 +98,8 @@ These run in the background, so they are easy to overlook. A dedicated task mode
 **Fix:** In **Settings > Admin > Experience > Interface**, set a dedicated Task Model. There are two fields, because the right choice depends on what your main chat model is:
 
 :::tip Recommended task models
-- **Task Model (External)**: Set to a fast, cheap, *non-reasoning* cloud model like `gpt-5-nano`, `gemini-2.5-flash-lite`, or `llama-3.1-8b-instant`.
-- **Task Model (Local)**: Set to a tiny local model like `qwen3:1b`, `gemma3:1b`, or `llama3.2:3b`.
+- **Task Model (External)**: Set to a fast, cheap, *non-reasoning* cloud model like `gpt-5.6-luna`, `gemini-3.5-flash-lite`, or `deepseek-v4-flash`.
+- **Task Model (Local)**: Set to a small local model like `qwen3.5:2b` or `qwen3.5:0.8b`. Title and tag generation needs very little capability — don't spend a 27B model on it.
 
 The main chat experience does not change. The background chores just stop dragging.
 :::

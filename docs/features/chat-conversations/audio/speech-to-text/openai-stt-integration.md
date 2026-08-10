@@ -28,7 +28,7 @@ See the companion guide: [Using OpenAI for Text-to-Speech](/features/chat-conver
 | **Speech-to-Text Engine** | `OpenAI` |
 | **API Base URL** | `https://api.openai.com/v1` |
 | **API Key** | Your OpenAI API key |
-| **STT Model** | `whisper-1` |
+| **STT Model** | `gpt-transcribe` |
 | **Supported Content Types** | Leave empty for defaults, or set `audio/wav,audio/mpeg,audio/webm` |
 
 5. Click **Save**
@@ -37,10 +37,12 @@ See the companion guide: [Using OpenAI for Text-to-Speech](/features/chat-conver
 
 | Model | Description |
 |-------|-------------|
-| `whisper-1` | OpenAI's Whisper large-v2 model, hosted in the cloud |
+| `gpt-transcribe` | Current OpenAI transcription model (recommended) — roughly half the word error rate of `whisper-1` |
+| `gpt-live-transcribe` | Low-latency streaming transcription |
+| `whisper-1` | Legacy Whisper large-v2 model, still available |
 
 :::info
-OpenAI currently only offers `whisper-1`. For more model options, use Local Whisper (built into Open WebUI) or other providers like Deepgram.
+OpenAI recommends `gpt-transcribe` for new setups; `whisper-1` remains available and is what Open WebUI uses when `AUDIO_STT_MODEL` is unset. For fully local transcription, use Local Whisper (built into Open WebUI) or another provider such as Deepgram.
 :::
 
 ## Environment Variables Setup
@@ -55,7 +57,7 @@ services:
       - AUDIO_STT_ENGINE=openai
       - AUDIO_STT_OPENAI_API_BASE_URL=https://api.openai.com/v1
       - AUDIO_STT_OPENAI_API_KEY=sk-...
-      - AUDIO_STT_MODEL=whisper-1
+      - AUDIO_STT_MODEL=gpt-transcribe
     # ... other configuration
 ```
 
@@ -66,7 +68,7 @@ services:
 | `AUDIO_STT_ENGINE` | Set to `openai` | empty (uses local Whisper) |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | OpenAI API base URL | `https://api.openai.com/v1` |
 | `AUDIO_STT_OPENAI_API_KEY` | Your OpenAI API key | empty |
-| `AUDIO_STT_MODEL` | STT model | `whisper-1` |
+| `AUDIO_STT_MODEL` | STT model | `gpt-transcribe` |
 | `AUDIO_STT_SUPPORTED_CONTENT_TYPES` | Allowed audio MIME types | `audio/*,video/webm` |
 
 ### Supported Audio Formats
@@ -95,7 +97,7 @@ OpenAI's Whisper API supports: `mp3`, `mp4`, `mpeg`, `mpga`, `m4a`, `wav`, `webm
 | **Cost** | Per-minute pricing | Free (uses your hardware) |
 | **Privacy** | Audio sent to OpenAI | Audio stays local |
 | **GPU Required** | No | Recommended for speed |
-| **Model Options** | `whisper-1` only | tiny, base, small, medium, large |
+| **Model Options** | `gpt-transcribe`, `gpt-live-transcribe`, `whisper-1` | tiny, base, small, medium, large |
 
 Choose **OpenAI** if:
 - You don't have a GPU

@@ -21,9 +21,8 @@ Autocomplete functionality relies heavily on the response speed of your **Task M
 
 **Recommended Models:**
 - **Llama 3.2** (1B or 3B)
-- **Qwen 3** (0.6B or 3B)
-- **Gemma 3** (1B or 4B)
-- **GPT-5 Nano** (Optimized for low latency)
+- **Qwen 3.5** (`qwen3.5:0.8b` or `qwen3.5:2b`)
+- **GPT-5.6 Luna** (optimized for low latency and cost)
 
 Avoid using "Reasoning" models (e.g., o1, o3) or heavy Chain-of-Thought models for this feature, as the latency will make the autocomplete experience sluggish.
 :::
