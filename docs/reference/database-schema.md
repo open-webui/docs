@@ -196,23 +196,23 @@ Things to know about the channel table:
 
 | **Column Name**   | **Data Type** | **Constraints**                 | **Description**                              |
 | ----------------- | ------------- | ------------------------------- | -------------------------------------------- |
-| id                | TEXT          | PRIMARY KEY, UNIQUE             | Unique identifier for the channel membership |
-| channel_id        | TEXT          | NOT NULL                        | Reference to the channel                     |
-| user_id           | TEXT          | NOT NULL                        | Reference to the user                        |
-| role              | TEXT          | nullable                        | Member's role within the channel             |
-| status            | TEXT          | nullable                        | Membership status: `joined` or `left`        |
-| is_active         | BOOLEAN       | NOT NULL, server_default=true   | Whether the membership is live               |
-| is_channel_muted  | BOOLEAN       | NOT NULL, server_default=false  | Per-member mute flag                         |
-| is_channel_pinned | BOOLEAN       | NOT NULL, server_default=false  | Per-member pin flag                          |
+| id                | Text          | PRIMARY KEY, UNIQUE             | Unique identifier for the channel membership |
+| channel_id        | Text          | NOT NULL                        | Reference to the channel                     |
+| user_id           | Text          | NOT NULL                        | Reference to the user                        |
+| role              | Text          | nullable                        | Member's role within the channel             |
+| status            | Text          | nullable                        | Membership status: `joined` or `left`        |
+| is_active         | Boolean       | NOT NULL, server_default=true   | Whether the membership is live               |
+| is_channel_muted  | Boolean       | NOT NULL, server_default=false  | Per-member mute flag                         |
+| is_channel_pinned | Boolean       | NOT NULL, server_default=false  | Per-member pin flag                          |
 | data              | JSON          | nullable                        | Extensible data payload                      |
 | meta              | JSON          | nullable                        | Optional metadata                            |
-| invited_at        | BIGINT        | nullable                        | Invitation timestamp (nanoseconds)           |
-| invited_by        | TEXT          | nullable                        | User who added this member                   |
-| joined_at         | BIGINT        | NOT NULL                        | Join timestamp (nanoseconds)                 |
-| left_at           | BIGINT        | nullable                        | Leave timestamp (nanoseconds)                |
-| last_read_at      | BIGINT        | nullable                        | Last read timestamp, drives unread state     |
-| created_at        | BIGINT        | -                               | Timestamp when membership was created        |
-| updated_at        | BIGINT        | nullable                        | Last update timestamp (nanoseconds)          |
+| invited_at        | BigInteger    | nullable                        | Invitation timestamp (nanoseconds)           |
+| invited_by        | Text          | nullable                        | User who added this member                   |
+| joined_at         | BigInteger    | NOT NULL                        | Join timestamp (nanoseconds)                 |
+| left_at           | BigInteger    | nullable                        | Leave timestamp (nanoseconds)                |
+| last_read_at      | BigInteger    | nullable                        | Last read timestamp, drives unread state     |
+| created_at        | BigInteger    | -                               | Timestamp when membership was created        |
+| updated_at        | BigInteger    | nullable                        | Last update timestamp (nanoseconds)          |
 
 Things to know about the channel_member table:
 
@@ -223,6 +223,7 @@ Things to know about the channel_member table:
 - `role` is read in one place, to test whether a member is a `manager` for manager-only queries. No code path writes it, so it is null on every row.
 - `is_channel_muted` has no write path and stays false. `is_channel_pinned` has a setter on the model, `Channels.pin_channel`, that nothing calls.
 - `joined_at` is NOT NULL in the database (migration `2f1211949ecc`) while the SQLAlchemy model omits the flag. The database constraint is the one that applies.
+- Deleting a user account leaves their `channel_member` rows in place. Member listings, the member count on a channel and the lookup that finds the existing direct message for a set of people all skip rows whose `user_id` no longer matches an account, so a leftover row is not counted as a member and does not push a direct message into a second conversation.
 
 ## Channel File Table
 
