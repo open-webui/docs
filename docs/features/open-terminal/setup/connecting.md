@@ -21,11 +21,11 @@ Click your **name** at the bottom of the left sidebar to open the user menu, the
 
 ![User menu showing Admin Panel option](/images/open-terminal-user-menu.png)
 
-### 2. Go to Settings → Integrations
+### 2. Go to Settings > Admin > Integrations
 
 In the Admin Panel, click **Settings** in the top nav, then click **Integrations**.
 
-![Admin Panel, Settings → Integrations](/images/open-terminal-integrations-page.png)
+![Settings > Admin > Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
 
@@ -141,6 +141,12 @@ docker exec open-webui curl -s http://open-terminal:8000/health
 
 If it prints `{"status": "ok"}`, the connection works. If it errors, the containers can't see each other.
 :::
+
+### Nothing happens when you save a new connection
+
+Adding a connection works whether Open WebUI is reached over `https://` or over plain `http://`. On older versions the **Add Terminal Connection** dialog stayed open and saved nothing when the interface was served over plain `http://` at anything other than `localhost`, because browsers withhold the identifier generator a new connection needs on origins that are not secure. Filling in the optional **ID** field yourself works around it, since nothing has to be generated then.
+
+Only creating a connection from **Settings > Admin > Integrations** was affected. Editing, enabling, disabling or deleting an existing one, adding one under your own **Settings > Integrations**, and connections shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) all worked regardless.
 
 ### Terminal shows up but AI doesn't use it
 

@@ -58,11 +58,15 @@ A sidebar you have closed is hidden from screen readers as well as from `Tab`, s
 
 The switches in **Settings > Interface** are announced with the name of the setting they control, and the **UI Scale** slider reports its position as a multiplier, `1.2x` for example, rather than as a bare number.
 
+An image attached to a response is described by its file name, and one the model generated, which has no file name, is described as **Generated Image**. An image that cannot be loaded is replaced by an **Image unavailable** placeholder, so a picture that is no longer there is announced as such instead of being read out as a stray description.
+
 ---
 
 ## Reducing motion
 
 **Fade Effect for Streaming Text**, in the **Chat** section of **Settings > Interface**, fades a response in as it arrives. It is on by default; turn it off to have the text appear without the animation.
+
+A thin cursor blinks where the answer is being written. It appears as soon as you send your message, unless a status line is showing in its place, and it stays until the response is finished, sitting on its own while the model is still silent and trailing the text once that starts arriving. Turning off **Fade Effect for Streaming Text** does not stop it, and it has no setting of its own.
 
 ---
 

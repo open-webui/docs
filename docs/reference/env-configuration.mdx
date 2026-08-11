@@ -249,7 +249,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings → Admin → Models**.
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings > Admin > Models** (**Model Defaults** > **Configure** > **Model Parameters**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_params`.
 
 :::info
@@ -258,6 +258,8 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Use valid JSON (for example: `{"temperature":0.7,"function_calling":"native"}`)
 - If parsing fails, Open WebUI logs the error and falls back to `{}`
+- Anything under `custom_params` (in the interface, **Add Custom Parameter**) is combined entry by entry with a model's own custom parameters, so a model that adds one of its own keeps the ones set here. A model that reuses the same name wins for that name only
+- Both this and a model's saved parameters only fill in what a request left out, so a parameter sent in the request body keeps the value the caller sent
 
 :::
 
@@ -6797,7 +6799,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to delete chats.
+- Description: Enables or disables user permission to delete chats. When set to `False`, the delete controls are hidden from non-admins instead of being offered and refused: the chat menu in the sidebar, the `Shift`+hover delete icon on a sidebar row, the chat's own top-bar menu, the search results, the per-chat delete in **Settings > Archived Chats** and **Delete All Chats** in **Settings > Data Controls**. The **Delete chat** keyboard shortcut stops doing anything, since there is no button left for it to press. Archiving is unaffected, and deleting a folder that still holds chats is refused with a permission error because it would take those chats with it. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Delete**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_EDIT`
@@ -6818,7 +6820,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). When disabled, non-admins cannot import chats.
+- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). It also covers **forking** a chat, which creates a copy the same way an import does. When set to `False`, non-admins cannot import chats, and the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are hidden rather than shown and refused. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Import**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`

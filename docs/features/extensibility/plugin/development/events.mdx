@@ -200,7 +200,7 @@ await __event_emitter__({"type": "status", "data": {"description": "Fetching dat
 
 When `hidden` is `true`, the status is saved to `statusHistory` but **not shown** in the current status display. This is useful for internal status tracking that shouldn't be visible to the user.
 
-Additionally, when `message.content` is empty and the last status has `hidden: true` (or no status exists at all), the frontend shows a skeleton loader instead of the status bar, so hidden statuses don't replace the loading indicator.
+Additionally, when the message has no content yet and the last status has `hidden: true` (or no status exists at all), the frontend shows a blinking typing cursor instead of the status bar, so hidden statuses don't replace the indicator that something is still running. A visible status suppresses that cursor while the message is still empty; once the first content arrives the cursor trails the text until the message is marked done, whether a status is on screen or not.
 
 ---
 

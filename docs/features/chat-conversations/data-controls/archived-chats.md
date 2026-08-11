@@ -31,6 +31,12 @@ From the Data Controls tab, you can also perform bulk operations:
     This action cannot be undone. All chat history will be permanently deleted.
     :::
 
+:::info Deleting needs the Chat Delete permission
+
+**Delete** on an archived chat and **Delete All Chats** are only drawn for people who are allowed to delete chats. If an administrator has turned **Allow Chat Delete** off for you, neither appears, and archiving still works as before. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
+
+:::
+
 ## FAQ
 
 **Q: Can I search within archived chats?**  

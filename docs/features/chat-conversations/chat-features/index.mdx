@@ -45,7 +45,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **💬 Reference Chats**: Attach another conversation to the current one, so the model can work from what was said there. Pick it from **+ > Reference Chats**, which lists your own chats, or drag a chat out of the sidebar and drop it on the message input, which also works for a chat that is not yours. The conversation goes in whole, as plain text, with no chunking and no vector search. Any chat you are allowed to read can be attached, including one [shared with you](./chatshare.md#using-a-shared-chat-as-context) and one sitting in a [folder shared with you](./conversation-organization.md#sharing-folders).
 
-- **🍴 Fork a Chat**: Branch a conversation into an independent copy from any assistant response. The **Fork chat** action on a message copies the history from the start of the conversation up to that point into a new chat titled `<original title> (fork)`, keeping the original's folder and pinned state, so you can take a different direction without touching the original. Forking requires the chat-import permission, and is unavailable while a response is still streaming.
+- **🍴 Fork a Chat**: Branch a conversation into an independent copy from any assistant response. The **Fork chat** action on a message copies the history from the start of the conversation up to that point into a new chat titled `<original title> (fork)`, keeping the original's folder and pinned state, so you can take a different direction without touching the original. Forking requires the [Chat Import](/features/authentication-access/rbac/permissions#3-chat-permissions) permission (`chat.import`, allowed by default; admins always pass). Without it the **Fork chat** action is not shown on a message at all. Forking is also unavailable while a response is still streaming.
 
 - **[🔍 History & Search](./history-search.mdx)**: Navigate and search your previous conversations, or allow models to search them autonomously via native tools.
 
@@ -98,7 +98,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
   `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` is always offered, an empty chat included, and it is the only one that takes anything after it.
 
-  `/fork` requires the **Chat Import** permission (`chat.import`, allowed by default; admins always pass). The command still appears in the menu without it, and reports **Access prohibited** when run.
+  `/fork` requires the **Chat Import** permission (`chat.import`, allowed by default; admins always pass). Without it the command is left out of the `/` menu, alongside the **Fork chat** action on a message. Typing `/fork` out by hand and sending it still reaches the server, which refuses it with a permission error.
 
   Choosing **Model** from the `/` menu opens the model picker rather than running the command, with the search box focused (on desktop), so you can change model from the keyboard alone. Typing an id matches a model's **id** exactly, never its display name, and an id you do not have reports `Model not found: <id>` and changes nothing. A successful switch replaces the current selection outright, so a multi-model chat drops back to the single model you named.
 

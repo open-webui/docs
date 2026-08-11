@@ -136,7 +136,7 @@ For the full mechanism (fsync latency + async concurrency + pool saturation + WA
 
 **Symptoms:**
 - You upload a file (for RAG) on one instance, but the model cannot find it later.
-- Generated images appear as broken links.
+- Images in a chat show an **Image unavailable** placeholder instead of the picture, intermittently, depending on which replica served the request.
 
 **Cause:**
 The `/app/backend/data` directory is not shared or is not consistent across replicas. If User A uploads a file to Replica 1, and the next request hits Replica 2, Replica 2 won't have the file physically on disk.

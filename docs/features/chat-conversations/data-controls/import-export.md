@@ -32,6 +32,12 @@ Click the **Import Chats** button and select a JSON file to restore conversation
 - **ChatGPT exports**: Conversations exported from OpenAI's ChatGPT (auto-detected and converted)
 - **Custom JSON files**: Any JSON file that follows the expected structure documented below
 
+:::info Import permission also covers forking
+
+**Allow Chat Import** gates [forking a chat](/features/chat-conversations/chat-features/) as well, since a fork is created the same way an import is. Turn it off for a group and its members lose the **Import Chats** row here, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu, none of which are shown any more. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
+
+:::
+
 ### Import Behavior
 
 - Imported chats are added to your existing conversations (they don't replace them)

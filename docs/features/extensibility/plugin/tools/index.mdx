@@ -423,7 +423,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Automations** | | |
 | `create_automation` | `name` (required), `prompt` (required), `rrule` (required), `folder_id` (optional, files the generated chats into one of the user's folders) | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
 | `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id`, `folder_id` (all optional; only provided fields are changed) | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
-| `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
+| `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `folder_id` (optional; one of the user's own folders, an empty string or omitting it lists across all folders), `count` (default: 10) | `{automations: [{id, name, folder_id, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
 | `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
 | `delete_automation` | `automation_id` (required) | `{status, message}` |
 | **Calendar** | | |

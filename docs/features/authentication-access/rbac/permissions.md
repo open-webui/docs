@@ -106,7 +106,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
 | **Allow File Upload** | Ability to upload files to the chat. |
 | **Allow Web Upload** | Ability to attach a web page to a chat by URL, using **Attach Webpage** in the message input's attach menu ([`USER_PERMISSIONS_CHAT_WEB_UPLOAD`](/reference/env-configuration#user_permissions_chat_web_upload)). On by default. When disabled, the option is greyed out and the attach is refused. Admins are always exempt. |
-| **Allow Chat Delete** | Ability to delete entire chat conversations. |
+| **Allow Chat Delete** | Ability to delete entire chat conversations ([`USER_PERMISSIONS_CHAT_DELETE`](/reference/env-configuration#user_permissions_chat_delete)). On by default. When disabled, the delete controls are hidden from non-admins rather than shown and refused: the sidebar chat menu, the `Shift`+hover delete icon on a sidebar row, the chat's own top-bar menu, the search results, the per-chat delete in **Settings > Archived Chats** and **Delete All Chats** in **Settings > Data Controls**. The **Delete chat** keyboard shortcut stops doing anything, and archiving is unaffected. Deleting a folder that still holds chats needs this permission too, and that menu entry is still offered, so it is the one delete that reports a permission error instead of disappearing. Admins are always exempt. |
 | **Allow Delete Messages** | Ability to delete individual messages. |
 | **Allow Chat Edit** | Ability to edit messages. |
 | **Allow Continue Response** | Ability to use the "Continue" feature for truncated responses. |
@@ -114,7 +114,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Rate Response** | Ability to thumbs up/down responses. |
 | **Allow Chat Share** | Ability to generate a share link for a chat. |
 | **Allow Chat Export** | Ability to export chat history. |
-| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI). |
+| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI) and to [fork a chat](/features/chat-conversations/chat-features/), which creates a copy the same way an import does ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. When disabled, **Import Chats** in **Settings > Data Controls**, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all hidden from non-admins. Admins are always exempt. |
 | **Allow Speech to Text** | Ability to use voice input. |
 | **Allow Text to Speech** | Ability to use voice output. |
 | **Allow Call** | Ability to use the real-time audio call feature. |

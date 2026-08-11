@@ -112,7 +112,7 @@ An automation can be assigned a folder, and every chat it creates from then on i
 
 - Only your own folders can be chosen. A folder shared with you belongs to someone else and is not offered, and naming one anyway is rejected the same way an unknown folder is.
 - The folder is a filing destination, not a project context: the chat is placed in the folder, and the folder's system prompt and attached knowledge apply to it as they do to any other chat there.
-- The automations list can be narrowed to a folder through the API and the chat tools; the list page itself does not label or filter by folder.
+- The automations list can be narrowed to a folder through the API and the chat tools; the list page itself does not label or filter by folder. Asking for the list without a folder, or with an empty one, returns every automation you have, whichever folder each is filed into.
 - Clearing the folder is a normal edit. The automation keeps running and its future chats go back to the ungrouped list; chats already created stay where they are.
 - Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running. The same happens if a folder disappears between two runs: the run notices, clears the setting, and creates its chat outside any folder rather than failing.
 - Imported automations keep their folder only if a folder with that ID exists in your account; otherwise they are imported without one.

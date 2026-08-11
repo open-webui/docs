@@ -32,6 +32,8 @@ Organize existing chats by moving them into folders:
 - **Drag and Drop**: Click and drag any conversation from the sidebar into a folder.
 - **Right-click Menu**: Right-click on a conversation and select "Move to Folder".
 
+A folder highlights while you drag a chat over it when you are allowed to file the chat there, so you can see where the drop will land before you let go. A folder of your own always takes one. A folder [shared with you](#sharing-folders) takes one only with write access; with read-only access it does not highlight and does not accept the drop, so a move that would be refused anyway is never started.
+
 ### Nested Folders
 
 Folders can be nested within other folders to create hierarchical organization:
@@ -124,8 +126,8 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 1. Hover over a folder in the sidebar and open the **three-dot menu** (⋯).
 2. Select **Share**.
 3. Add the users or groups to share with and choose their access:
-   - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it.
-   - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it.
+   - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it, and dragging a chat over it in the sidebar does not offer it as a drop target.
+   - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
 4. Save.
 
 Shared folders appear in the recipient's sidebar. A few rules to know:

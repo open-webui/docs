@@ -54,7 +54,7 @@ Every file carries metadata that helps both you and the AI understand its contex
 ## FAQ
 
 **Q: If I delete a file, is it gone from my chats?**  
-**A:** Yes. Deleting a file via the File Manager removes it from the system entirely. Any chat that referenced that file using RAG will no longer be able to pull information from it.
+**A:** Yes. Deleting a file via the File Manager removes it from the system entirely. Any chat that referenced that file using RAG will no longer be able to pull information from it. If the file was an image shown in a message, that message displays a small **Image unavailable** placeholder where the picture was, and the placeholder cannot be clicked open.
 
 **Q: Can I download my files back from the File Manager?**  
 **A:** Currently, the File Manager focuses on viewing metadata and management (deletion). To download a file, you should typically access it from the original chat or Knowledge Base where it was used.
