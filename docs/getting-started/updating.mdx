@@ -47,7 +47,9 @@ Browse all available tags on the [GitHub releases page](https://github.com/open-
 3. **Clear your browser cache** after updating (`Ctrl+F5` / `Cmd+Shift+R`) to avoid stale frontend assets.
 
 :::warning Running multiple workers or replicas?
-Run migrations on a single instance first: set `UVICORN_WORKERS=1` or `ENABLE_DB_MIGRATIONS=false` on all but one instance. See the [Scaling guide](/getting-started/advanced-topics/scaling) for details.
+Update every instance at the same time. Rolling updates are not supported across a release that changes the database schema: the migration moves the whole database forward at once, while the instances still on the old version keep querying the old shape. Stop all replicas and workers, let one instance migrate, then bring the rest back up on the new version.
+
+Setting `UVICORN_WORKERS=1` or `ENABLE_DB_MIGRATIONS=false` on all but one instance decides **which** instance runs the migration, it does not make a mixed-version fleet safe. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the full procedure and the [Scaling guide](/getting-started/advanced-topics/scaling) for the surrounding setup.
 :::
 
 ---
