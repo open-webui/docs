@@ -59,6 +59,10 @@ Limit terminal access to specific user groups via the access control button.
 
 {/* TODO: Screenshot — The Access Grants dropdown showing available user groups with checkboxes. */}
 
+:::tip Orchestrator connections can be scoped further
+A connection Open WebUI has detected as a [Terminals orchestrator](/features/open-terminal/terminals/) gets an extra **Orchestrator > Terminal Contexts** section, where you decide whether the terminal is offered in chats and in automations, and whether everything shares one workspace or each saved chat or automation gets its own. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). A direct Open Terminal connection has no such setting and is always available in both.
+:::
+
 ### 7. Select a terminal in chat
 
 In the chat input area, click the **terminal button** (cloud icon ☁). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
@@ -144,6 +148,12 @@ Make sure:
 - The toggle switch next to the connection is **turned on**. Turning it off takes the terminal server out of service completely: the model is not given its tools, the terminal and file browser refuse to connect, and any proxied request to it is rejected. It is a working off switch, not just a hint to the model, so use it to retire a server without deleting the connection.
 - You've **refreshed the page** after adding the connection
 - Your model supports tool calling (most modern models do)
+
+### Terminal is missing from the picker
+
+Only terminals the user is allowed to use are listed, so check the connection's access grants and that the connection is enabled.
+
+For an orchestrator connection, [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) also decides this. A terminal whose **Chat** context is **Off** never appears in a chat, and one set to **Per chat** is hidden in temporary chats because it needs a saved conversation to attach to.
 
 ### Wrong API key
 

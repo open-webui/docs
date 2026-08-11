@@ -99,6 +99,7 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 - **Resource controls**: set CPU, memory, and storage limits per user or per environment
 - **Multiple environments**: different setups for different teams (e.g., data science, development)
 - **Kubernetes support**: works with Docker, Kubernetes, and k3s
+- **Scoped workspaces**: optionally give each saved chat or each automation its own container instead of one per user, via [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)
 
 ```mermaid
 flowchart LR

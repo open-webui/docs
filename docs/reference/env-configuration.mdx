@@ -1692,7 +1692,11 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
     "config": {
       "access_grants": [
         {"principal_type": "user", "principal_id": "*", "permission": "read"}
-      ]
+      ],
+      "contexts": {
+        "chat": {"context_id": "chat_id"},
+        "automation": false
+      }
     }
   }
 ]
@@ -1700,6 +1704,19 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 For an orchestrator connection, set `policy_id` to route every terminal request through that named policy. Omitting it intentionally uses the orchestrator's service defaults through its backward-compatible unscoped route.
+
+`config.contexts` scopes the connection per context. It applies only to orchestrator connections (`server_type` of `orchestrator`, or any connection carrying a `policy_id`) and is ignored everywhere else. Each of the two keys, `chat` and `automation`, accepts:
+
+| Value | Meaning |
+| :--- | :--- |
+| key omitted, or `{}` | Shared. Every chat (or automation) of the same user reuses one workspace. This is what earlier releases did. |
+| `{"context_id": "chat_id"}` | Each saved chat gets its own workspace. Only valid under `chat`. |
+| `{"context_id": "automation_id"}` | Each automation gets its own workspace. Only valid under `automation`. |
+| `false` | The terminal is not offered in that context, and requests for it are refused. |
+
+Open WebUI sends the resolved context to the orchestrator as an `X-Terminal-Context-Id` header holding `chat:<chat-id>` or `automation:<automation-id>`; shared connections send no header. A chat-scoped terminal needs a saved chat, so it is unavailable in temporary chats and before the first message of a new conversation. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the admin UI and the capacity trade-off.
+
+`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI token), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it. Session auth over the interactive terminal WebSocket applies to orchestrator connections only.
 
 :::tip Helm chart auto-configuration
 When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
@@ -2808,7 +2825,7 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 - Navigate to `Admin Settings > Documents > Click Reindex Knowledge Base`
 
 **This rebuilds knowledge base vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
-**User memories, web search history, and files that were never added to a knowledge base are NOT migrated by this operation**
+**User memories, web search history and files that were never added to a knowledge base are NOT migrated by this operation**
 
 **Verify knowledge bases are accessible and functional**
 - Re-upload files that live outside any knowledge base if file-based retrieval for them is critical (file metadata remains but their vectors are not migrated)
@@ -5040,7 +5057,7 @@ This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or l
 
 - Type: `str`
 - Default: unset (requests come from the server's own address)
-- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many datacentre and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting, and routing the requests through a residential or otherwise accepted proxy is what gets them through.
+- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting. Setting it sends the transcript requests through that proxy instead of the server's own address.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Youtube Proxy URL**.
 
 #### `YOUTUBE_LOADER_LANGUAGE`

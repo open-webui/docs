@@ -10,7 +10,7 @@ An orchestrator connection can be scoped per context. For chats and for automati
 - whether the terminal can be used there at all
 - whether everything shares one workspace, or every saved chat (or every automation) gets a workspace of its own
 
-Direct Open Terminal connections have no contexts. They stay available everywhere and always resolve to the same workspace.
+Connections to a plain Open Terminal server have no contexts. They stay available everywhere and always resolve to the same workspace.
 
 :::info Requires Terminals 0.2.0 or newer
 The orchestrator resolves the context into a workspace. An older orchestrator ignores the context Open WebUI sends and keeps serving one shared workspace per user and policy, so **Per chat** and **Per automation** silently behave like **Shared** until it is upgraded.
@@ -19,7 +19,7 @@ The orchestrator resolves the context into a workspace. An older orchestrator ig
 ## Configure
 
 1. Open **Admin Panel > Settings > Integrations** and scroll to the **Open Terminal** section.
-2. Add or edit a connection, then click the verify button next to the URL so Open WebUI detects the server type. The **Orchestrator** section only appears once the connection is detected as an orchestrator, or when it already carries a **Policy ID**.
+2. Add or edit a connection, then use **Verify Connection** next to the URL so Open WebUI detects the server type. The **Orchestrator** section only appears once the connection is detected as an orchestrator, or when it already carries a **Policy ID**.
 3. Expand **Orchestrator** and set **Terminal Contexts**.
 
 | Row | Options |
@@ -27,7 +27,7 @@ The orchestrator resolves the context into a workspace. An older orchestrator ig
 | **Chat** | **Shared**, **Per chat**, **Off** |
 | **Automation** | **Shared**, **Per automation**, **Off** |
 
-Both rows default to **Shared**, which is the behaviour every earlier release had.
+Both rows default to **Shared**, which is the behavior every earlier release had.
 
 ## What Each Mode Does
 
@@ -40,9 +40,11 @@ Both rows default to **Shared**, which is the behaviour every earlier release ha
 
 Saving with both rows on **Shared** stores no `contexts` block at all, so an existing connection keeps working untouched.
 
-Open WebUI sends the resolved context to the orchestrator as an `X-Terminal-Context-Id` header, holding `chat:<chat-id>` or `automation:<automation-id>`. **Shared** sends no header, which the orchestrator reads as its `default` context. The same value is sent for the model's terminal tools, for the file browser, and for the interactive terminal WebSocket, so all three land in the same workspace.
+Open WebUI sends the resolved context to the orchestrator as an `X-Terminal-Context-Id` header, holding `chat:<chat-id>` or `automation:<automation-id>`. **Shared** sends no header, which the orchestrator reads as its `default` context. The same value is sent for the model's terminal tools, for the file browser and for the interactive terminal WebSocket, so all three land in the same workspace.
 
 The two rows are independent. A terminal can be **Per chat** in chats and **Off** in automations, or **Off** in chats and **Shared** in automations.
+
+**Off** is enforced on the server, so a terminal closed to a context cannot be reached from it whatever the client does. The chat terminal picker hides such a terminal, but the automation editor's terminal picker still lists it, so an automation can be pointed at a terminal that is closed to automations. The run then fails with an error saying the terminal is not available for automations.
 
 ## Per Chat Needs a Saved Chat
 
@@ -54,7 +56,7 @@ A per chat workspace is keyed on the chat's ID, so the chat has to exist first. 
 
 ## Capacity
 
-Each context is a separate workspace: a separate container on Docker, a separate pod on Kubernetes, and separate persisted files. **Per chat** therefore multiplies the number of workspaces a single user can have running, one per chat they touch, each counting against the policy's CPU, memory and storage.
+Each context is a separate workspace: a separate container on Docker, a separate pod on Kubernetes and separate persisted files. **Per chat** therefore multiplies the number of workspaces a single user can have running, one per chat they touch, each counting against the policy's CPU, memory and storage.
 
 Plan for that before switching a busy connection to **Per chat**:
 
@@ -69,4 +71,4 @@ The same setting can be shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/en
 
 Contexts are not a user isolation mechanism. Separating users is what the orchestrator already does through per-user workspaces, and contexts subdivide one user's workspaces further. See [Multi-User Setup](/features/open-terminal/advanced/multi-user) for the isolation tiers.
 
-Contexts also do not apply to direct Open Terminal connections, to connections added through personal **Settings > Integrations**, or to any connection Open WebUI has not detected as an orchestrator.
+Contexts also do not apply to direct Open Terminal connections, to connections added through personal **Settings > Integrations** or to any connection Open WebUI has not detected as an orchestrator.

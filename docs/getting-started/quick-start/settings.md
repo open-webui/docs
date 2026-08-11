@@ -93,14 +93,14 @@ Press **Configure** to open the same list of controls a user sees in **Settings 
 
 An on/off option a user has never touched shows a small **Default** label beside its switch in **Settings > Interface**. The options that are not switches carry no such label, but they inherit in exactly the same way. Either way, change the instance default later and everyone who has not overridden that option moves with it.
 
-:::info Setting an option back to the default releases it
-Open WebUI only stores the options a user actually differs on. Moving a control back to whatever the instance default currently is drops it from the user's own settings, so it goes back to being inherited and follows future changes to the default again.
+:::info Matching the default releases the option
+Open WebUI only stores the options a person actually differs on. Whenever they save their settings, every value that matches the instance default at that moment is dropped from their record, so the option goes back to being inherited and follows future changes to the default again. The value they see does not move; only the fact that it was pinned goes away.
 :::
 
 **What this does not do:**
 
 - It does not restrict anyone. Everyone keeps full control of every option in **Settings > Interface**; to actually hold people to your values, take **Interface Settings Access** away from them in [permissions](/features/authentication-access/rbac/permissions).
-- It does not rewrite accounts that already exist. Nobody's stored choices are touched; people who never set a given option simply start following your default instead of the built-in one.
+- It does not wipe anyone's existing choices. Whatever someone already set for themselves keeps its value. What changes is the options they never set: those move from the built-in value to yours.
 - It does not cover **Theme** or **Language**. Both live in the browser rather than in the account, so they are not part of this. Use [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale) for the starting language.
 
 If you configure your instance through environment variables, [`DEFAULT_INTERFACE_SETTINGS`](/reference/env-configuration#default_interface_settings) sets the same thing as a JSON object, for example `{"chatBubble": false, "widescreenMode": true}`.

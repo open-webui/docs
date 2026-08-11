@@ -116,6 +116,10 @@ The file browser remembers which folder you were in, even when you switch betwee
 If you have more than one terminal connected, switching between them in the dropdown updates the file browser to show that terminal's files.
 :::
 
+:::info Terminals that give each chat its own files
+An administrator can set an orchestrated terminal to give every conversation a workspace of its own, so the files you see in one chat are not the files you see in another. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and the terminal is not offered in temporary chats at all. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+:::
+
 ## More things to try
 
 - **[Analyze documents & data →](./use-cases/file-analysis)**: drag in a spreadsheet or PDF and ask about it

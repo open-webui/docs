@@ -69,6 +69,10 @@ Administrators can set global limits on automation usage for non-admin users. Th
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
 
+:::info Terminals can be taken out of automations
+The **Terminal** picker lists every terminal you can use, including ones an administrator has closed to automations. If a run fails with an error saying the terminal is not available for automations, the connection's **Automation** context has been set to **Off** and you need a different terminal. An administrator can also give each automation a workspace of its own instead of sharing one, which changes nothing about how you set the automation up. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+:::
+
 ## Edit and Manage
 
 From the Automations list, click an automation to open its dedicated editor page.

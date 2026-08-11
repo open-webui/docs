@@ -231,13 +231,13 @@ The re-index process performs the following steps for each knowledge base:
 
 1. **Deletes** the existing vector collection for the knowledge base.
 2. **Deletes** the per-file collection of every file in it. Each file has a vector collection of its own, which is what gets searched when you attach that single file to a chat instead of the whole knowledge base.
-3. **Re-chunks** every file from its stored extracted text, using the current chunk size, overlap, and text splitter settings.
+3. **Re-chunks** every file from its stored extracted text, using the current chunk size, overlap and text splitter settings.
 4. **Re-embeds** all chunks with the currently configured embedding model, writing them to the knowledge base collection and to the file's own collection.
 
 This means a single re-index applies both chunking setting changes and embedding model changes simultaneously, and it leaves every file in a knowledge base retrievable both through its knowledge base and on its own.
 
 :::note Re-indexing does not parse the file again
-Re-indexing starts from the text Open WebUI extracted when the file was first processed and stored alongside it, not from the original document. Changing the content extraction engine, or any other parsing setting, therefore has no effect on files that are already in a knowledge base. Re-upload them if you need them parsed again.
+Re-indexing works from the text Open WebUI extracted when the file was first processed and stored alongside it. The original document is never opened again, so changing the content extraction engine or any other parsing setting has no effect on files that are already in a knowledge base. Re-upload them if you need them parsed again.
 :::
 
 :::warning Re-indexing does not cover chat files
@@ -351,7 +351,7 @@ Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_
 Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.
 ```
 
-The column names come from the first row, the column count is that of the widest row, and the delimiter is detected from the start of the file (falling back to a comma). The line becomes the first part of the file's extracted content, so it is indexed as a chunk like any other and is always present when the file is used with **Using Entire Document**.
+The column names come from the first row, the column count is that of the widest row and the delimiter is detected from the start of the file (falling back to a comma). The line becomes the first part of the file's extracted content, so it is indexed as a chunk like any other and is always present when the file is used with **Using Entire Document**.
 
 :::info Which files get a summary
 The summary comes from Open WebUI's own CSV parser, so it does not apply when a `.csv` never reaches that parser. With the `external` engine every file goes to the external loader instead, and with `tika` or `docling` a `.csv` is read as plain text. Every other engine leaves `.csv` files to the built-in parser, so the summary applies there.

@@ -656,7 +656,7 @@ Use this endpoint to fetch a webpage, extract content, and store the resulting c
 | `true` (default) | Existing vectors in the target collection are replaced before inserting the new URL chunks |
 | `false` | Existing vectors are preserved and new URL chunks are added to the same collection |
 
-**Failure responses:** all failures return `400`, and the `detail` says which step failed. A URL that could not be fetched or parsed returns `[ERROR: Could not read content from <url>]`, naming the URL that was submitted. A YouTube URL returns the reason its transcript was refused (blocked request, transcripts disabled, age restricted, unavailable, or no transcript in the configured languages). A `detail` mentioning the knowledge base means the content was read and storing the chunks failed. See [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+**Failure responses:** all failures return `400`, and the `detail` says which step failed. A URL that could not be fetched or parsed returns `[ERROR: Could not read content from <url>]`, naming the URL that was submitted. A YouTube URL returns the reason its transcript was refused (blocked request, transcripts disabled, age restricted, unavailable or no transcript in the configured languages). A `detail` mentioning the knowledge base means the content was read and storing the chunks failed. See [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 - **Curl Example** (preserve existing vectors):
 

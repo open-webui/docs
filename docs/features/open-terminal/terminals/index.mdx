@@ -46,7 +46,7 @@ The orchestrator sits between Open WebUI and the per-user Open Terminal workspac
 1. A user activates Open Terminal in Open WebUI.
 2. Open WebUI proxies the request to the **orchestrator**, which manages workspace lifecycle.
 3. The orchestrator resolves the selected policy: image, resources, storage, env vars, security context, and idle timeout.
-4. The orchestrator provisions or reuses a personal Open Terminal workspace for that user and policy.
+4. The orchestrator provisions or reuses a personal Open Terminal workspace for that user and policy, and for the [terminal context](/features/open-terminal/terminals/orchestration/contexts) when the connection is scoped per chat or per automation.
 5. All traffic is proxied through the orchestrator. The user never connects to the workspace directly.
 6. Idle workspaces are cleaned up after a configurable timeout. Files can persist across sessions when storage is enabled.
 
@@ -58,7 +58,7 @@ Terminals is what makes the full agent harness operable for teams. It lets admin
 
 | Need | What Terminals provides |
 | :--- | :--- |
-| Isolation | One workspace per user and policy, with separate files and processes |
+| Isolation | One workspace per user and policy, with separate files and processes, and optionally one per saved chat or per automation |
 | Governance | Policy-controlled images, env vars, resource limits, storage, and security context |
 | Repeatability | Custom images and startup packages so users get the right tools every time |
 | Lifecycle | Reuse, idle cleanup, refresh, and scheduled resets |
@@ -96,11 +96,15 @@ The orchestrator supports three authentication modes:
 
 | Mode | When to use | How to configure |
 | :--- | :--- | :--- |
-| **Open WebUI JWT** | Production. The orchestrator validates tokens against your Open WebUI instance. | Set `TERMINALS_OPEN_WEBUI_URL` on the orchestrator to your Open WebUI URL. |
+| **Open WebUI JWT** | Production. The orchestrator validates tokens against your Open WebUI instance. | Set `TERMINALS_OPEN_WEBUI_URL` on the orchestrator to your Open WebUI URL, and set the connection's **Auth** to **Session** in Open WebUI. |
 | **Shared API key** | Standard. Open WebUI includes a shared secret in every request. | Set `TERMINALS_API_KEY` to the same value on both Open WebUI and the orchestrator. |
 | **Open** | Development only. No authentication. Do not use in production. | Leave both `TERMINALS_OPEN_WEBUI_URL` and `TERMINALS_API_KEY` unset. |
 
 When deployed via Docker Compose or Helm, the shared API key is configured automatically between Open WebUI and the orchestrator.
+
+JWT mode needs the two sides to agree. The orchestrator checks the token against Open WebUI and then refuses the request unless the identity it gets back matches the user the request claims to be for, so Open WebUI has to send each user's own token rather than one shared key. That is what **Auth > Session** on the connection does, and it now covers the interactive terminal as well as the model's tools and the file browser. With **Auth > Bearer** the orchestrator sees the shared key instead of a user token and rejects it, which shows up as an immediate `401`, or as a terminal that closes the moment it opens.
+
+Policy and lifecycle APIs are not covered by user tokens. Those still require `TERMINALS_API_KEY`, so set it alongside `TERMINALS_OPEN_WEBUI_URL` if you administer the orchestrator over its API. Note that Open WebUI attaches the connection's stored key to policy, lifecycle and refresh calls only when **Auth** is **Bearer**, so with **Session** those admin actions are made against the orchestrator with no key of their own.
 
 ---
 
@@ -114,9 +118,9 @@ When deployed via Docker Compose or Helm, the shared API key is configured autom
 
 ### Authentication failures
 
-- If using **JWT mode**, confirm `TERMINALS_OPEN_WEBUI_URL` points to a reachable Open WebUI instance.
+- If using **JWT mode**, confirm `TERMINALS_OPEN_WEBUI_URL` points to a reachable Open WebUI instance, and that the connection's **Auth** is set to **Session** so each user's own token is what gets validated.
 - If using **API key mode**, confirm the key is set identically on both sides. Check for extra whitespace or newlines.
-- Check the orchestrator logs for `401` or `403` responses.
+- Check the orchestrator logs for `401` or `403` responses. A `403` naming the user ID means the token validated but belongs to someone other than the user the request is for.
 
 ### Workspace is reaped too quickly
 
