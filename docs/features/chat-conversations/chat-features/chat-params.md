@@ -78,18 +78,6 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 :::
 
-:::note Background tasks have their own parameters
-
-These three levels shape the requests a chat sends. Background tasks (chat titles, tags, follow-up suggestions, image prompts, retrieval and web search queries, autocomplete and context compaction summaries) never see the per-chat or per-account levels. They run on the task model, with one set of parameters an administrator sets once. See [Task Models](/features/administration/task-models).
-
-:::
-
-:::note API requests set their own parameters
-
-The same resolution applies to a request sent straight to the [chat completions endpoint](/reference/api-endpoints#-chat-completions). A parameter the request carries is the one sent, and the model's saved values fill in the rest. **Stream Chat Response** is the exception: it still decides whether the reply streams, whatever `stream` the request asked for.
-
-:::
-
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 
 :::tip
