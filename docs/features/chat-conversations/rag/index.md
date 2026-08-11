@@ -343,17 +343,9 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 ### CSV Table Summary
 
-A parsed CSV is its rows and nothing else, so the text a model is given never states how big the table is or which columns it has. Ask how many orders a spreadsheet contains and the answer comes from whichever rows happened to be retrieved.
+A parsed CSV is its rows and nothing else, so a model asked how many orders a spreadsheet holds answers from whichever rows were retrieved. Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default, restart required) puts one line in front of every `.csv` file naming its row count, its data row count and its column names.
 
-Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default, and a restart is needed after changing it) puts one line in front of the rows of every `.csv` file, naming the total number of rows including the header, the number of data rows and the column names taken from the header row.
-
-The delimiter is detected from the start of the file (falling back to a comma). The line sits at the top of the file's content, so it is retrieved like any other part of the file and is always present when the file is used with **Using Entire Document**.
-
-:::info Which files get a summary
-No summary is added when the content extraction engine is `external`, `tika` or `docling`, which handle `.csv` files themselves. Every other engine leaves them to Open WebUI's own CSV parser, so the summary applies there.
-
-Only files parsed after you turn the setting on get a summary line. Re-indexing does not add one, so existing CSVs have to be re-uploaded.
-:::
+The `external`, `tika` and `docling` extraction engines parse `.csv` files themselves and get no summary. Only files parsed after you turn the setting on get one, and re-indexing does not add it, so existing CSVs have to be re-uploaded.
 
 ## Google Drive Integration
 
