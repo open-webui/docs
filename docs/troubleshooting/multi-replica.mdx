@@ -94,10 +94,6 @@ REDIS_URL=redis://your-redis-host:6379/0
 
 For Ollama specifically, a chat sent to a model the replica has not seen no longer fails outright: the replica clears its model cache, re-reads the model list from the Ollama servers, and only reports the model as unknown if it is still missing. A model pulled or added while a replica was holding a stale list therefore becomes usable on the next request instead of after the cache expires.
 
-A message sent while the shared model list is being rebuilt no longer fails either. A chat running on one of the user's own [Direct Connections](/features/chat-conversations/direct-connections) could previously error out, or spend the turn working from a mix of old and new entries, if a model was dropped from the list at the moment the request read it. Each request now reads one consistent copy of the list, and the cost of reading it no longer grows with the number of models, so on an instance carrying hundreds of models the background work a chat turn fires off (chat title, tags, follow-up suggestions, query rewriting, image prompts and context compaction) no longer holds up other people's responses.
-
-If Redis is already configured and the model list still empties itself, the cause is probably not configuration sync at all but name resolution: on v0.11.0 the container could intermittently stop resolving the hostname of the Ollama or provider server, which reads as "Model not found". See [Intermittent Name Lookup Failures](/troubleshooting/connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found).
-
 ### 4. Database Corruption / "Locked" Errors
 
 **Symptoms:**
