@@ -13,7 +13,7 @@ Open WebUI is where you already chat: your models, your prompts, your history. B
 
 1. **Mint the key.** In Computer, go to **Settings → Admin → Gateway** and create an API key. Copy it now; it's shown once and stored hashed.
 
-2. **Add the connection in Open WebUI.** Admin Settings → Connections → add an OpenAI API connection:
+2. **Add the connection in Open WebUI.** Settings → Admin → Connections → add an OpenAI API connection:
 
    - **Base URL:** `http://<computer-host>:8000/v1`
    - **API Key:** the `sk-cptr-...` key

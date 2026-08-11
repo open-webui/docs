@@ -88,7 +88,7 @@ This is the most common problem, and it's typically caused by issues during cont
 
 **Solution:** Check your content extraction settings.
 
-- Navigate to: **Admin Settings > Documents**.
+- Navigate to: **Settings > Admin > Documents**.
 - Make sure you're using a robust content extraction engine such as:
   - Apache Tika
   - Docling
@@ -108,7 +108,7 @@ Open WebUI is designed to work with models that have limited context windows by 
 
 **Solutions:**
 
-- Go to **Admin Settings > Documents**
+- Go to **Settings > Admin > Documents**
 - Either:
   - **Enable "Bypass Embedding and Retrieval"**: sends full content directly without applying retrieval filters.
   - **Toggle on "Full Context Mode"**: injects more comprehensive content into the model prompt.
@@ -165,7 +165,7 @@ Bad embeddings = bad retrieval. If the vector representation of your content is 
 **Solution:**
 
 - Change to a high-quality embedding model (e.g., all-MiniLM-L6-v2, Instructor X, or OpenAI embeddings)
-- Go to: **Admin Settings > Documents**
+- Go to: **Settings > Admin > Documents**
 - After changing the model, be sure to:
 After changing the model, **reindex all existing documents** so the new embeddings take effect. Embedding quality directly affects what content is retrieved.
 
@@ -182,7 +182,7 @@ This error indicates a misconfigured or missing embedding model. When Open WebUI
 
 **Solution:**
 
-- Go to: **Admin Settings > Documents > Embedding Model**
+- Go to: **Settings > Admin > Documents > Embedding Model**
 - Save the embedding model again, even if it's already selected. This forces a recheck/download.
 - If you're using a remote/external embedding tool, make sure it's running and accessible to Open WebUI.
 
@@ -219,7 +219,7 @@ When using the **Markdown Header Splitter**, documents can sometimes be split in
 
 **Solution:**
 
-- Go to **Admin Settings > Documents**.
+- Go to **Settings > Admin > Documents**.
 - Increase the **Chunk Min Size Target**.
 - Setting this to a value like `1000` (or ~50-60% of your `CHUNK_SIZE`) merges small fragments with neighboring chunks, resulting in better semantic coherence and fewer total chunks.
 
@@ -381,11 +381,11 @@ If PDFs containing images with text are returning empty content:
 ✅ **Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
-   - Navigate to **Admin Settings > Documents**
+   - Navigate to **Settings > Admin > Documents**
    - Try **Apache Tika** or **Docling** for better OCR support
 
 2. **Enable PDF Image Extraction**:
-   - In **Admin Settings > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+   - In **Settings > Admin > Documents**, ensure **PDF Extract Images (OCR)** is enabled
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats

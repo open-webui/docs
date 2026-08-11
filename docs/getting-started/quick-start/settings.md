@@ -62,7 +62,7 @@ Many features follow a **two-layer pattern**:
 
 | Layer | Setting Location | Effect |
 |-------|-----------------|--------|
-| Admin enables it | Admin Settings > Interface | Makes autocomplete **available** on the instance |
+| Admin enables it | Settings > Admin > Interface | Makes autocomplete **available** on the instance |
 | User enables it | Settings > Interface | Turns autocomplete **on for you personally** |
 
 :::important Key Rule
@@ -102,7 +102,7 @@ The one deliberate exception is [Default Interface Settings](/features/administr
 Check whether the admin has enabled it globally first. Your personal toggle only takes effect if the admin has made the feature available at the instance level.
 
 **"I am the admin. Where do I configure connections to OpenAI or Ollama?"**
-Admin Settings > Connections. These are instance-wide and shared by all users.
+Settings > Admin > Connections. These are instance-wide and shared by all users.
 
 **"I want to use my own API key without sharing it with the server."**
 If the admin has enabled **Direct Connections**, you can add personal API keys in User Settings > Connections. See [Direct Connections](/features/chat-conversations/direct-connections).
@@ -117,5 +117,5 @@ It means you have never changed that option, so it is following the instance-wid
 Yes, with [Default Interface Settings](/features/administration/interface-defaults). It sets where everyone starts; each person can still change any of it afterwards.
 
 :::tip First-Time Admin?
-Start with **Admin Settings > Connections** to connect your model providers (Ollama, OpenAI, etc.), then explore **Admin Settings > Interface** to enable or disable features for your users.
+Start with **Settings > Admin > Connections** to connect your model providers (Ollama, OpenAI, etc.), then explore **Settings > Admin > Interface** to enable or disable features for your users.
 :::

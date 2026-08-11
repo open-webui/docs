@@ -79,7 +79,7 @@ Choose one setup.
 1. Start the container.
 2. Open `http://<unraid-ip>:3000`.
 3. Complete initial admin setup.
-4. Open **Settings > Admin Settings > Connections** and verify the Ollama endpoint.
+4. Open **Settings > Settings > Admin > Connections** and verify the Ollama endpoint.
 5. Confirm models appear in the model selector.
 
 ## 4. Persistent Volume Notes

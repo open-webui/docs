@@ -110,7 +110,7 @@ Open WebUI emits **170+ events** spanning every subsystem. Each name is namespac
 
 A subset of these also drive user-facing [Notifications](/features/chat-conversations/chat-features/notifications): `chat.finished`, `chat.failed`, `channel.message` and `calendar.alert` are the four events a user can subscribe a webhook target to.
 
-The authoritative, complete list is exposed by the backend event catalog and shown in **Admin Settings → General → Events** when configuring webhooks.
+The authoritative, complete list is exposed by the backend event catalog and shown in **Settings → Admin → General → Events** when configuring webhooks.
 
 ---
 
@@ -302,8 +302,8 @@ Several of these (provisioning, welcome chat, scheduled jobs) must happen once g
 There are two ways to react to events, for different needs:
 
 - **Event functions** (this page) run **Python** in-process. Use them when you need real logic: branching, calling internal services, registering endpoints, transforming data.
-- **Event webhooks** (configured in **Admin Settings → General → Events**) send selected events to **external HTTP endpoints as JSON**, or to chat destinations (Slack, Discord) as readable messages, filtered by event pattern and by user or group. Use them for simple "notify an external system" needs without writing code.
+- **Event webhooks** (configured in **Settings → Admin → General → Events**) send selected events to **external HTTP endpoints as JSON**, or to chat destinations (Slack, Discord) as readable messages, filtered by event pattern and by user or group. Use them for simple "notify an external system" needs without writing code.
 
 :::info Breaking change in 0.10.0
-The single global notification webhook is being replaced by this per-event webhook system. Existing webhook configuration is migrated automatically into **Admin Settings → General → Events**. If you previously received a notification on every action (including page refreshes), you now choose exactly which events fire a webhook and where they go.
+The single global notification webhook is being replaced by this per-event webhook system. Existing webhook configuration is migrated automatically into **Settings → Admin → General → Events**. If you previously received a notification on every action (including page refreshes), you now choose exactly which events fire a webhook and where they go.
 :::

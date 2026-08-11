@@ -134,7 +134,7 @@ When a model streams reasoning as `<think>…</think>` (or any other configured 
 
 If the upstream stream emits `reasoning_content` / `reasoning` / `thinking` deltas (rather than text tags), typical for **OpenAI o-series**, **DeepSeek's official API**, **llama.cpp** with reasoning enabled, or **Ollama** with the `--reasoning-parser` flag, Open WebUI captures those deltas into a separate `reasoning` item inside the assistant message's `output` array. The displayed `content` only contains a `<details type="reasoning">` block for the UI; the structured form lives on `output`.
 
-When that message is replayed to the LLM (within a tool-call loop or on the next user turn), Open WebUI rebuilds it from `output` rather than forwarding the rendered `content`. The format used for the rebuilt reasoning depends on the **connection's `Provider` setting** (**Admin Settings → Connections → OpenAI → Provider** dropdown, options are `Default`, `Azure OpenAI`, `llama.cpp`; Ollama connections are detected automatically):
+When that message is replayed to the LLM (within a tool-call loop or on the next user turn), Open WebUI rebuilds it from `output` rather than forwarding the rendered `content`. The format used for the rebuilt reasoning depends on the **connection's `Provider` setting** (**Settings → Admin → Connections → OpenAI → Provider** dropdown, options are `Default`, `Azure OpenAI`, `llama.cpp`; Ollama connections are detected automatically):
 
 | Connection `Provider` | Rebuilt reasoning format |
 | :--- | :--- |

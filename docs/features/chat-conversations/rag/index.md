@@ -49,7 +49,7 @@ Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Pyt
 
 ### Adding an external knowledge source
 
-Configure these under **Admin Settings > Integrations > External Knowledge Sources**:
+Configure these under **Settings > Admin > Integrations > External Knowledge Sources**:
 
 1. **Create a connection** to your vector database:
    - **Provider** (Qdrant / Milvus / pgvector)

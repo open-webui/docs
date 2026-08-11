@@ -99,7 +99,7 @@ Open WebUI also supports the experimental [Open Responses](/getting-started/quic
 To control and query your locally running model directly from Open WebUI:
 
 1. Open Open WebUI in your browser
-2. Go to ⚙️ **Admin Settings → Connections → OpenAI**.
+2. Go to ⚙️ **Settings → Admin → Connections → OpenAI**.
 3. Click ➕ **Add Connection**.
 4. Set the following (under **Standard / Compatible** if tabs are visible):
    - **URL**: `http://127.0.0.1:10000/v1`
@@ -130,7 +130,7 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 Once a model is held in memory by your `llama-server` instance, Open WebUI marks it with a green "Loaded" indicator in the model selector. Admins also see an **Eject** button on the row that unloads the model without restarting the server. It calls `POST /api/models/unload`, which in turn hits llama.cpp's `POST /models/unload` endpoint on the OpenAI-compatible connection's root URL.
 
-For this to work, the matching connection in **Admin Settings → Connections → OpenAI** must have its **Provider** set to `llama.cpp` (Open WebUI uses that hint to pick the correct unload mechanism). Connections left at the default OpenAI-compatible provider type return an error when an admin attempts to unload a model.
+For this to work, the matching connection in **Settings → Admin → Connections → OpenAI** must have its **Provider** set to `llama.cpp` (Open WebUI uses that hint to pick the correct unload mechanism). Connections left at the default OpenAI-compatible provider type return an error when an admin attempts to unload a model.
 
 ---
 

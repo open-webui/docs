@@ -39,7 +39,7 @@ Admins control whether the autocomplete feature is available on the server.
 ### 1. Configuring Autocomplete (Global)
 
 **Admin Panel Settings:**
-Go to **Admin Settings > Interface > Task Model** and toggle **Autocomplete Generation**.
+Go to **Settings > Admin > Interface > Task Model** and toggle **Autocomplete Generation**.
 
 ### 2. User Configuration (Personal)
 
@@ -56,7 +56,7 @@ If the Admin has disabled Autocomplete globally, users will **not** be able to e
 
 ### Why aren't suggestions appearing?
 1. **Check Settings**: Ensure it is enabled in **both** Admin and User settings.
-2. **Task Model**: Go to **Admin Settings > Interface** and verify a **Task Model** is selected. If no model is selected, the feature cannot generate predictions.
+2. **Task Model**: Go to **Settings > Admin > Interface** and verify a **Task Model** is selected. If no model is selected, the feature cannot generate predictions.
 3. **Latency**: If your Task Model is large or running on slow hardware, predictions might arrive too late to be useful. Switch to a smaller model.
 4. **Reasoning Models**: Ensure you are **not** using a "Reasoning" model (like o1 or o3), as their internal thought process creates excessive latency that breaks real-time autocomplete. If you are stuck with one, you can turn its `reasoning_effort` down under **Task Model Parameters** in **Settings > Admin > Interface**. That setting is shared by every background task, so read [Task Models](/features/administration/task-models#task-model-parameters) first.
 

@@ -232,7 +232,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
+- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Settings → Admin → Models**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_metadata`.
 
 :::info
@@ -249,7 +249,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings → Admin → Models**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_params`.
 
 :::info
@@ -5320,7 +5320,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`
-- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). Configurable via **Admin Settings → Audio → STT**.
+- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). Configurable via **Settings → Admin → Audio → STT**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Text-to-Speech
@@ -5393,7 +5393,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Admin Settings → Interface → Voice Mode Custom Prompt** (toggle).
+- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Settings → Admin → Interface → Voice Mode Custom Prompt** (toggle).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.voice.prompt.enable`.
 
 #### `VOICE_MODE_PROMPT_TEMPLATE`

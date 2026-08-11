@@ -15,7 +15,7 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 ## 🚀 Quick start 
 
-1. Open **⚙️ Admin Settings → Integrations**.
+1. Open **⚙️ Settings > Admin > Integrations**.
 2. Click **+ (Add Server)**.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your **Server URL** and **Auth** details (OAuth 2.1, if required).
@@ -30,13 +30,13 @@ If you are adding an MCP server, make sure **Type** is set to **MCP (Streamable 
 
 Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI connection will cause the UI to crash or display an infinite loading screen. If you encounter this:
 
-1. Disable the problematic tool connection via Admin Settings
+1. Disable the problematic tool connection via **Settings > Admin > Integrations**
 2. Re-add it with the correct **Type** set to **MCP**
 :::
 
 ## 🔒 MCP servers are admin-only {#mcp-servers-are-admin-only}
 
-MCP servers can only be added by **administrators**, under **Admin Settings → Integrations**. Regular users cannot register their own, by design.
+MCP servers can only be added by **administrators**, under **Settings > Admin > Integrations**. Regular users cannot register their own, by design.
 
 This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings → Integrations**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
 
@@ -125,7 +125,7 @@ Enable the tool again to retry.
 
 Use this when you already have a client ID/client secret from your identity provider.
 
-1. Open **Admin Settings → Integrations**.
+1. Open **Settings > Admin > Integrations**.
 2. Click **+ (Add Server)**.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your MCP server **URL**.
@@ -186,7 +186,7 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 
 The group tokens are resolved with a membership lookup that only runs when a header value actually contains one of them, so connections that do not use them are unaffected. Use them to let a tool server authorize by group instead of by individual user.
 
-Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
+Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Settings > Admin > Connections** (the **OpenAI** section), so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 
 :::note
 `{{USER_EMAIL}}` and `{{USER_ROLE}}` were added in v0.9.6. The same release also fixed MCP server connections, where custom-header templates were previously stored but **not** interpolated at request time. They now expand the same way they always have for direct connections and OpenAPI tool servers.
@@ -220,7 +220,7 @@ After adding an External Tool connection, the frontend gets stuck on a loading s
 You likely configured an **MCP server** using the **OpenAPI** connection type, or entered MCP-style JSON (containing `mcpServers`) into an OpenAPI connection.
 
 **Solution**:
-1.  Open **Admin Settings → Integrations** (the sidebar still loads)
+1.  Open **Settings > Admin > Integrations** (the sidebar still loads)
 2.  **Disable** or **delete** the problematic tool connection
 3.  Refresh the page (Ctrl+F5)
 4.  Re-add the connection with the correct **Type** set to **MCP (Streamable HTTP)**
@@ -245,4 +245,4 @@ Yes. Many deployments do both.
 
 **Can users add their own MCP servers?**
 
-No. Adding MCP servers is admin-only (**Admin Settings → Integrations**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.
+No. Adding MCP servers is admin-only (**Settings > Admin > Integrations**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.

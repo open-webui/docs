@@ -121,7 +121,7 @@ If streaming responses show garbled markdown rendering (e.g., visible `##`, `**`
 
 - Raw markdown tokens visible in responses (`##`, `**`, `###`)
 - Bold markers appearing incorrectly (`** Control:**` instead of `**Control:**`)
-- Words or sections randomly missing from responses
+- Words or sections randomly missing from responses (if the proxy turns out to be fine, see [Missing Text with the Faster JSON Encoder](#missing-text-with-the-faster-json-encoder))
 - Formatting works correctly when streaming is disabled
 
 ### Cause: Nginx Proxy Buffering
@@ -162,6 +162,10 @@ Disabling proxy buffering also **significantly improves streaming speed**, as re
 - **HAProxy**: Ensure `option http-buffer-request` is not enabled for SSE endpoints
 - **Traefik**: Check compression/buffering middleware settings
 - **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
+
+### Missing Text with the Faster JSON Encoder
+
+If pieces of a reply go missing and the proxy is not the cause, check whether `ENABLE_ORJSON=True` is set. On v0.11.0 that setting sends three invisible characters unescaped: line separator (`U+2028`), paragraph separator (`U+2029`) and next line (`U+0085`). Anything reading the response stream line by line counts them as a line break, so a reply carrying one arrives split and the piece it landed in is dropped with no error, in the chat and in external clients reading the OpenAI-compatible stream alike. The three are common in text lifted from PDFs and word processor documents, so the usual trigger is a model quoting an uploaded file back. Upgrading past v0.11.0 fixes it, and unsetting `ENABLE_ORJSON` avoids it in the meantime.
 
 ## 🌐 Frontend vs. Backend Connections (localhost Confusion)
 
@@ -295,7 +299,7 @@ This reduces how long Open WebUI waits for each endpoint before giving up and co
 
 ### Solution 2: Fix or Remove Unreachable Endpoints
 
-1. Go to **Admin Settings → Connections**
+1. Go to **Settings > Admin > Connections**
 2. Review your Ollama and OpenAI base URLs
 3. Remove or correct any unreachable IP addresses or hostnames
 4. Save the configuration
