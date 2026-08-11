@@ -95,6 +95,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 39      | chat_message     | Normalized per-message store for chat conversations              |
 | 40      | api_key          | Stores per-user API keys, replacing the former `user.api_key` column |
 | 41      | knowledge_directory | Nestable folders that organize files within a knowledge base |
+| 42      | channel_webhook  | Stores per-channel incoming webhooks for unauthenticated posting |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 

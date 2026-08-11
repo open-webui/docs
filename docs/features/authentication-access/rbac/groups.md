@@ -71,7 +71,7 @@ You can restrict access to specific objects (like a proprietary Model or sensiti
 
 The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.** instead of leaving a **Users** heading above an empty list.
 
-Changing what someone already has is done from their row in the **Access List**, not from the picker. Each row carries the level (a **Read**/**Write** selector on resources that accept write grants, a **Read** badge on the ones that do not) and an **✕** that removes the grant.
+Their row in the **Access List** is where you change what someone already has. Each row carries the level (a **Read**/**Write** selector on resources that accept write grants, a **Read** badge on the ones that do not) and an **✕** that removes the grant.
 
 :::tip Knowledge Scoping for Models
 Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for details.
