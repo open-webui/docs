@@ -44,15 +44,15 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | Permission | Description |
 | :--- | :--- |
 | **Models Access** | **(Parent)** Access the **Models** workspace to create or edit custom models. |
-| **Models Import** | *(Requires Models Access)* Ability to import models from JSON/files. |
-| **Models Export** | *(Requires Models Access)* Ability to export models to files. |
+| **Import Models** | *(Requires Models Access)* Ability to import models from JSON/files. |
+| **Export Models** | *(Requires Models Access)* Ability to export models to files. |
 | **Knowledge Access** | Access the **Knowledge** workspace to manage knowledge bases. |
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
-| **Prompts Import** | *(Requires Prompts Access)* Ability to import prompts. |
-| **Prompts Export** | *(Requires Prompts Access)* Ability to export prompts. |
+| **Import Prompts** | *(Requires Prompts Access)* Ability to import prompts. |
+| **Export Prompts** | *(Requires Prompts Access)* Ability to export prompts. |
 | **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) is `false`, since the Tools workspace does not exist in that case. |
-| **Tools Import** | *(Requires Tools Access)* Ability to import tools. |
-| **Tools Export** | *(Requires Tools Access)* Ability to export tools. |
+| **Import Tools** | *(Requires Tools Access)* Ability to import tools. |
+| **Export Tools** | *(Requires Tools Access)* Ability to export tools. |
 
 :::danger ⚠️ Tools Access = Root-Equivalent Access
 **Treat the Tools Access permission as root-equivalent access.** Granting a user access to create or import Tools is equivalent to giving them shell access to your server, because Tools and Functions execute arbitrary Python code. Only grant this permission to users you would trust with direct access to your server. If you enable this permission for untrusted users, you are accepting the risk of arbitrary code execution on your host. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).

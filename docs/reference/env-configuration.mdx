@@ -2370,9 +2370,9 @@ You do **not** need to manually set this variable for a secure installation. **A
 | **Windows** (`backend\start_windows.bat`) | ✅ Yes | `.webui_secret_key` file next to the script |
 | **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A (set `WEBUI_SECRET_KEY` yourself) |
 
-Each of these methods checks for the environment variable first, and if it is not set, it generates a random key, saves it to a file and injects it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
+The Docker, `open-webui serve` and Windows methods check for the environment variable first, and if it is not set, they generate a random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
 
-The Windows script builds its key from the command shell's own `%RANDOM%` generator, which is not a cryptographic source. It is fine for a local install, but set `WEBUI_SECRET_KEY` explicitly for anything you expose to other people. Docker and `open-webui serve` both draw on the operating system's random source instead.
+The Windows script builds its key from the command shell's own `%RANDOM%` generator, which is not a cryptographic source. That is adequate for a local install, but set `WEBUI_SECRET_KEY` explicitly on any host other people can reach.
 
 :::
 
