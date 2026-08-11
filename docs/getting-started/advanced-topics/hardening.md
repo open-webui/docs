@@ -29,12 +29,6 @@ If you are deploying Open WebUI for the first time, start with the [Quick Refere
 
 The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption keys for OAuth session data.
 
-**How the default works:**
-
-When running via Docker (`start.sh`), the Windows start script (`backend\start_windows.bat`) or `open-webui serve`, the application checks whether `WEBUI_SECRET_KEY` is set as an environment variable. If it is not, a random key is generated automatically and saved to `.webui_secret_key` inside the data directory. On subsequent restarts, the saved key is reloaded. This means that for single-instance deployments, no manual configuration is needed.
-
-The Windows script builds its key from the command shell's `%RANDOM%` generator rather than from a cryptographic source, so set `WEBUI_SECRET_KEY` explicitly on any Windows host that is not a personal machine.
-
 **When you need to set it explicitly:**
 
 If you run multiple Open WebUI instances behind a load balancer, every instance must share the same key. Otherwise, a token signed by one instance will be rejected by another, causing login failures. Generate a key with `openssl rand -base64 32` and pass it as an environment variable to all replicas.

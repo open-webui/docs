@@ -114,7 +114,7 @@ A system prompt an admin has configured on the model in the Workspace takes prec
 It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
 
 **"The interface is too small to read comfortably."**
-Raise **UI Scale** at the top of the **UI** section in **Settings > Interface**. It enlarges the whole application and is stored with your account. See [Accessibility](/features/accessibility) for that, High Contrast Mode and keyboard navigation.
+Raise **UI Scale** at the top of the **UI** section in **Settings > Interface**. It enlarges the whole application and is stored with your account.
 
 **"I am the admin. Can I make everyone start with the same interface options?"**
 Yes, with [Default Interface Settings](/features/administration/interface-defaults). It sets where everyone starts; each person can still change any of it afterwards.

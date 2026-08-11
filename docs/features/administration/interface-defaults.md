@@ -94,7 +94,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `showUpdateToast` | Toast Notifications for New Updates | `true` |
 | `showChangelog` | Show "What's New" Modal on Login | `true` |
 
-`textScale` is the **UI Scale** slider and `highContrastMode` is **High Contrast Mode**. See [Accessibility](/features/accessibility) for what each of them changes.
+`textScale` is the **UI Scale** slider and `highContrastMode` is **High Contrast Mode**.
 
 ### Chat
 
