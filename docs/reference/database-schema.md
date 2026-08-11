@@ -93,6 +93,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 37      | automation_run   | Stores execution history for automation runs                 |
 | 38      | pinned_note      | Tracks per-user note pins (each row = one user pinning one note) |
 | 39      | chat_message     | Normalized per-message store for chat conversations              |
+| 40      | api_key          | Stores per-user API keys, replacing the former `user.api_key` column |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -149,11 +150,10 @@ Things to know about the auth table:
 | description     | Text          | nullable        | Channel description                 |
 | data            | JSON          | nullable        | Flexible data storage               |
 | meta            | JSON          | nullable        | Channel metadata                    |
-
 | created_at      | BigInteger    | -               | Creation timestamp (nanoseconds)    |
 | updated_at      | BigInteger    | -               | Last update timestamp (nanoseconds) |
 
-Things to know about the auth table:
+Things to know about the channel table:
 
 - Uses UUID for primary key
 - Case-insensitive channel names (stored lowercase)
@@ -450,7 +450,6 @@ Things to know about the config table:
 | path            | Text          | nullable        | File system path      |
 | data            | JSON          | nullable        | File-related data     |
 | meta            | JSON          | nullable        | File metadata         |
-
 | created_at      | BigInteger    | -               | Creation timestamp    |
 | updated_at      | BigInteger    | -               | Last update timestamp |
 
@@ -549,7 +548,6 @@ Things to know about the group_member table:
 | description     | Text          | -                   | Knowledge base description |
 | data            | JSON          | nullable            | Knowledge base content     |
 | meta            | JSON          | nullable            | Additional metadata        |
-
 | created_at      | BigInteger    | -                   | Creation timestamp         |
 | updated_at      | BigInteger    | -                   | Last update timestamp      |
 
@@ -625,7 +623,6 @@ Things to know about the memory table:
 | name            | Text          | -               | Display name           |
 | params          | JSON          | -               | Model parameters       |
 | meta            | JSON          | -               | Model metadata         |
-
 | is_active       | Boolean       | default=True    | Active status          |
 | created_at      | BigInteger    | -               | Creation timestamp     |
 | updated_at      | BigInteger    | -               | Last update timestamp  |
@@ -680,7 +677,6 @@ A `UNIQUE(user_id, note_id)` constraint prevents duplicate pins for the same use
 | content         | Text          | NOT NULL        | Prompt content/template             |
 | data            | JSON          | nullable        | Additional prompt data              |
 | meta            | JSON          | nullable        | Prompt metadata                     |
-
 | is_active       | Boolean       | default=True    | Active status                       |
 | version_id      | Text          | nullable        | Current version identifier          |
 | tags            | JSON          | nullable        | Associated tags                     |
@@ -744,7 +740,6 @@ Things to know about the tag table:
 | specs           | JSON          | -               | Tool specifications   |
 | meta            | JSON          | -               | Tool metadata         |
 | valves          | JSON          | -               | Tool control settings |
-
 | created_at      | BigInteger    | -               | Creation timestamp    |
 | updated_at      | BigInteger    | -               | Last update timestamp |
 
