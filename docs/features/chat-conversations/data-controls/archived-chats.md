@@ -33,7 +33,7 @@ From the Data Controls tab, you can also perform bulk operations:
 
 :::info Deleting needs the Chat Delete permission
 
-**Delete** on an archived chat and **Delete All Chats** are only drawn for people who are allowed to delete chats. If an administrator has turned **Allow Chat Delete** off for you, neither appears, and archiving still works as before. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
+**Delete** on an archived chat and **Delete All Chats** are drawn only for people who hold **Allow Chat Delete**. Without it neither appears, so there is no button that refuses when you press it, and archiving and **Unarchive All** work as before. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
 
 :::
 
