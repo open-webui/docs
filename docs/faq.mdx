@@ -240,8 +240,8 @@ This is also why the same model accessed through different interfaces might give
 By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-4 or Claude), this can significantly increase your costs.
 
 **To reduce API costs:**
-1. Go to **Settings > Admin > Experience > Interface** (for title/tag generation settings)
-2. Configure a **Task Model** under **Settings > Admin > Experience > Interface > Tasks** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
+1. Go to **Settings > Admin > Interface** (for title/tag generation settings)
+2. Configure a **Task Model** under **Settings > Admin > Interface > Tasks** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
 3. Disable features you don't need (auto-title, auto-tags, etc.)
 4. Cap what those requests can spend by setting `max_tokens` under **Task Model Parameters** in the same **Tasks** section. Tag, follow-up and search query generation otherwise send no output limit at all. See [Task Models](/features/administration/task-models#task-model-parameters)
 

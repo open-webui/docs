@@ -67,32 +67,32 @@ Controls what users can share with the community or make public.
 
 | Permission | Description |
 | :--- | :--- |
-| **Share Models** | **(Parent)** Ability to share models (make them accessible to others). |
-| **Public Models** | *(Requires Share Models)* Ability to make models publicly discoverable. |
-| **Share Knowledge** | **(Parent)** Ability to share knowledge bases. |
-| **Public Knowledge** | *(Requires Share Knowledge)* Ability to make knowledge bases public. |
-| **Share Prompts** | **(Parent)** Ability to share prompts. |
-| **Public Prompts** | *(Requires Share Prompts)* Ability to make prompts public. |
-| **Share Tools** | **(Parent)** Ability to share tools. |
-| **Public Tools** | *(Requires Share Tools)* Ability to make tools public. |
-| **Share Skills** | **(Parent)** Ability to share skills. |
-| **Public Skills** | *(Requires Share Skills)* Ability to make skills public. |
-| **Share Notes** | **(Parent)** Ability to share Notes. |
-| **Public Notes** | *(Requires Share Notes)* Ability to make Notes public. |
+| **Models Sharing** | **(Parent)** Ability to share models (make them accessible to others). |
+| **Models Public Sharing** | *(Requires Models Sharing)* Ability to make models publicly discoverable. |
+| **Knowledge Sharing** | **(Parent)** Ability to share knowledge bases. |
+| **Knowledge Public Sharing** | *(Requires Knowledge Sharing)* Ability to make knowledge bases public. |
+| **Prompts Sharing** | **(Parent)** Ability to share prompts. |
+| **Prompts Public Sharing** | *(Requires Prompts Sharing)* Ability to make prompts public. |
+| **Tools Sharing** | **(Parent)** Ability to share tools. |
+| **Tools Public Sharing** | *(Requires Tools Sharing)* Ability to make tools public. |
+| **Skills Sharing** | **(Parent)** Ability to share skills. |
+| **Skills Public Sharing** | *(Requires Skills Sharing)* Ability to make skills public. |
+| **Notes Sharing** | **(Parent)** Ability to share Notes. |
+| **Notes Public Sharing** | *(Requires Notes Sharing)* Ability to make Notes public. |
 | **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
 | **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
 | **Chats Open Sharing** | *(Requires Share Chat)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
 | **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, individual-user grants are stripped from create/update payloads; group and public sharing are unaffected. Admins are always exempt. |
-| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. Set this per group: the global default currently does not persist, see the [note in the reference](/reference/env-configuration#user_permissions_access_grants_allow_groups). |
+| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. |
 
 Every toggle in the panel's **Sharing Permissions** section is off unless you turn it on, and a public toggle is only drawn once the parent permission named in its row is on. The two **Allow Sharing With ...** rows sit in a separate **Access Grants** section and are on by default.
 
 :::warning Re-check Tools and Notes public sharing after an upgrade
 
-On instances upgraded from a release that predates the **Public Tools** and **Public Notes** permissions, the admin panel used to draw those two switches (labelled **Tools Public Sharing** and **Notes Public Sharing**) as on while the backend still refused the action. Saving any permission on that page then persisted them as enabled, granting public tool and note sharing that was never configured. The panel and the enforcement now agree, but a value already written to the database is not rolled back.
+On instances upgraded from a release that predates **Tools Public Sharing** and **Notes Public Sharing**, the admin panel used to draw both switches as on while the backend still refused the action. Saving any permission on that page then persisted them as enabled, granting public tool and note sharing that was never configured. The panel and the enforcement now agree, but a value already written to the database is not rolled back.
 
-If you saved default permissions on an affected release, open **Admin Panel > Users > Groups > Default Permissions** and confirm those two switches read the way you intend. Group-level overrides are worth the same check.
+If you saved default permissions on an affected release, open **Settings > Admin > Users > Groups**, edit **Default permissions** and confirm both switches read the way you intend. Group-level overrides are worth the same check.
 
 :::
 

@@ -1330,14 +1330,14 @@ when using OpenAI-compatible endpoints.
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Experience > Interface**.
+- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Interface**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_MODEL`
 
 - Type: `str`
 - Default: Empty string (follow the task model)
-- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Experience > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
+- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
@@ -1351,14 +1351,14 @@ when using OpenAI-compatible endpoints.
 
 - Type: `int`
 - Default: falls back to `CONTEXT_COMPACTION_TOKEN_THRESHOLD` when unset
-- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Experience > Interface** (**Token Cap**).
+- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Interface** (**Token Cap**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_RETENTION_PERCENTAGE`
 
 - Type: `int`
 - Default: `40`
-- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Compaction always splits on a user message, so the retained portion begins at a turn boundary rather than mid-exchange. Can also be set in **Settings > Admin > Experience > Interface** (**Retained Messages**).
+- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Compaction always splits on a user message, so the retained portion begins at a turn boundary rather than mid-exchange. Can also be set in **Settings > Admin > Interface** (**Retained Messages**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -2361,15 +2361,18 @@ When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_
 
 :::info How the secret key is generated
 
-You do **not** need to manually set this variable for a secure installation. **All standard launch methods automatically generate and persist a cryptographically random key on first start:**
+You do **not** need to manually set this variable for a secure installation. **All standard launch methods automatically generate and persist a random key on first start:**
 
 | Launch method | Auto-generates? | Persisted to |
 |---|---|---|
 | **Docker** (`start.sh`) | ✅ Yes | `.webui_secret_key` file inside the container |
 | **pip install** (`open-webui serve`) | ✅ Yes | `.webui_secret_key` file in the working directory |
+| **Windows** (`backend\start_windows.bat`) | ✅ Yes | `.webui_secret_key` file next to the script |
 | **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A (set `WEBUI_SECRET_KEY` yourself) |
 
-The standard Docker and `open-webui serve` methods check for the environment variable first, and if it is not set, they generate a secure random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
+Each of these methods checks for the environment variable first, and if it is not set, it generates a random key, saves it to a file and injects it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
+
+The Windows script builds its key from the command shell's own `%RANDOM%` generator, which is not a cryptographic source. It is fine for a local install, but set `WEBUI_SECRET_KEY` explicitly for anything you expose to other people. Docker and `open-webui serve` both draw on the operating system's random source instead.
 
 :::
 

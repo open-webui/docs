@@ -117,7 +117,7 @@ Toggle what the model can do and bind resources:
 | **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
 | **Image Generation** | Enable image generation |
 | **Usage** | Ask the provider to report token counts on streamed replies (`stream_options.include_usage`). Off by default. Most OpenAI-compatible providers report nothing unless asked, so without it a response has no token figures to show and none to aggregate in [Analytics](/features/administration/analytics) |
-| **Citations** | Show the sources behind a reply, from knowledge, web search and the builtin tools that return them. On by default; with it off those sources are neither collected nor displayed |
+| **Citations** | Show the sources behind a reply, from knowledge, web search and the builtin tools that return them. On by default; with it off no sources are shown |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
 | **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels, Files, Task Management, Automations |

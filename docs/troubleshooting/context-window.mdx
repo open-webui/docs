@@ -52,7 +52,7 @@ There is no single policy that is correct for every deployment, every user, and 
 
 Open WebUI ships an optional **Context Compaction** feature that handles the common case for you. When a chat's estimated context grows past a token threshold, it asks a model to summarize the older messages, then continues the conversation from that summary plus the most recent messages, so a long chat keeps going without overflowing the window.
 
-It is **disabled by default**. An administrator enables and tunes it in **Settings > Admin > Experience > Interface**:
+It is **disabled by default**. An administrator enables and tunes it in **Settings > Admin > Interface**:
 
 - **Context Compaction**: the on/off toggle ([`ENABLE_CONTEXT_COMPACTION`](/reference/env-configuration#enable_context_compaction)).
 - **Context Compaction Model**: the model that writes the summaries ([`CONTEXT_COMPACTION_MODEL`](/reference/env-configuration#context_compaction_model)). Leave it on **Current Model** to follow the task model as before.

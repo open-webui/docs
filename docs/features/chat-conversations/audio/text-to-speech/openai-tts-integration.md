@@ -176,7 +176,7 @@ OpenRouter supports `mp3` and `pcm` output formats. Always select `mp3` in Open 
 
 ## Response Splitting
 
-When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Admin > Experience > Audio** under **Response Splitting**.
+When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Admin > Audio** under **Response Splitting**.
 
 | Option | Description |
 |--------|-------------|
