@@ -104,6 +104,8 @@ These run in the background, so they are easy to overlook. A dedicated task mode
 The main chat experience does not change. The background chores just stop dragging.
 :::
 
+Under the two pickers, **Task Model Parameters > Configure** ([`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)) sets the generation parameters those background requests are sent with, `max_tokens` and `temperature` among them. Most people never need it. It matters if your task model is a reasoning one and titles or context compaction summaries come back cut off, because the built-in 1000-token limit gets spent on thinking; setting anything here replaces that limit with your own values.
+
 While you are in the Interface settings, you can also disable these chores entirely if you are on a low-spec machine or simply do not want them. Each one has both an **admin toggle** in the same page and an **environment variable**:
 
 | Chore | Admin toggle (Settings > Interface) | Env var |

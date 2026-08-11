@@ -94,6 +94,8 @@ REDIS_URL=redis://your-redis-host:6379/0
 
 For Ollama specifically, a chat sent to a model the replica has not seen no longer fails outright: the replica clears its model cache, re-reads the model list from the Ollama servers, and only reports the model as unknown if it is still missing. A model pulled or added while a replica was holding a stale list therefore becomes usable on the next request instead of after the cache expires.
 
+If Redis is already configured and the model list still empties itself, the cause is probably not configuration sync at all but name resolution: on v0.11.0 the container could intermittently stop resolving the hostname of the Ollama or provider server, which reads as "Model not found". See [Intermittent Name Lookup Failures](/troubleshooting/connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found).
+
 ### 4. Database Corruption / "Locked" Errors
 
 **Symptoms:**
@@ -322,17 +324,21 @@ Every Socket.IO event in a multi-replica deployment is published through Redis, 
 | Path | Why it matters at scale |
 |---|---|
 | Socket.IO payloads, including the ones published over Redis, plus Redis-backed session and collaborative-document state | The reason to turn this on. Every live update crossing replicas is encoded and decoded here |
+| Chat contents and the other JSON columns the database stores (user settings, the configuration table, folders, notes and so on) | The whole message tree is serialized on every save and parsed again on every open, so the cost grows with the length of the conversation, not with the number of requests |
 | Upstream provider responses (OpenAI-compatible and Ollama), including per-chunk parsing of streamed completions | Runs once per arriving token batch, so it scales with streaming volume rather than request count |
+| Request bodies sent to model providers: OpenAI-compatible chat completions, embeddings and responses, the Ollama inference endpoints and the Anthropic passthrough | Each body carries the entire conversation or the whole embedding batch, so this is the largest single serialization on a chat request |
 | Incoming HTTP request bodies and outgoing `JSONResponse` bodies | The broadest surface, but individually the cheapest |
+| Chunk metadata written and read by the Valkey vector store, and read by Oracle 23ai | Parsed once per result row, so it scales with how many chunks each knowledge base search returns |
+| Results returned by built-in tools, and the permission tree resolved on sign-in, sign-up, OAuth callback and every session refresh | Small payloads, but they sit on paths every user hits repeatedly, and a session refresh happens on every page load |
 
 **Why it is opt-in.** orjson is stricter than the standard library, so the default keeps behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
 
 Two differences do survive the fallback, neither of which affects a normal deployment:
 
 - **`NaN` and `Infinity` floats in a response body serialize as `null`** instead of raising. Starlette's own encoder is configured with `allow_nan=False`, so a response carrying those values previously failed outright and now goes out with nulls. If you have a custom tool or pipe that can emit them, this is a behaviour change to be aware of rather than a regression.
-- **Encoded output carries raw UTF-8 rather than `\uXXXX` escapes.** Both are valid JSON and every client parses them identically, but the exact bytes differ, which matters only if something downstream checksums or string-compares encoded JSON.
+- **Encoded output carries raw UTF-8 rather than `\uXXXX` escapes.** Both are valid JSON and every client parses them identically, but the exact bytes differ, which matters only if something downstream checksums or string-compares encoded JSON. This applies to stored data as well: rows written into the database's JSON columns, and chunk metadata written into the Valkey vector store, hold non-ASCII text raw and are correspondingly smaller. Each encoder reads the other's output, so rows written before you turned the setting on stay readable and turning it back off is equally safe; neither direction needs a migration.
 
-**When not to bother.** On a single-worker, single-user instance the saving is real but invisible next to model latency. The setting earns its keep once Socket.IO traffic is crossing Redis between workers or replicas.
+**When not to bother.** On a single-worker, single-user instance the saving is real but invisible next to model latency. The setting earns its keep once Socket.IO traffic is crossing Redis between workers or replicas. The one thing that can be felt on a small instance is very long chats, since the whole conversation is serialized on each save and parsed again on each open.
 
 See [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself and [Scaling → Switch the JSON Encoder to orjson](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it fits in a scaled rollout.
 

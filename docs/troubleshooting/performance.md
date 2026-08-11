@@ -42,6 +42,8 @@ There are two separate settings in **Settings > Admin > Experience > Interface**
 *   **External/Cloud**: `gpt-5-nano`, `gemini-2.5-flash-lite`, `llama-3.1-8b-instant` (OpenAI/Google/Groq/OpenRouter).
 *   **Local**: `qwen3:1b`, `gemma3:1b`, `llama3.2:3b`.
 
+**Tuning the requests themselves:** below the two model pickers, **Task Model Parameters > Configure** ([`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)) sets the generation parameters every background request is sent with, so you can cap output with `max_tokens`, lower `temperature` or set `reasoning_effort` low if you are stuck on a reasoning model. Note that setting anything here removes the built-in 1000-token cap on title generation and context compaction summaries, so add `max_tokens` explicitly if you want those bounded.
+
 ### 2. Caching & Latency Optimization
 
 Configure these settings to reduce latency and external API usage.
@@ -222,10 +224,11 @@ See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compre
 
 #### JSON Encoder
 
-Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chunk of a streamed completion arriving from the provider, and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
+Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat written to and read back from the database, every request body sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
 
 *   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
-*   **Where it is not**: a single-user instance. The saving is real but too small to notice against model latency.
+*   **Where else it shows up**: chat storage. A chat is held in a single JSON column, so the whole message tree is serialized on every save and parsed again on every open, and the cost of that grows with the length of the conversation. The request body sent upstream to the provider, which carries the same conversation, is encoded on the same path.
+*   **Where it is not**: a single-user instance with ordinary-sized chats. The saving is real but too small to notice against model latency.
 *   **Why it is opt-in**: orjson is stricter than the standard library. Payloads it rejects (non-string dictionary keys, integers beyond 64 bits, `NaN`/`Infinity` literals) fall back to the standard-library path automatically, so nothing breaks, but the default stays on the standard library to keep behaviour byte-for-byte identical to earlier releases. The one behaviour change to be aware of: `NaN` and `Infinity` floats in a JSON response now serialize as `null` instead of raising.
 
 - **Env Var**: `ENABLE_ORJSON=True`
@@ -251,6 +254,21 @@ Long LLM completions can exceed default HTTP client timeouts. Configure these to
 - **Env Var**: `AIOHTTP_CLIENT_TIMEOUT=1800` (30 minutes for completions)
 - **Env Var**: `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15` (shorter for model listing)
 - **Env Var**: `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=15`
+
+#### DNS Resolver
+
+Every model call, web search fetch, RAG page load and tool call starts with a hostname lookup. By default those lookups go through the operating system resolver, which runs `getaddrinfo` on asyncio's default executor (a separate pool from `THREAD_POOL_SIZE`). That pool holds `min(32, cpu_count + 4)` threads and is shared with other blocking work, so under heavy concurrency lookups queue behind each other and behind unrelated jobs.
+
+Setting `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True` switches to c-ares, which resolves on the event loop instead. Concurrent lookups then cost roughly what a single one costs, and a long blocking job can no longer stall name resolution for everyone else on the instance.
+
+*   **Where the win is**: instances doing hundreds of concurrent outbound requests, especially alongside blocking work such as vector-DB batch upserts.
+*   **Where it is not**: anything below that. At low concurrency the two resolvers are indistinguishable on a real network.
+*   **Why it is opt-in**: c-ares does not resolve names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file but not the rest of `nsswitch.conf`, so `.local` via avahi/mDNS, NIS or LDAP backends and Windows NBNS names resolve differently or not at all. On some Windows hosts it finds no usable nameserver, and in Docker its channel has been observed to intermittently stop resolving container names. v0.11.0 enabled it unconditionally and those failures are what made it a switch.
+
+- **Env Var**: `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True`
+  *   *Recommendation*: leave it off unless you have measured DNS as a bottleneck and confirmed c-ares resolves every name your deployment uses. Requires a restart.
+
+See [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the variable itself, and [Intermittent Name Lookup Failures](/troubleshooting/connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
 
 #### Container Resource Limits
 For Docker deployments, ensure adequate resource allocation:
@@ -527,7 +545,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
-13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of encoding Socket.IO events and parsing streamed provider chunks, which is the heaviest JSON work in a clustered deployment. See [JSON Encoder](#json-encoder).
+13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and reading and writing whole chats in the database. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 
@@ -585,6 +603,7 @@ For detailed information on all available variables, see the [Environment Config
 | :--- | :--- |
 | `TASK_MODEL` | [Task Model (Local)](/reference/env-configuration#task_model) |
 | `TASK_MODEL_EXTERNAL` | [Task Model (External)](/reference/env-configuration#task_model_external) |
+| `TASK_MODEL_PARAMS` | [Task Model Parameters](/reference/env-configuration#task_model_params) |
 | `ENABLE_BASE_MODELS_CACHE` | [Cache Model List](/reference/env-configuration#enable_base_models_cache) |
 | `MODELS_CACHE_TTL` | [Model Cache TTL](/reference/env-configuration#models_cache_ttl) |
 | `ENABLE_QUERIES_CACHE` | [Queries Cache](/reference/env-configuration#enable_queries_cache) |
@@ -594,6 +613,7 @@ For detailed information on all available variables, see the [Environment Config
 | `ENABLE_COMPRESSION_MIDDLEWARE` | [HTTP Response Compression](/reference/env-configuration#enable_compression_middleware) |
 | `ENABLE_ORJSON` | [JSON Encoder](/reference/env-configuration#enable_orjson) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
+| `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER` | [DNS Resolver](/reference/env-configuration#aiohttp_client_async_dns_resolver) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
 | `CONTENT_EXTRACTION_ENGINE` | [Content Extraction Engine](/reference/env-configuration#content_extraction_engine) |
 | `AUDIO_STT_ENGINE` | [STT Engine](/reference/env-configuration#audio_stt_engine) |

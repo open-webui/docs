@@ -58,7 +58,7 @@ If the Admin has disabled Autocomplete globally, users will **not** be able to e
 1. **Check Settings**: Ensure it is enabled in **both** Admin and User settings.
 2. **Task Model**: Go to **Admin Settings > Interface** and verify a **Task Model** is selected. If no model is selected, the feature cannot generate predictions.
 3. **Latency**: If your Task Model is large or running on slow hardware, predictions might arrive too late to be useful. Switch to a smaller model.
-4. **Reasoning Models**: Ensure you are **not** using a "Reasoning" model (like o1 or o3), as their internal thought process creates excessive latency that breaks real-time autocomplete.
+4. **Reasoning Models**: Ensure you are **not** using a "Reasoning" model (like o1 or o3), as their internal thought process creates excessive latency that breaks real-time autocomplete. If you are stuck with one, **Admin Settings > Interface > Tasks > Task Model Parameters** ([`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)) lets you turn its `reasoning_effort` down. That setting is shared by every background task, so whatever you put there also applies to titles, tags and context compaction summaries.
 
 ### Performance Impact
 Autocomplete sends a request to your LLM essentially every time you pause typing (debounced).

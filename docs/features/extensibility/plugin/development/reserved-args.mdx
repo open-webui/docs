@@ -319,6 +319,8 @@ await __event_emitter__({
 
 A `Callable` that sends an event and waits for the browser to answer it. Available to Pipes, Filters, Tools and Actions alike.
 
+It returns whatever the browser sent back. When it cannot get an answer it returns a `dict` with an `error` key instead of raising: `{"error": "Client session disconnected."}` if the tab is already gone, or `{"error": "Event call timed out. The browser tab may be inactive or closed."}` if [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) is set and elapses. Without that variable there is no timeout at all and the call waits indefinitely.
+
 ### `__files__`
 
 A `list` of files sent via the chat. Note that images are not considered files and are sent directly to the model as part of the `body["messages"]` list.

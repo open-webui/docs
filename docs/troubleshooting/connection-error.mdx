@@ -237,6 +237,34 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 After running the above, your WebUI should be available at `http://localhost:8080`.
 
+## 🧭 Intermittent Name Lookup Failures (Often Reported as "Model not found")
+
+### Common Symptoms
+
+- Chats fail with **"Model not found"** for a model that is configured and worked a moment ago, then work again later.
+- The Ollama model list empties by itself, and a restart brings it back.
+- Backend logs show `ClientConnectorDNSError` or `Cannot connect to host ...` for a hostname that resolves fine from a shell inside the same container.
+- On some Windows hosts, every request to an external model provider fails from the first start.
+
+### Cause
+
+Open WebUI resolves hostnames through the operating system resolver. Between v0.11.0 and this release it resolved them through c-ares instead, which the `aiodns` package activates inside aiohttp for the whole process. c-ares does not behave the same everywhere:
+
+- On some Windows hosts it discovers only `127.0.0.1:53` as a nameserver, so no external name resolves at all.
+- In Docker its long-lived channel intermittently stops resolving container names, even though Docker's embedded DNS is still answering. The symptom is a wiped model list and in-flight chats failing with a misleading "Model not found", since a name that will not resolve is indistinguishable from a provider that has no such model.
+
+### Solution
+
+Upgrade. Name lookups go through the operating system resolver again by default, so there is nothing to configure and container names, `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` all behave the way the rest of the host does.
+
+c-ares is still available for deployments whose resolver setup is known to work with it. It resolves on the event loop instead of occupying a thread, which keeps a burst of concurrent lookups roughly as cheap as a single one:
+
+```bash
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=true
+```
+
+Leave it off unless you have a measured reason to enable it, and be aware that with it on, names served only by an NSS module (`.local` via avahi/mDNS, NIS or LDAP backends, Windows NBNS) resolve differently or not at all. See [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the full trade-off.
+
 ## ⏱️ Model List Loading Issues (Slow UI / Unreachable Endpoints)
 
 If your Open WebUI takes a long time to load models, or the model selector spins indefinitely, it may be due to an unreachable or slow API endpoint configured in your connections.

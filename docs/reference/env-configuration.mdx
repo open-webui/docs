@@ -34,6 +34,8 @@ To disable this behavior and force Open WebUI to always use your environment var
 
 **CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved**.
 
+The OAuth settings are the exception: they are shown read-only in the Admin Panel whenever [`ENABLE_OAUTH_PERSISTENT_CONFIG`](#enable_oauth_persistent_config) is `False`, which is its default, so there is nothing to edit and nothing to lose.
+
 :::
 
 ### Troubleshooting Ignored Environment Variables 🛠️
@@ -256,6 +258,23 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Use valid JSON (for example: `{"temperature":0.7,"function_calling":"native"}`)
 - If parsing fails, Open WebUI logs the error and falls back to `{}`
+
+:::
+
+#### `DEFAULT_INTERFACE_SETTINGS`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: Sets instance-wide defaults for the personal options in **Settings > Interface**, so every account starts from your preferences instead of the built-in ones. Keys are the setting names as they are stored in a user's own settings, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins over the default. A setting the user has never touched follows the default and keeps following it, so changing the default later moves everyone who has not overridden it. Configurable via **Settings > Admin > System > General > UI > Default Interface Settings**, see [Default Interface Settings](/getting-started/quick-start/settings#default-interface-settings-admin).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.default_interface_settings`.
+
+:::info
+
+`DEFAULT_INTERFACE_SETTINGS` is read from the environment as a JSON string at startup.
+
+- Use valid JSON (for example: `{"chatBubble": false, "title": {"auto": false}}`)
+- If parsing fails, Open WebUI logs the error and falls back to `{}`
+- Anything that parses to something other than a JSON object (an array or a number, for example) is also replaced by `{}`
 
 :::
 
@@ -860,7 +879,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
 - Type: `bool`
 - Default: `False`
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, upstream provider responses including streamed chunks, and Socket.IO payloads. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, the JSON columns the database reads and writes (chat contents, user settings, the configuration table), the request bodies sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the permission lookup that runs on sign-in, sign-up and every session refresh, Socket.IO payloads and the chunk metadata read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -968,6 +987,25 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 - Type: `bool`
 - Default: `False`
 - Description: Controls whether outbound HTTP requests across the application follow `3xx` redirects. When `False` (the default since v0.9.6), redirects are not followed. This closes a class of SSRF where a public, validated URL `302`-redirects to an internal address (RFC 1918, loopback `127.0.0.1`, cloud-metadata `169.254.169.254`) that bypasses the original allowlist check. Affected call sites include the RAG web loader, image loading and base64 conversion, OAuth pre-flight, code-interpreter login, and tool-server execution. Set to `True` only if your deployment legitimately requires redirect following (e.g. shortlink-style URLs) AND you have other SSRF protections in place, typically an egress firewall or `WEB_FETCH_FILTER_LIST` covering your internal ranges.
+
+#### `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Chooses which resolver aiohttp uses for every outbound hostname lookup. When `False` (the default), lookups go through the operating system resolver (aiohttp's `ThreadedResolver`, which runs `getaddrinfo` on asyncio's default executor), so Open WebUI resolves names exactly the way anything else on the machine does. When `True`, lookups go through c-ares (the `aiodns` package, aiohttp's `AsyncResolver`), which resolves on the event loop instead of occupying a thread, so a burst of concurrent lookups costs roughly as much as a single one. Read once at startup and applied before the first connection is opened, so a restart is required for a change to take effect. It covers every outbound request, including the Mistral OCR content-extraction loader, which previously pinned itself to c-ares on its own.
+
+:::warning Only turn this on if you have confirmed c-ares works in your environment
+
+v0.11.0 shipped the `aiodns` package, which made aiohttp switch every outbound request to c-ares with no way to opt out. That broke name resolution on some deployments:
+
+- On some Windows hosts, c-ares discovers only `127.0.0.1:53` as a nameserver, so every lookup to an external model provider fails.
+- In Docker, the long-lived c-ares channel intermittently stops resolving container names while Docker's embedded DNS keeps answering. That empties the Ollama model list and fails in-flight chats with a misleading "Model not found".
+
+The operating system resolver is the default again, so nothing needs configuring to get working name resolution. Set this to `True` only for deployments whose resolver setup is known to work with c-ares.
+
+c-ares also reads `/etc/resolv.conf` and the hosts file but not the rest of `nsswitch.conf`, so names served only by an NSS module (`.local` via avahi/mDNS, NIS or LDAP backends, Windows NBNS) resolve differently or not at all when it is enabled. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` keep working either way, since those go through the hosts file.
+
+:::
 
 #### `USER_AGENT`
 
@@ -1268,6 +1306,24 @@ when using Ollama models.
 - Description: The default model to use for tasks such as title and web search query generation
 when using OpenAI-compatible endpoints.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `TASK_MODEL_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: The generation parameters sent with background task requests: title generation, tag generation, follow-up suggestions, image prompt generation, retrieval and web search query generation, autocomplete and context compaction summaries. It takes the same keys as a model's advanced parameters (`temperature`, `max_tokens`, `top_p`, `seed`, `reasoning_effort`, `stop`, the Ollama-only options and so on), and they are applied to whichever model the task actually runs on, whether that is [`TASK_MODEL`](#task_model), [`TASK_MODEL_EXTERNAL`](#task_model_external), [`CONTEXT_COMPACTION_MODEL`](#context_compaction_model) or the chat's own model. Leave it empty and nothing changes: title generation and compaction summaries stay capped at the `max_tokens` configured on whichever model runs them (default `1000`) and the other tasks send no parameters at all. Set anything at all here and that built-in cap is no longer applied, so include `max_tokens` yourself if you still want a limit. Raising or removing the cap is the fix for a reasoning task model that spends its budget on thinking and returns a title or summary that stops mid-sentence. Emoji generation always uses `max_tokens: 4` and ignores this setting. Can also be set in **Settings > Admin > Experience > Interface**, under **Tasks** > **Task Model Parameters** > **Configure**.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
+
+:::info
+
+`TASK_MODEL_PARAMS` is read from the environment as a JSON string at startup.
+
+- Use valid JSON (for example: `{"max_tokens":4000,"temperature":0.3}`)
+- If parsing fails, Open WebUI logs the error and falls back to `{}`
+- Open WebUI's own control keys are stripped before the request goes out and do nothing here: `stream_response`, `stream_delta_chunk_size`, `function_calling`, `reasoning_tags`, `compact_token_threshold`, `system` and `note_id`. The admin panel offers controls for the first five, so it is possible to set one and see no effect
+- Anything under `custom_params` is merged in, which is how you send a provider-specific field that has no control of its own (in the admin panel, **Add Custom Parameter**)
+
+:::
 
 #### `ENABLE_CONTEXT_COMPACTION`
 
@@ -2744,18 +2800,18 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 - Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
 - New data is written to the 5 shared multitenancy collections
 - Application treats knowledge bases as empty until reindexed
-- Files and memories are NOT automatically migrated to the new collection schema and will appear missing
+- Memories, and files that are not in a knowledge base, are NOT automatically migrated to the new collection schema and will appear missing
 
 **Clean migration path from normal Milvus to multitenancy milvus:**
 - Before enabling multitenancy, export any critical knowledge content from the UI if possible
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
 - Navigate to `Admin Settings > Documents > Click Reindex Knowledge Base`
 
-**This rebuilds ONLY knowledge base vectors into the new multitenancy collections**
-**Files, user memories, and web search history are NOT migrated by this operation**
+**This rebuilds knowledge base vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
+**User memories, web search history, and files that were never added to a knowledge base are NOT migrated by this operation**
 
 **Verify knowledge bases are accessible and functional**
-- Re-upload files if file-based retrieval is critical (file metadata remains but vectors are not migrated)
+- Re-upload files that live outside any knowledge base if file-based retrieval for them is critical (file metadata remains but their vectors are not migrated)
 - User chat memories will need to be regenerated through new conversations
 
 **Cleaning up legacy collections:**
@@ -2775,7 +2831,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 **Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
-- Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
+- Data loss risk: user memory vectors, and the vectors of files that are not in a knowledge base, are NOT migrated automatically. Reindexing migrates knowledge bases along with the per-file vectors of the files they contain.
 - Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
 - No automatic rollback: Disabling multitenancy after data is written will not restore access to the shared collections. Data would need manual extraction and re-import.
 
@@ -2783,7 +2839,7 @@ For fresh installations, no migration concerns exist
 
 **For existing installations with valuable data:**
 - Do not migrate to multitenancy mode if you do not want to handle migration and risk data loss
-- Understand that files and memories require re-upload/regeneration
+- Understand that memories, and files outside knowledge bases, require re-upload/regeneration
 - Test migration on a backup/staging environment first
 - Consider if RAM savings justify the migration effort for your use case
 
@@ -3123,7 +3179,7 @@ Currently, there is no button in the UI to only reset the vector DB. If you want
 - Remove all collections with the `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) using the native Qdrant client
 - Go to `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledge base
 
-`Reindex Knowledge Base` will ONLY migrate the knowledge base
+`Reindex Knowledge Base` migrates knowledge bases and the per-file vectors of the files inside them. Files that were never added to a knowledge base, user memories and cached web search results stay in the old collections.
 
 :::
 
@@ -3853,6 +3909,13 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_RAG_CSV_SUMMARY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Puts a single line describing the shape of the table in front of the parsed contents of every `.csv` file, for example `Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.` The built-in CSV parser emits one document per data row, so without this line nothing in the indexed text says how many rows the file has or which columns exist, and a model asked to count or list them can only go by the rows it retrieved. Column names are taken from the first row, the column count is that of the widest row, and the delimiter is detected from the first 4096 characters of the file, falling back to a comma. The line becomes the first part of the file's extracted content, so it is indexed as an ordinary chunk and is included whenever the whole document is injected. Files that cannot be read, or that have no rows at all, get no summary line and are still parsed as before. Only applies where Open WebUI's own CSV parser is used, so a CSV handled by the `external`, `tika` or `docling` extraction engine is unaffected; every other engine leaves CSVs to the built-in parser. Existing files keep the content they were parsed with, since re-indexing reuses stored text rather than parsing the file again, so re-upload a CSV to give it a summary line.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
@@ -4447,6 +4510,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `yacy`
   - `yandex`: Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
   - `youcom`: Uses the [You.com](https://you.com/) YDC Index API for web search.
+  - `openserp`: Uses a self-hosted [OpenSERP](https://github.com/karust/openserp) instance. Requires `OPENSERP_BASE_URL`; no API key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DDGS_BACKEND`
@@ -4476,7 +4540,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Type: `str`
 - Default: `http://localhost:7000`
 - Description: Base URL of a self-hosted [OpenSERP](https://github.com/karust/openserp) instance, used when the web search engine is set to `openserp`. Open WebUI calls its `/mega/search` endpoint, which returns results from Google, Bing, Yandex, Baidu, DuckDuckGo and Ecosia together. No API key is involved, the base URL is the only required setting. See the [OpenSERP provider guide](/features/chat-conversations/web-search/providers/openserp).
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > OpenSERP URL** when `openserp` is selected as the search engine.
 
 #### `SEARXNG_QUERY_URL`
 
@@ -4975,8 +5039,9 @@ This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or l
 #### `YOUTUBE_LOADER_PROXY_URL`
 
 - Type: `str`
-- Description: Sets the proxy URL for YouTube loader.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Default: unset (requests come from the server's own address)
+- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many datacentre and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting, and routing the requests through a residential or otherwise accepted proxy is what gets them through.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Youtube Proxy URL**.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
 
@@ -5794,6 +5859,18 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 By default (`False`), OAuth settings are read from your environment variables on every restart and are **not** loaded from the database, even if you previously changed them in the Admin Panel and even when `ENABLE_PERSISTENT_CONFIG` is `True`. This keeps environment variables authoritative for OAuth, which suits GitOps or immutable infrastructure where configuration lives in external files (e.g. Docker Compose, Kubernetes ConfigMaps).
 
 Set this variable to `True` to persist OAuth settings in the database and manage them through the Admin Panel after initial setup, the same way other persistent settings behave.
+
+:::
+
+:::info Read-only Admin Panel while this is `False`
+
+Because the environment is authoritative in that case, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is displayed read-only: every value stays visible but no control accepts input, a note above the section names `ENABLE_OAUTH_PERSISTENT_CONFIG` and saving the page leaves the OAuth settings untouched. Previously the fields were editable and every change was silently dropped on the next restart.
+
+Two consequences while the section is read-only: the client secret stays masked (the reveal button is inert as well); the field values cannot be selected for copying.
+
+To change these settings, edit your environment variables and restart, or set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to manage them in the Admin Panel.
+
+The read-only state follows this variable alone. Setting it to `True` while [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is `False` therefore leaves the section editable even though nothing at all is written to the database in that combination, so those edits still apply only to the running process and are gone after a restart.
 
 :::
 
@@ -8019,7 +8096,8 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 
 - Type: `int`
 - Default: unset, meaning no timeout
-- Description: Sets the timeout in seconds for the `sio.call()` used in `event_call` events. This controls how long the server waits for a user to respond to interactive prompts, forms, or dropdowns generated by tools and actions using `event_call` (e.g., `execute()` type events). Left unset the server waits indefinitely, so a prompt nobody answers holds that call open. A timeout raises into the calling plugin, so wrap the call in try/except when you set this.
+- Description: Sets the timeout in seconds for the `sio.call()` used in `event_call` events. This controls how long the server waits for a user to respond to interactive prompts, forms, or dropdowns generated by tools and actions using `event_call` (e.g., `execute()` type events). Left unset the server waits indefinitely, so a prompt nobody answers holds that call open. When the timeout elapses, the call returns `{"error": "Event call timed out. The browser tab may be inactive or closed."}` to the calling plugin, so check the returned value for an `error` key rather than wrapping the call in try/except. A value that is not a whole number falls back to `300`.
+- Details: The browser session is untouched when the timeout fires, so a tab that is still open and whose user simply has not answered yet stays connected and can be prompted again. Sessions that are genuinely gone are reaped separately, once they stop sending heartbeats. See [Events → Interactive Events](/features/extensibility/plugin/development/events#interactive-events) for how to handle the returned error in a plugin.
 
 #### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
 

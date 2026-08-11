@@ -29,7 +29,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 | Environment Variable                  | Default   | Description                                                                                                                             |
 |---------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `WEBUI_URL`                           | *(none)*           | **Required.** Your public WebUI address, e.g., `http://localhost:8080`. |
-| `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `false`            | Load OAuth settings from the database (when persistent config is on). Default `false` keeps environment variables authoritative for OAuth; set `true` to manage OAuth in the Admin Panel. |
+| `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `false`            | Load OAuth settings from the database (when persistent config is on). Default `false` keeps environment variables authoritative for OAuth and shows the OAuth section of the Admin Panel read-only; set `true` to manage OAuth in the Admin Panel. |
 | `ENABLE_OAUTH`                        | `true`             | Master switch for provider sign-in. Set `false` to turn SSO off while keeping the client ID, secret and endpoints configured. Also a toggle in **Settings > Admin > System > Authentication**, next to the LDAP one. |
 | `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`). |
 | `OAUTH_AUTO_REDIRECT`                 | `false`            | Send unauthenticated users at `/auth` straight to the provider login, skipping the "Continue with SSO" screen. Requires exactly one provider, `ENABLE_LOGIN_FORM=false` and no LDAP; visit `/auth?form=true` for the local login form. |
@@ -57,7 +57,27 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
    - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
    - Update settings through the Admin Panel instead of environment variables
 
+   With the default `ENABLE_OAUTH_PERSISTENT_CONFIG=false`, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is read-only, so the Admin Panel is not an option until you set the variable to `true`. See [Read-only OAuth settings in the Admin Panel](#read-only-oauth-settings-in-the-admin-panel).
+
 3. **Required Variables**: Always verify you're using the exact variable names from the [environment configuration documentation](https://docs.openwebui.com/reference/env-configuration/). Common mistakes include using non-existent variables like `OIDC_CONFIG`.
+
+:::
+
+### Read-only OAuth settings in the Admin Panel
+
+`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, everything under `oauth.` comes from the environment on every start, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only:
+
+- All values remain visible, and the section is dimmed with every field and switch inert, including the **OAuth / OIDC** master toggle.
+- A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.
+- Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
+
+This replaces the older behavior, where the fields were editable, a save appeared to succeed and the values reverted to the environment on the next restart.
+
+Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
+
+:::info
+
+While the section is read-only, the client secret cannot be revealed (it stays masked) and the field values cannot be selected for copying. Read them from your environment configuration instead.
 
 :::
 
@@ -224,6 +244,16 @@ The following environment variables are used:
 - Using non-existent environment variables like `OIDC_CONFIG` or `WEBUI_OIDC_CLIENT_ID`
 - Forgetting to set `OPENID_PROVIDER_URL` (this is mandatory for OIDC)
 - Using incorrect redirect URI format, must be exactly `<your-domain>/oauth/oidc/callback`
+
+:::
+
+:::info Providers that add their own ID token header parameters
+
+Some providers put a vendor-specific parameter in the JOSE header of the ID token, outside the set of header parameters the standards register. Apereo CAS sends `client_id`, CyberArk Identity sends `app_id`. Open WebUI ignores header parameters it does not recognize, so sign-in through those providers completes normally.
+
+The checks that protect the token are unaffected: the signature is still verified against the provider's keys, the signing algorithm is still restricted to the allowed list, `crit` is still honored and the registered header parameters are still validated.
+
+Earlier versions rejected the whole token, which ended the login at the callback with `OAuth callback failed: Unsupported {'app_id'} in header` in the server log and the misleading message `The email or password provided is incorrect` in the browser. If you see that pair, update Open WebUI.
 
 :::
 

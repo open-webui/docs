@@ -166,6 +166,8 @@ Administrators can set baseline capabilities and parameters that apply to all mo
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
 
+These cover chat completions. Background task requests (titles, tags, follow-ups, search queries, autocomplete, context compaction summaries) do not go through them; their parameters come from **Task Model Parameters** in **Settings > Admin > Experience > Interface**, or [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params).
+
 ### Merge behavior
 
 | Setting type | Strategy | Example |

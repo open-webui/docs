@@ -253,6 +253,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 | 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups |
 | 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
 | 🧠 Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or disable native function calling |
+| 🗂 Single attached file returns nothing | Re-index to rebuild the per-file collections |
 
 ---
 
@@ -521,6 +522,57 @@ Open WebUI is moving toward **agentic RAG**, where the model autonomously decide
 :::
 
 For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+
+---
+
+### 14. Attaching a Link or a YouTube Video Fails
+
+You attached a webpage or a YouTube video to a chat (**+ > Attach Webpage**, or by typing the URL after `@`), and it came back as an error toast instead of a document.
+
+**The Problem**: The message names the step that actually failed. A link that could not be fetched or parsed is reported against that link, and a YouTube video whose transcript was refused is reported with the reason. Earlier releases reported both as `[ERROR: Error querying knowledge base]`, which named a stage the attachment had never reached, so the message said nothing about the real cause.
+
+#### A link that could not be read
+
+```
+400: [ERROR: Could not read content from https://example.com/page]
+```
+
+The page was not fetched or not parsed, so nothing reached the vector database. The URL in the message is the one that failed, which matters when you attach several at once. Common causes:
+
+- The site blocks the request or serves its content only after JavaScript runs. Switch [`WEB_LOADER_ENGINE`](/reference/env-configuration#web_loader_engine) to `playwright`.
+- Open WebUI sits behind a proxy the loader is not using. See [`WEB_SEARCH_TRUST_ENV`](/reference/env-configuration#web_search_trust_env), which also governs the plain URL loader.
+- The address is refused on purpose. Private and loopback addresses, cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](/reference/env-configuration#web_fetch_filter_list) are rejected before any request goes out.
+
+#### A YouTube video whose transcript was refused
+
+YouTube attachments are transcript based, so a video with no usable transcript cannot be attached. The message says which of these happened:
+
+| Message | What it means |
+|---------|---------------|
+| `YouTube blocked the transcript request for <video id> from this server. …` | YouTube refused the request coming from your server's address, which is common for datacentre and cloud provider ranges. Route these requests through a proxy: **Settings > Admin > Tools > Web Search > Youtube Proxy URL**, or [`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url). |
+| `Transcripts are disabled for the YouTube video <video id>.` | The uploader turned captions off. No setting changes this. |
+| `The YouTube video <video id> is age restricted, so its transcript cannot be retrieved.` | Age restricted videos do not return a transcript. |
+| `The YouTube video <video id> is unavailable.` | The video is private, removed, region blocked, or the ID in the link is wrong. |
+| `YouTube requires additional verification to return the transcript for <video id>.` | YouTube demanded an extra proof-of-origin token that Open WebUI does not supply. |
+| `No transcript found for the YouTube video <video id> in these languages: <codes>.` | The video has transcripts, just not in the requested ones. Add the language to [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language). English is always appended to the list as the last fallback, so a video with only, say, Japanese captions needs `ja` added explicitly. |
+| `Could not retrieve a transcript for the YouTube video <video id>.` | Any other transcript failure. Check the server log for the underlying error. |
+
+:::note Same URL, less detail in a knowledge base
+Adding a URL under **Workspace > Knowledge** reports `Failed to process URL: <url>` regardless of the cause. The specific reason is written to the browser console and the server log.
+:::
+
+---
+
+### 15. Attaching a Single File Returns No Sources
+
+Attaching one file to a chat with `#` retrieves nothing, while attaching the knowledge base that contains the same file works normally. The model then answers from general knowledge without flagging that it found nothing.
+
+**The Problem**: A file that belongs to a knowledge base is indexed twice: once into its knowledge base's collection, and once into a per-file collection of its own (`file-<file id>`). Attaching the file on its own searches only the per-file collection, so if that collection went missing, through a vector database migration, a partial reset, or a manual deletion, the search comes back empty while the knowledge base keeps working.
+
+✅ **Solutions:**
+
+1. **Re-index**: go to **Admin Settings > Documents > Reindex Knowledge Base Vectors** and click **Reindex**. This rebuilds each knowledge base collection and the per-file collection of every file inside it, which restores retrieval for the individual file. It re-embeds everything, so allow for the time and, with a paid embedding model, the cost.
+2. **Re-upload the file** if it is not in any knowledge base. Re-indexing only walks knowledge bases, so a file that was only ever attached to a chat has to be uploaded again to get its collection back.
 
 ---
 

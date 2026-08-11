@@ -155,9 +155,17 @@ By default, OAuth env vars **will** take priority over database values because `
 **Solutions:**
 1. **For Development/Testing:** Ensure `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (this is already the default) to always read from environment variables
 2. **For Production:** Either:
-   - Configure settings through Admin Panel instead of environment variables, OR
+   - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` and configure settings through the Admin Panel instead of environment variables, OR
    - Keep `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (default) so that env vars always take priority for OAuth settings
 3. **Fresh Start:** Delete the database volume and restart with correct configuration
+
+:::info The Admin Panel tells you which one is in charge
+
+While `ENABLE_OAUTH_PERSISTENT_CONFIG` is `false`, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is read-only. The values are all visible, the controls do not accept input and a note above the section names `ENABLE_OAUTH_PERSISTENT_CONFIG`. Saving the page leaves the OAuth settings alone, so an edit can no longer look like it worked and then disappear on the next restart.
+
+If you need to configure OAuth from the Admin Panel, set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` and restart.
+
+:::
 
 📌 **Example for Docker Compose:**
 ```yaml
@@ -376,6 +384,18 @@ OAUTH_PROVIDER_NAME=Authentik
 OAUTH_SCOPES=openid email profile
 ```
 
+#### CyberArk Identity, Apereo CAS and other providers with vendor-specific ID token headers:
+
+**Problem:** The login fails right at the callback. The browser shows `The email or password provided is incorrect`, and the backend log records the real reason:
+
+```
+OAuth callback error during authorize_access_token for provider oidc: OAuth callback failed: Unsupported {'app_id'} in header
+```
+
+The parameter name varies by provider (`app_id` for CyberArk Identity, `client_id` for Apereo CAS). It is a private parameter the provider adds to the JOSE header of the ID token, and older versions of Open WebUI rejected any header parameter that is not a registered one.
+
+**Solution:** Update Open WebUI. Unrecognized header parameters are now ignored instead of ending the login, so no provider-specific configuration is needed and nothing has to be relaxed on the provider side. The signature check, the algorithm allowlist, `crit` handling and validation of the registered header parameters all still apply.
+
 ---
 
 ## Advanced Troubleshooting Tips
@@ -438,7 +458,8 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 ### Key Log Messages to Watch For:
 - `OAuth callback error: mismatching_state` → Session/cookie issue
 - `httpcore.ReadTimeout` → Network timeout issue
-- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established
+- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established. Every callback failure is reported to the browser with this message, so read the backend log for the actual cause
+- `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token header and your version still rejects it. See [CyberArk Identity, Apereo CAS and other providers with vendor-specific ID token headers](#cyberark-identity-apereo-cas-and-other-providers-with-vendor-specific-id-token-headers)
 - `404` on callback URLs → Redirect URI misconfiguration
 
 ---
@@ -450,7 +471,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | 🔗 WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
 | 📝 Env var typo or missing    | Double-check against official docs; avoid non-existent vars like `OIDC_CONFIG` |
 | 🚨 Missing OPENID_PROVIDER_URL | Always required for OIDC; set to provider's `.well-known/openid-configuration` |
-| 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` or use admin panel |
+| 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` for env vars, or `true` to use the admin panel (it is read-only while `false`) |
 | 🏢 Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
 | 🧊 Proxy caching interfering  | Exclude OAuth endpoints from all server-side caches         |
 | 🍪 Cookie configuration issues | Check reverse proxy cookie settings and env vars          |

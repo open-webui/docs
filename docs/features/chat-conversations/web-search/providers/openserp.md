@@ -26,7 +26,7 @@ If Open WebUI itself runs in Docker, `localhost` points at the Open WebUI contai
 1. Go to **Settings > Admin > Tools > Web Search**.
 2. Enable **Web Search**.
 3. Set **Web Search Engine** to `openserp`.
-4. Set **OpenSERP Base URL** to your instance, for example `http://localhost:7000`.
+4. Set **OpenSERP URL** to your instance, for example `http://localhost:7000`. The field only appears once `openserp` is selected.
 5. Save.
 
 The base URL can also be set with [`OPENSERP_BASE_URL`](/reference/env-configuration#openserp_base_url), which defaults to `http://localhost:7000`. A trailing slash is fine, it is stripped before the request.

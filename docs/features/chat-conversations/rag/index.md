@@ -230,10 +230,15 @@ After changing the embedding model in `Settings` > `Admin` > `Tools` > `Document
 The re-index process performs the following steps for each knowledge base:
 
 1. **Deletes** the existing vector collection for the knowledge base.
-2. **Re-chunks** all files using the current chunk size, overlap, and text splitter settings.
-3. **Re-embeds** all chunks using the currently configured embedding model.
+2. **Deletes** the per-file collection of every file in it. Each file has a vector collection of its own, which is what gets searched when you attach that single file to a chat instead of the whole knowledge base.
+3. **Re-chunks** every file from its stored extracted text, using the current chunk size, overlap, and text splitter settings.
+4. **Re-embeds** all chunks with the currently configured embedding model, writing them to the knowledge base collection and to the file's own collection.
 
-This means a single re-index applies both chunking setting changes and embedding model changes simultaneously.
+This means a single re-index applies both chunking setting changes and embedding model changes simultaneously, and it leaves every file in a knowledge base retrievable both through its knowledge base and on its own.
+
+:::note Re-indexing does not parse the file again
+Re-indexing starts from the text Open WebUI extracted when the file was first processed and stored alongside it, not from the original document. Changing the content extraction engine, or any other parsing setting, therefore has no effect on files that are already in a knowledge base. Re-upload them if you need them parsed again.
+:::
 
 :::warning Re-indexing does not cover chat files
 The re-index operation only processes files that belong to **knowledge bases**. Files that were uploaded directly into a chat (without being added to a knowledge base) have their own per-file vector collections that are not touched by re-indexing.
@@ -326,12 +331,32 @@ For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gi
 
 The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly. This innovative feature allows you to incorporate video content into your chats, further enriching your conversation experience.
 
+Attaching a video works from its transcript, so a video that YouTube returns no transcript for cannot be attached. The error says which case it is: captions disabled by the uploader, an age restricted or unavailable video, no transcript in the requested languages or a request YouTube blocked because of the address it came from. [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language) sets which languages are tried and in what order, with English appended to the end of the list when it is not already in it. A blocked request can be routed through a proxy, set in **Settings > Admin > Tools > Web Search > Youtube Proxy URL** ([`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url)). The individual messages are listed under [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+
 ## Document Parsing
 
 A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
 
 :::warning Temporary Chat Limitations
 When using **Temporary Chat**, document processing is restricted to **frontend-only** operations to ensure your data stays private and is not stored on the server. Consequently, advanced backend parsing (used for formats like complex DOCX files) is disabled, which may result in raw data being seen instead of parsed text. For full document support, use a standard chat session.
+:::
+
+### CSV Table Summary
+
+The built-in CSV parser turns each data row into a document of its own, so nothing in the parsed text states how big the table is or which columns it has. Ask a model how many orders a spreadsheet contains and it can only count the rows that happened to be retrieved.
+
+Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) puts one line describing the shape of the table in front of the parsed rows of every `.csv` file:
+
+```
+Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.
+```
+
+The column names come from the first row, the column count is that of the widest row, and the delimiter is detected from the start of the file (falling back to a comma). The line becomes the first part of the file's extracted content, so it is indexed as a chunk like any other and is always present when the file is used with **Using Entire Document**. It is off by default.
+
+:::info Which files get a summary
+The summary comes from Open WebUI's own CSV parser, so it does not apply when the content extraction engine handles the CSV itself: `external`, `tika` and `docling` all read CSVs their own way. Every other engine leaves CSVs to the built-in parser, so the summary applies there.
+
+Only files parsed after you turn the setting on get a summary line. Re-indexing reuses the text that was already extracted, so existing CSVs must be re-uploaded.
 :::
 
 ## Google Drive Integration
