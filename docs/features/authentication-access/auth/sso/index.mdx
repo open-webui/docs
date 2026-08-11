@@ -75,11 +75,7 @@ This replaces the older behavior, where the fields were editable, a save appeare
 
 Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
 
-:::info
-
-While the section is read-only, the client secret cannot be revealed (it stays masked) and the field values cannot be selected for copying. Read them from your environment configuration instead.
-
-:::
+`ENABLE_PERSISTENT_CONFIG` is the one in charge. When it is `false`, nothing is saved to the database whatever `ENABLE_OAUTH_PERSISTENT_CONFIG` says, so the OAuth variable then only decides whether the section can be typed into, not whether the values survive a restart. Both must be `true` to manage OAuth from the Admin Panel.
 
 ### Server-Side OAuth Session Management
 

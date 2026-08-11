@@ -28,8 +28,8 @@ Open Responses builds on the OpenAI Responses API format but is designed to work
 
 ## Step 1: Add or Edit a Connection
 
-1. Go to the ⚙️ **Admin Settings**.
-2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
+1. Go to **Settings > Admin > Connections**.
+2. Under **OpenAI**, click **Manage** (look for the wrench icon).
 3. Click ➕ **Add New Connection** or edit an existing connection.
 
 ---
@@ -118,6 +118,15 @@ Tool calls, re-invocations, and streaming are supported for Responses API connec
 
 1. Check the [Open WebUI Discord](https://discord.gg/5rJgQTnV4s) for known issues
 2. Report bugs on [GitHub](https://github.com/open-webui/open-webui/issues)
+
+### Providers that deviate from the Responses format
+
+Not every endpoint that advertises the Responses format emits it exactly. Open WebUI absorbs the two most common deviations rather than losing the reply over them, so you should not need to work around either one:
+
+- **A stream that closes by reporting no content.** Some providers end the stream saying the response contains nothing, even though they just streamed the whole answer. Open WebUI keeps what it received while streaming, so the reply stays on screen and is saved to the chat instead of blanking out the moment generation finishes. A provider that closes with a populated response of its own still takes precedence, so endpoints that follow the format are unaffected.
+- **Pieces of the response arriving out of order.** A fragment of message text, reasoning text or tool call arguments that turns up before the item it belongs to, or that points past the end of the response, is skipped and the rest of the stream carries on. The reply therefore runs to the end rather than breaking off where the stray fragment landed. For a caller hitting `/api/chat/completions` directly, the response body still finishes properly and the [`outlet()` filters](/features/extensibility/plugin/functions/filter) that run once a message is complete still run.
+
+Open WebUI cannot recover content the provider never sent. If replies are consistently short or empty, the problem is upstream; compare the same prompt against the provider's own API before reporting it here.
 
 ### Stateful sessions
 

@@ -557,10 +557,6 @@ A YouTube attachment is the video's transcript, so a video with no usable transc
 | `No transcript found for the YouTube video <video id> in these languages: <codes>.` | The video has transcripts, just not in the requested ones. Add the language to [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language). English is added to the end of the list when it is not already in it, so a video with only, say, Japanese captions needs `ja` added explicitly. |
 | `Could not retrieve a transcript for the YouTube video <video id>.` | Any other transcript failure. Check the server log for the underlying error. |
 
-:::note Same URL, less detail in a knowledge base
-Adding a URL under **Workspace > Knowledge** reports `Failed to process URL: <url>` regardless of the cause. The specific reason is written to the browser console and the server log.
-:::
-
 ---
 
 ### 15. Attaching a Single File Returns No Sources

@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.11.0](https://github.com/open-webui/open-webui/releases/tag/v0.11.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.11.1](https://github.com/open-webui/open-webui/releases/tag/v0.11.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -878,7 +878,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
 - Type: `bool`
 - Default: `False`
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -1097,7 +1097,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `INFO`
-- Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+- Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`. The level also decides how much work the backend does: messages it filters out are never built, so raising it saves CPU as well as log volume, and the saving follows the size of the text that would have been discarded (whole request payloads, retrieval results). See [What the Log Level Costs](/getting-started/advanced-topics/logging#what-the-log-level-costs).
 
 #### `LOG_FORMAT`
 
@@ -5888,11 +5888,9 @@ Set this variable to `True` to persist OAuth settings in the database and manage
 
 Because the environment is authoritative in that case, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is displayed read-only: every value stays visible but no control accepts input, a note above the section names `ENABLE_OAUTH_PERSISTENT_CONFIG` and saving the page leaves the OAuth settings untouched. Previously the fields were editable and every change was silently dropped on the next restart.
 
-Two consequences while the section is read-only: the client secret stays masked (the reveal button is inert as well); the field values cannot be selected for copying.
-
 To change these settings, edit your environment variables and restart, or set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to manage them in the Admin Panel.
 
-The read-only state follows this variable alone. Setting it to `True` while [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is `False` therefore leaves the section editable even though nothing is written to the database in that combination, so those edits last only until the next restart.
+[`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is the one in charge. When it is `False`, nothing is saved to the database whatever `ENABLE_OAUTH_PERSISTENT_CONFIG` says, so setting the OAuth variable to `True` in that case makes the section editable again without making the edits last: they are gone at the next restart. Set both to `True` to manage OAuth from the Admin Panel.
 
 :::
 

@@ -123,6 +123,8 @@ For high-concurrency PostgreSQL deployments, the default connection pool setting
 ### Vector Database (RAG)
 For multi-user setups, the choice of Vector DB matters.
 
+A knowledge base search runs without holding up the worker that issued it, so everyone else's responses keep streaming while it is in flight, and several collections are searched at the same time rather than one after another. A slow vector database therefore costs the chat that is searching, not every user on that worker. What the vector database still has to survive is being reached by several workers or replicas at once, which is what the choices below are about.
+
 -   **ChromaDB (Default)**: **NOT SAFE** for multi-worker (`UVICORN_WORKERS > 1`) or multi-replica deployments. The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. SQLite connections are not fork-safe: when uvicorn forks multiple workers, each process inherits the same database connection, and concurrent writes cause instant worker crashes (`Child process died`) or database corruption. This is a fundamental SQLite limitation, not a bug. See the [Scaling & HA troubleshooting guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for the full crash sequence and solutions.
 -   **Recommendations**:
     *   **Milvus** or **Qdrant**: Best for improved scale and performance. These are client-server databases, inherently safe for multi-process access.
@@ -222,7 +224,7 @@ See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compre
 Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
 
 *   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
-*   **Where else it shows up**: saving and opening chats. A whole conversation is encoded every time it is saved and decoded again every time it is opened, so the cost follows the length of the chat. The request sent on to the provider carries the same conversation and is encoded on the same path.
+*   **Where else it shows up**: saving and opening chats. A whole conversation is encoded every time it is saved and decoded again every time it is opened, so the cost follows the length of the chat. The request sent on to the provider carries the same conversation and is encoded on the same path. If code execution or the code interpreter runs on the Jupyter engine, the output of a run comes back on this path as well, so long printed output and generated images appear in the chat noticeably sooner.
 *   **Where it is not**: a single-user instance with ordinary-sized chats. The saving is real but too small to notice against model latency.
 *   **Why it is opt-in**: orjson is stricter than the standard library. Payloads it rejects (non-string dictionary keys, integers beyond 64 bits, `NaN`/`Infinity` literals) fall back to the standard-library path automatically, so nothing breaks, but the default stays on the standard library to keep behaviour byte-for-byte identical to earlier releases. The one behaviour change to be aware of: `NaN` and `Infinity` floats in a JSON response now serialize as `null` instead of raising.
 
@@ -230,6 +232,20 @@ Open WebUI encodes and decodes JSON constantly: every request body, every API re
   *   *Recommendation*: enable on any Redis-backed multi-worker or multi-replica deployment. Requires a restart. Available from v0.11.0.
 
 See [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full breakdown, and [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself.
+
+#### Log Level
+
+The log level decides how much work the backend does as well as how much it prints. Messages the level filters out are never built, so raising the level saves CPU as well as log volume. At the default `INFO` the backend's debug messages already cost nothing; `WARNING` extends that to the informational ones.
+
+*   **Where the win is**: the saving follows the size of the text that would have been discarded, so it is largest on busy servers, in long conversations and on chats that draw from a large knowledge base. Chat requests, retrieval, file upload and indexing and OAuth/LDAP sign-in all carry log calls of that kind.
+*   **Where it is not**: a quiet single-user instance. Fewer requests means fewer discarded messages, and the saving disappears against model latency.
+*   **What it costs you**: `WARNING` drops the `INFO` lines that record startup, key events and request handling. If your log aggregator or your support workflow relies on those, keep `INFO`.
+*   **What to avoid**: leaving `DEBUG` on in production. That is the one level where all of it really is built and written, whole request payloads and retrieval results included.
+
+- **Env Var**: `GLOBAL_LOG_LEVEL=WARNING`
+  *   *Recommendation*: try it on a busy instance that does not depend on the `INFO` lines. Requires a restart.
+
+See [Logging Open WebUI](/getting-started/advanced-topics/logging#what-the-log-level-costs) for the full explanation, and [`GLOBAL_LOG_LEVEL`](/reference/env-configuration#global_log_level) for the variable itself.
 
 #### Thread Pool Size
 Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count. Threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
@@ -607,6 +623,7 @@ For detailed information on all available variables, see the [Environment Config
 | `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
 | `ENABLE_COMPRESSION_MIDDLEWARE` | [HTTP Response Compression](/reference/env-configuration#enable_compression_middleware) |
 | `ENABLE_ORJSON` | [JSON Encoder](/reference/env-configuration#enable_orjson) |
+| `GLOBAL_LOG_LEVEL` | [Log Level](/reference/env-configuration#global_log_level) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
 | `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER` | [DNS Resolver](/reference/env-configuration#aiohttp_client_async_dns_resolver) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |

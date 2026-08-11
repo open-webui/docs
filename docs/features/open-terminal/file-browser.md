@@ -49,16 +49,16 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 ### Word documents (DOCX)
 `.docx` files render as **pages**, the way Word lays them out. Headers, footers, footnotes and endnotes are kept, embedded images appear where they belong, and page breaks split the document into separate pages instead of one long block of formatted text.
 
-The page is scaled down where needed so it fits the width of the panel, and that starting size counts as 100%. A small toolbar floats at the bottom of the preview with zoom out, the current zoom level and zoom in; click the level to go back to 100%. Zoom runs from 25% to 400%, and holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
+The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
 
 If a document cannot be rendered this way, the preview falls back to a simpler rendering of the same file (text, tables and images, without pages or zoom). Only when that fails too does it report an error and suggest downloading the file instead.
 
 ### Presentations (PPTX)
 `.pptx` files open in a **slide viewer**. Each slide is drawn from the file, so it picks up the slide background, shape fill colours, text alignment, bold, italic, font sizes and text colours, plus the position each placeholder takes from the slide's layout or master. A title lands where the layout puts it rather than in a generic default spot.
 
-A numbered **thumbnail strip** runs down the left side; click a thumbnail to jump to that slide. It is hidden automatically when the panel is narrower than 720px. The floating toolbar at the bottom steps between slides, shows `current / total` and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
+A numbered **thumbnail strip** runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
 
-Slides are an approximation of the deck, drawn by Open WebUI in the browser. Pictures and plain shapes are drawn; grouped shapes, tables, charts, connectors, gradient fills and EMF/WMF images are skipped, and speaker notes are not shown. Colours that reference the presentation theme are drawn from the standard Office palette rather than from the deck's own theme. Download the file when you need it to look exactly right.
+The preview is an approximation of the slide and may not show everything on it. Download the file and open it in its own application when the exact rendering matters.
 
 ### Markdown
 Markdown files show a **rendered preview** (with formatted headings, links, bold text) and a toggle to switch to raw source.

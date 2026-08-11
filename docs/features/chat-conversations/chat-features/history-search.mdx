@@ -47,11 +47,13 @@ You can narrow results with filter prefixes, alone or combined with a query:
 
 *   `tag:<name>` — chats with a given tag
 *   `folder:<name>` — chats in a folder
-*   `pinned:` — pinned chats only
-*   `archived:` — archived chats only
-*   `shared:` — shared chats only
+*   `pinned:true` or `pinned:false`: only pinned chats, or only chats that are not pinned
+*   `archived:true` or `archived:false`: only archived chats, or only chats that are not archived
+*   `shared:true` or `shared:false`: only chats with a share link, or only chats without one
 
-For example, `folder:work meeting notes` searches for "meeting notes" within the **work** folder. Matching results show a short **snippet** of the matched message, taken from wherever the match was found: the whole phrase if the chat contains it, otherwise the first of your words that turns up in a message. A chat matched only on its title shows no snippet.
+The last three need `true` or `false` after the colon. Typed on their own, `pinned:`, `archived:` and `shared:` are dropped from the query and filter nothing.
+
+For example, `folder:work meeting notes` searches for "meeting notes" within the **work** folder. Matching results show a short **snippet** of the matched message, taken from wherever the match was found: the whole phrase if the chat contains it, otherwise the first of your words that turns up in a message. A chat matched only on its title shows no snippet. Highlighting inside a snippet is applied only when your whole query appears in it, so a result found by a single word is shown unhighlighted.
 
 ---
 

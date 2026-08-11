@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.11.0.
+> This documentation reflects schema changes up to Open WebUI v0.11.1.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -534,7 +534,8 @@ Note: The `user_ids` column has been migrated to the `group_member` table.
 
 Things to know about the group_member table:
 
-- Unique constraint on (`group_id`, `user_id`) to prevent duplicate memberships
+- Unique constraint on (`group_id`, `user_id`) to prevent duplicate memberships, which also serves lookups that start from a group
+- Indexed on (`user_id`, `group_id`) for efficient lookups of the groups a user belongs to (migration `1ce6ade7d93b`). The unique constraint leads with `group_id` and cannot answer that question, so without this index every permission and access check reads the whole membership table, and the cost grows with the total number of memberships on the instance rather than with the number a single user has
 - Foreign key relationships with CASCADE delete to group and user tables
 
 ## Knowledge Table

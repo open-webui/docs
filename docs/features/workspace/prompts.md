@@ -277,6 +277,8 @@ Sends only the last 2 messages, each capped at 500 characters.
 
 Public prompts appear in every user's `/` suggestions. Too many public prompts clutter the menu. Use the enable/disable toggle to keep inactive prompts out of suggestions.
 
+The names of the [built-in slash commands](/features/chat-conversations/chat-features/) are effectively reserved: `compact`, `status`, `fork` and `model`. A prompt with one of those commands still shows in the menu and still works when picked from it, but a user who types it out and sends it gets the built-in command instead of the prompt. Pick a different command name.
+
 ### Optional by default
 
 All custom input variables are optional unless marked `:required`. If your prompt depends on a field, add `:required` explicitly.
