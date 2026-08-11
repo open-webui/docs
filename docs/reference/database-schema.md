@@ -485,11 +485,11 @@ Things to know about the chat_file table:
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**    |
 | --------------- | ------------- | --------------- | ------------------ |
-| id              | VARCHAR(255)  | NOT NULL        | Unique identifier  |
-| tag_name        | VARCHAR(255)  | NOT NULL        | Name of the tag    |
-| chat_id         | VARCHAR(255)  | NOT NULL        | Reference to chat  |
-| user_id         | VARCHAR(255)  | NOT NULL        | Reference to user  |
-| timestamp       | INTEGER       | NOT NULL        | Creation timestamp |
+| id              | String        | PRIMARY KEY     | Unique identifier  |
+| tag_name        | String        | nullable        | Name of the tag    |
+| chat_id         | String        | nullable        | Reference to chat  |
+| user_id         | String        | nullable        | Reference to user  |
+| timestamp       | BigInteger    | nullable        | Creation timestamp |
 
 ## Config
 
@@ -723,11 +723,15 @@ Things to know about the message table:
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**          |
 | --------------- | ------------- | --------------- | ------------------------ |
-| id              | Text          | PRIMARY KEY     | Unique identifier (UUID) |
-| user_id         | Text          | -               | User who reacted         |
-| message_id      | Text          | -               | Associated message       |
-| name            | Text          | -               | Reaction name/emoji      |
-| created_at      | BigInteger    | -               | Reaction timestamp       |
+| id              | Text          | PRIMARY KEY, UNIQUE | Unique identifier (UUID) |
+| user_id         | Text          | NOT NULL        | User who reacted         |
+| message_id      | Text          | NOT NULL        | Associated message       |
+| name            | Text          | NOT NULL        | Reaction name/emoji      |
+| created_at      | BigInteger    | nullable        | Reaction timestamp       |
+
+Things to know about the message_reaction table:
+
+- `user_id`, `message_id` and `name` are NOT NULL in the database (migration `3781e22d8b01`) while the SQLAlchemy model declares them without the flag. The database constraint is the one that applies.
 
 ## Model Table
 
