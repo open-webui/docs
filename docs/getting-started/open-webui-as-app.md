@@ -60,8 +60,6 @@ On a phone or tablet the sidebar slides in over the conversation instead of sitt
 - A mostly vertical drag scrolls the page as usual, and a drag started on a text field, a button or an open menu leaves the sidebar alone.
 - Every chat row carries an always-visible three-dot menu (⋯), so its actions do not depend on a hover you cannot perform.
 
-More detail in [History & Search](/features/chat-conversations/chat-features/history-search#on-a-phone-or-tablet).
-
 ---
 
 ## Customizing the PWA (Admins)
