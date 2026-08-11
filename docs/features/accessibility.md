@@ -58,7 +58,7 @@ A sidebar you have closed is hidden from screen readers as well as from `Tab`, s
 
 The switches in **Settings > Interface** are announced with the name of the setting they control, and the **UI Scale** slider reports its position as a multiplier, `1.2x` for example, rather than as a bare number.
 
-An image attached to a response is described by its file name, and one the model generated, which has no file name, is described as **Generated Image**. An image that cannot be loaded is replaced by an **Image unavailable** placeholder, so a picture that is no longer there is announced as such instead of being read out as a stray description.
+An image attached to a response is described by its file name, and one the model generated, which carries no file name, is described as **Generated Image**. Earlier releases used the text of the reply as the description, so the whole answer was read out a second time as the picture's description. An image that cannot be loaded is replaced by an **Image unavailable** placeholder, and that is what is read out in its place.
 
 ---
 

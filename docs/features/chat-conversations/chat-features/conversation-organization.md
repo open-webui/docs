@@ -75,6 +75,8 @@ Filing a chat into a folder requires **write access** to it. That means the fold
 
 The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. Naming a folder that does not exist is refused the same way as naming one you cannot write to.
 
+A refused move raises an error notification carrying the message the server sent, so you can read why it failed instead of seeing an `[object Object]` placeholder. This applies wherever the move is started: dragging a chat onto a folder in the sidebar, the chat's **Move to Folder** menu, the search dialog and the chat view itself.
+
 ## Folder Settings (Project Configuration)
 
 Folders can be configured as full project workspaces with their own AI behavior and context. To edit folder settings:

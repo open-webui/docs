@@ -115,6 +115,12 @@ Use `@username` to notify teammates. Use `#channel-name` to create clickable cro
 
 Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation.
 
+### Direct messages
+
+A direct message is addressed to people rather than to a name, so there is one conversation per set of participants. Start one from the **Message** button on someone's profile card in a channel, or from **(+)** in the sidebar's **Channels** section with **Channel Type** set to **Direct Message**. Either way, messaging someone you have messaged before reopens the conversation you already have with them, with its history, instead of adding a second one beside it. A name is optional on a direct message, and without one the conversation is listed under the names of the other participants.
+
+Membership is measured against the accounts that still exist. When someone's account is deleted, they stop counting towards the conversation: they are gone from the member list and from the member count next to the people icon in the conversation's header, and the participants who remain still land back in that same conversation when they message each other again. Deleting an account does not merge conversations that were already split in two, so both remain in the sidebar of everyone in them.
+
 ---
 
 ## AI Channel Awareness

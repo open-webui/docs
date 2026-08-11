@@ -338,6 +338,8 @@ Every Socket.IO event in a multi-replica deployment is published through Redis, 
 
 **Why it is opt-in.** orjson is stricter than the standard library, so the default keeps behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
 
+orjson is also narrower in what it can be asked to do: it always writes compact output, and it has fixed rules of its own for values the standard library will not encode at all. Encoding that asks for something outside that, indented output or a custom rule for converting values before they are written, is handed to the standard library as well, so the request is honoured instead of being dropped and the result matches what the same code produces with the setting off.
+
 Two differences do survive the fallback, neither of which affects a normal deployment:
 
 - **`NaN` and `Infinity` floats in a response body serialize as `null`** instead of raising. Starlette's own encoder is configured with `allow_nan=False`, so a response carrying those values previously failed outright and now goes out with nulls. If you have a custom tool or pipe that can emit them, this is a behaviour change to be aware of rather than a regression.

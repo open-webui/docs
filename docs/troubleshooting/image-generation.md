@@ -17,9 +17,9 @@ title: "Image Generation"
 
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
     - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
-    - The usual cause is that the file behind it is gone, deleted through **Settings** > **Data Controls** > **Manage Files**, or wiped along with the data directory. A deleted file cannot be brought back, so the placeholder stays on that message.
+    - The usual cause is that the file behind it is gone, deleted through **Settings** > **Data Controls** > **Manage Files** or wiped along with the data directory. A deleted file cannot be brought back, so the placeholder stays on that message.
     - The placeholder is not clickable, so the full-screen preview does not open on an image that cannot be shown. If the message later points at a different image address, the image is loaded again.
-    - Running more than one replica, check that `/app/backend/data` really is shared between them. See [Scaling & HA → Uploaded Files or RAG Knowledge Inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible).
+    - If you run more than one replica and the placeholder comes and goes, check that `/app/backend/data` really is shared between them. See [Scaling & HA → Uploaded Files or RAG Knowledge Inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible).
 
 ### ComfyUI Issues
 

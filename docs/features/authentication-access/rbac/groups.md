@@ -17,7 +17,7 @@ Open WebUI permissions are **additive** (Union-based).
 
 ## Group Management
 
-Groups can be managed in the **Admin Panel > Groups** section.
+Groups can be managed in the **Admin Panel > Users > Groups** section.
 
 ### Group Configuration
 When creating or editing a group, you can configure its visibility in the system:
@@ -68,6 +68,10 @@ You can restrict access to specific objects (like a proprietary Model or sensiti
 
 1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private** or **Restricted**.
 2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once.
+
+The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.**, rather than leaving a **Users** heading above an empty list.
+
+Changing what someone already has is done from their row in the **Access List**, not from the picker. Each row carries the level (a **Read**/**Write** selector on resources that accept write grants, a **Read** badge on the ones that do not) and an **✕** that removes the grant.
 
 :::tip Knowledge Scoping for Models
 Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for details.

@@ -94,6 +94,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 38      | pinned_note      | Tracks per-user note pins (each row = one user pinning one note) |
 | 39      | chat_message     | Normalized per-message store for chat conversations              |
 | 40      | api_key          | Stores per-user API keys, replacing the former `user.api_key` column |
+| 41      | knowledge_directory | Nestable folders that organize files within a knowledge base |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -192,12 +193,35 @@ Things to know about the channel table:
 
 ## Channel Member Table
 
-| **Column Name** | **Data Type** | **Constraints** | **Description**                              |
-| --------------- | ------------- | --------------- | -------------------------------------------- |
-| id              | TEXT          | NOT NULL        | Unique identifier for the channel membership |
-| channel_id      | TEXT          | NOT NULL        | Reference to the channel                     |
-| user_id         | TEXT          | NOT NULL        | Reference to the user                        |
-| created_at      | BIGINT        | -               | Timestamp when membership was created        |
+| **Column Name**   | **Data Type** | **Constraints**                 | **Description**                              |
+| ----------------- | ------------- | ------------------------------- | -------------------------------------------- |
+| id                | TEXT          | PRIMARY KEY, UNIQUE             | Unique identifier for the channel membership |
+| channel_id        | TEXT          | NOT NULL                        | Reference to the channel                     |
+| user_id           | TEXT          | NOT NULL                        | Reference to the user                        |
+| role              | TEXT          | nullable                        | Member's role within the channel             |
+| status            | TEXT          | nullable                        | Membership status: `joined` or `left`        |
+| is_active         | BOOLEAN       | NOT NULL, server_default=true   | Whether the membership is live               |
+| is_channel_muted  | BOOLEAN       | NOT NULL, server_default=false  | Per-member mute flag                         |
+| is_channel_pinned | BOOLEAN       | NOT NULL, server_default=false  | Per-member pin flag                          |
+| data              | JSON          | nullable                        | Extensible data payload                      |
+| meta              | JSON          | nullable                        | Optional metadata                            |
+| invited_at        | BIGINT        | nullable                        | Invitation timestamp (nanoseconds)           |
+| invited_by        | TEXT          | nullable                        | User who added this member                   |
+| joined_at         | BIGINT        | NOT NULL                        | Join timestamp (nanoseconds)                 |
+| left_at           | BIGINT        | nullable                        | Leave timestamp (nanoseconds)                |
+| last_read_at      | BIGINT        | nullable                        | Last read timestamp, drives unread state     |
+| created_at        | BIGINT        | -                               | Timestamp when membership was created        |
+| updated_at        | BIGINT        | nullable                        | Last update timestamp (nanoseconds)          |
+
+Things to know about the channel_member table:
+
+- `role`, `invited_at` and `invited_by` were added in migration `90ef40d4714e`. `status`, `is_active`, `is_channel_muted`, `is_channel_pinned`, `data`, `meta`, `joined_at`, `left_at`, `last_read_at` and `updated_at` were added in migration `2f1211949ecc`.
+- `status` is written as `joined` when the membership is created. Leaving a channel writes `left`, sets `is_active` to false and stamps `left_at`. The row survives.
+- `is_active` is the flag that channel listings and member listings filter on, so a membership someone has left drops out of those results while remaining in the table. It is also written by `POST /api/v1/channels/{id}/members/active`.
+- `last_read_at` is stamped when the membership is created and updated over the socket connection when the user reads the channel.
+- `role` is read in one place, to test whether a member is a `manager` for manager-only queries. No code path writes it, so it is null on every row.
+- `is_channel_muted` has no write path and stays false. `is_channel_pinned` has a setter on the model, `Channels.pin_channel`, that nothing calls.
+- `joined_at` is NOT NULL in the database (migration `2f1211949ecc`) while the SQLAlchemy model omits the flag. The database constraint is the one that applies.
 
 ## Channel File Table
 
@@ -583,22 +607,45 @@ Things to know about the group_member table:
 | created_at      | BigInteger    | -                   | Creation timestamp         |
 | updated_at      | BigInteger    | -                   | Last update timestamp      |
 
+## Knowledge Directory Table
+
+Nestable folders that organize the files inside one knowledge base. Added by migration `3c9b0ca343fd`, which also added `directory_id` to the [Knowledge File Table](#knowledge-file-table).
+
+| **Column Name** | **Data Type** | **Constraints**                                          | **Description**                 |
+| --------------- | ------------- | -------------------------------------------------------- | ------------------------------- |
+| id              | Text          | PRIMARY KEY                                              | Unique identifier (UUID)        |
+| knowledge_id    | Text          | FOREIGN KEY(knowledge.id) CASCADE, NOT NULL              | Parent knowledge base           |
+| parent_id       | Text          | FOREIGN KEY(knowledge_directory.id) CASCADE, nullable    | Parent directory for nesting    |
+| name            | Text          | NOT NULL                                                 | Directory name                  |
+| user_id         | Text          | NOT NULL                                                 | User who created the directory  |
+| created_at      | BigInteger    | NOT NULL                                                 | Creation timestamp              |
+| updated_at      | BigInteger    | NOT NULL                                                 | Last update timestamp           |
+
+Things to know about the knowledge_directory table:
+
+- Directories nest through the self-referencing `parent_id`. Root directories have a null `parent_id`.
+- Unique constraint on (`knowledge_id`, `parent_id`, `name`) (`uq_knowledge_directory_knowledge_parent_name`), so directory names are unique among siblings within one knowledge base.
+- Indexed on `knowledge_id` and on `parent_id` (`ix_knowledge_directory_knowledge_id`, `ix_knowledge_directory_parent_id`).
+- Deleting a knowledge base cascades to its directories. Deleting a directory cascades to the directories nested inside it.
+
 ## Knowledge File Table
 
-| **Column Name** | **Data Type** | **Constraints**                      | **Description**                   |
-| --------------- | ------------- | ------------------------------------ | --------------------------------- |
-| id              | Text          | PRIMARY KEY                          | Unique identifier (UUID)          |
-| user_id         | Text          | NOT NULL                             | Owner of the relationship         |
-| knowledge_id    | Text          | FOREIGN KEY(knowledge.id), NOT NULL  | Reference to the knowledge base   |
-| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL       | Reference to the file             |
-| created_at      | BigInteger    | NOT NULL                             | Creation timestamp                |
-| updated_at      | BigInteger    | NOT NULL                             | Last update timestamp             |
+| **Column Name** | **Data Type** | **Constraints**                                            | **Description**                   |
+| --------------- | ------------- | ---------------------------------------------------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY                                                | Unique identifier (UUID)          |
+| user_id         | Text          | NOT NULL                                                   | Owner of the relationship         |
+| knowledge_id    | Text          | FOREIGN KEY(knowledge.id), NOT NULL                        | Reference to the knowledge base   |
+| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL                             | Reference to the file             |
+| directory_id    | Text          | FOREIGN KEY(knowledge_directory.id) SET NULL, nullable, indexed | Directory holding the file   |
+| created_at      | BigInteger    | NOT NULL                                                   | Creation timestamp                |
+| updated_at      | BigInteger    | NOT NULL                                                   | Last update timestamp             |
 
 Things to know about the knowledge_file table:
 
 - Unique constraint on (`knowledge_id`, `file_id`) to prevent duplicate entries
 - Foreign key relationships with CASCADE delete
 - Indexed on `knowledge_id`, `file_id`, and `user_id` for performance
+- `directory_id` was added in migration `3c9b0ca343fd`, with the index `ix_knowledge_file_directory_id`. It is the one foreign key here that does not cascade: deleting a directory sets `directory_id` back to null on its files rather than deleting them, and a null `directory_id` puts the file at the root of its knowledge base
 
 Access control for resources (models, knowledge bases, tools, prompts, notes, files, channels) is managed through the `access_grant` table rather than embedded JSON. Each grant entry specifies a resource, a principal (user or group), and a permission level (read or write). See the [Access Grant Table](#access-grant-table) section above for details.
 
@@ -670,6 +717,8 @@ Things to know about the memory table:
 | meta            | JSON          | nullable        | Note metadata              |
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
+
+The note body lives in `data` under `content.md` and is markdown text. A row that holds an object or an array there instead, which a model can produce by passing structured data to the note tools, is served with that content rendered as a fenced `json` code block, and the row is rewritten to match the next time the note is saved.
 
 Pin state is no longer stored on this table. The legacy `is_pinned` column was removed in migration `4de81c2a3af1` and replaced by a per-user [Pinned Note Table](#pinned-note-table). Pre-existing pins were backfilled to the note owner; the API surfaces `is_pinned` as a per-request join against the calling user's rows.
 
@@ -888,7 +937,12 @@ erDiagram
     calendar ||--o{ calendar_event : "contains"
     calendar_event ||--o{ calendar_event_attendee : "has"
     channel ||--o{ message : "contains"
+    channel ||--o{ channel_member : "has"
+    user ||--o{ channel_member : "joins"
     message ||--o{ message : "replies"
+    knowledge ||--o{ knowledge_directory : "contains"
+    knowledge_directory ||--o{ knowledge_directory : "nests"
+    knowledge_directory ||--o{ knowledge_file : "holds"
 
     user {
         string id PK
@@ -997,10 +1051,35 @@ erDiagram
     channel {
         text id PK
         text user_id FK
+        text type
         text name
         text description
+        boolean is_private
         json data
         json meta
+        text updated_by
+        bigint archived_at
+        text archived_by
+        bigint deleted_at
+        text deleted_by
+    }
+
+    channel_member {
+        text id PK
+        text channel_id FK
+        text user_id FK
+        text role
+        text status
+        boolean is_active
+        boolean is_channel_muted
+        boolean is_channel_pinned
+        json data
+        json meta
+        bigint invited_at
+        text invited_by
+        bigint joined_at
+        bigint left_at
+        bigint last_read_at
     }
 
     message {
@@ -1079,6 +1158,26 @@ erDiagram
         text description
         json data
         json meta
+    }
+
+    knowledge_directory {
+        text id PK
+        text knowledge_id FK
+        text parent_id FK
+        text name
+        text user_id FK
+        bigint created_at
+        bigint updated_at
+    }
+
+    knowledge_file {
+        text id PK
+        text knowledge_id FK
+        text file_id FK
+        text directory_id FK
+        text user_id FK
+        bigint created_at
+        bigint updated_at
     }
 
     memory {
