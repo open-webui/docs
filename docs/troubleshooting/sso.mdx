@@ -159,13 +159,7 @@ By default, OAuth env vars **will** take priority over database values because `
    - Keep `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (default) so that env vars always take priority for OAuth settings
 3. **Fresh Start:** Delete the database volume and restart with correct configuration
 
-:::info The Admin Panel tells you which one is in charge
-
-While `ENABLE_OAUTH_PERSISTENT_CONFIG` is `false`, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is read-only. The values are all visible, the controls do not accept input and a note above the section names `ENABLE_OAUTH_PERSISTENT_CONFIG`. Saving the page leaves the OAuth settings alone, so an edit can no longer look like it worked and then disappear on the next restart.
-
-If you need to configure OAuth from the Admin Panel, set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` and restart.
-
-:::
+While it is `false` the OAuth section of the Admin Panel is read-only, so an edit cannot look like it worked and then vanish on the next restart. See [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config).
 
 📌 **Example for Docker Compose:**
 ```yaml
