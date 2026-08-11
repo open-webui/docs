@@ -206,17 +206,13 @@ For the full breakdown of what it covers, the two behaviour differences worth kn
 
 ### Speed Up Name Lookups
 
-Every outbound request starts by turning a hostname into an address: every model call, every web search fetch, every document fetch, every tool call. By default Open WebUI asks the operating system, and at scale those lookups queue behind each other and behind other background work, so a lookup that should take milliseconds delays the request it belongs to. Switching to the faster c-ares resolver removes that queue:
+Every outbound request starts by turning a hostname into an address, and by default those lookups queue behind each other under load. The faster c-ares resolver removes that queue, so many simultaneous lookups take about as long as one:
 
 ```
 AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 ```
 
-Many simultaneous lookups then take about as long as one, and a heavy background job (a bulk vector-database write, for example) can no longer hold up name lookups for every other user on the instance. It is read once at startup and is worth trying on any instance carrying real concurrent load.
-
-It is opt-in because c-ares does not find names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` are unaffected. After enabling it, exercise your models, web search and any internal services you point Open WebUI at, and switch it back off if lookups start failing.
-
-See [Performance → DNS Resolver](/troubleshooting/performance#dns-resolver) for the full trade-off and [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the variable itself.
+It is opt-in because c-ares reads `/etc/resolv.conf` and the hosts file but not other name sources, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving. Exercise your models, web search and any internal services afterwards, and switch it back off if lookups start failing. See [Performance → DNS Resolver](/troubleshooting/performance#dns-resolver) for the full trade-off.
 
 ---
 

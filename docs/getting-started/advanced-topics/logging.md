@@ -64,11 +64,7 @@ Use `DEBUG` for development and troubleshooting. For production, stick with `INF
 
 ### What the Log Level Costs
 
-Raising the level saves work as well as log volume. Messages the level filters out are never built, so they cost nothing. At the default `INFO` that already covers every debug message in the backend, and `WARNING` extends it to the informational ones, which include the retrieval results written on every chat request that reads from a knowledge base.
-
-The saving follows the size of the text that would have been thrown away, so it is largest on busy servers, in long conversations and on chats that draw from a large knowledge base. It applies the same way when logs are exported to an OpenTelemetry collector: nothing is prepared for a message the level has already dropped.
-
-`DEBUG` goes the other way and is the most expensive level to run, because everything it adds is genuinely built and written, whole chat request payloads included. Use it while you are chasing a problem and set it back afterwards.
+Raising the level saves work as well as log volume, because a message the level filters out is never built. `WARNING` also drops the retrieval results written on every chat request that reads from a knowledge base. `DEBUG` is the most expensive level to run, whole chat request payloads included, so set it back once you have chased down whatever you turned it on for.
 
 ---
 
