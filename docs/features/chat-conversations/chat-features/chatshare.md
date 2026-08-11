@@ -97,7 +97,7 @@ To view a shared chat:
 
 A chat that belongs to someone else is shown under its author: their name and profile picture sit on the messages they wrote. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app rather than through a share link, the chat's **Overview** panel labels its message nodes the same way.
 
-Two things limit what you see. The name and picture beside a message are only drawn when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message. And reading a chat shared as **Open** without signing in leaves the author unresolved, since looking them up needs an account, so their name and picture do not appear.
+Two things limit what you see. The name and picture beside a message are only drawn when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message. And reading a chat shared as **Open** without signing in leaves the author unresolved, since looking them up needs an account, so the name beside their messages reads **You** and the picture is the default avatar.
 
 #### Using a Shared Chat as Context
 
