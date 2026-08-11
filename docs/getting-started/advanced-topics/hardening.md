@@ -33,7 +33,7 @@ The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption
 
 When running via Docker (`start.sh`), the Windows start script (`backend\start_windows.bat`) or `open-webui serve`, the application checks whether `WEBUI_SECRET_KEY` is set as an environment variable. If it is not, a random key is generated automatically and saved to `.webui_secret_key` inside the data directory. On subsequent restarts, the saved key is reloaded. This means that for single-instance deployments, no manual configuration is needed.
 
-The Windows script is the exception on key quality: it builds its key from the command shell's `%RANDOM%` generator rather than from a cryptographic source, so set `WEBUI_SECRET_KEY` explicitly on any Windows host that is not a personal machine.
+The Windows script builds its key from the command shell's `%RANDOM%` generator rather than from a cryptographic source, so set `WEBUI_SECRET_KEY` explicitly on any Windows host that is not a personal machine.
 
 **When you need to set it explicitly:**
 

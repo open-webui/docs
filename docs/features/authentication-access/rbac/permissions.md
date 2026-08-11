@@ -80,8 +80,8 @@ Controls what users can share with the community or make public.
 | **Notes Sharing** | **(Parent)** Ability to share Notes. |
 | **Notes Public Sharing** | *(Requires Notes Sharing)* Ability to make Notes public. |
 | **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
-| **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
-| **Chats Open Sharing** | *(Requires Share Chat)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
+| **Chats Public Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
+| **Chats Open Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
 | **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, individual-user grants are stripped from create/update payloads; group and public sharing are unaffected. Admins are always exempt. |
 | **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. |
@@ -101,26 +101,26 @@ Controls the features available to the user inside the chat interface.
 
 | Permission | Description |
 | :--- | :--- |
-| **Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. |
-| **Model Valves** | *(Requires Chat Controls)* Access to model-specific configuration "valves". |
-| **System Prompt** | *(Requires Chat Controls)* Ability to edit the system prompt for a conversation. |
-| **Parameters** | *(Requires Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
-| **File Upload** | Ability to upload files to the chat. |
-| **Delete Chat** | Ability to delete entire chat conversations. |
-| **Delete Message** | Ability to delete individual messages. |
-| **Edit Message** | Ability to edit messages. |
-| **Continue Response** | Ability to use the "Continue" feature for truncated responses. |
-| **Regenerate Response**| Ability to regenerate an AI response. |
-| **Rate Response** | Ability to thumbs up/down responses. |
-| **Share Chat** | Ability to generate a share link for a chat. |
-| **Export Chat** | Ability to export chat history. |
+| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. |
+| **Allow Chat Valves** | *(Requires Allow Chat Controls)* Access to model-specific configuration "valves". |
+| **Allow Chat System Prompt** | *(Requires Allow Chat Controls)* Ability to edit the system prompt for a conversation. |
+| **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
+| **Allow File Upload** | Ability to upload files to the chat. |
+| **Allow Chat Delete** | Ability to delete entire chat conversations. |
+| **Allow Delete Messages** | Ability to delete individual messages. |
+| **Allow Chat Edit** | Ability to edit messages. |
+| **Allow Continue Response** | Ability to use the "Continue" feature for truncated responses. |
+| **Allow Regenerate Response**| Ability to regenerate an AI response. |
+| **Allow Rate Response** | Ability to thumbs up/down responses. |
+| **Allow Chat Share** | Ability to generate a share link for a chat. |
+| **Allow Chat Export** | Ability to export chat history. |
 | **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI). |
-| **Speech-to-Text (STT)**| Ability to use voice input. |
-| **Text-to-Speech (TTS)**| Ability to use voice output. |
-| **Audio Call** | Ability to use the real-time audio call feature. |
-| **Multiple Models** | Ability to select multiple models for a simultaneous response. |
-| **Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
-| **Enforced Temporary** | *(Requires Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
+| **Allow Speech to Text** | Ability to use voice input. |
+| **Allow Text to Speech** | Ability to use voice output. |
+| **Allow Call** | Ability to use the real-time audio call feature. |
+| **Allow Multiple Models in Chat** | Ability to select multiple models for a simultaneous response. |
+| **Allow Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
+| **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
 
 ### 4. Features Permissions
 Controls access to broad platform capabilities.
