@@ -405,6 +405,8 @@ If you want to interact directly with Ollama models (including for embedding gen
 - **Base URL**: `/ollama/<api>`
 - **Reference**: [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)
 
+When the `model` you name is a workspace model, its saved advanced parameters are added to the proxied request. They only fill in what you left out, so an `options` entry you send yourself is the one Ollama receives.
+
 #### 🔁 Generate Completion (Streaming)
 
 ```bash
