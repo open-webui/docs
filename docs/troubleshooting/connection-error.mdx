@@ -163,6 +163,41 @@ Disabling proxy buffering also **significantly improves streaming speed**, as re
 - **Traefik**: Check compression/buffering middleware settings
 - **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
 
+## 📭 Blank Replies When the Model Uses a Tool
+
+### Common Symptoms
+
+- The assistant message comes back **completely empty**, with no error in the UI and nothing in the logs at any log level.
+- It looks **random**: most turns are fine, and the same prompt sometimes works and sometimes does not.
+- The provider still bills you for output tokens on the empty turn.
+- The stored message has `content: ''` and `output: []` while `usage.completion_tokens` is non-zero.
+- It gets much worse once tools are enabled, and worst of all with the builtin tools, since the model calls those on its own.
+
+### Cause: the provider omits `index` on streamed tool calls
+
+The OpenAI streaming schema puts an `index` field on every tool call delta, which is what lets a client stitch the fragments of a call back together across chunks. Open WebUI keys its accumulator on that field. A provider that sends each tool call complete in a single chunk and leaves `index` out is off-schema, and the call is dropped. The turn then ends with no text and no tool run, which is the empty message you see.
+
+This is not tied to one vendor. It affects any OpenAI-compatible endpoint that streams tool calls without `index`. **Google's OpenAI compatibility layer at `https://generativelanguage.googleapis.com/v1beta/openai` is the known case**, and Gemini 3 models add a second problem on top: a proprietary `thought_signature` that Google requires to be sent back on the follow-up request, which no OpenAI-schema client will do.
+
+### Confirm it in one command
+
+Ask the endpoint directly and look at the tool call chunk. Substitute your own URL, key and model:
+
+```bash
+curl -s -N -X POST "https://your-provider.example/v1/chat/completions" -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" -d '{"model":"your-model","stream":true,"messages":[{"role":"user","content":"What is the weather in Paris?"}],"tools":[{"type":"function","function":{"name":"get_weather","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}]}'
+```
+
+In the `delta.tool_calls` entry, look for `"index"`. If it is absent, you have this problem. The `index` on the surrounding `choices` entry is a different field and does not count.
+
+### Solutions
+
+1. **Put a gateway in front.** LiteLLM, OpenRouter or any proxy that talks the provider's native API and emits schema-correct OpenAI output. This is the only option that keeps native tool calling and the builtin tools working.
+2. **Switch the model to Legacy function calling.** In the model's **Advanced Params**, set **Function Calling** to **Legacy**. Tools are then selected by a separate non-streaming request and never go through the streaming accumulator. Note that **Default** is not the same as Legacy here: an unset value means native. The trade-off is that the builtin tools (Memory and the rest) are unavailable in Legacy mode, since they are injected only for native function calling.
+3. **Turn tools off for that model.** If you only want plain chat, disable the **builtin tools** capability on the model so it never tries to call anything. Chat completions themselves are unaffected by this bug.
+4. **Use a pipe.** A [pipe function](/features/extensibility/plugin/functions/pipe) that calls the provider's own API directly bypasses the OpenAI-compatible path entirely.
+
+Open WebUI follows the OpenAI Chat Completions schema and does not add per-provider workarounds for endpoints that diverge from it, which is the same reasoning described under [Protocol-Oriented Design](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#protocol-oriented-design).
+
 ## 🌐 Frontend vs. Backend Connections (localhost Confusion)
 
 Several Open WebUI features offer **two ways** to configure connections: a **user/direct** method (from the browser) and an **admin/global** method (from the backend). These work at completely different network levels, and the same URL can succeed in one and fail in the other.

@@ -79,6 +79,10 @@ These are set automatically by the memory tools; you do not need to assign them 
 3.  **Minimum Model Tier**: Use a current model with solid tool calling — at minimum GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Very small models may not manage memories reliably.
 4.  **Per-Model Category Toggle**: Ensure the **Memory** category is enabled for the model in **Workspace > Models > Edit > Builtin Tools** (enabled by default).
 
+:::warning Blank replies instead of memory operations
+Memory runs as a native tool call, so it only works on a connection whose streaming output follows the OpenAI schema. On an endpoint that omits the `index` field on streamed tool calls, notably Google's OpenAI compatibility layer, the call is dropped and the turn returns an empty assistant message with nothing in the logs. Because the model decides on its own when to call `list_memories` or `add_memory`, this shows up as occasional blank replies rather than an obvious memory failure. See [Blank Replies When the Model Uses a Tool](/troubleshooting/connection-error#-blank-replies-when-the-model-uses-a-tool).
+:::
+
 :::info Central Tool Documentation
 For complete details on all built-in agentic tools (including memory, web search, and knowledge bases) and how to configure them, see the [**Native/Agentic Mode Tools Guide**](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 :::
