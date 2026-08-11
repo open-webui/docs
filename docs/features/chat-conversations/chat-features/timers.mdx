@@ -61,7 +61,6 @@ Timers cannot be listed, inspected or cancelled from the interface. A timer with
 - **The scheduler claims up to 10 due timers per poll.** This is a batching limit rather than a per-user cap, so a backlog drains a few at a time.
 - **There is no limit on how many timers a user can set**, how far ahead, or how close together. Automations have [`AUTOMATION_MAX_COUNT`](/reference/env-configuration#automation_max_count) and [`AUTOMATION_MIN_INTERVAL`](/reference/env-configuration#automation_min_interval); timers have no equivalent.
 - **Each fired timer costs a model call**, since it produces a real reply in the chat.
-- **The reply reports its token usage** like any other chat, provided the model has the **Usage** capability enabled. See [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
 
 ## Managing Timers from Chat
 

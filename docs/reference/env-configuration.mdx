@@ -993,20 +993,13 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 - Type: `bool`
 - Default: `False`
-- Description: Chooses how Open WebUI turns hostnames into addresses for every outbound request. When `False` (the default), it asks the operating system, so it resolves names exactly the way anything else on the machine does. When `True`, it uses the faster c-ares resolver instead, which stops name lookups queueing behind each other and behind other background work. On a busy instance that removes a delay in front of every model call, web search fetch, document fetch and tool call, so it is worth trying. Read once at startup, so a restart is required for a change to take effect. Applies to every outbound request Open WebUI makes.
+- Description: Chooses how Open WebUI turns hostnames into addresses for every outbound request. When `False` (the default), it asks the operating system, resolving names the way anything else on the machine does. When `True`, it uses the faster c-ares resolver, which stops lookups queueing behind each other on a busy instance. Read once at startup, so a restart is required.
 
 :::warning Test it before you leave it on
 
-v0.11.0 used c-ares for everything with no way to turn it off, and it does not work everywhere:
+c-ares reads `/etc/resolv.conf` and the hosts file but not other name sources, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving, and on some Windows hosts it finds no usable nameserver at all. Exercise your models, web search and any internal services after turning it on, and turn it back off if lookups start failing.
 
-- On some Windows hosts it finds no usable nameserver, so every lookup to an external model provider fails.
-- In Docker it can intermittently stop resolving container names while Docker's own DNS keeps answering. That empties the Ollama model list and fails in-flight chats with a misleading "Model not found".
-
-Open WebUI asks the operating system by default again, so a working deployment needs no configuration here. If you turn c-ares on, exercise your models, web search and any internal services afterwards, and turn it back off if lookups start failing.
-
-One more difference to know about: c-ares reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use. Names that only those sources know (`.local` via avahi/mDNS, NIS or LDAP directories, Windows NBNS) resolve differently or not at all while it is enabled. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` keep working either way, since those go through the hosts file.
-
-Open WebUI pins the `aiodns` package to version `3.6.1`, the last release before the c-ares build that fails to find a nameserver on Windows. If you build your own image, do not upgrade that package past the pin while this setting is on.
+The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your own image, do not upgrade it past that pin while this setting is on.
 
 :::
 
@@ -1314,17 +1307,14 @@ when using OpenAI-compatible endpoints.
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: The generation parameters sent with background task requests: title generation, tag generation, follow-up suggestions, image prompt generation, retrieval and web search query generation, autocomplete and context compaction summaries. It takes the same keys as a model's advanced parameters (`temperature`, `max_tokens`, `top_p`, `seed`, `reasoning_effort`, `stop`, the Ollama-only options and so on), applied to whichever model ends up running the task. Leave it empty and nothing changes: title generation and compaction summaries stop at 1000 output tokens and the other tasks send no parameters at all. Set anything at all here and that built-in limit is no longer applied, so include `max_tokens` yourself if you still want one. Raising the limit is the fix for a reasoning task model that spends its budget on thinking and returns a title or summary that stops mid-sentence. Emoji generation always uses `max_tokens: 4` and ignores this setting. Can also be set in **Settings > Admin > Interface**, under **Tasks** > **Task Model Parameters** > **Configure**. See [Task Models](/features/administration/task-models) for the full picture.
+- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation and compaction summaries stop at 1000 output tokens and the other tasks send no parameters. Setting anything here drops that built-in limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
 
 :::info
 
-`TASK_MODEL_PARAMS` is read from the environment as a JSON string at startup.
+Read from the environment as a JSON string at startup, for example `{"max_tokens":4000,"temperature":0.3}`. If parsing fails, Open WebUI logs the error and falls back to `{}`.
 
-- Use valid JSON (for example: `{"max_tokens":4000,"temperature":0.3}`)
-- If parsing fails, Open WebUI logs the error and falls back to `{}`
-- These have no effect on background requests, whether you set them here or in the admin panel: `stream_response` (**Stream Chat Response**), `stream_delta_chunk_size` (**Stream Delta Chunk Size**), `function_calling` (**Function Calling**), `reasoning_tags` (**Reasoning Tags**), `compact_token_threshold` (**Context Compaction Threshold**), `system` and `note_id`
-- Anything under `custom_params` is merged in, which is how you send a provider-specific field that has no control of its own (in the admin panel, **Add Custom Parameter**)
+Several parameters have no effect on background requests wherever you set them: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Emoji generation ignores the setting entirely.
 
 :::
 
@@ -1708,16 +1698,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 For an orchestrator connection, set `policy_id` to route every terminal request through that named policy. Omitting it intentionally uses the orchestrator's service defaults through its backward-compatible unscoped route.
 
-`config.contexts` scopes the connection per context. It applies only to orchestrator connections (`server_type` of `orchestrator`, or any connection carrying a `policy_id`) and is ignored everywhere else. Each of the two keys, `chat` and `automation`, accepts:
-
-| Value | Meaning |
-| :--- | :--- |
-| key omitted, or `{}` | Shared. Every chat (or automation) of the same user reuses one workspace. This is what earlier releases did. |
-| `{"context_id": "chat_id"}` | Each saved chat gets its own workspace. Only valid under `chat`. |
-| `{"context_id": "automation_id"}` | Each automation gets its own workspace. Only valid under `automation`. |
-| `false` | The terminal is not offered in that context, and requests for it are refused. |
-
-A chat-scoped terminal needs a saved chat, so it is unavailable in temporary chats and before the first message of a new conversation. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the admin UI and the capacity trade-off.
+`config.contexts` gives an orchestrator connection a separate workspace per chat or per automation, or withholds it from either, with the keys `chat` and `automation`. It is ignored on connections that are not orchestrator ones. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the values, the admin controls and the capacity trade-off.
 
 `auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` for an orchestrator connection when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it.
 
@@ -2426,11 +2407,9 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 :::warning The unit is not the same on every platform
 
-`start.sh` and `open-webui serve` read this as a number of random **bytes** and then base64-encode them, so the default `24` produces a **32-character** key. `backend\start_windows.bat` builds the key one character at a time, so it reads the same value as a number of **characters** and the default `24` produces a **24-character** key. The same setting therefore gives you different keys on different platforms; set it per platform if you need a specific length.
+`start.sh` and `open-webui serve` read it as a number of **bytes** and base64-encode them, so the default `24` gives a 32-character key. `backend\start_windows.bat` reads it as a number of **characters**, so `24` gives a 24-character key. Set it per platform if you need a specific length.
 
-Avoid any value that lands on a key of exactly **44 characters** (`33` on Docker or `open-webui serve`, `44` on Windows). A 44-character `WEBUI_SECRET_KEY` is used verbatim as an encryption key rather than being hashed into one, and an auto-generated key of that length does not decode to the 32 bytes required, so Open WebUI fails to start. The same rule is described under [`ENABLE_VALVE_ENCRYPTION`](#enable_valve_encryption). The default `24` is safe everywhere.
-
-`start.sh` and `open-webui serve` reject a value that is not a positive integer and refuse to start. The Windows script does not validate it.
+Avoid any value producing a key of exactly **44 characters** (`33` on Docker or `open-webui serve`, `44` on Windows), which stops Open WebUI starting for the reason given under [`ENABLE_VALVE_ENCRYPTION`](#enable_valve_encryption). The default is safe everywhere.
 
 :::
 
@@ -4021,7 +4000,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Puts a single line describing the shape of the table in front of the parsed contents of every `.csv` file, naming the total number of rows including the header, the number of data rows and the column names taken from the header row. Without it, nothing in the text a model is given says how many rows or columns the file has, so a question about the size of the table is answered from whichever rows happened to be retrieved. The delimiter is detected from the start of the file, falling back to a comma. The line sits at the top of the file's extracted content, so it is retrieved like any other part of the file and is always present when the whole document is injected. A file that cannot be read, or that has no rows at all, gets no summary line and is parsed as before. No summary is added when `CONTENT_EXTRACTION_ENGINE` is `external`, `tika` or `docling`, which handle `.csv` files themselves; every other engine leaves them to Open WebUI's own CSV parser. Only files parsed after you turn this on get a summary line, and re-indexing does not add one, so re-upload a CSV to give it one. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
+- Description: Puts one line in front of every parsed `.csv` file naming its row count, its data row count and its column names, so a question about the size of the table is not answered from whichever rows happened to be retrieved. No summary is added when `CONTENT_EXTRACTION_ENGINE` is `external`, `tika` or `docling`, which parse `.csv` files themselves. Only files parsed after you turn it on get one, and re-indexing does not add it, so a CSV has to be re-uploaded. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
 - Persistence: Set via environment variable; changing it requires a restart (not a `ConfigVar`, so it does not appear in the admin settings).
 
 #### `RAG_FILE_MAX_SIZE`
@@ -5974,11 +5953,9 @@ Set this variable to `True` to persist OAuth settings in the database and manage
 
 :::info Read-only Admin Panel while this is `False`
 
-Because the environment is authoritative in that case, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is displayed read-only: every value stays visible but no control accepts input, a note above the section names `ENABLE_OAUTH_PERSISTENT_CONFIG` and saving the page leaves the OAuth settings untouched. Previously the fields were editable and every change was silently dropped on the next restart.
+The environment is authoritative, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only: values stay visible, no control accepts input, and saving the page leaves them untouched. Change them in the environment and restart, or set this to `True` to manage them in the Admin Panel.
 
-To change these settings, edit your environment variables and restart, or set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to manage them in the Admin Panel.
-
-[`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is the one in charge. When it is `False`, nothing is saved to the database whatever `ENABLE_OAUTH_PERSISTENT_CONFIG` says, so setting the OAuth variable to `True` in that case makes the section editable again without making the edits last: they are gone at the next restart. Set both to `True` to manage OAuth from the Admin Panel.
+[`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is the one in charge. While it is `False` nothing is saved whatever this variable says, so both have to be `True` for an edit to last.
 
 :::
 
@@ -6793,13 +6770,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" option stays in the attach menu for non-admin users but is greyed out and does nothing, with a tooltip explaining why, and an attach sent anyway is refused. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Web Upload**.
+- Description: Enables or disables user permission to attach web pages in chats. When `False`, the **Attach Webpage** option stays in the attach menu for non-admins but is greyed out with a tooltip, and an attach sent anyway is refused. Configurable per-group as **Allow Web Upload**.
 
 #### `USER_PERMISSIONS_CHAT_DELETE`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to delete chats. When set to `False`, the delete controls are hidden from non-admins instead of being offered and refused: the chat menu in the sidebar, the `Shift`+hover delete icon on a sidebar row, the chat's own top-bar menu, the search results, the per-chat delete in **Settings > Archived Chats** and **Delete All Chats** in **Settings > Data Controls**. The **Delete chat** keyboard shortcut stops doing anything, since there is no button left for it to press. Archiving is unaffected. Deleting a folder that still holds chats needs the same permission, and that action is not hidden, so it is refused rather than absent. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Delete**.
+- Description: Enables or disables user permission to delete chats. When `False`, the delete controls are hidden from non-admins rather than offered and refused, in the sidebar, the chat menu, search, archived chats and data controls, and the **Delete chat** shortcut stops doing anything. Archiving is unaffected. Deleting a folder that still holds chats needs the same permission and is refused rather than hidden. Configurable per-group as **Allow Chat Delete**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_EDIT`
@@ -6820,7 +6797,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). It also covers **forking** a chat, which copies an existing conversation into a new one. When set to `False`, non-admins cannot import chats, and the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are hidden rather than shown and refused. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Import**.
+- Description: Enables or disables user permission to import chats, and to fork one, which copies an existing conversation into a new one. When `False`, non-admins cannot import, and the **Fork chat** action and the `/fork` command are hidden rather than shown and refused. Configurable per-group as **Allow Chat Import**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`
@@ -6923,7 +6900,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). Set to `False` and the affected users lose the **Personalization** settings tab, the memory API endpoints answer them with `403`, the model is not given the memory tools and their stored memories are no longer injected into the system context of their chats. Admins are exempt from the check.
+- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). When `False`, the affected users lose the **Personalization** settings tab, the memory endpoints answer them with `403`, the model is not given the memory tools and their stored memories no longer reach the system context. Admins are exempt.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`
@@ -7113,11 +7090,11 @@ These settings control whether users can share workspace items with other users 
 
 ### Sharing (Public)
 
-These settings control whether users can share workspace items **publicly**. All of them default to `False`, and each one has a parent permission that has to be on before its toggle is shown in the admin panel: the matching private-sharing setting above for workspace items and notes, `USER_PERMISSIONS_CHAT_SHARE` for chats and `USER_PERMISSIONS_FEATURES_CALENDAR` for calendars.
+These settings control whether users can share workspace items **publicly**. All default to `False`, and each has a parent permission that must be on before its toggle appears: the matching private-sharing setting above for workspace items and notes, `USER_PERMISSIONS_CHAT_SHARE` for chats and `USER_PERMISSIONS_FEATURES_CALENDAR` for calendars.
 
 :::warning Re-check tools and notes after an upgrade
 
-On instances upgraded from a release that predates these two variables, the admin panel used to show **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the action was still being refused. Saving any permission on that page then wrote both as enabled and really did grant public tool and note sharing to everyone. The panel now shows what is enforced, but a value already saved is not rolled back. Open **Admin Panel > Users > Groups**, edit **Default permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+On instances upgraded from a release predating these two variables, the admin panel showed **Tools Public Sharing** and **Notes Public Sharing** as on while the action was still refused, and saving any permission on that page wrote both as enabled for real. A value already saved is not rolled back, so open **Admin Panel > Users > Groups**, edit **Default permissions** and confirm both read the way you intend.
 
 :::
 
@@ -7146,7 +7123,7 @@ On instances upgraded from a release that predates these two variables, the admi
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING` (Tools Sharing) to be enabled for the user: with the parent off, the tool's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from tool create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share tools publicly. Configurable per-group as **Tools Public Sharing** in **Admin Panel > Users > Groups**.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from tool create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Tools Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -7160,14 +7137,14 @@ On instances upgraded from a release that predates these two variables, the admi
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Notes Sharing) to be enabled for the user: with the parent off, the note's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from note create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share notes publicly. Configurable per-group as **Notes Public Sharing** in **Admin Panel > Users > Groups**.
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from note create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Notes Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. For links that work without an account, see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Allow Chat Share) to be enabled for the user. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Chats Public Sharing**.
+- Description: Enables or disables **public sharing** of chats. Public means every signed-in user of the instance rather than the open internet; for links that work without an account see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, non-admins lose the **Public** option in the share modal but can still share with named users and groups. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`
