@@ -516,6 +516,12 @@ UVICORN_WORKERS="4"  # Adjust based on your CPU cores
 REDIS_URL="redis://redis:6379/0"  # Required when UVICORN_WORKERS > 1
 ```
 
+:::warning Prefer more containers over more workers
+
+Raising `UVICORN_WORKERS` is the weakest way to scale Open WebUI. It requires the same external services as running several containers, Redis included, while leaving every worker inside one container that shares a single memory limit and fails as a unit. Run replicas with Docker Compose, Kubernetes or the Helm chart instead, keeping one worker each. See [Scaling Open WebUI](/getting-started/advanced-topics/scaling).
+
+:::
+
 :::danger
 
 **Critical: Redis Required for UVICORN_WORKERS > 1**

@@ -135,18 +135,20 @@ Use Kubernetes, Docker Swarm, or similar platforms to manage multiple replicas:
 - Set `ENABLE_DB_MIGRATIONS=false` on all replicas except one designated "primary" pod to prevent migration race conditions: see [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the safe procedure
 - Scale up/down by adjusting your replica count
 
-### Option B: Multiple Workers per Container
+### Option B: Multiple Workers per Container (Last Resort)
 
-For simpler setups (e.g., a single powerful server), increase `UVICORN_WORKERS`:
+On a single machine with no orchestrator at all, you can raise `UVICORN_WORKERS`:
 
 ```
 UVICORN_WORKERS=4
 ```
 
-This spawns multiple application processes inside a single container. You still need PostgreSQL and Redis when using this approach.
+:::warning This is the weakest way to scale
 
-:::info
-Container orchestration is generally preferred because it provides automatic restarts, rolling updates, and more granular resource control. Multiple workers inside a single container is a simpler alternative when orchestration isn't available.
+Prefer more containers even on one machine: Docker Compose runs replicas on a single host perfectly well, and gets you restarts one at a time and a per-container memory limit.
+
+Extra workers cost you everything replicas cost, PostgreSQL, Redis and a client-server vector database are all still required, and return none of the benefit. They share one container, so they share its memory limit and die with it, and they cannot be spread across machines when one stops being enough.
+
 :::
 
 ### Offload HTTP Compression to the Load Balancer

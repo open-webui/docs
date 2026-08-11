@@ -8246,11 +8246,13 @@ For most deployments, the default browser cookie-based session management is suf
 - Default: `1`
 - Description: Controls the number of worker processes that Uvicorn spawns to handle requests. Each worker runs its own instance of the application in a separate process.
 
-:::info
+:::warning Raising this is the worst way to scale Open WebUI
 
-When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
+Leave it at `1` and add containers instead: more replicas in Docker Compose, or more pods through Kubernetes and the Helm chart, behind a load balancer.
 
-If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-worker setups are set accordingly.
+Extra workers demand everything extra replicas demand, a client-server vector database, Redis, PostgreSQL and a single instance running migrations, and give you none of what replicas give you in return. They all sit in one container, so they share its memory limit and its fate: the container is a single point of failure, cannot be restarted one worker at a time, and cannot be spread across machines.
+
+If you do raise it, set the related variables for multi-worker deployments as well; the rest of this entry covers what breaks without them.
 
 :::
 
