@@ -13,7 +13,7 @@ An orchestrator connection can be scoped per context. For chats and for automati
 Connections to a plain Open Terminal server have no contexts. They stay available everywhere and always resolve to the same workspace.
 
 :::info Requires Terminals 0.2.0 or newer
-The orchestrator resolves the context into a workspace. An older orchestrator ignores the context Open WebUI sends and keeps serving one shared workspace per user and policy, so **Per chat** and **Per automation** silently behave like **Shared** until it is upgraded.
+The orchestrator resolves the context into a workspace. An older orchestrator ignores the context Open WebUI sends and keeps serving one shared workspace per user and policy, so **Per chat** and **Per automation** quietly behave like **Shared** until it is upgraded. Open WebUI still applies its own half of the setting either way, so **Off** still hides the terminal and **Per chat** still waits for a saved chat.
 :::
 
 ## Configure
@@ -44,7 +44,7 @@ Open WebUI sends the resolved context to the orchestrator as an `X-Terminal-Cont
 
 The two rows are independent. A terminal can be **Per chat** in chats and **Off** in automations, or **Off** in chats and **Shared** in automations.
 
-**Off** is enforced on the server, so a terminal closed to a context cannot be reached from it whatever the client does. The chat terminal picker hides such a terminal, but the automation editor's terminal picker still lists it, so an automation can be pointed at a terminal that is closed to automations. The run then fails with an error saying the terminal is not available for automations.
+**Off** is enforced on the server, so a terminal closed to a context cannot be reached from it whatever the client does. The chat terminal picker hides such a terminal, so users do not run into it there. The **Automation** row has no equivalent: an [automation](/features/chat-conversations/chat-features/automations) runs with the terminal configured on its model, and the model editor's terminal list shows every terminal regardless of context. A model pointed at a terminal that is closed to automations still works in chat, and its automation runs fail with an error saying the terminal is not available for automations.
 
 ## Per Chat Needs a Saved Chat
 
@@ -52,7 +52,7 @@ A per chat workspace is keyed on the chat's ID, so the chat has to exist first. 
 
 - In a new conversation that has not been sent yet, the terminal panel and file browser for that terminal are not available. They appear once the chat is saved.
 - In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions), a per chat terminal is not listed in the terminal picker at all. A temporary chat is never saved, so there is nothing to key the workspace on.
-- A request that still reaches the backend without a saved chat is refused rather than silently falling back to the shared workspace. The proxy answers `409`, the terminal WebSocket closes with code `4003`, and the model's terminal tools fail with an error naming the terminal.
+- A request that still reaches the backend without a saved chat is refused rather than silently falling back to the shared workspace. The proxy answers `409`, the terminal WebSocket closes with code `4003` and the model's terminal tools fail with an error naming the terminal.
 
 ## Capacity
 
@@ -71,4 +71,4 @@ The same setting can be shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/en
 
 Contexts are not a user isolation mechanism. Separating users is what the orchestrator already does through per-user workspaces, and contexts subdivide one user's workspaces further. See [Multi-User Setup](/features/open-terminal/advanced/multi-user) for the isolation tiers.
 
-Contexts also do not apply to direct Open Terminal connections, to connections added through personal **Settings > Integrations** or to any connection Open WebUI has not detected as an orchestrator.
+Contexts also do not apply to a plain Open Terminal server, to connections added through personal **Settings > Integrations** or to any connection Open WebUI has not detected as an orchestrator.

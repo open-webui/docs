@@ -40,7 +40,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 |---|---|---|
 | **File Context (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High — injected content changes per query |
 | **Citations** | Rewrites the **system message and the last user message** with the RAG template plus the source list, after every tool-calling round that produced sources | Very high, see the warning below |
-| **Memory (system context)** | Injects stored user memories into the system message | High — changes whenever memories change |
+| **Memory (system context)** | Injects stored user memories into the system message, in a fixed section order with the entries sorted alphabetically | Medium — the same memories render identically every turn; changes when your memories change or when the retrieved selection does |
 | **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high — but a **File Context sub-mode**; only fires while File Context is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low — constant while voice mode is on |
 | **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low — stable as long as the attachments don't change |
@@ -128,9 +128,21 @@ Tool definitions sit in the cached prefix alongside the system prompt, so toggli
 
 ### 5. Handle Memory deliberately
 
-Memory injection writes into the **system message** and is **not** governed by File Context, so it can churn the cache independently. Options:
+Memory injection writes into the **system message** and is **not** governed by File Context, so it can churn the cache independently.
 
-- Don't change your memories mid-conversation (the injected block then stays stable across the chat), **or**
+The injected `<memory_context>` block is rendered in a fixed order: the sections `[User Memory]`, `[Memory Neighborhood]` and `[Relevant Context]`, with the entries inside each section sorted alphabetically. An unchanged set of memories therefore produces exactly the same text on every turn, so a vector store handing back the same memories in a different order no longer rewrites your system message and no longer costs you the cached prefix.
+
+What sits in each section decides how often the block still moves:
+
+| Section | What it holds | When it changes |
+|---|---|---|
+| `[User Memory]` | Every `user` memory you have stored | Only when a `user` memory is added, edited or deleted |
+| `[Memory Neighborhood]` | `context` memories filed under paths whose names appear in your recent messages | When your recent messages point at different paths |
+| `[Relevant Context]` | Vector-search hits across your memories, queried with your last seven user messages (capped at 4000 characters) | When that search returns a different selection |
+
+The lower two are retrieved fresh on every turn, so a large `context` memory bank can still change the block as a conversation moves between topics. Options:
+
+- Don't change your memories mid-conversation. The `[User Memory]` section then stays fixed for the whole chat and only the retrieved sections can move, **or**
 - Disable system-prompt memory injection with `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model retrieve memories **on demand** via the memory tools (tell it to do so in your static system prompt). See [Memory](/features/chat-conversations/memory).
 
 ### 6. Voice mode is usually fine

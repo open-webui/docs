@@ -7,6 +7,8 @@ title: "Message Queue"
 
 The **Message Queue** feature allows you to continue composing and sending messages while the AI is still generating a response. Instead of blocking your input until the current response completes, your messages are queued and automatically sent in sequence.
 
+The same queue catches a message whose attachments have not finished uploading, so pressing send early parks the message instead of rejecting it. See [Attachments Still Uploading](#attachments-still-uploading).
+
 ---
 
 ## How It Works
@@ -27,7 +29,7 @@ Each queued message shows three action buttons:
 
 | Action | Icon | Description |
 |--------|------|-------------|
-| **Send Now** | ↑ | Interrupts the current generation and sends this message immediately |
+| **Send Now** | ↑ | Interrupts the current generation and sends this message immediately. Greyed out, with a **Waiting for upload** tooltip, while the message still has an attachment that is uploading or that failed |
 | **Edit** | ✏️ | Removes the message from the queue and puts it back in the input field |
 | **Delete** | 🗑️ | Removes the message from the queue without sending |
 

@@ -29,11 +29,17 @@ Open WebUI tracks read state per chat and updates it when you open a conversatio
 You can search through your conversations using the global search bar in the sidebar.
 
 1.  Click the **Search** icon or use the keyboard shortcut `Cmd+K` / `Ctrl+K`.
-2.  Type your query. Open WebUI performs a fuzzy search across:
+2.  Type your query. Open WebUI searches across:
     *   **Chat Titles**
     *   **Message Content**
     *   **Tags** (Search using `tag:my-tag-name`)
 3.  Click on a result to immediately jump to that conversation.
+
+### How queries are matched
+
+A query of several words finds every chat that contains all of them, in any order, without needing them next to each other. Each word can come from the chat's title or from any of its messages, and different words can come from different messages, so `docker healthcheck` also finds a chat titled "Docker setup" whose reply mentions a healthcheck. Chats that contain your query as an exact phrase are listed first, then the rest, each group ordered by most recently updated.
+
+Matching ignores case and works on substrings, so `log` also matches "login" and "backlog". Words are cut out of your query on English letters and digits, so `v0.9.1` searches for `v0`, `9` and `1` separately. A query written entirely in another script, Chinese or Russian for example, is searched as one exact phrase.
 
 ### Filter prefixes
 
@@ -45,7 +51,7 @@ You can narrow results with filter prefixes, alone or combined with a query:
 *   `archived:` — archived chats only
 *   `shared:` — shared chats only
 
-For example, `folder:work meeting notes` searches for "meeting notes" within the **work** folder. Matching results show a short **snippet** of the matched message.
+For example, `folder:work meeting notes` searches for "meeting notes" within the **work** folder. Matching results show a short **snippet** of the matched message, taken from wherever the match was found: the whole phrase if the chat contains it, otherwise the first of your words that turns up in a message. A chat matched only on its title shows no snippet.
 
 ---
 
@@ -54,7 +60,7 @@ For example, `folder:work meeting notes` searches for "meeting notes" within the
 When using a model with **Native Function Calling** enabled (see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)), models can search through your chat history autonomously.
 
 ### Available History Tools:
-- **`search_chats`**: Simple text search across chat titles and message content. Returns matching chat IDs and snippets.
+- **`search_chats`**: Text search across chat titles and message content, using the same matching as the search bar and skipping the chat the model is currently in. Returns matching chat IDs and snippets.
 - **`view_chat`**: Reads and returns the full message history of a specific chat by ID.
 
 ### Why use native tool calling for Search?

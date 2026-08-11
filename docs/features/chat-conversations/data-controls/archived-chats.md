@@ -34,7 +34,7 @@ From the Data Controls tab, you can also perform bulk operations:
 ## FAQ
 
 **Q: Can I search within archived chats?**  
-**A:** The archive dashboard searches by chat title. To search within message content, you would need to restore the chat first.
+**A:** Yes. The archive dashboard itself searches by chat title, but the sidebar search (`Cmd+K` / `Ctrl+K`) reads the messages of archived chats too: add the `archived:true` filter, for example `archived:true quarterly report`. You do not need to restore a chat to search inside it. See [History & Search](/features/chat-conversations/chat-features/history-search#filter-prefixes).
 
 **Q: Is there a limit to how many chats I can archive?**  
 **A:** There is no hard limit. The scalability depends on your database configuration.

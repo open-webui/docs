@@ -213,6 +213,12 @@ Open WebUI automatically captures token usage from model responses and stores it
 
 Token data is normalized across different model providers (OpenAI, Ollama, llama.cpp, etc.) to provide consistent metrics regardless of which backend you're using.
 
+The figures are the ones the provider reports, and most OpenAI-compatible providers report nothing on a streamed reply unless they are asked. Asking is what the **Usage** capability in **Workspace > Models > Edit** does, so a model without it can show no tokens at all. See [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
+
+:::info Scheduled and delegated runs are counted too
+The request for token counts is added server-side, so a model with **Usage** enabled reports its tokens in every chat it runs, including the ones Open WebUI starts on a user's behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Those runs are part of the same totals as the chats people type in.
+:::
+
 ### Token Usage Metrics
 
 The **Token Usage** section (accessible via the Tokens endpoint or dashboard) provides:

@@ -16,7 +16,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into one of your [folders](/features/chat-conversations/chat-features/conversation-organization)
-- Optionally attach a terminal server and working directory for runs that need terminal context
+- Give runs a terminal by configuring one on the model the automation uses
 
 ## Access Control
 
@@ -64,13 +64,16 @@ Administrators can set global limits on automation usage for non-admin users. Th
    - **Model**
    - **Schedule**
 4. (Optional) Choose a **Folder** for the chats the automation creates
-5. (Optional) Select a **Terminal** server and **Working Directory**
-6. Click **Create**
+5. Click **Create**
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
 
-:::info Terminals can be taken out of automations
-The **Terminal** picker lists every terminal you can use, including ones an administrator has closed to automations. If a run fails with an error saying the terminal is not available for automations, the connection's **Automation** context has been set to **Off** and you need a different terminal. An administrator can also give each automation a workspace of its own instead of sharing one, which changes nothing about how you set the automation up. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+### Giving a Run a Terminal
+
+The automation editor has no terminal setting. A run uses the terminal configured on the model it runs, so set that up first in **Workspace > Models**: edit the model and pick the terminal from the **Terminal** list. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default. Every automation using that model then runs with that terminal.
+
+:::info A terminal can be closed to automations
+Administrators can take an orchestrated terminal out of automations, and can give each automation a workspace of its own rather than sharing one across everything. The model editor's **Terminal** list does not reflect that, so a run can fail with an error saying the terminal is not available for automations, which means its **Automation** context is set to **Off**. Pick a different terminal for the model, or ask an administrator to reopen that one. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
 :::
 
 ## Edit and Manage
@@ -79,7 +82,7 @@ From the Automations list, click an automation to open its dedicated editor page
 
 On the editor page, you can:
 
-- Update title, instructions, model, schedule, and terminal settings
+- Update title, instructions, model and schedule
 - Save changes
 - Run immediately with **Run now**
 - Pause/resume automation state

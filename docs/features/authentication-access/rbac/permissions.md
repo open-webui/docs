@@ -86,6 +86,16 @@ Controls what users can share with the community or make public.
 | **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, individual-user grants are stripped from create/update payloads; group and public sharing are unaffected. Admins are always exempt. |
 | **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. Set this per group: the global default currently does not persist, see the [note in the reference](/reference/env-configuration#user_permissions_access_grants_allow_groups). |
 
+Every sharing permission in this table starts off, and each **Public** toggle only appears once its parent sharing permission is on.
+
+:::warning Re-check Tools and Notes public sharing after an upgrade
+
+On instances upgraded from a release that predates the **Public Tools** and **Public Notes** keys, this page used to draw both switches as on while the backend still refused the action. Saving any permission here then persisted them as enabled, granting public tool and note sharing that was never configured. The panel and the enforcement now agree, but a value already written to the database is not rolled back.
+
+If you saved default permissions on an affected release, open **Admin Panel > Users > Groups > Default Permissions** and confirm **Tools Public Sharing** and **Notes Public Sharing** read the way you intend. Group-level overrides are worth the same check.
+
+:::
+
 ### 3. Chat Permissions
 Controls the features available to the user inside the chat interface.
 
@@ -125,7 +135,7 @@ Controls access to broad platform capabilities.
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
-| **Memories** | Access to the Memories feature for persistent user context. |
+| **Memories** | Access to the Memories feature for persistent user context. Taking it away hides the **Personalization** settings tab, blocks the memory API endpoints, withholds the memory tools from the model, and stops stored memories being injected into the chat's system context. The injection check runs server-side on every chat request, so a client that still asks for memory does not get it. Admins are always exempt. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
 | **User Webhooks** | Ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default. |

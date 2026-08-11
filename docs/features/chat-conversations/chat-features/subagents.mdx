@@ -31,6 +31,16 @@ Typical uses are researching several questions at once, working through a task t
 
 While background is disabled, the `background` option is stripped from the tool definition entirely, so the model cannot ask for it.
 
+## Handing Over Files
+
+A sub-agent starts with no attachments. Nothing the parent chat has uploaded travels with the task on its own, so delegating does not quietly drag every file in a long conversation into a second model call.
+
+To pass a file, the model names it in the `file_ids` argument of `delegate_task`. Those files are attached to the sub-agent's opening message the way you would attach them yourself: an image is handed to the model as an image, so a vision model can actually look at it, and a document is available to the sub-agent exactly as it is in a normal chat, retrieved through file context or read with the **Files** builtin tools when file context is off.
+
+Only files already attached in the parent chat can be passed, and every ID is checked before anything runs. If one of them is unknown or no longer available, the call comes back as `Error: file_ids not attached or unavailable: <ids>` and no sub-agent is started.
+
+A file ID written into `context` is only text. The sub-agent receives the ID and no file, so anything it has to open belongs in `file_ids`.
+
 ## Enable Sub-agents
 
 Sub-agents need three things to line up:
@@ -83,7 +93,7 @@ The defaults are permissive: 20 concurrent sub-agents, each allowed 30 tool-call
 |---|---|
 | `delegate_task` | Delegate a task to a parallel sub-agent and return its result. |
 
-`delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), and `background` when background sub-agents are enabled.
+`delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), optional `file_ids` naming attachments the sub-agent has to open (see [Handing Over Files](#handing-over-files)), and `background` when background sub-agents are enabled.
 
 ### Requirements
 

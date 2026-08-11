@@ -294,7 +294,7 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `write_note` | Create a new private note for the user. |
 | `replace_note_content` | Update an existing note, replacing the whole content or applying range edits to part of it. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
-| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. |
+| `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the full message history of a specific chat by ID. |
 | **Channels** | *Requires `ENABLE_CHANNELS` AND per-model "Channels" category enabled (default: on).* |
 | `search_channels` | Find public or accessible channels by name/description. |
@@ -410,7 +410,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `write_note` | `title` (required), `content` (required) | `{status: "success", id}` |
 | `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
 | **Chat History** | | |
-| `search_chats` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
+| `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
 | **Channels** | | |
 | `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
@@ -437,7 +437,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
 | **Sub-agents** | | |
-| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which get no files at all without it. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |

@@ -95,6 +95,8 @@ Administrators can also control Memory access on a per-role or per-group basis f
 - **Admin UI**: Admin Panel > Users > Permissions > Features > **Memories**
 - **Environment Variable**: [`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories) (Default: `True`)
 
+Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab and the memory API endpoints answer them with `403`, the memory tools are no longer handed to the model, and their stored memories are no longer injected into the system context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
+
 ### Background Review & Limits
 
 - **Background review** — when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation and updates `context` memories automatically, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
@@ -104,6 +106,8 @@ Administrators can also control Memory access on a per-role or per-group basis f
 By default Open WebUI injects the user's stored memories into the model's system context so the model is aware of them on every turn. This injection can be turned off independently of the memory tools: when disabled, the model can still add, update and delete memories on request, but remembered information is no longer added to the prompt automatically.
 - **Admin UI**: Settings > Admin > System > General > **Memory System Context** (shown when Memories is enabled)
 - **Environment Variable**: [`ENABLE_MEMORY_SYSTEM_CONTEXT`](/reference/env-configuration#enable_memory_system_context) (Default: `True`)
+
+The injected block is wrapped in `<memory_context>` tags and appended to the system message. It always renders in the same order: the sections `[User Memory]`, `[Memory Neighborhood]` and `[Relevant Context]`, with the entries inside each section sorted alphabetically. The same set of memories therefore produces exactly the same text on every turn, so the model's cached prompt prefix survives instead of being thrown away because the vector search happened to return the same memories in a different order. See [Prompt Caching](/features/chat-conversations/prompt-caching#5-handle-memory-deliberately) for what still changes the block mid-conversation.
 
 ## Privacy & Security
 

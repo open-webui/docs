@@ -483,7 +483,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `bool`
 - Default: `True`
-- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Surfaced as the "Memory System Context" toggle under **Admin Settings > General** when Memories is enabled.
+- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Injection additionally requires the user to hold the `features.memories` permission ([`USER_PERMISSIONS_FEATURES_MEMORIES`](#user_permissions_features_memories); admins are exempt), and the injected block is rendered in a fixed order, so an unchanged set of memories produces the same text on every turn and leaves a provider's [cached prompt prefix](/features/chat-conversations/prompt-caching#5-handle-memory-deliberately) intact. Surfaced as the "Memory System Context" toggle under **Admin Settings > General** when Memories is enabled.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBHOOK_URL`
@@ -6832,7 +6832,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory).
+- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). Set to `False` and the affected users lose the **Personalization** settings tab, the memory API endpoints answer them with `403`, the model is not given the memory tools, and their stored memories are no longer injected into the system context of their chats. Admins are exempt from the check.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`
@@ -7008,9 +7008,9 @@ These settings control whether users can share workspace items with other users 
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
 
-- Type: `str`
-- Default: `True`
-- Description: Enables or disables **private sharing** of notes.
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables **private sharing** of notes. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
@@ -7022,7 +7022,13 @@ These settings control whether users can share workspace items with other users 
 
 ### Sharing (Public)
 
-These settings control whether users can share workspace items **publicly**.
+These settings control whether users can share workspace items **publicly**. Every one of them is off unless you turn it on, and each one requires its private-sharing parent above to be enabled first.
+
+:::warning Re-check tools and notes after an upgrade
+
+On instances upgraded from a release that predates `public_tools` and `public_notes`, the admin panel used to draw **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the backend was still refusing the action. Saving any permission on that page then wrote those two as enabled and really did grant public tool and note sharing to everyone. What the admin panel shows now matches what is enforced, but a value already written to the database is not rolled back. Open **Admin Panel > Users > Groups > Default Permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+
+:::
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
@@ -7047,9 +7053,9 @@ These settings control whether users can share workspace items **publicly**.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING` (Tools Sharing) to be enabled for the user: the **Tools Public Sharing** toggle only appears once Tools Sharing is on. Admins can always share tools publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Tools Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -7061,9 +7067,9 @@ These settings control whether users can share workspace items **publicly**.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
-- Default: `True`
-- Description: Enables or disables **public sharing** of notes.
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Notes Sharing) to be enabled for the user: the **Notes Public Sharing** toggle only appears once Notes Sharing is on. Admins can always share notes publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Notes Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`

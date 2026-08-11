@@ -115,10 +115,15 @@ Toggle what the model can do and bind resources:
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Image Generation** | Enable image generation |
+| **Usage** | Ask the provider to report token counts on streamed replies (`stream_options.include_usage`). Off by default. Most OpenAI-compatible providers report nothing unless asked, so without it a response has no token figures to show and none to aggregate in [Analytics](/features/administration/analytics) |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
 | **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels, Files, Task Management, Automations |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **TTS Voice** | Set a specific voice for this model's responses |
+
+:::info Usage covers every chat the model runs
+The request for token counts is added server-side, so it applies wherever the model is used: the chat interface, the API, and the chats Open WebUI starts on your behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Nothing needs to be set per request. Only streaming requests are touched, so a model with **Stream Chat Response** turned off is left alone.
+:::
 
 ### Advanced parameters
 
@@ -251,6 +256,8 @@ Setting a model as Selected does not stop anyone from switching to another model
 Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
 
 ![The model selector, searchable and showing pinned models](/images/features/chat/model-selector.png)
+
+You can also switch without opening the picker. Send `/model` followed by a model id, for example `/model gpt-5.1`, and the chat moves to that model; send `/model` on its own and it tells you which model the chat is on. The id has to match exactly, the display name will not do, and an id you cannot reach reports `Model not found`. Picking **Model** from the `/` menu opens the picker with its search box focused instead. See [Chat Features](/features/chat-conversations/chat-features/) for the other built-in slash commands.
 
 ---
 

@@ -83,16 +83,23 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
   `/` and `@` used to offer only prompts and only models respectively; both now cover much more.
 
-- **Built-in Slash Commands**: three commands act on the current chat. They only appear once the chat has messages, and are typed on their own rather than sent to the model:
+- **Built-in Slash Commands**: four commands act on the current chat rather than being sent to the model:
 
   | Command | What it does |
   |---|---|
   | `/compact` | Compacts the conversation now, instead of waiting for it to cross the threshold. Only offered when [Context Compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is enabled, and not while a response is generating. It reports what happened: the context was compacted, or it was skipped because the chat is too short, empty, or compaction is disabled. |
   | `/status` | Opens a status panel for the chat showing **Context usage**, **Queued messages**, **Tasks** currently running, and the **Chat ID**. |
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
+  | `/model` | On its own, names the model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
+
+  `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` is always offered, an empty chat included, and is the one that takes an argument.
 
   `/fork` requires the **Chat Import** permission (`chat.import`, allowed by default; admins always pass). The command still appears in the menu without it, and reports **Access prohibited** when run.
 
+  Choosing **Model** from the `/` menu opens the model picker rather than running the command, with the search box focused (on desktop), so you can change model from the keyboard alone. Typing an id instead matches a model's **id** exactly, never its display name, and an id you do not have reports `Model not found: <id>` and changes nothing. A successful switch replaces the current selection outright, so a multi-model chat drops back to the single model you named.
+
 - **Writing & Content Blocks**: Responses from models that include colon-fence blocks (e.g., `:::writing`, `:::code_execution`, `:::search_results`) are automatically rendered as formatted content in a styled container with a copy button. This is commonly used by newer OpenAI models to distinguish different types of output (prose, code results, search results) from the main response text.
+
+  Each block is headed by its type (**Writing**, **Code Execution**), unless the model put attributes in braces on the opening line, as in `:::writing{variant="email" subject="Short question" recipient="mail@example.com"}`. Then `subject` becomes the heading and `recipient` follows it, so a chat holding several drafted emails shows their subjects instead of one identical **Writing** heading after another. A heading too wide for the row is cut short and shown in full when you rest the pointer on it. The recipient is plain text: it is not a link, and there is no send action. Attributes are read only from between the braces, so a `key="value"` written in ordinary prose on that opening line is ignored, as is a brace that is never closed, and a block with no attributes looks exactly as it did before.
 
 - **Structured Response Editing**: Clicking the edit icon on an assistant response that contains tool calls, reasoning blocks, or code-interpreter output opens a structured editor instead of a plain textarea. Each output item (text, thought, tool call, code block, web/file/computer search) becomes its own collapsible field, and a **JSON** toggle exposes the underlying [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) payload for direct editing. Reasoning/thinking blocks are editable here too. The previous textarea editor reduced them to a non-editable `<details>` placeholder. Plain text-only responses keep the original textarea behavior. Editing rewrites the message's `output` array; Open WebUI re-derives the displayed `content` (including `<details>` blocks for thoughts and tool calls) on save, so the rendered message stays consistent.

@@ -91,6 +91,8 @@ Connections that are not orchestrator-backed have no `contexts` entry and are al
 
 Practically: read `contexts.chat` before choosing a terminal. If it is `false`, pick another. If it is `{"context_id": "chat_id"}`, you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one.
 
+[Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) covers the admin side: where the setting lives and what each mode does to the workspace behind the terminal.
+
 ---
 
 ## Path A: full agentic loop
