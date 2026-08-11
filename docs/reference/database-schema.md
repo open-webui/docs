@@ -137,7 +137,7 @@ Things to know about the access_grant table:
 Things to know about the auth table:
 
 - Uses UUID for primary key
-- One-to-One relationship with `users` table (shared id)
+- One-to-One relationship with the `user` table (shared id)
 
 ## Channel Table
 
@@ -656,15 +656,22 @@ A `UNIQUE(user_id, note_id)` constraint prevents duplicate pins for the same use
 
 ## OAuth Session Table
 
-| **Column Name** | **Data Type** | **Constraints**      | **Description**                   |
-| --------------- | ------------- | -------------------- | --------------------------------- |
-| id              | Text          | PRIMARY KEY          | Unique session identifier         |
-| user_id         | Text          | FOREIGN KEY(user.id) | Associated user                   |
-| provider        | Text          | -                    | OAuth provider (e.g., 'google')   |
-| token           | Text          | -                    | OAuth session token               |
-| expires_at      | BigInteger    | -                    | Token expiration timestamp        |
-| created_at      | BigInteger    | -                    | Session creation timestamp        |
-| updated_at      | BigInteger    | -                    | Session last update timestamp     |
+| **Column Name** | **Data Type** | **Constraints**                            | **Description**                   |
+| --------------- | ------------- | ------------------------------------------ | --------------------------------- |
+| id              | Text          | PRIMARY KEY, UNIQUE                        | Unique session identifier         |
+| user_id         | Text          | FOREIGN KEY(user.id) CASCADE, NOT NULL     | Associated user                   |
+| provider        | Text          | NOT NULL                                   | OAuth provider (e.g., 'google')   |
+| token           | Text          | NOT NULL                                   | Encrypted OAuth token set         |
+| expires_at      | BigInteger    | NOT NULL                                   | Token expiration timestamp        |
+| created_at      | BigInteger    | NOT NULL                                   | Session creation timestamp        |
+| updated_at      | BigInteger    | NOT NULL                                   | Session last update timestamp     |
+
+Things to know about the oauth_session table:
+
+- A user holds one session per identity provider, so the relationship to `user` is one-to-many. The (`user_id`, `provider`) pair is what identifies a session for lookup and replacement.
+- Indexed on `user_id`, on `expires_at`, and on (`user_id`, `provider`) (`idx_oauth_session_user_id`, `idx_oauth_session_expires_at`, `idx_oauth_session_user_provider`, all from migration `38d63c18f30f`).
+- Deleting a user cascades to delete their sessions.
+- `token` holds the provider's token set (access token, ID token and refresh token) as JSON, encrypted at rest with Fernet before it is written. The key comes from `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`, which must be set or the application refuses to start. A key that is not already 44 characters is hashed with SHA-256 and base64-encoded to the length Fernet requires.
 
 ## Prompt Table
 
