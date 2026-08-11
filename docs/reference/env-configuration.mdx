@@ -265,7 +265,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets instance-wide defaults for the personal options in **Settings > Interface**, so every account starts from your preferences instead of the built-in ones. Keys are the setting names as they are stored in a user's own settings, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins over the default. A setting the user has never touched follows the default and keeps following it, so changing the default later moves everyone who has not overridden it. Configurable via **Settings > Admin > General > UI > Default Interface Settings**, see [Default Interface Settings](/getting-started/quick-start/settings#default-interface-settings-admin).
+- Description: Sets instance-wide starting values for the personal options in **Settings > Interface**, so every account opens on your preferences instead of the built-in ones, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins. An option nobody has touched keeps following the default, so changing it later moves everyone who has not overridden it. The defaults also reach personal settings written outside the **Interface** page, such as `system` and `params`, which the admin editor does not offer. Configurable via **Settings > Admin > General > UI > Default Interface Settings**. See [Default Interface Settings](/features/administration/interface-defaults) for the full list of keys, their labels and their built-in values.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.default_interface_settings`.
 
 :::info
@@ -273,8 +273,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 `DEFAULT_INTERFACE_SETTINGS` is read from the environment as a JSON string at startup.
 
 - Use valid JSON (for example: `{"chatBubble": false, "title": {"auto": false}}`)
-- If parsing fails, Open WebUI logs the error and falls back to `{}`
-- Anything that parses to something other than a JSON object (an array or a number, for example) is also replaced by `{}`
+- If parsing fails, or the value is not a JSON object, it is ignored and no defaults are applied
 
 :::
 

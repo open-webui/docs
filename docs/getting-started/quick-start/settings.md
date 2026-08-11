@@ -73,9 +73,9 @@ This pattern applies across web search, image generation, direct connections, co
 
 ---
 
-## Starting Values, Not Just Ceilings
+## Instance-Wide Starting Values
 
-Feature toggles are a ceiling. There is one admin control that works the other way: **Default Interface Settings** decides what everyone's **Settings > Interface** page starts on, and each person can still change any of it for themselves. An option somebody has never touched keeps following your default, so a later change to it reaches them too.
+Feature toggles are a ceiling. One admin control works the other way round: **Default Interface Settings** decides what everyone's **Settings > Interface** page starts on, and each person can still change any of it for themselves. An option somebody has never touched keeps following your default, so a later change to it reaches them too.
 
 Set it in **Settings > Admin > General**, under **UI > Default Interface Settings**, or with the `DEFAULT_INTERFACE_SETTINGS` environment variable.
 
@@ -92,7 +92,7 @@ Set it in **Settings > Admin > General**, under **UI > Default Interface Setting
 | **Controls** | API connections, feature toggles, security, defaults | Theme, default model, personal preferences |
 | **Override behavior** | Cannot be overridden by users | Can customize within admin-allowed boundaries |
 
-The one deliberate exception is [Default Interface Settings](#default-interface-settings-admin), which an admin sets as a starting value rather than a limit; each user can change any of it for themselves.
+The one deliberate exception is [Default Interface Settings](/features/administration/interface-defaults), which an admin sets as a starting value rather than a limit; each user can change any of it for themselves.
 
 ---
 
@@ -111,10 +111,10 @@ If the admin has enabled **Direct Connections**, you can add personal API keys i
 Model-level settings configured by admins in the Workspace take precedence over personal settings. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
 
 **"A switch in Settings > Interface has Default written next to it. What does that mean?"**
-It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](#default-interface-settings-admin) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
+It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
 
 **"I am the admin. Can I make everyone start with the same interface options?"**
-Yes. **Settings > Admin > System > General > UI > Default Interface Settings**, or the [`DEFAULT_INTERFACE_SETTINGS`](/reference/env-configuration#default_interface_settings) environment variable. It sets where everyone starts; each person can still change any of it afterwards.
+Yes, with [Default Interface Settings](/features/administration/interface-defaults). It sets where everyone starts; each person can still change any of it afterwards.
 
 :::tip First-Time Admin?
 Start with **Admin Settings > Connections** to connect your model providers (Ollama, OpenAI, etc.), then explore **Admin Settings > Interface** to enable or disable features for your users.
