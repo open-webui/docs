@@ -153,7 +153,7 @@ Channels must be enabled by an administrator before use.
 2. Toggle **Channels** on and save
 3. Channels appear in the sidebar. Click **(+)** to create your first one
 
-Channel creation is restricted to administrators by default. Channels support granular permissions including read-only access, write access, and feature-level toggles via environment variables or group permissions.
+Creating a standard channel is restricted to administrators. Someone with the **Channels** permission ([`USER_PERMISSIONS_FEATURES_CHANNELS`](/reference/env-configuration#user_permissions_features_channels)) can create group channels and direct messages. Channels support granular permissions including read-only access, write access, and feature-level toggles via environment variables or group permissions.
 
 ---
 
