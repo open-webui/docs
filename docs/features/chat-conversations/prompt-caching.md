@@ -128,21 +128,9 @@ Tool definitions sit in the cached prefix alongside the system prompt, so toggli
 
 ### 5. Handle Memory deliberately
 
-Memory injection writes into the **system message** and is **not** governed by File Context, so it can churn the cache independently.
+Memory injection writes into the **system message** and is **not** governed by File Context, so it can churn the cache independently. Options:
 
-The injected `<memory_context>` block is rendered in a fixed order: the sections `[User Memory]`, `[Memory Neighborhood]` and `[Relevant Context]`, with the entries inside each section sorted alphabetically. An unchanged set of memories therefore produces exactly the same text on every turn, so a vector store handing back the same memories in a different order no longer rewrites your system message and no longer costs you the cached prefix.
-
-What sits in each section decides how often the block still moves:
-
-| Section | What it holds | When it changes |
-|---|---|---|
-| `[User Memory]` | Every `user` memory you have stored | Only when a `user` memory is added, edited or deleted |
-| `[Memory Neighborhood]` | `context` memories filed under paths whose names appear in your recent messages | When your recent messages point at different paths |
-| `[Relevant Context]` | Vector-search hits across your memories, queried with your most recent user messages (up to seven of them, capped at 4000 characters) | When that search returns a different selection |
-
-The lower two are retrieved fresh on every turn, so a large `context` memory bank can still change the block as a conversation moves between topics. Options:
-
-- Don't change your memories mid-conversation. The `[User Memory]` section then stays fixed for the whole chat and only the retrieved sections can move, **or**
+- Don't change your memories mid-conversation. Part of the injected block is still retrieved against your recent messages on every turn, so it can move as the conversation changes topic, **or**
 - Disable system-prompt memory injection with `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model retrieve memories **on demand** via the memory tools (tell it to do so in your static system prompt). See [Memory](/features/chat-conversations/memory).
 
 ### 6. Voice mode is usually fine

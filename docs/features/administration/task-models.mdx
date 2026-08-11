@@ -51,6 +51,8 @@ Reach for it when:
 As soon as you set a single parameter, the built-in 1000-token limit on titles and compaction summaries is no longer applied. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
 :::
 
+Five of the controls in the panel have no effect on background requests: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Setting them here changes nothing.
+
 This is the only place background requests get parameters from. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
 
 ---

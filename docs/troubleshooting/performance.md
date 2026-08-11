@@ -240,7 +240,7 @@ The log level decides how much work the backend does as well as how much it prin
 *   **Where the win is**: the saving follows the size of the text that would have been discarded, so it is largest on busy servers, in long conversations and on chats that draw from a large knowledge base. Chat requests, retrieval, file upload and indexing and OAuth/LDAP sign-in all carry log calls of that kind.
 *   **Where it is not**: a quiet single-user instance. Fewer requests means fewer discarded messages, and the saving disappears against model latency.
 *   **What it costs you**: `WARNING` drops the `INFO` lines that record startup, key events and request handling. If your log aggregator or your support workflow relies on those, keep `INFO`.
-*   **What to avoid**: leaving `DEBUG` on in production. That is the one level where all of it really is built and written, whole request payloads and retrieval results included.
+*   **What to avoid**: leaving `DEBUG` on in production. It is the most expensive level to run, because everything it adds is genuinely built and written, whole chat request payloads included.
 
 - **Env Var**: `GLOBAL_LOG_LEVEL=WARNING`
   *   *Recommendation*: try it on a busy instance that does not depend on the `INFO` lines. Requires a restart.
