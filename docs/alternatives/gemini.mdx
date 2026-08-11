@@ -84,6 +84,10 @@ Gemini models are available through Open WebUI via the Google AI API. You can us
 3. Add a new connection with the base URL `https://generativelanguage.googleapis.com/v1beta/openai` and your Google AI API key
 4. Gemini models will appear in your model selector
 
+:::warning Tools need extra setup on this endpoint
+Google's OpenAI compatibility layer does not follow the OpenAI schema for tool calls, so a turn where the model decides to call a tool comes back as an empty assistant message. This covers the builtin tools such as Memory, so it shows up as the occasional blank reply rather than an obvious failure. Set **Function Calling** to **Legacy** in the model's Advanced Params, or route Gemini through a gateway such as LiteLLM or OpenRouter. The [OpenAI-compatible provider guide](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) has the details.
+:::
+
 ---
 
 *Gemini brings strong multimodal AI to the Google ecosystem. Open WebUI is one way to use those models alongside others, on your own infrastructure.*

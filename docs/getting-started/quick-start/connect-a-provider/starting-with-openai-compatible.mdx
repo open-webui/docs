@@ -94,7 +94,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   </TabItem>
   <TabItem value="gemini" label="Google Gemini">
 
-  **Google Gemini** provides an OpenAI-compatible endpoint that works well with Open WebUI.
+  **Google Gemini** provides an OpenAI-compatible endpoint. It works for plain chat, but its tool calling does not follow the OpenAI schema, so read the warning below before enabling tools.
 
   | Setting | Value |
   |---|---|
@@ -104,6 +104,18 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::warning No trailing slash
   The URL must be exactly `https://generativelanguage.googleapis.com/v1beta/openai`, **without** a trailing slash. A trailing slash will break the `/models` endpoint call.
+  :::
+
+  :::warning Native tool calling is broken on this endpoint
+  Google's compatibility layer departs from the OpenAI streaming schema in two ways. It omits the `index` field that the schema carries on every streamed tool call, and Gemini 3 models attach a proprietary `thought_signature` that Google then requires back on the follow-up request. Open WebUI speaks the OpenAI schema, so on any turn where the model decides to call a tool, the call is discarded and **the assistant message arrives empty**, with nothing in the logs.
+
+  This includes the builtin tools such as Memory, which is why it looks intermittent: the turn only breaks when the model chooses to call something. Your options:
+
+  - Set **Function Calling** to **Legacy** in the model's **Advanced Params**. Tools then run through a separate non-streaming request that never touches the affected code path. Builtin tools are unavailable in this mode.
+  - Turn the **builtin tools** capability off for the model if you only want plain chat.
+  - For working native tool calling, put a gateway in front that translates to Google's own API, such as LiteLLM or OpenRouter, or use a pipe that calls `generateContent` directly.
+
+  This is a deviation on Google's side, so Open WebUI will not work around it. See [#28492](https://github.com/open-webui/open-webui/issues/28492).
   :::
 
   </TabItem>
