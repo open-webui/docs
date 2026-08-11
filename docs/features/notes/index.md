@@ -88,7 +88,9 @@ Rewriting happens in the chat, there is no separate **Enhance** button. Select t
 
 ### Chat Sidebar
 
-Opens the full chat interface in a pane beside the note. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and everything else the chat input offers. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+Opens the full chat interface in a pane beside the note. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+
+**Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
 
 **Insert a response into the note.** Every assistant response carries an **Insert** button that drops that response into the note at the cursor. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
 
