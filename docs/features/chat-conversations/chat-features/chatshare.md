@@ -24,7 +24,7 @@ This will enable community sharing for all users on your Open WebUI instance.
 To share a chat:
 
 1. Select the chat conversation you want to share.
-2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat.
+2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Then click on the **Share** option.
 4. Select either **Share to Open WebUI Community** (if **Enable Community Sharing** is toggled on by an **Admin**) or **Copy Link**.
 
@@ -106,7 +106,7 @@ The model receives the conversation as it stands now, so messages added since th
 To update a shared chat:
 
 1. Select the chat conversation you want to share.
-2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat.
+2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Click on the **Share** option.
 4. The **Share Chat** Modal should look different if you've shared a chat before.
 
@@ -122,7 +122,7 @@ The **Share Chat** Modal includes the following options:
 To delete a shared chat link:
 
 1. Select the chat conversation you want to delete the shared link for.
-2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat.
+2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Click on the **Share** option.
 4. The **Share Chat** Modal should look different if you've shared a chat before.
 5. Click on **delete this link**.

@@ -111,8 +111,11 @@ Click the small **+** button next to the **Calendars** heading in the calendar s
    - **Calendar**: which calendar to add the event to
    - **When**: date and time, or toggle **All day**
    - **Location** (optional)
+   - **Repeat**: how often the event comes back, see [Recurring Events](#recurring-events)
    - **Description** (optional)
 3. Click **Create**
+
+**New Event** opens the form on today's date, starting at the current time and ending an hour later. Both come from your own clock, so opening the form late in the evening or early in the morning still gives you today rather than tomorrow or yesterday. Opening the form by clicking the grid prefills that slot instead: the hour you clicked in week and day view, 09:00 in month view.
 
 ### Edit or Delete an Event
 
@@ -134,13 +137,23 @@ Use the **arrow buttons** to navigate forward/backward, or click **Today** to ju
 
 ---
 
+## Recurring Events
+
+The **Repeat** field in the event form decides whether an event comes back: **No Repeat** (the default), **Daily**, **Monday – Friday**, **Weekly**, **Monthly** or **Yearly**. Occurrences are counted from the event's own start, so a weekly event lands on the weekday it starts on and a monthly one on the same day of the month.
+
+Every occurrence sits at the clock time you set, read in your time zone rather than the server's. A 09:00 standup shows at 09:00 whether the server runs on UTC or anywhere else, and it stays at 09:00 after the clocks go forward or back for daylight saving.
+
+Your time zone comes from your browser and is stored on your account, so there is nothing to configure. When an account carries no usable time zone, its recurring events fall back to the server's time zone.
+
+---
+
 ## Automation Integration
 
 The **Scheduled Tasks** calendar bridges the gap between automations and the calendar view. It is a **virtual calendar**, not stored in the database, that is synthesized at API response time whenever the user has access to the Automations feature.
 
 ### Future runs
 
-For each active automation with an RRULE schedule, the calendar computes upcoming occurrences and renders them as virtual events in the requested date range.
+For each active automation with an RRULE schedule, the calendar computes upcoming occurrences and renders them as virtual events in the requested date range, in your own time zone.
 
 ### Past runs
 

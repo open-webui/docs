@@ -353,7 +353,7 @@ Things to know about the calendar_event table:
 
 - Composite index on (`calendar_id`, `start_at`) for efficient range queries within a calendar.
 - Composite index on (`user_id`, `start_at`) for efficient per-user date range queries.
-- Recurring events store an `rrule` string and are expanded into individual instances at query time (server-side Python expansion using `dateutil`).
+- Recurring events store an `rrule` string and are expanded into individual instances at query time (server-side Python expansion using `dateutil`). Expansion runs in the user's time zone, so every instance keeps the local clock time of the stored `start_at`, including across daylight saving changes. Accounts with no usable time zone fall back to the server's.
 - Cancelled events (`is_cancelled = True`) are excluded from range queries but retained in the database.
 
 ## Calendar Event Attendee Table
