@@ -2086,7 +2086,7 @@ Settings for the experimental long-term memory system (**Settings → Personaliz
 
 - Type: `int`
 - Default: `2000`
-- Description: Maximum number of characters of `context`-type memories injected into the prompt. Older or lower-priority context memories beyond this budget are not included.
+- Description: Maximum number of characters of `context`-type memories injected into the prompt. Anything beyond this budget is cut off.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MEMORIES_USER_CHAR_LIMIT`
@@ -2553,7 +2553,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`, `valkey`
+- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opengauss`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`, `valkey`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -3124,6 +3124,65 @@ For IVFFlat indexes, choosing the right number of lists is crucial for query per
 - Type: `int`
 - Default: `3600`
 - Description: Specifies the time in seconds after which connections are recycled in the PGVector pool to prevent stale connections.
+
+
+### openGauss
+
+Use [openGauss](https://opengauss.org/) as the vector store by setting `VECTOR_DB=opengauss`. Open WebUI connects to it with the PostgreSQL driver and creates its own table with a vector column on first use, so the server has to support vector columns and `ivfflat` indexes.
+
+:::warning
+
+openGauss is a non-core integration, not maintained by the core Open WebUI team. Fixes come from outside the core Open WebUI maintenance path.
+If you want to use openGauss, be careful when upgrading Open WebUI (create backups and snapshots for rollbacks) in case internal changes in Open WebUI lead to breakage.
+
+:::
+
+:::note
+
+PostgreSQL Dependencies
+openGauss uses the same driver as `pgvector`, so the PostgreSQL dependencies have to be installed:
+
+```bash
+pip install open-webui[postgres]
+```
+
+:::
+
+#### `OPENGAUSS_DB_URL`
+
+- Type: `str`
+- Default: The value of the `DATABASE_URL` environment variable
+- Description: Sets the connection URL of the openGauss database that stores the embeddings. Leave it unset only if `DATABASE_URL` already points at openGauss.
+
+#### `OPENGAUSS_INITIALIZE_MAX_VECTOR_LENGTH`
+
+- Type: `int`
+- Default: `1536`
+- Description: Sets the dimension of the vector column created on first use. Match it to your embedding model: embeddings longer than this are truncated and shorter ones are padded with zeros, both of which cost retrieval quality. The column keeps whatever dimension it was created with, so changing this afterwards does not resize an existing table.
+
+#### `OPENGAUSS_POOL_SIZE`
+
+- Type: `int`
+- Default: `None` (no connection pooling)
+- Description: Sets the number of connections to maintain in the openGauss connection pool. Pooling is only used when this is a positive number; the other `OPENGAUSS_POOL_*` variables are ignored otherwise.
+
+#### `OPENGAUSS_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the maximum number of connections that can be created beyond `OPENGAUSS_POOL_SIZE` when the pool is exhausted.
+
+#### `OPENGAUSS_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Sets the timeout in seconds for acquiring a connection from the openGauss pool.
+
+#### `OPENGAUSS_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the time in seconds after which connections are recycled in the openGauss pool to prevent stale connections.
 
 
 ### Qdrant

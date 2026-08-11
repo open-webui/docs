@@ -99,6 +99,7 @@ Mentioning a model in a channel runs through the same chat-completion pipeline a
 | **Knowledge (RAG)** | Knowledge bases attached to the model are queried and injected |
 | **Attached documents** | Images **and** non-image files (PDF, DOCX, etc.) uploaded in the thread are forwarded into the model's context |
 | **Structured replies** | The reply is rendered from the model's full output, so reasoning blocks, tool calls, generated images and code results appear in the channel as they do in a chat, rather than being flattened to plain text |
+| **Token usage** | A channel reply reports its token usage like any other chat, provided the model has the **Usage** capability enabled. See [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings) |
 
 In other words, a channel-summoned model is a fully-equipped agent, not a one-shot completion.
 
