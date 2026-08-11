@@ -53,14 +53,13 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) is `false`, since the Tools workspace does not exist in that case. |
 | **Import Tools** | *(Requires Tools Access)* Ability to import tools. |
 | **Export Tools** | *(Requires Tools Access)* Ability to export tools. |
+| **Skills Access** | **(Parent)** Access the **Skills** workspace to create and manage reusable instruction sets. |
+| **Import Skills** | *(Requires Skills Access)* Import skills into the Skills workspace. |
+| **Export Skills** | *(Requires Skills Access)* Export skills from the Skills workspace. |
 
 :::danger ⚠️ Tools Access = Root-Equivalent Access
 **Treat the Tools Access permission as root-equivalent access.** Granting a user access to create or import Tools is equivalent to giving them shell access to your server, because Tools and Functions execute arbitrary Python code. Only grant this permission to users you would trust with direct access to your server. If you enable this permission for untrusted users, you are accepting the risk of arbitrary code execution on your host. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
-
-| **Skills Access** | Access the **Skills** workspace to create and manage reusable instruction sets. |
-| **Import Skills** | Import skills into the Skills workspace. |
-| **Export Skills** | Export skills from the Skills workspace. |
 
 ### 2. Sharing Permissions
 Controls what users can share with the community or make public.
@@ -106,6 +105,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Chat System Prompt** | *(Requires Allow Chat Controls)* Ability to edit the system prompt for a conversation. |
 | **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
 | **Allow File Upload** | Ability to upload files to the chat. |
+| **Allow Web Upload** | Ability to attach a web page to a chat by URL, using **Attach Webpage** in the message input's attach menu ([`USER_PERMISSIONS_CHAT_WEB_UPLOAD`](/reference/env-configuration#user_permissions_chat_web_upload)). On by default. When disabled, the option is greyed out and the attach is refused. Admins are always exempt. |
 | **Allow Chat Delete** | Ability to delete entire chat conversations. |
 | **Allow Delete Messages** | Ability to delete individual messages. |
 | **Allow Chat Edit** | Ability to edit messages. |
