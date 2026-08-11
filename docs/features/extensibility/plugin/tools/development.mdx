@@ -83,7 +83,7 @@ async def search_docs(self, query: str, limit: int = 5) -> str:
 
 Here the model is told about the operators and the quoting rule as well as the first line. The text after `:return:` is not sent to the model, so put anything the model needs to know into the description or into a `:param`.
 
-Only the reST `:param name:` form is read. A Google-style `Args:` block produces no parameter descriptions at all, and lands in the tool's own description instead.
+Only the reST `:param name:` form is read. A Google-style `Args:` block produces no parameter descriptions and lands in the tool's own description instead.
 
 ### Type Hints
 Each tool must have type hints for arguments. The types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.

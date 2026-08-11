@@ -86,7 +86,7 @@ These three levels shape the requests a chat sends. Background tasks (chat title
 
 :::note API requests set their own parameters
 
-The three levels above describe the browser. A request sent straight to the [chat completions endpoint](/reference/api-endpoints#-chat-completions) keeps whatever parameters it carries: the model's saved values, and the instance-wide ones under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin), only fill in what the request left out. **Stream Chat Response** is the exception, and still decides whether the reply streams.
+The three levels above describe the browser. A request sent straight to the [chat completions endpoint](/reference/api-endpoints#-chat-completions) keeps whatever parameters it carries: the model's saved values, and the instance-wide ones under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin), only fill in what the request left out. **Stream Chat Response** is the exception: it still decides whether the reply streams.
 
 :::
 

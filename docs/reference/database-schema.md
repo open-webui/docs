@@ -220,7 +220,7 @@ Things to know about the channel_member table:
 - `status` is written as `joined` when the membership is created. Leaving a channel writes `left`, sets `is_active` to false and stamps `left_at`. The row survives.
 - `is_active` is the flag that channel listings and member listings filter on, so a membership someone has left drops out of those results while remaining in the table. It is also written by `POST /api/v1/channels/{id}/members/active`.
 - `last_read_at` is stamped when the membership is created and updated over the socket connection when the user reads the channel.
-- `role` is read in one place, to test whether a member is a `manager` for manager-only queries. No code path writes it, so it is null on every row.
+- `role` is read in one place, to test whether a member is a `manager`. No code path writes it, so it is null on every row and that test never matches. Manager-only actions such as viewing and creating channel webhooks fall through to the other two branches of the check: the channel's own `user_id`, or an instance admin.
 - `is_channel_muted` has no write path and stays false. `is_channel_pinned` has a setter on the model, `Channels.pin_channel`, that nothing calls.
 - `joined_at` is NOT NULL in the database (migration `2f1211949ecc`) while the SQLAlchemy model omits the flag. The database constraint is the one that applies.
 - Deleting a user account leaves their `channel_member` rows in place. Member listings, the member count on a channel and the lookup that finds the existing direct message for a set of people all skip rows whose `user_id` no longer matches an account, so a leftover row is not counted as a member and does not push a direct message into a second conversation.
@@ -231,16 +231,16 @@ Things to know about the channel_member table:
 | --------------- | ------------- | ---------------------------------- | --------------------------------- |
 | id              | Text          | PRIMARY KEY                        | Unique identifier (UUID)          |
 | user_id         | Text          | NOT NULL                           | Owner of the relationship         |
-| channel_id      | Text          | FOREIGN KEY(channel.id), NOT NULL  | Reference to the channel          |
-| file_id         | Text          | FOREIGN KEY(file.id), NOT NULL     | Reference to the file             |
-| message_id      | Text          | FOREIGN KEY(message.id), nullable  | Reference to associated message   |
+| channel_id      | Text          | FOREIGN KEY(channel.id) CASCADE, NOT NULL | Reference to the channel   |
+| file_id         | Text          | FOREIGN KEY(file.id) CASCADE, NOT NULL | Reference to the file         |
+| message_id      | Text          | FOREIGN KEY(message.id) CASCADE, nullable | Reference to associated message |
 | created_at      | BigInteger    | NOT NULL                           | Creation timestamp                |
 | updated_at      | BigInteger    | NOT NULL                           | Last update timestamp             |
 
 Things to know about the channel_file table:
 
 - Unique constraint on (`channel_id`, `file_id`) to prevent duplicate entries
-- Foreign key relationships with CASCADE delete
+- All three foreign keys cascade on delete, `message_id` included, so deleting the message a file was attached to removes the row here as well as deleting the channel or the file
 - Indexed on `channel_id`, `file_id`, and `user_id` for performance
 
 ## Chat Table
@@ -677,12 +677,23 @@ Things to know about the memory table:
 | id              | Text          | PRIMARY KEY     | Unique identifier (UUID)            |
 | user_id         | Text          | -               | Message author                      |
 | channel_id      | Text          | nullable        | Associated channel                  |
-| parent_id       | Text          | nullable        | Parent message for threads          |
+| reply_to_id     | Text          | nullable        | Message this one quotes in its reply |
+| parent_id       | Text          | nullable        | Thread root for threaded replies    |
+| is_pinned       | Boolean       | NOT NULL, server_default=false | Whether the message is pinned in its channel |
+| pinned_at       | BigInteger    | nullable        | Pin timestamp (nanoseconds)         |
+| pinned_by       | Text          | nullable        | User who pinned the message         |
 | content         | Text          | -               | Message content                     |
 | data            | JSON          | nullable        | Additional message data             |
 | meta            | JSON          | nullable        | Message metadata                    |
 | created_at      | BigInteger    | -               | Creation timestamp (nanoseconds)    |
 | updated_at      | BigInteger    | -               | Last update timestamp (nanoseconds) |
+
+Things to know about the message table:
+
+- `parent_id` was added in migration `3781e22d8b01`, `reply_to_id` in migration `a5c220713937`, and `is_pinned`, `pinned_at` and `pinned_by` in migration `2f1211949ecc`.
+- `parent_id` and `reply_to_id` do different jobs. `parent_id` is the thread root: a channel's message list selects rows with a null `parent_id`, and a thread is read by selecting rows whose `parent_id` is the root message. `reply_to_id` points at a single message that the reply quotes, and the quoted message is fetched and attached when a message is served. It has no effect on which list a message appears in.
+- `is_pinned`, `pinned_at` and `pinned_by` are written together by `POST /api/v1/channels/{id}/messages/{message_id}/pin`. Unpinning clears `pinned_at` and `pinned_by` back to null. `GET /api/v1/channels/{id}/messages/pinned` reads them.
+- `meta` carries the webhook identity for messages posted through a [channel webhook](#channel-webhook-table), under a `webhook` key, which is what lets those messages render with the webhook's name rather than a user account.
 
 ## Message Reaction Table
 
