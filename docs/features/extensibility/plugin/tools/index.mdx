@@ -134,10 +134,10 @@ Why it is legacy:
 Since v0.10.0 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
-    *   Navigate to **Settings → Admin → AI → Models**.
+    *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Settings → Admin → AI → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
+2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -169,12 +169,12 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 Native Mode is the **default** as of v0.10.0, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
-    *   Navigate to **Settings → Admin → AI → Models**.
+    *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the top of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
-    *   In **Settings → Admin → AI → Models**, pick a specific model and click its edit button.
+    *   In **Settings → Admin → Models**, pick a specific model and click its edit button.
     *   Under **Model Params**, expand **Advanced Params** and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
@@ -182,7 +182,7 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → AI → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
+The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`

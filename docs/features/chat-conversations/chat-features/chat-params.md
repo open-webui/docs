@@ -80,7 +80,7 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 :::note Background tasks have their own parameters
 
-These three levels shape the requests a chat sends. Background tasks (chat titles, tags, follow-up suggestions, image prompts, retrieval and web search queries, autocomplete and context compaction summaries) never see the per-chat or per-account levels. They run on the task model, with the advanced parameters an administrator sets once in **Settings > Admin > Experience > Interface** under **Tasks** > **Task Model Parameters**, or through [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params).
+These three levels shape the requests a chat sends. Background tasks (chat titles, tags, follow-up suggestions, image prompts, retrieval and web search queries, autocomplete and context compaction summaries) never see the per-chat or per-account levels. They run on the task model, with one set of parameters an administrator sets once. See [Task Models](/features/administration/task-models).
 
 :::
 

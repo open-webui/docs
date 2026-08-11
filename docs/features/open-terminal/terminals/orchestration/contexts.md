@@ -50,7 +50,7 @@ A per chat workspace belongs to a specific conversation, so the conversation has
 
 - In a new conversation that has not been sent yet, the terminal panel and file browser for that terminal are not available. They appear once the chat is saved.
 - In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions), a per chat terminal is not listed in the terminal picker at all. A temporary chat is never saved, so there is nothing for the workspace to belong to.
-- Nothing falls back to the shared workspace. A request made before the chat is saved is refused, and the model's terminal tools fail with an error naming the terminal.
+- Nothing quietly falls back to the shared workspace. Before the chat is saved the terminal is refused, and a model told to use it reports an error naming the terminal.
 
 ## Capacity
 

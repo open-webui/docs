@@ -39,7 +39,7 @@ The Code Interpreter is a model capability that enables LLMs to write and execut
 
 **Global Configuration (Admin Panel):**
 
-These settings can be configured at **Settings → Admin → Tools → Code Execution**:
+These settings can be configured at **Settings → Admin → Code Execution**:
 - Enable/disable code interpreter
 - Select engine: **Pyodide (legacy)** or **Jupyter (legacy)** (for full Python and shell access, use [Open Terminal](/features/open-terminal) instead)
 - Configure Jupyter connection settings
