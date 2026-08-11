@@ -125,6 +125,28 @@ Things to know about the access_grant table:
 - `principal_type` of `anyone` (added in v0.11.0) is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
 
+## API Key Table
+
+Added in v0.6.41 (migration `b10670c03dd5`), which also dropped the `api_key` column from the [User Table](#user-table) after copying every existing key into this table.
+
+| **Column Name** | **Data Type** | **Constraints**                        | **Description**                       |
+| --------------- | ------------- | -------------------------------------- | ------------------------------------- |
+| id              | Text          | PRIMARY KEY, UNIQUE                    | Unique identifier                     |
+| user_id         | Text          | FOREIGN KEY(user.id) CASCADE           | Owner of the key                      |
+| key             | Text          | UNIQUE, NOT NULL                       | The API key itself                    |
+| data            | JSON          | nullable                               | Extensible data payload               |
+| expires_at      | BigInteger    | nullable                               | Expiry timestamp                      |
+| last_used_at    | BigInteger    | nullable                               | Timestamp of the key's last use       |
+| created_at      | BigInteger    | NOT NULL                               | Creation timestamp                    |
+| updated_at      | BigInteger    | NOT NULL                               | Last update timestamp                 |
+
+Things to know about the api_key table:
+
+- Deleting a user cascades to delete their keys.
+- Generating a key deletes the account's existing rows first, so an account holds at most one key. Rows carry the fixed id `key_{user_id}`.
+- Key generation, retrieval and deletion all go through `/api/v1/auths/api_key`. All three are refused unless the `auth.enable_api_keys` config key is on, and non-admins additionally need the `features.api_keys` permission.
+- `data`, `expires_at` and `last_used_at` are present in the schema and no code path writes them. Key lookup joins on `key` alone and does not consult `expires_at`.
+
 ## Auth Table
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**   |
@@ -668,10 +690,10 @@ A `UNIQUE(user_id, note_id)` constraint prevents duplicate pins for the same use
 
 Things to know about the oauth_session table:
 
-- A user holds one session per identity provider, so the relationship to `user` is one-to-many. The (`user_id`, `provider`) pair is what identifies a session for lookup and replacement.
-- Indexed on `user_id`, on `expires_at`, and on (`user_id`, `provider`) (`idx_oauth_session_user_id`, `idx_oauth_session_expires_at`, `idx_oauth_session_user_provider`, all from migration `38d63c18f30f`).
+- The relationship to `user` is one-to-many. Each sign-in inserts a new row, so several rows can exist for the same user and the same provider. `OAUTH_MAX_SESSIONS_PER_USER` (default 10) caps how many a user may hold per provider; on sign-in the oldest rows above the cap are deleted.
+- Indexed on `user_id`, on `expires_at` and on (`user_id`, `provider`) (`idx_oauth_session_user_id`, `idx_oauth_session_expires_at`, `idx_oauth_session_user_provider`, all from migration `38d63c18f30f`).
 - Deleting a user cascades to delete their sessions.
-- `token` holds the provider's token set (access token, ID token and refresh token) as JSON, encrypted at rest with Fernet before it is written. The key comes from `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`, which must be set or the application refuses to start. A key that is not already 44 characters is hashed with SHA-256 and base64-encoded to the length Fernet requires.
+- `token` holds the provider's token set (access token, ID token and refresh token) as JSON, encrypted at rest with Fernet before it is written and decrypted on read. The key comes from `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`, which falls back to `WEBUI_SECRET_KEY`. A key that is not already 44 characters is hashed with SHA-256 and base64-encoded to the length Fernet requires.
 
 ## Prompt Table
 
@@ -782,11 +804,12 @@ Things to know about the user table:
 
 - Uses UUID for primary key
 - One-to-One relationship with `auth` table (shared id)
-- One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
+- One-to-Many relationship with `oauth_session` table (via `user_id` foreign key), one row per sign-in
 - `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
+- The `email` column carries no plain `UNIQUE` constraint in the database, which is why the row above shows none. The SQLAlchemy model declares `unique=True` on it, but the schema is built only from the migrations and none of them creates that constraint, so the index above is the whole of the enforcement.
 - `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 - `oauth` replaced the single `oauth_sub` text column in v0.6.41 (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases that were still older than v0.6.41 when they were upgraded on a v0.9.6 or newer build had that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
-- The `api_key` column was removed in v0.6.41 (the same migration `b10670c03dd5`). API keys are now rows in a dedicated `api_key` table, keyed by `user_id` and carrying their own `expires_at` and `last_used_at`. The migration copies each existing key across before dropping the column. Generating a key still replaces the account's previous one, so an account holds at most one key.
+- The `api_key` column was removed in v0.6.41 (the same migration `b10670c03dd5`). API keys are now rows in the dedicated [API Key Table](#api-key-table). The migration copies each existing key across before dropping the column.
 - `profile_banner_image_url`, `timezone`, `presence_state`, `status_emoji`, `status_message` and `status_expires_at` were all added in v0.6.41 (migration `b10670c03dd5`).
 - `timezone` holds an IANA zone name (for example `Europe/Vienna`), written by `POST /api/v1/auths/update/timezone`. Calendar recurrence expansion, automation scheduling and the per-user usage statistics read it. An unset or unrecognised value falls back to the server's zone for calendars and automations, and to UTC for usage statistics.
 - `status_emoji`, `status_message` and `status_expires_at` hold the status a user sets for themselves. They are written through `POST /api/v1/users/user/status/update`, which is refused unless the `users.enable_status` config key is on, and they are returned with the signin response and with channel member listings.
@@ -843,7 +866,8 @@ erDiagram
     user ||--o{ note : "owns"
     user ||--o{ pinned_note : "pins"
     note ||--o{ pinned_note : "pinned_by"
-    user ||--|| oauth_session : "has"
+    user ||--o{ oauth_session : "has"
+    user ||--o{ api_key : "holds"
 
     %% Content Relationships
     message ||--o{ message_reaction : "has"
@@ -967,7 +991,6 @@ erDiagram
         text description
         json data
         json meta
-        json access_control
     }
 
     message {
@@ -1005,7 +1028,6 @@ erDiagram
         text path
         json data
         json meta
-        json access_control
     }
 
     folder {
@@ -1038,7 +1060,6 @@ erDiagram
         json data
         json meta
         json permissions
-        json user_ids
     }
 
     knowledge {
@@ -1048,7 +1069,6 @@ erDiagram
         text description
         json data
         json meta
-        json access_control
     }
 
     memory {
@@ -1067,7 +1087,6 @@ erDiagram
         text name
         json params
         json meta
-        json access_control
         boolean is_active
     }
 
@@ -1077,7 +1096,6 @@ erDiagram
         text title
         json data
         json meta
-        json access_control
     }
 
     pinned_note {
@@ -1095,6 +1113,15 @@ erDiagram
         bigint expires_at
     }
 
+    api_key {
+        text id PK
+        text user_id FK
+        text key
+        json data
+        bigint expires_at
+        bigint last_used_at
+    }
+
     prompt {
         text id PK
         string command
@@ -1103,7 +1130,6 @@ erDiagram
         text content
         json data
         json meta
-        json access_control
         boolean is_active
         text version_id
         json tags
@@ -1144,7 +1170,6 @@ erDiagram
         json specs
         json meta
         json valves
-        json access_control
     }
 ```
 
