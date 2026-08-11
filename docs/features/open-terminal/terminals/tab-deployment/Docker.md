@@ -108,7 +108,7 @@ The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to m
 <details>
 <summary>Container lifecycle details</summary>
 
-**Naming.** Containers are named `terminals-<user-hash>` (where `<user-hash>` is the first 12 hex chars of the SHA-256 of the user ID, for a DNS-safe name), or `terminals-<user-hash>-<policy>` for non-default policies. A connection scoped with [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) appends a further `-<context-hash>`, so one user can have several containers for the same policy, one per chat or automation. They are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`.
+**Naming.** Containers are named `terminals-<user-hash>` (where `<user-hash>` is the first 12 hex chars of the SHA-256 of the user ID, for a DNS-safe name), or `terminals-<user-hash>-<policy>` for non-default policies. They are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`.
 
 **Health checks.** After creating a container, the orchestrator polls its `/health` endpoint until it returns HTTP 200 (up to 15 seconds). Only then does it start proxying traffic.
 
