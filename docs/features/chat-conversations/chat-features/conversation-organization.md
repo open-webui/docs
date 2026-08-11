@@ -135,6 +135,7 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
+- **Someone else's chat opens read-only, under their name.** Their messages carry their name and profile picture, both in the conversation and on the user nodes in the **Overview** panel, so a chat you did not write is not presented as yours. The name and picture next to a message are only drawn when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Only the owner or an admin can delete a shared root folder** or change who it is shared with. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.

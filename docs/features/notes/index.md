@@ -148,7 +148,7 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 
 :::info Notes saved as structured data
 
-A note's body is markdown text. If a model passes a JSON object or array to `write_note` or `replace_note_content` instead of text, that content is kept and shown in the note as a formatted `json` code block. The Notes list carries on working, where before a single note in that state made the whole list fail to load. Notes already stored that way open the same way, and the code block replaces the structured content the next time the note is saved.
+A note's body is markdown text. If a model passes a JSON object or array to `write_note` or `replace_note_content` instead of text, that content is kept and shown in the note as a formatted `json` code block, and one note in that state no longer stops the whole Notes list from loading. Notes already saved that way are shown the same, and the code block replaces the structured content the next time the note is saved.
 
 :::
 
