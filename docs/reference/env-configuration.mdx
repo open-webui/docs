@@ -6791,7 +6791,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" option stays in the attach menu for non-admin users but is greyed out and does nothing, with a tooltip explaining why, and an attach sent anyway is refused. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Chat Permissions → Allow Web Upload**.
+- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" option stays in the attach menu for non-admin users but is greyed out and does nothing, with a tooltip explaining why, and an attach sent anyway is refused. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Web Upload**.
 
 #### `USER_PERMISSIONS_CHAT_DELETE`
 
@@ -7115,7 +7115,7 @@ These settings control whether users can share workspace items **publicly**. All
 
 :::warning Re-check tools and notes after an upgrade
 
-On instances upgraded from a release that predates these two variables, the admin panel used to show **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the action was still being refused. Saving any permission on that page then wrote both as enabled and really did grant public tool and note sharing to everyone. The panel now shows what is enforced, but a value already saved is not rolled back. Open **Settings > Admin > Users > Groups**, edit **Default permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+On instances upgraded from a release that predates these two variables, the admin panel used to show **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the action was still being refused. Saving any permission on that page then wrote both as enabled and really did grant public tool and note sharing to everyone. The panel now shows what is enforced, but a value already saved is not rolled back. Open **Admin Panel > Users > Groups**, edit **Default permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 :::
 
@@ -7144,7 +7144,7 @@ On instances upgraded from a release that predates these two variables, the admi
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING` (Tools Sharing) to be enabled for the user: with the parent off, the tool's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from tool create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share tools publicly. Configurable per-group as **Tools Public Sharing** in **Settings > Admin > Users > Groups**.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING` (Tools Sharing) to be enabled for the user: with the parent off, the tool's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from tool create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share tools publicly. Configurable per-group as **Tools Public Sharing** in **Admin Panel > Users > Groups**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -7158,28 +7158,28 @@ On instances upgraded from a release that predates these two variables, the admi
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Notes Sharing) to be enabled for the user: with the parent off, the note's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from note create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share notes publicly. Configurable per-group as **Notes Public Sharing** in **Settings > Admin > Users > Groups**.
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Notes Sharing) to be enabled for the user: with the parent off, the note's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from note create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share notes publicly. Configurable per-group as **Notes Public Sharing** in **Admin Panel > Users > Groups**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. For links that work without an account, see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
+- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. For links that work without an account, see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Chats Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Allows non-admin users to mark a chat share link **Open**, meaning it can be read by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and no resource type other than chats accepts this kind of grant. When disabled, the "Open" option is hidden for non-admin users and any open grant sent directly to the API is stripped before saving. Admins are always exempt. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
+- Description: Allows non-admin users to mark a chat share link **Open**, meaning it can be read by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and no resource type other than chats accepts this kind of grant. When disabled, the "Open" option is hidden for non-admin users and any open grant sent directly to the API is stripped before saving. Admins are always exempt. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Calendars Public Sharing**.
+- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Calendars Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Access Grants
@@ -7188,13 +7188,13 @@ On instances upgraded from a release that predates these two variables, the admi
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Users**.
+- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
 
 #### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`
 
 - Type: `bool`
 - Default: `True`
-- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Groups**.
+- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
 
 ### Import / Export
 

@@ -48,7 +48,7 @@ For more details on enterprise solutions and branding customizations, [click her
 
 Open WebUI intentionally does **not** ship a built-in context trimmer. Every model has a different tokenizer and a different context window, and every deployment wants a different truncation policy (by tokens, by turns, by message count, file-attachments-first, summarize-and-replace, per-model budgets, and so on). There is no single policy that is correct for every user, so we expose the hook instead of choosing one for you.
 
-Context management is done with [filter Functions](/features/extensibility/plugin/functions/filter): `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.). Many published context filters are already available one-click on [openwebui.com](https://openwebui.com/): browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel → Functions** and edit it.
+Context management is done with [filter Functions](/features/extensibility/plugin/functions/filter): `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.). Many published context filters are already available one-click on [openwebui.com](https://openwebui.com/): browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel > Functions** and edit it.
 
 For the full write-up with examples, see [Context Window / Prompt Too Long](/troubleshooting/context-window).
 

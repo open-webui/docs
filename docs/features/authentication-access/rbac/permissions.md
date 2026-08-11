@@ -91,7 +91,7 @@ Every toggle in the panel's **Sharing Permissions** section is off unless you tu
 
 On instances upgraded from a release that predates **Tools Public Sharing** and **Notes Public Sharing**, the admin panel used to draw both switches as on while the backend still refused the action. Saving any permission on that page then persisted them as enabled, granting public tool and note sharing that was never configured. The panel and the enforcement now agree, but a value already written to the database is not rolled back.
 
-If you saved default permissions on an affected release, open **Settings > Admin > Users > Groups**, edit **Default permissions** and confirm both switches read the way you intend. Group-level overrides are worth the same check.
+If you saved default permissions on an affected release, open **Admin Panel > Users > Groups**, edit **Default permissions** and confirm both switches read the way you intend. Group-level overrides are worth the same check.
 
 :::
 

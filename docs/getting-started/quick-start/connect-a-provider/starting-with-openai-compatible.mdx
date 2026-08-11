@@ -237,7 +237,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   :::tip
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
   1. **Use an allowlist**: add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
-  2. **Enable model caching** via `Settings > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
+  2. **Enable model caching** via `Settings > Admin > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
   :::
 
   </TabItem>
@@ -312,7 +312,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Step 2: Add Connection in Open WebUI**
 
-  1. Under the **Admin Panel**, go to **Settings** → **Connections**.
+  1. Go to **Settings > Admin > Connections**.
   2. Use the **+** button to add a new connection under OpenAI.
   3. For the URL, use `http://host.docker.internal:8000/api/v1`.
   4. For the API Key, the default key defined in BAG is `bedrock` (you can change this via `DEFAULT_API_KEYS` in BAG settings).

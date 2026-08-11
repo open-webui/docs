@@ -228,7 +228,7 @@ Registering routes and calling admin endpoints from a function is powerful and e
 
 ## Configuration with Valves
 
-Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel → Functions → ⚙️**, not hard-coded.
+Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel > Functions > ⚙️**, not hard-coded.
 
 The `function.valves_updated` event also fires when an admin saves new Valve values, so a function can **react to its own configuration changing** and apply it live.
 
