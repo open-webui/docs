@@ -104,6 +104,8 @@ When deployed via Docker Compose or Helm, the shared API key is configured autom
 
 JWT mode needs the two sides to agree. The orchestrator checks each request against the identity of the user who made it, so Open WebUI has to send that user's own credentials rather than one shared key. That is what **Auth > Session** on the connection does, and it applies to the model's tools, the file browser and the terminal panel alike. Leaving the connection on **Auth > Bearer** in JWT mode fails authentication, which shows up as a terminal that closes the moment it opens.
 
+Administration is a separate lane by design. The policy, lifecycle and refresh APIs are not terminal traffic, so they authenticate with the orchestrator's own `TERMINALS_API_KEY` and never with a user's token, whichever mode is in use. Keep that key set even in JWT mode, and use it when you call those endpoints yourself. Open WebUI attaches it to the policy and lifecycle calls it makes on your behalf when the connection's **Auth** is **Bearer**.
+
 ---
 
 ## Troubleshooting

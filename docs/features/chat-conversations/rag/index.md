@@ -345,13 +345,9 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 A parsed CSV is its rows and nothing else, so the text a model is given never states how big the table is or which columns it has. Ask how many orders a spreadsheet contains and the answer comes from whichever rows happened to be retrieved.
 
-Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default, and a restart is needed after changing it) puts one line describing the shape of the table in front of the rows of every `.csv` file:
+Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default, and a restart is needed after changing it) puts one line in front of the rows of every `.csv` file, naming the total number of rows including the header, the number of data rows and the column names taken from the header row.
 
-```
-Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.
-```
-
-The column names come from the first row, the column count is that of the widest row and the delimiter is detected from the start of the file (falling back to a comma). The line sits at the top of the file's content, so it is retrieved like any other part of the file and is always present when the file is used with **Using Entire Document**.
+The delimiter is detected from the start of the file (falling back to a comma). The line sits at the top of the file's content, so it is retrieved like any other part of the file and is always present when the file is used with **Using Entire Document**.
 
 :::info Which files get a summary
 No summary is added when the content extraction engine is `external`, `tika` or `docling`, which handle `.csv` files themselves. Every other engine leaves them to Open WebUI's own CSV parser, so the summary applies there.

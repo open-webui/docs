@@ -466,7 +466,7 @@ Local Whisper models are heavy (~500MB+ RAM).
 
 -   **Recommendation**: Use **WebAPI** (Browser-based). It uses the user's device capabilities, costing 0 server RAM.
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Audio > STT Engine`
+    *   **Admin Panel**: `Settings > Admin > Audio > STT Engine`
     *   **Env Var**: `AUDIO_STT_ENGINE=webapi`
 
 -   **Bypass Audio Preprocessing (offload to the STT provider)**: If you use an external STT engine (OpenAI, Deepgram, Azure, Mistral) that already accepts raw audio and handles format conversion on its side, set `BYPASS_PYDUB_PREPROCESSING=true`. This skips Open WebUI's pydub-based MP3 conversion, compression, and chunk splitting, eliminating a CPU-heavy step on every upload, removing the ffmpeg dependency, and reducing latency on large files. Only disable preprocessing when you are confident the upstream provider handles unprocessed audio correctly.
@@ -475,8 +475,8 @@ Local Whisper models are heavy (~500MB+ RAM).
 
 Prevent the application from loading **local** models you don't use.
 
--   **Image Generation**: `ENABLE_IMAGE_GENERATION=False` (Admin: `Settings > Images`)
--   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Code Execution`)
+-   **Image Generation**: `ENABLE_IMAGE_GENERATION=False` (Admin: `Settings > Admin > Images`)
+-   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Admin > Code Execution`)
 
 ### 3. Disable Background Tasks
 
@@ -485,11 +485,11 @@ If resource usage is critical, disable automated features that constantly trigge
 **Recommendation order (Highest Impact first):**
 
 1.  **Autocomplete**: `ENABLE_AUTOCOMPLETE_GENERATION=False` (**High Impact**: Triggers on every keystroke!)
-    *   Admin: `Settings > Interface > Autocomplete`
+    *   Admin: `Settings > Admin > Interface > Autocomplete`
 2.  **Follow-up Questions**: `ENABLE_FOLLOW_UP_GENERATION=False`
-    *   Admin: `Settings > Interface > Follow-up`
+    *   Admin: `Settings > Admin > Interface > Follow-up`
 3.  **Title Generation**: `ENABLE_TITLE_GENERATION=False`
-    *   Admin: `Settings > Interface > Chat Title`
+    *   Admin: `Settings > Admin > Interface > Chat Title`
 4.  **Tag Generation**: `ENABLE_TAGS_GENERATION=False`
 
 ### 4. SQLite Memory Footprint on Constrained Containers

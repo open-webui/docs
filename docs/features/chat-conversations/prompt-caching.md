@@ -40,7 +40,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 |---|---|---|
 | **File Context (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High — injected content changes per query |
 | **Citations** | Rewrites the **system message and the last user message** with the RAG template plus the source list, after every tool-calling round that produced sources | Very high, see the warning below |
-| **Memory (system context)** | Injects stored user memories into the system message, in a fixed section order with the entries sorted alphabetically | Medium: renders identically while the same memories are selected; changes when your memories change or the retrieved selection does |
+| **Memory (system context)** | Injects stored user memories into the system message | High — changes whenever memories change |
 | **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high — but a **File Context sub-mode**; only fires while File Context is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low — constant while voice mode is on |
 | **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low — stable as long as the attachments don't change |

@@ -107,8 +107,6 @@ By default Open WebUI injects the user's stored memories into the model's system
 - **Admin UI**: Settings > Admin > General > **Memory System Context** (shown when Memories is enabled)
 - **Environment Variable**: [`ENABLE_MEMORY_SYSTEM_CONTEXT`](/reference/env-configuration#enable_memory_system_context) (Default: `True`)
 
-The injected block is wrapped in `<memory_context>` tags and appended to the system message. It always renders in the same order: the sections `[User Memory]`, `[Memory Neighborhood]` and `[Relevant Context]`, with the entries inside each section sorted alphabetically. The same set of memories therefore produces exactly the same text on every turn, so the model's cached prompt prefix survives instead of being thrown away because the vector search happened to return the same memories in a different order. See [Prompt Caching](/features/chat-conversations/prompt-caching#5-handle-memory-deliberately) for what still changes the block mid-conversation.
-
 ## Privacy & Security
 
 Memories are stored locally in your Open WebUI database and are scoped to your user account. They are not shared with other users by default, and you can clear your entire memory bank at any time.

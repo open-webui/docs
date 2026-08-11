@@ -266,6 +266,7 @@ Things to know about the chat_message table:
 - Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
 - `context_summary` was added in v0.10.0 (migration `4c5ce3d2f27f`) to store a summary of the message's context.
 - `meta` was added in v0.11.0 (migration `856c5b02fb54`). It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
+- [Chat search](/features/chat-conversations/chat-features/history-search) reads a different set of stores per backend. On PostgreSQL it matches `chat_message.content` as well as the `history.messages` map and the older flat `messages` array inside the `chat.chat` blob. On SQLite it matches those two JSON locations only.
 
 ## Automation Table
 
