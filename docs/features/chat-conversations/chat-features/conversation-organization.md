@@ -71,7 +71,7 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 
 Filing a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly filing the chat in the folder.
 
-The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. A folder ID that does not exist is treated exactly like a folder you cannot write to, so the request is rejected rather than leaving the chat pointing at nothing.
+The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. Naming a folder that does not exist is refused the same way as naming one you cannot write to.
 
 ## Folder Settings (Project Configuration)
 

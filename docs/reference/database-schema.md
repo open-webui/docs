@@ -529,7 +529,7 @@ Note: The `user_ids` column has been migrated to the `group_member` table.
 | --------------- | ------------- | -------------------------------- | --------------------------------- |
 | id              | Text          | PRIMARY KEY, UNIQUE              | Unique identifier (UUID)          |
 | group_id        | Text          | FOREIGN KEY(group.id), NOT NULL  | Reference to the group            |
-| user_id         | Text          | FOREIGN KEY(user.id), NOT NULL   | Reference to the user             |
+| user_id         | Text          | FOREIGN KEY(user.id), NOT NULL, indexed | Reference to the user      |
 | created_at      | BigInteger    | nullable                         | Creation timestamp                |
 | updated_at      | BigInteger    | nullable                         | Last update timestamp             |
 

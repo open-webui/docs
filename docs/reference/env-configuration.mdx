@@ -3235,7 +3235,7 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 
 - Type: `int`
 - Default: `5`
-- Description: Sets the timeout in seconds for all requests made to the Qdrant server, helping to prevent long-running queries from stalling the application.
+- Description: Sets the timeout in seconds for all requests made to the Qdrant server, so a slow or unresponsive Qdrant cannot hold a request open indefinitely.
 
 #### `QDRANT_HNSW_M`
 
@@ -7091,7 +7091,7 @@ These settings control whether users can share workspace items **publicly**. All
 
 :::warning Re-check tools and notes after an upgrade
 
-On instances upgraded from a release that predates `public_tools` and `public_notes`, the admin panel used to draw **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the backend was still refusing the action. Saving any permission on that page then wrote those two as enabled and really did grant public tool and note sharing to everyone. What the admin panel shows now matches what is enforced, but a value already written to the database is not rolled back. Open **Admin Panel → Users → Groups → Default Permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+On instances upgraded from a release that predates these two variables, the admin panel used to show **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the action was still being refused. Saving any permission on that page then wrote both as enabled and really did grant public tool and note sharing to everyone. The panel now shows what is enforced, but a value already saved is not rolled back. Open **Settings > Admin > Users > Groups**, edit **Default permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 :::
 

@@ -27,6 +27,8 @@ In a standard deployment, Open WebUI acts as a proxy: the browser sends the prom
 
 With **Direct Connections**, the browser communicates directly with the API provider.
 
+The server still runs the rest of the turn, including background steps such as the chat title and tags, and those steps read the instance's model list. They read one consistent copy of it, so on a Redis-backed multi-replica deployment a refresh of that list landing mid-request no longer fails the message, and a long model list no longer slows the turn down ([details](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch)).
+
 ## Benefits
 
 *   **Privacy & Control**: Users can use their own personal API keys without storing them on the Open WebUI server (keys are stored in the browser's local storage).
