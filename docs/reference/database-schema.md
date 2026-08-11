@@ -764,7 +764,7 @@ Things to know about the tag table:
 | date_of_birth            | Date          | nullable          | User's date of birth       |
 | timezone                 | String        | nullable          | IANA time zone name        |
 | presence_state           | String        | nullable          | Presence state             |
-| status_emoji             | String        | nullable          | Emoji shown with the status |
+| status_emoji             | String        | nullable          | Emoji shown with status    |
 | status_message           | Text          | nullable          | Status text                |
 | status_expires_at        | BigInteger    | nullable          | Status expiry timestamp    |
 | last_active_at           | BigInteger    | -                 | Last activity timestamp    |
@@ -784,6 +784,11 @@ Things to know about the user table:
 - `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
 - `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 - `oauth` replaced the single `oauth_sub` text column in v0.6.41 (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases that were still older than v0.6.41 when they were upgraded on a v0.9.6 or newer build had that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
+- The `api_key` column was removed in v0.6.41 (the same migration `b10670c03dd5`). API keys are now rows in a dedicated `api_key` table, keyed by `user_id` and carrying their own `expires_at` and `last_used_at`. The migration copies each existing key across before dropping the column. Generating a key still replaces the account's previous one, so an account holds at most one key.
+- `profile_banner_image_url`, `timezone`, `presence_state`, `status_emoji`, `status_message` and `status_expires_at` were all added in v0.6.41 (migration `b10670c03dd5`).
+- `timezone` holds an IANA zone name (for example `Europe/Vienna`), written by `POST /api/v1/auths/update/timezone`. Calendar recurrence expansion, automation scheduling and the per-user usage statistics read it. An unset or unrecognised value falls back to the server's zone for calendars and automations, and to UTC for usage statistics.
+- `status_emoji`, `status_message` and `status_expires_at` hold the status a user sets for themselves. They are written through `POST /api/v1/users/user/status/update`, which is refused unless the `users.enable_status` config key is on, and they are returned with the signin response and with channel member listings.
+- `presence_state` is returned in channel member listings and in the socket session payload. No code path writes it.
 
 The `scim` field's expected structure:
 
@@ -856,13 +861,19 @@ erDiagram
         string email
         string role
         text profile_image_url
+        text profile_banner_image_url
         text bio
         text gender
         date date_of_birth
+        string timezone
+        string presence_state
+        string status_emoji
+        text status_message
+        bigint status_expires_at
         bigint last_active_at
-        string api_key
         json settings
         json info
+        json variables
         json oauth
         json scim
     }
