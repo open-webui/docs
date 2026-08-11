@@ -189,8 +189,10 @@ Access management options via the **More (...)** menu in the top right corner.
 
 ### Sharing
 
-* **Copy Link** to share the note URL
-* **Copy to Clipboard** to paste the content elsewhere
+Open **Share** in the **More (...)** menu for the two copy actions:
+
+* **Copy link** to share the note URL
+* **Copy to clipboard** to paste the content elsewhere
 
 A copied link opens the note only for people who can already reach it. Giving someone that reach is what the **Access** button does. It sits at the top right of the note, beside the **More (...)** menu, and opens the **Access Control** panel, where you set the note's visibility and manage the list of people and groups it is shared with. Each entry holds one of two levels:
 
