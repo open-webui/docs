@@ -192,6 +192,15 @@ Access management options via the **More (...)** menu in the top right corner.
 * **Copy Link** to share the note URL
 * **Copy to Clipboard** to paste the content elsewhere
 
+A copied link opens the note only for people who can already reach it. Giving someone that reach is what the **Access** button does. It sits at the top right of the note, beside the **More (...)** menu, and opens the **Access Control** panel, where you set the note's visibility and manage the list of people and groups it is shared with. Each entry holds one of two levels:
+
+* **Read**: open and read the note, and start chats from it. The editor stays read-only.
+* **Write**: also edit the note's body and upload or detach its files.
+
+The button is shown only when you have write access on the note, and it is disabled unless you own the note or you are an admin. With read-only access a **Read-Only Access** label takes its place.
+
+The access list behaves the same here as everywhere else in Open WebUI, including which people and groups the **Add Access** picker offers you. See [Resource Access](/features/authentication-access/rbac/groups#resource-access-rbac).
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) for internal sharing (default `False`)

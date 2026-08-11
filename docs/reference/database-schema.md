@@ -225,6 +225,30 @@ Things to know about the channel_member table:
 - `joined_at` is NOT NULL in the database (migration `2f1211949ecc`) while the SQLAlchemy model omits the flag. The database constraint is the one that applies.
 - Deleting a user account leaves their `channel_member` rows in place. Member listings, the member count on a channel and the lookup that finds the existing direct message for a set of people all skip rows whose `user_id` no longer matches an account, so a leftover row is not counted as a member and does not push a direct message into a second conversation.
 
+## Channel Webhook Table
+
+Incoming webhooks that post messages into one channel without a signed-in user. Added by migration `90ef40d4714e`.
+
+| **Column Name**   | **Data Type** | **Constraints**                             | **Description**                    |
+| ----------------- | ------------- | ------------------------------------------- | ---------------------------------- |
+| id                | Text          | PRIMARY KEY, UNIQUE                         | Unique identifier (UUID)           |
+| channel_id        | Text          | FOREIGN KEY(channel.id) CASCADE, NOT NULL   | Channel the webhook posts into     |
+| user_id           | Text          | NOT NULL                                    | User who created the webhook       |
+| name              | Text          | NOT NULL                                    | Display name shown on its messages |
+| profile_image_url | Text          | nullable                                    | Avatar shown on its messages       |
+| token             | Text          | NOT NULL                                    | Secret used to authorize posting   |
+| last_used_at      | BigInteger    | nullable                                    | Timestamp of the last post         |
+| created_at        | BigInteger    | NOT NULL                                    | Creation timestamp                 |
+| updated_at        | BigInteger    | NOT NULL                                    | Last update timestamp              |
+
+Things to know about the channel_webhook table:
+
+- Deleting a channel cascades to delete its webhooks.
+- `token` is a URL-safe random token carrying 32 bytes of entropy, generated with `secrets.token_urlsafe(32)`, stored in plain text and carried in the request path. `POST /api/v1/channels/webhooks/{webhook_id}/{token}` takes no authentication and matches the `id` and `token` pair against this table, so anyone holding the pair can post to the channel.
+- `last_used_at` is stamped on each accepted post.
+- Listing and creating webhooks require the caller to be an instance admin or the channel's own creator. See the `role` note on the [Channel Member Table](#channel-member-table) for why the membership-based manager branch of that check never matches.
+- The webhook's `id` and `name` are copied into the posted message's `meta.webhook`, which is what the interface renders in place of an author account.
+
 ## Channel File Table
 
 | **Column Name** | **Data Type** | **Constraints**                    | **Description**                   |
@@ -690,7 +714,7 @@ Things to know about the memory table:
 
 Things to know about the message table:
 
-- `parent_id` was added in migration `3781e22d8b01`, `reply_to_id` in migration `a5c220713937`, and `is_pinned`, `pinned_at` and `pinned_by` in migration `2f1211949ecc`.
+- `parent_id` was added in migration `3781e22d8b01` and `reply_to_id` in migration `a5c220713937`. `is_pinned`, `pinned_at` and `pinned_by` were added in migration `2f1211949ecc`.
 - `parent_id` and `reply_to_id` do different jobs. `parent_id` is the thread root: a channel's message list selects rows with a null `parent_id`, and a thread is read by selecting rows whose `parent_id` is the root message. `reply_to_id` points at a single message that the reply quotes, and the quoted message is fetched and attached when a message is served. It has no effect on which list a message appears in.
 - `is_pinned`, `pinned_at` and `pinned_by` are written together by `POST /api/v1/channels/{id}/messages/{message_id}/pin`. Unpinning clears `pinned_at` and `pinned_by` back to null. `GET /api/v1/channels/{id}/messages/pinned` reads them.
 - `meta` carries the webhook identity for messages posted through a [channel webhook](#channel-webhook-table), under a `webhook` key, which is what lets those messages render with the webhook's name rather than a user account.
@@ -951,6 +975,7 @@ erDiagram
     calendar_event ||--o{ calendar_event_attendee : "has"
     channel ||--o{ message : "contains"
     channel ||--o{ channel_member : "has"
+    channel ||--o{ channel_webhook : "has"
     user ||--o{ channel_member : "joins"
     message ||--o{ message : "replies"
     knowledge ||--o{ knowledge_directory : "contains"
@@ -1095,11 +1120,25 @@ erDiagram
         bigint last_read_at
     }
 
+    channel_webhook {
+        text id PK
+        text channel_id FK
+        text user_id FK
+        text name
+        text profile_image_url
+        text token
+        bigint last_used_at
+    }
+
     message {
         text id PK
         text user_id FK
         text channel_id FK
+        text reply_to_id FK
         text parent_id FK
+        boolean is_pinned
+        bigint pinned_at
+        text pinned_by
         text content
         json data
         json meta

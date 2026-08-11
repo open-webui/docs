@@ -64,7 +64,7 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 |------|----------|
 | **Standard** | Topic-based rooms (`#engineering`, `#marketing-strategy`), public or private |
 | **Group** | Team-scoped spaces with explicit membership and user-group sync |
-| **Direct Message** | Private 1:1 or small-group conversations with online/offline status |
+| **[Direct Message](#direct-messages)** | Private 1:1 or small-group conversations with online/offline status |
 
 ---
 
@@ -117,9 +117,9 @@ Hover any message to react with emoji, pin it for reference, reply inline, or st
 
 ### Direct messages
 
-A direct message is addressed to people rather than to a name, so there is one conversation per set of participants. Start one from the **Message** button on someone's profile card in a channel, or from **(+)** in the sidebar's **Channels** section with **Channel Type** set to **Direct Message**. Either way, messaging someone you have messaged before reopens the conversation you already have with them, with its history, instead of adding a second one beside it. A name is optional on a direct message, and without one the conversation is listed under the names of the other participants.
+A direct message is a conversation between you and the people you pick, and there is one of them per set of participants. Start one from the **Message** button on someone's profile card in a channel, or from **(+)** in the sidebar's **Channels** section with **Channel Type** set to **Direct Message**. Messaging someone you have messaged before reopens the conversation you already have with them, with its history, instead of adding a second one beside it. A name is optional on a direct message; without one it is listed under the names of the other participants.
 
-Membership is measured against the accounts that still exist. When someone's account is deleted, they stop counting towards the conversation: they are gone from the member list and from the member count next to the people icon in the conversation's header, and the participants who remain still land back in that same conversation when they message each other again. Nothing merges two conversations that already exist for the same set of people, so where a duplicate was created it stays in the sidebar alongside the original, keeping the messages sent in it.
+Membership is measured against the accounts that still exist. When someone's account is deleted, they stop counting towards the conversation: they are gone from the member list and from the member count next to the people icon in the header, and the participants who remain still land back in that same conversation when they message each other again. Group channels count their members the same way. Nothing merges two conversations that already exist for the same set of people, so where a duplicate was created it stays in the sidebar alongside the original, with the messages that were sent in it.
 
 ---
 

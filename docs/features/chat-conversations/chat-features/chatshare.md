@@ -95,7 +95,9 @@ To view a shared chat:
 3. The chat will be displayed in a read-only format.
 4. If the Admin of the Open WebUI instance from which the shared link was shared has Text-to-Speech set up, there may be an audio button for messages to be read aloud to you (situational).
 
-A chat you are reading keeps the authorship of the person whose chat it is: their name and profile picture sit on the messages they wrote. This holds however you reached it, through the share link, through a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders), or as an admin opening a user's chat from **Admin Panel > Users**. Opened inside the app rather than through a share link, the chat's **Overview** panel labels its message nodes the same way. Reading an **Open** link while signed out is the exception, since looking the author up needs an account: their name and picture do not appear. The name and picture beside a message are only drawn when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message.
+A chat that belongs to someone else is shown under its author: their name and profile picture sit on the messages they wrote. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app rather than through a share link, the chat's **Overview** panel labels its message nodes the same way.
+
+Two things limit what you see. The name and picture beside a message are only drawn when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message. And reading a chat shared as **Open** without signing in leaves the author unresolved, since looking them up needs an account, so their name and picture do not appear.
 
 #### Using a Shared Chat as Context
 
