@@ -6,7 +6,7 @@ title: "LLM Output Unpredictability"
 
 |  |  |
 | :--- | :--- |
-| **Class** | Inherent model behavior (prompt injection, jailbreaks, unsafe or hallucinated output) — OWASP LLM Top 10 |
+| **Class** | Inherent model behavior (prompt injection, jailbreaks, unsafe or hallucinated output), OWASP LLM Top 10 |
 | **Status** | Inherent to LLMs; not a remediable application defect; out of scope as a vulnerability on its own, unless proven as part of a chain with a legitimate Open WebUI vulnerability per the [Security Policy](../security-policy) |
 
 ---
@@ -31,7 +31,7 @@ These reduce the *consequences* of bad model output. They do not, and cannot, ma
 
 ## What remains, and why it is not treated as a vulnerability
 
-A security issue whose entire impact is **the model's output** — the model was talked into saying something, recommending something, or attempting an action it was already permitted to attempt — is **inherent to LLMs and is not, on its own, an Open WebUI vulnerability**. It is bounded by the state of the art in model alignment, not by anything Open WebUI's code can patch, and "make the model never produce harmful output" is not an achievable application-level fix.
+A security issue whose entire impact is **the model's output**, the model was talked into saying something, recommending something, or attempting an action it was already permitted to attempt, is **inherent to LLMs and is not, on its own, an Open WebUI vulnerability**. It is bounded by the state of the art in model alignment, not by anything Open WebUI's code can patch, and "make the model never produce harmful output" is not an achievable application-level fix.
 
 We therefore **do not accept reports as vulnerabilities when the whole impact is the model producing undesirable content, or being persuaded to misuse a capability it was already allowed to use.** That behavior is an accepted, inherent property of running an LLM and will not be addressed as a defect.
 

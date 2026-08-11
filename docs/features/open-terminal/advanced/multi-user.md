@@ -35,7 +35,7 @@ docker run -d --name open-terminal -p 8000:8000 \
   ghcr.io/open-webui/open-terminal
 ```
 
-{/* TODO: Screenshot — Docker run command in terminal with the MULTI_USER=true flag highlighted. */}
+{/* TODO: Screenshot: Docker run command in terminal with the MULTI_USER=true flag highlighted. */}
 
 ### What happens
 
@@ -48,7 +48,7 @@ When someone uses the terminal through Open WebUI, Open Terminal automatically:
 
 Each user sees only their own files in the file browser.
 
-{/* TODO: Screenshot — Two views side by side: User A's file browser showing /home/user-a/ with their files, and User B's file browser showing /home/user-b/ with completely different files. */}
+{/* TODO: Screenshot: Two views side by side: User A's file browser showing /home/user-a/ with their files, and User B's file browser showing /home/user-b/ with completely different files. */}
 
 ### What's shared vs. separate
 

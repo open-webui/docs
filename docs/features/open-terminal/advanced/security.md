@@ -23,7 +23,7 @@ docker run -d --name open-terminal -p 8000:8000 \
 
 The `--memory 2g` and `--cpus 2` flags prevent runaway processes from consuming all your machine's resources.
 
-{/* TODO: Screenshot — A simple diagram showing your computer on the left, a Docker container in the middle (labeled "Open Terminal — isolated"), and an arrow showing that only the /home/user volume is shared. The rest of the host filesystem is blocked off. */}
+{/* TODO: Screenshot: A simple diagram showing your computer on the left, a Docker container in the middle (labeled "Open Terminal — isolated"), and an arrow showing that only the /home/user volume is shared. The rest of the host filesystem is blocked off. */}
 
 :::warning Running without Docker
 Without Docker (bare metal mode), the AI can run any command with your user's permissions, including deleting files, installing software, or accessing anything your account can access. Only use bare metal on your own personal machine for personal projects.
@@ -41,7 +41,7 @@ An API key gates all access: anyone who can reach the port and present the key c
 
 For production, use a [config file](./configuration#config-file) or [Docker secrets](./configuration#docker-secrets) instead of putting the key on the command line.
 
-{/* TODO: Screenshot — Example showing the docker logs command revealing an auto-generated API key, with a note saying "change this to your own strong password". */}
+{/* TODO: Screenshot: Example showing the docker logs command revealing an auto-generated API key, with a note saying "change this to your own strong password". */}
 
 ---
 
@@ -57,7 +57,7 @@ When connecting to Open WebUI, prefer the **admin-configured** approach:
 
 Admin-configured connections keep the API key out of users' browsers and let you control who has access.
 
-{/* TODO: Screenshot — Admin settings showing the Open Terminal connection. The API key field shows dots (masked). A note points out that this key never reaches users' browsers. */}
+{/* TODO: Screenshot: Admin settings showing the Open Terminal connection. The API key field shows dots (masked). A note points out that this key never reaches users' browsers. */}
 
 ---
 
@@ -75,7 +75,7 @@ deploy:
 
 If a process exceeds these limits, Docker throttles it (CPU) or kills it (memory). Your server stays healthy.
 
-{/* TODO: Screenshot — Docker stats or htop inside the container showing CPU and memory usage within the configured limits. */}
+{/* TODO: Screenshot: Docker stats or htop inside the container showing CPU and memory usage within the configured limits. */}
 
 ---
 
@@ -110,7 +110,7 @@ This means:
 - Open Terminal is **not accessible** from the internet
 - Open Terminal **cannot make outbound internet requests**
 
-{/* TODO: Screenshot — Network diagram showing the public network (internet → Open WebUI) and the internal network (Open WebUI → Open Terminal). The internal network has no path to the internet. */}
+{/* TODO: Screenshot: Network diagram showing the public network (internet → Open WebUI) and the internal network (Open WebUI → Open Terminal). The internal network has no path to the internet. */}
 
 ---
 
@@ -127,7 +127,7 @@ Only these domains will be reachable. Everything else is blocked. This prevents:
 - Downloading unexpected software
 - Accessing internal services you didn't intend
 
-{/* TODO: Screenshot — Terminal showing two curl commands: one to an allowed domain (succeeds) and one to a blocked domain (fails with "connection refused"). */}
+{/* TODO: Screenshot: Terminal showing two curl commands: one to an allowed domain (succeeds) and one to a blocked domain (fails with "connection refused"). */}
 
 ---
 
@@ -148,7 +148,7 @@ Mounting the Docker socket gives the container **full control** over your host's
 Only do this if you fully trust everyone who has access to the terminal.
 :::
 
-{/* TODO: Screenshot — A warning diagram showing the Docker socket as a direct bridge to the host, with arrows pointing to "can access host filesystem", "can access host network", "can manage all containers". */}
+{/* TODO: Screenshot: A warning diagram showing the Docker socket as a direct bridge to the host, with arrows pointing to "can access host filesystem", "can access host network", "can manage all containers". */}
 
 ---
 

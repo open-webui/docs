@@ -103,13 +103,13 @@ Upload spreadsheets, CSVs, databases, or exported logs. The agent can inspect th
 
 Point the agent at a folder of PDFs, Word docs, spreadsheets, or emails. It can search, extract, convert, summarize, cross-reference, and produce structured output.
 
-{/* TODO: Screenshot — A chat where the user asks about the Johnson contract. The AI lists the files it found in a folder (contract_v2.docx, notes.pdf, invoice.xlsx) and provides a consolidated summary of relevant information from each. */}
+{/* TODO: Screenshot: A chat where the user asks about the Johnson contract. The AI lists the files it found in a folder (contract_v2.docx, notes.pdf, invoice.xlsx) and provides a consolidated summary of relevant information from each. */}
 
 ### Web development with live preview
 
 Describe a site or app. The agent can create the files, install dependencies, start a dev server, and render the result inside Open WebUI. Iterate by describing changes in chat.
 
-{/* TODO: Screenshot — A chat on the left side of the screen. On the right, a live website preview panel shows a clean event landing page with a banner, date, and registration button. */}
+{/* TODO: Screenshot: A chat on the left side of the screen. On the right, a live website preview panel shows a clean event landing page with a banner, date, and registration button. */}
 
 ### Software development
 
@@ -119,7 +119,7 @@ Clone repos, inspect architecture, run test suites, debug failures, refactor cod
 
 Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage disk usage, process logs, prepare exports, and automate repeatable operations.
 
-{/* TODO: Screenshot — A chat where the user asks "rename all the photos to include the date". The AI responds confirming "Renamed 43 files" with a before/after example: IMG_4521.jpg → 2025-03-15_IMG_4521.jpg. */}
+{/* TODO: Screenshot: A chat where the user asks "rename all the photos to include the date". The AI responds confirming "Renamed 43 files" with a before/after example: IMG_4521.jpg → 2025-03-15_IMG_4521.jpg. */}
 
 ---
 

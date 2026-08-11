@@ -328,18 +328,18 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 
 #### Attached Chat Files
 
-The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but does **not** use file context — when file context is on, the content is already in the conversation and the tools would be redundant — and only while the chat actually has attachments.
+The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but does **not** use file context, when file context is on, the content is already in the conversation and the tools would be redundant, and only while the chat actually has attachments.
 
 The model then works the file the way it works a knowledge base: `list_chat_files` to see what is there, `query_chat_files` for meaning, `grep_chat_files` for literal strings and line numbers, `view_file` to read a passage. Chunks returned by `query_chat_files` are rendered as citations, the same as knowledge results. Every file is still re-checked against the user's own access before it is read, so an attachment they can no longer open is skipped rather than searched.
 
 #### Images in Tool Results
 
-A tool can return images as well as text — `generate_image` and `edit_image` do, and so can a custom tool. How that reaches the model depends on the provider:
+A tool can return images as well as text, `generate_image` and `edit_image` do, and so can a custom tool. How that reaches the model depends on the provider:
 
 - On the **Responses API**, the image rides along inside the tool result, where it belongs.
 - On **Chat Completions**, a tool message may only carry text. The image is therefore split off: the tool result is delivered as plain text, and the images that came with it follow in a short user message that hands them to the model for analysis.
 
-The effect is that a model on a Chat Completions provider can actually look at what a tool produced — generate an image and then critique or edit it — instead of receiving a result it cannot open. Nothing extra is shown in the conversation; the images were already rendered from the tool result itself.
+The effect is that a model on a Chat Completions provider can actually look at what a tool produced, generate an image and then critique or edit it, instead of receiving a result it cannot open. Nothing extra is shown in the conversation; the images were already rendered from the tool result itself.
 
 #### Knowledge Tool Availability (At a Glance)
 
@@ -364,7 +364,7 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
 - knowledge attached to the model in its editor,
 - knowledge attached to the [folder](/features/chat-conversations/chat-features/conversation-organization) the chat sits in,
-- knowledge bases and notes attached to the chat itself — counted only when the model's **File Context** capability is off, since with it on the content is already in the conversation.
+- knowledge bases and notes attached to the chat itself, counted only when the model's **File Context** capability is off, since with it on the content is already in the conversation.
 
 When the **Knowledge Base** category is enabled and any of these are present, the model's system prompt gains an `<attached_knowledge>` block listing each item's type, ID, name, and which of the three it came from. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
 

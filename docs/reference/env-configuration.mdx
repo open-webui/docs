@@ -743,7 +743,7 @@ It is recommended to set this to a high single-digit to low double-digit number 
 - Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The pre-v0.9.6 name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (old default `30`) is still honored as a fallback if this is unset; prefer the new name.
 
 :::info Hitting the limit is visible (since v0.9.6)
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. A continuation request that fails outright — the provider erroring while the loop is fetching the model's next turn — is now reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is now reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -861,11 +861,11 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Default: `True`
 - Description: Enables the HTTP response compression middleware ([starlette-compress](https://pypi.org/project/starlette-compress/)), which compresses HTTP responses using ZStd, Brotli, or Gzip, negotiated via the client's `Accept-Encoding` header. This variable is read once at startup and requires a restart to change.
 
-**What it affects — and what it doesn't:**
+**What it affects, and what it doesn't:**
 
 - Only **HTTP responses** with compressible content types (JSON API responses, HTML, JavaScript/CSS static assets, SVG, etc.) that are larger than 500 bytes get compressed.
 - **WebSocket traffic (Socket.IO) is never touched** by this middleware, regardless of this setting.
-- **Streaming chat responses (SSE, `text/event-stream`) are never compressed** either way — the content type is not in the middleware's compressible list, so the token-streaming hot path is unaffected by this setting in both directions.
+- **Streaming chat responses (SSE, `text/event-stream`) are never compressed** either way, the content type is not in the middleware's compressible list, so the token-streaming hot path is unaffected by this setting in both directions.
 
 **Trade-offs of disabling (`ENABLE_COMPRESSION_MIDDLEWARE=false`):**
 
@@ -873,7 +873,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - **Downside**: Responses leave the backend uncompressed. For typical JSON API responses this only adds a few kilobytes per request, which is negligible on almost any connection. Two cases grow substantially more, however: the **first (uncached) page load** of the web UI, whose JavaScript/CSS bundles amount to several megabytes uncompressed, and **large JSON payloads** such as long chat histories or large model lists, which typically compress 5–10×. On fast or local networks this is still negligible; on slow or mobile links it is noticeable.
 
 :::tip Best of both worlds: compress at the reverse proxy
-If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloudflare, ...) sits in front of Open WebUI, enable compression **there** and set `ENABLE_COMPRESSION_MIDDLEWARE=false`. Clients still receive compressed responses, while the compression work moves off the Python workers onto infrastructure built for it — CDNs and proxies can additionally cache static assets in pre-compressed form. Pair this with aggressive proxy-side caching of the content-hashed frontend bundles under `/_app/immutable/` (`Cache-Control: public, max-age=31536000, immutable`), which removes the larger-first-page-load downside for every visit after the first. This is the recommended setup for scaled deployments; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for details and an Nginx example.
+If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloudflare, ...) sits in front of Open WebUI, enable compression **there** and set `ENABLE_COMPRESSION_MIDDLEWARE=false`. Clients still receive compressed responses, while the compression work moves off the Python workers onto infrastructure built for it, CDNs and proxies can additionally cache static assets in pre-compressed form. Pair this with aggressive proxy-side caching of the content-hashed frontend bundles under `/_app/immutable/` (`Cache-Control: public, max-age=31536000, immutable`), which removes the larger-first-page-load downside for every visit after the first. This is the recommended setup for scaled deployments; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for details and an Nginx example.
 :::
 
 #### `ENABLE_ORJSON`
@@ -916,7 +916,7 @@ allowing the client to wait indefinitely.
 
 - Type: `int`
 - Default: unset (no idle cap)
-- Description: Maximum number of seconds a **streaming** request may go without receiving a chunk before it is aborted. This is an idle cap between chunks, not a cap on the whole response, so a long answer that keeps producing tokens is never cut off — only a stream that has gone silent is. `AIOHTTP_CLIENT_TIMEOUT` still bounds the total duration.
+- Description: Maximum number of seconds a **streaming** request may go without receiving a chunk before it is aborted. This is an idle cap between chunks, not a cap on the whole response, so a long answer that keeps producing tokens is never cut off, only a stream that has gone silent is. `AIOHTTP_CLIENT_TIMEOUT` still bounds the total duration.
 
 :::info
 

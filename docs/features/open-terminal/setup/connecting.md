@@ -57,7 +57,7 @@ Click **Save**. A green "Connected" indicator confirms the connection.
 
 Limit terminal access to specific user groups via the access control button.
 
-{/* TODO: Screenshot — The Access Grants dropdown showing available user groups with checkboxes. */}
+{/* TODO: Screenshot: The Access Grants dropdown showing available user groups with checkboxes. */}
 
 :::tip Orchestrator connections can be scoped further
 A connection Open WebUI has detected as a [Terminals orchestrator](/features/open-terminal/terminals/) gets an extra **Orchestrator > Terminal Contexts** section, where you decide whether the terminal is offered in chats and in automations, and whether everything shares one workspace or each saved chat or automation gets its own. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). A direct Open Terminal connection has no such setting and is always available in both.
@@ -130,7 +130,7 @@ This almost always means Open WebUI can't reach Open Terminal over the network. 
 | Both on same machine, no Docker | `http://localhost:8000` |
 | Open Terminal on another machine | `http://that-machines-ip:8000` |
 
-{/* TODO: Screenshot — A simple diagram showing Open WebUI and Open Terminal as two boxes, with an arrow between them labeled with the URL. Shows correct URLs for Docker Compose (service name) vs separate containers (host.docker.internal). */}
+{/* TODO: Screenshot: A simple diagram showing Open WebUI and Open Terminal as two boxes, with an arrow between them labeled with the URL. Shows correct URLs for Docker Compose (service name) vs separate containers (host.docker.internal). */}
 
 :::tip Quick check
 Run this command to see if Open WebUI can reach Open Terminal:
