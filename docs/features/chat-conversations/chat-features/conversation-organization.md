@@ -30,7 +30,7 @@ Create a new folder to organize your conversations:
 Organize existing chats by moving them into folders:
 
 - **Drag and Drop**: Click and drag any conversation from the sidebar into a folder.
-- **Right-click Menu**: Right-click on a conversation and select "Move to Folder".
+- **Right-click Menu**: Right-click on a conversation, open **Move** and pick the destination folder. The entry appears once at least one folder exists.
 
 A folder highlights while you drag a chat over it when you are allowed to file the chat there, so you can see where the drop will land before you let go. A folder of your own always takes one. A folder [shared with you](#sharing-folders) takes one only with write access; with read-only access it does not highlight and does not accept the drop, so a move that would be refused anyway is never started.
 
@@ -75,7 +75,7 @@ Filing a chat into a folder requires **write access** to it. That means the fold
 
 The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. Naming a folder that does not exist is refused the same way as naming one you cannot write to.
 
-A refused move raises an error notification carrying the message the server sent, so you can read why it failed instead of seeing an `[object Object]` placeholder. This applies wherever the move is started: dragging a chat onto a folder in the sidebar, the chat's **Move to Folder** menu, the search dialog and the chat view itself.
+When a move is refused, the error notification carries the message the server sent rather than an `[object Object]` placeholder, so the reason is readable. This holds wherever the move was started: the chat's **Move** menu, the search dialog, the chat view and drag and drop.
 
 ## Folder Settings (Project Configuration)
 
@@ -135,7 +135,7 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
-- **Someone else's chat opens read-only, under their name.** Their messages carry their name and profile picture, both in the conversation and on the user nodes in the **Overview** panel, so a chat you did not write is not presented as yours. The name and picture next to a message are only drawn when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message.
+- **Someone else's chat opens read-only, under their name.** Their messages carry their name and profile picture, both in the conversation and on the message nodes in the **Overview** panel. The name and picture beside a message appear only when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Only the owner or an admin can delete a shared root folder** or change who it is shared with. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.

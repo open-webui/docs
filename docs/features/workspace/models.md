@@ -192,7 +192,7 @@ These cover chat completions. Background task requests (titles, tags, follow-ups
 | **Parameters** | Simple merge | Global sets `temperature: 0.7`, model sets `0.3` > model gets `0.3` |
 | **Custom parameters** | Key-by-key merge | Global adds `service_tier`, model adds `tools` > model gets both, and the model's value wins on a shared name |
 
-Custom parameters (the ones added with **Add Custom Parameter**, stored under `custom_params`) are merged entry by entry, so a model that defines one of its own keeps the global ones alongside it. Everything else is a whole-value replacement: a model that sets `temperature` replaces the global `temperature` and leaves the other global parameters untouched.
+Custom parameters are the ones added with **Add Custom Parameter**, stored under `custom_params`. They are the only group merged entry by entry, so a model that defines one of its own keeps the global ones alongside it.
 
 :::info A request that sets a parameter keeps its own value
 Both layers only fill in what the request left out. A parameter sent in the body of a [chat completions](/reference/api-endpoints#-chat-completions) request survives, so an integration that sends its own `temperature` or `max_tokens` gets the value it asked for rather than the model's saved one. The exception is **Stream Chat Response**, which still decides whether the reply streams no matter what the request asked for.
