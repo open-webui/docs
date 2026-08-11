@@ -51,17 +51,6 @@ Safari is the only browser that supports PWA installation on iOS. Chrome and Fir
 
 ---
 
-## Getting Around on a Phone
-
-On a phone or tablet the sidebar slides in over the conversation instead of sitting beside it, and you move it with your finger:
-
-- **Drag right** anywhere on the screen to pull the sidebar in, **left** to push it away. It follows your finger and dims the chat behind it as it comes, and a quick flick settles it either way.
-- A swipe that opens the sidebar has to start clear of the **very edge of the screen**, so an edge swipe still reaches your browser or phone. Closing works from anywhere.
-- A mostly vertical drag scrolls the page as usual, and a drag started on a text field, a button or an open menu leaves the sidebar alone.
-- Every chat row carries an always-visible three-dot menu (⋯), so its actions do not depend on a hover you cannot perform.
-
----
-
 ## Customizing the PWA (Admins)
 
 Admins can white-label the PWA by pointing to a custom manifest with the [`EXTERNAL_PWA_MANIFEST_URL`](/reference/env-configuration#external_pwa_manifest_url) environment variable. This lets you set a custom app name, icon, and theme color.
