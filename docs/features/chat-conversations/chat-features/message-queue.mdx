@@ -45,28 +45,13 @@ When the AI finishes generating, all queued messages are **combined into a singl
 
 ## Attachments Still Uploading
 
-Sending a message before its attachments have finished uploading queues the message and sends it once the files are ready. Earlier releases rejected the send with the error *Oops! There are files still uploading. Please wait for the upload to complete.* and left you to watch the upload and press send again.
+Sending a message before its attachments have finished uploading queues it rather than refusing. The message leaves the input box straight away and waits in the queue, each attachment showing a spinner until it is ready, and goes out on its own once they all are. No second press of send is needed.
 
-The message leaves the input box immediately and appears in the queue with its attachments beside it:
-
-- An image is shown as a thumbnail with a spinner over it while it uploads.
-- Any other file is shown as a small chip with its name and a spinner.
-- The spinner disappears as each attachment finishes, so you can see what the message is still waiting for.
-
-Once every attachment in the queue is ready, and any response in progress has finished, the queue is sent on its own. No second press of send is needed.
-
-This applies to files picked from your device, Google Drive or OneDrive, as well as web pages and YouTube links added with **Attach Webpage** or by typing the URL after `#` or `@`. Attached notes, knowledge bases and chats hold nothing up, since nothing is uploaded for them.
-
-:::note Independent of the **Enable Message Queue** toggle
-Queuing behind an upload happens whether that setting is on or off. The setting decides what a message does while a response is generating; a message with an unfinished upload has nothing to send yet either way.
-:::
+This happens whether **Enable Message Queue** is on or off, since a message with an unfinished upload has nothing to send yet either way. Notes, knowledge bases and chats hold nothing up, because nothing is uploaded for them.
 
 ### When an Upload Fails
 
-A queued message whose attachment failed is labeled **Upload failed** and holds the whole queue: nothing behind it is sent, and anything you send afterwards joins the queue instead of going out. Clear it with one of the two remaining buttons on that queued message:
-
-- **Edit** returns the message and its attachments to the input box. Remove the failed file with the ✕ on its chip, then send again.
-- **Delete** drops the queued message and its attachments.
+A queued message whose attachment failed is labeled **Upload failed** and holds the whole queue, so nothing behind it is sent. Clear it with **Edit**, which returns the message and its attachments to the input box so you can remove the failed file, or **Delete**, which drops the message and its attachments.
 
 ---
 
