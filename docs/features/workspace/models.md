@@ -122,7 +122,7 @@ Toggle what the model can do and bind resources:
 | **TTS Voice** | Set a specific voice for this model's responses |
 
 :::info Usage covers every chat the model runs
-The request for token counts is added server-side, so it applies wherever the model is used: the chat interface, the API, and the chats Open WebUI starts on your behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Nothing needs to be set per request. Only streaming requests are touched, so a model with **Stream Chat Response** turned off is left alone.
+The request for token counts is added server-side, so it applies wherever the model is used: the chat interface, the API and the chats Open WebUI starts on your behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Nothing needs to be set per request. Only streaming requests are touched, so a model with **Stream Chat Response** turned off is left alone.
 :::
 
 ### Advanced parameters

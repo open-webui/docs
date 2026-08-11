@@ -30,7 +30,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 |---------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `WEBUI_URL`                           | *(none)*           | **Required.** Your public WebUI address, e.g., `http://localhost:8080`. |
 | `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `false`            | Load OAuth settings from the database (when persistent config is on). Default `false` keeps environment variables authoritative for OAuth and shows the OAuth section of the Admin Panel read-only; set `true` to manage OAuth in the Admin Panel. |
-| `ENABLE_OAUTH`                        | `true`             | Master switch for provider sign-in. Set `false` to turn SSO off while keeping the client ID, secret and endpoints configured. Also a toggle in **Settings > Admin > System > Authentication**, next to the LDAP one. |
+| `ENABLE_OAUTH`                        | `true`             | Master switch for provider sign-in. Set `false` to turn SSO off while keeping the client ID, secret and endpoints configured. Also a toggle in **Settings > Admin > Authentication**, next to the LDAP one. |
 | `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`). |
 | `OAUTH_AUTO_REDIRECT`                 | `false`            | Send unauthenticated users at `/auth` straight to the provider login, skipping the "Continue with SSO" screen. Requires exactly one provider, `ENABLE_LOGIN_FORM=false` and no LDAP; visit `/auth?form=true` for the local login form. |
 | `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails). |
@@ -65,7 +65,7 @@ You cannot have Microsoft **and** Google as OIDC providers simultaneously.
 
 ### Read-only OAuth settings in the Admin Panel
 
-`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, everything under `oauth.` comes from the environment on every start, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only:
+`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only:
 
 - All values remain visible, and the section is dimmed with every field and switch inert, including the **OAuth / OIDC** master toggle.
 - A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.
@@ -247,13 +247,11 @@ The following environment variables are used:
 
 :::
 
-:::info Providers that add their own ID token header parameters
+:::info Providers that add their own parameters to the ID token
 
-Some providers put a vendor-specific parameter in the JOSE header of the ID token, outside the set of header parameters the standards register. Apereo CAS sends `client_id`, CyberArk Identity sends `app_id`. Open WebUI ignores header parameters it does not recognize, so sign-in through those providers completes normally.
+Some providers add a vendor-specific parameter of their own to the header of the ID token they issue. Open WebUI ignores parameters it does not recognize there, so sign-in through such a provider completes normally, and the token's signature and signing algorithm are still verified as before.
 
-The checks that protect the token are unaffected: the signature is still verified against the provider's keys, the signing algorithm is still restricted to the allowed list, `crit` is still honored and the registered header parameters are still validated.
-
-Earlier versions rejected the whole token, which ended the login at the callback with `OAuth callback failed: Unsupported {'app_id'} in header` in the server log and the misleading message `The email or password provided is incorrect` in the browser. If you see that pair, update Open WebUI.
+Earlier versions rejected the whole token instead, so the login ended at the callback with `The email or password provided is incorrect` in the browser and `Unsupported {'app_id'} in header` in the server log. If you see that pair, update Open WebUI.
 
 :::
 
@@ -274,6 +272,8 @@ You can configure the following environment variables to match the roles returne
 :::info
 
 If changing the role of a logged in user, they will need to log out and log back in to receive the new role.
+
+When that login does change the role, Open WebUI ends the account's other live WebSocket connections, so an old tab cannot keep acting on the previous role. Those browsers reconnect and re-authenticate on their own. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
 
 :::
 
@@ -357,6 +357,7 @@ You can use the `WEBUI_AUTH_TRUSTED_ROLE_HEADER` environment variable to control
 - When the header is present and valid, the user's role is updated on every sign-in to match the header value.
 - If the header contains an invalid value, the role is not changed and a warning is logged.
 - If the header is not present or empty, the user's existing role is left unchanged.
+- When the header does change the role, the account's live WebSocket connections are ended so the previous role cannot linger in an open tab. Those browsers reconnect and re-authenticate by themselves. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
 
 :::warning
 

@@ -200,7 +200,7 @@ Multiple instances mean Socket.IO events travel through Redis, and every one of 
 ENABLE_ORJSON=True
 ```
 
-It covers HTTP request and response bodies, the JSON columns the database reads and writes (chat contents above all, since a whole conversation is serialized on every save and parsed again on every open), the request bodies sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0.
+It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0.
 
 For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
 

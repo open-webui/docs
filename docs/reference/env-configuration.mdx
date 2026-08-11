@@ -879,7 +879,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
 - Type: `bool`
 - Default: `False`
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, the JSON columns the database reads and writes (chat contents, user settings, the configuration table), the request bodies sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the permission lookup that runs on sign-in, sign-up and every session refresh, Socket.IO payloads and the chunk metadata read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -992,18 +992,20 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 - Type: `bool`
 - Default: `False`
-- Description: Chooses which resolver aiohttp uses for every outbound hostname lookup. When `False` (the default), lookups go through the operating system resolver (aiohttp's `ThreadedResolver`, which runs `getaddrinfo` on asyncio's default executor), so Open WebUI resolves names exactly the way anything else on the machine does. When `True`, lookups go through c-ares (the `aiodns` package, aiohttp's `AsyncResolver`), which resolves on the event loop instead of occupying a thread, so a burst of concurrent lookups costs roughly as much as a single one. Read once at startup and applied before the first connection is opened, so a restart is required for a change to take effect. It covers every outbound request, including the Mistral OCR content-extraction loader, which previously pinned itself to c-ares on its own.
+- Description: Chooses how Open WebUI turns hostnames into addresses for every outbound request. When `False` (the default), it asks the operating system, so it resolves names exactly the way anything else on the machine does. When `True`, it uses the faster c-ares resolver instead, which stops name lookups queueing behind each other and behind other background work. On a busy instance that removes a delay in front of every model call, web search fetch, document fetch and tool call, so it is worth trying. Read once at startup, so a restart is required for a change to take effect. Applies to every outbound request Open WebUI makes.
 
-:::warning Only turn this on if you have confirmed c-ares works in your environment
+:::warning Test it before you leave it on
 
-v0.11.0 shipped the `aiodns` package, which made aiohttp switch every outbound request to c-ares with no way to opt out. That broke name resolution on some deployments:
+v0.11.0 used c-ares for everything with no way to turn it off, and it does not work everywhere:
 
-- On some Windows hosts, c-ares discovers only `127.0.0.1:53` as a nameserver, so every lookup to an external model provider fails.
-- In Docker, the long-lived c-ares channel intermittently stops resolving container names while Docker's embedded DNS keeps answering. That empties the Ollama model list and fails in-flight chats with a misleading "Model not found".
+- On some Windows hosts it finds no usable nameserver, so every lookup to an external model provider fails.
+- In Docker it can intermittently stop resolving container names while Docker's own DNS keeps answering. That empties the Ollama model list and fails in-flight chats with a misleading "Model not found".
 
-The operating system resolver is the default again, so nothing needs configuring to get working name resolution. Set this to `True` only for deployments whose resolver setup is known to work with c-ares.
+The operating system is asked by default again, so a working deployment needs no configuration here. If you turn c-ares on, exercise your models, web search and any internal services afterwards, and turn it back off if lookups start failing.
 
-c-ares also reads `/etc/resolv.conf` and the hosts file but not the rest of `nsswitch.conf`, so names served only by an NSS module (`.local` via avahi/mDNS, NIS or LDAP backends, Windows NBNS) resolve differently or not at all when it is enabled. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` keep working either way, since those go through the hosts file.
+One more difference to know about: c-ares reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use. Names that only those sources know (`.local` via avahi/mDNS, NIS or LDAP directories, Windows NBNS) resolve differently or not at all while it is enabled. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` keep working either way, since those go through the hosts file.
+
+Open WebUI pins the `aiodns` package to version `3.6.1`, the last release before the c-ares build that fails to find a nameserver on Windows. If you build your own image, do not upgrade that package past the pin while this setting is on.
 
 :::
 
@@ -2085,7 +2087,7 @@ Settings for the experimental long-term memory system (**Settings → Personaliz
 
 - Type: `int`
 - Default: `2000`
-- Description: Maximum number of characters of `context`-type memories injected into the prompt. Older or lower-priority context memories beyond this budget are not included.
+- Description: Maximum number of characters of `context`-type memories injected into the prompt. The `[Memory Neighborhood]` and `[Relevant Context]` sections share this budget and the text is cut at the limit. Entries are sorted alphabetically, so what falls outside the budget is whatever sorts last, not whatever is oldest.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MEMORIES_USER_CHAR_LIMIT`
@@ -3325,6 +3327,8 @@ Open WebUI uses `connect_to_custom` for Weaviate connections, which supports bot
 
 ### Oracle 23ai Vector Search (oracle23ai)
 
+The chunk details stored with each vector are read back on every knowledge base search, which [`ENABLE_ORJSON`](#enable_orjson) makes faster.
+
 #### `ORACLE_DB_USE_WALLET`
 
 -   **Type**: `bool`
@@ -3411,7 +3415,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
 
 ### Valkey
 
-Use [Valkey](https://valkey.io/) with the [valkey-search](https://github.com/valkey-io/valkey-search) module as the vector store by setting `VECTOR_DB=valkey`. Indexing, KNN search and metadata filtering all run server-side in Valkey.
+Use [Valkey](https://valkey.io/) with the [valkey-search](https://github.com/valkey-io/valkey-search) module as the vector store by setting `VECTOR_DB=valkey`. Indexing, KNN search and metadata filtering all run server-side in Valkey. The chunk details stored with each vector are written on upload and read back on every knowledge base search, which [`ENABLE_ORJSON`](#enable_orjson) makes faster.
 
 :::warning Community-supported
 The Valkey backend is community-contributed and maintained on a best-effort basis.
@@ -4528,6 +4532,8 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `yandex`: Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
   - `youcom`: Uses the [You.com](https://you.com/) YDC Index API for web search.
   - `openserp`: Uses a self-hosted [OpenSERP](https://github.com/karust/openserp) instance. Requires `OPENSERP_BASE_URL`; no API key.
+  - `firecrawl`: Uses [Firecrawl](https://firecrawl.dev/) for search. Requires `FIRECRAWL_API_KEY`; `FIRECRAWL_API_BASE_URL` points at a self-hosted instance.
+  - `external`: Uses your own search endpoint. Requires `EXTERNAL_WEB_SEARCH_URL`; `EXTERNAL_WEB_SEARCH_API_KEY` authenticates the call.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DDGS_BACKEND`
@@ -6110,7 +6116,7 @@ In any production environment running more than one instance of Open WebUI (e.g.
 #### `WEBUI_AUTH_TRUSTED_ROLE_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/authentication-access/auth/sso).
+- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. A role change from this header ends that account's live WebSocket connections, which reconnect and re-authenticate on their own, so the previous role cannot linger in an open tab. See [SSO docs](/features/authentication-access/auth/sso) and [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
 
 ### Google
 
@@ -7022,11 +7028,11 @@ These settings control whether users can share workspace items with other users 
 
 ### Sharing (Public)
 
-These settings control whether users can share workspace items **publicly**. Every one of them is off unless you turn it on, and each one requires its private-sharing parent above to be enabled first.
+These settings control whether users can share workspace items **publicly**. All of them default to `False`, and each one has a parent permission that has to be on before its toggle is shown in the admin panel: the matching private-sharing setting above for workspace items and notes, `USER_PERMISSIONS_CHAT_SHARE` for chats and `USER_PERMISSIONS_FEATURES_CALENDAR` for calendars.
 
 :::warning Re-check tools and notes after an upgrade
 
-On instances upgraded from a release that predates `public_tools` and `public_notes`, the admin panel used to draw **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the backend was still refusing the action. Saving any permission on that page then wrote those two as enabled and really did grant public tool and note sharing to everyone. What the admin panel shows now matches what is enforced, but a value already written to the database is not rolled back. Open **Admin Panel > Users > Groups > Default Permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+On instances upgraded from a release that predates `public_tools` and `public_notes`, the admin panel used to draw **Tools Public Sharing** and **Notes Public Sharing** as switched on even though the backend was still refusing the action. Saving any permission on that page then wrote those two as enabled and really did grant public tool and note sharing to everyone. What the admin panel shows now matches what is enforced, but a value already written to the database is not rolled back. Open **Admin Panel → Users → Groups → Default Permissions** and confirm both toggles read the way you intend. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 :::
 
@@ -7055,7 +7061,7 @@ On instances upgraded from a release that predates `public_tools` and `public_no
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING` (Tools Sharing) to be enabled for the user: the **Tools Public Sharing** toggle only appears once Tools Sharing is on. Admins can always share tools publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Tools Public Sharing**.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING` (Tools Sharing) to be enabled for the user: with the parent off, the tool's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from tool create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share tools publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Tools Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -7069,7 +7075,7 @@ On instances upgraded from a release that predates `public_tools` and `public_no
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Notes Sharing) to be enabled for the user: the **Notes Public Sharing** toggle only appears once Notes Sharing is on. Admins can always share notes publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Notes Public Sharing**.
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING` (Notes Sharing) to be enabled for the user: with the parent off, the note's access-control modal does not offer the "Public" option and the admin panel does not draw this toggle. When disabled, public access grants are silently stripped from note create and update payloads; per-user and per-group grants are unaffected. Admins always retain the ability to share notes publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Notes Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`

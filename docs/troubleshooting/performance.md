@@ -224,10 +224,10 @@ See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compre
 
 #### JSON Encoder
 
-Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat written to and read back from the database, every request body sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
+Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
 
 *   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
-*   **Where else it shows up**: chat storage. A chat is held in a single JSON column, so the whole message tree is serialized on every save and parsed again on every open, and the cost of that grows with the length of the conversation. The request body sent upstream to the provider, which carries the same conversation, is encoded on the same path.
+*   **Where else it shows up**: saving and opening chats. A whole conversation is encoded every time it is saved and decoded again every time it is opened, so the cost follows the length of the chat. The request sent on to the provider carries the same conversation and is encoded on the same path.
 *   **Where it is not**: a single-user instance with ordinary-sized chats. The saving is real but too small to notice against model latency.
 *   **Why it is opt-in**: orjson is stricter than the standard library. Payloads it rejects (non-string dictionary keys, integers beyond 64 bits, `NaN`/`Infinity` literals) fall back to the standard-library path automatically, so nothing breaks, but the default stays on the standard library to keep behaviour byte-for-byte identical to earlier releases. The one behaviour change to be aware of: `NaN` and `Infinity` floats in a JSON response now serialize as `null` instead of raising.
 
@@ -257,16 +257,16 @@ Long LLM completions can exceed default HTTP client timeouts. Configure these to
 
 #### DNS Resolver
 
-Every model call, web search fetch, RAG page load and tool call starts with a hostname lookup. By default those lookups go through the operating system resolver, which runs `getaddrinfo` on asyncio's default executor (a separate pool from `THREAD_POOL_SIZE`). That pool holds `min(32, cpu_count + 4)` threads and is shared with other blocking work, so under heavy concurrency lookups queue behind each other and behind unrelated jobs.
+Every model call, web search fetch, document fetch and tool call begins by turning a hostname into an address. By default Open WebUI asks the operating system to do that, and those lookups queue: they wait behind each other and behind other background work, so under load a lookup that should take milliseconds can take a second or more before the request it belongs to even starts.
 
-Setting `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True` switches to c-ares, which resolves on the event loop instead. Concurrent lookups then cost roughly what a single one costs, and a long blocking job can no longer stall name resolution for everyone else on the instance.
+Setting `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True` switches to the faster c-ares resolver, which does not queue. Many simultaneous lookups then take about as long as one, and a heavy background job can no longer hold up name lookups for everyone else on the instance. On a busy instance that is a delay removed from the front of every outbound request, so it is worth trying.
 
-*   **Where the win is**: instances doing hundreds of concurrent outbound requests, especially alongside blocking work such as vector-DB batch upserts.
-*   **Where it is not**: anything below that. At low concurrency the two resolvers are indistinguishable on a real network.
-*   **Why it is opt-in**: c-ares does not resolve names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file but not the rest of `nsswitch.conf`, so `.local` via avahi/mDNS, NIS or LDAP backends and Windows NBNS names resolve differently or not at all. On some Windows hosts it finds no usable nameserver, and in Docker its channel has been observed to intermittently stop resolving container names. v0.11.0 enabled it unconditionally, and those failures are why it is a switch now.
+*   **Where the win is largest**: instances making many outbound requests at once, especially alongside heavy background work such as bulk vector-database writes.
+*   **Where you will not notice it**: a quiet or single-user instance. With only a handful of lookups in flight the two are indistinguishable.
+*   **What to watch for**: c-ares does not find names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving. On some Windows hosts it finds no usable nameserver at all, and in Docker it has been seen to intermittently stop resolving container names. v0.11.0 used it unconditionally, which is how those cases came to light, and it is a switch now for exactly that reason.
 
 - **Env Var**: `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True`
-  *   *Recommendation*: leave it off unless you have measured DNS as a bottleneck and confirmed c-ares resolves every name your deployment uses. Requires a restart.
+  *   *Recommendation*: try it. Requires a restart. Afterwards, exercise your models, web search and any internal services you point Open WebUI at, and switch it back off if lookups start failing.
 
 See [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the variable itself, and [Intermittent Name Lookup Failures](/troubleshooting/connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
 
@@ -545,7 +545,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
-13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and reading and writing whole chats in the database. See [JSON Encoder](#json-encoder).
+13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 

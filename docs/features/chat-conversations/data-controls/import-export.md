@@ -130,7 +130,7 @@ If the objects in the array do **not** have a `chat` key, the entire object is t
 | `chat` | object | ✅ | The conversation data (see Chat Data below) |
 | `meta` | object | ❌ | Metadata such as `tags` (array of strings). Defaults to `{}` |
 | `pinned` | boolean | ❌ | Whether the chat is pinned. Defaults to `false` |
-| `folder_id` | string \| null | ❌ | ID of the folder to place the chat in. Defaults to `null` |
+| `folder_id` | string \| null | ❌ | ID of the folder to place the chat in. Defaults to `null`. It has to name a folder **you own**: a folder that does not exist, or one merely shared with you, is cleared and the chat is imported outside any folder rather than failing the import |
 | `created_at` | integer \| null | ❌ | Unix timestamp (seconds) for when the chat was created |
 | `updated_at` | integer \| null | ❌ | Unix timestamp (seconds) for when the chat was last updated |
 

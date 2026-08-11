@@ -11,7 +11,7 @@ OAuth and Single Sign-On (SSO) provide secure authentication for Open WebUI. Whe
 Most OAuth flows require the application's external URL ("redirect URI") so the provider knows where to send users after login. If this is missing, OAuth cannot complete.
 
 **Solution:**
-- Navigate to: **Admin Settings > General**
+- Navigate to: **Settings > Admin > General**
 - Ensure your **WebUI URL** field is filled in and points to your deployed instance (e.g., `https://yourwebui.yourdomain.com`)
 
 :::tip
@@ -384,17 +384,39 @@ OAUTH_PROVIDER_NAME=Authentik
 OAUTH_SCOPES=openid email profile
 ```
 
-#### CyberArk Identity, Apereo CAS and other providers with vendor-specific ID token headers:
+#### Providers that add their own parameters to the ID token:
 
 **Problem:** The login fails right at the callback. The browser shows `The email or password provided is incorrect`, and the backend log records the real reason:
 
 ```
-OAuth callback error during authorize_access_token for provider oidc: OAuth callback failed: Unsupported {'app_id'} in header
+OAuth callback failed: Unsupported {'app_id'} in header
 ```
 
-The parameter name varies by provider (`app_id` for CyberArk Identity, `client_id` for Apereo CAS). It is a private parameter the provider adds to the JOSE header of the ID token, and older versions of Open WebUI rejected any header parameter that is not a registered one.
+The parameter name varies by provider, `app_id` and `client_id` being two seen in the wild. Some providers add a vendor-specific parameter of their own to the header of the ID token they issue, and older versions of Open WebUI rejected any parameter they did not recognize there.
 
-**Solution:** Update Open WebUI. Unrecognized header parameters are now ignored instead of ending the login, so no provider-specific configuration is needed and nothing has to be relaxed on the provider side. The signature check, the algorithm allowlist, `crit` handling and validation of the registered header parameters all still apply.
+**Solution:** Update Open WebUI. Unrecognized parameters are now ignored instead of ending the login, so nothing has to be changed on the provider side. The token's signature and signing algorithm are still verified as before.
+
+---
+
+### 12. Existing Accounts Cannot Sign In After a Long-Delayed Upgrade
+
+**Problem:** An instance that had been left on a version older than v0.6.41 is upgraded, and afterwards nobody who had ever signed in through SSO can get back in. Password sign-in fails for those same accounts too, while accounts that never used SSO are fine. The backend log records:
+
+```
+ERROR - Error during OAuth process: 1 validation error for UserModel
+oauth
+  Input should be a valid dictionary [type=dict_type, input_value='{"oidc": {"sub": "..."}}', input_type=str]
+```
+
+v0.6.41 moved each account's identity provider subject out of the old `oauth_sub` column into an `oauth` JSON field that can hold several providers per account. In builds from v0.9.6 onwards, the step that copied those values encoded them twice, so the field ended up holding the *text* of a JSON object rather than the object. Every read of such an account then failed validation, and the lookup that matches an incoming SSO login to an existing account never matched it.
+
+This only affects databases that were still older than v0.6.41 at the moment they were upgraded, and only the accounts that had an `oauth_sub` value at that time. An instance that had already reached v0.6.41 or newer before upgrading further was never touched, and neither were accounts created or linked after the upgrade.
+
+**Solution:** Update Open WebUI. A repair migration runs on startup, rewrites the affected rows back into proper JSON objects and leaves every other row alone, so it is harmless on databases that were never affected. No manual database work is needed, no accounts have to be re-linked and nothing changes on the identity provider side.
+
+:::note Settings will not work around this
+`OAUTH_MERGE_ACCOUNTS_BY_EMAIL` does not help, because the fallback lookup by email reads the same account and fails the same validation. Deleting and recreating the affected accounts would restore sign-in, at the cost of everything those accounts own. Upgrading is the repair.
+:::
 
 ---
 
@@ -459,7 +481,8 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 - `OAuth callback error: mismatching_state` → Session/cookie issue
 - `httpcore.ReadTimeout` → Network timeout issue
 - `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established. Every callback failure is reported to the browser with this message, so read the backend log for the actual cause
-- `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token header and your version still rejects it. See [CyberArk Identity, Apereo CAS and other providers with vendor-specific ID token headers](#cyberark-identity-apereo-cas-and-other-providers-with-vendor-specific-id-token-headers)
+- `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token and your version still rejects it. See [Providers that add their own parameters to the ID token](#providers-that-add-their-own-parameters-to-the-id-token)
+- `1 validation error for UserModel` on the `oauth` field → An old upgrade step stored the identity provider subject as text. See [Existing Accounts Cannot Sign In After a Long-Delayed Upgrade](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
 - `404` on callback URLs → Redirect URI misconfiguration
 
 ---
@@ -478,6 +501,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | ⏱️ Timeout problems          | Increase `AIOHTTP_CLIENT_TIMEOUT` values                    |
 | 🔐 CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
 | 🔀 Multi-instance problems    | Configure Redis and shared secrets                          |
+| 🧬 SSO accounts locked out right after a long-delayed upgrade | Update Open WebUI; a repair migration fixes the stored identity data on startup |
 | Still stuck? | Check debug logs, test without proxy, verify provider setup |
 
 ---

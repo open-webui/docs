@@ -71,7 +71,7 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 
 Filing a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly filing the chat in the folder.
 
-The same rule applies wherever a chat picks up a folder: creating one through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. A folder ID that does not exist is treated exactly like a folder you cannot write to, so the request is rejected rather than leaving the chat pointing at nothing.
+The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. A folder ID that does not exist is treated exactly like a folder you cannot write to, so the request is rejected rather than leaving the chat pointing at nothing.
 
 ## Folder Settings (Project Configuration)
 
@@ -124,13 +124,14 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 1. Hover over a folder in the sidebar and open the **three-dot menu** (⋯).
 2. Select **Share**.
 3. Add the users or groups to share with and choose their access:
-   - **Read**: they can open the folder and read its chats.
-   - **Write**: they can also rename the folder, add chats and create subfolders inside it.
+   - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it.
+   - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it.
 4. Save.
 
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
+- **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Only the owner or an admin can delete a shared root folder** or change who it is shared with. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
 

@@ -39,7 +39,8 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | CUDA out of memory during embedding | [RAG → CUDA OOM](./rag#10-cuda-out-of-memory-during-embedding) |
 | OAuth redirect loops, CSRF state mismatch | [SSO & OAuth](./sso) |
 | `CSRF Warning! State not equal in request and response` | [SSO → CSRF Errors](./sso#9-session-state-mismatch-csrf-errors) |
-| SSO login ends with "The email or password provided is incorrect" and the log shows `Unsupported {'app_id'} in header` | [SSO → Vendor-specific ID token headers](./sso#cyberark-identity-apereo-cas-and-other-providers-with-vendor-specific-id-token-headers) |
+| SSO login ends with "The email or password provided is incorrect" and the log shows `Unsupported {'app_id'} in header` | [SSO → Provider adds its own ID token parameters](./sso#providers-that-add-their-own-parameters-to-the-id-token) |
+| Nobody who ever used SSO can sign in after an upgrade, log shows `1 validation error for UserModel` on `oauth` | [SSO → Accounts locked out after a long-delayed upgrade](./sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade) |
 | TTS loading forever, `Dataset scripts are no longer supported` | [Audio → TTS Issues](./audio#tts-loading-forever--not-working) |
 | Whisper `int8 compute type` error | [Audio → STT Issues](./audio#whisper-stt-not-working--compute-type-error) |
 | Microphone not working (non-HTTPS) | [Audio → Microphone](./audio#microphone-access-issues) |

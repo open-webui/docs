@@ -127,7 +127,7 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 
 The full content of the note is injected into the context window for that conversation.
 
-You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **folders** and **models** from the sidebar.
+You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **chats**, **folders** and **models** from the sidebar.
 
 ---
 
@@ -193,9 +193,9 @@ Administrators can control sharing via environment variables or the Admin Panel:
 
 These can also be configured in **Admin Panel > Users > Groups > Default Permissions**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless.
 
-:::warning
+:::warning Check Notes Public Sharing after an upgrade
 
-If your instance was upgraded from a release that predates the **Notes Public Sharing** permission and you saved the permissions page at any point since, the setting may have been written to the database as enabled without anyone turning it on. Check it. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+If your instance was upgraded from a release that predates the **Notes Public Sharing** permission and you saved the permissions page at any point since, the setting may have been written to the database as enabled without anyone turning it on. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 :::
 
