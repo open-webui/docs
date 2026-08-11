@@ -148,12 +148,6 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 >
 > **You:** Add a new task to my "Weekly Todo" note to review the PR.
 
-:::info Notes saved as structured data
-
-A note's body is markdown text. If a model passes a JSON object or array to `write_note` or `replace_note_content` instead of text, that content is kept and shown in the note as a formatted `json` code block, and one note in that state no longer stops the whole Notes list from loading. Notes already saved that way are shown the same, and the code block replaces the structured content the next time the note is saved.
-
-:::
-
 ---
 
 ## Pinning Notes
