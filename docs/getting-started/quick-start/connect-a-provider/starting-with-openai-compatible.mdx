@@ -51,7 +51,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
 
-**How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error.
+**How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error. Each ID goes on the list once; typing one that is already there is refused with **Model ID is already added**, and any spaces around what you type are stripped off first.
 
 :::
 
@@ -60,7 +60,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 ## Step 1: Add Your Provider Connection
 
 1. Open Open WebUI in your browser.
-2. Go to ⚙️ **Admin Settings** → **Connections** → **OpenAI**.
+2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
 3. Click ➕ **Add Connection**.
 4. Fill in the **URL** and **API Key** for your provider (see tabs below). The URL field will **suggest common provider endpoints** as you type.
 5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs (Filter)** allowlist.
@@ -191,7 +191,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Step 3: Configure Connection in Open WebUI**
 
-  1. Open Open WebUI and navigate to **Settings** > **Admin** > **AI** > **Connections**.
+  1. Open Open WebUI and navigate to **Settings > Admin > Connections**.
   2. Click the **+** (plus) icon under the **OpenAI API** section.
   3. Enter the URL and API Key from the table above.
   4. **Important**: MiniMax does not expose a `/models` endpoint, so you must add the model manually.

@@ -139,7 +139,7 @@ Use the **arrow buttons** to navigate forward/backward, or click **Today** to ju
 
 ## Recurring Events
 
-The **Repeat** field in the event form decides whether an event comes back: **No Repeat** (the default), **Daily**, **Monday – Friday**, **Weekly**, **Monthly** or **Yearly**. Occurrences are counted from the event's own start, so a weekly event lands on the weekday it starts on and a monthly one on the same day of the month.
+Set **Repeat** in the event form to make an event come back: **No Repeat** (the default), **Daily**, **Monday – Friday**, **Weekly**, **Monthly** or **Yearly**. Occurrences are counted from the event's own start, so a weekly event lands on the weekday it starts on and a monthly one on the same day of the month.
 
 Every occurrence sits at the clock time you set, read in your time zone rather than the server's. A 09:00 standup shows at 09:00 whether the server runs on UTC or anywhere else, and it stays at 09:00 after the clocks go forward or back for daylight saving.
 

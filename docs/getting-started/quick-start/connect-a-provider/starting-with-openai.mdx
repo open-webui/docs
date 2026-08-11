@@ -34,9 +34,9 @@ import TabItem from '@theme/TabItem';
 
 Once Open WebUI is running:
 
-1. Go to the ⚙️ **Admin Settings**.
-2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
-3. Click ➕ **Add New Connection**.
+1. Go to **Settings > Admin > Connections**.
+2. Find the **Manage OpenAI API Connections** list.
+3. Click the ➕ **Add Connection** button next to it.
 
 <Tabs>
   <TabItem value="standard" label="OpenAI" default>
@@ -64,6 +64,7 @@ Once Open WebUI is running:
 *   **Model IDs (Filter)**:
     *   *Default (Empty)*: Auto-detects all available models from the provider.
     *   *Set*: Acts as an **Allowlist**. Only the specific model IDs you enter here will be visible to users. Use this to hide older or expensive models.
+    *   *One entry per ID*: Leading and trailing spaces are stripped from what you type, and an ID that is already on the list is refused with **Model ID is already added**. Reopening a connection whose stored list contains duplicates collapses them to one entry each, and saving writes the cleaned list back.
 
 *   **Prefix ID**:
     *   If you connect multiple providers that have models with the same name (e.g., two providers both offering `llama3`), add a prefix here (e.g., `groq/`) to distinguish them. The model will appear as `groq/llama3`.

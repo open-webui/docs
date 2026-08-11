@@ -113,6 +113,9 @@ Model-level settings configured by admins in the Workspace take precedence over 
 **"A switch in Settings > Interface has Default written next to it. What does that mean?"**
 It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
 
+**"The interface is too small to read comfortably."**
+Open **Settings > Interface** and click **Default** beside **UI Scale**, at the top of the **UI** section, to reveal a slider that runs from `1x` to `1.5x`. It enlarges the entire application, the sidebar, menus, dialogs and the Open Terminal file browser included, and it is stored with your account, so it follows you to another browser or device. Click the value to go back to **Default**. The default text size configured in your browser scales the interface the same way.
+
 **"I am the admin. Can I make everyone start with the same interface options?"**
 Yes, with [Default Interface Settings](/features/administration/interface-defaults). It sets where everyone starts; each person can still change any of it afterwards.
 

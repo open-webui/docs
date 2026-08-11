@@ -92,6 +92,8 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `showUpdateToast` | Toast Notifications for New Updates | `true` |
 | `showChangelog` | Show "What's New" Modal on Login | `true` |
 
+`textScale` is the **UI Scale** slider, which enlarges the entire interface, the sidebar, menus, dialogs and the file browser included.
+
 ### Chat
 
 | Key | Label in Settings > Interface | Built-in default |
