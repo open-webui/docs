@@ -766,7 +766,7 @@ Things to know about the tag table:
 | settings          | JSON          | nullable         | User preferences           |
 | info              | JSON          | nullable         | Additional user info       |
 | variables         | JSON          | nullable         | User variables substituted into system prompts |
-| oauth_sub         | Text          | UNIQUE           | OAuth subject identifier   |
+| oauth             | JSON          | nullable         | Identity provider subjects, keyed by provider |
 | scim              | JSON          | nullable         | SCIM provisioning data     |
 
 Things to know about the user table:
@@ -776,6 +776,7 @@ Things to know about the user table:
 - One-to-One relationship with `oauth_session` table (via `user_id` foreign key)
 - `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
 - `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
+- `oauth` replaced the single `oauth_sub` text column in v0.6.41 (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases that were still older than v0.6.41 when they were upgraded on a v0.9.6 or newer build had that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
 
 The `scim` field's expected structure:
 
@@ -795,7 +796,7 @@ The `scim` field's expected structure:
 
 - **SCIM account linking**: Stores per-provider `externalId` values from SCIM provisioning, enabling identity providers (like Azure AD, Okta) to match users by their external identifiers rather than relying solely on email.
 - **Multi-provider support**: The per-provider key structure allows a single user to be provisioned from multiple identity providers simultaneously, each storing their own `externalId`.
-- **OAuth fallback**: When looking up a user by `externalId`, the system falls back to matching against `oauth_sub` if no `scim` entry is found, enabling seamless linking of SCIM-provisioned and OAuth-authenticated accounts.
+- **OAuth fallback**: When looking up a user by `externalId`, the system falls back to matching it against the subject stored in the `oauth` field for the same provider if no `scim` entry is found, enabling seamless linking of SCIM-provisioned and OAuth-authenticated accounts.
 
 ## Entity Relationship Diagram
 
@@ -855,7 +856,7 @@ erDiagram
         string api_key
         json settings
         json info
-        text oauth_sub
+        json oauth
         json scim
     }
 

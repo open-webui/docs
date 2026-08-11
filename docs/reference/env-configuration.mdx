@@ -265,7 +265,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets instance-wide defaults for the personal options in **Settings > Interface**, so every account starts from your preferences instead of the built-in ones. Keys are the setting names as they are stored in a user's own settings, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins over the default. A setting the user has never touched follows the default and keeps following it, so changing the default later moves everyone who has not overridden it. Configurable via **Settings > Admin > System > General > UI > Default Interface Settings**, see [Default Interface Settings](/getting-started/quick-start/settings#default-interface-settings-admin).
+- Description: Sets instance-wide defaults for the personal options in **Settings > Interface**, so every account starts from your preferences instead of the built-in ones. Keys are the setting names as they are stored in a user's own settings, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins over the default. A setting the user has never touched follows the default and keeps following it, so changing the default later moves everyone who has not overridden it. Configurable via **Settings > Admin > General > UI > Default Interface Settings**, see [Default Interface Settings](/getting-started/quick-start/settings#default-interface-settings-admin).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.default_interface_settings`.
 
 :::info
@@ -351,7 +351,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `int`
 - Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > System > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
 #### `ENABLE_AUTOMATIONS`
 
@@ -483,7 +483,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `bool`
 - Default: `True`
-- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Injection additionally requires the user to hold the `features.memories` permission ([`USER_PERMISSIONS_FEATURES_MEMORIES`](#user_permissions_features_memories); admins are exempt), and the injected block is rendered in a fixed order, so an unchanged set of memories produces the same text on every turn and leaves a provider's [cached prompt prefix](/features/chat-conversations/prompt-caching#5-handle-memory-deliberately) intact. Surfaced as the "Memory System Context" toggle under **Admin Settings > General** when Memories is enabled.
+- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Injection additionally requires the user to hold the `features.memories` permission ([`USER_PERMISSIONS_FEATURES_MEMORIES`](#user_permissions_features_memories); admins are exempt), and the injected block is rendered in a fixed order, so an unchanged set of memories produces the same text on every turn and leaves a provider's [cached prompt prefix](/features/chat-conversations/prompt-caching#5-handle-memory-deliberately) intact. Surfaced as the "Memory System Context" toggle under **Settings > Admin > General** when Memories is enabled.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBHOOK_URL`
@@ -605,7 +605,7 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 - Type: `bool`
 - Default: `True`
 - Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > System > General > User Status**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > General > User Status**.
 
 #### `ENABLE_EASTER_EGGS`
 
@@ -2824,7 +2824,7 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 **Clean migration path from normal Milvus to multitenancy milvus:**
 - Before enabling multitenancy, export any critical knowledge content from the UI if possible
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
-- Navigate to `Admin Settings > Documents > Click Reindex Knowledge Base`
+- Navigate to `Settings > Admin > Documents > Click Reindex Knowledge Base`
 
 **This rebuilds knowledge base vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
 **User memories, web search history and files that were never added to a knowledge base are NOT migrated by this operation**
@@ -2840,7 +2840,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 
 **Current UI limitations:**
 - No one-click "migrate and cleanup" button exists
-- Vector DB reset from UI (Admin Settings > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
+- Vector DB reset from UI (Settings > Admin > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
 - Legacy collections require manual cleanup via Milvus client tools
 
 :::
@@ -2864,7 +2864,7 @@ For fresh installations, no migration concerns exist
 
 **To perform a full reset and switch to multitenancy:**
 - Backup any critical knowledge base content externally
-- Navigate to `Admin Settings > Documents`
+- Navigate to `Settings > Admin > Documents`
 - Click `Reset Vector Storage/Knowledge` (this deletes all active mode collections and stored knowledge metadata)
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
@@ -3510,7 +3510,7 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Tools → Documents**.
+- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Documents**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
@@ -3666,7 +3666,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `dict` (JSON object)
 - Default: `{}` (engine defaults)
-- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Tools → Documents** when MinerU is the content-extraction engine.
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Documents** when MinerU is the content-extraction engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `PADDLEOCR_VL_BASE_URL`
@@ -3934,8 +3934,8 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Puts a single line describing the shape of the table in front of the parsed contents of every `.csv` file, for example `Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.` The built-in CSV parser emits one document per data row, so without this line nothing in the indexed text says how many rows the file has or which columns exist, and a model asked to count or list them can only go by the rows it retrieved. Column names are taken from the first row, the column count is that of the widest row, and the delimiter is detected from the first 4096 characters of the file, falling back to a comma. The line becomes the first part of the file's extracted content, so it is indexed as an ordinary chunk and is included whenever the whole document is injected. Files that cannot be read, or that have no rows at all, get no summary line and are still parsed as before. Only applies where Open WebUI's own CSV parser is used, so it has no effect when `CONTENT_EXTRACTION_ENGINE` is `external` (everything goes to the external loader) or `tika` or `docling` (a `.csv` is read as plain text); every other engine leaves `.csv` files to the built-in parser. Existing files keep the content they were parsed with, since re-indexing reuses stored text rather than parsing the file again, so re-upload a CSV to give it a summary line. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
-- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+- Description: Puts a single line describing the shape of the table in front of the parsed contents of every `.csv` file, for example `Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.` Without it, nothing in the text a model is given says how many rows or columns the file has, so a question about the size of the table is answered from whichever rows happened to be retrieved. Column names come from the first row, the column count is that of the widest row and the delimiter is detected from the start of the file, falling back to a comma. The line sits at the top of the file's extracted content, so it is retrieved like any other part of the file and is always present when the whole document is injected. A file that cannot be read, or that has no rows at all, gets no summary line and is parsed as before. No summary is added when `CONTENT_EXTRACTION_ENGINE` is `external`, `tika` or `docling`, which handle `.csv` files themselves; every other engine leaves them to Open WebUI's own CSV parser. Only files parsed after you turn this on get a summary line, and re-indexing does not add one, so re-upload a CSV to give it one. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
+- Persistence: Set via environment variable; changing it requires a restart (not a `ConfigVar`, so it does not appear in the admin settings).
 
 #### `RAG_FILE_MAX_SIZE`
 
@@ -4542,7 +4542,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Default: `auto`
 - Options: `auto` (Random), `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `wikipedia`, `yahoo`, `yandex`.
 - Description: Specifies the backend to be used by the DDGS engine.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > DDGS Backend** when DDGS is selected as the search engine.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > DDGS Backend** when DDGS is selected as the search engine.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
@@ -4563,7 +4563,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Type: `str`
 - Default: `http://localhost:7000`
 - Description: Base URL of a self-hosted [OpenSERP](https://github.com/karust/openserp) instance, used when the web search engine is set to `openserp`. Open WebUI calls its `/mega/search` endpoint, which returns results from Google, Bing, Yandex, Baidu, DuckDuckGo and Ecosia together. No API key is involved, the base URL is the only required setting. See the [OpenSERP provider guide](/features/chat-conversations/web-search/providers/openserp).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > OpenSERP URL** when `openserp` is selected as the search engine.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > OpenSERP URL** when `openserp` is selected as the search engine.
 
 #### `SEARXNG_QUERY_URL`
 
@@ -4625,7 +4625,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `int`
 - Default: `8192`
-- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Admin → Tools → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
+- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Admin → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.brave_search_context_tokens`.
 
 #### `KAGI_SEARCH_API_KEY`
@@ -4694,7 +4694,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str` (JSON object)
 - Default: `''` (parsed to `{}`; effective defaults are `{"url": "https://api.linkup.so/v1/search", "depth": "standard", "outputType": "sourcedAnswer"}`)
-- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Admin → Tools → Web Search** when the `linkup` engine is selected.
+- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Admin → Web Search** when the `linkup` engine is selected.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.linkup_search_params`.
 
 #### `JINA_API_KEY`
@@ -4708,7 +4708,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Type: `str`
 - Default: `https://s.jina.ai/`
 - Description: Sets the Base URL for Jina Search API. Useful for specifying custom or regional endpoints (e.g., `https://eu-s-beta.jina.ai/`).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Jina API Base URL**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Jina API Base URL**.
 
 #### `BING_SEARCH_V7_ENDPOINT`
 
@@ -5028,7 +5028,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `int`
 - Default: `None`
 - Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Firecrawl Timeout**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Firecrawl Timeout**.
 
 #### `PLAYWRIGHT_TIMEOUT`
 
@@ -5064,7 +5064,7 @@ This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or l
 - Type: `str`
 - Default: unset (requests come from the server's own address)
 - Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting. Setting it sends the transcript requests through that proxy instead of the server's own address.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Youtube Proxy URL**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Youtube Proxy URL**.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
 
@@ -5848,7 +5848,7 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Admin > System > Authentication**, alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
+- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Admin > Authentication**, alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_SIGNUP`
@@ -6629,21 +6629,21 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**.
+- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_LDAP_GROUP_CREATION`
 
 - Type: `bool`
 - Default: `False`
-- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**.
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_GROUPS`
 
 - Type: `str`
 - Default: `memberOf`
-- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**, where group management cannot be saved while this is left empty.
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > Authentication**, where group management cannot be saved while this is left empty.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ## SCIM

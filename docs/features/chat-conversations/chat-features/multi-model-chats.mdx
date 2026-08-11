@@ -57,13 +57,13 @@ Merging takes the outputs from all your active models and sends them (along with
 
 ### Configuration
 
-The merging process relies on the backend **Tasks** system.
+There is nothing to configure, and that is worth knowing before you go looking:
 
-*   **Task Model**: The specific model used to perform the merger can be configured in **Settings > Admin > Experience > Interface > Tasks**. We recommend using a highly capable model (like GPT-5.1 or Claude Sonnet 4.5) as the task model for the best results.
-*   **Prompt Template**: The system uses a specialized prompt template to instruct the AI on how to synthesize the answers.
+*   **Model**: the merge runs on one of the models already in the comparison, the one whose response you are viewing when you press **Merge**. It does not use the Task Model, so the settings under **Settings > Admin > Interface** have no effect on it.
+*   **Prompt Template**: the merge uses a built-in prompt telling the model how to synthesize the answers. There is no admin field or environment variable for it.
 
 :::info Experimental
-The Merging/MOA feature is an advanced capability. While powerful, it requires a capable Task Model to work effectively.
+The Merging/MOA feature is an advanced capability. The result is only as good as the model doing the synthesizing, so run the merge from your strongest model's response rather than a small one.
 :::
 
 

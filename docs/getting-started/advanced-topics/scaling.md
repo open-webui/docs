@@ -204,6 +204,20 @@ It covers HTTP request and response bodies, saving and opening chats (a whole co
 
 For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
 
+### Speed Up Name Lookups
+
+Every outbound request starts by turning a hostname into an address: every model call, every web search fetch, every document fetch, every tool call. By default Open WebUI asks the operating system, and at scale those lookups queue behind each other and behind other background work, so a lookup that should take milliseconds delays the request it belongs to. Switching to the faster c-ares resolver removes that queue:
+
+```
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
+```
+
+Many simultaneous lookups then take about as long as one, and a heavy background job (a bulk vector-database write, for example) can no longer hold up name lookups for every other user on the instance. It is read once at startup and is worth trying on any instance carrying real concurrent load.
+
+It is opt-in because c-ares does not find names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` are unaffected. After enabling it, exercise your models, web search and any internal services you point Open WebUI at, and switch it back off if lookups start failing.
+
+See [Performance → DNS Resolver](/troubleshooting/performance#dns-resolver) for the full trade-off and [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the variable itself.
+
 ---
 
 ## Step 4: Switch to an External Vector Database
@@ -468,6 +482,10 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300
 # Faster JSON encoder (v0.11.0+): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
+
+# Faster name lookups: removes the queueing delay in front of every outbound
+# request. Verify your names still resolve after enabling it; see Step 3
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 ```
 
 :::warning Two settings people forget, and then their scaled deployment stalls

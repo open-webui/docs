@@ -11,7 +11,7 @@ This page covers the most common RAG problems and their solutions.
 
 ## Recommended Settings by Scenario
 
-RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Settings > Admin > Tools > Documents**.
+RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Settings > Admin > Documents**.
 
 :::tip Agentic retrieval: enable kb_exec
 If your models use **native function calling**, set [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) for a noticeably better knowledge-base experience. It gives the model a filesystem-style interface (`ls`, `tree`, `grep`, `cat`, read-by-line) over your knowledge that capable models chain more reliably than the individual search tools. It has no effect in Legacy Mode. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
@@ -76,7 +76,7 @@ The embedding model determines retrieval quality. The right choice depends on yo
 | **Production, API budget available** | `text-embedding-3-small` via OpenAI | Best retrieval quality per dollar |
 | **Air-gapped / self-hosted** | `nomic-embed-text` or `mxbai-embed-large` via Ollama | No external API calls needed |
 
-After changing your embedding model, **reindex all existing documents** in **Settings > Admin > Tools > Documents** for the new embeddings to take effect.
+After changing your embedding model, **reindex all existing documents** in **Settings > Admin > Documents** for the new embeddings to take effect.
 
 ---
 
@@ -199,9 +199,9 @@ After fixing the configuration, try re-embedding a document and verify no error 
 Open WebUI implements various limits to ensure system stability and prevent abuse. It is important to understand how these limits apply to different upload methods:
 
 *   **Chat Uploads:** Subject to global file size and count limits.
-    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Tools > Documents > General > Max Upload Size**.
-    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Tools > Documents > General > Max Upload Count**.
-    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Tools > Documents > General > Allowed File Extensions**.
+    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Size**.
+    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Count**.
+    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Documents > General > Allowed File Extensions**.
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
@@ -364,7 +364,7 @@ Error generating embeddings: 429 Rate limit reached
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
-   Or configure it in the **Settings > Admin > Tools > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
+   Or configure it in the **Settings > Admin > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
    Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
@@ -529,7 +529,7 @@ For the full explanation of how knowledge scoping and retrieval modes work, see 
 
 You attached a webpage or a YouTube video to a chat (**+ > Attach Webpage**, or by typing the URL after `#` or `@`), and it came back as an error toast instead of a document.
 
-**The Problem**: The message names the step that actually failed. A link that could not be fetched or parsed is reported against that link, and a YouTube video whose transcript was refused is reported with the reason. Earlier releases reported both as `[ERROR: Error querying knowledge base]`, which named a stage the attachment had never reached, so the message said nothing about the real cause.
+**The Problem**: The message tells you what went wrong. A link that could not be read names that link, and a YouTube video whose transcript was refused gives the reason. A message about the knowledge base means the content was read and only saving it failed.
 
 #### A link that could not be read
 
@@ -537,11 +537,11 @@ You attached a webpage or a YouTube video to a chat (**+ > Attach Webpage**, or 
 [ERROR: Could not read content from https://example.com/page]
 ```
 
-The page was not fetched or not parsed, so nothing reached the vector database. The URL in the message is the one that failed, which matters when you attach several at once. Common causes:
+Nothing was attached: the page could not be reached, or nothing readable came back. The URL in the message is the one that failed, which matters when you attach several at once. Common causes:
 
 - The site blocks the request or serves its content only after JavaScript runs. Switch [`WEB_LOADER_ENGINE`](/reference/env-configuration#web_loader_engine) to `playwright`.
-- Open WebUI sits behind a proxy the loader is not using. See [`WEB_SEARCH_TRUST_ENV`](/reference/env-configuration#web_search_trust_env), which also governs the plain URL loader.
-- The address is refused on purpose. Private and loopback addresses, cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](/reference/env-configuration#web_fetch_filter_list) are rejected before any request goes out.
+- Open WebUI sits behind a proxy it is not being told to use. See [`WEB_SEARCH_TRUST_ENV`](/reference/env-configuration#web_search_trust_env), which covers plain URL attachments as well as web search.
+- The address is refused on purpose. Private and loopback addresses, cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](/reference/env-configuration#web_fetch_filter_list) are never requested.
 
 #### A YouTube video whose transcript was refused
 
@@ -549,11 +549,11 @@ A YouTube attachment is the video's transcript, so a video with no usable transc
 
 | Message | What it means |
 |---------|---------------|
-| `YouTube blocked the transcript request for <video id> from this server. …` | YouTube refused the request coming from your server's address, which is common for data center and cloud provider ranges. Route these requests through a proxy: **Settings > Admin > Tools > Web Search > Youtube Proxy URL**, or [`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url). |
+| `YouTube blocked the transcript request for <video id> from this server. …` | YouTube refused the request coming from your server's address, which is common for data center and cloud provider ranges. Route these requests through a proxy: **Settings > Admin > Web Search > Youtube Proxy URL**, or [`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url). |
 | `Transcripts are disabled for the YouTube video <video id>.` | The uploader turned captions off. No setting changes this. |
 | `The YouTube video <video id> is age restricted, so its transcript cannot be retrieved.` | Age restricted videos do not return a transcript. |
 | `The YouTube video <video id> is unavailable.` | The video is private, removed, region blocked or the ID in the link is wrong. |
-| `YouTube requires additional verification to return the transcript for <video id>.` | YouTube demanded an extra proof-of-origin token that Open WebUI does not supply. |
+| `YouTube requires additional verification to return the transcript for <video id>.` | YouTube asked for an extra verification step that Open WebUI cannot provide. |
 | `No transcript found for the YouTube video <video id> in these languages: <codes>.` | The video has transcripts, just not in the requested ones. Add the language to [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language). English is added to the end of the list when it is not already in it, so a video with only, say, Japanese captions needs `ja` added explicitly. |
 | `Could not retrieve a transcript for the YouTube video <video id>.` | Any other transcript failure. Check the server log for the underlying error. |
 
