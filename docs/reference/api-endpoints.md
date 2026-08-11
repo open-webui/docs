@@ -87,6 +87,8 @@ Earlier releases put the running total in `prompt_tokens` / `completion_tokens` 
 
 :::
 
+**Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless the request asks for it. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled in **Workspace > Models > Edit**, so you do not have to send it. This happens on the server, for every caller of this endpoint and for the chats Open WebUI starts on a user's behalf, such as [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Two consequences worth knowing: a non-streaming request is left untouched, and a `stream_options` object you send yourself keeps its other keys but has `include_usage` set to `true`, so you cannot switch usage off per request while the capability is on.
+
 #### Using Open WebUI tools, including MCP, from the API
 
 The chat completions endpoint can run server-side tools when you pass Open WebUI tool IDs in the request body. This includes native Python tools, OpenAPI tool servers, and MCP tool servers that are already configured and enabled in Open WebUI.

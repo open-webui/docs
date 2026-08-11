@@ -43,6 +43,33 @@ When the AI finishes generating, all queued messages are **combined into a singl
 
 ---
 
+## Attachments Still Uploading
+
+Sending a message before its attachments have finished uploading queues the message and sends it once the files are ready. Earlier releases rejected the send with the error *Oops! There are files still uploading. Please wait for the upload to complete.* and left you to watch the upload and press send again.
+
+The message leaves the input box immediately and appears in the queue with its attachments beside it:
+
+- An image is shown as a thumbnail with a spinner over it while it uploads.
+- Any other file is shown as a small chip with its name and a spinner.
+- The spinner disappears as each attachment finishes, so you can see what the message is still waiting for.
+
+Once every attachment in the queue is ready, and any response in progress has finished, the queue is sent on its own. No second press of send is needed.
+
+This applies to files picked from your device, Google Drive or OneDrive, and to web pages and YouTube links added with **Attach Webpage** or by typing the URL after `#` or `@`. Attached notes, knowledge bases and chats hold nothing up, since nothing is uploaded for them.
+
+:::note Independent of the **Enable Message Queue** toggle
+Queuing behind an upload happens whether that setting is on or off. The setting decides what a message does while a response is generating; a message with an unfinished upload has nothing to send yet either way.
+:::
+
+### When an Upload Fails
+
+A queued message whose attachment failed is labeled **Upload failed** and holds the whole queue: nothing behind it is sent, and anything you send afterwards joins the queue instead of going out. Clear it with one of the two remaining buttons on that queued message:
+
+- **Edit** returns the message and its attachments to the input box. Remove the failed file with the ✕ on its chip, then send again.
+- **Delete** drops the queued message and its attachments.
+
+---
+
 ## Persistence
 
 The message queue is preserved when you navigate between chats within the same browser session:
@@ -71,6 +98,8 @@ When disabled, sending a message while the AI is generating will:
 Message Queue is **enabled by default**. The toggle allows you to choose between:
 - **Queue mode** (default) - Messages queue up until generation completes
 - **Interrupt mode** - New messages stop current generation immediately
+
+Either way, a message with an attachment that is still uploading is queued until the upload settles. See [Attachments Still Uploading](#attachments-still-uploading).
 :::
 
 ---
@@ -107,6 +136,8 @@ You're in a long conversation and need to capture quick notes:
 |---------|----------|
 | **Enabled** | Messages queue during generation, sent together when complete |
 | **Disabled** | New messages interrupt current generation immediately |
+| **Pending uploads** | Message is queued until its attachments finish, then sent, whether the toggle is on or off |
+| **Failed upload** | Queued message is marked **Upload failed** and holds the queue until you edit or delete it |
 | **Persistence** | Queue survives navigation within session |
 | **Actions** | Send Now, Edit, Delete for each queued item |
 

@@ -437,7 +437,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
 | **Sub-agents** | | |
-| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which get no files at all without it. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
@@ -599,6 +599,8 @@ Builtin tools that correspond to an RBAC feature permission are also gated by th
 | Calendar | `features.calendar` |
 
 This ensures that RBAC permissions are respected end-to-end: disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
+
+`features.memories` reaches beyond the tool list. It also gates the [memory system context](/features/chat-conversations/memory#memory-system-context), so a user without the permission gets no stored memories injected into their prompt either, whatever the chat request asks for.
 :::
 
 :::tip Per-Chat Feature Toggles (Web Search, Image Generation, Code Interpreter)

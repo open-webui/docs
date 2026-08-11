@@ -6832,7 +6832,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). Set to `False` and the affected users lose the **Personalization** settings tab, the memory API endpoints answer them with `403`, the model is not given the memory tools, and their stored memories are no longer injected into the system context of their chats. Admins are exempt from the check.
+- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). Set to `False` and the affected users lose the **Personalization** settings tab, the memory API endpoints answer them with `403`, the model is not given the memory tools and their stored memories are no longer injected into the system context of their chats. Admins are exempt from the check.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`

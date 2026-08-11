@@ -95,7 +95,7 @@ Administrators can also control Memory access on a per-role or per-group basis f
 - **Admin UI**: Admin Panel > Users > Permissions > Features > **Memories**
 - **Environment Variable**: [`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories) (Default: `True`)
 
-Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab and the memory API endpoints answer them with `403`, the memory tools are no longer handed to the model, and their stored memories are no longer injected into the system context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
+Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab, the memory API endpoints answer them with `403`, the model is no longer handed the memory tools and their stored memories are no longer injected into the system context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
 
 ### Background Review & Limits
 

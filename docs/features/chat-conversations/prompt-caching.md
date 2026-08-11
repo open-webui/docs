@@ -40,7 +40,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 |---|---|---|
 | **File Context (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High — injected content changes per query |
 | **Citations** | Rewrites the **system message and the last user message** with the RAG template plus the source list, after every tool-calling round that produced sources | Very high, see the warning below |
-| **Memory (system context)** | Injects stored user memories into the system message, in a fixed section order with the entries sorted alphabetically | Medium — the same memories render identically every turn; changes when your memories change or when the retrieved selection does |
+| **Memory (system context)** | Injects stored user memories into the system message, in a fixed section order with the entries sorted alphabetically | Medium: renders identically while the same memories are selected; changes when your memories change or the retrieved selection does |
 | **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high — but a **File Context sub-mode**; only fires while File Context is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low — constant while voice mode is on |
 | **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low — stable as long as the attachments don't change |
@@ -138,7 +138,7 @@ What sits in each section decides how often the block still moves:
 |---|---|---|
 | `[User Memory]` | Every `user` memory you have stored | Only when a `user` memory is added, edited or deleted |
 | `[Memory Neighborhood]` | `context` memories filed under paths whose names appear in your recent messages | When your recent messages point at different paths |
-| `[Relevant Context]` | Vector-search hits across your memories, queried with your last seven user messages (capped at 4000 characters) | When that search returns a different selection |
+| `[Relevant Context]` | Vector-search hits across your memories, queried with your most recent user messages (up to seven of them, capped at 4000 characters) | When that search returns a different selection |
 
 The lower two are retrieved fresh on every turn, so a large `context` memory bank can still change the block as a conversation moves between topics. Options:
 
