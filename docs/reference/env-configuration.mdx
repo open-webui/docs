@@ -2249,6 +2249,8 @@ When `ENABLE_OAUTH_SIGNUP` is enabled, setting `WEBUI_SESSION_COOKIE_SAME_SITE` 
 
 However, a `strict` session cookie is not sent with the callback request, leading to potential login issues. If you experience this problem, use the default `lax` value instead.
 
+The same session cookie carries the authorization when a user [connects their account to an OAuth 2.1 MCP tool server](/features/extensibility/mcp#connecting-an-account), so `strict` breaks that as well: the provider's redirect arrives without the cookie and the connection fails with `OAuth callback failed: OAuth callback state is invalid or expired`.
+
 :::
 
 #### `WEBUI_SESSION_COOKIE_SECURE`
@@ -6767,7 +6769,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" button is hidden for non-admin users. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Chat Permissions → Allow Web Upload**.
+- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" option stays in the attach menu for non-admin users but is greyed out and does nothing, with a tooltip explaining why, and an attach sent anyway is refused. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Chat Permissions → Allow Web Upload**.
 
 #### `USER_PERMISSIONS_CHAT_DELETE`
 
