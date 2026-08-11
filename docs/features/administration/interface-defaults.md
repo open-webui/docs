@@ -27,7 +27,9 @@ An on/off option someone has never touched shows a small **Default** label besid
 Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option.
 
 :::info Matching the default releases the option
-Moving a control to whatever your default currently is releases the override: the **Default** label comes back and the option follows your defaults again. That is how someone undoes a choice they made earlier. It also means that if you later set a default to the value a person had already picked for themselves, their option goes back to being inherited and will move with your next change.
+Moving a control to whatever your default currently is releases the override: the **Default** label comes back and the option follows your defaults again. That is how someone undoes a choice they made earlier.
+
+Releasing happens when that person saves their settings, and it compares against your defaults as they stand at that moment. So setting a default to the value someone had already chosen for themselves does not release their override on its own: their choice stays pinned, and your next change still will not reach them. It is released the next time they save anything on the **Interface** page, at which point every option of theirs that matches your current defaults is released together, not only the one they just changed.
 :::
 
 ---
