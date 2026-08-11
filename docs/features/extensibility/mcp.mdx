@@ -107,16 +107,16 @@ An admin registers the MCP server once. Each user then connects their own accoun
 
 The authorization belongs to the person who started it and to the browser session they started it in:
 
-- It completes only for the account that began it. If a different account is signed in in that browser when the provider redirects back, the authorization is refused and no account is connected.
+- It completes only for the account that began it. If a different account is signed in when the provider redirects back, the authorization is refused and no account is connected.
 - Signing out cancels an authorization that is still in progress. Sign back in and enable the tool again to start over.
-- Finish the flow in the browser you started it in, and on the same address you started it on. Coming back anywhere else leaves nothing for the authorization to match against.
+- Finish the flow in the same browser and at the same address you started it from. Coming back anywhere else leaves nothing for the authorization to match against.
 
 If it cannot complete, the browser lands back on Open WebUI with an error notification:
 
 | Notification | What happened |
 | :--- | :--- |
 | `OAuth callback failed: OAuth callback state is invalid or expired` | The authorization was not started in this browser session, or that session is gone: someone signed out, the session expired, or the provider sent the browser back to an address other than the one in [`WEBUI_URL`](/reference/env-configuration#webui_url). |
-| `OAuth callback failed: OAuth callback user does not match authenticated session` | A different user is signed in in this browser than the one who started the authorization. |
+| `OAuth callback failed: OAuth callback user does not match authenticated session` | A different user is signed in than the one who started the authorization. |
 | `OAuth callback failed: OAuth callback user is not authorized` | The account that started the authorization no longer exists or no longer has access, for example it was deleted or set back to **pending**. |
 
 Enable the tool again to retry.
