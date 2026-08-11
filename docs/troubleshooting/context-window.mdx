@@ -14,7 +14,7 @@ Errors like:
 - `Input is too long for the model`
 - `context length exceeded`
 
-These come from the **model provider** (OpenAI, Anthropic, Google, your Ollama server, GLM-4/5.x, etc.), **not from Open WebUI**. The provider counted the tokens of everything you sent and rejected the request because it exceeds the model's context window.
+These come from the **model provider** (OpenAI, Anthropic, Google, your Ollama server, GLM-5.x, etc.), **not from Open WebUI**. The provider counted the tokens of everything you sent and rejected the request because it exceeds the model's context window.
 
 ## Why it happens
 
@@ -33,7 +33,7 @@ As a chat grows, the history grows. Large attachments or long tool-call outputs 
 
 Open WebUI does **not** silently truncate your conversation. It ships one optional, off-by-default mechanism, **Context Compaction** (covered below), which *summarizes* older messages rather than dropping them. Apart from that opt-in, Open WebUI does no automatic context trimming, by design. Here is why blind trimming is not a built-in default:
 
-1. **Every model uses a different tokenizer.** The token count for the same text differs between OpenAI (tiktoken), Anthropic, Gemini, GLM, Llama-family, Mistral, Qwen, and so on. A truly correct trimmer would need a per-model tokenizer for every provider in existence. Getting that wrong ships silent data corruption.
+1. **Every model uses a different tokenizer.** The token count for the same text differs between OpenAI (tiktoken), Anthropic, Gemini, GLM, Qwen, Mistral, and so on. A truly correct trimmer would need a per-model tokenizer for every provider in existence. Getting that wrong ships silent data corruption.
 2. **Every model has a different context window.** 8k, 32k, 128k, 200k, 1M, and that's before you factor in reserved output tokens, provider-side overhead, and multimodal content.
 3. **Everyone wants a different truncation policy.** We have seen users ask for all of the following, and all of them are reasonable:
    - Trim by **token count**.
@@ -44,7 +44,7 @@ Open WebUI does **not** silently truncate your conversation. It ships one option
    - Trim **tool-call results** first, keep everything else.
    - Set a **hard ceiling** on chat length (block further messages beyond N turns).
    - Summarize older messages instead of dropping them, and replace the dropped block with the summary.
-   - Per-model policies (keep 1M tokens for Gemini, 400k for GPT-5, 32k for smaller local models).
+   - Per-model policies (keep 1M tokens for Gemini, 1M for GPT-5.6, 32k for smaller local models).
 
 There is no single policy that is correct for every deployment, every user, and every model. That is why context management is **opt-in**: the built-in Context Compaction covers the common summarize-and-replace case, and for anything else the filter hook lets you pick exactly the policy you want.
 
@@ -163,7 +163,7 @@ class Filter:
 
 </details>
 
-Enable this filter globally or attach it to specific models in **Admin Panel > Functions**. The `max_turns` valve is configurable per-model via the model card, so you can set a smaller window for local 8k models and a larger one for Gemini 1M.
+Enable this filter globally or attach it to specific models in **Admin Panel > Functions**. The `max_turns` valve is configurable per-model via the model card, so you can set a smaller window for local 8k models and a larger one for Gemini's 1M.
 
 :::info Why the tool-call repair block?
 With tool calling on, an `assistant` message that invokes tools is paired with one or more `tool` messages carrying results that share the same `tool_call_id`. If `max_turns` happens to slice the conversation in the middle of that pair, keeping the orphan half, the upstream provider returns a 400 because the tool call / result structure is invalid. The repair block drops the orphans so the window always starts on a clean boundary. This matches what production community filters for context management do; the rest of the filter is the generic trimming logic.
@@ -234,10 +234,10 @@ class Filter:
         model_budgets_json: str = Field(
             default=(
                 '{\n'
-                '  "gpt-5.5": 1000000,\n'
-                '  "claude-opus-4-8": 1000000,\n'
-                '  "claude-sonnet-4-6": 1000000,\n'
-                '  "gemini-3.5-flash": 1000000,\n'
+                '  "gpt-5.6-sol": 1000000,\n'
+                '  "claude-opus-5": 1000000,\n'
+                '  "claude-sonnet-5": 1000000,\n'
+                '  "gemini-3.6-flash": 1000000,\n'
                 '  "qwen3.6": 262144,\n'
                 '  "deepseek-v4": 1000000\n'
                 '}'
@@ -306,8 +306,8 @@ class Filter:
             budgets = {}
         if model_id in budgets:
             return int(budgets[model_id])
-        # Prefix match: "claude-sonnet-4-6-20260514" uses the "claude-sonnet-4-6"
-        # budget. Longest key first so "gpt-5.5-mini" beats "gpt-5.5".
+        # Prefix match: "claude-sonnet-5-20260514" uses the "claude-sonnet-5"
+        # budget. Longest key first so "gpt-5.6-sol-pro" beats "gpt-5.6-sol".
         for key, value in sorted(budgets.items(), key=lambda kv: -len(kv[0])):
             if model_id.startswith(key):
                 return int(value)
@@ -368,14 +368,14 @@ class Filter:
 A few things worth noticing:
 
 - **Configure once, run everywhere.** Set this filter as a **global** filter in Admin Panel > Functions. The `model_budgets_json` valve lets you enumerate every model you care about; anything else falls back to `default_budget_tokens`. Admins can tune budgets at runtime without touching code.
-- **Prefix match on model id, longest-first.** `claude-sonnet-4-6-20260514` transparently uses the `claude-sonnet-4-6` budget. If you list nested ids like `gpt-5.5` and `gpt-5.5-mini`, `_budget_for` sorts keys by length descending before the prefix loop so the more specific one wins; otherwise dict insertion order would decide and `gpt-5.5` could shadow `gpt-5.5-mini` for anyone who listed it first.
+- **Prefix match on model id, longest-first.** `claude-sonnet-5-20260514` transparently uses the `claude-sonnet-5` budget. If you list nested ids like `gpt-5.6-sol` and `gpt-5.6-sol-pro`, `_budget_for` sorts keys by length descending before the prefix loop so the more specific one wins; otherwise dict insertion order would decide and `gpt-5.6-sol` could shadow `gpt-5.6-sol-pro` for anyone who listed it first.
 - **One tokenizer, every model.** Counts come from `tiktoken`, loaded once and cached. `encoding_for_model(model_id)` returns the model's own encoding when the installed tiktoken recognizes the id, otherwise it falls back to `tiktoken_encoding` (default `cl100k_base`). tiktoken only ships OpenAI encodings, and only for models older than its release, so Claude, Gemini, Qwen, DeepSeek and any brand-new OpenAI model all use the fallback. That is an approximation, which is more than good enough for a trim budget with headroom. `cl100k_base` is the one Open WebUI pre-caches, so it works offline; the newer `o200k_base` is **not** pre-cached and is fetched on first use, so an air-gapped box either needs it in `TIKTOKEN_CACHE_DIR` or falls back to `cl100k_base` automatically.
 - **Images get a worst-case allowance; audio and files do not.** Open WebUI hands images to the model as `image_url` content parts, and the filter can't see their resolution without decoding the base64, so it charges a flat `tokens_per_image` (default **1600**) for each one rather than undercounting and busting the window. That default is sized for a 4K, high-detail upload: OpenAI high-detail tops out near 1445 tokens (85 + 170 per 512px tile), Claude near 1590 (about width × height / 750 after its resize). Gemini high-resolution tiling can run higher, so raise the valve if you lean on Gemini with many images. **Audio and file parts still count as zero**; add their own allowance the same way if you need it.
 - **Same tool-call repair.** Reused from the first example. This is the block that keeps the request valid after trimming.
 - **Fail-open when misconfigured.** If you somehow set the headroom larger than the budget, the filter passes the request through untouched rather than wiping the conversation. The provider's error is better than a silent delete.
 
 :::warning Check your model ids
-Open WebUI doesn't always present the raw provider id to `body["model"]`. If an admin sets a connection `prefix_id`, every model is wrapped as `{prefix}.{raw_id}` (e.g. `openai.gpt-5.5`). Pipe-function manifolds wrap their sub-models as `{pipe.id}.{sub_id}` (e.g. `anthropic.claude-sonnet-4-6-20260514`). Custom Workspace models can have arbitrary ids, often UUIDs.
+Open WebUI doesn't always present the raw provider id to `body["model"]`. If an admin sets a connection `prefix_id`, every model is wrapped as `{prefix}.{raw_id}` (e.g. `openai.gpt-5.6-sol`). Pipe-function manifolds wrap their sub-models as `{pipe.id}.{sub_id}` (e.g. `anthropic.claude-sonnet-5-20260514`). Custom Workspace models can have arbitrary ids, often UUIDs.
 
 **Copy the exact id shown in the model picker** into `model_budgets_json`, not the upstream provider's id. If you get the format wrong, requests silently land on `default_budget_tokens` and you won't notice until a chat that fits a real budget fails to fit the fallback.
 :::

@@ -104,7 +104,7 @@ curl -X POST http://localhost:3000/api/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "llama3.1",
+    "model": "qwen3.6:27b",
     "messages": [
       {"role": "user", "content": "Use the configured MCP tool if it helps."}
     ],
@@ -127,7 +127,7 @@ Which fields you send decides whether Open WebUI executes tool calls for you or 
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "llama3.1",
+        "model": "qwen3.6:27b",
         "messages": [
           {
             "role": "user",
@@ -189,7 +189,7 @@ This applies when the connection's base URL is an Anthropic one, or when its **P
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "gpt-4o",
+        "model": "gpt-5.6-sol",
         "max_tokens": 1024,
         "messages": [
           {
@@ -207,7 +207,7 @@ This applies when the connection's base URL is an Anthropic one, or when its **P
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "gpt-4o",
+        "model": "gpt-5.6-sol",
         "max_tokens": 1024,
         "stream": true,
         "messages": [
@@ -230,7 +230,7 @@ This applies when the connection's base URL is an Anthropic one, or when its **P
   )
 
   message = client.messages.create(
-      model="gpt-4o",
+      model="gpt-5.6-sol",
       max_tokens=1024,
       messages=[
           {"role": "user", "content": "Why is the sky blue?"}
@@ -292,7 +292,7 @@ curl -X POST http://localhost:3000/api/v1/messages/count_tokens \
 -H "x-api-key: YOUR_API_KEY" \
 -H "Content-Type: application/json" \
 -d '{
-      "model": "gpt-4o",
+      "model": "gpt-5.6-sol",
       "messages": [
         {
           "role": "user",
@@ -355,7 +355,7 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "llama3.1",
+        "model": "qwen3.6:27b",
         "messages": [
           {"role": "user", "content": "Hello"},
           {"role": "assistant", "content": "Hi! How can I help you today?"}
@@ -412,7 +412,7 @@ curl http://localhost:3000/ollama/api/generate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-  "model": "llama3.2",
+  "model": "qwen3.6:27b",
   "prompt": "Why is the sky blue?"
 }'
 ```
@@ -431,7 +431,7 @@ curl -X POST http://localhost:3000/ollama/api/embed \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-  "model": "llama3.2",
+  "model": "qwen3.6:27b",
   "input": ["Open WebUI is great!", "Let'\''s generate embeddings."]
 }'
 ```
@@ -449,7 +449,7 @@ curl -X POST http://localhost:3000/ollama/v1/responses \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-  "model": "llama3.2",
+  "model": "qwen3.6:27b",
   "input": "Why is the sky blue?"
 }'
 ```
@@ -467,7 +467,7 @@ curl -X POST http://localhost:3000/ollama/v1/embeddings \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-  "model": "llama3.2",
+  "model": "qwen3.6:27b",
   "input": "Open WebUI is great!"
 }'
 ```
@@ -787,7 +787,7 @@ This method is beneficial when you want to focus the chat model's response on th
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "gpt-4-turbo",
+        "model": "gpt-5.6-terra",
         "messages": [
           {"role": "user", "content": "Explain the concepts in this document."}
         ],
@@ -829,7 +829,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-        "model": "gpt-4-turbo",
+        "model": "gpt-5.6-terra",
         "messages": [
           {"role": "user", "content": "Provide insights on the historical perspectives covered in the collection."}
         ],

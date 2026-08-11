@@ -529,7 +529,7 @@ curl -X POST http://localhost:3000/api/chat/completed \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "llama3.1",
+    "model": "qwen3.6:27b",
     "messages": [
       {"role": "user", "content": "Hello"},
       {"role": "assistant", "content": "Hi there! How can I help you?"}
@@ -774,7 +774,7 @@ class Filter:
         base_model_id = None
         if __model__ and "info" in __model__:
             base_model_id = __model__["info"].get("base_model_id")
-            # e.g. "gpt-5.2"
+            # e.g. "gpt-5.6-sol"
 
         if base_model_id:
             print(f"Workspace model '{custom_model_id}' → base model '{base_model_id}'")

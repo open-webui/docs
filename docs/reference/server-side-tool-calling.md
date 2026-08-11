@@ -113,12 +113,12 @@ CHAT_ID=$(curl -s -X POST $OWUI_URL/api/v1/chats/new \
   -H "Content-Type: application/json" \
   -d "{\"chat\": {
         \"title\": \"API run\",
-        \"models\": [\"gpt-4o\"],
+        \"models\": [\"gpt-5.6-sol\"],
         \"history\": {
           \"currentId\": \"$ASSISTANT_MSG_ID\",
           \"messages\": {
-            \"$USER_MSG_ID\": {\"id\": \"$USER_MSG_ID\", \"role\": \"user\", \"content\": \"Search the web for the latest Open WebUI release and summarise it.\", \"timestamp\": $TS, \"models\": [\"gpt-4o\"], \"childrenIds\": [\"$ASSISTANT_MSG_ID\"]},
-            \"$ASSISTANT_MSG_ID\": {\"id\": \"$ASSISTANT_MSG_ID\", \"role\": \"assistant\", \"content\": \"\", \"parentId\": \"$USER_MSG_ID\", \"childrenIds\": [], \"model\": \"gpt-4o\", \"modelName\": \"gpt-4o\", \"modelIdx\": 0, \"done\": false, \"timestamp\": $((TS + 1))}
+            \"$USER_MSG_ID\": {\"id\": \"$USER_MSG_ID\", \"role\": \"user\", \"content\": \"Search the web for the latest Open WebUI release and summarise it.\", \"timestamp\": $TS, \"models\": [\"gpt-5.6-sol\"], \"childrenIds\": [\"$ASSISTANT_MSG_ID\"]},
+            \"$ASSISTANT_MSG_ID\": {\"id\": \"$ASSISTANT_MSG_ID\", \"role\": \"assistant\", \"content\": \"\", \"parentId\": \"$USER_MSG_ID\", \"childrenIds\": [], \"model\": \"gpt-5.6-sol\", \"modelName\": \"gpt-5.6-sol\", \"modelIdx\": 0, \"done\": false, \"timestamp\": $((TS + 1))}
           }
         }
       }}" | jq -r '.id')
@@ -133,7 +133,7 @@ curl -s -X POST $OWUI_URL/api/chat/completions \
   -H "Authorization: Bearer $OWUI_KEY" \
   -H "Content-Type: application/json" \
   -d "{
-    \"model\": \"gpt-4o\",
+    \"model\": \"gpt-5.6-sol\",
     \"messages\": [{\"role\": \"user\", \"content\": \"Search the web for the latest Open WebUI release and summarise it.\"}],
     \"stream\": true,
     \"chat_id\": \"$CHAT_ID\",
@@ -215,7 +215,7 @@ curl -s -X POST $OWUI_URL/api/chat/completions \
   -H "Authorization: Bearer $OWUI_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o",
+    "model": "gpt-5.6-sol",
     "messages": [{"role": "user", "content": "What does the my_workspace_tool say about order 4711?"}],
     "stream": false,
     "params": {"function_calling": "legacy"},
@@ -264,7 +264,7 @@ import requests
 
 OWUI_URL = "http://localhost:3000"
 OWUI_KEY = "sk-..."
-MODEL = "gpt-4o"
+MODEL = "gpt-5.6-sol"
 DELETE_CHAT_WHEN_DONE = True  # False keeps the conversation in the user's chat list
 
 

@@ -115,7 +115,11 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://api.deepseek.com/v1` |
   | **API Key** | Your API key from [platform.deepseek.com](https://platform.deepseek.com/) |
-  | **Model IDs** | Auto-detected (e.g., `deepseek-chat`, `deepseek-reasoner`) |
+  | **Model IDs** | Auto-detected (e.g., `deepseek-v4-pro`, `deepseek-v4-flash`) |
+
+  :::caution Legacy aliases retired
+  The `deepseek-chat` and `deepseek-reasoner` aliases were retired on 2026-07-24. Use the `deepseek-v4-*` model IDs directly.
+  :::
 
   </TabItem>
   <TabItem value="mistral" label="Mistral">
@@ -126,7 +130,11 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://api.mistral.ai/v1` |
   | **API Key** | Your API key from [console.mistral.ai](https://console.mistral.ai/) |
-  | **Model IDs** | Auto-detected (e.g., `mistral-large-latest`, `codestral-latest`, `mistral-small-latest`) |
+  | **Model IDs** | Auto-detected (e.g., `mistral-large-3-25-12`, `mistral-small-4-0-26-03`, `codestral-25-08`) |
+
+  :::caution No more `-latest` aliases
+  Mistral no longer publishes `-latest` alias names such as `mistral-large-latest`. Use the dated model IDs from the [Mistral models overview](https://docs.mistral.ai/getting-started/models/models_overview/).
+  :::
 
   </TabItem>
   <TabItem value="groq" label="Groq">
@@ -137,7 +145,11 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://api.groq.com/openai/v1` |
   | **API Key** | Your API key from [console.groq.com](https://console.groq.com/) |
-  | **Model IDs** | Auto-detected (e.g., `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b`) |
+  | **Model IDs** | Auto-detected (e.g., `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `groq/compound`) |
+
+  :::caution Groq retired its Llama chat models
+  `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` are shut down as of 2026-08-16. Use the `gpt-oss` or `compound` models instead.
+  :::
 
   </TabItem>
   <TabItem value="perplexity" label="Perplexity">
@@ -157,13 +169,17 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   </TabItem>
   <TabItem value="minimax" label="MiniMax">
 
-  **MiniMax** is a leading AI company providing high-performance coding-focused models. Their latest model, **MiniMax M2.5**, is specifically optimized for coding, reasoning, and multi-turn dialogue. Their **Coding Plan** subscription is significantly more cost-effective for high-frequency programming than standard pay-as-you-go pricing.
+  **MiniMax** is a leading AI company providing high-performance coding-focused models. Their latest model, **MiniMax M3**, is optimized for agentic reasoning, tool use, coding, and long-context tasks. Their **Coding Plan** subscription is significantly more cost-effective for high-frequency programming than standard pay-as-you-go pricing.
 
   | Setting | Value |
   |---|---|
   | **URL** | `https://api.minimax.io/v1` |
   | **API Key** | Your Coding Plan API key (see Step 2 below) |
-  | **Model IDs** | **Required**, add manually (e.g., `MiniMax-M2.5`) |
+  | **Model IDs** | **Required**, add manually (e.g., `MiniMax-M3`) |
+
+  :::note Screenshots below show `MiniMax-M2.5`
+  The screenshots in this section were captured before M3 shipped. The steps are unchanged — substitute `MiniMax-M3` wherever you see `MiniMax-M2.5`.
+  :::
 
   **Step 1: Subscribe to a MiniMax Coding Plan**
 
@@ -195,7 +211,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   2. Click the **+** (plus) icon under the **OpenAI API** section.
   3. Enter the URL and API Key from the table above.
   4. **Important**: MiniMax does not expose a `/models` endpoint, so you must add the model manually.
-  5. In the **Model IDs (Filter)**, type `MiniMax-M2.5` and click the **+** icon.
+  5. In the **Model IDs (Filter)**, type `MiniMax-M3` and click the **+** icon.
   6. Click **Verify Connection** (you should see a success alert).
   7. Click **Save**.
 
@@ -204,7 +220,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Step 4: Start Chatting**
 
-  Select **MiniMax-M2.5** from the model dropdown and start chatting. Reasoning and thinking work by default without any additional configuration.
+  Select **MiniMax-M3** from the model dropdown and start chatting. Reasoning and thinking work by default without any additional configuration.
 
   ![MiniMax Chat interface](/images/tutorials/minimax/minimax-chat.png)
 
@@ -217,7 +233,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `https://ai-gateway.vercel.sh/v1` |
   | **API Key** | Your AI Gateway API key from the [Vercel dashboard](https://vercel.com/docs/ai-gateway/authentication/api-keys) |
-  | **Model IDs** | Auto-detected; optionally filter to specific gateway model IDs such as `anthropic/claude-opus-4.8` |
+  | **Model IDs** | Auto-detected; optionally filter to specific gateway model IDs such as `anthropic/claude-opus-5` |
 
   :::tip
   Vercel AI Gateway implements the OpenAI Chat Completions API, including `/models` and `/chat/completions`, so you can add it as a normal OpenAI-compatible connection in Open WebUI. Use the model IDs shown in the [AI Gateway model catalog](https://vercel.com/ai-gateway/models).
@@ -236,7 +252,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::tip
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
-  1. **Use an allowlist**: add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-4-5`, `google/gemini-2.5-pro`).
+  1. **Use an allowlist**: add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-5`, `google/gemini-3.6-flash`).
   2. **Enable model caching** via `Settings > Admin > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
   :::
 
@@ -527,7 +543,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   ```bash
   pip install litellm
-  litellm --model gpt-4 --port 4000
+  litellm --model gpt-5.6-sol --port 4000
   ```
 
   For production deployments, configure models via `litellm_config.yaml`. See the [LiteLLM docs](https://docs.litellm.ai/) for details.

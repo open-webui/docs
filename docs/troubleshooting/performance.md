@@ -34,7 +34,7 @@ By default, Open WebUI automates background tasks like title generation, tagging
 **Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid a large reasoning model: it spends seconds thinking, and charges you for those thinking tokens, before producing a three word chat title. Every major provider offers a small tier that suits this far better than its flagship.
 
 **Good options:**
-*   **External/Cloud**: `gpt-5.4-nano`, `gemini-3.5-flash-lite`, `claude-haiku-4-5-20251001` (OpenAI, Google and Anthropic directly, or the same models through OpenRouter).
+*   **External/Cloud**: `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `claude-haiku-4-5-20251001` (OpenAI, Google and Anthropic directly, or the same models through OpenRouter).
 *   **Local**: `qwen3.5:2b`, `gemma4:e2b`, `llama3.2:3b`.
 
 **Configuration:** the two model pickers, the parameters those background requests are sent with, and the switches for turning individual tasks off are all in **Settings > Admin > Interface**. See [Task Models](/features/administration/task-models) for the walkthrough.
@@ -516,7 +516,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 
 1.  **Embeddings**: Default (SentenceTransformers). *Runs on CPU, lightweight.*
 2.  **Audio**: `AUDIO_STT_ENGINE=webapi`. *Zero server load.*
-3.  **Task Model**: Disable or use tiny model (`llama3.2:1b`).
+3.  **Task Model**: Disable, or use a tiny model (`qwen3.5:0.8b`).
 4.  **Scaling**: Keep default `THREAD_POOL_SIZE` (40).
 5.  **Disable**: Image Gen, Code Interpreter, Autocomplete, Follow-ups.
 6.  **Database**: SQLite is fine, but cap its memory: `DATABASE_POOL_SIZE=8`, `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000`, `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`. The unset SQLite pool default is large (512); see [SQLite Memory Footprint on Constrained Containers](#4-sqlite-memory-footprint-on-constrained-containers).
@@ -525,7 +525,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 *Target: Max Quality & Speed, Local + External APIs.*
 
 1.  **Embeddings**: `RAG_EMBEDDING_ENGINE=openai` (or `ollama` with `nomic-embed-text` on a fast server).
-2.  **Task Model**: `gpt-5.4-nano` or `gemini-3.5-flash-lite`.
+2.  **Task Model**: `gpt-5.6-luna` or `gemini-3.5-flash-lite`.
 3.  **Caching**: `MODELS_CACHE_TTL=300`.
 4.  **Database**: `ENABLE_REALTIME_CHAT_SAVE=False` (Keeping this disabled is recommended even for single users to ensure maximum stability).
 5.  **Vector DB**: PGVector (recommended) or ChromaDB (either is fine unless dealing with massive data).

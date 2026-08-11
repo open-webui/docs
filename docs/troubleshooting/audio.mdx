@@ -54,7 +54,7 @@ User settings override admin defaults. If you're having issues, check both locat
 If you have an OpenAI API key, this is the simplest setup:
 
 **In Settings → Admin → Audio:**
-- **STT Engine:** `OpenAI` | **Model:** `whisper-1`
+- **STT Engine:** `OpenAI` | **Model:** `gpt-transcribe` (or the legacy `whisper-1`)
 - **TTS Engine:** `OpenAI` | **Model:** `tts-1` | **Voice:** `alloy`
 - Enter your OpenAI API key in both sections
 
@@ -76,8 +76,8 @@ environment:
 If you prefer Mistral's audio stack:
 
 **In Settings → Admin → Audio:**
-- **STT Engine:** `MistralAI` | **Model:** `voxtral-mini-latest` (or leave empty)
-- **TTS Engine:** `MistralAI` | **Model:** `mistral-tts-latest` (or leave empty) | **Voice:** choose from list
+- **STT Engine:** `MistralAI` | **Model:** `voxtral-mini-2602`
+- **TTS Engine:** `MistralAI` | **Model:** `voxtral-tts-26-03` | **Voice:** choose from list
 - Enter your Mistral API key in both sections
 
 Or via environment variables:
@@ -87,7 +87,7 @@ environment:
   - AUDIO_STT_MISTRAL_API_KEY=...
   - AUDIO_TTS_ENGINE=mistral
   - AUDIO_TTS_MISTRAL_API_KEY=...
-  - AUDIO_TTS_MODEL=mistral-tts-latest
+  - AUDIO_TTS_MODEL=voxtral-tts-26-03
 ```
 
 → See guides: [Mistral Voxtral STT](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) | [Mistral TTS](/features/chat-conversations/audio/text-to-speech/mistral-tts-integration)

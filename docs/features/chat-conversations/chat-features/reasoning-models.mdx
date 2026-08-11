@@ -180,7 +180,7 @@ For a `llama.cpp` connection it looks like:
 
 - **Detection is unchanged.** Reasoning is detected from incoming streams the same way it always was: `<think>`-style tag matching for Path 1, `reasoning_content` / `reasoning` / `thinking` deltas for Path 2. The provider-aware behavior added here only governs how Path 2 reasoning is **rebuilt** when the message is replayed.
 - **Within-turn vs. cross-turn use the same logic.** The same rebuild rules apply whether Open WebUI is sending the message inside a multi-step tool-call loop or building the payload for a fresh user turn.
-- **Most users are on Path 1.** Models that emit `<think>` tags inline (the DeepSeek-R1 family on Ollama, Qwen3, MiniMax M2.5, etc.) keep their reasoning in `content` and continue to round-trip without any provider configuration.
+- **Most users are on Path 1.** Models that emit `<think>` tags inline (the DeepSeek-R1 family on Ollama, Qwen3, MiniMax M3, etc.) keep their reasoning in `content` and continue to round-trip without any provider configuration.
 
 ---
 
@@ -212,7 +212,7 @@ When using the Open WebUI API with reasoning models:
 
 ```json
 {
-  "model": "qwen3:32b",
+  "model": "qwen3.6:27b",
   "messages": [
     {"role": "user", "content": "Solve: What is 234 * 567?"}
   ],
@@ -383,11 +383,11 @@ There is no standard way for storing reasoning content as part of the API payloa
 This limitation applies specifically to combining Anthropic's extended thinking with tool calls. Extended thinking works without tool calls, and tool calls work without extended thinking. The issue only occurs when using both features together via the Anthropic API.
 :::
 
-### Stateful Reasoning Models (GPT-5.2, etc.)
+### Stateful Reasoning Models (GPT-5.6, etc.)
 
 **Symptom:** Using a model that hides its reasoning (stateful/internal reasoning), and reasoning is not being preserved.
 
-**Cause:** Some newer models (like GPT-5.2) keep their reasoning internal and don't expose it in the API response. Open WebUI can only preserve reasoning that is actually returned by the model.
+**Cause:** Some newer models (like GPT-5.6) keep their reasoning internal and don't expose it in the API response. Open WebUI can only preserve reasoning that is actually returned by the model.
 
 **Behavior:** If the model returns a reasoning summary instead of full reasoning content, that summary is what gets preserved and sent back.
 

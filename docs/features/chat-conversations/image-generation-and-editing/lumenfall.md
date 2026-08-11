@@ -21,7 +21,7 @@ Open WebUI also supports image generation through [Lumenfall](https://lumenfall.
 3. Change the `API Base URL` to `https://api.lumenfall.ai/openai/v1`.
 4. Enter your Lumenfall API key.
 5. The API version can be left blank.
-6. Enter the model you wish to use. For example: `gemini-3-pro-image`, `gpt-image-1.5`, or `flux.2-max`. See all available models at [lumenfall.ai/models](https://lumenfall.ai/models).
+6. Enter the model you wish to use. For example: `gemini-3.1-flash-image`, `gpt-image-2`, or `flux.2-max`. See all available models at [lumenfall.ai/models](https://lumenfall.ai/models).
 7. Set the image size (e.g. `1024x1024`). Supported sizes depend on the model - if unsure, `1024x1024` works with most models.
 
 ![Screenshot of the Open WebUI Images settings page configured with Lumenfall.](/images/image-generation-and-editing/lumenfall-settings.png)
@@ -35,6 +35,6 @@ Lumenfall also supports image editing through the same API:
 3. Set the `Image Edit Engine` to `Default (Open AI)`.
 4. Enter the same `API Base URL`: `https://api.lumenfall.ai/openai/v1`.
 5. Enter your Lumenfall API key.
-6. Choose a model that supports editing (e.g. `gpt-image-1.5`).
+6. Choose a model that supports editing (e.g. `gpt-image-2`).
 
 For more details, see the [Lumenfall documentation](https://docs.lumenfall.ai/integrations/openwebui).

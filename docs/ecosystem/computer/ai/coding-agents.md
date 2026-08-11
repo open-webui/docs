@@ -62,7 +62,7 @@ Profile mode: **auto** (selectable only when ready), **enabled** (force), or **d
 
 ## Models, sessions, and the Home field
 
-- **Models:** leave the profile's model list empty to auto-detect from the CLI, or pin a manual list. Model ids look like `agent:claude/claude-sonnet-4-5`.
+- **Models:** leave the profile's model list empty to auto-detect from the CLI, or pin a manual list. Model ids look like `agent:claude/claude-sonnet-5`.
 - **Sessions resume automatically.** Each backend returns a session or thread id that is stored on the chat and passed back next turn (Claude Code SDK session, Codex thread resume, Cursor/Grok/Cline session load). Close the tab, open the chat on your phone, and the agent continues where it left off.
 - **Home:** point the profile at an alternate agent config/login directory. This is useful for a second account or an isolated login kept apart from your default `~` config.
 

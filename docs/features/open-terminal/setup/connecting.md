@@ -87,7 +87,7 @@ If the model is set to **Legacy**, Open WebUI falls back to prompt-based tool ca
 :::
 
 :::tip Performance depends on the model
-Not all models are equally capable with tools. Frontier models (GPT-5.4, Claude Sonnet 4.6, Gemini 3.1 Pro) handle multi-step terminal workflows well. Smaller or older models may struggle with complex tasks, fail to invoke tools, or produce malformed tool calls. If results are poor, try a more capable model.
+Not all models are equally capable with tools. Multi-step terminal workflows are the most demanding agentic use case in Open WebUI, so this is one place where a top-tier model genuinely pays off — GPT-5.6 Sol, Claude Opus 5, or Gemini 3.5 Pro. A current mid-tier model (GPT-5.6 Terra, Claude Sonnet 5, Gemini 3.6 Flash, MiniMax M3) is the practical **minimum**. Older or very small models may fail to invoke tools or produce malformed tool calls. If results are poor, try a more capable model.
 :::
 
 ### 9. Try it out

@@ -7,8 +7,10 @@ title: "Agentic Search & URL Fetching"
 
 Open WebUI's web search has evolved from simple result injection to a fully **agentic research system**. By enabling **Native Function Calling (Agentic Mode)**, you allow quality models to independently explore the web, verify facts, and follow links autonomously.
 
-:::tip Quality Models Required
-Agentic web search works best with frontier models like **GPT-5**, **Claude 4.5+**, **Gemini 3+**, or **MiniMax M2.5** that can reason about search results and decide when to dig deeper. Small local models may struggle with the multi-step reasoning required.
+:::tip Minimum model tier (not a maintained list)
+Agentic web search needs a model that can call tools reliably and decide when to dig deeper. That does **not** mean a frontier model — cheap and fast is fine. **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B** all handle this well and are the **minimum**, each verified working at the time of writing. Only genuinely old or very small models struggle with the multi-step reasoning.
+
+**This list is not continuously updated** — chasing every model release is impossible and adds no value. Use whatever current model your provider offers; you don't need the latest *and greatest*, just something recent.
 :::
 
 :::info Central Tool Documentation
@@ -27,7 +29,7 @@ For comprehensive information about all built-in agentic tools (including web se
 
 ## How to Enable Agentic Behavior
 
-To unlock these features, your model must support native tool calling and have strong reasoning capabilities (e.g., GPT-5, Claude 4.5 Sonnet, Gemini 3 Flash, MiniMax M2.5). Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+To unlock these features, your model needs native tool calling and reasonable multi-step reasoning — at minimum something like GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 1.  **Enable Web Search Globally**: Ensure a search engine is configured in **Settings → Admin → Web Search**.
 2.  **Enable Model Capability**: In **Settings → Admin → Models**, select your model and enable the **Web Search** capability.

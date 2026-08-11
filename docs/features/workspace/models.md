@@ -20,7 +20,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 **Wrap any model with custom instructions, tools, and knowledge to build specialized agents.**
 
-The Models workspace lets you create configuration presets that sit on top of any base model. Pick GPT-4o, Claude, Llama 3, or anything else connected to Open WebUI, then bind a system prompt, knowledge bases, tools, skills, and parameter overrides to it. The result is a purpose-built agent that behaves exactly the way you need without modifying the underlying model.
+The Models workspace lets you create configuration presets that sit on top of any base model. Pick GPT-5.6, Claude, Qwen 3.6, or anything else connected to Open WebUI, then bind a system prompt, knowledge bases, tools, skills, and parameter overrides to it. The result is a purpose-built agent that behaves exactly the way you need without modifying the underlying model.
 
 A "Python Tutor" that always uses your style guide. A "Meeting Summarizer" with your company's template. A "Code Reviewer" with your linting rules baked in. Every agent is a thin wrapper: pick a base model, configure it, and share it with your team.
 
@@ -30,7 +30,7 @@ A "Python Tutor" that always uses your style guide. A "Meeting Summarizer" with 
 
 ### One base model, many personas
 
-The same GPT-4o can power a coding assistant, a customer support bot, and a creative writer. Each preset has its own system prompt, tools, and knowledge, so the model behaves differently depending on which preset is selected.
+The same GPT-5.6 can power a coding assistant, a customer support bot, and a creative writer. Each preset has its own system prompt, tools, and knowledge, so the model behaves differently depending on which preset is selected.
 
 ### Knowledge and tools come pre-attached
 
@@ -320,7 +320,7 @@ The practical consequence: anyone who should use your curated model must also ha
 
 This is the reliable way to give everyone a single curated experience:
 
-1. Set the base model (for example "GPT-4o") to **Public**, so every intended user passes the base-access check.
+1. Set the base model (for example "GPT-5.6") to **Public**, so every intended user passes the base-access check.
 2. **Hide** the base model (ellipsis **...** > **Hide**) so it does not appear in the model selector.
 3. Create a curated workspace model on top of that base. Give it its own name, avatar, system prompt, knowledge and tools, then share it with your users (or leave it public).
 

@@ -89,8 +89,8 @@ The assistant message must appear in both locations:
   "content": "",
   "parentId": "<user-msg-id>",
   "childrenIds": [],
-  "model": "gpt-4o",
-  "modelName": "gpt-4o",
+  "model": "gpt-5.6-sol",
+  "modelName": "gpt-5.6-sol",
   "modelIdx": 0,
   "done": false,
   "timestamp": 1720000001
@@ -122,14 +122,14 @@ curl -X POST https://<host>/api/v1/chats/new \
   -d '{
     "chat": {
       "title": "New Chat",
-      "models": ["gpt-4o"],
+      "models": ["gpt-5.6-sol"],
       "messages": [
         {
           "id": "'"$USER_MSG_ID"'",
           "role": "user",
           "content": "Hi, what is the capital of France?",
           "timestamp": '"$TIMESTAMP"',
-          "models": ["gpt-4o"],
+          "models": ["gpt-5.6-sol"],
           "childrenIds": ["'"$ASSISTANT_MSG_ID"'"]
         },
         {
@@ -138,8 +138,8 @@ curl -X POST https://<host>/api/v1/chats/new \
           "content": "",
           "parentId": "'"$USER_MSG_ID"'",
           "childrenIds": [],
-          "model": "gpt-4o",
-          "modelName": "gpt-4o",
+          "model": "gpt-5.6-sol",
+          "modelName": "gpt-5.6-sol",
           "modelIdx": 0,
           "done": false,
           "timestamp": '"$((TIMESTAMP + 1))"'
@@ -153,7 +153,7 @@ curl -X POST https://<host>/api/v1/chats/new \
             "role": "user",
             "content": "Hi, what is the capital of France?",
             "timestamp": '"$TIMESTAMP"',
-            "models": ["gpt-4o"],
+            "models": ["gpt-5.6-sol"],
             "childrenIds": ["'"$ASSISTANT_MSG_ID"'"]
           },
           "'"$ASSISTANT_MSG_ID"'": {
@@ -162,8 +162,8 @@ curl -X POST https://<host>/api/v1/chats/new \
             "content": "",
             "parentId": "'"$USER_MSG_ID"'",
             "childrenIds": [],
-            "model": "gpt-4o",
-            "modelName": "gpt-4o",
+            "model": "gpt-5.6-sol",
+            "modelName": "gpt-5.6-sol",
             "modelIdx": 0,
             "done": false,
             "timestamp": '"$((TIMESTAMP + 1))"'
@@ -199,7 +199,7 @@ curl -X POST https://<host>/api/chat/completions \
         "content": "Hi, what is the capital of France?"
       }
     ],
-    "model": "gpt-4o",
+    "model": "gpt-5.6-sol",
     "stream": true,
     "background_tasks": {
       "title_generation": true,
@@ -245,7 +245,7 @@ curl -X POST https://<host>/api/chat/completions \
         "content": "Hi, what is the capital of France?"
       }
     ],
-    "model": "gpt-4o",
+    "model": "gpt-5.6-sol",
     "stream": true,
     "files": [
       {
@@ -364,7 +364,7 @@ curl -X POST https://<host>/api/v1/chats/<chatId> \
             "parentId": "'"$ASSISTANT_MSG_ID"'",
             "childrenIds": ["'"$NEW_ASSISTANT_MSG_ID"'"],
             "timestamp": '"$(date +%s)"',
-            "models": ["gpt-4o"]
+            "models": ["gpt-5.6-sol"]
           },
           "'"$NEW_ASSISTANT_MSG_ID"'": {
             "id": "'"$NEW_ASSISTANT_MSG_ID"'",
@@ -372,8 +372,8 @@ curl -X POST https://<host>/api/v1/chats/<chatId> \
             "content": "",
             "parentId": "'"$NEW_USER_MSG_ID"'",
             "childrenIds": [],
-            "model": "gpt-4o",
-            "modelName": "gpt-4o",
+            "model": "gpt-5.6-sol",
+            "modelName": "gpt-5.6-sol",
             "modelIdx": 0,
             "done": false,
             "timestamp": '"$(($(date +%s) + 1))"'
@@ -395,7 +395,7 @@ curl -X POST https://<host>/api/chat/completions \
       { "role": "assistant", "content": "The capital of France is Paris." },
       { "role": "user", "content": "Can you tell me more about Paris?" }
     ],
-    "model": "gpt-4o",
+    "model": "gpt-5.6-sol",
     "stream": true,
     "session_id": "<session-uuid>"
   }'
@@ -446,7 +446,7 @@ This cleaning process handles:
 {
   "id": "chat-uuid-12345",
   "title": "New Chat",
-  "models": ["gpt-4o"],
+  "models": ["gpt-5.6-sol"],
   "files": [],
   "tags": [],
   "params": {
@@ -460,7 +460,7 @@ This cleaning process handles:
       "role": "user",
       "content": "Hi, what is the capital of France?",
       "timestamp": 1720000000,
-      "models": ["gpt-4o"],
+      "models": ["gpt-5.6-sol"],
       "childrenIds": ["assistant-msg-id"]
     },
     {
@@ -469,8 +469,8 @@ This cleaning process handles:
       "content": "",
       "parentId": "user-msg-id",
       "childrenIds": [],
-      "model": "gpt-4o",
-      "modelName": "gpt-4o",
+      "model": "gpt-5.6-sol",
+      "modelName": "gpt-5.6-sol",
       "modelIdx": 0,
       "done": false,
       "timestamp": 1720000001
@@ -484,7 +484,7 @@ This cleaning process handles:
         "role": "user",
         "content": "Hi, what is the capital of France?",
         "timestamp": 1720000000,
-        "models": ["gpt-4o"],
+        "models": ["gpt-5.6-sol"],
         "childrenIds": ["assistant-msg-id"]
       },
       "assistant-msg-id": {
@@ -493,8 +493,8 @@ This cleaning process handles:
         "content": "",
         "parentId": "user-msg-id",
         "childrenIds": [],
-        "model": "gpt-4o",
-        "modelName": "gpt-4o",
+        "model": "gpt-5.6-sol",
+        "modelName": "gpt-5.6-sol",
         "modelIdx": 0,
         "done": false,
         "timestamp": 1720000001
@@ -517,7 +517,7 @@ This cleaning process handles:
       "content": "Hi, what is the capital of France?"
     }
   ],
-  "model": "gpt-4o",
+  "model": "gpt-5.6-sol",
   "stream": true,
   "background_tasks": {
     "title_generation": true,
@@ -568,7 +568,7 @@ This cleaning process handles:
       "role": "user",
       "content": "Hi, what is the capital of France?",
       "timestamp": 1720000000,
-      "models": ["gpt-4o"],
+      "models": ["gpt-5.6-sol"],
       "childrenIds": ["assistant-msg-id"]
     },
     "assistant-msg-id": {
@@ -577,8 +577,8 @@ This cleaning process handles:
       "content": "The capital of France is Paris.",
       "parentId": "user-msg-id",
       "childrenIds": [],
-      "model": "gpt-4o",
-      "modelName": "gpt-4o",
+      "model": "gpt-5.6-sol",
+      "modelName": "gpt-5.6-sol",
       "modelIdx": 0,
       "timestamp": 1720000001
     }
@@ -596,7 +596,7 @@ This cleaning process handles:
   "role": "user",
   "content": "Hi, what is the capital of France?",
   "timestamp": 1720000000,
-  "models": ["gpt-4o"],
+  "models": ["gpt-5.6-sol"],
   "childrenIds": ["assistant-msg-id"]
 }
 ```
@@ -610,8 +610,8 @@ This cleaning process handles:
   "content": "The capital of France is Paris.",
   "parentId": "user-msg-id",
   "childrenIds": [],
-  "model": "gpt-4o",
-  "modelName": "gpt-4o",
+  "model": "gpt-5.6-sol",
+  "modelName": "gpt-5.6-sol",
   "modelIdx": 0,
   "done": true,
   "timestamp": 1720000001
@@ -629,14 +629,14 @@ This cleaning process handles:
   "title": "New Chat",
   "chat": {
     "title": "New Chat",
-    "models": ["gpt-4o"],
+    "models": ["gpt-5.6-sol"],
     "messages": [
       {
         "id": "user-msg-id",
         "role": "user",
         "content": "Hi, what is the capital of France?",
         "timestamp": 1720000000,
-        "models": ["gpt-4o"],
+        "models": ["gpt-5.6-sol"],
         "childrenIds": ["assistant-msg-id"]
       },
       {
@@ -645,8 +645,8 @@ This cleaning process handles:
         "content": "",
         "parentId": "user-msg-id",
         "childrenIds": [],
-        "model": "gpt-4o",
-        "modelName": "gpt-4o",
+        "model": "gpt-5.6-sol",
+        "modelName": "gpt-5.6-sol",
         "modelIdx": 0,
         "done": false,
         "timestamp": 1720000001
@@ -660,7 +660,7 @@ This cleaning process handles:
           "role": "user",
           "content": "Hi, what is the capital of France?",
           "timestamp": 1720000000,
-          "models": ["gpt-4o"],
+          "models": ["gpt-5.6-sol"],
           "childrenIds": ["assistant-msg-id"]
         },
         "assistant-msg-id": {
@@ -669,8 +669,8 @@ This cleaning process handles:
           "content": "",
           "parentId": "user-msg-id",
           "childrenIds": [],
-          "model": "gpt-4o",
-          "modelName": "gpt-4o",
+          "model": "gpt-5.6-sol",
+          "modelName": "gpt-5.6-sol",
           "modelIdx": 0,
           "done": false,
           "timestamp": 1720000001
@@ -691,7 +691,7 @@ This cleaning process handles:
   "id": "chat-uuid-12345",
   "title": "Capital of France Discussion",
   "chat": {
-    "models": ["gpt-4o"],
+    "models": ["gpt-5.6-sol"],
     "history": {
       "currentId": "assistant-msg-id",
       "messages": {
@@ -700,7 +700,7 @@ This cleaning process handles:
           "role": "user",
           "content": "Hi, what is the capital of France?",
           "timestamp": 1720000000,
-          "models": ["gpt-4o"],
+          "models": ["gpt-5.6-sol"],
           "childrenIds": ["assistant-msg-id"]
         },
         "assistant-msg-id": {
@@ -709,8 +709,8 @@ This cleaning process handles:
           "content": "The capital of France is Paris. Paris is not only the capital but also the most populous city in France, known for its iconic landmarks such as the Eiffel Tower, the Louvre Museum, and Notre-Dame Cathedral.",
           "parentId": "user-msg-id",
           "childrenIds": [],
-          "model": "gpt-4o",
-          "modelName": "gpt-4o",
+          "model": "gpt-5.6-sol",
+          "modelName": "gpt-5.6-sol",
           "modelIdx": 0,
           "done": true,
           "timestamp": 1720000001
@@ -740,12 +740,12 @@ This cleaning process handles:
 
 ```json
 {
-  "id": "gpt-4o",
-  "name": "GPT-4 Optimized",
-  "model": "gpt-4o",
-  "base_model_id": "gpt-4o",
+  "id": "gpt-5.6-sol",
+  "name": "GPT-5.6 Sol",
+  "model": "gpt-5.6-sol",
+  "base_model_id": "gpt-5.6-sol",
   "meta": {
-    "description": "Most advanced GPT-4 model optimized for performance",
+    "description": "OpenAI's frontier model for complex professional work",
     "capabilities": ["text", "vision", "function_calling"],
     "context_length": 128000,
     "max_output_tokens": 4096
@@ -822,7 +822,7 @@ This cleaning process handles:
 **Model Names:**
 
 - Must match available models in your Open WebUI instance
-- Common examples: `gpt-4o`, `gpt-3.5-turbo`, `claude-3-sonnet`
+- Common examples: `gpt-5.6-sol`, `gpt-5.6-luna`, `claude-sonnet-5`
 
 **Session IDs:**
 
