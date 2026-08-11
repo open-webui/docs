@@ -87,7 +87,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 **To Fix This:** Navigate to **Settings > Admin > AI > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-4 Turbo with 128k tokens).
 :::
 
-For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can.
+For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. If it cannot, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 :::tip
 
@@ -345,18 +345,18 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 The built-in CSV parser turns each data row into a document of its own, so nothing in the parsed text states how big the table is or which columns it has. Ask a model how many orders a spreadsheet contains and it can only count the rows that happened to be retrieved.
 
-Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) puts one line describing the shape of the table in front of the parsed rows of every `.csv` file:
+Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default) puts one line describing the shape of the table in front of the parsed rows of every `.csv` file:
 
 ```
 Table: 501 rows incl. header; 500 data rows; 4 columns: id, name, region, revenue.
 ```
 
-The column names come from the first row, the column count is that of the widest row, and the delimiter is detected from the start of the file (falling back to a comma). The line becomes the first part of the file's extracted content, so it is indexed as a chunk like any other and is always present when the file is used with **Using Entire Document**. It is off by default.
+The column names come from the first row, the column count is that of the widest row, and the delimiter is detected from the start of the file (falling back to a comma). The line becomes the first part of the file's extracted content, so it is indexed as a chunk like any other and is always present when the file is used with **Using Entire Document**.
 
 :::info Which files get a summary
-The summary comes from Open WebUI's own CSV parser, so it does not apply when the content extraction engine handles the CSV itself: `external`, `tika` and `docling` all read CSVs their own way. Every other engine leaves CSVs to the built-in parser, so the summary applies there.
+The summary comes from Open WebUI's own CSV parser, so it does not apply when a `.csv` never reaches that parser. With the `external` engine every file goes to the external loader instead, and with `tika` or `docling` a `.csv` is read as plain text. Every other engine leaves `.csv` files to the built-in parser, so the summary applies there.
 
-Only files parsed after you turn the setting on get a summary line. Re-indexing reuses the text that was already extracted, so existing CSVs must be re-uploaded.
+Only files parsed after you turn the setting on get a summary line. Re-indexing reuses the text that was already extracted, so existing CSVs have to be re-uploaded.
 :::
 
 ## Google Drive Integration

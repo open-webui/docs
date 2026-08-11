@@ -263,7 +263,7 @@ Setting `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True` switches to c-ares, which resol
 
 *   **Where the win is**: instances doing hundreds of concurrent outbound requests, especially alongside blocking work such as vector-DB batch upserts.
 *   **Where it is not**: anything below that. At low concurrency the two resolvers are indistinguishable on a real network.
-*   **Why it is opt-in**: c-ares does not resolve names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file but not the rest of `nsswitch.conf`, so `.local` via avahi/mDNS, NIS or LDAP backends and Windows NBNS names resolve differently or not at all. On some Windows hosts it finds no usable nameserver, and in Docker its channel has been observed to intermittently stop resolving container names. v0.11.0 enabled it unconditionally and those failures are what made it a switch.
+*   **Why it is opt-in**: c-ares does not resolve names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file but not the rest of `nsswitch.conf`, so `.local` via avahi/mDNS, NIS or LDAP backends and Windows NBNS names resolve differently or not at all. On some Windows hosts it finds no usable nameserver, and in Docker its channel has been observed to intermittently stop resolving container names. v0.11.0 enabled it unconditionally, and those failures are why it is a switch now.
 
 - **Env Var**: `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True`
   *   *Recommendation*: leave it off unless you have measured DNS as a bottleneck and confirmed c-ares resolves every name your deployment uses. Requires a restart.

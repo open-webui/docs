@@ -91,7 +91,7 @@ Press **Configure** to open the same list of controls a user sees in **Settings 
 2. Otherwise the instance default is used.
 3. If there is no instance default, the built-in default is used.
 
-Options a user has never touched are marked **Default** next to their control in **Settings > Interface**, and they keep tracking the instance default. Change the default later and everyone who has not overridden that option moves with it.
+An on/off option a user has never touched shows a small **Default** label beside its switch in **Settings > Interface**. The options that are not switches carry no such label, but they inherit in exactly the same way. Either way, change the instance default later and everyone who has not overridden that option moves with it.
 
 :::info Setting an option back to the default releases it
 Open WebUI only stores the options a user actually differs on. Moving a control back to whatever the instance default currently is drops it from the user's own settings, so it goes back to being inherited and follows future changes to the default again.
@@ -134,7 +134,7 @@ If the admin has enabled **Direct Connections**, you can add personal API keys i
 **"I set a system prompt but my admin's model settings override it."**
 Model-level settings configured by admins in the Workspace take precedence over personal settings. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
 
-**"An option in Settings > Interface says Default next to it. What does that mean?"**
+**"A switch in Settings > Interface has Default written next to it. What does that mean?"**
 It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](#default-interface-settings-admin) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
 
 **"I am the admin. Can I make everyone start with the same interface options?"**

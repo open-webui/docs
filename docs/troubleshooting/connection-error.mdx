@@ -248,7 +248,7 @@ After running the above, your WebUI should be available at `http://localhost:808
 
 ### Cause
 
-Open WebUI resolves hostnames through the operating system resolver. Between v0.11.0 and this release it resolved them through c-ares instead, which the `aiodns` package activates inside aiohttp for the whole process. c-ares does not behave the same everywhere:
+Open WebUI resolves hostnames through the operating system resolver. v0.11.0 resolved them through c-ares instead, which the `aiodns` package activates inside aiohttp for the whole process with no way to opt out. c-ares does not behave the same everywhere:
 
 - On some Windows hosts it discovers only `127.0.0.1:53` as a nameserver, so no external name resolves at all.
 - In Docker its long-lived channel intermittently stops resolving container names, even though Docker's embedded DNS is still answering. The symptom is a wiped model list and in-flight chats failing with a misleading "Model not found", since a name that will not resolve is indistinguishable from a provider that has no such model.
