@@ -235,17 +235,12 @@ See [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-repli
 
 #### Log Level
 
-The log level decides how much work the backend does as well as how much it prints. Messages the level filters out are never built, so raising the level saves CPU as well as log volume. At the default `INFO` the backend's debug messages already cost nothing; `WARNING` extends that to the informational ones.
-
-*   **Where the win is**: the saving follows the size of the text that would have been discarded, so it is largest on busy servers, in long conversations and on chats that draw from a large knowledge base. Chat requests, retrieval, file upload and indexing and OAuth/LDAP sign-in all carry log calls of that kind.
-*   **Where it is not**: a quiet single-user instance. Fewer requests means fewer discarded messages, and the saving disappears against model latency.
-*   **What it costs you**: `WARNING` drops the `INFO` lines that record startup, key events and request handling. If your log aggregator or your support workflow relies on those, keep `INFO`.
-*   **What to avoid**: leaving `DEBUG` on in production. It is the most expensive level to run, because everything it adds is genuinely built and written, whole chat request payloads included.
+Messages the level filters out are never built, so raising it saves CPU as well as log volume, most on busy servers and on chats drawing from a large knowledge base. `WARNING` also drops the `INFO` lines recording startup, key events and request handling, so keep `INFO` if your log aggregator relies on them.
 
 - **Env Var**: `GLOBAL_LOG_LEVEL=WARNING`
-  *   *Recommendation*: try it on a busy instance that does not depend on the `INFO` lines. Requires a restart.
+  *   *Recommendation*: try it on a busy instance that does not depend on the `INFO` lines. Never leave `DEBUG` on in production, it is the most expensive level to run. Requires a restart.
 
-See [Logging Open WebUI](/getting-started/advanced-topics/logging#what-the-log-level-costs) for the full explanation, and [`GLOBAL_LOG_LEVEL`](/reference/env-configuration#global_log_level) for the variable itself.
+See [What the Log Level Costs](../getting-started/advanced-topics/logging.md#what-the-log-level-costs) for the full explanation.
 
 #### Thread Pool Size
 Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count. Threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
@@ -268,18 +263,12 @@ Long LLM completions can exceed default HTTP client timeouts. Configure these to
 
 #### DNS Resolver
 
-Every model call, web search fetch, document fetch and tool call begins by turning a hostname into an address. By default Open WebUI asks the operating system to do that, and those lookups queue: they wait behind each other and behind other background work, so under load a lookup that should take milliseconds can take a second or more before the request it belongs to even starts.
-
-Setting `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True` switches to the faster c-ares resolver, which does not queue. Many simultaneous lookups then take about as long as one, and a heavy background job can no longer hold up name lookups for everyone else on the instance. On a busy instance that is a delay removed from the front of every outbound request, so it is worth trying.
-
-*   **Where the win is largest**: instances making many outbound requests at once, especially alongside heavy background work such as bulk vector-database writes.
-*   **Where you will not notice it**: a quiet or single-user instance. With only a handful of lookups in flight the two are indistinguishable.
-*   **What to watch for**: c-ares does not find names the same way the rest of the machine does. It reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving. On some Windows hosts it finds no usable nameserver at all, and in Docker it has been seen to intermittently stop resolving container names. v0.11.0 used it unconditionally, which is how those cases came to light, and it is a switch now for exactly that reason.
+By default Open WebUI asks the operating system to resolve hostnames, and those lookups queue behind each other and behind other background work, so under load a lookup that should take milliseconds delays the request it belongs to. The c-ares resolver does not queue, so many simultaneous lookups take about as long as one. The win is largest on instances making many outbound requests at once and invisible on a quiet one.
 
 - **Env Var**: `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True`
-  *   *Recommendation*: try it. Requires a restart. Afterwards, exercise your models, web search and any internal services you point Open WebUI at, and switch it back off if lookups start failing.
+  *   *Recommendation*: try it, then exercise your models, web search and any internal services and switch it back off if lookups start failing. Requires a restart.
 
-See [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the variable itself, and [Intermittent Name Lookup Failures](/troubleshooting/connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
+c-ares reads fewer name sources than the operating system does, so read [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](../reference/env-configuration.mdx#aiohttp_client_async_dns_resolver) before leaving it on. See [Intermittent Name Lookup Failures](./connection-error.mdx#-intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
 
 #### Container Resource Limits
 For Docker deployments, ensure adequate resource allocation:

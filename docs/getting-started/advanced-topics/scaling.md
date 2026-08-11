@@ -208,13 +208,13 @@ For the full breakdown of what it covers, the two behaviour differences worth kn
 
 ### Speed Up Name Lookups
 
-Every outbound request starts by turning a hostname into an address, and by default those lookups queue behind each other under load. The faster c-ares resolver removes that queue, so many simultaneous lookups take about as long as one:
+Hostname lookups queue behind each other under load, delaying the request each one belongs to. The c-ares resolver removes that queue:
 
 ```
 AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 ```
 
-It is opt-in because c-ares reads `/etc/resolv.conf` and the hosts file but not other name sources, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving. Exercise your models, web search and any internal services afterwards, and switch it back off if lookups start failing. See [Performance → DNS Resolver](/troubleshooting/performance#dns-resolver) for the full trade-off.
+It is opt-in because c-ares reads fewer name sources than the operating system does. See [DNS Resolver](../../troubleshooting/performance.md#dns-resolver) for the trade-off and what to test afterwards.
 
 ---
 
