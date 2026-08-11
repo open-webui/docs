@@ -191,13 +191,7 @@ Administrators can control sharing via environment variables or the Admin Panel:
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) for internal sharing (default `False`)
 * [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_notes_allow_public_sharing) for public links (default `False`)
 
-These can also be configured in **Admin Panel > Users > Groups > Default Permissions**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless.
-
-:::warning Check Notes Public Sharing after an upgrade
-
-If your instance was upgraded from a release that predates the **Notes Public Sharing** permission and you saved the permissions page at any point since, the setting may have been written to the database as enabled without anyone turning it on. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
-
-:::
+These can also be configured in **Settings > Admin > Users > Groups**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 ### Attachments
 
