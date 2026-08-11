@@ -158,7 +158,7 @@ From the model list, click the ellipsis (**...**) on any model:
 
 ### Enabled and disabled
 
-Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Admin > Models** alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **Model not found**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
+Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Admin > Models** alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **"Model not found"**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
 
 **Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it.
 

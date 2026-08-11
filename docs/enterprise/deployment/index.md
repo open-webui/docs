@@ -71,6 +71,8 @@ ENABLE_DB_MIGRATIONS=false
 
 :::warning Database Migrations
 Set `ENABLE_DB_MIGRATIONS=false` on **all instances except one**. During updates, scale down to a single instance, allow migrations to complete, then scale back up. Concurrent migrations can corrupt your database.
+
+Rolling updates are not supported across a release that changes the schema, whatever rolling-deployment machinery your platform offers: every instance has to move to the new version at once, and old and new instances must never serve traffic against the same database at the same time. Back the database up before you start. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations).
 :::
 
 For the complete step-by-step scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). For the full environment variable reference, see [Environment Variable Configuration](/reference/env-configuration).

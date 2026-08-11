@@ -280,9 +280,11 @@ For more details, see the [External Packages](/features/extensibility/plugin/too
 
 Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, potentially leading to race conditions or database schema corruption.
 
-Version skew is a separate and harder failure. Migrations move the schema forward for the whole database at once, and the still-running old instances keep issuing queries written against the old shape. Whether that survives depends entirely on what the release changed. v0.11.0 only adds columns and indexes, so an old instance left running through the upgrade keeps working. A release that renames or drops something does not: v0.10.0 renamed the `config` table to `config_old` and replaced it with a per-key table, and any older instance still querying `config` fails from the moment the migration lands. Releases are not labelled by which kind they are.
+Version skew is a separate and harder failure. Migrations move the schema forward for the whole database at once, and the still-running old instances keep issuing queries written against the old shape. Whether that survives depends entirely on what the release changed. The upgrade to v0.11.0 only added columns and indexes, so an old instance left running through it kept working. A release that renames or drops something does not: v0.10.0 renamed the `config` table to `config_old` and replaced it with a per-key table, and any older instance still querying `config` fails from the moment the migration lands. A third kind leaves the schema alone and rewrites rows that are already stored, so the old instances go on reading the same columns and find different values in them. Releases are not labelled by which kind they are, and comparing column lists before and after the upgrade does not tell you either.
 
 Treat every upgrade as the second kind. Stop all replicas and workers, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage, and there is no general zero-downtime path across a schema change.
+
+Back up the database before you start. Putting the old image back does not undo a migration: the schema stays where the migration left it, and rows a migration rewrote stay rewritten. Restoring a backup taken before the upgrade is the way back. See [Backup & Restore](/getting-started/updating#backup--restore).
 
 **Safe Update Procedure:**
 

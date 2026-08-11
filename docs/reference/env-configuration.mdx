@@ -1835,7 +1835,7 @@ Output:
 
 - Type: `str` (JSON)
 - Default: `[]`
-- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings.
+- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Admin > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) and saving it collapses the duplicates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MESSAGE_RATING`
@@ -7562,7 +7562,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption.
+- Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption. It decides **which** instance migrates and nothing else: it does not make a mixed-version fleet safe, so a release that changes the schema still has to reach every pod at once rather than one at a time. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations).
 
 :::warning
 
@@ -8267,6 +8267,8 @@ When `UVICORN_WORKERS > 1` or when running multiple replicas, starting the appli
 To handle migrations safely in multi-process/multi-pod environments, you can:
 1.  **Designate a Master (Recommended):** Set `ENABLE_DB_MIGRATIONS=False` on all but one instance/worker. The instance with `ENABLE_DB_MIGRATIONS=True` (default) will handle the migration, while others will wait or skip it.
 2.  **Scale Down:** Temporarily scale down to a single instance/worker to let migrations finish before scaling back up.
+
+Both options only settle **which** process runs the migration. Neither makes it safe to leave instances on the old version while the new one migrates, so roll a release that changes the schema out to every instance at once. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations).
 
 **For Kubernetes, Helm, and Orchestrated Setups:**
 It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a specific pod for migrations, or use an init container/job to handle migrations before scaling up the main application pods. This ensures schema updates are applied exactly once.

@@ -750,26 +750,31 @@ Things to know about the tag table:
 
 ## User Table
 
-| **Column Name**   | **Data Type** | **Constraints**  | **Description**            |
-| ----------------- | ------------- | ---------------- | -------------------------- |
-| id                | String        | PRIMARY KEY      | Unique identifier          |
-| username          | String(50)    | nullable         | User's unique username     |
-| name              | String        | -                | User's name                |
-| email             | String        | -                | User's email               |
-| role              | String        | -                | User's role                |
-| profile_image_url | Text          | -                | Profile image path         |
-| bio               | Text          | nullable         | User's biography           |
-| gender            | Text          | nullable         | User's gender              |
-| date_of_birth     | Date          | nullable         | User's date of birth       |
-| last_active_at    | BigInteger    | -                | Last activity timestamp    |
-| updated_at        | BigInteger    | -                | Last update timestamp      |
-| created_at        | BigInteger    | -                | Creation timestamp         |
-| api_key           | String        | UNIQUE, nullable | API authentication key     |
-| settings          | JSON          | nullable         | User preferences           |
-| info              | JSON          | nullable         | Additional user info       |
-| variables         | JSON          | nullable         | User variables substituted into system prompts |
-| oauth             | JSON          | nullable         | Identity provider subjects, keyed by provider |
-| scim              | JSON          | nullable         | SCIM provisioning data     |
+| **Column Name**          | **Data Type** | **Constraints**   | **Description**            |
+| ------------------------ | ------------- | ----------------- | -------------------------- |
+| id                       | String        | PRIMARY KEY       | Unique identifier          |
+| username                 | String(50)    | nullable          | User's handle              |
+| name                     | String        | NOT NULL          | User's name                |
+| email                    | String        | -                 | User's email               |
+| role                     | String        | default='pending' | User's role                |
+| profile_image_url        | Text          | -                 | Profile image path         |
+| profile_banner_image_url | Text          | nullable          | Profile banner image path  |
+| bio                      | Text          | nullable          | User's biography           |
+| gender                   | Text          | nullable          | User's gender              |
+| date_of_birth            | Date          | nullable          | User's date of birth       |
+| timezone                 | String        | nullable          | IANA time zone name        |
+| presence_state           | String        | nullable          | Presence state             |
+| status_emoji             | String        | nullable          | Emoji shown with the status |
+| status_message           | Text          | nullable          | Status text                |
+| status_expires_at        | BigInteger    | nullable          | Status expiry timestamp    |
+| last_active_at           | BigInteger    | -                 | Last activity timestamp    |
+| updated_at               | BigInteger    | -                 | Last update timestamp      |
+| created_at               | BigInteger    | -                 | Creation timestamp         |
+| settings                 | JSON          | nullable          | User preferences           |
+| info                     | JSON          | nullable          | Additional user info       |
+| variables                | JSON          | nullable          | User variables substituted into system prompts |
+| oauth                    | JSON          | nullable          | Identity provider subjects, keyed by provider |
+| scim                     | JSON          | nullable          | SCIM provisioning data     |
 
 Things to know about the user table:
 

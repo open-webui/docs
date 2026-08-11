@@ -65,7 +65,7 @@ Avoid the `:main` tag in production. It tracks the latest development build and 
 | **Storage** | Use object storage (S3, GCS, Azure Blob) or a shared filesystem (such as EFS). Container-local storage is ephemeral and not shared across tasks. |
 | **Tika sidecar** | Run Tika as a sidecar container in the same task definition, or as a separate service. Sidecar pattern keeps extraction traffic local. |
 | **Secrets management** | Use your platform's secrets manager (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) for `DATABASE_URL`, `REDIS_URL`, and `WEBUI_SECRET_KEY`. |
-| **Updates** | Perform a rolling deployment with a single task first. This task runs migrations (`ENABLE_DB_MIGRATIONS=true`). Once healthy, scale the remaining tasks with `ENABLE_DB_MIGRATIONS=false`. |
+| **Updates** | Scale the service down to a single task, deploy the new image on it (`ENABLE_DB_MIGRATIONS=true`), wait for it to become healthy, then scale the remaining tasks back up (`ENABLE_DB_MIGRATIONS=false`). Rolling updates are not supported across a release that changes the schema, so old and new tasks must never serve traffic at the same time. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations). |
 
 ## Anti-Patterns to Avoid
 

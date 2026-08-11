@@ -68,14 +68,14 @@ Need more depth? You can even replicate a [**Chatbot Arena**](https://lmarena.ai
 
 #### Configuring an Arena Model
 
-Arena models live in **Settings > Admin > Evaluations**. Switch **Arena Models** on and the **Models** section appears, listing the arena models you have created. Until you add one, a single default arena model is used and it draws from every model on the instance.
+Arena models live in **Settings > Admin > Evaluations**. Switch **Arena Models** on and a **Models** section appears listing the arena models you have created. Until you add one, a single default arena model is used and it draws from every model on the instance.
 
-Click the **+** button to add an arena model, or click an existing one to edit it. Alongside the name, ID, description and access control, each arena model carries its own pool of models:
+Use the **+** button to add an arena model, or the gear icon on an existing row to edit it. Alongside the name, ID, description and access control, each arena model carries its own pool of models:
 
 - Pick models one at a time from the **Select a model** dropdown and click **+**. Leave the list empty to draw from every model.
 - The **Include** / **Exclude** button above the list flips whether the models you listed are the pool or are the ones kept out of it.
 
-A model can sit in the list only once. The dropdown offers only models that are not already listed, so there is nothing left to pick twice. That matters because every message draws one model from the pool at random, and an ID stored twice is drawn twice as often. Opening an arena model whose stored list still contains duplicates collapses them, and saving writes the cleaned list back.
+A model can sit in the list only once. The dropdown offers only models that are not already listed, so there is nothing left to pick twice. That matters in **Include** mode, where every message draws one model from the list at random and an ID stored twice is drawn twice as often. Opening an arena model whose stored list still contains duplicates collapses them, and saving writes the cleaned list back.
 
 ### **2. Normal Interaction**
 
