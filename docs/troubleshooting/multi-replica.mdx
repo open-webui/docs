@@ -276,9 +276,7 @@ For more details, see the [External Packages](/features/extensibility/plugin/too
 
 Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, potentially leading to race conditions or database schema corruption.
 
-Version skew is a separate and harder failure. Migrations move the schema forward for the whole database at once, and the still-running old instances keep issuing queries written against the old shape. Whether that survives depends entirely on what the release changed. The upgrade to v0.11.0 only added columns and indexes, so an old instance left running through it kept working. A release that renames or drops something does not: v0.10.0 renamed the `config` table to `config_old` and replaced it with a per-key table, and any older instance still querying `config` fails from the moment the migration lands. A third kind leaves the schema alone and rewrites rows that are already stored, so the old instances go on reading the same columns and find different values in them. Releases are not labelled by which kind they are, and comparing column lists before and after the upgrade does not tell you either.
-
-Treat every upgrade as the second kind. Stop all replicas and workers, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage, and there is no general zero-downtime path across a schema change.
+Stop all replicas and workers, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage, and there is no general zero-downtime path across a schema change.
 
 Back up the database before you start. Putting the old image back does not undo a migration: the schema stays where the migration left it, and rows a migration rewrote stay rewritten. Restoring a backup taken before the upgrade is the way back. See [Backup & Restore](/getting-started/updating#backup--restore).
 
@@ -333,8 +331,6 @@ Every Socket.IO event in a multi-replica deployment is published through Redis, 
 | The output a Jupyter server returns for code run in chat | Only when the code execution or code interpreter engine is set to Jupyter. The cost follows how much a run prints and how many images it produces, so the difference shows on chart-heavy or output-heavy runs |
 
 **Why it is opt-in.** orjson is stricter than the standard library, so the default keeps behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
-
-orjson is also narrower in what it can be asked to do: it always writes compact output, and it has fixed rules of its own for values the standard library will not encode at all. Encoding that asks for something outside that, indented output or a custom rule for converting values before they are written, is handed to the standard library as well, so the request is honoured instead of being dropped and the result matches what the same code produces with the setting off.
 
 Two differences do survive the fallback, neither of which affects a normal deployment:
 
