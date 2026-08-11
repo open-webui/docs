@@ -48,13 +48,13 @@ The dashboard described here is the instance-wide admin view. Separately, **ever
 
 It is scoped strictly to the signed-in user's own data:
 
-- Token totals (input and output), both lifetime and for the selected period
+- Token totals (input and output), both lifetime and for the period covered
 - Message and chat counts, and the number of days they were active
 - An activity heatmap, viewable by day, by week, or as a cumulative total
 - Current and longest activity streaks
 - Their most-used models and tools
 
-The period is selectable, and the data is bucketed in the user's own timezone. Because it only ever reports the requesting user's own activity, it exposes nothing about anyone else's.
+The period covered is the past two years (the last 730 days), the same window for every account regardless of when it was created, and the data is bucketed in the user's own timezone. Because it only ever reports the requesting user's own activity, it exposes nothing about anyone else's.
 
 ## Dashboard Features
 
@@ -67,8 +67,11 @@ At the top right of the Analytics dashboard, you can filter all data by time per
 - **Last 30 days** - Monthly snapshot
 - **Last 90 days** - Quarterly trends
 - **All time** - Complete historical data
+- **Custom range** - A start and an end date you choose
 
-Your selected time period is **automatically saved** and persists across browser sessions.
+Choosing **Custom range** puts two date fields next to the period dropdown. Nothing is queried until both are filled in, so while you are still picking, the dashboard sits idle instead of showing a spinner, and it loads as soon as the second date is set. The end date is inclusive, so it covers the whole of that day.
+
+Your selected time period is **automatically saved** and persists across browser sessions, the custom dates included. If you leave Analytics on **Custom range** with the dates incomplete and come back to it later, the dashboard shows empty figures until you fill the range in, rather than loading indefinitely.
 
 ### Group Filtering
 
@@ -350,7 +353,7 @@ GET /api/v1/analytics/models/{model_id}/overview # Get feedback history and tags
 ```
 GET /api/v1/users/usage
 ```
-Accepts either `days` (7-732) or an explicit `start_date` / `end_date` range, and buckets results in the requesting user's timezone. This one is not admin-gated, because it reports nothing beyond the caller's own activity.
+Accepts either `days` (7-732) or an explicit `start_date` / `end_date` range, and buckets results in the requesting user's timezone. Called with none of them, as the **Settings > Usage** page does, it returns the last 730 days ending now. This one is not admin-gated, because it reports nothing beyond the caller's own activity.
 
 **Common Query Parameters:**
 

@@ -2410,6 +2410,28 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 :::
 
+#### `WEBUI_SECRET_KEY_FILE`
+
+- Type: `str`
+- Default: `.webui_secret_key`
+- Description: Where the start script writes the auto-generated `WEBUI_SECRET_KEY` on first start, and reads it back from on every later start. A relative path is resolved against the `backend` directory the script lives in. Read by `start.sh` (Docker) and `backend\start_windows.bat` only; `open-webui serve` ignores it and always uses `.webui_secret_key` in the current working directory. It has no effect when `WEBUI_SECRET_KEY` is already set in the environment, because no key file is written or read in that case.
+
+#### `WEBUI_SECRET_KEY_LENGTH`
+
+- Type: `int`
+- Default: `24`
+- Description: How much randomness goes into an auto-generated `WEBUI_SECRET_KEY`. Only read on the first start, when no key is set in the environment and no key file exists yet.
+
+:::warning The unit is not the same on every platform
+
+`start.sh` and `open-webui serve` read this as a number of random **bytes** and then base64-encode them, so the default `24` produces a **32-character** key. `backend\start_windows.bat` builds the key one character at a time, so it reads the same value as a number of **characters** and the default `24` produces a **24-character** key. The same setting therefore gives you different keys on different platforms; set it per platform if you need a specific length.
+
+Avoid any value that lands on a key of exactly **44 characters** (`33` on Docker or `open-webui serve`, `44` on Windows). A 44-character `WEBUI_SECRET_KEY` is used verbatim as an encryption key rather than being hashed into one, and an auto-generated key of that length does not decode to the 32 bytes required, so Open WebUI fails to start. The same rule is described under [`ENABLE_VALVE_ENCRYPTION`](#enable_valve_encryption). The default `24` is safe everywhere.
+
+`start.sh` and `open-webui serve` reject a value that is not a positive integer and refuse to start. The Windows script does not validate it.
+
+:::
+
 #### `ENABLE_VALVE_ENCRYPTION`
 
 - Type: `bool`

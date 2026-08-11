@@ -115,7 +115,7 @@ If it cannot complete, the browser lands back on Open WebUI with an error notifi
 
 | Notification | What happened |
 | :--- | :--- |
-| `OAuth callback failed: OAuth callback state is invalid or expired` | The authorization was not started in this browser session, or that session is gone: someone signed out, the session expired, or the provider sent the browser back to an address other than the one in [`WEBUI_URL`](/reference/env-configuration#webui_url). |
+| `OAuth callback failed: OAuth callback state is invalid or expired` | The authorization was not started in this browser session, or that session is gone: someone signed out, the session expired or the provider sent the browser back to an address other than the one in [`WEBUI_URL`](/reference/env-configuration#webui_url). |
 | `OAuth callback failed: OAuth callback user does not match authenticated session` | A different user is signed in than the one who started the authorization. |
 | `OAuth callback failed: OAuth callback user is not authorized` | The account that started the authorization no longer exists or no longer has access, for example it was deleted or set back to **pending**. |
 
