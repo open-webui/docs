@@ -156,6 +156,12 @@ From the model list, click the ellipsis (**...**) on any model:
 | **Share** | Share to the Open WebUI community |
 | **Delete** | Permanently remove the preset |
 
+### Enabled and disabled
+
+Every row also carries an **Enabled** switch, in **Workspace > Models** and in **Settings > Admin > Models** alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector and requests naming it come back with **Model not found**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
+
+This is the harder of the two removals. **Hide** keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it.
+
 ### Import and export
 
 - **Import**: From `.json` files or Open WebUI community links
