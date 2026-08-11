@@ -64,7 +64,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 08      | channel_member   | Tracks user membership and permissions within channels       |
 | 09      | chat             | Stores chat sessions and their metadata                      |
 | 10      | chat_file        | Links files to chats and messages                            |
-| 11      | chatidtag        | Maps relationships between chats and their associated tags   |
+| 11      | chatidtag        | **Legacy.** Pre-`tag` chat/tag mapping; data migrated to `chat` and no longer used (see note below) |
 | 12      | config           | Maintains system-wide configuration settings                 |
 | 13      | document         | **Legacy.** Pre-Knowledge documents table; data migrated to `knowledge` and no longer used (see note below) |
 | 14      | feedback         | Captures user feedback and ratings                           |
@@ -490,6 +490,8 @@ Things to know about the chat_file table:
 | chat_id         | String        | nullable        | Reference to chat  |
 | user_id         | String        | nullable        | Reference to user  |
 | timestamp       | BigInteger    | nullable        | Creation timestamp |
+
+Note on the `chatidtag` table: it is a **legacy** table from before chat tags moved onto the chat record. Its rows were read out into the `chat` table (migration `1af9b942657b`), which wrote each tag into `chat.meta.tags` and turned the `pinned` tag into `chat.pinned`, and nothing writes to it anymore. That migration leaves the rows where they are and no migration drops the table, so an older database may still hold stale rows in it. There is no backing model for it in current code. Chat tags now live in the `tag` table.
 
 ## Config
 
