@@ -181,7 +181,7 @@ Controls access to user settings areas.
 
 :::info Interface Settings Access and instance defaults
 
-Taking this permission away hides the **Interface** tab and rejects any attempt to save personal settings, so the people affected stay on whatever [Default Interface Settings](/getting-started/quick-start/settings#default-interface-settings-admin) you have configured. Leave it on, and those defaults are only a starting point that each person can change. Admins are exempt.
+Taking this permission away hides the **Interface** page and refuses any attempt to save personal settings, so the people affected stay on whatever [Default Interface Settings](/features/administration/interface-defaults) you have configured. Leave it on, and those defaults are only a starting point that each person can change. Admins are exempt.
 
 :::
 
