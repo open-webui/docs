@@ -407,7 +407,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Notes** | | |
 | `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
-| `write_note` | `title` (required), `content` (required) | `{status: "success", id}` |
+| `write_note` | `title` (required), `content` (required; markdown text. A JSON object or array is stored as a fenced `json` code block rather than left in the note as structured data) | `{status: "success", id}` |
 | `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |

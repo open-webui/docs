@@ -144,7 +144,7 @@ If it prints `{"status": "ok"}`, the connection works. If it errors, the contain
 
 ### Nothing happens when you save a new connection
 
-Adding a connection works whether Open WebUI is reached over `https://` or over plain `http://`. On older versions the **Add Terminal Connection** dialog stayed open and saved nothing when the interface was served over plain `http://` at anything other than `localhost`, because browsers withhold the identifier generator a new connection needs on origins that are not secure. Filling in the optional **ID** field yourself works around it, since nothing has to be generated then.
+Adding a connection works whether you reach Open WebUI over `https://` or over plain `http://`. On older versions the **Add Terminal Connection** dialog stayed open and saved nothing when the interface was reached over plain `http://` at a network address, a LAN IP for example, rather than on `localhost`. Browsers withhold the identifier generator a new connection needs on origins they do not treat as secure, and a new connection gets its identifier automatically when you leave the optional **ID** field blank. Typing an **ID** of your own works around it, because then there is nothing to generate.
 
 Only creating a connection from **Settings > Admin > Integrations** was affected. Editing, enabling, disabling or deleting an existing one, adding one under your own **Settings > Integrations**, and connections shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) all worked regardless.
 

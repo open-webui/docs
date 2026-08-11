@@ -93,6 +93,10 @@ You can also include provider-specific options on a tool object (for web search,
 The **Add Custom Parameter** button is shown to administrators in the model editor. Custom parameters are forwarded to the provider as-is, so only use valid Responses API tool definitions.
 :::
 
+:::info Custom parameters set instance-wide still apply
+The same button exists under **Model Defaults** in **Settings > Admin > Models**, which applies to every model. Custom parameters from the two places are combined name by name, so adding `tools` here keeps the instance-wide ones the model does not name. Give one the same name in both places and the model's value is the one sent. See [Global Model Defaults](/features/workspace/models#global-model-defaults-admin).
+:::
+
 ---
 
 ## Supported Providers

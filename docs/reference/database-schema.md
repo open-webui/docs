@@ -170,15 +170,25 @@ Things to know about the auth table:
 | type            | Text          | nullable        | Channel type                        |
 | name            | Text          | -               | Channel name                        |
 | description     | Text          | nullable        | Channel description                 |
+| is_private      | Boolean       | nullable        | Private flag for `group` type channels |
 | data            | JSON          | nullable        | Flexible data storage               |
 | meta            | JSON          | nullable        | Channel metadata                    |
 | created_at      | BigInteger    | -               | Creation timestamp (nanoseconds)    |
 | updated_at      | BigInteger    | -               | Last update timestamp (nanoseconds) |
+| updated_by      | Text          | nullable        | User who last updated the channel   |
+| archived_at     | BigInteger    | nullable        | Archive timestamp (nanoseconds)     |
+| archived_by     | Text          | nullable        | User who archived the channel       |
+| deleted_at      | BigInteger    | nullable        | Deletion timestamp (nanoseconds)    |
+| deleted_by      | Text          | nullable        | User who deleted the channel        |
 
 Things to know about the channel table:
 
 - Uses UUID for primary key
 - Case-insensitive channel names (stored lowercase)
+- `type` was added in migration `3781e22d8b01`. `is_private`, `updated_by`, `archived_at`, `archived_by`, `deleted_at` and `deleted_by` were added in migration `90ef40d4714e`.
+- Channel listing and member queries return only rows where both `archived_at` and `deleted_at` are null, so the schema is shaped for archiving and soft deletion.
+- No code path writes `archived_at`, `archived_by`, `deleted_at`, `deleted_by` or `updated_by`. Deleting a channel removes the row outright, so a deleted channel leaves nothing behind for the `deleted_at` filter to exclude. Anyone querying this table directly will find those five columns null on every row.
+- The `access_control` column that this table was created with was dropped in migration `f1e2d3c4b5a6`. Channel access is managed through the `access_grant` table with `resource_type = 'channel'`.
 
 ## Channel Member Table
 

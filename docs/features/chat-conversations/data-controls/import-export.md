@@ -34,7 +34,7 @@ Click the **Import Chats** button and select a JSON file to restore conversation
 
 :::info Import permission also covers forking
 
-**Allow Chat Import** gates [forking a chat](/features/chat-conversations/chat-features/) as well, since a fork is created the same way an import is. Turn it off for a group and its members lose the **Import Chats** row here, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu, none of which are shown any more. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
+**Allow Chat Import** gates [forking a chat](/features/chat-conversations/chat-features/) as well, since a fork is created the same way an import is. Where it is not granted, the **Import Chats** row here, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all left out of the interface rather than shown and refused. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
 
 :::
 
