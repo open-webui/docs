@@ -134,6 +134,8 @@ The request for token counts is added server-side, so it applies wherever the mo
 - **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). Press Enter after each.
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
 
+What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
+
 ### Prompt suggestions
 
 Clickable starter chips that appear when a user opens a fresh chat with this model. Add phrases like "Explain this code step-by-step" or "Summarize this document" to guide users.

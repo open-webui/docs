@@ -108,7 +108,7 @@ Settings > Admin > Connections. These are instance-wide and shared by all users.
 If the admin has enabled **Direct Connections**, you can add personal API keys in User Settings > Connections. See [Direct Connections](/features/chat-conversations/direct-connections).
 
 **"I set a system prompt but my admin's model settings override it."**
-Model-level settings configured by admins in the Workspace take precedence over personal settings. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
+A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat in **Chat Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
 
 **"A switch in Settings > Interface has Default written next to it. What does that mean?"**
 It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.

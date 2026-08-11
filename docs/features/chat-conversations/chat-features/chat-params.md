@@ -9,15 +9,15 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 
 | **Level** | **Definition** | **Modification Permissions** | **Override Capabilities** |
 | --- | --- | --- | --- |
-| **Per-Chat** | System prompt and advanced parameters for a specific chat instance | Users can modify, but cannot override model-specific settings | Restricted from overriding model-specific settings |
-| **Per-Account** | Default system prompt and advanced parameters for a specific user account | Users can set, but may be overridden by model-specific settings | User settings can be overridden by model-specific settings |
-| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | Admin-specific settings take precedence, User settings can be overridden |
+| **Per-Chat** | System prompt and advanced parameters for a specific chat instance | Users can modify, but cannot override the model's system prompt | An advanced parameter set here is the one sent, in place of the per-account and per-model value |
+| **Per-Account** | Default system prompt and advanced parameters for a specific user account | Users can set, but the system prompt may be overridden by model-specific settings | An advanced parameter set here replaces the per-model value, and gives way to a per-chat one |
+| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | The system prompt takes precedence. Advanced parameters apply to every chat that has not set them itself |
 
 ### 1. **Per-chat basis:**
 
 - **Description**: The per-chat basis setting refers to the system prompt and advanced parameters configured for a specific chat instance. These settings are only applicable to the current conversation and do not affect future chats.
 - **How to set**: Users can modify the system prompt and advanced parameters for a specific chat instance within the right-hand sidebar's **Chat Controls** section in Open WebUI.
-- **Override capabilities**: Users are restricted from overriding the **System Prompt** or specific **Advanced Parameters** already set by an administrator on a per-model basis (**#2**). This ensures consistency and adherence to model-specific settings.
+- **Override capabilities**: Users are restricted from overriding the **System Prompt** already set by an administrator on a per-model basis (**#3**). This ensures consistency and adherence to model-specific settings. An **Advanced Parameter** set here is the value sent for that chat, even when the model carries one of its own.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -36,7 +36,7 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 
 - **Description**: The per-account basis setting refers to the default system prompt and advanced parameters configured for a specific user account. Any user-specific changes can serve as a fallback in situations where lower-level settings aren't defined.
 - **How to set**: Users can set their own system prompt and advanced parameters for their account within the **General** section of the **Settings** menu in Open WebUI.
-- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that such parameters can still be overridden if an administrator has already set the **System Prompt** or specific **Advanced Parameters** on a per-model basis for the particular model being used.
+- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that it can still be overridden if an administrator has already set the **System Prompt** on a per-model basis for the particular model being used. An **Advanced Parameter** set here is sent in place of the model's, and is itself replaced by anything the chat sets in **Chat Controls**.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -56,8 +56,8 @@ Suppose a user wants to set their own system prompt for their account. They can 
 - **Description**: The per-model basis setting refers to the default system prompt and advanced parameters configured for a specific model. These settings are applicable to all chat instances using that model.
 - **How to set**: Administrators can set the default system prompt and advanced parameters for a specific model within the **Models** section of the **Workspace** in Open WebUI.
 - **Override capabilities**: **User** accounts are restricted from modifying the **System Prompt** or specific **Advanced Parameters** on a per-model basis (**#3**). This restriction prevents users from inappropriately altering default settings.
-- **Context length preservation:** When a model's **System Prompt** or specific **Advanced Parameters** are set manually in the **Workspace** section by an Admin, said **System Prompt** or manually set **Advanced Parameters** cannot be overridden or adjusted on a per-account basis within the **General** settings or **Chat Controls** section by a **User** account. This ensures consistency and prevents excessive reloading of the model whenever a user's context length setting changes.
-- **Model precedence:** If a model's **System Prompt** or specific **Advanced Parameters** value is pre-set in the Workspace section by an Admin, any context length changes made by a **User** account in the **General** settings or **Chat Controls** section will be disregarded, maintaining the pre-configured value for that model. Be advised that parameters left untouched by an **Admin** account can still be manually adjusted by a **User** account on a per-account or per-chat basis.
+- **System prompt preservation:** When a model's **System Prompt** is set manually in the **Workspace** section by an Admin, it cannot be overridden or adjusted on a per-account basis within the **General** settings or **Chat Controls** section by a **User** account. This ensures consistency and adherence to model-specific settings.
+- **Parameter precedence:** An **Advanced Parameter** an Admin sets on the model applies to every chat that does not set that same parameter itself. A **User** account that sets it in the **General** settings or in **Chat Controls** sends its own value instead, and the per-chat value wins over the per-account one. A parameter nobody has set at any of those levels falls through to the instance-wide values under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin). This includes the context length: a `num_ctx` set in **Chat Controls** is the one sent, even for a model that carries its own.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -86,7 +86,7 @@ These three levels shape the requests a chat sends. Background tasks (chat title
 
 :::note API requests set their own parameters
 
-The three levels above describe the browser. A request sent straight to the [chat completions endpoint](/reference/api-endpoints#-chat-completions) keeps whatever parameters it carries: the model's saved values, and the instance-wide ones under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin), only fill in what the request left out. **Stream Chat Response** is the exception: it still decides whether the reply streams.
+The same resolution applies to a request sent straight to the [chat completions endpoint](/reference/api-endpoints#-chat-completions). A parameter the request carries is the one sent, and the model's saved values fill in the rest. **Stream Chat Response** is the exception: it still decides whether the reply streams, whatever `stream` the request asked for.
 
 :::
 
