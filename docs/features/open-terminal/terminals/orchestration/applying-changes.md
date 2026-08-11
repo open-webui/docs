@@ -27,7 +27,7 @@ curl -X POST http://terminals-orchestrator:3000/api/v1/terminals/refresh \
 
 `only_idle` defaults to `true`, so active users are not interrupted. Set it to `false` only when you intentionally want to stop matching running terminals immediately.
 
-To refresh one user's terminal:
+To refresh one user's terminals:
 
 ```json
 {
@@ -35,6 +35,18 @@ To refresh one user's terminal:
   "policy_id": "data-science"
 }
 ```
+
+That covers every terminal the user has under that policy. On a connection using [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) they have more than one, so add `context_id` to refresh just one of them:
+
+```json
+{
+  "user_id": "user-123",
+  "policy_id": "data-science",
+  "context_id": "chat:0f3c1a2b-7d55-4a19-9c0e-2b8f6d4e1a37"
+}
+```
+
+Use `default` for the shared terminal, `chat:<chat-id>` for one chat's terminal and `automation:<automation-id>` for one automation's terminal.
 
 To also wipe persisted terminal files during refresh:
 

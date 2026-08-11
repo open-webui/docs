@@ -76,23 +76,27 @@ Refresh request body:
 {
   "user_id": "optional-user-id",
   "policy_id": "optional-policy-id",
+  "context_id": "optional-context-id",
   "only_idle": true,
   "reset": false
 }
 ```
 
-`only_idle` defaults to `true`. `reset` defaults to `false`.
+`only_idle` defaults to `true`. `reset` defaults to `false`. Omitting `context_id` matches every context a user has.
 
 Stop request body:
 
 ```json
 {
   "user_id": "...",
-  "policy_id": "default"
+  "policy_id": "default",
+  "context_id": "default"
 }
 ```
 
 `policy_id` defaults to `default`.
+
+`context_id` also defaults to `default`, which is the shared terminal. Pass `chat:<chat-id>` or `automation:<automation-id>` to target one of the separate terminals created by [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). Because stop defaults to the shared terminal rather than to everything, a user on a per chat connection keeps their chat terminals unless you name them.
 
 ## Troubleshooting
 
