@@ -386,21 +386,21 @@ OAUTH_SCOPES=openid email profile
 
 #### Providers that add their own parameters to the ID token:
 
-**Problem:** The login fails right at the callback. The browser shows `The email or password provided is incorrect`, and the backend log records the real reason:
+**Problem:** The login fails at the callback. The browser shows `The email or password provided is incorrect`, and the log records the real reason:
 
 ```
 OAuth callback failed: Unsupported {'app_id'} in header
 ```
 
-Some providers add a vendor-specific parameter of their own to the header of the ID token they issue, and older versions of Open WebUI rejected any parameter they did not recognize there. The name varies by provider, `app_id` and `client_id` being two of them.
+Some providers add a vendor-specific parameter to the ID token header, which older versions rejected. The name varies by provider.
 
-**Solution:** Update Open WebUI. Unrecognized parameters are now ignored instead of ending the login, so nothing has to be changed on the provider side. The token's signature and signing algorithm are still verified as before.
+**Solution:** Update Open WebUI. Unrecognized parameters are ignored, so nothing changes on the provider side. The signature and signing algorithm are still verified.
 
 ---
 
 ### 12. Existing Accounts Cannot Sign In After a Long-Delayed Upgrade
 
-**Problem:** An instance that had been left on a version older than v0.6.41 is upgraded, and afterwards nobody who had ever signed in through SSO can get back in. Password sign-in fails for those same accounts too, while accounts that never used SSO are fine. The backend log records:
+**Problem:** After upgrading an instance that had been left on a version older than v0.6.41, nobody who had signed in through SSO can get back in, and password sign-in fails for those same accounts. Accounts that never used SSO are fine. The log records:
 
 ```
 ERROR - Error during OAuth process: 1 validation error for UserModel
@@ -408,15 +408,9 @@ oauth
   Input should be a valid dictionary [type=dict_type, input_value='{"oidc": {"sub": "..."}}', input_type=str]
 ```
 
-v0.6.41 moved each account's identity provider subject out of the old `oauth_sub` column into an `oauth` JSON field that can hold several providers per account. From v0.9.6 the step performing that copy encoded the values twice, so on a database that had not yet made the move the field ended up holding the *text* of a JSON object rather than the object itself. Every read of such an account then failed validation, and the lookup that matches an incoming SSO login to an existing account never matched it.
+The upgrade step that moves an account's identity provider subject into its current field encoded the value twice, so it holds the text of a JSON object rather than the object. Only databases still older than v0.6.41 at the moment they were upgraded are affected, and only accounts that had a subject stored at the time.
 
-This only affects databases that were still older than v0.6.41 at the moment they were upgraded, and only the accounts that had an `oauth_sub` value at that time. An instance that had already reached v0.6.41 or newer before upgrading further was never touched, and neither were accounts created or linked after the upgrade.
-
-**Solution:** Update Open WebUI. A repair migration runs on startup, rewrites the affected rows back into proper JSON objects and leaves every other row alone, so it is harmless on databases that were never affected. No manual database work is needed, no accounts have to be re-linked and nothing changes on the identity provider side.
-
-:::note Settings will not work around this
-`OAUTH_MERGE_ACCOUNTS_BY_EMAIL` does not help, because the fallback lookup by email reads the same account and fails the same validation. Deleting and recreating the affected accounts would restore sign-in, at the cost of everything those accounts own. Upgrading is the repair.
-:::
+**Solution:** Update Open WebUI. A repair migration runs on startup and rewrites the affected rows, leaving every other row alone. No manual database work, no re-linking and nothing to change on the provider side. `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` does not work around it, since the fallback lookup reads the same account and fails the same way.
 
 ---
 

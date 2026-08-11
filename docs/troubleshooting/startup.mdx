@@ -101,41 +101,20 @@ See the [Offline Mode guide](/tutorials/maintenance/offline-mode) for the full o
 
 ### Symptom
 
-`backend\start_windows.bat` prints a long run of the same line, once per character of the key it is trying to generate:
-
-```text
-Generating WEBUI_SECRET_KEY
-The system cannot find the file specified.
-The system cannot find the file specified.
-The system cannot find the file specified.
-...
-WEBUI_SECRET_KEY generated
-```
-
-It then claims to load the key and aborts:
+On a fresh installation with no key set and no key file yet, `backend\start_windows.bat` prints `The system cannot find the file specified.` repeatedly while generating the key, then aborts:
 
 ```text
 WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is enabled.
 ```
 
-This only happens on a **fresh** installation: no `.webui_secret_key` file exists yet and `WEBUI_SECRET_KEY` is not set in the environment.
-
 ### Cause
 
-The key-generation step in older copies of `start_windows.bat` never wrote anything, so it left an **empty** `.webui_secret_key` behind. The backend then started with no key and refused to run, because a secret key is a hard requirement whenever authentication is enabled. The same copies also broke when the Open WebUI folder sat under a path containing spaces.
+The key-generation step in older copies of the script wrote nothing, leaving an empty `.webui_secret_key` behind. The same copies also broke on an installation path containing spaces.
 
 ### Fix
 
-Pick one:
+Update Open WebUI, and **delete the empty `.webui_secret_key` file first** from the `backend` folder. The script only generates a key when that file is missing, so an empty one left over from the failed run gives you the same abort.
 
-- **Update Open WebUI.** Current copies of `backend\start_windows.bat` generate the key correctly and handle paths with spaces. **Delete the empty `.webui_secret_key` file first** from the `backend` folder next to the script. The script only generates a key when that file is missing, so an empty one left over from the failed run is loaded again and you get the same abort.
-- **Set the key yourself**, which is the recommended configuration for anything beyond a personal machine anyway:
-
-  ```bat
-  set WEBUI_SECRET_KEY=your-long-random-value
-  backend\start_windows.bat
-  ```
-
-  With the variable set, the script skips key generation and the key file entirely.
+Setting `WEBUI_SECRET_KEY` yourself also works, and is the right configuration for anything beyond a personal machine. With it set, the script skips key generation entirely.
 
 See [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) for how each start method generates and persists the key.
