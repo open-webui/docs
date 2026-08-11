@@ -9,7 +9,7 @@ keywords: ["Open WebUI vs ChatGPT", "ChatGPT alternative", "self-hosted ChatGPT"
 import Head from '@docusaurus/Head';
 
 <Head>
-<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I self-host ChatGPT?", "acceptedAnswer": {"@type": "Answer", "text": "Not ChatGPT itself, but Open WebUI connects to the OpenAI API so you can use the same models. Open WebUI runs on your infrastructure, though API calls still go to OpenAI."}}, {"@type": "Question", "name": "Can I use OpenAI models in Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Add your OpenAI API key in Settings and all OpenAI models appear in the model selector."}}, {"@type": "Question", "name": "Is Open WebUI a ChatGPT alternative?", "acceptedAnswer": {"@type": "Answer", "text": "Open WebUI can connect to the OpenAI API, so you can use the same models. Open WebUI runs on your own infrastructure, though API calls still go to the provider. It also supports connecting to other providers."}}, {"@type": "Question", "name": "Can I use ChatGPT and local models together?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Many users run OpenAI for complex reasoning alongside local models via Ollama for privacy-sensitive tasks, all in the same Open WebUI interface."}}]})}</script>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I self-host ChatGPT?", "acceptedAnswer": {"@type": "Answer", "text": "Not ChatGPT itself, but Open WebUI connects to the OpenAI API so you can use OpenAI models available to your API account. Open WebUI runs on your infrastructure, though API calls still go to OpenAI."}}, {"@type": "Question", "name": "Can I use OpenAI models in Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Add your OpenAI API key in Settings and OpenAI models available to your API account appear in the model selector."}}, {"@type": "Question", "name": "Is Open WebUI a ChatGPT alternative?", "acceptedAnswer": {"@type": "Answer", "text": "Open WebUI can connect to the OpenAI API, so you can use OpenAI models available to your API account. Open WebUI runs on your own infrastructure, though API calls still go to the provider. It also supports connecting to other providers."}}, {"@type": "Question", "name": "Can I use ChatGPT and local models together?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Many users run OpenAI for complex reasoning alongside local models via Ollama for privacy-sensitive tasks, all in the same Open WebUI interface."}}]})}</script>
 </Head>
 
 
@@ -17,7 +17,7 @@ import Head from '@docusaurus/Head';
 
 *Last updated: August 2026*
 
-[ChatGPT](https://chat.openai.com/) by OpenAI brought modern AI into everyday life for hundreds of millions of people and set the bar for what a conversational AI experience should feel like. It changed how the world thinks about AI, and it continues to inspire us. We use it daily and learn from the work behind it: the research, engineering, design, safety work, infrastructure, product judgment, and support that make a product at this scale feel natural. GPT-5.6, the o-series reasoning models, and the constant pace of product innovation have kept ChatGPT at the forefront, and honestly, it keeps pushing us to make Open WebUI better too.
+[ChatGPT](https://chat.openai.com/) by OpenAI brought modern AI into everyday life for hundreds of millions of people and set the bar for what a conversational AI experience should feel like. It changed how the world thinks about AI, and it continues to inspire us. We use it daily and learn from the work behind it: the research, engineering, design, safety work, infrastructure, product judgment, and support that make a product at this scale feel natural. The GPT-5.6 family, ChatGPT agent, ChatGPT Images, and the constant pace of product innovation have kept ChatGPT at the forefront, and honestly, it keeps pushing us to make Open WebUI better too.
 
 Open WebUI is built in a category ChatGPT helped create. The people at OpenAI made AI feel useful, approachable, and worth bringing into everyday work, not just labs and demos. Their work raised the bar for everyone building in this space. Open WebUI is for people and teams who want to run the interface themselves, connect the models they choose, and adapt the stack to their environment.
 
@@ -27,15 +27,15 @@ Commercial · Free tier available
 
 ## What ChatGPT Does Well
 
-- **Frontier models** including GPT-5.6 Sol, Terra, and Luna
-- **Canvas** for collaborative document and code editing inside conversations
+- **Frontier models** including the GPT-5.6 family
+- **Writing and code blocks** for long-form drafting, editing, and code work inside conversations
 - **Projects** for organizing conversations with persistent context and custom instructions
 - **Deep research** that synthesizes information across multiple sources into comprehensive reports
 - **Refined experience** from years of iteration on the interface
 - **GPT Store** with an ecosystem of custom GPTs built by the community
-- **Multimodal** with vision, voice, image generation (DALL-E), and code execution
+- **Multimodal** with vision, voice, ChatGPT Images, and code execution
 - **Memory** that remembers context across conversations
-- **Operator** for agentic web browsing and task automation
+- **ChatGPT agent** for agentic web browsing and task automation
 - **Enterprise tier** with SSO, admin controls, and data privacy commitments
 - **Zero setup** where you sign up and start, no installation needed
 
@@ -46,7 +46,7 @@ Commercial · Free tier available
 - **Full agentic platform** with [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) the model calls itself, [MCP](/features/extensibility/mcp) servers, [sub-agents](/features/chat-conversations/chat-features/subagents), [timers](/features/chat-conversations/chat-features/timers) and [automations](/features/chat-conversations/chat-features/automations), on the model of your choice rather than one vendor's
 - **Customise practically everything**, from per-model prompts, tools, knowledge and parameters to [filters, pipes, actions and event functions](/features/extensibility/plugin/functions) that change behaviour anywhere in the pipeline, plus theming, banners and per-group permissions
 - **Self-hosted** so the platform itself runs on your hardware
-- **Any model, any provider** so you can use GPT-5.6 *and* Claude *and* Gemini *and* local models all in one interface
+- **Any model, any provider** so you can use OpenAI models available to your API account *and* Claude *and* Gemini *and* local models all in one interface
 - **Knowledge & RAG** for building knowledge bases from your documents with advanced retrieval
 - **Team platform** with Channels, Notes, Automations, RBAC, SSO/OIDC/LDAP, and SCIM 2.0
 - **Open Terminal** providing a full sandboxed computing environment
@@ -58,19 +58,19 @@ Commercial · Free tier available
 
 | | Open WebUI | ChatGPT |
 | :--- | :--- | :--- |
-| **Models** | Any model from any provider | OpenAI models (GPT-5.6, o-series) |
+| **Models** | Any model from any provider | OpenAI models available in ChatGPT, depending on plan |
 | **Data** | Self-hosted, your infrastructure | Cloud-hosted by OpenAI |
-| **Knowledge & RAG** | 13 vector DBs, 8 extraction engines, hybrid search | File upload with in-chat context |
+| **Knowledge & RAG** | 13 vector DBs, 8 extraction engines, hybrid search | Projects with files, memory, and project context |
 | **Custom agents** | Model agents with tools, knowledge, and parameters | Custom GPTs via GPT Store |
 | **Code execution** | Python in-browser + Open Terminal | Built-in code interpreter |
-| **Extensibility** | Python tools, MCP, OpenAPI, pipelines | GPT Actions and plugins |
-| **Pricing** | Free community edition; Enterprise plans available | Free tier, Plus, Team, and Enterprise plans |
+| **Extensibility** | Python tools, MCP, OpenAPI, pipelines | GPT Actions and Plugin Directory |
+| **Pricing** | Free community edition; Enterprise plans available | Free, Go, Plus, Pro, Business, and Enterprise plans |
 
 ---
 
 ## When to Use Each
 
-**Choose ChatGPT if** you want the most polished direct path to OpenAI's best work. No installation, no configuration, just sign up and start. The native experience with Canvas, Projects, memory, voice, and deep research features is excellent and constantly improving.
+**Choose ChatGPT if** you want the most polished direct path to OpenAI's best work. No installation, no configuration, just sign up and start. The native experience with Projects, memory, voice, ChatGPT agent, image generation, and deep research features is excellent and constantly improving.
 
 **Choose Open WebUI if** you want to run on your own infrastructure, connect to multiple providers in one interface, build knowledge bases from your documents, or need team features like RBAC and SSO included in the free community edition.
 
@@ -80,14 +80,14 @@ Commercial · Free tier available
 
 ## Use OpenAI Models Through Open WebUI
 
-Open WebUI connects to the OpenAI API, so all of OpenAI's models are available alongside Open WebUI's knowledge management, tools, and team features.
+Open WebUI connects to the OpenAI API, so OpenAI models available to your API account are available alongside Open WebUI's knowledge management, tools, and team features.
 
 **How to connect:**
 
 1. Get an API key from [platform.openai.com](https://platform.openai.com/)
 2. In Open WebUI, go to **Admin → Settings → Connections**
 3. Add a new OpenAI connection with your API key
-4. OpenAI models will appear in your model selector
+4. OpenAI models available to your API account will appear in your model selector
 
 Many users run OpenAI models for complex reasoning alongside local models via Ollama for privacy-sensitive tasks, all in the same interface.
 
@@ -102,13 +102,13 @@ Many users run OpenAI models for complex reasoning alongside local models via Ol
 ## Frequently Asked Questions
 
 **Can I self-host ChatGPT?**
-Not ChatGPT itself, but Open WebUI connects to the OpenAI API so you can use the same models. Open WebUI runs on your infrastructure, though API calls still go to OpenAI.
+Not ChatGPT itself, but Open WebUI connects to the OpenAI API so you can use OpenAI models available to your API account. Open WebUI runs on your infrastructure, though API calls still go to OpenAI.
 
 **Can I use OpenAI models in Open WebUI?**
-Yes. Add your OpenAI API key in Settings and all OpenAI models appear in the model selector.
+Yes. Add your OpenAI API key in Settings and OpenAI models available to your API account appear in the model selector.
 
 **Is Open WebUI a ChatGPT alternative?**
-Open WebUI can connect to the OpenAI API, so you can use the same models. Open WebUI runs on your own infrastructure, though API calls still go to the provider. It also supports connecting to other providers.
+Open WebUI can connect to the OpenAI API, so you can use OpenAI models available to your API account. Open WebUI runs on your own infrastructure, though API calls still go to the provider. It also supports connecting to other providers.
 
 **Can I use ChatGPT and local models together?**
 Yes. Many users run OpenAI for complex reasoning alongside local models via Ollama for privacy-sensitive tasks, all in the same Open WebUI interface.
