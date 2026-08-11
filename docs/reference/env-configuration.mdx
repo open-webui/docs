@@ -6820,7 +6820,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). It also covers **forking** a chat, which creates a copy the same way an import does. When set to `False`, non-admins cannot import chats, and the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are hidden rather than shown and refused. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Import**.
+- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). It also covers **forking** a chat, which copies an existing conversation into a new one. When set to `False`, non-admins cannot import chats, and the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are hidden rather than shown and refused. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Import**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`
