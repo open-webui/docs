@@ -253,7 +253,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 | 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups |
 | 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
 | 🧠 Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or disable native function calling |
-| 🗂 Single attached file returns nothing | Re-index to rebuild the per-file collections |
+| 🗂 Single attached file returns nothing | Re-index to rebuild the per-file indexes |
 
 ---
 
@@ -567,12 +567,12 @@ Adding a URL under **Workspace > Knowledge** reports `Failed to process URL: <ur
 
 Attaching one file to a chat with `#` retrieves nothing, while attaching the knowledge base that contains the same file works normally. The model then answers from general knowledge without flagging that it found nothing.
 
-**The Problem**: A file that belongs to a knowledge base is indexed twice: once into its knowledge base's collection, and once into a per-file collection of its own (`file-<file id>`). Attaching the file on its own searches only the per-file collection, so if that collection went missing (through a vector database migration, a partial reset or a manual deletion) the search comes back empty while the knowledge base keeps working.
+**The Problem**: A file that belongs to a knowledge base is indexed twice, once as part of the knowledge base and once on its own. Attaching the file by itself searches only its own index, so if that has gone missing (after a vector database migration, a partial reset or a deletion made directly in the vector database) the search comes back empty while the knowledge base keeps working.
 
 ✅ **Solutions:**
 
-1. **Re-index**: go to **Admin Settings > Documents > Reindex Knowledge Base Vectors** and click **Reindex**. This rebuilds each knowledge base collection and the per-file collection of every file inside it, which restores retrieval for the individual file. It re-embeds everything, so allow for the time and, with a paid embedding model, the cost.
-2. **Re-upload the file** if it is not in any knowledge base. Re-indexing only walks knowledge bases, so a file that was only ever attached to a chat has to be uploaded again to get its collection back.
+1. **Re-index**: go to **Settings > Admin > Documents > Reindex Knowledge Base Vectors** and click **Reindex**. This rebuilds each knowledge base and the per-file index of every file inside it, which restores retrieval for the individual file. It re-embeds everything, so allow for the time and, with a paid embedding model, the cost.
+2. **Re-upload the file** if it is not in any knowledge base. Re-indexing only covers knowledge bases, so a file that was only ever attached to a chat has to be uploaded again.
 
 ---
 

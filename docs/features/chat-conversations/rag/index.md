@@ -97,7 +97,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 ## RAG Template Customization
 
-Customize the RAG template from the `Settings` > `Admin` > `Tools` > `Documents` menu.
+Customize the RAG template from the `Settings` > `Admin` > `Documents` menu.
 
 The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
 
@@ -203,7 +203,7 @@ Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size 
 
 ## RAG Embedding Support
 
-Change the RAG embedding model directly in the `Settings` > `Admin` > `Tools` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
+Change the RAG embedding model directly in the `Settings` > `Admin` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -223,7 +223,7 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model in `Settings` > `Admin` > `Tools` > `Documents`, navigate to `Settings` > `Admin` > `Tools` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+After changing the embedding model in `Settings` > `Admin` > `Documents`, navigate to `Settings` > `Admin` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
@@ -331,7 +331,7 @@ For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gi
 
 The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly. This innovative feature allows you to incorporate video content into your chats, further enriching your conversation experience.
 
-Attaching a video works from its transcript, so a video that YouTube returns no transcript for cannot be attached. The error says which case it is: captions disabled by the uploader, an age restricted or unavailable video, no transcript in the requested languages or a request YouTube blocked because of the address it came from. [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language) sets which languages are tried and in what order, with English appended to the end of the list when it is not already in it. A blocked request can be routed through a proxy, set in **Settings > Admin > Web Search > Youtube Proxy URL** ([`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url)). The individual messages are listed under [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+A video is attached as its transcript, so one with no usable transcript cannot be attached, and the error says which case it is: captions disabled by the uploader, an age restricted or unavailable video, no transcript in the requested languages or a request YouTube blocked because of the address it came from. Set the languages to try with [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language), and route blocked requests through a proxy with **Settings > Admin > Web Search > Youtube Proxy URL** ([`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url)). The individual messages are listed under [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 ## Document Parsing
 
@@ -361,7 +361,7 @@ Only files parsed after you turn the setting on get a summary line. Re-indexing 
 
 ## Google Drive Integration
 
-When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Tools` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
+When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
 
 ### Detailed Instructions
 

@@ -272,7 +272,7 @@ Register a periodic background task on `system.startup.completed` (see [Spawn a 
 
 ### Compliance and audit
 
-- **Event-driven alerting.** Fan out a loud multi-sink alert (channel + email + SIEM) on a high-signal event. Flagship: scream when someone becomes **admin**; same pattern for `config.*` changes.
+- **Event-driven alerting.** Fan out a loud multi-sink alert (channel + email + SIEM) on a high-signal event. Flagship: scream when someone becomes **admin**. `user.role_updated` fires however the role was set, and the event's `source` names the route: `api` for the admin panel, `scim` for a directory sync, `oauth` for an identity provider login that maps roles, `trusted_header` for the trusted role header. A role change never hides inside `user.updated`. Same pattern for `config.*` changes.
 - **Immutable audit sink.** Ship every event to an append-only store or SIEM. Tamper-evident audit logging, for free.
 - **Content flagging.** Scan `message.created` for secrets and PII and flag it. (To block in-band, use a [Filter](./filter).)
 - **Access recertification.** Periodically ask resource owners to re-approve who can access their stuff. Automated access reviews.

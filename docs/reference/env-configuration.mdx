@@ -1001,7 +1001,7 @@ v0.11.0 used c-ares for everything with no way to turn it off, and it does not w
 - On some Windows hosts it finds no usable nameserver, so every lookup to an external model provider fails.
 - In Docker it can intermittently stop resolving container names while Docker's own DNS keeps answering. That empties the Ollama model list and fails in-flight chats with a misleading "Model not found".
 
-The operating system is asked by default again, so a working deployment needs no configuration here. If you turn c-ares on, exercise your models, web search and any internal services afterwards, and turn it back off if lookups start failing.
+Open WebUI asks the operating system by default again, so a working deployment needs no configuration here. If you turn c-ares on, exercise your models, web search and any internal services afterwards, and turn it back off if lookups start failing.
 
 One more difference to know about: c-ares reads `/etc/resolv.conf` and the hosts file, but not other name sources your system may be configured to use. Names that only those sources know (`.local` via avahi/mDNS, NIS or LDAP directories, Windows NBNS) resolve differently or not at all while it is enabled. `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` keep working either way, since those go through the hosts file.
 
@@ -5063,7 +5063,7 @@ This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or l
 
 - Type: `str`
 - Default: unset (requests come from the server's own address)
-- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting. Setting it sends the transcript requests through that proxy instead of the server's own address.
+- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Youtube Proxy URL**.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
@@ -5893,7 +5893,7 @@ Two consequences while the section is read-only: the client secret stays masked 
 
 To change these settings, edit your environment variables and restart, or set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to manage them in the Admin Panel.
 
-The read-only state follows this variable alone. Setting it to `True` while [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is `False` therefore leaves the section editable even though nothing at all is written to the database in that combination, so those edits still apply only to the running process and are gone after a restart.
+The read-only state follows this variable alone. Setting it to `True` while [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is `False` therefore leaves the section editable even though nothing is written to the database in that combination, so those edits last only until the next restart.
 
 :::
 

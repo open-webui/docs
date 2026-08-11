@@ -73,37 +73,13 @@ This pattern applies across web search, image generation, direct connections, co
 
 ---
 
-## Default Interface Settings (Admin)
+## Starting Values, Not Just Ceilings
 
-Feature toggles are a ceiling. **Default Interface Settings** are a starting point: an administrator decides the values every account begins with for the options in **Settings > Interface**, and each person can still change any of them for themselves.
+Feature toggles are a ceiling. There is one admin control that works the other way: **Default Interface Settings** decides what everyone's **Settings > Interface** page starts on, and each person can still change any of it for themselves. An option somebody has never touched keeps following your default, so a later change to it reaches them too.
 
-| | |
-| :--- | :--- |
-| **Location** | **Settings > Admin > System > General**, under **UI > Default Interface Settings** |
-| **Access** | Administrators only |
-| **Scope** | Every account, until the individual changes that setting |
+Set it in **Settings > Admin > General**, under **UI > Default Interface Settings**, or with the `DEFAULT_INTERFACE_SETTINGS` environment variable.
 
-Press **Configure** to open the same list of controls a user sees in **Settings > Interface**, set the ones you care about, then press **Save** at the bottom of the admin page. A line above the list counts how many settings you have configured. Every control you touch joins that set, including one you move and then move back, so use **Clear** to empty the whole set and return to the built-in defaults.
-
-**How a value is decided for a user:**
-
-1. If the user has set that option themselves, their value is used.
-2. Otherwise the instance default is used.
-3. If there is no instance default, the built-in default is used.
-
-An on/off option a user has never touched shows a small **Default** label beside its switch in **Settings > Interface**. The options that are not switches carry no such label, but they inherit in exactly the same way. Either way, change the instance default later and everyone who has not overridden that option moves with it.
-
-:::info Matching the default releases the option
-Open WebUI only stores the options a person actually differs on. Whenever they save their settings, every value that matches the instance default at that moment is dropped from their record, so the option goes back to being inherited and follows future changes to the default again. The value they see does not move; only the fact that it was pinned goes away.
-:::
-
-**What this does not do:**
-
-- It does not restrict anyone. Everyone keeps full control of every option in **Settings > Interface**; to actually hold people to your values, take **Interface Settings Access** away from them in [permissions](/features/authentication-access/rbac/permissions).
-- It does not wipe anyone's existing choices. Whatever someone already set for themselves keeps its value. What changes is the options they never set: those move from the built-in value to yours.
-- It does not cover **Theme** or **Language**. Both live in the browser rather than in the account, so they are not part of this. Use [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale) for the starting language.
-
-If you configure your instance through environment variables, [`DEFAULT_INTERFACE_SETTINGS`](/reference/env-configuration#default_interface_settings) sets the same thing as a JSON object, for example `{"chatBubble": false, "widescreenMode": true}`.
+[**Learn about Default Interface Settings →**](/features/administration/interface-defaults)
 
 ---
 

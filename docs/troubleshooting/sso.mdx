@@ -392,7 +392,7 @@ OAUTH_SCOPES=openid email profile
 OAuth callback failed: Unsupported {'app_id'} in header
 ```
 
-The parameter name varies by provider, `app_id` and `client_id` being two seen in the wild. Some providers add a vendor-specific parameter of their own to the header of the ID token they issue, and older versions of Open WebUI rejected any parameter they did not recognize there.
+Some providers add a vendor-specific parameter of their own to the header of the ID token they issue, and older versions of Open WebUI rejected any parameter they did not recognize there. The name varies by provider, `app_id` and `client_id` being two of them.
 
 **Solution:** Update Open WebUI. Unrecognized parameters are now ignored instead of ending the login, so nothing has to be changed on the provider side. The token's signature and signing algorithm are still verified as before.
 
