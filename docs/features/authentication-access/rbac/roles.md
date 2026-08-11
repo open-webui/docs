@@ -77,6 +77,8 @@ A role change ends that account's live WebSocket connections straight away, whic
 
 Deleting an account ends its live connections in the same way.
 
+In a multi-replica deployment with [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager), connections are found through the shared session pool and dropped on whichever replica is holding them, not only on the replica that handled the change.
+
 The browser reconnects on its own and re-authenticates, so the features that run over that connection (channels, collaborative note editing) act on the new role instead of the one cached when the connection opened. REST API calls read the account from the database on every request, so a demoted admin loses the admin-only endpoints on their very next call regardless.
 
 :::note A role change does not revoke the person's token
@@ -180,7 +182,7 @@ spec:
 - **Use Secrets Management**: Never hardcode `WEBUI_ADMIN_PASSWORD` in Docker Compose files or Dockerfiles. Use Docker secrets, Kubernetes secrets, or environment variable injection.
 - **Strong Passwords**: Use a strong, unique password for production deployments.
 - **Change After Setup**: Consider changing the admin password through the UI after initial deployment for enhanced security.
-- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Settings > Admin > System > General** if needed.
+- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Settings > Admin > General** if needed.
 :::
 
 :::info Behavior Details

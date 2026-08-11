@@ -9,7 +9,7 @@ Sub-agents let a model hand a focused piece of work to a second agent that runs 
 
 A sub-agent is a full chat completion of its own. It runs with the same model, tools, skills and filters as the chat that spawned it, works through the task on its own, and hands back its final answer as the tool result. The work happens in a separate chat that is kept out of your chat list, so the parent conversation stays readable.
 
-Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Admin > AI > Sub-agents** toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
+Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Admin > Sub-agents** toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
 
 ## Why Delegate
 
@@ -45,7 +45,7 @@ A file ID written into `context` is only text. The sub-agent receives the ID and
 
 Sub-agents need three things to line up:
 
-1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > AI > Sub-agents**.
+1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > Sub-agents**.
 2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Workspace > Models > Edit**, on by default once the feature is on.
 3. **Native function calling in the UI**: builtin tools are only injected for chats started in the interface, and only in Native mode. Legacy function calling and direct API callers never receive `delegate_task`.
 
@@ -53,7 +53,7 @@ There is no per-user permission for sub-agents. Once enabled for a model, anyone
 
 ## Admin Limits
 
-Configure these in **Settings > Admin > AI > Sub-agents**, or with the matching environment variables:
+Configure these in **Settings > Admin > Sub-agents**, or with the matching environment variables:
 
 | Setting | Variable | Default | Purpose |
 |---|---|---|---|

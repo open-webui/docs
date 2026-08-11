@@ -19,7 +19,7 @@ A separate **Always Play Notification Sound** setting used to sit under **Settin
 
 | Requirement | Where |
 |---|---|
-| [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) | **Settings > Admin > System > General**, the **User Webhooks** toggle |
+| [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) | **Settings > Admin > General**, the **User Webhooks** toggle |
 | The `features.webhooks` permission ([`USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`](/reference/env-configuration#user_permissions_features_user_webhooks), default: off) | **Admin Panel > Users > Groups > Permissions** |
 
 Admins always hold the permission. While the feature is off, the endpoints report the feature as absent rather than forbidden, so it stays hidden rather than looking blocked.

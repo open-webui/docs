@@ -107,6 +107,10 @@ A hand-picked set to show what is possible, grouped by plugin type. **Highlighti
 | **[Theme Designer Pro](https://github.com/silentoplayz/theme-designer-pro-presets/tree/main/event-function)** | Instance-wide theme designer that runs as a **standalone admin page** (no chat, no iframe sandbox), persisting CSS and state server-side under `DATA_DIR/theme/` and pushing changes to every connected user in real time over SSE. Includes an OKLCH color engine, draft/publish preview mode, custom-CSS auto-scoping, and login-page theming. |
 | **[User Disclaimer](https://github.com/mhupfauer/open-webui-user-disclaimer)** | Makes every user accept a disclaimer (acceptable-use policy, confidentiality notice, retention warning) before they can use the instance, on a consent page it serves itself. Enforced at the **role** level rather than in the browser, so it covers the REST API too: anyone who has not accepted is held at `pending` and gets their role back on acceptance. Bumping the `version` valve re-prompts everyone. Needs a restart after install. |
 
+:::note Interface defaults are now built in
+Open WebUI ships instance-wide starting values for **Settings > Interface**, configurable from the Admin Panel or `DEFAULT_INTERFACE_SETTINGS`. See [Default Interface Settings](/features/administration/interface-defaults). The built-in version leaves untouched options inherited, so a later change to a default still reaches everyone who has not overridden it, whereas the **Interface Defaults** plugin writes the values into each account as it is created. Check which behaviour you want before installing the plugin.
+:::
+
 ## Before you import: a beginner safety checklist
 
 A community plugin runs with the same access as the rest of the server. Treat installing one like running someone else's script as an administrator. Before you import:

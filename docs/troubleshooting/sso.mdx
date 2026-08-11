@@ -408,7 +408,7 @@ oauth
   Input should be a valid dictionary [type=dict_type, input_value='{"oidc": {"sub": "..."}}', input_type=str]
 ```
 
-v0.6.41 moved each account's identity provider subject out of the old `oauth_sub` column into an `oauth` JSON field that can hold several providers per account. In builds from v0.9.6 onwards, the step that copied those values encoded them twice, so the field ended up holding the *text* of a JSON object rather than the object. Every read of such an account then failed validation, and the lookup that matches an incoming SSO login to an existing account never matched it.
+v0.6.41 moved each account's identity provider subject out of the old `oauth_sub` column into an `oauth` JSON field that can hold several providers per account. From v0.9.6 the step performing that copy encoded the values twice, so on a database that had not yet made the move the field ended up holding the *text* of a JSON object rather than the object itself. Every read of such an account then failed validation, and the lookup that matches an incoming SSO login to an existing account never matched it.
 
 This only affects databases that were still older than v0.6.41 at the moment they were upgraded, and only the accounts that had an `oauth_sub` value at that time. An instance that had already reached v0.6.41 or newer before upgrading further was never touched, and neither were accounts created or linked after the upgrade.
 

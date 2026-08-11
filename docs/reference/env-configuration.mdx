@@ -210,7 +210,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > AI > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
@@ -224,7 +224,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Admin > AI > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Example: `gpt-4,claude-3-opus,llama-3-70b`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -395,7 +395,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same model, tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > AI > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same model, tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_BACKGROUND_ENABLED`
@@ -1312,7 +1312,7 @@ when using OpenAI-compatible endpoints.
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: The generation parameters sent with background task requests: title generation, tag generation, follow-up suggestions, image prompt generation, retrieval and web search query generation, autocomplete and context compaction summaries. It takes the same keys as a model's advanced parameters (`temperature`, `max_tokens`, `top_p`, `seed`, `reasoning_effort`, `stop`, the Ollama-only options and so on), and they are applied to whichever model the task actually runs on, whether that is [`TASK_MODEL`](#task_model), [`TASK_MODEL_EXTERNAL`](#task_model_external), [`CONTEXT_COMPACTION_MODEL`](#context_compaction_model) or the chat's own model. Leave it empty and nothing changes: title generation and compaction summaries stay capped at the `max_tokens` configured on whichever model runs them (default `1000`) and the other tasks send no parameters at all. Set anything at all here and that built-in cap is no longer applied, so include `max_tokens` yourself if you still want a limit. Raising or removing the cap is the fix for a reasoning task model that spends its budget on thinking and returns a title or summary that stops mid-sentence. Emoji generation always uses `max_tokens: 4` and ignores this setting. Can also be set in **Settings > Admin > Experience > Interface**, under **Tasks** > **Task Model Parameters** > **Configure**.
+- Description: The generation parameters sent with background task requests: title generation, tag generation, follow-up suggestions, image prompt generation, retrieval and web search query generation, autocomplete and context compaction summaries. It takes the same keys as a model's advanced parameters (`temperature`, `max_tokens`, `top_p`, `seed`, `reasoning_effort`, `stop`, the Ollama-only options and so on), applied to whichever model ends up running the task. Leave it empty and nothing changes: title generation and compaction summaries stop at 1000 output tokens and the other tasks send no parameters at all. Set anything at all here and that built-in limit is no longer applied, so include `max_tokens` yourself if you still want one. Raising the limit is the fix for a reasoning task model that spends its budget on thinking and returns a title or summary that stops mid-sentence. Emoji generation always uses `max_tokens: 4` and ignores this setting. Can also be set in **Settings > Admin > Interface**, under **Tasks** > **Task Model Parameters** > **Configure**. See [Task Models](/features/administration/task-models) for the full picture.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
 
 :::info
@@ -1715,9 +1715,9 @@ For an orchestrator connection, set `policy_id` to route every terminal request 
 | `{"context_id": "automation_id"}` | Each automation gets its own workspace. Only valid under `automation`. |
 | `false` | The terminal is not offered in that context, and requests for it are refused. |
 
-Open WebUI sends the resolved context to the orchestrator as an `X-Terminal-Context-Id` header holding `chat:<chat-id>` or `automation:<automation-id>`; shared connections send no header. A chat-scoped terminal needs a saved chat, so it is unavailable in temporary chats and before the first message of a new conversation. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the admin UI and the capacity trade-off.
+A chat-scoped terminal needs a saved chat, so it is unavailable in temporary chats and before the first message of a new conversation. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the admin UI and the capacity trade-off.
 
-`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI token), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it. Session auth over the interactive terminal WebSocket applies to orchestrator connections only.
+`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` for an orchestrator connection when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it.
 
 :::tip Helm chart auto-configuration
 When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
@@ -1999,7 +1999,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > AI > Connections > "Cache Base Model List".
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > Connections > "Cache Base Model List".
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 **How the cache works:**
@@ -2009,7 +2009,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 - **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
 - **Cache Refresh**: The cache is refreshed when:
   - The application restarts
-  - The connection settings are saved in the **Settings > Admin > AI > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
+  - The connection settings are saved in the **Settings > Admin > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
 - **No TTL**: There is no automatic time-based expiration.
 
 :::tip Performance Consideration
@@ -2189,7 +2189,7 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 
 Beyond the fixed user and session headers above, each connection can forward **arbitrary custom headers** whose values may embed **template placeholders** that Open WebUI substitutes for each request. Unlike the variables above, this is configured **per connection, not through an environment variable**, and it works **independently of `ENABLE_FORWARD_USER_INFO_HEADERS`** (custom headers are sent even when that toggle is `false`). They are applied **last**, so a custom header takes precedence over a built-in forwarded header of the same name.
 
-Set them in **Settings > Admin > AI > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
+Set them in **Settings > Admin > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
 
 ```json
 {

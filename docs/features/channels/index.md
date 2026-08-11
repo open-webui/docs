@@ -142,7 +142,7 @@ If you want a one-click path from a chat message into a channel, the community *
 Channels must be enabled by an administrator before use.
 :::
 
-1. Navigate to **Settings > Admin > System > General**
+1. Navigate to **Settings > Admin > General**
 2. Toggle **Channels** on and save
 3. Channels appear in the sidebar. Click **(+)** to create your first one
 

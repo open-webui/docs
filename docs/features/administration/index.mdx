@@ -27,6 +27,7 @@ Open WebUI gives administrators a full operational toolkit. Track which models y
 
 | | |
 | :--- | :--- |
+| 🎛️ **[Task Models](./task-models)** | The model and parameters behind titles, tags, follow-ups, autocomplete, search queries and compaction summaries |
 | 📊 **[Analytics](./analytics)** | Usage dashboards with message volume, token consumption, model breakdowns, and per-user activity |
 | 🏆 **[Evaluation](./evaluation)** | Model arena, blind A/B testing, ELO-based leaderboards, and chat snapshots for fine-tuning |
 | 📢 **[Banners](./banners)** | Customizable system-wide announcements with dismissible notifications |
@@ -36,6 +37,16 @@ Open WebUI gives administrators a full operational toolkit. Track which models y
 ---
 
 ![Admin settings, General](/images/admin/admin-general.png)
+
+## Task Models
+
+Chat titles, tags, follow-up suggestions, autocomplete, search query rewriting and context compaction summaries all run as separate model calls in the background. Out of the box they run on whatever model the user is chatting with, which is why a flagship model can quietly write a lot of three-word titles.
+
+**Use it for:** moving that work onto a small, fast model, capping what those requests are allowed to spend, and switching off the ones your instance does not want.
+
+[**Learn about Task Models →**](./task-models)
+
+---
 
 ## Analytics
 

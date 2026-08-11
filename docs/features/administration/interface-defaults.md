@@ -5,9 +5,9 @@ title: "Default Interface Settings"
 
 ## Overview
 
-Every account has its own **Settings > Interface** page, and out of the box everyone starts on the values Open WebUI ships with. **Default Interface Settings** let an administrator choose those starting values for the whole instance, so people open a fresh account on the interface you want rather than the stock one.
+Every account has its own **Settings > Interface** page, and out of the box everyone starts on the values Open WebUI ships with. **Default Interface Settings** let an administrator choose those starting values for the whole instance, so a new account opens on the interface you want rather than the stock one.
 
-These are starting values, not restrictions. Anyone can still change any of them for themselves.
+They are starting values. Anyone can still change any of them for themselves.
 
 You can configure them in two ways:
 
@@ -27,7 +27,7 @@ An on/off option someone has never touched shows a small **Default** label besid
 Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option.
 
 :::info Matching the default releases the option
-Open WebUI only stores the options a person actually differs on. Whenever they save their settings, any value that matches your current default is dropped from their own settings and goes back to being inherited. What they see does not change; the option just stops being pinned and follows your default again.
+Moving a control to whatever your default currently is releases the override: the **Default** label comes back and the option follows your defaults again. That is how someone undoes a choice they made earlier. It also means that if you later set a default to the value a person had already picked for themselves, their option goes back to being inherited and will move with your next change.
 :::
 
 ---
@@ -67,10 +67,10 @@ services:
       - 'DEFAULT_INTERFACE_SETTINGS={"chatBubble":false,"widescreenMode":true,"chatHoverPreview":false,"title":{"auto":false}}'
 ```
 
-If the value is not valid JSON, or parses to something that is not an object, it is ignored and no defaults are applied. Nothing else about startup changes.
+If the value is not valid JSON, or parses to something that is not an object, it is ignored and no defaults are applied.
 
-:::tip Reach further than the panel
-The defaults are merged into a person's whole settings record, not only the part the **Interface** page writes. The environment variable therefore accepts keys from the other personal settings pages too, such as `system` (a personal system prompt), `params` (personal advanced parameters), `notificationSound` and `keyboardShortcuts`, even though the Admin Panel editor only offers the interface controls. They inherit and release exactly like the keys in the table.
+:::tip Reach beyond the Interface page
+The defaults apply to a person's whole settings record, which is wider than the **Interface** page. The environment variable therefore accepts keys written by the other personal settings pages as well, such as `system` (a personal system prompt), `params` (personal advanced parameters), `notificationSound` and `keyboardShortcuts`, even though the Admin Panel editor only offers the interface controls. They inherit and release just like the keys in the table.
 :::
 
 ---
@@ -176,7 +176,6 @@ A few controls only appear under a condition: **Toast Notifications for New Upda
 - **It does not restrict anyone.** Everyone keeps full control of every option in **Settings > Interface**. To actually hold people to your values, take **Interface Settings Access** away from them, see [Locking the defaults](#locking-the-defaults).
 - **It does not wipe anyone's existing choices.** Whatever someone already set for themselves keeps its value. What changes is the options they never set: those move from the built-in value to yours.
 - **It does not cover Theme or Language.** Both are stored in the browser rather than on the account, so they are not part of this. Use [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale) to choose the starting language.
-- **It is not the same as pinned or selected models.** Those have their own settings, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 
 ---
 
@@ -186,9 +185,9 @@ If a set of accounts should stay exactly on your values, remove the **Interface 
 
 ---
 
-## Checking what someone has actually overridden
+## Checking what an account has overridden
 
-`GET /api/v1/users/user/settings` normally returns a person's settings with your defaults already filled in, which is what the app uses. Add `?raw=true` to get their own stored settings instead, without the defaults merged in. That is the quickest way to see which options a person has genuinely pinned and which are still inherited.
+`GET /api/v1/users/user/settings` returns the signed-in account's settings with your defaults already filled in, which is what the app itself uses. Add `?raw=true` to get that account's own stored settings instead, without the defaults merged in, so you can see exactly which options it has pinned and which are still inherited.
 
 ---
 

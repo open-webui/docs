@@ -166,7 +166,7 @@ To download new base models, go to **Settings > Connections > Ollama** or type `
 
 ## Global Model Defaults (Admin)
 
-Administrators can set baseline capabilities and parameters that apply to all models via **Settings > Admin > AI > Models > Model Defaults > Configure**.
+Administrators can set baseline capabilities and parameters that apply to all models via **Settings > Admin > Models > Model Defaults > Configure**.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
@@ -210,7 +210,7 @@ The **Model Defaults** panel at the top of the same page is a different feature:
 
 ### Setting a selected or pinned model
 
-1. Go to **Settings > Admin > AI > Models**.
+1. Go to **Settings > Admin > Models**.
 2. Find the model with **Search Models**, or narrow the list with the view filter.
 3. Click the ellipsis (**...**) at the end of the model's row.
 4. Choose **Set as Selected Model** or **Set as Pinned Model**.
@@ -327,4 +327,4 @@ Model presets configure behavior through system prompts and tool bindings. They 
 
 ### Fallback requires configuration
 
-If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Admin > AI > Models**. The fallback uses the first Selected Model.
+If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Admin > Models**. The fallback uses the first Selected Model.

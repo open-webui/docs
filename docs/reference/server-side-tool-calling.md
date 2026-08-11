@@ -438,7 +438,7 @@ To adapt it:
 | No tools were called at all, and `stream` was `false` | The native loop is streaming-only | Send `stream: true` |
 | `stream: true` was sent but nothing streamed | The workspace model's **Stream Chat Response** parameter overrides the request | Clear it on the model, or accept the model's setting |
 | Web search, code interpreter, memory or image generation never offered | Missing `session_id`, missing `features` flag, missing user permission, disabled globally, or the model's **Builtin Tools** category is off | All five must line up. Check them in that order |
-| `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Admin > Tools > Code Interpreter**, or drop `code_interpreter` from `features` |
+| `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Admin > Code Execution**, or drop `code_interpreter` from `features` |
 | File tools (`view_file`, `grep_chat_files`, ...) missing | They need `files` in the request body, the model's **File Upload** capability on, and **File Context** off | See [Prompt Caching and Context Optimization](/features/chat-conversations/prompt-caching) |
 | `503 Terminal unavailable` | The terminal server is unreachable, disabled, or your user has no access grant | Confirm the ID appears in `GET /api/v1/terminals/` for that key |
 | `503`, terminal not available for chat | The terminal's `contexts.chat` is `false`, so an administrator has taken it out of chats | Pick a terminal whose `contexts.chat` is not `false` |

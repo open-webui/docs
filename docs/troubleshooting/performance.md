@@ -33,16 +33,11 @@ By default, Open WebUI automates background tasks like title generation, tagging
 
 **Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid using large reasoning models (like o1, r1, or Claude) as they are too slow and expensive for simple background tasks.
 
-**Configuration:**
-There are two separate settings in **Settings > Admin > Experience > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
-*   **Task Model (External)**: Used when you are chatting with an external model (e.g., OpenAI).
-*   **Task Model (Local)**: Used when you are chatting with a locally hosted model (e.g., Ollama).
-
 **Best Options (2025):**
 *   **External/Cloud**: `gpt-5-nano`, `gemini-2.5-flash-lite`, `llama-3.1-8b-instant` (OpenAI/Google/Groq/OpenRouter).
 *   **Local**: `qwen3:1b`, `gemma3:1b`, `llama3.2:3b`.
 
-**Tuning the requests themselves:** below the two model pickers, **Task Model Parameters > Configure** ([`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)) sets the generation parameters every background request is sent with, so you can cap output with `max_tokens`, lower `temperature` or set `reasoning_effort` low if you are stuck on a reasoning model. Note that setting anything here removes the built-in 1000-token cap on title generation and context compaction summaries, so add `max_tokens` explicitly if you want those bounded.
+**Configuration:** the two model pickers, the parameters those background requests are sent with, and the switches for turning individual tasks off are all in **Settings > Admin > Interface**. See [Task Models](/features/administration/task-models) for the walkthrough.
 
 ### 2. Caching & Latency Optimization
 
@@ -55,7 +50,7 @@ Drastically reduces startup time and API calls to external providers.
 If you are using **OpenRouter** or any provider with hundreds/thousands of models, enabling model caching is **highly recommended**. Without caching, initial page loads can take **10-15+ seconds** as the application queries all available models. Enabling the cache reduces this to near-instant.
 :::
 
-- **Admin Panel**: `Settings > Admin > AI > Connections > Cache Base Model List`
+- **Admin Panel**: `Settings > Admin > Connections > Cache Base Model List`
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
   *   *Note*: Caches the list of models in memory. Only refreshes on App Restart or when clicking **Save** in Connections settings.
 
@@ -447,7 +442,7 @@ Open WebUI loads local ML models for features like RAG and STT. **This section i
     *   **Option B (Best Performance)**: Use an **External API** (OpenAI/Cloud).
 
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Admin > Tools > Documents > Embedding Model Engine`
+    *   **Admin Panel**: `Settings > Admin > Documents > Embedding Model Engine`
     *   **Env Var**: `RAG_EMBEDDING_ENGINE=openai` (to offload completely)
 
 #### Speech-to-Text (STT)

@@ -90,6 +90,8 @@ If you understand the risk and need it, the per-user **Settings > Interface > if
 Navigate to the folder you want first, then drag and drop. The file uploads to whatever directory you're currently viewing.
 :::
 
+Uploading is switched off in a folder marked **Read-only**, and dropping files onto one does nothing.
+
 ---
 
 ## Downloading files
@@ -106,13 +108,27 @@ Click the **edit icon** on any text file to open it in an editor. Make your chan
 
 ![Editing a file directly in the file browser](/images/open-terminal-preview-code.png)
 
+Files marked **Read-only** cannot be edited, so the edit and save buttons stay greyed out for them.
+
 ---
 
 ## Creating and deleting
 
-You can create new files and folders, or delete things you don't need anymore, directly from the file browser.
+You can create new files and folders, or delete things you don't need anymore, directly from the file browser. Both are switched off in a folder marked **Read-only**.
 
 ![File browser action bar with New File, New Folder options](/images/open-terminal-file-browser-home.png)
+
+---
+
+## Read-only files and folders
+
+Some files and folders cannot be changed. The file browser marks them **Read-only** and greys out the actions that would fail, so you find out before you try rather than after.
+
+A folder you cannot write to is marked **Read-only** next to the breadcrumbs at the top. **New File**, **New Folder** and **Upload** are greyed out while you are in it, dropping files onto it does nothing, and nothing inside it can be renamed or deleted.
+
+A single file or folder you cannot change is marked **Read-only** next to its name. **Rename** and **Delete** are greyed out in its menu, it cannot be dragged into another folder, and its preview offers no edit or save. If you select several items at once, **Delete** stays greyed out when any one of them is read-only.
+
+Being read-only limits changes, nothing else. You can still browse, preview and download these files as usual.
 
 ---
 

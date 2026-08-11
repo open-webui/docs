@@ -214,7 +214,7 @@ Models frequently:
 
 **To verify which model you're actually using:**
 1. Check the model selector in the Open WebUI interface
-2. Look at the **Settings > Admin > AI > Connections** to confirm your API endpoints
+2. Look at the **Settings > Admin > Connections** to confirm your API endpoints
 3. Check your provider's dashboard/logs for the actual API calls being made
 
 Asking the model itself is **not** a valid way to diagnose routing issues. If you suspect a configuration problem, check your connection settings and API keys instead.
@@ -243,7 +243,7 @@ By default, these tasks use the **same model** you're chatting with. If you're u
 1. Go to **Settings > Admin > Experience > Interface** (for title/tag generation settings)
 2. Configure a **Task Model** under **Settings > Admin > Experience > Interface > Tasks** to use a smaller, cheaper model (like GPT-4o-mini) or a local model for background tasks
 3. Disable features you don't need (auto-title, auto-tags, etc.)
-4. Bound what those requests can spend with **Task Model Parameters > Configure** in the same **Tasks** section ([`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)). Setting `max_tokens` there caps the output of every background request, including tag, follow-up and search query generation, which otherwise send no limit at all
+4. Cap what those requests can spend by setting `max_tokens` under **Task Model Parameters** in the same **Tasks** section. Tag, follow-up and search query generation otherwise send no output limit at all. See [Task Models](/features/administration/task-models#task-model-parameters)
 
 :::tip Cost-Saving Recommendation
 Set your Task Model to a fast, inexpensive model (or a local model via Ollama) while keeping your primary chat model as a more capable one. This gives you the best of both worlds: smart responses for your conversations, cheap/free processing for background tasks.
