@@ -5,22 +5,22 @@ title: "Task Models"
 
 # Task Models
 
-Open WebUI makes small model calls in the background, separately from the answer a user is waiting for. They write chat titles, generate tags, suggest follow-up questions, produce autocomplete ghost text, rewrite a message into a retrieval or web search query, rewrite a message into an image prompt, and summarize older messages when [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is on.
+Open WebUI makes small model calls in the background, separately from the answer a user is waiting for. They write chat titles, generate tags, suggest follow-up questions, produce autocomplete ghost text, rewrite a message into a retrieval or web search query, rewrite a message into an image prompt and summarize older messages when [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is on.
 
 By default all of that runs on the model the user is chatting with. On an expensive flagship model it is a bill nobody planned for, and on a slow local model it makes the whole interface feel sluggish. Pointing background work at a small, fast model is the highest-value change an administrator can make here.
 
-Everything on this page lives in **Settings > Admin > Interface**.
+The settings below are in **Settings > Admin > Interface**.
 
 ---
 
 ## Choosing the task model
 
-The **Tasks** section holds two pickers. Open WebUI decides between them from the connection the chat model came from:
+The **Tasks** section holds two pickers. Open WebUI picks between them based on the connection the chat model came from:
 
-| Field | Environment variable | Used when the chat model comes from a connection typed |
+| Field | Environment variable | Used when the chat model comes from |
 | :--- | :--- | :--- |
-| **Local Task Model** | [`TASK_MODEL`](/reference/env-configuration#task_model) | **Local** (Ollama, and anything else you marked local) |
-| **External Task Model** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | **External** (OpenAI-compatible providers) |
+| **Local Task Model** | [`TASK_MODEL`](/reference/env-configuration#task_model) | a connection typed **Local** (Ollama and anything else you marked local) |
+| **External Task Model** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | a connection typed **External** (OpenAI-compatible providers) |
 
 Both default to **Current Model**, which means background work runs on the chat's own model. If you name a model that is no longer available, background work falls back to the chat's model rather than failing.
 
@@ -43,15 +43,15 @@ Leave it empty and background requests behave as they always have: title generat
 
 Reach for it when:
 
-- **A title or a compaction summary comes back cut off.** This is the usual symptom of a reasoning task model. Thinking counts against the same 1000 tokens, so the budget can be gone before any answer is written. Raise `max_tokens`, or turn `reasoning_effort` down.
-- **Background calls cost more than you expected.** Tag, follow-up, query and autocomplete requests send no output limit of their own. Setting `max_tokens` puts a ceiling on all of them at once.
-- **Background output is too creative.** Lower `temperature` for steadier titles and tags.
+- **A title or a compaction summary comes back cut off.** This is the usual symptom of a reasoning task model. Thinking counts against the same 1000 tokens, so the budget can be gone before any answer is written. Raise `max_tokens` or turn `reasoning_effort` down.
+- **Background calls cost more than you expected.** Tag, follow-up, query and autocomplete requests carry no output limit of their own. Setting `max_tokens` puts a ceiling on all of them at once.
+- **Background output is too loose.** Lower `temperature` for steadier titles and tags.
 
 :::warning Setting anything replaces the built-in limit
 As soon as you set a single parameter, the built-in 1000-token limit on titles and compaction summaries is no longer applied. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
 :::
 
-These parameters are the only ones background requests get. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
+This is the only place background requests get parameters from. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
 
 ---
 
@@ -68,7 +68,7 @@ Each background task has a switch under **Generation** in the same panel, and an
 | Query rewriting for knowledge retrieval | **Retrieval Query Generation** | [`ENABLE_RETRIEVAL_QUERY_GENERATION`](/reference/env-configuration#enable_retrieval_query_generation) |
 | Query rewriting for web search | **Web Search Query Generation** | [`ENABLE_SEARCH_QUERY_GENERATION`](/reference/env-configuration#enable_search_query_generation) |
 
-Image prompt generation is toggled in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)).
+Image prompt generation is switched off in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)).
 
 :::tip Weak hardware
 Autocomplete is the first thing to turn off. It fires as users type, so a slow task model turns the prompt box to molasses.
@@ -78,6 +78,6 @@ Autocomplete is the first thing to turn off. It fires as users type, so a slow t
 
 ## Changing the prompts
 
-Every task's prompt sits next to its toggle under **Generation**, and each one is empty by default, meaning the built-in prompt is used. The full text of each default, and the placeholders it accepts, is in the [environment configuration reference](/reference/env-configuration#tasks): [`TITLE_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#title_generation_prompt_template), [`TAGS_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#tags_generation_prompt_template), [`FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#follow_up_generation_prompt_template), [`QUERY_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#query_generation_prompt_template), [`AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#autocomplete_generation_prompt_template) and [`IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#image_prompt_generation_prompt_template).
+Every task's prompt sits next to its toggle under **Generation**, and each one is empty by default, meaning the built-in prompt is used. The [Tasks section of the environment configuration reference](/reference/env-configuration#tasks) has the full text of each built-in prompt and the placeholders it accepts.
 
 [Prompt modifiers](/features/workspace/prompts) are worth knowing about here, since task prompts often have to cope with pasted documents and long code blocks.

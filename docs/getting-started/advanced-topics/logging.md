@@ -62,6 +62,16 @@ Use `DEBUG` for development and troubleshooting. For production, stick with `INF
 
 ---
 
+### What the Log Level Costs
+
+Raising the level saves work as well as log volume. Messages the level filters out are never built, so they cost nothing. At the default `INFO` that already covers every debug message in the backend, and `WARNING` extends it to the informational ones.
+
+The saving follows the size of the text that would have been thrown away, so it is largest on busy servers, in long conversations and on chats that draw from a large knowledge base. It applies the same way when logs are exported to an OpenTelemetry collector: nothing is prepared for a message the level has already dropped.
+
+Going the other way, `DEBUG` is the one level where all of that text really is built and written, including whole request payloads and retrieval results. Use it while you are chasing a problem and set it back afterwards.
+
+---
+
 ### Structured JSON Logging
 
 For production environments using log aggregators, set `LOG_FORMAT=json` to switch all stdout output to single-line JSON objects.
