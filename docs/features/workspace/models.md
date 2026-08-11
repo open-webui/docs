@@ -169,7 +169,7 @@ Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** an
 - **Discover**: Browse community presets at the bottom of the page
 
 :::info Downloading base models
-To download new base models, go to **Settings > Connections > Ollama** or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
+To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
 :::
 
 ---
