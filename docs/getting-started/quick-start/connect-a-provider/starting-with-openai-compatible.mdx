@@ -698,6 +698,14 @@ Everything in the panel is admin-only, and the actions are proxied to the local 
 
 The connection URL you already use for chat is the right one here: Open WebUI strips a trailing `/v1`, `/api/v1` or `/api/v0` before calling the management API, so `http://localhost:1234/v1` and `http://127.0.0.1:10000/v1` both work unchanged.
 
+### From the model selector
+
+Admins do not have to open the panel to pull a model. Type a model ref into the model selector's search box and Open WebUI offers one **Download** row per target: Ollama if it is connected, plus every `llama.cpp` and LM Studio connection, each labelled with the provider it would download from. Arrow keys reach the rows and **Enter** starts the download. A row in progress shows a percentage and an ✕ to cancel it, and up to three downloads can run at once across all targets.
+
+Model rows for these two providers also carry their parameter size, quantization and file size next to the name, taken from whatever the server reports.
+
+### Loaded models and eject
+
 Loaded models are marked in the model selector for both provider types. The **Eject** button that admins see on a loaded row only works for `llama.cpp`; on an LM Studio model it returns `Provider "lmstudio" does not support model unloading`, so unload those from the management panel instead.
 
 ---
