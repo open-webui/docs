@@ -168,6 +168,9 @@ For chat-based automation tools to be available:
 4. **`ENABLE_AUTOMATIONS`** must be enabled globally (enabled by default)
 5. The user must have the **Features > Automations** permission (admins always pass)
 
-The folder argument these tools accept is a folder ID, and it is checked against the folders you own: a folder that is not yours, or no longer exists, comes back as an error instead of being applied. On `update_automation` and `list_automations`, leaving the argument out keeps the automation's current folder or lists across all folders, while passing an empty string clears the folder or the filter.
+The folder argument these tools accept is a folder ID, and it is checked against the folders you own: a folder that is not yours, or no longer exists, comes back as an error instead of being applied.
+
+- On `update_automation`, omitting the argument or passing a blank string keeps the automation's current folder. Passing `null` clears it. The same applies to `model_id`: a blank value is ignored rather than wiping the automation's model.
+- On `list_automations`, omitting the argument or passing a blank string lists across all folders.
 
 See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for full details on all builtin tools.
