@@ -3,13 +3,6 @@ sidebar_position: 310
 title: "Exporting & Importing DB"
 ---
 
-:::warning
-
-This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
-
-:::
-
-
 If you need to migrate your **Open WebUI** data (e.g., chat histories, configurations, etc.) from one server to another or back it up for later use, you can export and import the database. This guide assumes you're running Open WebUI using the internal SQLite database (not PostgreSQL).
 
 Follow the steps below to export and import the `webui.db` file, which contains your database.
@@ -20,13 +13,24 @@ Follow the steps below to export and import the `webui.db` file, which contains 
 
 To export the database from your current Open WebUI instance:
 
-1. **Use `docker cp` to copy the database file**:
+1. **Stop Open WebUI before copying the database**:
+   SQLite can use write-ahead logging (WAL), which may keep recent committed changes in sidecar files while the application is running. Stop the container first so the database is in a consistent state before export:
+   ```bash
+   docker stop open-webui
+   ```
+
+2. **Use `docker cp` to copy the database file**:
    The `webui.db` file is located in the container inside the directory `/app/backend/data`. Run the following command to copy it into your local machine:
    ```bash
    docker cp open-webui:/app/backend/data/webui.db ./webui.db
    ```
 
-2. **Transfer the exported file to the new server**:
+3. **Start Open WebUI again on the source server**:
+   ```bash
+   docker start open-webui
+   ```
+
+4. **Transfer the exported file to the new server**:
    You can use **FileZilla** or any other file transfer tool of your choice to move the `webui.db` file to the new server.
 
    :::info
@@ -45,13 +49,19 @@ After moving the `webui.db` file to the new server, follow these steps:
    docker stop open-webui
    ```
 
-2. **Use `docker cp` to copy the database file to the container**:
+2. **Remove destination SQLite sidecar files**:
+   If the destination container has already created `webui.db-wal` or `webui.db-shm`, remove those files before replacing `webui.db`. They belong to the old destination database state and must not be mixed with the imported database.
+   ```bash
+   docker run --rm --volumes-from open-webui --entrypoint rm "$(docker inspect -f '{{.Config.Image}}' open-webui)" -f /app/backend/data/webui.db-wal /app/backend/data/webui.db-shm
+   ```
+
+3. **Use `docker cp` to copy the database file to the container**:
    Assuming the exported `webui.db` file is in your current working directory, copy it into the container:
    ```bash
    docker cp ./webui.db open-webui:/app/backend/data/webui.db
    ```
 
-3. **Start the Open WebUI container**:
+4. **Start the Open WebUI container**:
    Start the container again to use the imported database.
    ```bash
    docker start open-webui
@@ -65,6 +75,7 @@ After moving the `webui.db` file to the new server, follow these steps:
 
 - This export/import process **only works if you're using the internal SQLite database (`webui.db`)**.
 - If you're using an external PostgreSQL database, this method is not applicable because the database is managed outside the container. For PostgreSQL, you'd need to follow PostgreSQL-specific tools and procedures to back up and restore your database.
+- Do not mix `webui.db-wal` or `webui.db-shm` files from a different database copy. When replacing `webui.db` on the destination, remove any existing destination sidecar files before starting Open WebUI.
 
 ---
 
@@ -81,12 +92,15 @@ This approach is particularly useful when:
 # Quick commands summary for export and import
 
 # Export:
+docker stop open-webui
 docker cp open-webui:/app/backend/data/webui.db ./webui.db
+docker start open-webui
 
 # Stop container on the new server:
 docker stop open-webui
 
 # Import:
+docker run --rm --volumes-from open-webui --entrypoint rm "$(docker inspect -f '{{.Config.Image}}' open-webui)" -f /app/backend/data/webui.db-wal /app/backend/data/webui.db-shm
 docker cp ./webui.db open-webui:/app/backend/data/webui.db
 
 # Start container:
