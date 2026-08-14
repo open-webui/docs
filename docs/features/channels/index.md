@@ -108,7 +108,7 @@ Before v0.9.6, tagging a model in a channel only forwarded **images** from the t
 
 ### Tagging people and linking channels
 
-Use `@username` to notify teammates. Use `#channel-name` to create clickable cross-references between conversations.
+Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. Use `#channel-name` to create clickable cross-references between conversations.
 
 ### Message interactions
 
