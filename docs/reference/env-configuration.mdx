@@ -1318,6 +1318,13 @@ Several parameters have no effect on background requests wherever you set them: 
 
 :::
 
+#### `ENABLE_TOOL_PERMISSIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Adds a **Tool Permissions** entry to the chat input's ➕ menu, where a user picks **Full access** (run tools without asking, the default) or **Ask for approval** (stop before each tool call until it is allowed or denied). Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Automations and channel replies always run with full access, since nobody is watching the chat to approve anything. Can also be toggled in **Settings > Admin > Interface**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `ENABLE_CONTEXT_COMPACTION`
 
 - Type: `bool`

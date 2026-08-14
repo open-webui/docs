@@ -251,6 +251,25 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | **Complex Chaining** | ⚠️ Unreliable | ✅ Excellent |
 | **Future development** | ❌ None | ✅ All new features target this mode |
 
+### Tool Approval
+
+By default a model runs its tool calls as soon as it makes them. An administrator can offer a second mode by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
+
+Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with two choices:
+
+| Mode | Behaviour |
+| :--- | :--- |
+| **Full access** (default) | Tool calls run immediately, as they always have. |
+| **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
+
+Your choice is saved to your user settings, so it carries over to new chats until you change it back. A denied call is reported back to the model as an error, so it can react rather than silently losing the result, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
+
+Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
+
+:::info Requires a saved chat
+Approval works by persisting the pending call on the assistant message, so a temporary chat has nowhere to store it. Approval prompts also survive a page reload, since the pending state lives in the message rather than in the browser.
+:::
+
 ### Built-in System Tools (Native/Agentic Mode)
 
 🛠️ These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
@@ -322,6 +341,8 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message.* |
+| `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
@@ -438,6 +459,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
+| **Ask User** | | |
+| `ask_user` | `questions` (required, 1-3 objects of `{id, header, question, options}` where `options` is 2-3 `{label, description}` pairs and an optional per-question `allow_other`), `allow_other` (default: `true`), `timeout_ms` (default: `120000`, clamped to 60000-240000) | `{status: "answered", answers}` keyed by question id, or `{status: "cancelled", answers: {}}` when the card times out. Dismissing the card returns a rejection error instead |
 | **Sub-agents** | | |
 | `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
@@ -545,6 +568,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | Category | Tools Included | Description |
 |----------|----------------|-------------|
 | **Time & Calculation** | `get_current_timestamp`, `calculate_timestamp` | Get current time and perform date/time calculations |
+| **Ask User** | `ask_user` | Pause a response to ask the user a clarifying question |
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
