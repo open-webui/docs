@@ -41,10 +41,14 @@ These eighteen can be rebound:
 | Focus input | `Shift+Escape` |
 | Generate message pair | `Cmd+Shift+Enter` |
 | Regenerate response | `Cmd+R` |
+| Allow tool call | `Cmd+Alt+Enter` |
+| Deny tool call | `Cmd+Alt+Backspace` |
 | Copy last code block | `Cmd+Shift+;` |
 | Copy last response | `Cmd+Shift+C` |
 
 Anything not listed here is fixed and cannot be reassigned.
+
+**Allow tool call** and **Deny tool call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
 
 Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to previous / next chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle Controls** opens and closes the chat controls panel. They are left unbound so they cannot collide with an existing binding on arrival, pick keys that suit you.
 

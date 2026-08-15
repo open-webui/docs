@@ -89,7 +89,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
   `/` and `@` used to offer only prompts and only models respectively; both now cover much more.
 
-- **Built-in Slash Commands**: four commands act on the current chat rather than being sent to the model:
+- **Built-in Slash Commands**: these act on the chat or the interface rather than being sent to the model:
 
   | Command | What it does |
   |---|---|
@@ -97,8 +97,12 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/status` | Opens a status panel for the chat showing **Context usage**, **Queued messages**, **Tasks** currently running, and the **Chat ID**. |
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
+  | `/settings` | Opens the Settings dialog. |
+  | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
-  `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` is always offered, an empty chat included, and it is the only one that takes anything after it.
+  `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` and `/settings` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.
+
+  `/temporary` is the mirror image: it appears **only before a chat exists**, since the setting cannot change once messages are saved. It is also left out when the **Temporary Chat** permission is withheld, and when an administrator has enforced temporary chat, because in that case there is nothing left to toggle. Turning it on switches you to a new temporary chat and marks the URL with `?temporary-chat=true`.
 
   `/fork` requires the **Chat Import** permission (`chat.import`, allowed by default; admins always pass). Without it the command is left out of the `/` menu, alongside the **Fork chat** action on a message. Typing `/fork` out by hand and sending it still runs the built-in command, which reports **Access prohibited**.
 

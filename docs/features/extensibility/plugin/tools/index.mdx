@@ -262,6 +262,8 @@ Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with
 | **Full access** (default) | Tool calls run immediately, as they always have. |
 | **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
 
+You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
+
 Your choice is saved to your user settings, so it carries over to new chats until you change it back. A denied call is reported back to the model as an error, so it can react rather than silently losing the result, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
 
 Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
