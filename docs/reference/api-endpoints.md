@@ -171,7 +171,7 @@ Internally, the endpoint converts the Anthropic request format to OpenAI Chat Co
 
 When the target connection already speaks the Anthropic Messages API, the request is forwarded as-is instead of being converted to OpenAI format and back. Nothing is lost in translation, so provider-specific fields survive the round trip without needing `passthrough_params`.
 
-This applies when the connection's base URL is an Anthropic one, or when its **Provider** is set to **LiteLLM** in the connection's settings (alongside **Default**, **Azure OpenAI** and **llama.cpp**), since LiteLLM exposes an Anthropic-compatible route of its own. Every other connection keeps the conversion behaviour described above.
+This applies when the connection's base URL is an Anthropic one, or when its **Provider** is set to **LiteLLM** under **Advanced** in the connection's settings, since LiteLLM exposes an Anthropic-compatible route of its own. The forwarded request goes straight to the provider, so filters, tools and knowledge do not run on it. Every other connection keeps the conversion behaviour described above, and the rest of the dropdown is covered in [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting).
 
 :::
 

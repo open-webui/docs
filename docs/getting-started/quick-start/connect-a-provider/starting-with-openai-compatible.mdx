@@ -511,15 +511,15 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Azure OpenAI** provides enterprise-grade OpenAI hosting through Microsoft Azure.
 
-  To add an Azure OpenAI connection, you need to **switch the provider type** in the connection dialog:
+  To add an Azure OpenAI connection, set the **Provider** in the connection dialog:
 
-  1. In the connection form, find the **Provider Type** button (it says **OpenAI** by default).
-  2. **Click it to toggle** it to **Azure OpenAI**.
+  1. In the connection form, click **Advanced** to expand it.
+  2. Set the **Provider** dropdown to **Azure OpenAI**.
   3. Fill in the settings below.
 
   | Setting | Value |
   |---|---|
-  | **Provider Type** | Click to switch to **Azure OpenAI** |
+  | **Provider** | **Azure OpenAI** (see [The Provider Setting](#the-provider-setting)) |
   | **URL** | Your Azure endpoint (e.g., `https://my-resource.openai.azure.com`) |
   | **API Version** | e.g., `2024-02-15-preview` |
   | **API Key** | Your Azure API Key |
@@ -527,6 +527,10 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::info
   Azure OpenAI uses **deployment names** as model IDs, not standard OpenAI model names. You must add your deployment names to the Model IDs allowlist.
+  :::
+
+  :::tip Azure is detected from the URL
+  If you leave **Provider** at **Default** and the URL contains `azure.` or `cognitive.microsoft.com` without ending in `/openai/v1`, the dialog switches itself into Azure mode and asks for the API Version and deployment names anyway. Setting the dropdown explicitly is only needed for Azure-compatible endpoints on other hostnames.
   :::
 
   :::tip Two Azure URL Formats
@@ -550,6 +554,9 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **URL** | `http://localhost:4000/v1` (default LiteLLM proxy port) |
   | **API Key** | Your LiteLLM proxy key (if configured) |
   | **Model IDs** | Auto-detected from your LiteLLM configuration |
+  | **Provider** | `LiteLLM` (optional, see below) |
+
+  Setting **Provider** to `LiteLLM` under **Advanced** only matters when something calls Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#-anthropic-messages-api), for example an Anthropic SDK or a coding agent pointed at Open WebUI. With it set, such a request is handed to LiteLLM untouched instead of being translated into Chat Completions and back, so Anthropic-only fields survive the trip. The trade is that the request goes straight to LiteLLM and skips the Open WebUI chat pipeline, so filters, tools and knowledge do not run on it. Normal chatting in the Open WebUI interface is unaffected either way.
 
   **Quick setup:**
 
@@ -625,11 +632,11 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   |---|---|
   | **URL** | `http://localhost:1234/v1` |
   | **API Key** | Leave blank (or `lm-studio` as placeholder) |
-  | **Provider Type** | `LM Studio` (optional, enables model management from Open WebUI) |
+  | **Provider** | `LM Studio` (optional, enables model management from Open WebUI) |
 
   Start the server in LM Studio via the "Local Server" tab before connecting.
 
-  Setting **Provider Type** to `LM Studio` marks loaded models in the model selector and lets admins download, load and unload models without leaving Open WebUI. See [Managing Local Models from Open WebUI](#managing-local-models-from-open-webui).
+  Setting **Provider** to `LM Studio` under **Advanced** marks loaded models in the model selector and lets admins download, load and unload models without leaving Open WebUI. See [Managing Local Models from Open WebUI](#managing-local-models-from-open-webui).
 
   </TabItem>
   <TabItem value="vllm" label="vLLM">
@@ -681,9 +688,29 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 ---
 
+## The Provider Setting
+
+Every OpenAI connection has a **Provider** dropdown, hidden behind **Advanced** in the connection dialog. It is a hint about what the server on the other end actually is. Open WebUI cannot tell a llama.cpp server from a LiteLLM proxy by looking at `/v1/chat/completions`, since both answer it the same way, so the dropdown is how you tell it, and each option switches on the extras that server supports.
+
+Leaving it at **Default** is always safe. Chatting works the same with every option; the setting only adds capabilities around the chat.
+
+| Option | What it changes |
+| :--- | :--- |
+| **Default** | Nothing. The connection is treated as a plain OpenAI-compatible endpoint. |
+| **Azure OpenAI** | Requests are rewritten into Azure's deployment-based URL form with an `api-version` parameter, so the connection needs an **API Version** and the deployment names listed under **Model IDs**. Also switched on automatically for Azure-looking URLs, see the Azure OpenAI tab under [Cloud Providers](#cloud-providers). |
+| **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
+| **LM Studio** | Unlocks the same [model management panel](#managing-local-models-from-open-webui), loaded markers and model details, minus deleting models and minus the **Eject** button. |
+| **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#-anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
+
+:::info Where the dropdown is not shown
+The **Provider** dropdown belongs to OpenAI connections only. Ollama connections are recognised on their own, and the personal **Direct Connections** users add in their own settings do not offer it.
+:::
+
+---
+
 ## Managing Local Models from Open WebUI
 
-Two provider types go beyond plain chat completions: setting **Provider Type** on the connection tells Open WebUI which management API the server speaks, which unlocks a model management panel for admins.
+Two provider types go beyond plain chat completions: setting **Provider** on the connection tells Open WebUI which management API the server speaks, which unlocks a model management panel for admins.
 
 Open it from **Settings > Admin > Models**, the **⋯** menu, then **Manage**. When you have both Ollama and a managed provider connection, a picker at the top of the dialog switches between them; a second picker lists every managed connection by URL.
 
