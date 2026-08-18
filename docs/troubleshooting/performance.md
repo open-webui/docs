@@ -128,7 +128,8 @@ For multi-user setups, the choice of Vector DB matters.
 
 -   **ChromaDB (Default)**: **NOT SAFE** for multi-worker (`UVICORN_WORKERS > 1`) or multi-replica deployments. The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. SQLite connections are not fork-safe: when uvicorn forks multiple workers, each process inherits the same database connection, and concurrent writes cause instant worker crashes (`Child process died`) or database corruption. This is a fundamental SQLite limitation, not a bug. See the [Scaling & HA troubleshooting guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for the full crash sequence and solutions.
 -   **Recommendations**:
-    *   **Milvus** or **Qdrant**: Best for improved scale and performance. These are client-server databases, inherently safe for multi-process access.
+    *   **Milvus** or **Qdrant**: Best for improved scale and performance, when run as servers. A server deployment is safe for multi-process access, because every worker talks to it over the network.
+    *   **Milvus Lite**: for small single-worker deployments only, where it is a better local store than ChromaDB. See [Swap ChromaDB for Milvus Lite](#4-swap-chromadb-for-milvus-lite-small-deployments). A Milvus server remains the right choice for anything larger, and Milvus Lite is embedded rather than a server, so it carries the same multi-process restriction as local ChromaDB. Point `MILVUS_URI` at a Milvus server before raising `UVICORN_WORKERS` or adding replicas.
     *   **PGVector**: Excellent choice if you are already using PostgreSQL. Also fully multi-process safe.
     *   **ChromaDB HTTP mode**: If you want to keep using ChromaDB, run it as a [separate server](/reference/env-configuration#chroma_http_host) so Open WebUI connects via HTTP instead of local SQLite.
 -   **Multitenancy**: If using Milvus or Qdrant, enabling multitenancy offers better resource sharing.
@@ -441,6 +442,23 @@ Local Whisper models are heavy (~500MB+ RAM).
     *   **Env Var**: `AUDIO_STT_ENGINE=webapi`
 
 -   **Bypass Audio Preprocessing (offload to the STT provider)**: If you use an external STT engine (OpenAI, Deepgram, Azure, Mistral) that already accepts raw audio and handles format conversion on its side, set `BYPASS_PYDUB_PREPROCESSING=true`. This skips Open WebUI's pydub-based MP3 conversion, compression, and chunk splitting, eliminating a CPU-heavy step on every upload, removing the ffmpeg dependency, and reducing latency on large files. Only disable preprocessing when you are confident the upstream provider handles unprocessed audio correctly.
+
+### 4. Swap ChromaDB for Milvus Lite (Small Deployments)
+
+On a Raspberry Pi or a small VPS, the default local ChromaDB is usually the largest thing in the process after the models. Milvus Lite is an embedded database like ChromaDB, needs no server and no extra container, and holds the same content in noticeably less disk and less resident memory.
+
+The saving comes from multitenancy, so enable it rather than switching alone:
+
+```
+VECTOR_DB=milvus
+ENABLE_MILVUS_MULTITENANCY_MODE=True
+```
+
+Leave `MILVUS_URI` unset. The default already points at the embedded database inside your data directory, and setting the variable to that path stops the application from starting. See [`MILVUS_URI`](/reference/env-configuration#milvus_uri) for why, and for the directory that has to exist first.
+
+With multitenancy on, users share one set of collections and each user's vectors are partitioned inside them. Without it, every user and every knowledge base gets its own collection, which is what makes the footprint grow far faster than the content does. On a device where storage is small or billed, this is usually the single biggest reduction available after offloading the embedding model.
+
+This applies to single-worker deployments. Milvus Lite is a file held by one process, so raising `UVICORN_WORKERS` or adding replicas requires a Milvus server instead.
 
 ### 2. Disable Unused Features
 
