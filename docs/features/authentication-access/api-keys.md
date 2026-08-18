@@ -7,7 +7,9 @@ title: "API Keys"
 
 **Programmatic access to Open WebUI, for scripts, bots, and integrations.**
 
-API keys are personal access tokens that let external code call the same endpoints the web UI uses. Anything you can do in a browser - chat completions, model listing, file uploads, RAG queries - your scripts can do with a single `Authorization: Bearer` header. Each key inherits the permissions of the user who created it, so there's no separate permission model to learn.
+An API key is a personal access token that lets external code call the same endpoints the web UI uses. Anything you can do in a browser - chat completions, model listing, file uploads, RAG queries - your scripts can do with a single `Authorization: Bearer` header. The key acts as the user who created it, so there is no separate permission model to learn.
+
+Each account has exactly **one** API key. Creating a key when you already have one replaces it, and the previous key stops working immediately.
 
 ---
 
@@ -15,15 +17,15 @@ API keys are personal access tokens that let external code call the same endpoin
 
 ### Automation without a browser
 
-Scripts, CI/CD pipelines, monitoring bots, and third-party tools all need programmatic access. API keys give them a stable credential that doesn't expire with a browser session.
+Scripts, CI/CD pipelines, monitoring bots, and third-party tools all need programmatic access. An API key gives them a stable credential that does not expire with a browser session.
 
 ### Same permissions, different interface
 
-An API key acts as you. It inherits your role and group permissions - the same access controls that govern the web UI apply to every API request.
+An API key acts as you. It inherits your role and group permissions, and those permissions are re-checked on every single request rather than frozen at the moment the key was created.
 
 ### Revocable and auditable
 
-Name each key descriptively (e.g., "CI Pipeline", "Monitoring Bot") to track usage. Delete a key instantly if it's compromised - no password reset, no session invalidation, just a single click.
+Creating a new key overwrites the old one, so rotating a leaked credential is one click and takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission. Key creation and deletion are recorded as authentication events.
 
 ---
 
@@ -33,8 +35,8 @@ Name each key descriptively (e.g., "CI Pipeline", "Monitoring Bot") to track usa
 | :--- | :--- |
 | 🔐 **Bearer token auth** | Standard `Authorization: Bearer` header, works with any HTTP client or SDK |
 | 🛡️ **Scoped to user** | Key inherits the creating user's role and group permissions |
-| 🚫 **Endpoint restrictions** | Optionally limit which API routes a key can access |
-| 👥 **Permission-gated** | Requires a global admin toggle plus per-group feature permission for non-admins |
+| 🚫 **Endpoint restrictions** | Optionally limit which API routes API keys can access |
+| 👥 **Permission-gated** | Requires a global admin toggle plus a per-group feature permission for non-admins |
 
 ---
 
@@ -43,18 +45,17 @@ Name each key descriptively (e.g., "CI Pipeline", "Monitoring Bot") to track usa
 ### Step 1: Enable API Keys Globally (Admin)
 
 1. Log in as an **administrator**
-2. Open **Settings > Admin > System > General**
-3. Scroll to the **Authentication** section
-4. Toggle **API Keys** on
-5. Click **Save**
+2. Open **Admin Panel > Settings > Authentication**
+3. Toggle **API Keys** on
+4. Click **Save**
 
 :::info
-This is the global master switch. When it's off, no one - not even admins - can generate keys. When it's on:
-- **Admin** users can generate keys immediately
+This is the global master switch. When it is off, nobody can create or use a key, not even admins, and keys that already exist stop authenticating. When it is on:
+- **Admin** users can create a key immediately
 - **Non-admin** users still need the API Keys feature permission (Step 2)
 :::
 
-*(Optional)* Enable **API Key Endpoint Restrictions** to limit which routes API keys can call. Specify allowed endpoints as a comma-separated list (e.g., `/api/v1/models,/api/v1/chat/completions`).
+*(Optional)* Enable **API Key Endpoint Restrictions** to limit which routes API keys can call, then list the allowed paths as a comma-separated list (e.g., `/api/v1/models,/api/v1/chat/completions`). The restriction applies to every API key on the instance, not per key.
 
 ### Step 2: Grant Permission to Non-admin Users (Admin)
 
@@ -67,7 +68,7 @@ Non-admin users need the **API Keys** feature permission. Grant it using either 
 3. Click **Save**
 
 :::warning
-This grants every user with the "user" role the ability to generate API keys. For tighter control, use Option B.
+This grants every user with the "user" role the ability to create an API key. For tighter control, use Option B.
 :::
 
 #### Option B: User Groups (specific users)
@@ -85,12 +86,18 @@ Create a dedicated "API Users" or "Monitoring" group and add only the accounts t
 
 1. Click your **profile icon** (bottom-left sidebar)
 2. Select **Settings > Account**
-3. In the **API Keys** section, click **Generate New API Key**
-4. Give it a descriptive name (e.g., "Monitoring Bot")
-5. **Copy the key immediately** - you won't be able to view it again
+3. Scroll to the **API keys** section and click **Show** next to **Secrets**
+4. Click **Create new secret key**
+5. Copy the key with the copy button next to the field
+
+:::info
+The **API keys** section is collapsed by default and shows nothing but a **Show** button until you click it. If you see the heading and no key field, that is the collapsed state, not a permission problem.
+
+Admins see their current **JWT Token** in the same block. That is the browser session token, not an API key, and it expires with the session.
+:::
 
 :::warning
-Treat API keys like passwords. Store them in a secrets manager, never commit them to version control, and never share them in public channels. If a key is compromised, delete it immediately and generate a new one.
+Treat your API key like a password. Store it in a secrets manager, never commit it to version control, and never share it in public channels. If it is compromised, create a new key immediately, which overwrites the compromised one.
 :::
 
 ---
@@ -113,6 +120,8 @@ response = requests.get(
 )
 print(response.json())
 ```
+
+Keys are issued in the form `sk-` followed by 32 hex characters.
 
 For the full endpoint reference - chat completions, Ollama proxy, RAG, file management, and more - see [API Endpoints](/reference/api-endpoints).
 
@@ -138,43 +147,53 @@ CUSTOM_API_KEY_HEADER=X-OpenWebUI-Key
 
 ### Dedicated service accounts
 
-Create a **non-admin user** specifically for automation (e.g., `monitoring-bot`, `ci-pipeline`). Generate keys from that account. If a key leaks, the attacker only gets that user's permissions - not admin access.
+Because an account only ever holds one key, give every integration its own **non-admin user** (e.g., `monitoring-bot`, `ci-pipeline`) and create the key from that account. One key per account is what lets you rotate or revoke a single integration without breaking the others, and a leaked key only exposes that user's permissions rather than admin access.
 
 ### Endpoint restrictions
 
-Enable **API Key Endpoint Restrictions** and whitelist only the routes your integration actually needs. A monitoring bot only needs `/api/models` and `/api/chat/completions` - don't give it access to `/api/v1/files/` or admin endpoints.
+Enable **API Key Endpoint Restrictions** and list only the routes your integrations actually need. A request is allowed when its path exactly matches an entry or sits under one as a path segment, so `/api/v1/models` also covers `/api/v1/models/anything`. A monitoring bot only needs `/api/models` and `/api/chat/completions`, so do not open up `/api/v1/files/` or admin endpoints. The allowlist is instance-wide, so it has to be the union of what every integration needs.
 
 ### Key rotation
 
-Periodically delete old keys and generate new ones, especially for long-lived integrations. Name keys with a date or version to track rotation (`"Monitoring Bot - 2025-Q1"`).
+Rotate long-lived integrations on a schedule by clicking **Create new secret key** from the integration's account, which replaces the old key in place. Roll one account at a time and update the consumer straight away, because the previous key is rejected the moment the new one is issued.
 
 ---
 
 ## Troubleshooting
 
-**Can't see the API Keys section in Settings > Account?**
+**The API keys section in Settings > Account looks empty?**
 
-- **Check the global toggle:** Verify that an admin has enabled API keys in **Settings > Admin > System > General > API Keys**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
-- **Check your permissions (non-admin users):** Verify that your account or group has the **API Keys** feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
+- **Click Show:** the section is collapsed behind the **Show** button next to **Secrets**. The key field and the **Create new secret key** button only render once it is expanded.
+
+**No API keys section at all in Settings > Account?**
+
+- **Check the global toggle:** verify that an admin has enabled API keys in **Admin Panel > Settings > Authentication**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
+- **Check your permissions (non-admin users):** verify that your account or group has the **API Keys** feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
 
 **Getting `401 Unauthorized` responses?**
 
 - Verify the key is formatted correctly: `Authorization: Bearer sk-...`
-- Check that the key hasn't been deleted
-- If endpoint restrictions are enabled, confirm the route you're calling is in the allowlist
+- Check that the key has not been replaced by a newer one on the same account
+- Confirm the account still exists and is not pending
+
+**Getting `403 Forbidden` responses?**
+
+- The global **API Keys** toggle may have been turned off, which invalidates existing keys
+- The key's owner may have lost the **API Keys** feature permission
+- If endpoint restrictions are enabled, confirm the route you are calling is in the allowlist
 
 ---
 
 ## Limitations
 
-### No post-creation viewing
+### One key per account
 
-API keys cannot be viewed after creation. If you lose a key, delete it and generate a new one.
+An account holds a single unnamed key. There is no way to run two keys side by side for the same user, and creating a key always overwrites the existing one. Use a separate account per integration.
 
 ### No per-key permissions
 
-Keys inherit the full permissions of the user who created them. You cannot restrict a key to a subset of its owner's permissions (beyond endpoint restrictions).
+A key inherits the full permissions of the user who created it. You cannot restrict a key to a subset of its owner's permissions, and endpoint restrictions apply instance-wide rather than per key.
 
 ### No automatic expiration
 
-API keys do not expire automatically. You must manually delete and rotate them.
+API keys do not expire. Rotating a key is a manual action, and there is no scheduled or time-based expiry to fall back on.
