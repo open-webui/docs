@@ -133,17 +133,28 @@ After enough back-and-forth you will eventually see:
 This error comes from your model provider, not from Open WebUI. Every time you send a message, the *entire* conversation (system prompt, all previous turns, attached files, tool call results, and your new message) is sent as the "prompt." When the sum exceeds the model's context window, the provider rejects the request.
 :::
 
-Open WebUI intentionally does not ship a built-in trimmer, because:
+### The built-in answer: Context Compaction
 
-- Every model uses a **different tokenizer** (GPT, Claude, Gemini, GLM, Qwen all differ).
-- Every model has a **different context window** (8k to 1M+).
-- Every deployment wants a **different policy** (trim by tokens, by turns, by message count, drop attachments first, summarize older messages, etc.).
+Open WebUI ships **Context Compaction** for exactly this. Once a chat's estimated context passes a token threshold, a model summarizes the older messages, and the conversation continues from that summary plus the most recent messages, so a long chat keeps going instead of hitting the wall. It runs server-side and changes only what is sent to the model on that turn. Your chat is still stored and displayed in full, and nothing is deleted.
 
-There is no single correct answer. The supported approach is to install a **filter Function** that trims the conversation on your terms.
+It is **off by default**. An administrator turns it on in **Settings > Admin > Experience > Interface**, where the token threshold (default `80000`), the model that writes the summaries, the share of recent messages kept verbatim and an optional custom summary prompt are all configurable. Set the threshold below your model's real context window.
+
+Two things to know before you lean on it:
+
+- Crossing the threshold does not guarantee it ran. The cut has to land on a user message, so a chat that is one enormous exchange rather than many turns is sent uncompacted. That happens silently and is retried on the next turn, so compaction is a relief valve rather than a hard ceiling.
+- The token figure is an estimate wherever your provider did not report real usage, so read it as a gauge rather than an exact count.
+
+With it enabled, `/compact` in the chat input compacts the conversation right away instead of waiting for the threshold.
+
+### When you need a different policy
+
+Compaction is the summarize-and-replace strategy. For a hard cap on chat length, attachments dropped before dialogue, tool results trimmed first or a different window per model, install a **filter Function** instead. Open WebUI ships no blind trimmer, because tokenizers, context windows and the right policy all differ per model and per deployment.
 
 :::tip Quick fix
 Community filters for most common policies already exist and can be installed with one click. If none fits, the code is short enough to copy and adapt. See the full guide including a minimal "newest N turns" filter: [Troubleshooting: Context Window / Prompt Too Long](/troubleshooting/context-window).
 :::
+
+More detail: [Context Compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) covers the checkpointing, the fallbacks when the summarizer fails, and the `context_usage` API for showing how close a chat is to compacting.
 
 ---
 
