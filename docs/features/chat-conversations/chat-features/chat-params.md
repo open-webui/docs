@@ -112,6 +112,16 @@ That produces a single-line text field. Add a definition after the pipe for a ty
 
 The grammar and the available field types are the same ones used by [prompt input variables](/features/workspace/prompts#available-input-types). Keys must be lowercase snake case: start with a letter, then letters, digits, or underscores.
 
+:::danger The `chat.variables.` prefix is required
+
+Only a placeholder carrying the full `chat.variables.` prefix declares a chat variable. A bare `{{project_name | text:required}}` is the [prompt input variable](/features/workspace/prompts#custom-input-variables) syntax, which works in prompt content and does nothing in a system prompt.
+
+Writing one in a system prompt declares no variable at all: no control appears next to the chat input, no form ever opens, and the placeholder itself is sent to the model as literal text. Nothing warns you, so the model looks like it simply ignored the feature.
+
+The check is the **Detected Variables** list in the model editor. It updates as you type, and a placeholder missing the prefix never shows up in it.
+
+:::
+
 ### Filling them in
 
 When a selected model declares chat variables, a control appears next to the chat input and opens the **Chat Variables** form. Selecting the model does not open it: nothing is shown until you either press that control or try to send a message. The values can be changed from the same control later, and take effect for messages sent after the change.

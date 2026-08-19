@@ -106,6 +106,14 @@ Automatically replaced with their value at runtime:
 
 Add variables to your prompt content and users get a popup form when they use the slash command.
 
+:::info This syntax only works in prompt content
+
+The syntax on this page applies to the content of a saved prompt. Putting `{{name | text:required}}` into a model's system prompt does nothing: it declares no field, opens no form, and reaches the model as literal text.
+
+System prompts use [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) instead, which are the same field types written with a `chat.variables.` prefix, so the example above becomes `{{chat.variables.name | text:required}}`.
+
+:::
+
 **Simple input** creates a single-line text field:
 ```
 {{variable_name}}
