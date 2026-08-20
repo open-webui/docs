@@ -94,6 +94,12 @@ With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open W
 - **Custom scopes**: provide an explicit, space- or comma-separated list to override the discovered scopes, for example to request a narrower set than the server advertises, or when the server's metadata does not list usable scopes.
 :::
 
+:::info Check OAuth Discovery
+On an MCP connection using either OAuth mode, the verify button beside the URL reads **Check OAuth Discovery**, and a green result reports "OAuth discovery successful". It fetches the OAuth discovery document and parses it, and that is the whole of what it does. The MCP server itself is never contacted and no tools are listed, so a passing check tells you the authorization server was found and tells you nothing about whether tool calls will work.
+
+With **OAuth 2.1 (Static)**, the check runs against the **OAuth Server URL** when one is set, and against the MCP **URL** when it is left empty.
+:::
+
 :::tip Choosing Between OAuth 2.1 and OAuth 2.1 (Static)
 
 - Start with **OAuth 2.1** if your server supports DCR.
@@ -106,6 +112,10 @@ With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open W
 An admin registers the MCP server once. Each user then connects their own account to it: the first time someone enables an OAuth 2.1 tool from the **Integrations** menu in a chat, Open WebUI sends them to the provider, and the access they grant is stored against their account alone. Nobody else inherits it.
 
 The authorization is bound to the account that started it and to the browser session it started in, so it has to be finished in that same browser, signed in as that same person, at the address in [`WEBUI_URL`](/reference/env-configuration#webui_url). Signing out cancels one still in progress. Anything else leaves the browser back on Open WebUI with a notification saying why; enable the tool again to retry.
+
+An admin can also start the flow from the connection itself. Once the OAuth client is registered and the connection has been saved, reopening it under **Settings > Admin > Integrations** shows an **Authorize OAuth** button beside **Register Client**. It sends the same authorization request that enabling the tool in a chat sends, on the same terms: the grant is stored against the admin's own account and nobody else inherits it. The button appears only once a client is registered, and stays greyed out until the connection has been saved at least once.
+
+The provider returns the browser to the Open WebUI home page when the flow finishes, so reopen **Settings > Admin > Integrations** to carry on editing the connection.
 
 ### OAuth 2.1 (Static) Setup
 
@@ -127,6 +137,8 @@ After saving:
 2. Click **+ > Integrations > Tools**.
 3. Enable your MCP tool.
 4. Complete the OAuth consent/authorization flow in the browser redirect.
+
+Reopening the connection and clicking **Authorize OAuth** does the same thing for your own account without opening a chat. See [Connecting an account](#connecting-an-account).
 
 :::info
 
@@ -189,7 +201,7 @@ This field restricts which tools are exposed to the LLM.
 ### "Failed to connect to MCP server"
 
 **Symptom**: 
-The chat shows "Failed to connect to MCP server" when using a tool, even if the **Verify Connection** button in settings says "Connected".
+The chat shows "Failed to connect to MCP server" when using a tool, even if the verify button in settings reported success. On a connection using either OAuth 2.1 mode that button reads **Check OAuth Discovery**, and it confirms only that the authorization server's discovery document was found and could be parsed.
 
 **Solutions**:
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
