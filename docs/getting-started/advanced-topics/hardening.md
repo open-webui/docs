@@ -21,6 +21,14 @@ For organizations where security is a priority, the recommended deployment place
 
 DDoS protection and brute-force prevention (rate limiting, connection throttling, fail2ban) should be handled at the proxy or network layer.
 
+### Requests for paths that do not exist
+
+Open WebUI serves a single-page application, so a request for a path the application does not know returns the application shell with a status of 200 rather than a 404. Requests for JavaScript files are the exception and do return 404, because a missing script has to fail rather than be handed a page of HTML.
+
+The visible consequence is in the access log. Automated scanners probe every host they find for the same handful of paths, `/wp-admin/`, `/phpmyadmin`, `.env` and similar, and each of those probes is answered with a 200. Nothing has been found and nothing has been exposed, since the response is the same shell every visitor receives, but the log gives the impression that the requests succeeded.
+
+Filtering that traffic belongs at the reverse proxy, together with the rate limiting and brute-force protection above. A proxy can answer or drop those paths before they reach the application, which keeps them out of the log entirely and costs the application nothing. Blocking them inside Open WebUI would mean maintaining a list of paths that scanners currently use, and that list would need updating forever.
+
 If you are deploying Open WebUI for the first time, start with the [Quick Reference](#quick-reference) at the bottom of this page for a prioritized summary, then read the sections relevant to your setup.
 
 ---
