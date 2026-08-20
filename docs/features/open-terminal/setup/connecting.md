@@ -44,6 +44,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
 | **Auth Type** | Leave as `Bearer` (the default) |
+| **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
 
 ![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
 
@@ -114,6 +115,27 @@ Adding a terminal connection via personal Settings sends the API key to your bro
 :::
 
 If you need to test a connection without admin access, you can add one from **Settings → Integrations → Open Terminal**. The same URL and API key fields apply.
+
+---
+
+## Chat Uploads
+
+**Chat Uploads** on the connection form decides where a file attached in the chat input goes while that terminal is selected.
+
+`Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what a connection nobody has touched does, and what happens with no terminal selected at all.
+
+`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
+
+A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
+
+Four things change with it:
+
+- **The model no longer needs to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
+- **The model is told the path only when it can act on it.** Open WebUI passes the paths of attached files to the model alongside the message when the model is using native function calling in a saved conversation. Set the model to [Legacy](#8-enable-native-function-calling) function calling, or turn its **Builtin Tools** capability off, and the file still reaches the terminal while the model is left without its location.
+- **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
+- **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
+
+The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
 ---
 

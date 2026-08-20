@@ -1707,6 +1707,8 @@ For an orchestrator connection, set `policy_id` to route every terminal request 
 
 `config.contexts` gives an orchestrator connection a separate workspace per chat or per automation, or withholds it from either, with the keys `chat` and `automation`. It is ignored on connections that are not orchestrator ones. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the values, the admin controls and the capacity trade-off.
 
+`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. The default, `default`, uploads it to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's current working directory instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+
 `auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` for an orchestrator connection when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it.
 
 :::tip Helm chart auto-configuration
