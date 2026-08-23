@@ -102,6 +102,20 @@ Files attached in the chat input normally go to Open WebUI, where their text is 
 
 Click the **download button** on any file to save it to your computer. This is how you get results back: after the AI generates a chart, creates a spreadsheet, processes an image, or writes a report, just download it.
 
+### Files shown in the chat message
+
+The AI can also put a file straight into its reply, rather than leaving you to find it in the browser. Ask for it to be shown in the chat and the message carries a small card with the file's name, a preview of its contents, and buttons to download it or open it in the file browser.
+
+The preview understands the same formats the browser does, so a spreadsheet arrives as a table, an image as a picture, a PDF as pages. The card reads the file from the terminal each time it is opened, using your own access, so nothing is copied out of the terminal and no public link to it exists. It follows that a card only works while the terminal it came from is connected and selected, and reports the terminal as unavailable otherwise.
+
+This replaces the older behaviour where a generated file produced a link in the reply that pointed at a path on the terminal's filesystem rather than at anything the browser could open.
+
+![A CSV and a generated chart shown as cards inside an assistant message](/images/open-terminal-inline-file-card.png)
+
+The card header is a toggle, so a preview can be folded down to just the filename when it is taking up too much of the reply, and image and document previews carry a zoom control and a resize handle.
+
+By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Terminal File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message. The preference applies to terminals you connect yourself.
+
 ![File browser with download and action buttons](/images/open-terminal-file-browser-project.png)
 
 ---

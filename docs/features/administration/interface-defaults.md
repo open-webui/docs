@@ -127,6 +127,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `chatHoverPreview` | Chat Hover Previews | `true` |
 | `displayMultiModelResponsesInTabs` | Display Multi-model Responses in Tabs | `false` |
 | `showFilesOnTerminalSelect` | Show Files on Terminal Select | `true` |
+| `terminalFileDisplay` | Terminal File Display | `sidebar` |
 | `stylizedPdfExport` | Stylized PDF Export | `true` |
 | `showFloatingActionButtons` | Floating Quick Actions | `true` |
 | `floatingActionButtons` | Floating Quick Actions > **Manage** | `null` |
