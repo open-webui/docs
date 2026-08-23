@@ -25,6 +25,8 @@ Click your **name** at the bottom of the left sidebar to open the user menu, the
 
 In the Admin Panel, click **Settings** in the top nav, then click **Integrations**.
 
+The settings sidebar lists **Integrations** twice, once under **Personal** in the *Services* group and once under **Admin** in the *Tools* group. Open Terminal belongs in the Admin one. Configuring the personal entry connects the terminal to your account alone and the deployment will not work as described here.
+
 ![Admin Panel, Settings → Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
@@ -109,7 +111,7 @@ For Docker deployments, you can configure terminal connections automatically usi
 Adding a terminal connection via personal Settings sends the API key to your browser and routes requests directly from it. This is fine for **quick testing**, but for anything beyond that, use Admin Settings instead. It's more secure and works for all users automatically.
 :::
 
-If you need to test a connection without admin access, you can add one from **Settings → Integrations → Open Terminal**. The same URL and API key fields apply.
+If you need to test a connection without admin access, you can add one from the **Personal** part of settings, under *Services*, at **Integrations → Open Terminal**. The same URL and API key fields apply, and the connection is yours alone rather than the instance's.
 
 ---
 

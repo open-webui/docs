@@ -20,6 +20,12 @@ If **Image** is missing from the **Integrations** menu entirely, then either ima
 
 ![Image Generation Tutorial](/images/tutorial_image_generation_2.png)
 
+:::warning Keep chatting with your chat model
+The model selector at the top of the chat stays on your normal chat model. The image model is configured once in the admin image settings and is never selected there.
+
+Picking the image model as the chat model is the most common setup mistake. Everything looks configured, and generation fails or returns nothing useful, because an image model cannot hold a conversation and is not being asked for a picture in the way it expects. If image generation has stopped working and the settings look right, check what the model selector says first.
+:::
+
 What happens next depends on the **Function Calling** mode. It can be set per chat in **Chat Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.
 
 **Native** takes the tool path described below. In **Legacy** mode every message you send while the toggle is on goes straight to the image engine, whatever you asked for. It edits instead of creating when the recent conversation carries images and **Image Edit** is on. On the create path a task model rewrites your message into the image prompt first, unless you switch **Image Prompt Generation** off in the admin settings.
