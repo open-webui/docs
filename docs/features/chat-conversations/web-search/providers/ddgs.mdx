@@ -3,12 +3,6 @@ sidebar_position: 4
 title: "DDGS"
 ---
 
-:::warning
-
-This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
-
-:::
-
 :::tip
 
 For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](/reference/env-configuration#web-search).
@@ -23,7 +17,13 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 ## DDGS (Dux Distributed Global Search)
 
-DDGS is a metasearch engine that allows you to search multiple providers through a single interface. 
+DDGS is a metasearch engine that allows you to search multiple providers through a single interface.
+
+:::info Nothing to install and no account needed
+DDGS ships with Open WebUI and runs inside it. There is no separate service to deploy, no container to connect, no URL to point at and no API key to obtain. The three steps below are the entire setup.
+
+It reaches each search provider through that provider's public pages rather than through a paid API. If you want a provider's official API, with the reliability and the quota that come with it, use its own entry in the Web Search Engine list instead, such as Brave, Google PSE or SerpApi, each of which does take a key.
+:::
 
 ### Setup
 
@@ -49,3 +49,15 @@ You can also configure the backend using the `DDGS_BACKEND` environment variable
 ```bash
 DDGS_BACKEND="google"
 ```
+
+#### Choosing a backend
+
+**Auto (Random)** is the default and the most reliable choice. Because each search picks a provider at random, one provider refusing the request does not take searching down with it.
+
+Pinning a single backend makes every search depend on that one provider continuing to serve automated requests. Providers vary in how they treat them, and some answer with a page that carries no results rather than with an error, so a pinned backend can return nothing while the rest keep working. The same provider can also start refusing after a period of normal use, and a shared or datacenter address is more likely to be refused than a home connection.
+
+If searches return nothing on a pinned backend, switch back to Auto before changing anything else.
+
+:::warning The model says the search tool is unavailable
+This usually has nothing to do with the search engine. The tool is offered to a model only when web search is enabled in the admin settings, enabled for that specific model in its editor, enabled for the chat, permitted for the user, and the model is not set to Legacy function calling. A model with the web search capability switched off in its own editor will say the tool is unavailable while searching works perfectly everywhere else.
+:::
