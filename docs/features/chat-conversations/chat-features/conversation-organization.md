@@ -30,7 +30,7 @@ Create a new folder to organize your conversations:
 Organize existing chats by moving them into folders:
 
 - **Drag and Drop**: Click and drag any conversation from the sidebar into a folder.
-- **Right-click Menu**: Right-click on a conversation, open **Move** and pick the destination folder. The entry appears once at least one folder exists.
+- **Conversation menu**: Hover a conversation in the sidebar, click the three-dot menu that appears, then choose **Move** and pick the destination folder. The entry appears once at least one folder exists.
 
 A folder highlights while you drag a chat over it when you are allowed to file the chat there, so you can see where the drop will land before you let go. A folder of your own always takes one. A folder [shared with you](#sharing-folders) takes one only with write access; with read-only access it does not highlight and does not accept the drop, so a move that would be refused anyway is never started.
 
@@ -38,9 +38,9 @@ A folder highlights while you drag a chat over it when you are allowed to file t
 
 Folders can be nested within other folders to create hierarchical organization:
 
-- **Create subfolder from menu**: Right-click (or click the three-dot menu ⋯) on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
+- **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
-- **Move via context menu**: Right-click on a folder and use the move option to relocate it under a different parent.
+- **Move via folder menu**: Open the same three-dot menu on a folder and use the move option to relocate it under a different parent.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 

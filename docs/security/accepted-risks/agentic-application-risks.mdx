@@ -42,6 +42,17 @@ We therefore **do not accept reports as vulnerabilities when the whole impact is
 
 Those are Open WebUI defects and are fixed as such. The distinction mirrors the framework's own: an agent misusing a tool strictly within its granted privilege is inherent agentic risk, whereas privilege escalation or code execution through a platform flaw is a defect. See the [Security Policy](../security-policy) for the full reporting scope.
 
+### The test is where the defect lives, not who triggered it
+
+The carve-out above turns on the tool's implementation, not on the agent's use of it. Stated plainly: **if a tool does something we did not intend it to do, that is the bug, and the agent abusing it is not.**
+
+Read it in both directions.
+
+- **The tool behaves as designed and the agent puts it to a use we would rather it had not.** That is agentic risk, and it stays out of scope however creative or expensive the outcome is. The tool did what it was built to do, and the absence of a limit on how often or how heavily an agent may use it is a configuration and hardening question rather than a defect.
+- **The tool itself does something we did not intend, such as a shipped built-in tool missing an access check, and an agent reaches data through it.** The missing check is the vulnerability. The agent is only the trigger, exactly as in the third bullet above.
+
+This is also why the carve-out is aimed at the tools Open WebUI ships: there, intended behavior is our intent and can be checked against our code. For a tool a user wrote or imported themselves there is no such thing as an unintended bypass, because the author defines what the tool does, and the permission to create or import tools is root-equivalent on its own.
+
 ## References
 
 - [OWASP Top 10 for Agentic Applications](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)

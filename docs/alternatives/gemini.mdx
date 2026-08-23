@@ -15,7 +15,7 @@ import Head from '@docusaurus/Head';
 
 # Open WebUI & Gemini
 
-*Last updated: May 2026*
+*Last updated: August 2026*
 
 [Gemini](https://gemini.google.com/) brings Google's AI research into a consumer product with strong multimodal capabilities (text, vision, audio, code), generous context windows, and natural integration with Google Workspace. Gemini 3.5 Pro is among the strongest models available for code and complex tasks.
 
@@ -65,7 +65,7 @@ Commercial · Free tier available
 
 ## When to Use Each
 
-**Choose Gemini if** you live in the Google ecosystem and want AI that integrates naturally with Gmail, Docs, Drive, and Search. NotebookLM and Deep Research are standout features with no direct equivalent elsewhere. The API pricing is also among the most competitive.
+**Choose Gemini if** you live in the Google ecosystem and want AI that integrates naturally with Gmail, Docs, Drive, and Search. NotebookLM and Deep Research are standout features, especially for Google-heavy workflows. The API pricing is also among the most competitive.
 
 **Choose Open WebUI if** you want to use Gemini alongside other providers, need persistent knowledge bases, or want to self-host. Open WebUI connects to the Google AI API so you still get Gemini's models.
 
@@ -85,7 +85,7 @@ Gemini models are available through Open WebUI via the Google AI API. You can us
 4. Gemini models will appear in your model selector
 
 :::warning Tools need extra setup on this endpoint
-Google's OpenAI compatibility layer does not follow the OpenAI schema for tool calls, so a turn where the model decides to call a tool comes back as an empty assistant message. This covers the builtin tools such as Memory, so it shows up as the occasional blank reply rather than an obvious failure. Set **Function Calling** to **Legacy** in the model's Advanced Params, or route Gemini through a gateway such as LiteLLM or OpenRouter. See [Blank Replies When the Model Uses a Tool](/troubleshooting/connection-error#-blank-replies-when-the-model-uses-a-tool) and the [OpenAI-compatible provider guide](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible).
+Google's OpenAI compatibility layer uses a different tool-call shape than OpenAI-compatible clients expect, so a tool-using turn can come back as an empty assistant message. This can affect builtin tools such as Memory. Set **Function Calling** to **Legacy** in the model's Advanced Params, or route Gemini through a gateway such as LiteLLM or OpenRouter. See [Blank Replies When the Model Uses a Tool](/troubleshooting/connection-error#-blank-replies-when-the-model-uses-a-tool) and the [OpenAI-compatible provider guide](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible).
 :::
 
 ---

@@ -1,0 +1,86 @@
+---
+sidebar_position: 5
+title: "AI Summaries of Rejected CVEs"
+---
+
+# AI Summaries of Rejected CVEs
+
+A note for anyone building an AI layer over vulnerability data.
+
+**A generated summary of a withdrawn CVE will describe the vulnerability as though it exists.** Not occasionally, and not because the model is weak. It happens because of how the record is shaped: the withdrawal is a late-arriving sentence of prose, and everything structurally around it still asserts that a finding is real.
+
+We ran into this on our own records, and the pattern is general enough to be worth stating on its own page rather than leaving it inside a complaint about one vendor.
+
+---
+
+## Why it happens
+
+Ask a model to summarise a vulnerability record and it will summarise a vulnerability, because that is what the record is built to hold. When an identifier is rejected, the fields that carry meaning are not cleared:
+
+- the title still names an attack;
+- the severity, the CVSS vector and the EPSS probability are still populated;
+- the affected product and version range are still listed;
+- the weakness classification and any mapped attack patterns still resolve;
+- the status field frequently still reads something like current or received.
+
+The withdrawal, meanwhile, arrives as replacement text inside the description field. It is one unstructured string among a dozen structured assertions, and it is the only element that says the finding is gone.
+
+A summarisation prompt weighs those inputs the way the data presents them. The scored, typed, machine-readable fields describe a live vulnerability, so the summary describes a live vulnerability, in the confident register of an assessment. Some systems then compound it by generating remediation advice, telling readers to upgrade to a fixed version that does not exist, for a defect that was never real.
+
+The output is not a hallucination in the usual sense. The model is faithfully summarising what the record still says.
+
+---
+
+## Two examples
+
+Both of these are live at the time of writing and can be checked directly.
+
+### An executive summary beside the withdrawal notice
+
+On [BaseFortify](./vulnerability-databases/basefortify) the entry for a withdrawn record carries the CNA's rejection notice in the description, and an AI-generated Executive Summary in the right-hand column of the same screen explains how the vulnerability is exploited, including that it is remotely exploitable without authentication. Neither statement is hidden from the other. A reader sees the correct answer and the wrong one in one glance, and only the wrong one is written as an assessment.
+
+Around it, every structured field still describes a current finding: a status of Received, CVSS across three versions with a plotted vector, an EPSS probability, a CPE range, and an attack-flow graph mapping the record through CWE and CAPEC into MITRE ATT&CK.
+
+### Generated text that recommends an upgrade
+
+On [Vulners](./vulnerability-databases/vulners) the default description for a withdrawn record is machine-generated and labelled "AI enhanced". It states that the endpoint allows unauthenticated remote attackers to reach sensitive configuration data, cites other databases as corroboration, and closes by advising affected organisations to upgrade to a patched version or apply vendor mitigations.
+
+There is nothing to upgrade to, because there was nothing to fix. The same entry also carries a generated risk score above the rating the issuing CNA gave the record before withdrawing it.
+
+---
+
+## The design requirement
+
+It is one check, and it belongs before generation rather than after it.
+
+**Read the record's state first. If it is rejected, do not generate an assessment of the finding.** Either generate nothing, or generate only the withdrawal: that the identifier was rejected, by whom, and when.
+
+Everything else follows from that, and none of it is expensive:
+
+- **Do not score a rejected record.** A severity, a base score, a vector and an exploitation probability are all statements that a vulnerability exists. There is nothing left to rate.
+- **Do not emit remediation guidance for one.** Advice to upgrade implies a fix, which implies a defect.
+- **Do not let generated output outlive the record it came from.** If a summary was written while the identifier was live, it is stale the moment the state changes, and serving it afterwards is a choice the system is making on every page load.
+- **Expose the state as a field, not only as prose.** Downstream consumers, including the next AI layer built on top of yours, need something to filter on that is not English text inside a description.
+
+The state is trivially available. Any consumer can read it from the record itself:
+
+```bash
+curl -s https://cveawg.mitre.org/api/cve/CVE-2024-7033 | grep -o '"state":"[A-Z]*"'
+```
+
+---
+
+## Why this is not only a vulnerability-database problem
+
+The same shape appears anywhere a model is pointed at vulnerability records: security copilots that answer questions about a CVE, LLM-based triage that decides whether a finding matters, agents that read a scanner's output and open tickets from it, and dependency tools that generate advisory text for downstream packages.
+
+Each of them inherits the same failure if it summarises before checking state. And where one of those systems publishes its output, the next one ingests it, so a withdrawn identifier can acquire fresh corroboration long after the record itself went quiet.
+
+For what happens to withdrawn identifiers across databases generally, see [Rejected CVEs in Vulnerability Databases](./vulnerability-databases).
+
+---
+
+## See also
+
+- [Rejected CVEs in Vulnerability Databases](./vulnerability-databases), the per-database record and how to verify any entry yourself.
+- [Vendor Dispositions](/security/vendor-dispositions), our assessment of each identifier raised against Open WebUI.

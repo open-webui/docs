@@ -2730,6 +2730,16 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 - Example (Remote): `http://your-server-ip:19530`
 - Description: Specifies the URI for connecting to the Milvus vector database. This can point to a local or remote Milvus server based on the deployment configuration.
 
+:::warning Do not set this to a file path
+Leave this variable unset if you want the embedded database (Milvus Lite). The default above already points at it, and setting the variable to that same path breaks startup.
+
+The Milvus client library reads this variable from the environment itself, before Open WebUI is involved, and parses it as a network address. A file path fails that parse and the process exits during import with `Illegal uri`, naming the expected form `http[s]://[user:password@]example.com[:12345]`. Set the variable only when you are connecting to a Milvus server.
+
+The parent directory must also exist before startup. The client opens the database file but does not create the directory holding it, and reports `Open local milvus failed, dir: ... not exists` if it is missing. This matters after any operation that clears the data directory, since the directory is not recreated for you.
+
+Milvus Lite is embedded, so the file is held by a single process. A second process cannot open it while Open WebUI is running, which includes any attempt to inspect the database from a separate shell.
+:::
+
 #### `MILVUS_DB`
 
 - Type: `str`

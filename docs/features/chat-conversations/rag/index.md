@@ -268,7 +268,7 @@ The **File Context** capability controls whether Open WebUI performs RAG (Retrie
 | File Context | Behavior |
 |--------------|----------|
 | ✅ **Enabled** (default) | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
-| ❌ **Disabled** | File processing is **completely skipped**. No content extraction, no injection. The model receives no file content. |
+| ❌ **Disabled** | File content is never extracted or injected. If Builtin Tools is also enabled, the model still receives a short listing of which files are attached, their names rather than their content, so it can decide to fetch one with a tool. |
 
 **When to disable File Context:**
 - **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
@@ -295,7 +295,7 @@ The **Builtin Tools** capability controls whether the model receives native func
 
 | Builtin Tools | Behavior |
 |---------------|----------|
-| ✅ **Enabled** (default) | In Native Function Calling mode, the model receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats`, etc. |
+| ✅ **Enabled** (default) | Unless the model is set to Legacy, it receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats` and others. |
 | ❌ **Disabled** | No builtin tools are injected. The model works only with pre-injected context. |
 
 **When to disable Builtin Tools:**
@@ -304,7 +304,9 @@ The **Builtin Tools** capability controls whether the model receives native func
 
 ### Combining the Two Capabilities
 
-These capabilities work independently, giving you fine-grained control:
+These capabilities work independently, giving you fine-grained control, and the rows below describe files and knowledge bases attached **inside the chat** on a model set to Default or Native function calling.
+
+On Legacy, the Builtin Tools setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so File Context alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
 
 | File Context | Builtin Tools | Result |
 |--------------|---------------|--------|
@@ -313,10 +315,25 @@ These capabilities work independently, giving you fine-grained control:
 | ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
 | ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
+:::warning Knowledge attached to a model or a folder behaves differently
+The table above covers attachments made in the chat. Knowledge attached to a model in the Workspace, and knowledge attached to a folder, follow the Function Calling mode instead:
+
+- **Legacy**: the knowledge is queued for retrieval and injected upfront, exactly as the table describes, provided File Context is enabled. Turning File Context off removes the retrieval step entirely, so nothing is injected on Legacy either.
+- **Default and Native**: nothing is injected regardless of File Context. The knowledge is offered to the model through the builtin knowledge tools, and the model decides whether to search it.
+
+The consequence is a configuration that silently does nothing. With File Context enabled, Builtin Tools disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
+
+Any one of these resolves it:
+
+- Leave Builtin Tools enabled on that model.
+- Set Function Calling to Legacy on that model.
+- Attach the knowledge base in the chat rather than on the model or folder.
+:::
+
 :::tip Choosing the Right Configuration
 - **Most models**: Keep both enabled (defaults) for full functionality.
 - **Small/local models**: Disable Builtin Tools if they don't support function calling.
-- **On-demand retrieval only**: Disable File Context, enable Builtin Tools if you want the model to decide what to retrieve rather than pre-injecting everything.
+- **On-demand retrieval only**: Disable File Context, enable Builtin Tools and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with File Context off nothing would be retrieved at all.
 :::
 
 ## Enhanced RAG Pipeline
