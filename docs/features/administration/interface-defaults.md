@@ -150,8 +150,10 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
 | `detectArtifacts` | Detect Artifacts Automatically | `true` |
+| `iframeSandboxAllowScripts` | iframe Sandbox Allow Scripts | `true` |
 | `iframeSandboxAllowSameOrigin` | iframe Sandbox Allow Same Origin | `false` |
-| `iframeSandboxAllowForms` | iframe Sandbox Allow Forms | `false` |
+| `iframeSandboxAllowForms` | iframe Sandbox Allow Forms | `true` |
+| `iframeSandboxAllowDownloads` | iframe Sandbox Allow Downloads | `true` |
 
 ### Voice
 
