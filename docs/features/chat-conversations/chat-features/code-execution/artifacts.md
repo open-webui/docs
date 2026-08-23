@@ -48,6 +48,21 @@ That keeps inline scripts and styles working (most artifacts need them) while bl
 An overly strict policy can make a preview appear blank, since many artifacts rely on inline `<script>` and `<style>`. Start permissive and narrow from there. `IFRAME_CSP` is a startup environment variable (not an Admin Panel setting), so changing it requires a restart. For the security-focused walkthrough, see [Hardening → Iframe content-security-policy](/getting-started/advanced-topics/hardening#iframe-content-security-policy).
 :::
 
+## What a preview is allowed to do
+
+The sandbox on the preview iframe is assembled from four settings under **Settings > Interface**, so you can tighten or loosen what generated HTML may do without touching the CSP.
+
+| Setting | Default | What it allows |
+| :--- | :--- | :--- |
+| **iframe Sandbox Allow Scripts** | On | JavaScript runs inside the preview. Most artifacts need this, and turning it off leaves anything interactive inert. |
+| **iframe Sandbox Allow Forms** | On | Forms inside the preview can be submitted. |
+| **iframe Sandbox Allow Downloads** | On | The preview can start a file download. |
+| **iframe Sandbox Allow Same Origin** | Off | The preview is treated as sharing your Open WebUI origin. |
+
+Leave **Allow Same Origin** off unless something specifically requires it. With it on, script inside a preview is same-origin with the application, which means it can reach your session rather than being confined to the frame. The [troubleshooting section](#artifacts-preview-not-working-uncaught-securityerror) below covers the one error that legitimately calls for it.
+
+The other three are about what the content can do inside its own frame, and switching them off is a way to render something you do not trust while keeping it inert.
+
 ## Editing Artifacts
 
 1. **Targeted Updates**: Describe what you want changed and where. For example:
