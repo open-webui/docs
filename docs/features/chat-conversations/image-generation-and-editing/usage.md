@@ -55,7 +55,7 @@ If you prefer the workflow where you can click a button on any message to genera
 
 1. Visit the **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)** on the Open WebUI Community site.
 2. Click **Get** to import it into your local instance (or copy the code and paste it into your local instance).
-3. Once imported, go to **Workspace** > **Functions** and ensure the **Generate Image** action is enabled.
+3. Once imported, go to **Admin Panel** > **Functions** and ensure the **Generate Image** action is enabled.
 
 This action adds a "Generate Image" icon to the message action bar, allowing you to generate images directly from LLM responses, which is helpful if you want the assistant to first iterate on the image prompt and generate it once you are satisfied.
 
