@@ -45,7 +45,9 @@ Go to **Admin Settings > Interface > Task Model** and toggle **Autocomplete Gene
 Even if enabled globally, individual users can turn it off for themselves if they find it distracting.
 
 - Go to **Settings > Interface**.
-- Toggle **Autocomplete Generation**.
+- Toggle **Prompt Autocompletion**.
+
+The personal setting carries a different label from the administrator one, which reads **Autocomplete Generation**. They control the same feature.
 
 :::note
 If the Admin has disabled Autocomplete globally, users will **not** be able to enable it in their personal settings.
