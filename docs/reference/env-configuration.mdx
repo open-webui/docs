@@ -3932,6 +3932,13 @@ Provide a clear and direct response to the user's query, including inline citati
 
 ### Document Processing
 
+#### `ENABLE_KNOWLEDGE_FILE_RETENTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls what happens to a file when it is removed from a knowledge base, or when the knowledge base itself is deleted. By default the file record, the stored copy of the file and its embeddings are all deleted with it. Enable this to keep them, so that removal takes the file out of the knowledge base without destroying anything, which suits deployments that retain uploads for audit or reuse. Storage then grows with every removal, since nothing is reclaimed.
+- Persistence: No
+
 #### `CHUNK_SIZE`
 
 - Type: `int`
@@ -7587,7 +7594,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, authenticate to an **AWS RDS** database using a short-lived **IAM auth token** (generated via boto3 `generate_db_auth_token`) instead of a static password. The token is refreshed automatically before it expires. **PostgreSQL only**, and the database host and user must be set. Requires `boto3` and AWS credentials/region available to the process (standard AWS SDK resolution).
+- Description: When enabled, authenticate to an **AWS RDS** database using a short-lived **IAM auth token** (generated via boto3 `generate_db_auth_token`) instead of a static password. The token is refreshed automatically before it expires. **PostgreSQL only**, and the database host and user must be set. Requires `boto3` and AWS credentials/region available to the process (standard AWS SDK resolution). This applies to the vector store as well when `VECTOR_DB=pgvector`, so a deployment using both connects to each without a static password.
 - Persistence: No
 
 #### `DATABASE_PASSWORD`
@@ -7627,13 +7634,13 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 #### `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
 
 - Type: `float`
-- Default: `None`
-- Description: Minimum interval, in seconds, between writes of a user's `last_active_at` timestamp to the database (this timestamp drives online/"active" presence, evaluated over a ~3-minute window). The write is throttled **per user**: within the interval, repeat activity does not hit the database.
+- Default: `60`
+- Description: Minimum interval, in seconds, between writes of a user's `last_active_at` timestamp to the database (this timestamp drives online/"active" presence, evaluated over a ~3-minute window). The write is throttled **per user**: within the interval, repeat activity does not hit the database. Set it to `0` to disable throttling and write on every request.
 
-:::warning Set this on every deployment, mandatory at scale
-**With the default (`None`, or an invalid value which becomes `0.0`), throttling is disabled and the write is unthrottled: essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs ~minute granularity.
+:::warning Raise this at scale, and never set it to zero there
+Throttling is on by default at 60 seconds, which already collapses thousands of writes into at most one per user per interval. **Setting it to `0` disables throttling, so essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance that is a continuous flood of tiny write transactions which amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs about minute granularity.
 
-Setting a positive interval collapses thousands of these writes into at most one per user per interval. This is **free performance for any setup** and is **required** for large/production deployments; leaving it unset is a common, avoidable database bottleneck.
+Large deployments should raise it further, to somewhere around `300` to `500` seconds, since the only cost is that presence takes longer to go stale.
 
 - **Recommended:** a few hundred seconds, e.g. `300` to `500`. Presence accuracy stays within the interval, which is well inside the 3-minute active window.
 - Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
