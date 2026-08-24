@@ -108,6 +108,8 @@ The AI can also put a file straight into its reply, rather than leaving you to f
 
 The preview understands the same formats the browser does, so a spreadsheet arrives as a table, an image as a picture, a PDF as pages. The card reads the file from the terminal each time it is opened, using your own access, so nothing is copied out of the terminal and no public link to it exists. It follows that a card only works while the terminal it came from is connected and selected, and reports the terminal as unavailable otherwise.
 
+A long document can be opened at the part that matters. For a PDF, a Word document or a slide deck, the AI can name the page or slide it means, and the preview opens there rather than at the beginning. Ask for the page an answer came from and you get the document already scrolled to it, which saves hunting through a hundred pages for the paragraph the reply is quoting. The same applies when the file opens in the browser instead of in the message.
+
 This replaces the older behaviour where a generated file produced a link in the reply that pointed at a path on the terminal's filesystem rather than at anything the browser could open.
 
 ![A CSV and a generated chart shown as cards inside an assistant message](/images/open-terminal-inline-file-card.png)
