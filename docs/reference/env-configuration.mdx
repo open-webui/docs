@@ -8283,6 +8283,13 @@ It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a spec
 
 ### Cache Settings
 
+#### `UVICORN_WS_PER_MESSAGE_DEFLATE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Whether the websocket server negotiates per-message compression with the browser. Chat responses arrive as a stream of very small frames, one per token, and compressing each of them costs processor time on the server for every subscriber while saving almost nothing, since there is little to compress in a fragment that size. Setting this to `false` declines the compression extension, so frames go out uncompressed. The large frames that did benefit, a finished message or a set of sources, are only a few hundred kilobytes even for a very long reply, which any network carries without a noticeable delay. Worth turning off on instances under heavy streaming load, where it shows up as measurable processor use. The default preserves the previous behaviour.
+- Persistence: No
+
 #### `CACHE_CONTROL`
 
 - Type: `str`

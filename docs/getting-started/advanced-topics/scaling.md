@@ -163,6 +163,14 @@ By default every Open WebUI worker compresses its own HTTP responses (JSON API r
 
 WebSocket traffic and streaming chat responses (SSE) are never compressed by this middleware anyway, so disabling it has no effect on the chat streaming path. If nothing in front of Open WebUI compresses responses, the main cost of disabling is a larger first (uncached) page load, several megabytes of JavaScript/CSS, and larger big-JSON payloads (long chat histories, large model lists), which matters mostly on slow or mobile links. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
+WebSocket frames are compressed separately, by the websocket server itself, and that is worth switching off under heavy streaming:
+
+```
+UVICORN_WS_PER_MESSAGE_DEFLATE=false
+```
+
+Chat responses stream as a very small frame per token, so compressing each one costs processor time for every subscriber and saves almost nothing at that size. The frames that did benefit, a finished message or a set of sources, are a few hundred kilobytes at most even for a very long reply. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
+
 #### Pair It with Static Asset Caching at the Proxy
 
 Disabling app-side compression works best when the proxy also **caches the static assets aggressively**, so the "larger first page load" downside effectively disappears: each browser downloads the (proxy-compressed) bundles once and then never asks for them again.

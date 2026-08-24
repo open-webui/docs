@@ -220,6 +220,16 @@ By default, Open WebUI compresses HTTP responses (JSON API responses and the sta
 
 See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
+#### WebSocket Frame Compression
+The HTTP middleware above never touches WebSocket traffic, but the WebSocket server compresses frames on its own, and that is the one worth disabling under streaming load. Chat responses arrive as a very small frame per token, so each is compressed separately, for every subscriber, with almost nothing to gain at that size. Under heavy streaming this shows up as measurable worker CPU.
+
+- **Env Var**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`
+
+*   **What you give up**: the frames that did compress well are the rare large ones, a finished message or a set of sources, and even a very long reply is only a few hundred kilobytes uncompressed, which any network carries without a noticeable delay.
+*   **Default**: enabled, matching the behaviour before the setting existed, so nothing changes until you turn it off.
+
+See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate) for the full description.
+
 #### JSON Encoder
 
 Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
@@ -563,7 +573,8 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
-13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
+13. **WebSocket Compression**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Streaming sends one tiny frame per token, and compressing each of them costs CPU per subscriber for almost no saving. See [WebSocket Frame Compression](#websocket-frame-compression).
+14. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 
