@@ -7458,7 +7458,7 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 
 Setting a positive interval collapses thousands of these writes into at most one per user per interval. This is **free performance for any setup** and is **required** for large/production deployments; leaving it unset is a common, avoidable database bottleneck.
 
-- **Recommended:** a few hundred seconds, e.g. `300` to `500`. Presence accuracy stays within the interval, which is well inside the 3-minute active window.
+- **Recommended:** `60` to `120` seconds. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count before the next write is allowed. They then drop out and reappear, which shows up as a sawtooth in the active-user figure and the metric that reports it rather than a steady number.
 - Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
 - Read once at startup; not a `ConfigVar` and not changeable from the Admin UI.
 :::

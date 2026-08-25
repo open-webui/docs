@@ -92,7 +92,7 @@ Open WebUI tracks online/"active" presence by writing each user's `last_active_a
 
 -   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`
 -   **Default**: unset (**unthrottled, writes on every request**)
--   **Recommendation**: Set a positive interval in seconds. `300` to `500` is a good range. This collapses thousands of writes into at most one per user per interval. It is **free performance for any setup** and is effectively **mandatory for large/production deployments**; leaving it unset is a common, avoidable database bottleneck. There is no downside on weak hardware either: it only *reduces* writes. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+-   **Recommendation**: Set a positive interval in seconds. `60` to `120` is a good range, and it must stay below `180`, the width of the active-presence window, or users age out of the count between writes and the active-user figure oscillates instead of holding steady. This collapses thousands of writes into at most one per user per interval. It is **free performance for any setup** and is effectively **mandatory for large/production deployments**; leaving it unset is a common, avoidable database bottleneck. There is no downside on weak hardware either: it only *reduces* writes. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
 
 ### Database Session Sharing
 
