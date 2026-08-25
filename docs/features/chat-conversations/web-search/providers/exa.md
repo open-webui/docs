@@ -53,7 +53,7 @@ First, you need to sign up for an Exa AI account and get an API key.
 Next, you need to configure the Exa AI integration in the Open WebUI admin settings.
 
 1.  **Log in as an Administrator:** Access your Open WebUI instance and log in with an administrator account.
-2.  **Navigate to Web Search Settings:** Go to the **Admin Panel**, then click on **Settings** > **Web Search**.
+2.  **Navigate to Web Search Settings:** Go to **Settings > Admin > Web Search**.
 3.  **Select Exa as the Search Engine:** In the "Web Search Engine" dropdown menu, select **Exa**.
 4.  **Enter Your API Key:** In the **Exa API Key** input field that appears, paste the API key you copied from the Exa AI dashboard.
 5.  **Save Changes:** Scroll down and click the **Save** button to apply the changes.

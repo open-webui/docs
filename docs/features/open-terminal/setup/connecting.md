@@ -9,21 +9,21 @@ Open Terminal is [installed and running](./installation). This guide covers conn
 
 ---
 
-## Recommended: Admin Panel
+## Recommended: Admin settings
 
-Recommended for all deployments, including single-user. The Admin Panel keeps the API key server-side.
+Recommended for all deployments, including single-user. An admin connection keeps the API key server-side.
 
 
 
-### 1. Open the Admin Panel
+### 1. Open Settings
 
-Click your **name** at the bottom of the left sidebar to open the user menu, then click **Admin Panel**.
+Click your **name** at the bottom of the left sidebar to open the user menu, then click **Settings**.
 
-![User menu showing Admin Panel option](/images/open-terminal-user-menu.png)
+![User menu showing the Settings option](/images/open-terminal-user-menu.png)
 
 ### 2. Go to Settings > Admin > Integrations
 
-In the Admin Panel, click **Settings** in the top nav, then click **Integrations**.
+In the settings sidebar, find the **Admin** section and click **Integrations**.
 
 The settings sidebar lists **Integrations** twice, once under **Personal** in the *Services* group and once under **Admin** in the *Tools* group. Open Terminal belongs in the Admin one. Configuring the personal entry connects the terminal to your account alone and the deployment will not work as described here.
 

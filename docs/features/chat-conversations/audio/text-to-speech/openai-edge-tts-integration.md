@@ -49,7 +49,7 @@ This will run the service at port 5050 with all the default configs
 
 ## Setting up Open WebUI to use `openai-edge-tts`
 
-- Open the Admin Panel and go to `Settings` -> `Audio`
+- Go to `Settings` -> `Admin` -> `Audio`
 - Set your TTS Settings to match the screenshot below
 - *Note: you can specify the TTS Voice here*
 

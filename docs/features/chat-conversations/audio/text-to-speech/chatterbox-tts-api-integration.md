@@ -207,7 +207,7 @@ We recommend running with the frontend interface so you can upload the audio fil
 
 To use Chatterbox TTS API with Open WebUI, follow these steps:
 
-- Open the Admin Panel and go to `Settings` -> `Audio`
+- Go to `Settings` -> `Admin` -> `Audio`
 - Set your TTS Settings to match the following:
 - - Text-to-Speech Engine: OpenAI
   - API Base URL: `http://localhost:4123/v1` # alternatively, try `http://host.docker.internal:4123/v1`

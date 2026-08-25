@@ -382,4 +382,4 @@ When paired with a Google Cloud project that has the Google Picker API and Googl
 10. Set up the environment variable `GOOGLE_DRIVE_API_KEY` to the API Key value setup up in step 7 (NOT the OAuth client secret from step 2).
 11. Set up the `GOOGLE_REDIRECT_URI` to my Open-WebUI instance's URL (include the port, if any).
 12. Then relaunch your Open-WebUI instance with those three environment variables.
-13. After that, make sure Google Drive was enabled under `Admin Panel` < `Settings` < `Documents` < `Google Drive`
+13. After that, make sure Google Drive was enabled under `Settings` > `Admin` > `Documents` > `Google Drive`

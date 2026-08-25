@@ -45,7 +45,7 @@ A key can be replaced or removed outright. Creating a new key overwrites the old
 ### Step 1: Enable API Keys Globally (Admin)
 
 1. Log in as an **administrator**
-2. Open **Admin Panel > Settings > Authentication**
+2. Open **Settings > Admin > Authentication**
 3. Toggle **API Keys** on
 4. Click **Save**
 
@@ -171,7 +171,7 @@ Retiring an integration for good is a **Delete** rather than a rotation, since t
 
 **No API keys section at all in Settings > Account?**
 
-- **Check the global toggle:** verify that an admin has enabled API keys in **Admin Panel > Settings > Authentication**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
+- **Check the global toggle:** verify that an admin has enabled API keys in **Settings > Admin > Authentication**. See [`ENABLE_API_KEYS`](/reference/env-configuration#enable_api_keys).
 - **Check your permissions (non-admin users):** verify that your account or group has the **API Keys** feature permission under **Features Permissions**. See [`USER_PERMISSIONS_FEATURES_API_KEYS`](/reference/env-configuration#user_permissions_features_api_keys).
 
 **Getting `401 Unauthorized` responses?**

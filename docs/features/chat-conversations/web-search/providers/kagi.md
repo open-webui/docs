@@ -35,7 +35,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 1. Go to [kagi.com/api](https://kagi.com/api) and set up API billing.
 2. Go to [kagi.com/api/keys](https://kagi.com/api/keys) and create an API key. Copy the key.
-3. Open the **Open WebUI Admin Panel** and click **Settings**, then **Web Search**.
+3. Open **Settings > Admin > Web Search**.
 4. Enable **Web search** and set **Web Search Engine** to `kagi`.
 5. Paste your API key into the **Kagi Search API Key** field.
 6. Click **Save**.

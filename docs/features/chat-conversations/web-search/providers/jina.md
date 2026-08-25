@@ -54,7 +54,7 @@ Follow these steps to get an API key:
 To enable the Jina web search integration, follow these steps in the Open WebUI admin settings:
 
 1. **Log in as an Administrator:** Access your Open WebUI instance and log in with an administrator account.
-2. **Navigate to Web Search Settings:** Go to the **Admin Panel**, then click on **Settings** > **Web Search**.
+2. **Navigate to Web Search Settings:** Go to **Settings > Admin > Web Search**.
 3. **Select Jina as the Search Engine:** In the "Web Search Engine" dropdown menu, select **Jina**.
 4. **Enter Your API Key:** Paste your Jina API key into the **Jina API Key** input field.
 5. **(Optional) Enter Jina API Base URL:** If you need to use a specific endpoint (e.g., for EU data processing), enter it in the **Jina API Base URL** field. Default is `https://s.jina.ai/`.
