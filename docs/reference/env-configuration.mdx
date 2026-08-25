@@ -7659,7 +7659,7 @@ Throttling is on by default at 60 seconds, which already collapses thousands of 
 
 **Keep it below 180 seconds.** Active presence counts users whose timestamp falls in the last 180 seconds, and that window is fixed in the code. An interval at or above it means a user's timestamp can age past the window before the next write is allowed, so they drop out of the count and reappear on the next write, which shows up as a sawtooth in the active-user metric rather than a steady figure.
 
-- **Recommended:** leave it at the default `60`, or raise it toward `120` if you want fewer writes still. Both stay comfortably inside the window.
+- **Recommended:** `120`. That halves the presence writes again while leaving a full minute of headroom inside the 180 second window, so a user who is still active is always counted. The default of `60` is also fine and needs no change.
 - Above `180` the count stops being reliable. Only go there if you do not use the active-user figure or the metric that reports it.
 - Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
 - Read once at startup; not a `ConfigVar` and not changeable from the Admin UI.

@@ -481,7 +481,7 @@ ENABLE_DB_MIGRATIONS=false
 
 # Concurrency & DB write throttling (REQUIRED at scale — see note below)
 THREAD_POOL_SIZE=2000
-DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300
+DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 
 # HTTP compression — disable in the app IF your LB/ingress/CDN compresses
 # responses instead (saves ~3-4% CPU on every worker; see Step 3)
@@ -506,7 +506,7 @@ AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 
 :::warning Two settings people forget, and then their scaled deployment stalls
 - **`THREAD_POOL_SIZE=2000`**: Open WebUI offloads blocking work (DB calls, file I/O, sync handlers) to a thread pool whose default concurrency ceiling is only **40**. At scale, once 40 blocking operations are in flight every further request **queues**, and the whole app appears to freeze even though CPU/RAM look fine. `2000` is a *lower* bound for large instances; it is a concurrency ceiling, **not** a CPU/thread count, so a high value is not a contention risk. Never lower it. (The only exception is genuinely tiny hardware, which is not a "scaled deployment".)
-- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`**: presence tracking writes each user's `last_active_at` to the database. The default throttles that to one write per user per 60 seconds, so the flood of tiny write transactions is already avoided and there is usually nothing to change. Keep any value you do set below `180`, since active presence counts users seen in the last 180 seconds and an interval at or above that makes users drop out of the count between writes. Setting it to `0` turns throttling off and returns to roughly one `UPDATE` plus `COMMIT` per authenticated request, which saturates the connection pool for no functional gain.
+- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`**: presence tracking writes each user's `last_active_at` to the database. The default throttles that to one write per user per 60 seconds, so the flood of tiny write transactions is already avoided and there is usually nothing to change. `120` is the value to use if you set one: it halves the writes again and still leaves a full minute of headroom inside the 180 second window that active presence counts users over. Anything at or above 180 makes users drop out of the count between writes. Setting it to `0` turns throttling off and returns to roughly one `UPDATE` plus `COMMIT` per authenticated request, which saturates the connection pool for no functional gain.
 
 Both are read once at startup and are not configurable from the Admin UI. See [Performance → Database Optimization](/troubleshooting/performance#-database-optimization) and [Performance → High-Concurrency](/troubleshooting/performance#-high-concurrency--network-optimization).
 :::

@@ -89,7 +89,7 @@ Open WebUI tracks online/"active" presence by writing each user's `last_active_a
 
 -   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
 -   **Default**: `60` seconds, so the throttling is already in place
--   **Recommendation**: leave the default alone, or raise it toward `120` if you want fewer writes still. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count between writes and the active-user figure oscillates instead of holding steady. Setting it to `0` disables throttling entirely and restores the per-request write. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+-   **Recommendation**: `120`. It halves the presence writes again and still leaves a full minute of headroom inside the window, so an active user is never missed. The default of `60` is fine too if you would rather not set anything. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count between writes and the active-user figure oscillates instead of holding steady. Setting it to `0` disables throttling entirely and restores the per-request write. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
 
 ### Database Session Sharing
 
