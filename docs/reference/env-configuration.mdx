@@ -3626,6 +3626,16 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Description: Sets the URL for the Apache Tika server.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `TIKA_SERVER_VERSION`
+
+- Type: `str`
+- Options:
+  - `3` - Tika 3.x
+  - `4` - Tika 4.x
+- Default: `3`
+- Description: Tells Open WebUI which Apache Tika API to speak, since the two major versions differ in the endpoints they expose. Set this to match the server you are running, or extraction fails against an otherwise healthy Tika. It can also be changed from the Documents tab in the admin settings.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `DOCLING_SERVER_URL`
 
 - Type: `str`
