@@ -200,6 +200,7 @@ Open WebUI implements various limits to ensure system stability and prevent abus
 
 *   **Chat Uploads:** Subject to global file size and count limits.
     *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Size**.
+    *   **Office and EPUB documents** are additionally checked against what they contain, because those formats are archives. One that unpacks to far more than its own size is refused with a message about the archive being too large after decompression, even though the file itself is small. A genuine document rarely trips this; one that does is either corrupt or built to exhaust memory on whatever opens it.
     *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Count**.
     *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Documents > General > Allowed File Extensions**.
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.

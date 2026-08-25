@@ -4042,7 +4042,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size.
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. Office and EPUB documents are checked a second time against their contents, since those formats are archives: a file whose contents unpack to far more than the file itself is refused rather than extracted, which stops a small upload from consuming the whole machine's memory.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_MAX_COUNT`
