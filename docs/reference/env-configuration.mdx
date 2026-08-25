@@ -7979,6 +7979,13 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 - Default: `open-webui`
 - Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
 
+#### `REDIS_RESPONSE_STREAM_TTL`
+
+- Type: `int` (seconds)
+- Default: `3600`
+- Description: How long a finished response is kept in Redis so a reconnecting browser can pick a reply back up where it left off. Each entry expires on its own after this many seconds, so the store no longer grows with every reply on a busy instance. Raise it if users routinely return to a tab hours later and expect the streamed reply still to be there, lower it to reclaim memory sooner, or set `0` to keep entries indefinitely as before. Applies only when Redis is in use.
+- Persistence: No
+
 #### `REDIS_SOCKET_CONNECT_TIMEOUT`
 
 - Type: `float` (seconds) or empty string for None
@@ -8218,6 +8225,12 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 - Type: `int`
 - Default: `25`
 - Description: The interval in seconds at which the Socket.IO/Engine.IO server sends heartbeat pings to connected websocket clients.
+
+#### `WEBSOCKET_HEARTBEAT_INTERVAL`
+
+- Type: `int` (seconds)
+- Default: unset, meaning the browser sends a heartbeat every 30 seconds and presence entries are held for 120 seconds
+- Description: How often each connected browser tells the server it is still there. The value is served to the browser, so setting it changes the client's behaviour without a rebuild, and it also lengthens how long the server keeps a presence entry before assuming the client is gone, to four times this interval or 120 seconds, whichever is larger. Raise it to cut the number of small websocket messages a large deployment handles, at the cost of a disconnected user showing as active for longer. Values are held between `5` and `90`, and anything that is not a whole number falls back to `30`.
 
 #### `WEBSOCKET_EVENT_CALLER_TIMEOUT`
 
