@@ -3753,8 +3753,10 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 #### `RAG_METADATA_MAX_VALUE_CHARS`
 
 - Type: `int`
-- Default: unset (no limit)
-- Description: Drops a metadata field from what is stored alongside a document chunk when the field is a list or an object whose text runs longer than this many characters. Extraction can attach large structures to a document, and those travel into the vector store with every chunk, where they cost memory and space without helping retrieval. Setting a limit discards the oversized ones and keeps the rest of the metadata intact. Leave unset to store everything as before.
+- Default: unset, in which case the limit follows `RAG_FILE_MAX_SIZE`, or no limit at all if that is unset too
+- Description: Drops a metadata field from what is stored alongside a document chunk when the field is a list or an object whose text runs longer than this many characters. Extraction can attach large structures to a document, and those travel into the vector store with every chunk, where they cost memory and space without helping retrieval.
+
+  Left entirely unbounded this is also a way to exhaust a server: an Office document is an archive, and one crafted to expand during extraction can turn a few hundred kilobytes into gigabytes of metadata held in memory, so a handful of uploads is enough to take an instance down. When this is unset the bound therefore follows the upload size limit, on the reasoning that a document cannot legitimately carry more metadata than the file itself is permitted to weigh. Set this explicitly to override that, and note that a deployment with no upload limit configured has no metadata limit either.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MINERU_MAX_MARKDOWN_BYTES`
@@ -4049,7 +4051,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. Office and EPUB documents are checked a second time against their contents, since those formats are archives: a file whose contents unpack to far more than the file itself is refused rather than extracted, which stops a small upload from consuming the whole machine's memory.
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. Office and EPUB documents are checked a second time against their contents, since those formats are archives: a file whose contents unpack to far more than the file itself is refused rather than extracted, which stops a small upload from consuming the whole machine's memory. This value doubles as the default ceiling on extracted metadata, so leaving it unset removes that protection as well; see [`RAG_METADATA_MAX_VALUE_CHARS`](#rag_metadata_max_value_chars).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_MAX_COUNT`
