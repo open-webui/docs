@@ -171,6 +171,8 @@ UVICORN_WS_PER_MESSAGE_DEFLATE=false
 
 Chat responses stream as a very small frame per token, so compressing each one costs processor time for every subscriber and saves almost nothing at that size. The frames that did benefit, a finished message or a set of sources, are a few hundred kilobytes at most even for a very long reply. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
 
+Two more websocket settings matter once a deployment is large. Each open tab sends a heartbeat every thirty seconds by default, so an instance holding thousands of idle tabs handles a steady stream of messages carrying nothing; `WEBSOCKET_HEARTBEAT_INTERVAL=60` halves that, at the cost of a disconnected user staying in the active count for longer, since the server holds a presence entry for four times the interval. And a response being streamed is held in Redis so a reconnecting browser can resume it, with the entry deleted as soon as that response finishes; `REDIS_RESPONSE_STREAM_TTL` puts an hour's expiry on the leftovers from workers killed mid-stream, which previously stayed forever. See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_heartbeat_interval) and [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
+
 #### Pair It with Static Asset Caching at the Proxy
 
 Disabling app-side compression works best when the proxy also **caches the static assets aggressively**, so the "larger first page load" downside effectively disappears: each browser downloads the (proxy-compressed) bundles once and then never asks for them again.
@@ -485,6 +487,14 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300
 # responses instead (saves ~3-4% CPU on every worker; see Step 3)
 # ENABLE_COMPRESSION_MIDDLEWARE=false
 
+# Websocket heartbeats: one message per open tab every 30s by default.
+# Raising it cuts idle traffic; a dropped user lingers in the active count
+# WEBSOCKET_HEARTBEAT_INTERVAL=60
+
+# Expiry on stream entries left behind by workers killed mid-response.
+# Finished responses are deleted immediately; 0 keeps orphans forever
+# REDIS_RESPONSE_STREAM_TTL=3600
+
 # Faster JSON encoder (v0.11.0+): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
@@ -496,7 +506,7 @@ AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 
 :::warning Two settings people forget, and then their scaled deployment stalls
 - **`THREAD_POOL_SIZE=2000`**: Open WebUI offloads blocking work (DB calls, file I/O, sync handlers) to a thread pool whose default concurrency ceiling is only **40**. At scale, once 40 blocking operations are in flight every further request **queues**, and the whole app appears to freeze even though CPU/RAM look fine. `2000` is a *lower* bound for large instances; it is a concurrency ceiling, **not** a CPU/thread count, so a high value is not a contention risk. Never lower it. (The only exception is genuinely tiny hardware, which is not a "scaled deployment".)
-- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`**: presence tracking writes each user's `last_active_at` to the database. The default throttles that to one write per user per 60 seconds, so the flood of tiny write transactions is already avoided. Raise it to `300` to `500` seconds at scale, where the only cost is presence taking longer to go stale. Setting it to `0` turns throttling off and returns to roughly one `UPDATE` plus `COMMIT` per authenticated request, which saturates the connection pool for no functional gain.
+- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`**: presence tracking writes each user's `last_active_at` to the database. The default throttles that to one write per user per 60 seconds, so the flood of tiny write transactions is already avoided and there is usually nothing to change. Keep any value you do set below `180`, since active presence counts users seen in the last 180 seconds and an interval at or above that makes users drop out of the count between writes. Setting it to `0` turns throttling off and returns to roughly one `UPDATE` plus `COMMIT` per authenticated request, which saturates the connection pool for no functional gain.
 
 Both are read once at startup and are not configurable from the Admin UI. See [Performance → Database Optimization](/troubleshooting/performance#-database-optimization) and [Performance → High-Concurrency](/troubleshooting/performance#-high-concurrency--network-optimization).
 :::

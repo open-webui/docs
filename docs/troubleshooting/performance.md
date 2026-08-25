@@ -85,11 +85,11 @@ By default, Open WebUI saves chats **after generation is complete**. While savin
 
 ### User Active-Status Write Throttling (set this on every deployment)
 
-Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. **By default this write is unthrottled**: essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`. On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit (presence only needs ~minute granularity).
+Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. Unthrottled, that means essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`, a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit, since presence only needs about minute granularity.
 
--   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`
--   **Default**: unset (**unthrottled, writes on every request**)
--   **Recommendation**: Set a positive interval in seconds. `300` to `500` is a good range. This collapses thousands of writes into at most one per user per interval. It is **free performance for any setup** and is effectively **mandatory for large/production deployments**; leaving it unset is a common, avoidable database bottleneck. There is no downside on weak hardware either: it only *reduces* writes. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+-   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
+-   **Default**: `60` seconds, so the throttling is already in place
+-   **Recommendation**: leave the default alone, or raise it toward `120` if you want fewer writes still. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count between writes and the active-user figure oscillates instead of holding steady. Setting it to `0` disables throttling entirely and restores the per-request write. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
 
 ### Database Session Sharing
 
@@ -229,6 +229,16 @@ The HTTP middleware above never touches WebSocket traffic, but the WebSocket ser
 *   **Default**: enabled, matching the behaviour before the setting existed, so nothing changes until you turn it off.
 
 See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate) for the full description.
+
+#### WebSocket Heartbeats
+Every connected browser tells the server it is still there on a fixed interval, thirty seconds by default. That is one small message per open tab, so an instance holding thousands of idle tabs spends real time on messages that carry nothing.
+
+- **Env Var**: `WEBSOCKET_HEARTBEAT_INTERVAL=60`
+
+*   **What it costs**: the server holds a presence entry for four times the interval, or 120 seconds, whichever is larger, so a user who closes their laptop shows as active for longer before dropping out of the active-user count.
+*   **Range**: values are held between `5` and `90`. The setting is sent to the browser, so it applies without rebuilding the frontend.
+
+See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_heartbeat_interval).
 
 #### JSON Encoder
 
@@ -573,12 +583,15 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
-13. **WebSocket Compression**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Streaming sends one tiny frame per token, and compressing each of them costs CPU per subscriber for almost no saving. See [WebSocket Frame Compression](#websocket-frame-compression).
-14. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
+13. **WebSocket Heartbeats**: `WEBSOCKET_HEARTBEAT_INTERVAL=60`. Halves the idle heartbeat traffic from every open tab, at the cost of a disconnected user lingering in the active count. See [WebSocket Heartbeats](#websocket-heartbeats).
+14. **WebSocket Compression**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Streaming sends one tiny frame per token, and compressing each of them costs CPU per subscriber for almost no saving. See [WebSocket Frame Compression](#websocket-frame-compression).
+15. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 
 A single Redis instance is sufficient for the vast majority of deployments, including those with thousands of users. **You almost certainly do not need Redis Cluster or Redis Sentinel** unless you have specific HA requirements.
+
+A response being streamed is held in Redis so a browser that reconnects can resume it, and the entry is deleted the moment that response finishes. What used to accumulate was the leftovers, entries whose cleanup never ran because the worker was killed mid-stream, which stayed forever. Those now expire after an hour, and `REDIS_RESPONSE_STREAM_TTL` shortens that where memory is tight or `0` restores the old unbounded behaviour. See [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
 
 Common Redis configuration issues that cause unnecessary scaling:
 

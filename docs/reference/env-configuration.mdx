@@ -7650,9 +7650,10 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 :::warning Raise this at scale, and never set it to zero there
 Throttling is on by default at 60 seconds, which already collapses thousands of writes into at most one per user per interval. **Setting it to `0` disables throttling, so essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance that is a continuous flood of tiny write transactions which amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs about minute granularity.
 
-Large deployments should raise it further, to somewhere around `300` to `500` seconds, since the only cost is that presence takes longer to go stale.
+**Keep it below 180 seconds.** Active presence counts users whose timestamp falls in the last 180 seconds, and that window is fixed in the code. An interval at or above it means a user's timestamp can age past the window before the next write is allowed, so they drop out of the count and reappear on the next write, which shows up as a sawtooth in the active-user metric rather than a steady figure.
 
-- **Recommended:** a few hundred seconds, e.g. `300` to `500`. Presence accuracy stays within the interval, which is well inside the 3-minute active window.
+- **Recommended:** leave it at the default `60`, or raise it toward `120` if you want fewer writes still. Both stay comfortably inside the window.
+- Above `180` the count stops being reliable. Only go there if you do not use the active-user figure or the metric that reports it.
 - Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
 - Read once at startup; not a `ConfigVar` and not changeable from the Admin UI.
 :::
@@ -7983,7 +7984,7 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 - Type: `int` (seconds)
 - Default: `3600`
-- Description: How long a finished response is kept in Redis so a reconnecting browser can pick a reply back up where it left off. Each entry expires on its own after this many seconds, so the store no longer grows with every reply on a busy instance. Raise it if users routinely return to a tab hours later and expect the streamed reply still to be there, lower it to reclaim memory sooner, or set `0` to keep entries indefinitely as before. Applies only when Redis is in use.
+- Description: A safety net on the entries Redis holds while a response is streaming, which let a reconnecting browser pick a reply back up where it left off. An entry is deleted as soon as its response finishes, so this timeout is not the normal lifetime of one. It catches the entries whose cleanup never ran, a worker killed mid-stream or a process that died, which previously stayed in Redis forever and accumulated. Lower it to reclaim that memory sooner, raise it if a long-running response could legitimately outlive the default hour, or set `0` to keep orphaned entries indefinitely as before. Applies only when Redis is in use.
 - Persistence: No
 
 #### `REDIS_SOCKET_CONNECT_TIMEOUT`
