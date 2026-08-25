@@ -62,7 +62,7 @@ Many features follow a **two-layer pattern**:
 
 | Layer | Setting Location | Effect |
 |-------|-----------------|--------|
-| Admin enables it | Admin Settings > Interface | Makes autocomplete **available** on the instance |
+| Admin enables it | Settings > Admin > Interface | Makes autocomplete **available** on the instance |
 | User enables it | Settings > Interface | Turns autocomplete **on for you personally** |
 
 :::important Key Rule
@@ -70,6 +70,16 @@ If an admin **disables** a feature globally, users **cannot** enable it for them
 :::
 
 This pattern applies across web search, image generation, direct connections, code interpreter, and more. The admin controls **what is possible**. Users control **what they want**.
+
+---
+
+## Instance-Wide Starting Values
+
+Feature toggles are a ceiling. One admin control works the other way round: **Default Interface Settings** decides what everyone's **Settings > Interface** page starts on, and each person can still change any of it for themselves. An option somebody has never touched keeps following your default, so a later change to it reaches them too.
+
+Set it in **Settings > Admin > General**, under **UI > Default Interface Settings**, or with the `DEFAULT_INTERFACE_SETTINGS` environment variable.
+
+[**Learn about Default Interface Settings →**](/features/administration/interface-defaults)
 
 ---
 
@@ -82,6 +92,8 @@ This pattern applies across web search, image generation, direct connections, co
 | **Controls** | API connections, feature toggles, security, defaults | Theme, default model, personal preferences |
 | **Override behavior** | Cannot be overridden by users | Can customize within admin-allowed boundaries |
 
+The one deliberate exception is [Default Interface Settings](/features/administration/interface-defaults), which an admin sets as a starting value rather than a limit; each user can change any of it for themselves.
+
 ---
 
 ## Common Scenarios
@@ -90,14 +102,23 @@ This pattern applies across web search, image generation, direct connections, co
 Check whether the admin has enabled it globally first. Your personal toggle only takes effect if the admin has made the feature available at the instance level.
 
 **"I am the admin. Where do I configure connections to OpenAI or Ollama?"**
-Admin Settings > Connections. These are instance-wide and shared by all users.
+Settings > Admin > Connections. These are instance-wide and shared by all users.
 
 **"I want to use my own API key without sharing it with the server."**
 If the admin has enabled **Direct Connections**, you can add personal API keys in User Settings > Connections. See [Direct Connections](/features/chat-conversations/direct-connections).
 
 **"I set a system prompt but my admin's model settings override it."**
-Model-level settings configured by admins in the Workspace take precedence over personal settings. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
+A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat in **Chat Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
+
+**"A switch in Settings > Interface has Default written next to it. What does that mean?"**
+It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
+
+**"The interface is too small to read comfortably."**
+Raise **UI Scale** at the top of the **UI** section in **Settings > Interface**. It enlarges the whole application and is stored with your account.
+
+**"I am the admin. Can I make everyone start with the same interface options?"**
+Yes, with [Default Interface Settings](/features/administration/interface-defaults). It sets where everyone starts; each person can still change any of it afterwards.
 
 :::tip First-Time Admin?
-Start with **Admin Settings > Connections** to connect your model providers (Ollama, OpenAI, etc.), then explore **Admin Settings > Interface** to enable or disable features for your users.
+Start with **Settings > Admin > Connections** to connect your model providers (Ollama, OpenAI, etc.), then explore **Settings > Admin > Interface** to enable or disable features for your users.
 :::

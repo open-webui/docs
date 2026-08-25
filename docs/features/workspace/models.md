@@ -114,16 +114,27 @@ Toggle what the model can do and bind resources:
 | **Vision** | Enable image analysis (requires a vision-capable base model) |
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
+| **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
 | **Image Generation** | Enable image generation |
+| **Usage** | Ask the provider to report token counts on streamed replies (`stream_options.include_usage`). Off by default. Most OpenAI-compatible providers report nothing unless asked, so without it a response has no token figures to show and none to aggregate in [Analytics](/features/administration/analytics) |
+| **Citations** | Show the sources behind a reply, from knowledge, web search and the builtin tools that return them. On by default; with it off no sources are shown |
+| **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
 | **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels, Files, Task Management, Automations |
+| **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **File Context** disappears from this editor since there is nothing to extract |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **TTS Voice** | Set a specific voice for this model's responses |
+
+:::info Usage covers every chat the model runs
+The request for token counts is added server-side, so it applies wherever the model is used: the chat interface, the API and the chats Open WebUI starts on your behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Nothing needs to be set per request. Only streaming requests are touched, so a model with **Stream Chat Response** turned off is left alone.
+:::
 
 ### Advanced parameters
 
 - **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). Press Enter after each.
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
+
+What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
 
 ### Prompt suggestions
 
@@ -147,6 +158,12 @@ From the model list, click the ellipsis (**...**) on any model:
 | **Share** | Share to the Open WebUI community |
 | **Delete** | Permanently remove the preset |
 
+### Enabled and disabled
+
+Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Admin > Models** alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **"Model not found"**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
+
+**Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it.
+
 ### Import and export
 
 - **Import**: From `.json` files or Open WebUI community links
@@ -154,17 +171,19 @@ From the model list, click the ellipsis (**...**) on any model:
 - **Discover**: Browse community presets at the bottom of the page
 
 :::info Downloading base models
-To download new base models, go to **Settings > Connections > Ollama** or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
+To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
 :::
 
 ---
 
 ## Global Model Defaults (Admin)
 
-Administrators can set baseline capabilities and parameters that apply to all models via **Settings > Admin > AI > Models > Model Defaults > Configure**.
+Administrators can set baseline capabilities and parameters that apply to all models via **Settings > Admin > Models > Model Defaults > Configure**.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
+
+These cover chat completions. Background task requests (titles, tags, follow-ups, search queries, autocomplete, context compaction summaries) do not go through them; their parameters are set separately, in [Task Models](/features/administration/task-models).
 
 ### Merge behavior
 
@@ -173,6 +192,13 @@ Administrators can set baseline capabilities and parameters that apply to all mo
 | **Capabilities** | Deep merge | Global sets `file_context: false`, model sets `vision: true` > model gets both |
 | **Other metadata** | Fill-only | Global sets description, model has none > model gets the global value |
 | **Parameters** | Simple merge | Global sets `temperature: 0.7`, model sets `0.3` > model gets `0.3` |
+| **Custom parameters** | Key-by-key merge | Global adds `service_tier`, model adds `tools` > model gets both, and the model's value wins on a shared name |
+
+Custom parameters are the ones added with **Add Custom Parameter**, stored under `custom_params`. They are the only group merged entry by entry, so a model that defines one of its own keeps the global ones alongside it.
+
+:::info A request that sets a parameter keeps its own value
+Both layers only fill in what the request left out. A parameter sent in the body of a [chat completions](/reference/api-endpoints#-chat-completions) request survives, so an integration that sends its own `temperature` or `max_tokens` gets the value it asked for rather than the model's saved one. The exception is **Stream Chat Response**, which still decides whether the reply streams no matter what the request asked for.
+:::
 
 :::warning Knowledge base + function calling interaction
 Setting `function_calling: native` in global params changes how **all** models handle attached knowledge bases. In native mode, model-attached KBs are not auto-injected. The model must call builtin tools to retrieve knowledge. If your knowledge bases suddenly stop working, check global defaults first.
@@ -203,7 +229,7 @@ The **Model Defaults** panel at the top of the same page is a different feature:
 
 ### Setting a selected or pinned model
 
-1. Go to **Settings > Admin > AI > Models**.
+1. Go to **Settings > Admin > Models**.
 2. Find the model with **Search Models**, or narrow the list with the view filter.
 3. Click the ellipsis (**...**) at the end of the model's row.
 4. Choose **Set as Selected Model** or **Set as Pinned Model**.
@@ -249,6 +275,8 @@ Setting a model as Selected does not stop anyone from switching to another model
 Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
 
 ![The model selector, searchable and showing pinned models](/images/features/chat/model-selector.png)
+
+You can also switch without opening the picker. Send `/model` followed by a model id, for example `/model gpt-5.1`, and the chat moves to that model; send `/model` on its own and it tells you which model the chat is on. The id has to match exactly, the display name will not do, and an id you cannot reach reports `Model not found`. Picking **Model** from the `/` menu opens the picker with its search box focused instead. See [Chat Features](/features/chat-conversations/chat-features/) for the other built-in slash commands.
 
 ---
 
@@ -318,4 +346,4 @@ Model presets configure behavior through system prompts and tool bindings. They 
 
 ### Fallback requires configuration
 
-If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Admin > AI > Models**. The fallback uses the first Selected Model.
+If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Admin > Models**. The fallback uses the first Selected Model.

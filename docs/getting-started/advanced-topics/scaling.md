@@ -135,18 +135,20 @@ Use Kubernetes, Docker Swarm, or similar platforms to manage multiple replicas:
 - Set `ENABLE_DB_MIGRATIONS=false` on all replicas except one designated "primary" pod to prevent migration race conditions: see [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the safe procedure
 - Scale up/down by adjusting your replica count
 
-### Option B: Multiple Workers per Container
+### Option B: Multiple Workers per Container (Last Resort)
 
-For simpler setups (e.g., a single powerful server), increase `UVICORN_WORKERS`:
+On a single machine with no orchestrator at all, you can raise `UVICORN_WORKERS`:
 
 ```
 UVICORN_WORKERS=4
 ```
 
-This spawns multiple application processes inside a single container. You still need PostgreSQL and Redis when using this approach.
+:::warning This is the weakest way to scale
 
-:::info
-Container orchestration is generally preferred because it provides automatic restarts, rolling updates, and more granular resource control. Multiple workers inside a single container is a simpler alternative when orchestration isn't available.
+Prefer more containers even on one machine: Docker Compose runs replicas on a single host perfectly well, and gets you restarts one at a time and a per-container memory limit.
+
+Extra workers cost you everything replicas cost, PostgreSQL, Redis and a client-server vector database are all still required, and return none of the benefit. They share one container, so they share its memory limit and die with it, and they cannot be spread across machines when one stops being enough.
+
 :::
 
 ### Offload HTTP Compression to the Load Balancer
@@ -157,15 +159,25 @@ Once a load balancer, ingress, or CDN sits in front of Open WebUI, let **it** ha
 ENABLE_COMPRESSION_MIDDLEWARE=false
 ```
 
-By default every Open WebUI worker compresses its own HTTP responses (JSON API responses and static assets) with ZStd/Brotli/Gzip. Profiling shows this costs roughly **3–4% CPU per worker** — multiplied across every replica in a scaled deployment. Enabling compression at the proxy layer instead (e.g. Nginx `gzip on;`, Traefik's compress middleware, Cloudflare's default compression) keeps responses just as small on the wire while freeing that CPU on every worker, and lets CDNs cache static assets in pre-compressed form.
+By default every Open WebUI worker compresses its own HTTP responses (JSON API responses and static assets) with ZStd/Brotli/Gzip. Profiling shows this costs roughly **3–4% CPU per worker**, multiplied across every replica in a scaled deployment. Enabling compression at the proxy layer instead (e.g. Nginx `gzip on;`, Traefik's compress middleware, Cloudflare's default compression) keeps responses just as small on the wire while freeing that CPU on every worker, and lets CDNs cache static assets in pre-compressed form.
 
-WebSocket traffic and streaming chat responses (SSE) are never compressed by this middleware anyway, so disabling it has no effect on the chat streaming path. If nothing in front of Open WebUI compresses responses, the main cost of disabling is a larger first (uncached) page load — several megabytes of JavaScript/CSS — and larger big-JSON payloads (long chat histories, large model lists), which matters mostly on slow or mobile links. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
+WebSocket traffic and streaming chat responses (SSE) are never compressed by this middleware anyway, so disabling it has no effect on the chat streaming path. If nothing in front of Open WebUI compresses responses, the main cost of disabling is a larger first (uncached) page load, several megabytes of JavaScript/CSS, and larger big-JSON payloads (long chat histories, large model lists), which matters mostly on slow or mobile links. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
+
+WebSocket frames are compressed separately, by the websocket server itself, and that is worth switching off under heavy streaming:
+
+```
+UVICORN_WS_PER_MESSAGE_DEFLATE=false
+```
+
+Chat responses stream as a very small frame per token, so compressing each one costs processor time for every subscriber and saves almost nothing at that size. The frames that did benefit, a finished message or a set of sources, are a few hundred kilobytes at most even for a very long reply. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
+
+Two more websocket settings matter once a deployment is large. Each open tab sends a heartbeat every thirty seconds by default, so an instance holding thousands of idle tabs handles a steady stream of messages carrying nothing; `WEBSOCKET_HEARTBEAT_INTERVAL=60` halves that, at the cost of a disconnected user staying in the active count for longer, since the server holds a presence entry for four times the interval. And a response being streamed is held in Redis so a reconnecting browser can resume it, with the entry deleted as soon as that response finishes; `REDIS_RESPONSE_STREAM_TTL` puts an hour's expiry on the leftovers from workers killed mid-stream, which previously stayed forever. See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_heartbeat_interval) and [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
 
 #### Pair It with Static Asset Caching at the Proxy
 
 Disabling app-side compression works best when the proxy also **caches the static assets aggressively**, so the "larger first page load" downside effectively disappears: each browser downloads the (proxy-compressed) bundles once and then never asks for them again.
 
-Open WebUI's frontend is a SvelteKit app: all of its JavaScript/CSS lives under `/_app/immutable/` with **content-hashed filenames**. A given URL never changes content — an upgrade produces new filenames — so these files are safe to cache essentially forever. The HTML shell and `/_app/version.json` are the opposite: they must stay short-lived, because they are how browsers discover a new build (Open WebUI polls `version.json` to detect upgrades and reload).
+Open WebUI's frontend is a SvelteKit app: all of its JavaScript/CSS lives under `/_app/immutable/` with **content-hashed filenames**. A given URL never changes content, an upgrade produces new filenames, so these files are safe to cache essentially forever. The HTML shell and `/_app/version.json` are the opposite: they must stay short-lived, because they are how browsers discover a new build (Open WebUI polls `version.json` to detect upgrades and reload).
 
 Example for Nginx:
 
@@ -187,10 +199,10 @@ location ^~ /_app/immutable/ {
 }
 ```
 
-- The `immutable` keyword stops browsers from revalidating on reload/F5 — `max-age` alone doesn't. If a year feels uncomfortable, 30 days (`max-age=2592000, immutable`) gives nearly the same effect; the hashed filenames make staleness impossible either way.
-- **Do not** apply long caching to the HTML shell or `/_app/version.json` — leave those uncached or at a few minutes at most, or users won't pick up upgrades.
+- The `immutable` keyword stops browsers from revalidating on reload/F5, `max-age` alone doesn't. If a year feels uncomfortable, 30 days (`max-age=2592000, immutable`) gives nearly the same effect; the hashed filenames make staleness impossible either way.
+- **Do not** apply long caching to the HTML shell or `/_app/version.json`, leave those uncached or at a few minutes at most, or users won't pick up upgrades.
 - `proxy_cache` means each asset is fetched from a worker once per cache lifetime instead of once per user, removing the static file serving load from the Python workers entirely.
-- If Nginx compresses on the fly, note that it compresses on **every response** (its proxy cache stores the uncompressed body), so prefer moderate levels — `gzip_comp_level 4;` / brotli quality 4–5 gets ~95% of the ratio of level 6 at roughly half the CPU — and set `gzip_min_length 1000;` so tiny responses skip the compressor.
+- If Nginx compresses on the fly, note that it compresses on **every response** (its proxy cache stores the uncompressed body), so prefer moderate levels, `gzip_comp_level 4;` / brotli quality 4–5 gets ~95% of the ratio of level 6 at roughly half the CPU, and set `gzip_min_length 1000;` so tiny responses skip the compressor.
 
 ### Switch the JSON Encoder to orjson
 
@@ -200,9 +212,19 @@ Multiple instances mean Socket.IO events travel through Redis, and every one of 
 ENABLE_ORJSON=True
 ```
 
-It covers HTTP request and response bodies, upstream provider responses including the per-chunk parsing of streamed completions, and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0.
+It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0.
 
 For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
+
+### Speed Up Name Lookups
+
+Hostname lookups queue behind each other under load, delaying the request each one belongs to. The c-ares resolver removes that queue:
+
+```
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
+```
+
+It is opt-in because c-ares reads fewer name sources than the operating system does. See [DNS Resolver](../../troubleshooting/performance.md#dns-resolver) for the trade-off and what to test afterwards.
 
 ---
 
@@ -459,20 +481,32 @@ ENABLE_DB_MIGRATIONS=false
 
 # Concurrency & DB write throttling (REQUIRED at scale — see note below)
 THREAD_POOL_SIZE=2000
-DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300
+DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 
 # HTTP compression — disable in the app IF your LB/ingress/CDN compresses
 # responses instead (saves ~3-4% CPU on every worker; see Step 3)
 # ENABLE_COMPRESSION_MIDDLEWARE=false
 
+# Websocket heartbeats: one message per open tab every 30s by default.
+# Raising it cuts idle traffic; a dropped user lingers in the active count
+# WEBSOCKET_HEARTBEAT_INTERVAL=60
+
+# Expiry on stream entries left behind by workers killed mid-response.
+# Finished responses are deleted immediately; 0 keeps orphans forever
+# REDIS_RESPONSE_STREAM_TTL=3600
+
 # Faster JSON encoder (v0.11.0+): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
+
+# Faster name lookups: removes the queueing delay in front of every outbound
+# request. Verify your names still resolve after enabling it; see Step 3
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 ```
 
 :::warning Two settings people forget, and then their scaled deployment stalls
 - **`THREAD_POOL_SIZE=2000`**: Open WebUI offloads blocking work (DB calls, file I/O, sync handlers) to a thread pool whose default concurrency ceiling is only **40**. At scale, once 40 blocking operations are in flight every further request **queues**, and the whole app appears to freeze even though CPU/RAM look fine. `2000` is a *lower* bound for large instances; it is a concurrency ceiling, **not** a CPU/thread count, so a high value is not a contention risk. Never lower it. (The only exception is genuinely tiny hardware, which is not a "scaled deployment".)
-- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`**: presence tracking writes each user's `last_active_at` to the database. **Unset (the default) means this write is unthrottled, roughly one `UPDATE` + `COMMIT` per authenticated request.** At scale that is a continuous flood of tiny write transactions that saturates the connection pool for no functional gain. Set it to `60` to `120` seconds. Keep it below `180`, the width of the active-presence window, or users age out of the active count between writes and the figure oscillates. It is mandatory for large/production deployments and free performance everywhere else.
+- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`**: presence tracking writes each user's `last_active_at` to the database. The default throttles that to one write per user per 60 seconds, so the flood of tiny write transactions is already avoided and there is usually nothing to change. `120` is the value to use if you set one: it halves the writes again and still leaves a full minute of headroom inside the 180 second window that active presence counts users over. Anything at or above 180 makes users drop out of the count between writes. Setting it to `0` turns throttling off and returns to roughly one `UPDATE` plus `COMMIT` per authenticated request, which saturates the connection pool for no functional gain.
 
 Both are read once at startup and are not configurable from the Admin UI. See [Performance → Database Optimization](/troubleshooting/performance#-database-optimization) and [Performance → High-Concurrency](/troubleshooting/performance#-high-concurrency--network-optimization).
 :::

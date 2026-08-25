@@ -46,6 +46,20 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
+### Word documents (DOCX)
+`.docx` files render as **pages**, the way Word lays them out. Headers, footers, footnotes and endnotes are kept, embedded images appear where they belong, and page breaks split the document into separate pages instead of one long block of formatted text.
+
+The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
+
+If a document cannot be rendered this way, the preview falls back to a simpler rendering of the same file (text, tables and images, without pages or zoom). Only when that fails too does it report an error and suggest downloading the file instead.
+
+### Presentations (PPTX)
+`.pptx` files open in a **slide viewer**. Each slide is drawn from the file, so it picks up the slide background, shape fill colours, text alignment, bold, italic, font sizes and text colours, plus the position each placeholder takes from the slide's layout or master. A title lands where the layout puts it rather than in a generic default spot.
+
+A numbered **thumbnail strip** runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
+
+The preview is an approximation of the slide and may not show everything on it. Download the file and open it in its own application when the exact rendering matters.
+
 ### Markdown
 Markdown files show a **rendered preview** (with formatted headings, links, bold text) and a toggle to switch to raw source.
 
@@ -76,11 +90,33 @@ If you understand the risk and need it, the per-user **Settings > Interface > if
 Navigate to the folder you want first, then drag and drop. The file uploads to whatever directory you're currently viewing.
 :::
 
+Uploading is switched off in a folder marked **Read-only**, and dropping files onto one does nothing.
+
+### From the chat input
+
+Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the current working directory and show up here like anything else, and the model opens them with the terminal's tools rather than reading extracted text. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+
 ---
 
 ## Downloading files
 
 Click the **download button** on any file to save it to your computer. This is how you get results back: after the AI generates a chart, creates a spreadsheet, processes an image, or writes a report, just download it.
+
+### Files shown in the chat message
+
+The AI can also put a file straight into its reply, rather than leaving you to find it in the browser. Ask for it to be shown in the chat and the message carries a small card with the file's name, a preview of its contents, and buttons to download it or open it in the file browser.
+
+The preview understands the same formats the browser does, so a spreadsheet arrives as a table, an image as a picture, a PDF as pages. The card reads the file from the terminal each time it is opened, using your own access, so nothing is copied out of the terminal and no public link to it exists. It follows that a card only works while the terminal it came from is connected and selected, and reports the terminal as unavailable otherwise.
+
+A long document can be opened at the part that matters. For a PDF, a Word document or a slide deck, the AI can name the page or slide it means, and the preview opens there rather than at the beginning. Ask for the page an answer came from and you get the document already scrolled to it, which saves hunting through a hundred pages for the paragraph the reply is quoting. The same applies when the file opens in the browser instead of in the message.
+
+This replaces the older behaviour where a generated file produced a link in the reply that pointed at a path on the terminal's filesystem rather than at anything the browser could open.
+
+![A CSV and a generated chart shown as cards inside an assistant message](/images/open-terminal-inline-file-card.png)
+
+The card header is a toggle, so a preview can be folded down to just the filename when it is taking up too much of the reply, and image and document previews carry a zoom control and a resize handle.
+
+By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Terminal File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message. The preference applies to terminals you connect yourself.
 
 ![File browser with download and action buttons](/images/open-terminal-file-browser-project.png)
 
@@ -92,13 +128,27 @@ Click the **edit icon** on any text file to open it in an editor. Make your chan
 
 ![Editing a file directly in the file browser](/images/open-terminal-preview-code.png)
 
+Files marked **Read-only** cannot be edited, so the edit and save buttons stay greyed out for them.
+
 ---
 
 ## Creating and deleting
 
-You can create new files and folders, or delete things you don't need anymore, directly from the file browser.
+You can create new files and folders, or delete things you don't need anymore, directly from the file browser. Both are switched off in a folder marked **Read-only**.
 
 ![File browser action bar with New File, New Folder options](/images/open-terminal-file-browser-home.png)
+
+---
+
+## Read-only files and folders
+
+Some files and folders cannot be changed. The file browser marks them **Read-only** and greys out the actions that would fail, so you find out before you try rather than after.
+
+A folder you cannot write to is marked **Read-only** next to the breadcrumbs at the top. **New File**, **New Folder** and **Upload** are greyed out while you are in it, dropping files onto it does nothing, and nothing inside it can be renamed or deleted.
+
+A single file or folder you cannot change is marked **Read-only** next to its name. **Rename** and **Delete** are greyed out in its menu, it cannot be dragged into another folder, and its preview offers no edit or save. If you select several items at once, **Delete** stays greyed out when any one of them is read-only.
+
+Being read-only limits changes, nothing else. You can still browse, preview and download these files as usual.
 
 ---
 
@@ -114,6 +164,10 @@ The file browser remembers which folder you were in, even when you switch betwee
 
 :::tip Multiple terminals
 If you have more than one terminal connected, switching between them in the dropdown updates the file browser to show that terminal's files.
+:::
+
+:::info Terminals that give each chat its own files
+An administrator can set an orchestrated terminal to give every conversation a workspace of its own, so the files you see in one chat are not the files you see in another. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and the terminal is not offered in temporary chats at all. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
 :::
 
 ## More things to try

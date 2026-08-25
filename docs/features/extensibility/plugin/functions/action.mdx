@@ -119,6 +119,8 @@ async def action(self, body: dict, __event_call__=None):
     })
 ```
 
+When the browser cannot answer, `__event_call__` returns a `dict` with an `error` key rather than raising: the tab has already disconnected, or [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) is set and nobody responded in time. Check for that key before using the result. See [Events → Interactive Events](/features/extensibility/plugin/development/events#interactive-events).
+
 ## Action Types and Configurations
 
 ### Single Actions

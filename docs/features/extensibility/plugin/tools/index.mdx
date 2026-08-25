@@ -99,7 +99,7 @@ Attaching a workspace tool to a model does **not** bypass access control. When a
 
 **Example scenario**: An admin creates a private tool and attaches it to a model shared with all users. Regular users chatting with this model will **not** have the tool available because they don't have read access to the tool itself.
 
-**Solution**: Make sure users who need the model's tools also have read access to each tool (via access grants, group permissions, or by making the tool public). The "Workspace → Tools" permission controls whether users can *create and manage* tools; it does **not** affect whether model-attached tools work for them.
+**Solution**: Make sure users who need the model's tools also have read access to each tool (via access grants, group permissions, or by making the tool public). The "Workspace > Tools" permission controls whether users can *create and manage* tools; it does **not** affect whether model-attached tools work for them.
 :::
 
 ---
@@ -134,10 +134,10 @@ Why it is legacy:
 Since v0.10.0 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
-    *   Navigate to **Settings → Admin → AI → Models**.
+    *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Settings → Admin → AI → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
+2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -169,12 +169,12 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 Native Mode is the **default** as of v0.10.0, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
-    *   Navigate to **Settings → Admin → AI → Models**.
+    *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the top of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
-    *   In **Settings → Admin → AI → Models**, pick a specific model and click its edit button.
+    *   In **Settings → Admin → Models**, pick a specific model and click its edit button.
     *   Under **Model Params**, expand **Advanced Params** and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
@@ -182,7 +182,7 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → AI → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
+The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -251,6 +251,27 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | **Complex Chaining** | ⚠️ Unreliable | ✅ Excellent |
 | **Future development** | ❌ None | ✅ All new features target this mode |
 
+### Tool Approval
+
+By default a model runs its tool calls as soon as it makes them. An administrator can offer a second mode by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
+
+Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with two choices:
+
+| Mode | Behaviour |
+| :--- | :--- |
+| **Full access** (default) | Tool calls run immediately, as they always have. |
+| **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
+
+You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
+
+Your choice is saved to your user settings, so it carries over to new chats until you change it back. A denied call is reported back to the model as an error, so it can react rather than silently losing the result, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
+
+Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
+
+:::info Requires a saved chat
+Approval works by persisting the pending call on the assistant message, so a temporary chat has nowhere to store it. Approval prompts also survive a page reload, since the pending state lives in the message rather than in the browser.
+:::
+
 ### Built-in System Tools (Native/Agentic Mode)
 
 🛠️ These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
@@ -296,7 +317,7 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `write_note` | Create a new private note for the user. |
 | `replace_note_content` | Update an existing note, replacing the whole content or applying range edits to part of it. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
-| `search_chats` | Simple text search across chat titles and message content. Returns matching chat IDs and snippets. |
+| `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the full message history of a specific chat by ID. |
 | **Channels** | *Requires `ENABLE_CHANNELS` AND per-model "Channels" category enabled (default: on).* |
 | `search_channels` | Find public or accessible channels by name/description. |
@@ -317,11 +338,13 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires at least one skill to be attached to the model via **Workspace or Settings > Admin > AI > Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed; attaching a skill is the only requirement.* |
+| **Skills** | *Requires at least one skill to be attached to the model via **Workspace or Settings > Admin > Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed; attaching a skill is the only requirement.* |
 | `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message.* |
+| `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
@@ -330,18 +353,18 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 
 #### Attached Chat Files
 
-The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but does **not** use file context — when file context is on, the content is already in the conversation and the tools would be redundant — and only while the chat actually has attachments.
+The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but does **not** use file context, when file context is on, the content is already in the conversation and the tools would be redundant, and only while the chat actually has attachments.
 
 The model then works the file the way it works a knowledge base: `list_chat_files` to see what is there, `query_chat_files` for meaning, `grep_chat_files` for literal strings and line numbers, `view_file` to read a passage. Chunks returned by `query_chat_files` are rendered as citations, the same as knowledge results. Every file is still re-checked against the user's own access before it is read, so an attachment they can no longer open is skipped rather than searched.
 
 #### Images in Tool Results
 
-A tool can return images as well as text — `generate_image` and `edit_image` do, and so can a custom tool. How that reaches the model depends on the provider:
+A tool can return images as well as text, `generate_image` and `edit_image` do, and so can a custom tool. How that reaches the model depends on the provider:
 
 - On the **Responses API**, the image rides along inside the tool result, where it belongs.
 - On **Chat Completions**, a tool message may only carry text. The image is therefore split off: the tool result is delivered as plain text, and the images that came with it follow in a short user message that hands them to the model for analysis.
 
-The effect is that a model on a Chat Completions provider can actually look at what a tool produced — generate an image and then critique or edit it — instead of receiving a result it cannot open. Nothing extra is shown in the conversation; the images were already rendered from the tool result itself.
+The effect is that a model on a Chat Completions provider can actually look at what a tool produced, generate an image and then critique or edit it, instead of receiving a result it cannot open. Nothing extra is shown in the conversation; the images were already rendered from the tool result itself.
 
 #### Knowledge Tool Availability (At a Glance)
 
@@ -366,7 +389,7 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
 - knowledge attached to the model in its editor,
 - knowledge attached to the [folder](/features/chat-conversations/chat-features/conversation-organization) the chat sits in,
-- knowledge bases and notes attached to the chat itself — counted only when the model's **File Context** capability is off, since with it on the content is already in the conversation.
+- knowledge bases and notes attached to the chat itself, counted only when the model's **File Context** capability is off, since with it on the content is already in the conversation.
 
 When the **Knowledge Base** category is enabled and any of these are present, the model's system prompt gains an `<attached_knowledge>` block listing each item's type, ID, name, and which of the three it came from. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
 
@@ -409,10 +432,10 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Notes** | | |
 | `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
-| `write_note` | `title` (required), `content` (required) | `{status: "success", id}` |
-| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
+| `write_note` | `title` (required), `content` (required; markdown text. A JSON object or array is stored as a fenced `json` code block rather than left in the note as structured data) | `{status: "success", id}` |
+| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
 | **Chat History** | | |
-| `search_chats` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
+| `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
 | **Channels** | | |
 | `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
@@ -424,8 +447,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `update_task` | `id` (required), `status` (default: `completed`; one of `pending`, `in_progress`, `completed`, `cancelled`) | `{tasks: [...], summary: {total, pending, in_progress, completed, cancelled}}` |
 | **Automations** | | |
 | `create_automation` | `name` (required), `prompt` (required), `rrule` (required), `folder_id` (optional, files the generated chats into one of the user's folders) | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
-| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id`, `folder_id` (all optional; only provided fields are changed) | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
-| `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `count` (default: 10) | `{automations: [{id, name, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
+| `update_automation` | `automation_id` (required), `name`, `prompt`, `rrule`, `model_id`, `folder_id` (all optional; only provided fields are changed). A blank `model_id` or `folder_id` keeps the current value; `folder_id: null` clears the folder | `{status, id, name, model_id, folder_id, is_active, next_runs}` |
+| `list_automations` | `status` (optional: `"active"`, `"paused"`, or omit for all), `folder_id` (optional; one of the user's own folders, an empty string or omitting it lists across all folders), `count` (default: 10) | `{automations: [{id, name, folder_id, prompt_snippet, model_id, rrule, is_active, last_run_at, next_runs}], total}` |
 | `toggle_automation` | `automation_id` (required) | `{status, id, name, is_active}` |
 | `delete_automation` | `automation_id` (required) | `{status, message}` |
 | **Calendar** | | |
@@ -438,8 +461,10 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
+| **Ask User** | | |
+| `ask_user` | `questions` (required, 1-3 objects of `{id, header, question, options}` where `options` is 2-3 `{label, description}` pairs and an optional per-question `allow_other`), `allow_other` (default: `true`), `timeout_ms` (default: `120000`, clamped to 60000-240000) | `{status: "answered", answers}` keyed by question id, or `{status: "cancelled", answers: {}}` when the card times out. Dismissing the card returns a rejection error instead |
 | **Sub-agents** | | |
-| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
@@ -545,6 +570,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | Category | Tools Included | Description |
 |----------|----------------|-------------|
 | **Time & Calculation** | `get_current_timestamp`, `calculate_timestamp` | Get current time and perform date/time calculations |
+| **Ask User** | `ask_user` | Pause a response to ask the user a clarifying question |
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
@@ -601,6 +627,8 @@ Builtin tools that correspond to an RBAC feature permission are also gated by th
 | Calendar | `features.calendar` |
 
 This ensures that RBAC permissions are respected end-to-end: disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
+
+`features.memories` reaches beyond the tool list. It also gates the [memory system context](/features/chat-conversations/memory#memory-system-context), so a user without the permission gets no stored memories injected into their prompt either, whatever the chat request asks for.
 :::
 
 :::tip Per-Chat Feature Toggles (Web Search, Image Generation, Code Interpreter)
@@ -614,7 +642,7 @@ This means users can disable web search (or image generation, or code interprete
 :::
 
 :::tip Full Agentic Experience
-For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In **Settings > Admin > AI > Models**, click the pencil (**Edit**) on your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
+For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In **Settings > Admin > Models**, click the pencil (**Edit**) on your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
 :::
 
 :::tip Builtin Tools vs File Context

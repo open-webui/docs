@@ -44,7 +44,7 @@ podman run -d --network=slirp4netns:allow_host_loopback=true --name openwebui -p
 ```
 
 ### Connection Configuration
-Once inside Open WebUI, navigate to **Settings > Admin Settings > Connections** and set your Ollama API connection to:
+Once inside Open WebUI, navigate to **Settings > Settings > Admin > Connections** and set your Ollama API connection to:
 `http://host.containers.internal:11434`
 
 Refer to the Podman [documentation](https://podman.io/) for advanced configurations.

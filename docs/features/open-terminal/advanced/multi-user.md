@@ -35,7 +35,7 @@ docker run -d --name open-terminal -p 8000:8000 \
   ghcr.io/open-webui/open-terminal
 ```
 
-{/* TODO: Screenshot — Docker run command in terminal with the MULTI_USER=true flag highlighted. */}
+{/* TODO: Screenshot: Docker run command in terminal with the MULTI_USER=true flag highlighted. */}
 
 ### What happens
 
@@ -48,7 +48,7 @@ When someone uses the terminal through Open WebUI, Open Terminal automatically:
 
 Each user sees only their own files in the file browser.
 
-{/* TODO: Screenshot — Two views side by side: User A's file browser showing /home/user-a/ with their files, and User B's file browser showing /home/user-b/ with completely different files. */}
+{/* TODO: Screenshot: Two views side by side: User A's file browser showing /home/user-a/ with their files, and User B's file browser showing /home/user-b/ with completely different files. */}
 
 ### What's shared vs. separate
 
@@ -99,6 +99,7 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 - **Resource controls**: set CPU, memory, and storage limits per user or per environment
 - **Multiple environments**: different setups for different teams (e.g., data science, development)
 - **Kubernetes support**: works with Docker, Kubernetes, and k3s
+- **Scoped workspaces**: optionally give each saved chat or each automation its own workspace instead of one per user, via [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)
 
 ```mermaid
 flowchart LR

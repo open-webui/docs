@@ -62,6 +62,12 @@ Use `DEBUG` for development and troubleshooting. For production, stick with `INF
 
 ---
 
+### What the Log Level Costs
+
+Raising the level saves work as well as log volume, because a message the level filters out is never built. `WARNING` also drops the retrieval results written on every chat request that reads from a knowledge base. `DEBUG` is the most expensive level to run, whole chat request payloads included, so set it back once you have chased down whatever you turned it on for.
+
+---
+
 ### Structured JSON Logging
 
 For production environments using log aggregators, set `LOG_FORMAT=json` to switch all stdout output to single-line JSON objects.

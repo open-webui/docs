@@ -60,7 +60,7 @@ WEBSOCKET_REDIS_URL=redis://redis:6379/1
 
 The `WEBUI_URL` must be set correctly BEFORE using OAuth/SSO. Since it's a persistent config variable, you can only change it by:
 - Disabling persistent config temporarily with `ENABLE_PERSISTENT_CONFIG=false`
-- Changing it in Settings > Admin > System > General > WebUI URL
+- Changing it in Settings > Admin > General > WebUI URL
 - Setting it correctly before first launch
 
 **CORS Configuration Details**
@@ -121,7 +121,7 @@ If streaming responses show garbled markdown rendering (e.g., visible `##`, `**`
 
 - Raw markdown tokens visible in responses (`##`, `**`, `###`)
 - Bold markers appearing incorrectly (`** Control:**` instead of `**Control:**`)
-- Words or sections randomly missing from responses
+- Words or sections randomly missing from responses (if the proxy turns out to be fine, see [Missing Text with the Faster JSON Encoder](#missing-text-with-the-faster-json-encoder))
 - Formatting works correctly when streaming is disabled
 
 ### Cause: Nginx Proxy Buffering
@@ -162,6 +162,10 @@ Disabling proxy buffering also **significantly improves streaming speed**, as re
 - **HAProxy**: Ensure `option http-buffer-request` is not enabled for SSE endpoints
 - **Traefik**: Check compression/buffering middleware settings
 - **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
+
+### Missing Text with the Faster JSON Encoder
+
+If pieces of a reply go missing and the proxy is not the cause, check whether `ENABLE_ORJSON=True` is set. On v0.11.0 that setting sends three invisible characters unescaped: line separator (`U+2028`), paragraph separator (`U+2029`) and next line (`U+0085`). Anything reading the response stream line by line counts them as a line break, so a reply carrying one arrives split and the piece it landed in is dropped with no error, in the chat and in external clients reading the OpenAI-compatible stream alike. All three are rare in ordinary text, so this is an edge case rather than something you would hit in normal use. Upgrading past v0.11.0 fixes it, and unsetting `ENABLE_ORJSON` avoids it in the meantime.
 
 ## 📭 Blank Replies When the Model Uses a Tool
 
@@ -272,6 +276,34 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 After running the above, your WebUI should be available at `http://localhost:8080`.
 
+## 🧭 Intermittent Name Lookup Failures (Often Reported as "Model not found")
+
+### Common Symptoms
+
+- Chats fail with **"Model not found"** for a model that is configured and worked a moment ago, then work again later.
+- The Ollama model list empties by itself, and a restart brings it back.
+- Logs show `ClientConnectorDNSError` or `Cannot connect to host ...` for a hostname that resolves fine from a shell inside the same container.
+- On some Windows hosts, every request to an external model provider fails from the first start.
+
+### Cause
+
+Open WebUI asks the operating system to turn hostnames into addresses. v0.11.0 used the c-ares resolver for that instead, with no way to turn it off, and c-ares does not behave the same everywhere:
+
+- On some Windows hosts it finds no usable nameserver, so no external name resolves at all.
+- In Docker it can intermittently stop resolving container names even though Docker's own DNS is still answering. The result is a wiped model list and in-flight chats failing with a misleading "Model not found", because a name that will not resolve is indistinguishable from a provider that has no such model.
+
+### Solution
+
+Upgrade. Name lookups go through the operating system again by default, so there is nothing to configure, and container names, `host.docker.internal`, Compose `extra_hosts` and Kubernetes `hostAliases` all behave the way the rest of the host does.
+
+c-ares is still available as an option, and on a busy instance it is worth trying, since it removes a queueing delay in front of every outbound request:
+
+```bash
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=true
+```
+
+If you turn it on, exercise your models, web search and any internal services afterwards, and be aware that names your system serves from somewhere other than `/etc/resolv.conf` or the hosts file (`.local` via avahi/mDNS, NIS or LDAP directories, Windows NBNS) may stop resolving. See [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the full picture and [Performance → DNS Resolver](/troubleshooting/performance#dns-resolver) for what it buys you.
+
 ## ⏱️ Model List Loading Issues (Slow UI / Unreachable Endpoints)
 
 If your Open WebUI takes a long time to load models, or the model selector spins indefinitely, it may be due to an unreachable or slow API endpoint configured in your connections.
@@ -302,7 +334,7 @@ This reduces how long Open WebUI waits for each endpoint before giving up and co
 
 ### Solution 2: Fix or Remove Unreachable Endpoints
 
-1. Go to **Admin Settings → Connections**
+1. Go to **Settings > Admin > Connections**
 2. Review your Ollama and OpenAI base URLs
 3. Remove or correct any unreachable IP addresses or hostnames
 4. Save the configuration

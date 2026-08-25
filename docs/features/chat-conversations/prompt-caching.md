@@ -5,17 +5,17 @@ title: "Prompt Caching (KV Cache) Optimization"
 
 # Prompt Caching (KV Cache) Optimization
 
-Most hosted LLM providers cache the KV state of a request's **prefix**. When two requests share an identical leading sequence of tokens, the provider serves the shared part from cache instead of recomputing it — which is **cheaper and faster**. If you want to save money by getting as many cache hits as possible, this page is for you.
+Most hosted LLM providers cache the KV state of a request's **prefix**. When two requests share an identical leading sequence of tokens, the provider serves the shared part from cache instead of recomputing it, which is **cheaper and faster**. If you want to save money by getting as many cache hits as possible, this page is for you.
 
 :::tip Who this is for
-Anyone maximising cache hits (and minimising spend/latency) on providers that support prompt/prefix caching — Anthropic, OpenAI, Google Gemini, DeepSeek, and OpenAI-compatible gateways.
+Anyone maximising cache hits (and minimising spend/latency) on providers that support prompt/prefix caching, Anthropic, OpenAI, Google Gemini, DeepSeek, and OpenAI-compatible gateways.
 :::
 
 :::warning Before you start
 Your model (or the provider/gateway serving it) must **support prompt caching**, and it must actually be **enabled** for your requests.
 
-- **Fully automatic** — identical leading tokens are cached and reused with no opt-in and no extra cost to enable (e.g. OpenAI, Gemini, DeepSeek). Often called **implicit** or **automatic prefix caching**.
-- **Opt-in per request** — the provider only caches when your request explicitly asks it to. **Anthropic** supports both **explicit** caching (cache breakpoints) and what it calls **implicit** caching, but in both cases a caching directive must be sent **on every request**, and **cache writes are billed** — so it is never turned on silently. You must send that opt-in for the caching to take effect.
+- **Fully automatic**: identical leading tokens are cached and reused with no opt-in and no extra cost to enable (e.g. OpenAI, Gemini, DeepSeek). Often called **implicit** or **automatic prefix caching**.
+- **Opt-in per request**: the provider only caches when your request explicitly asks it to. **Anthropic** supports both **explicit** caching (cache breakpoints) and what it calls **implicit** caching, but in both cases a caching directive must be sent **on every request**, and **cache writes are billed**, so it is never turned on silently. You must send that opt-in for the caching to take effect.
 
 If your model or endpoint does not cache prompts at all, none of the settings below will change your cost or latency.
 :::
@@ -30,7 +30,7 @@ So the golden rule is:
 
 > **Keep the beginning of every request stable, and let only new content be appended at the end.**
 
-A chat conversation naturally grows by appending new turns at the end, which is inherently cache-friendly — **unless something rewrites earlier parts of the request on every turn**. Eliminating those rewrites is what this guide is about.
+A chat conversation naturally grows by appending new turns at the end, which is inherently cache-friendly, **unless something rewrites earlier parts of the request on every turn**. Eliminating those rewrites is what this guide is about.
 
 ## What breaks the cache in Open WebUI
 
@@ -38,12 +38,12 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 
 | Source | What it does | Cache impact |
 |---|---|---|
-| **File Context (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High — injected content changes per query |
+| **File Context (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High: injected content changes per query |
 | **Citations** | Rewrites the **system message and the last user message** with the RAG template plus the source list, after every tool-calling round that produced sources | Very high, see the warning below |
-| **Memory (system context)** | Injects stored user memories into the system message | High — changes whenever memories change |
-| **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high — but a **File Context sub-mode**; only fires while File Context is on |
-| **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low — constant while voice mode is on |
-| **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low — stable as long as the attachments don't change |
+| **Memory (system context)** | Injects stored user memories into the system message | High: changes whenever memories change |
+| **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high: but a **File Context sub-mode**; only fires while File Context is on |
+| **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low: constant while voice mode is on |
+| **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low: stable as long as the attachments don't change |
 
 :::info
 The attachment metadata block is intentionally **metadata only** (no file content), so it stays stable across turns and does not meaningfully hurt caching. The content-injecting rows above are the ones to watch.
@@ -61,7 +61,7 @@ The goal is a **static prefix** (system prompt + tools) with **append-only** gro
 
 ### 1. Use a static system prompt
 
-Configure a fixed system prompt on the model and avoid anything that regenerates it per turn. This is the single most valuable cacheable block — put your instructions (including how to cite, see below) here once.
+Configure a fixed system prompt on the model and avoid anything that regenerates it per turn. This is the single most valuable cacheable block, put your instructions (including how to cite, see below) here once.
 
 ### 2. Turn File Context off (this is what switches the file tools on)
 
@@ -85,7 +85,7 @@ Turning File Context off also re-routes any knowledge collections or notes attac
 :::
 
 :::info "Using Entire Document" is a File Context sub-mode
-The per-file/per-knowledge **Full Context** ("Using Entire Document") mode injects a complete document into every message — the heaviest cache-breaker of all. But it runs **inside** File Context, so turning File Context off (this step) **already disables it** — enabling Full Context while File Context is off does nothing. Just don't re-enable File Context + Full Context as a retrieval workaround; use on-demand tools instead. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
+The per-file/per-knowledge **Full Context** ("Using Entire Document") mode injects a complete document into every message, the heaviest cache-breaker of all. But it runs **inside** File Context, so turning File Context off (this step) **already disables it**, enabling Full Context while File Context is off does nothing. Just don't re-enable File Context + Full Context as a retrieval workaround; use on-demand tools instead. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
 :::
 
 ### 3. Turn Citations off and move citation rules into the system prompt
@@ -130,7 +130,7 @@ Tool definitions sit in the cached prefix alongside the system prompt, so toggli
 
 Memory injection writes into the **system message** and is **not** governed by File Context, so it can churn the cache independently. Options:
 
-- Don't change your memories mid-conversation (the injected block then stays stable across the chat), **or**
+- Don't change your memories mid-conversation. Part of the injected block is still retrieved against your recent messages on every turn, so it can move as the conversation changes topic, **or**
 - Disable system-prompt memory injection with `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model retrieve memories **on demand** via the memory tools (tell it to do so in your static system prompt). See [Memory](/features/chat-conversations/memory).
 
 ### 6. Voice mode is usually fine
@@ -141,7 +141,7 @@ The dynamic voice-mode prompt is prepended once and stays constant while voice m
 
 With the setup above:
 
-- **Prefix** — system prompt + tool definitions — is identical every turn → **cached**.
+- **Prefix**: system prompt + tool definitions, is identical every turn → **cached**.
 - **Body** grows by appending new user messages and tool results → only the new tail is uncached.
 - Nothing (RAG template, sources, citations, memory) rewrites the earlier request.
 
@@ -151,18 +151,18 @@ Watch your provider's usage response for cached-token counts (for example cache-
 
 ## Provider notes
 
-- **Anthropic** — supports both explicit caching (cache breakpoints) and implicit caching, but caching is **opt-in on every request** (a caching directive must be sent each time) and **cache writes are billed**. You must send that opt-in; a stable prefix then maximises the portion that is cached and reused.
-- **OpenAI / Gemini / DeepSeek / OpenAI-compatible gateways** — automatic (implicit) prefix caching; identical leading tokens are served from cache with no opt-in and no extra flags.
+- **Anthropic**: supports both explicit caching (cache breakpoints) and implicit caching, but caching is **opt-in on every request** (a caching directive must be sent each time) and **cache writes are billed**. You must send that opt-in; a stable prefix then maximises the portion that is cached and reused.
+- **OpenAI / Gemini / DeepSeek / OpenAI-compatible gateways**: automatic (implicit) prefix caching; identical leading tokens are served from cache with no opt-in and no extra flags.
 
 In every case the requirement is the same: **don't rewrite the beginning of the request between turns.**
 
 ## Summary checklist
 
-Set on the model, under **Settings > Admin > AI > Models**, click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
+Set on the model, under **Settings > Admin > Models**, click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
 
 - [ ] Static system prompt (no per-turn regeneration)
 - [ ] **File Upload** on, **File Context** off, no automatic content injection (this also disables "Using Entire Document" / Full Context) **and** it is what injects the Files tools
-- [ ] **Citations** off — citation rules moved into the system prompt
+- [ ] **Citations** off, citation rules moved into the system prompt
 - [ ] **Builtin Tools** on, with the **Files**, **Knowledge Base**, **Notes** and **Chat History** categories left enabled
 - [ ] Function calling set to **Native** (builtin tools do not exist in Legacy mode)
 - [ ] **Memory** stable, or `ENABLE_MEMORY_SYSTEM_CONTEXT=false` + on-demand retrieval

@@ -61,5 +61,5 @@ flowchart LR
 5. You see the response in the familiar chat interface, with full conversation history, user accounts, and all Open WebUI features
 
 :::tip
-Because agents speak the standard OpenAI Chat Completions protocol, adding one is as simple as adding the URL and API key in **Admin Settings → Connections → OpenAI**. No plugins, no pipes, no middleware required.
+Because agents speak the standard OpenAI Chat Completions protocol, adding one is as simple as adding the URL and API key in **Settings → Admin → Connections → OpenAI**. No plugins, no pipes, no middleware required.
 :::

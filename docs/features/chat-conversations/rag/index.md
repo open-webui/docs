@@ -49,7 +49,7 @@ Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Pyt
 
 ### Adding an external knowledge source
 
-Configure these under **Admin Settings > Integrations > External Knowledge Sources**:
+Configure these under **Settings > Admin > Integrations > External Knowledge Sources**:
 
 1. **Create a connection** to your vector database:
    - **Provider** (Qdrant / Milvus / pgvector)
@@ -84,10 +84,10 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 :::warning
 **Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 2048 tokens available, you're getting less than half the page content, often missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
-**To Fix This:** Navigate to **Settings > Admin > AI > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
+**To Fix This:** Navigate to **Settings > Admin > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
 :::
 
-For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can.
+For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. If it cannot, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 :::tip
 
@@ -97,7 +97,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 ## RAG Template Customization
 
-Customize the RAG template from the `Settings` > `Admin` > `Tools` > `Documents` menu.
+Customize the RAG template from the `Settings` > `Admin` > `Documents` menu.
 
 The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
 
@@ -111,7 +111,7 @@ When enabled, documents are first split by markdown headers (H1-H6). This preser
 
 :::tip
 
-Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Tools > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
+Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
 
 :::
 
@@ -203,7 +203,7 @@ Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size 
 
 ## RAG Embedding Support
 
-Change the RAG embedding model directly in the `Settings` > `Admin` > `Tools` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
+Change the RAG embedding model directly in the `Settings` > `Admin` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -223,17 +223,22 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model in `Settings` > `Admin` > `Tools` > `Documents`, navigate to `Settings` > `Admin` > `Tools` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+After changing the embedding model in `Settings` > `Admin` > `Documents`, navigate to `Settings` > `Admin` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
 The re-index process performs the following steps for each knowledge base:
 
 1. **Deletes** the existing vector collection for the knowledge base.
-2. **Re-chunks** all files using the current chunk size, overlap, and text splitter settings.
+2. **Re-chunks** every file using the current chunk size, overlap and text splitter settings.
 3. **Re-embeds** all chunks using the currently configured embedding model.
+4. **Rebuilds** the per-file collection of every file in the knowledge base as well, so attaching one of those files to a chat on its own retrieves the same content as searching the knowledge base it belongs to.
 
 This means a single re-index applies both chunking setting changes and embedding model changes simultaneously.
+
+:::note Re-indexing does not parse the file again
+Re-indexing works from the text that was extracted when the file was first uploaded. The original document is not opened again, so changing the content extraction engine or any other parsing setting has no effect on files that are already in a knowledge base. Re-upload them if you need them parsed again.
+:::
 
 :::warning Re-indexing does not cover chat files
 The re-index operation only processes files that belong to **knowledge bases**. Files that were uploaded directly into a chat (without being added to a knowledge base) have their own per-file vector collections that are not touched by re-indexing.
@@ -343,6 +348,8 @@ For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gi
 
 The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly. This innovative feature allows you to incorporate video content into your chats, further enriching your conversation experience.
 
+A video is attached as its transcript, so one with no usable transcript cannot be attached, and the error says which case it is: captions disabled by the uploader, an age restricted or unavailable video, no transcript in the requested languages or a request YouTube blocked because of the address it came from. Set the languages to try with [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language), and route blocked requests through a proxy with **Settings > Admin > Web Search > Youtube Proxy URL** ([`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url)). See [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+
 ## Document Parsing
 
 A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
@@ -351,9 +358,15 @@ A variety of parsers extract content from local and remote documents. For more, 
 When using **Temporary Chat**, document processing is restricted to **frontend-only** operations to ensure your data stays private and is not stored on the server. Consequently, advanced backend parsing (used for formats like complex DOCX files) is disabled, which may result in raw data being seen instead of parsed text. For full document support, use a standard chat session.
 :::
 
+### CSV Table Summary
+
+A parsed CSV is its rows and nothing else, so a model asked how many orders a spreadsheet holds answers from whichever rows were retrieved. Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default, restart required) puts one line in front of every `.csv` file naming its row count, its data row count and its column names.
+
+The `external`, `tika` and `docling` extraction engines parse `.csv` files themselves and get no summary. Only files parsed after you turn the setting on get one, and re-indexing does not add it, so existing CSVs have to be re-uploaded.
+
 ## Google Drive Integration
 
-When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Tools` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
+When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
 
 ### Detailed Instructions
 

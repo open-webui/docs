@@ -34,7 +34,7 @@ flowchart LR
 5. You see the response in the chat interface
 
 :::tip
-Adding a provider is as simple as entering a URL and API key in **Admin Settings → Connections**. Open WebUI auto-detects available models from most providers.
+Adding a provider is as simple as entering a URL and API key in **Settings → Admin → Connections**. Open WebUI auto-detects available models from most providers.
 :::
 
 ---

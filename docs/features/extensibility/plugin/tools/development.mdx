@@ -61,6 +61,30 @@ class Tools:
         return string[::-1]
 ```
 
+### Method Docstrings
+
+The docstring of each method is what the model reads before deciding to call it. The text above the first `:param` becomes the tool's own description, and each `:param name:` becomes the description of that argument in the JSON schema.
+
+A parameter description can run over as many lines as it needs. Every following line belongs to it until the next `:param`, or until another field such as `:return:`. Indentation is stripped and blank lines are dropped, so you can lay a long description out as a paragraph and the model still receives all of it:
+
+```python
+async def search_docs(self, query: str, limit: int = 5) -> str:
+    """
+    Searches the internal documentation.
+
+    :param query: The phrase to search for.
+        Supports the AND and OR operators.
+
+        Wrap an exact phrase in double quotes.
+    :param limit: How many results to return.
+    :return: The matching passages.
+    """
+```
+
+Here the model is told about the operators and the quoting rule as well as the first line. The text after `:return:` is not sent to the model, so put anything the model needs to know into the description or into a `:param`.
+
+Only the reST `:param name:` form is read. A Google-style `Args:` block produces no parameter descriptions and lands in the tool's own description instead.
+
 ### Type Hints
 Each tool must have type hints for arguments. The types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
 
@@ -142,7 +166,7 @@ For the full mode policy, model requirements, and configuration, see the [**Tool
 
 You can configure the function calling mode in two places:
 
-1. **Administrator Level**: Go to **Settings > Admin > AI > Models**, click the pencil (**Edit**) on the model, then **Advanced Params > Function Calling** (set to "Native" or "Legacy").
+1. **Administrator Level**: Go to **Settings > Admin > Models**, click the pencil (**Edit**) on the model, then **Advanced Params > Function Calling** (set to "Native" or "Legacy").
 2. **Per-request basis**: Set `params.function_calling = "native"` or `"legacy"` in Chat Controls > Advanced Params.
 
 If the model seems to be unable to call the tool, make sure it is enabled (either via the Model page or via the `+` sign next to the chat input field).

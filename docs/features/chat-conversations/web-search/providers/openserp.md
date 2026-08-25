@@ -3,6 +3,18 @@ sidebar_position: 27
 title: "OpenSERP"
 ---
 
+:::tip
+
+For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](/reference/env-configuration#web-search).
+
+:::
+
+:::tip Troubleshooting
+
+Having issues with web search? Check out the [Web Search Troubleshooting Guide](/troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
+
+:::
+
 [OpenSERP](https://github.com/karust/openserp) is a self-hosted scraper that returns results from several major search engines. Like [SearXNG](./searxng.md) and [YaCy](./yacy.md), it runs on your own infrastructure and needs **no API key**, so the only setting Open WebUI requires is a reachable base URL.
 
 Open WebUI calls its `/mega/search` endpoint, which queries Google, Bing, Yandex, Baidu, DuckDuckGo and Ecosia together and returns the combined results.
@@ -23,10 +35,10 @@ If Open WebUI itself runs in Docker, `localhost` points at the Open WebUI contai
 
 ## 2. Point Open WebUI at it
 
-1. Go to **Settings > Admin > Tools > Web Search**.
+1. Go to **Settings > Admin > Web Search**.
 2. Enable **Web Search**.
 3. Set **Web Search Engine** to `openserp`.
-4. Set **OpenSERP Base URL** to your instance, for example `http://localhost:7000`.
+4. Set **OpenSERP URL** to your instance, for example `http://localhost:7000`. The field only appears once `openserp` is selected.
 5. Save.
 
 The base URL can also be set with [`OPENSERP_BASE_URL`](/reference/env-configuration#openserp_base_url), which defaults to `http://localhost:7000`. A trailing slash is fine, it is stripped before the request.

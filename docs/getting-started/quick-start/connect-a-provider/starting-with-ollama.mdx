@@ -31,8 +31,8 @@ However, if you encounter connection issues, the most common cause is a network 
 
 To manage your Ollama instance in Open WebUI, follow these steps:
 
-1. Go to **Admin Settings** in Open WebUI.
-2. Navigate to **Connections > Ollama > Manage** (click the wrench icon).
+1. Go to **Settings > Admin > Connections** in Open WebUI.
+2. Find your instance under **Manage Ollama API Connections** and click **Manage** (the download icon).
    From here, you can download models, configure settings, and manage your connection to Ollama.
 
 ### Connection Tips
@@ -44,7 +44,7 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 ### Advanced Configuration
 
 *   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote/`) to distinguish them.
-*   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all.
+*   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all. Each ID goes on the list once: spaces around what you type are stripped off, and an ID that is already listed is refused with **Model ID is already added**.
 
 :::tip Connection Timeout Configuration
 

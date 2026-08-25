@@ -223,7 +223,7 @@ It serves a spec at `GET /openapi.json` exposing exactly three actions (the dash
 To connect it:
 
 1. **Secure it first.** Set `OIKB_API_KEY` so `/sync` and `/history` are not open to anyone who can reach the daemon.
-2. Add the daemon's URL (for example `http://oikb:8080`) as a tool server: **Admin Settings → Integrations** for an instance-wide connection, or **Settings → Integrations** for a personal one. Supply the same `OIKB_API_KEY` as the connection's API key.
+2. Add the daemon's URL (for example `http://oikb:8080`) as a tool server: **Settings → Admin → Integrations** for an instance-wide connection, or **Settings → Integrations** for a personal one. Supply the same `OIKB_API_KEY` as the connection's API key.
 
 This is a standard OpenAPI tool-server connection, the same mechanism described on the [OpenAPI / MCP tool servers](/features/extensibility/mcp) page; oikb just happens to be the thing on the other end.
 

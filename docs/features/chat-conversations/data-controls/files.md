@@ -28,6 +28,7 @@ The File Manager modal offers several powerful tools for maintaining your data:
   - **File Size**: See how much space each document occupies (e.g., KB, MB).
   - **Upload Date**: Track when each file was added to your instance.
 - **Built-in Viewer**: Click on any file to open the **File Item Viewer**, which displays the file's metadata and specific details (such as size and type).
+  - **Preview tab**: Word documents, presentations, spreadsheets, PDFs, audio, code and Markdown open on a **Content** tab showing the extracted text, with a **Preview** tab beside it that renders the file itself. Word documents (`.docx`) render as pages, keeping headers, footers, footnotes and embedded images, and presentations (`.pptx`) open in a slide viewer with a numbered thumbnail strip. Both can be zoomed from the small toolbar that floats over the preview. The same viewer opens when you click a file attached in a chat or on a note.
 - **Safe Deletion**: Easily remove files you no longer need.
   - :::info **Knowledge Base Cleanup**
     When you delete a file through the File Manager, Open WebUI automatically performs a deep cleanup. It removes the file from all associated Knowledge Bases and deletes its corresponding vector embeddings, ensuring your database stays clean and efficient.
@@ -53,7 +54,7 @@ Every file carries metadata that helps both you and the AI understand its contex
 ## FAQ
 
 **Q: If I delete a file, is it gone from my chats?**  
-**A:** Yes. Deleting a file via the File Manager removes it from the system entirely. Any chat that referenced that file using RAG will no longer be able to pull information from it.
+**A:** Yes. Deleting a file via the File Manager removes it from the system entirely. Any chat that referenced that file using RAG will no longer be able to pull information from it. If the file was an image shown in a message, that message displays a small **Image unavailable** placeholder where the picture was, and the placeholder cannot be clicked open.
 
 **Q: Can I download my files back from the File Manager?**  
 **A:** Currently, the File Manager focuses on viewing metadata and management (deletion). To download a file, you should typically access it from the original chat or Knowledge Base where it was used.

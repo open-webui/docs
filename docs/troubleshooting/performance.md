@@ -31,16 +31,13 @@ By default, Open WebUI automates background tasks like title generation, tagging
 
 ![Task model settings under Admin > Interface](/images/admin/admin-interface.png)
 
-**Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid using large reasoning models (like o1, r1, or Claude) as they are too slow and expensive for simple background tasks.
+**Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid a large reasoning model: it spends seconds thinking, and charges you for those thinking tokens, before producing a three word chat title. Every major provider offers a small tier that suits this far better than its flagship.
 
-**Configuration:**
-There are two separate settings in **Settings > Admin > Experience > Interface**. The system intelligently selects which one to use based on the model you are currently chatting with:
-*   **Task Model (External)**: Used when you are chatting with an external model (e.g., OpenAI).
-*   **Task Model (Local)**: Used when you are chatting with a locally hosted model (e.g., Ollama).
+**Good options:**
+*   **External/Cloud**: `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `claude-haiku-4-5-20251001` (OpenAI, Google and Anthropic directly, or the same models through OpenRouter).
+*   **Local**: `qwen3.5:2b`, `gemma4:e2b`, `llama3.2:3b`.
 
-**Best Options (2025):**
-*   **External/Cloud**: `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `deepseek-v4-flash` (OpenAI/Google/DeepSeek/OpenRouter).
-*   **Local**: `qwen3.5:2b`, `qwen3.5:0.8b`.
+**Configuration:** the two model pickers, the parameters those background requests are sent with, and the switches for turning individual tasks off are all in **Settings > Admin > Interface**. See [Task Models](/features/administration/task-models) for the walkthrough.
 
 ### 2. Caching & Latency Optimization
 
@@ -53,7 +50,7 @@ Drastically reduces startup time and API calls to external providers.
 If you are using **OpenRouter** or any provider with hundreds/thousands of models, enabling model caching is **highly recommended**. Without caching, initial page loads can take **10-15+ seconds** as the application queries all available models. Enabling the cache reduces this to near-instant.
 :::
 
-- **Admin Panel**: `Settings > Admin > AI > Connections > Cache Base Model List`
+- **Admin Panel**: `Settings > Admin > Connections > Cache Base Model List`
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
   *   *Note*: Caches the list of models in memory. Only refreshes on App Restart or when clicking **Save** in Connections settings.
 
@@ -88,11 +85,11 @@ By default, Open WebUI saves chats **after generation is complete**. While savin
 
 ### User Active-Status Write Throttling (set this on every deployment)
 
-Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. **By default this write is unthrottled**: essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`. On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit (presence only needs ~minute granularity).
+Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. Unthrottled, that means essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`, a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit, since presence only needs about minute granularity.
 
--   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=300`
--   **Default**: unset (**unthrottled, writes on every request**)
--   **Recommendation**: Set a positive interval in seconds. `60` to `120` is a good range, and it must stay below `180`, the width of the active-presence window, or users age out of the count between writes and the active-user figure oscillates instead of holding steady. This collapses thousands of writes into at most one per user per interval. It is **free performance for any setup** and is effectively **mandatory for large/production deployments**; leaving it unset is a common, avoidable database bottleneck. There is no downside on weak hardware either: it only *reduces* writes. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+-   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
+-   **Default**: `60` seconds, so the throttling is already in place
+-   **Recommendation**: `120`. It halves the presence writes again and still leaves a full minute of headroom inside the window, so an active user is never missed. The default of `60` is fine too if you would rather not set anything. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count between writes and the active-user figure oscillates instead of holding steady. Setting it to `0` disables throttling entirely and restores the per-request write. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
 
 ### Database Session Sharing
 
@@ -125,6 +122,8 @@ For high-concurrency PostgreSQL deployments, the default connection pool setting
 
 ### Vector Database (RAG)
 For multi-user setups, the choice of Vector DB matters.
+
+A knowledge base search runs without holding up the worker that issued it, so everyone else's responses keep streaming while it is in flight, and several collections are searched at the same time rather than one after another. A slow vector database therefore costs the chat that is searching rather than every user on that worker. It still has to cope with being reached by several workers or replicas at once, which is what the choices below are about.
 
 -   **ChromaDB (Default)**: **NOT SAFE** for multi-worker (`UVICORN_WORKERS > 1`) or multi-replica deployments. The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. SQLite connections are not fork-safe: when uvicorn forks multiple workers, each process inherits the same database connection, and concurrent writes cause instant worker crashes (`Child process died`) or database corruption. This is a fundamental SQLite limitation, not a bug. See the [Scaling & HA troubleshooting guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for the full crash sequence and solutions.
 -   **Recommendations**:
@@ -217,22 +216,52 @@ By default, Open WebUI compresses HTTP responses (JSON API responses and the sta
 
 - **Env Var**: `ENABLE_COMPRESSION_MIDDLEWARE=false`
 
-*   **Recommended companion**: When you disable app-side compression in favor of the proxy, also have the proxy **cache the static assets aggressively**. Open WebUI's JS/CSS bundles live under `/_app/immutable/` with content-hashed filenames, so they can be cached with `Cache-Control: public, max-age=31536000, immutable` and served from the proxy cache without ever hitting a worker — which eliminates the "larger first page load" downside for every visit after the first. See [Scaling → Pair It with Static Asset Caching at the Proxy](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for a ready-made Nginx snippet.
+*   **Recommended companion**: When you disable app-side compression in favor of the proxy, also have the proxy **cache the static assets aggressively**. Open WebUI's JS/CSS bundles live under `/_app/immutable/` with content-hashed filenames, so they can be cached with `Cache-Control: public, max-age=31536000, immutable` and served from the proxy cache without ever hitting a worker, which eliminates the "larger first page load" downside for every visit after the first. See [Scaling → Pair It with Static Asset Caching at the Proxy](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for a ready-made Nginx snippet.
 
 See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
+#### WebSocket Frame Compression
+The HTTP middleware above never touches WebSocket traffic, but the WebSocket server compresses frames on its own, and that is the one worth disabling under streaming load. Chat responses arrive as a very small frame per token, so each is compressed separately, for every subscriber, with almost nothing to gain at that size. Under heavy streaming this shows up as measurable worker CPU.
+
+- **Env Var**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`
+
+*   **What you give up**: the frames that did compress well are the rare large ones, a finished message or a set of sources, and even a very long reply is only a few hundred kilobytes uncompressed, which any network carries without a noticeable delay.
+*   **Default**: enabled, matching the behaviour before the setting existed, so nothing changes until you turn it off.
+
+See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate) for the full description.
+
+#### WebSocket Heartbeats
+Every connected browser tells the server it is still there on a fixed interval, thirty seconds by default. That is one small message per open tab, so an instance holding thousands of idle tabs spends real time on messages that carry nothing.
+
+- **Env Var**: `WEBSOCKET_HEARTBEAT_INTERVAL=60`
+
+*   **What it costs**: the server holds a presence entry for four times the interval, or 120 seconds, whichever is larger, so a user who closes their laptop shows as active for longer before dropping out of the active-user count.
+*   **Range**: values are held between `5` and `90`. The setting is sent to the browser, so it applies without rebuilding the frontend.
+
+See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_heartbeat_interval).
+
 #### JSON Encoder
 
-Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chunk of a streamed completion arriving from the provider, and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
+Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. By default all of that goes through Python's standard-library `json` module. Setting `ENABLE_ORJSON=True` switches the whole application to [orjson](https://pypi.org/project/orjson/), a Rust implementation that is several times faster. It is already installed as a dependency, so this is a one-line change.
 
 *   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
-*   **Where it is not**: a single-user instance. The saving is real but too small to notice against model latency.
-*   **Why it is opt-in**: orjson is stricter than the standard library. Payloads it rejects (non-string dictionary keys, integers beyond 64 bits, `NaN`/`Infinity` literals) fall back to the standard-library path automatically, so nothing breaks, but the default stays on the standard library to keep behaviour byte-for-byte identical to earlier releases. The one behaviour change to be aware of: `NaN` and `Infinity` floats in a JSON response now serialize as `null` instead of raising.
+*   **Where else it shows up**: saving and opening chats, so the cost follows the length of the chat.
+*   **Where it is not**: a single-user instance with ordinary-sized chats.
+*   **Why it is opt-in**: anything orjson cannot encode falls back to the standard library automatically, so nothing breaks, but the default keeps behaviour identical to earlier releases. One change to know about: `NaN` and `Infinity` floats serialize as `null` instead of raising.
 
 - **Env Var**: `ENABLE_ORJSON=True`
   *   *Recommendation*: enable on any Redis-backed multi-worker or multi-replica deployment. Requires a restart. Available from v0.11.0.
 
 See [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full breakdown, and [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself.
+
+#### Log Level
+
+Messages the level filters out are never built, so raising it saves CPU as well as log volume, most on busy servers and on chats drawing from a large knowledge base. `WARNING` also drops the `INFO` lines recording startup, key events and request handling, so keep `INFO` if your log aggregator relies on them.
+
+- **Env Var**: `GLOBAL_LOG_LEVEL=WARNING`
+  *   *Recommendation*: try it on a busy instance that does not depend on the `INFO` lines. Never leave `DEBUG` on in production, it is the most expensive level to run. Requires a restart.
+
+See [What the Log Level Costs](../getting-started/advanced-topics/logging.md#what-the-log-level-costs) for the full explanation.
 
 #### Thread Pool Size
 Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers offloaded via `run_in_threadpool`) may run at once. This is a concurrency **ceiling**, not a fixed pool of pre-spawned OS threads and **not** a CPU-core/thread count. Threads are created lazily and reused, so a high value does not spawn that many threads, burn CPU, or cause CPU contention while idle.
@@ -252,6 +281,15 @@ Long LLM completions can exceed default HTTP client timeouts. Configure these to
 - **Env Var**: `AIOHTTP_CLIENT_TIMEOUT=1800` (30 minutes for completions)
 - **Env Var**: `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15` (shorter for model listing)
 - **Env Var**: `AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=15`
+
+#### DNS Resolver
+
+By default Open WebUI asks the operating system to resolve hostnames, and those lookups queue behind each other and behind other background work, so under load a lookup that should take milliseconds delays the request it belongs to. The c-ares resolver does not queue, so many simultaneous lookups take about as long as one. The win is largest on instances making many outbound requests at once and invisible on a quiet one.
+
+- **Env Var**: `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True`
+  *   *Recommendation*: try it, then exercise your models, web search and any internal services and switch it back off if lookups start failing. Requires a restart.
+
+c-ares reads fewer name sources than the operating system does, so read [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](../reference/env-configuration.mdx#aiohttp_client_async_dns_resolver) before leaving it on. See [Intermittent Name Lookup Failures](./connection-error.mdx#-intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
 
 #### Container Resource Limits
 For Docker deployments, ensure adequate resource allocation:
@@ -430,7 +468,7 @@ Open WebUI loads local ML models for features like RAG and STT. **This section i
     *   **Option B (Best Performance)**: Use an **External API** (OpenAI/Cloud).
 
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Admin > Tools > Documents > Embedding Model Engine`
+    *   **Admin Panel**: `Settings > Admin > Documents > Embedding Model Engine`
     *   **Env Var**: `RAG_EMBEDDING_ENGINE=openai` (to offload completely)
 
 #### Speech-to-Text (STT)
@@ -438,7 +476,7 @@ Local Whisper models are heavy (~500MB+ RAM).
 
 -   **Recommendation**: Use **WebAPI** (Browser-based). It uses the user's device capabilities, costing 0 server RAM.
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Audio > STT Engine`
+    *   **Admin Panel**: `Settings > Admin > Audio > STT Engine`
     *   **Env Var**: `AUDIO_STT_ENGINE=webapi`
 
 -   **Bypass Audio Preprocessing (offload to the STT provider)**: If you use an external STT engine (OpenAI, Deepgram, Azure, Mistral) that already accepts raw audio and handles format conversion on its side, set `BYPASS_PYDUB_PREPROCESSING=true`. This skips Open WebUI's pydub-based MP3 conversion, compression, and chunk splitting, eliminating a CPU-heavy step on every upload, removing the ffmpeg dependency, and reducing latency on large files. Only disable preprocessing when you are confident the upstream provider handles unprocessed audio correctly.
@@ -464,8 +502,8 @@ This applies to single-worker deployments. Milvus Lite is a file held by one pro
 
 Prevent the application from loading **local** models you don't use.
 
--   **Image Generation**: `ENABLE_IMAGE_GENERATION=False` (Admin: `Settings > Images`)
--   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Code Execution`)
+-   **Image Generation**: `ENABLE_IMAGE_GENERATION=False` (Admin: `Settings > Admin > Images`)
+-   **Code Interpreter**: `ENABLE_CODE_INTERPRETER=False` (Admin: `Settings > Admin > Code Execution`)
 
 ### 3. Disable Background Tasks
 
@@ -474,11 +512,11 @@ If resource usage is critical, disable automated features that constantly trigge
 **Recommendation order (Highest Impact first):**
 
 1.  **Autocomplete**: `ENABLE_AUTOCOMPLETE_GENERATION=False` (**High Impact**: Triggers on every keystroke!)
-    *   Admin: `Settings > Interface > Autocomplete`
+    *   Admin: `Settings > Admin > Interface > Autocomplete`
 2.  **Follow-up Questions**: `ENABLE_FOLLOW_UP_GENERATION=False`
-    *   Admin: `Settings > Interface > Follow-up`
+    *   Admin: `Settings > Admin > Interface > Follow-up`
 3.  **Title Generation**: `ENABLE_TITLE_GENERATION=False`
-    *   Admin: `Settings > Interface > Chat Title`
+    *   Admin: `Settings > Admin > Interface > Chat Title`
 4.  **Tag Generation**: `ENABLE_TAGS_GENERATION=False`
 
 ### 4. SQLite Memory Footprint on Constrained Containers
@@ -545,11 +583,15 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 10. **Caching**: `ENABLE_BASE_MODELS_CACHE=True`, `MODELS_CACHE_TTL=300`, `ENABLE_QUERIES_CACHE=True`.
 11. **Redis**: Single instance with `timeout 1800` and high `maxclients` (10000+). See [Redis Tuning](#redis-tuning) below.
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
-13. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of encoding Socket.IO events and parsing streamed provider chunks, which is the heaviest JSON work in a clustered deployment. See [JSON Encoder](#json-encoder).
+13. **WebSocket Heartbeats**: `WEBSOCKET_HEARTBEAT_INTERVAL=60`. Halves the idle heartbeat traffic from every open tab, at the cost of a disconnected user lingering in the active count. See [WebSocket Heartbeats](#websocket-heartbeats).
+14. **WebSocket Compression**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Streaming sends one tiny frame per token, and compressing each of them costs CPU per subscriber for almost no saving. See [WebSocket Frame Compression](#websocket-frame-compression).
+15. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 
 A single Redis instance is sufficient for the vast majority of deployments, including those with thousands of users. **You almost certainly do not need Redis Cluster or Redis Sentinel** unless you have specific HA requirements.
+
+A response being streamed is held in Redis so a browser that reconnects can resume it, and the entry is deleted the moment that response finishes. What used to accumulate was the leftovers, entries whose cleanup never ran because the worker was killed mid-stream, which stayed forever. Those now expire after an hour, and `REDIS_RESPONSE_STREAM_TTL` shortens that where memory is tight or `0` restores the old unbounded behaviour. See [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
 
 Common Redis configuration issues that cause unnecessary scaling:
 
@@ -592,6 +634,7 @@ These are real-world mistakes that cause organizations to massively over-provisi
 | **Not configuring Redis stale connection timeout** | Connections accumulate forever → Redis OOM → you deploy Redis Cluster | Add `timeout 1800` to redis.conf |
 | **Using base64-encoded icons in Actions/Filters** | Icon data is embedded in `/api/models` responses sent to the frontend on every page load for every model. A 500 KB base64 icon on 3 actions across 20 models = **30 MB of payload bloat** per request → slow frontend loads, high bandwidth usage, unnecessary backend memory pressure | Host icons as static files and reference them by URL in `icon_url` / `self.icon`. See [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example-specifying-action-frontmatter) |
 | **Running SQLite with the default pool on a tiny container** | Unset `DATABASE_POOL_SIZE` falls back to a 512-connection pool; each connection grows its own ~64 MB page cache plus a 256 MB mmap window, so a connection-fanning workflow (editing model/KB permissions, reloading a long model list) OOM-kills a 1 GB container | Cap `DATABASE_POOL_SIZE` (e.g. `8`), set `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000` and `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`, give the container ≥ 2 GB. See [SQLite Memory Footprint](#4-sqlite-memory-footprint-on-constrained-containers) |
+| **Leaving `GLOBAL_LOG_LEVEL=DEBUG` on in production** | Set once to chase a problem and never set back. `DEBUG` is the most expensive level to run: every message it adds is genuinely built and written, whole chat request payloads included, on every request → wasted CPU on top of the log volume, and prompts and user content sitting in your logs | Set it back to `INFO` (the default), or `WARNING` on a busy instance that does not consume the informational lines. Requires a restart. See [Log Level](#log-level) |
 
 ---
 
@@ -603,6 +646,7 @@ For detailed information on all available variables, see the [Environment Config
 | :--- | :--- |
 | `TASK_MODEL` | [Task Model (Local)](/reference/env-configuration#task_model) |
 | `TASK_MODEL_EXTERNAL` | [Task Model (External)](/reference/env-configuration#task_model_external) |
+| `TASK_MODEL_PARAMS` | [Task Model Parameters](/reference/env-configuration#task_model_params) |
 | `ENABLE_BASE_MODELS_CACHE` | [Cache Model List](/reference/env-configuration#enable_base_models_cache) |
 | `MODELS_CACHE_TTL` | [Model Cache TTL](/reference/env-configuration#models_cache_ttl) |
 | `ENABLE_QUERIES_CACHE` | [Queries Cache](/reference/env-configuration#enable_queries_cache) |
@@ -611,7 +655,9 @@ For detailed information on all available variables, see the [Environment Config
 | `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` | [Streaming Chunk Size](/reference/env-configuration#chat_response_stream_delta_chunk_size) |
 | `ENABLE_COMPRESSION_MIDDLEWARE` | [HTTP Response Compression](/reference/env-configuration#enable_compression_middleware) |
 | `ENABLE_ORJSON` | [JSON Encoder](/reference/env-configuration#enable_orjson) |
+| `GLOBAL_LOG_LEVEL` | [Log Level](/reference/env-configuration#global_log_level) |
 | `THREAD_POOL_SIZE` | [Thread Pool Size](/reference/env-configuration#thread_pool_size) |
+| `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER` | [DNS Resolver](/reference/env-configuration#aiohttp_client_async_dns_resolver) |
 | `RAG_EMBEDDING_ENGINE` | [Embedding Engine](/reference/env-configuration#rag_embedding_engine) |
 | `CONTENT_EXTRACTION_ENGINE` | [Content Extraction Engine](/reference/env-configuration#content_extraction_engine) |
 | `AUDIO_STT_ENGINE` | [STT Engine](/reference/env-configuration#audio_stt_engine) |

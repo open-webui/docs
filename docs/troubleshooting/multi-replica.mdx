@@ -20,7 +20,7 @@ Before troubleshooting specific errors, ensure your deployment meets these **abs
 5.  **External Vector Database (Required):** The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not safe for multi-worker or multi-replica deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** use a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), [MariaDB Vector](/reference/env-configuration#mariadb_vector_db_url), Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a [separate HTTP server](/reference/env-configuration#chroma_http_host).
 6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/reference/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
 7.  **Thread Pool Ceiling:** Set [`THREAD_POOL_SIZE=2000`](/reference/env-configuration#thread_pool_size) (or higher). The default concurrency ceiling for blocking operations is only **40**; at multi-user scale this is exhausted quickly and the app appears to **freeze** while CPU/RAM look fine. It is a ceiling, not a thread/CPU count: a high value is not a contention risk. Never lower it.
-8.  **Throttle Presence Writes:** Set [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=60`](/reference/env-configuration#database_user_active_status_update_interval) (60 to 120s, and below 180 so users do not age out of the active count between writes). Unset (the default) means each user's `last_active_at` is written **on essentially every request**: a continuous flood of tiny `UPDATE`/`COMMIT` transactions that saturates the connection pool at scale for no functional benefit.
+8.  **Presence Writes:** [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval) already throttles each user's `last_active_at` write to once per 60 seconds, so the flood of tiny `UPDATE`/`COMMIT` transactions is avoided by default. Set `120` if you want fewer writes still, which keeps a full minute of headroom inside the 180 second active-presence window. Anything at or above 180 drops users out of the count between writes, and `0` disables throttling and writes on essentially every request.
 
 ---
 
@@ -132,7 +132,7 @@ For the full mechanism (fsync latency + async concurrency + pool saturation + WA
 
 **Symptoms:**
 - You upload a file (for RAG) on one instance, but the model cannot find it later.
-- Generated images appear as broken links.
+- Images in a chat show an **Image unavailable** placeholder instead of the picture, intermittently, depending on which replica served the request.
 
 **Cause:**
 The `/app/backend/data` directory is not shared or is not consistent across replicas. If User A uploads a file to Replica 1, and the next request hits Replica 2, Replica 2 won't have the file physically on disk.
@@ -276,9 +276,9 @@ For more details, see the [External Packages](/features/extensibility/plugin/too
 
 Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, potentially leading to race conditions or database schema corruption.
 
-Version skew is a separate and harder failure. Migrations move the schema forward for the whole database at once, and the still-running old instances keep issuing queries written against the old shape. Whether that survives depends entirely on what the release changed. v0.11.0 only adds columns and indexes, so an old instance left running through the upgrade keeps working. A release that renames or drops something does not: v0.10.0 renamed the `config` table to `config_old` and replaced it with a per-key table, and any older instance still querying `config` fails from the moment the migration lands. Releases are not labelled by which kind they are.
+Stop all replicas and workers, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage, and there is no general zero-downtime path across a schema change.
 
-Treat every upgrade as the second kind. Stop all replicas and workers, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage, and there is no general zero-downtime path across a schema change.
+Back up the database before you start. Putting the old image back does not undo a migration: the schema stays where the migration left it, and rows a migration rewrote stay rewritten. Restoring a backup taken before the upgrade is the way back. See [Backup & Restore](/getting-started/updating#backup--restore).
 
 **Safe Update Procedure:**
 
@@ -307,7 +307,9 @@ While Open WebUI is designed to be stateless with proper Redis configuration, en
 
 ### Compress at the Load Balancer, Not in the App
 
-By default each Open WebUI worker compresses its own HTTP responses, which profiling shows costs roughly 3–4% CPU per worker — multiplied across all replicas. In multi-replica deployments there is always a load balancer or ingress in front, so enable compression there and disable it in the app with `ENABLE_COMPRESSION_MIDDLEWARE=false`. WebSocket and SSE streaming traffic is never compressed by this middleware, so chat streaming is unaffected. Pair this with proxy-side caching of the content-hashed static bundles under `/_app/immutable/` so they are served from the proxy cache instead of the workers. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) and [Scaling → Offload HTTP Compression](/getting-started/advanced-topics/scaling#offload-http-compression-to-the-load-balancer).
+By default each Open WebUI worker compresses its own HTTP responses, which profiling shows costs roughly 3–4% CPU per worker, multiplied across all replicas. In multi-replica deployments there is always a load balancer or ingress in front, so enable compression there and disable it in the app with `ENABLE_COMPRESSION_MIDDLEWARE=false`. WebSocket and SSE streaming traffic is never compressed by this middleware, so chat streaming is unaffected. Pair this with proxy-side caching of the content-hashed static bundles under `/_app/immutable/` so they are served from the proxy cache instead of the workers. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) and [Scaling → Offload HTTP Compression](/getting-started/advanced-topics/scaling#offload-http-compression-to-the-load-balancer).
+
+WebSocket frames are compressed by the WebSocket server rather than that middleware, and under streaming load that is worth switching off with `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Every replica pays it, since chat responses arrive as one small frame per token and each is compressed separately for every subscriber. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
 
 ### Use the Faster JSON Encoder
 
@@ -322,17 +324,22 @@ Every Socket.IO event in a multi-replica deployment is published through Redis, 
 | Path | Why it matters at scale |
 |---|---|
 | Socket.IO payloads, including the ones published over Redis, plus Redis-backed session and collaborative-document state | The reason to turn this on. Every live update crossing replicas is encoded and decoded here |
+| Saving and opening chats, and the rest of what is stored as JSON (user settings, configuration, folders, notes) | A whole conversation is encoded on every save and decoded again on every open, so the cost follows the length of the chat rather than the number of requests |
 | Upstream provider responses (OpenAI-compatible and Ollama), including per-chunk parsing of streamed completions | Runs once per arriving token batch, so it scales with streaming volume rather than request count |
+| The requests sent out to model providers (OpenAI-compatible, Ollama and Anthropic) | Each one carries the whole conversation or a whole embedding batch, so it is the largest single encode on a chat request |
 | Incoming HTTP request bodies and outgoing `JSONResponse` bodies | The broadest surface, but individually the cheapest |
+| The stored chunk details on the Valkey and Oracle 23ai vector stores | Read back once per result, so the cost follows how many chunks each knowledge base search returns |
+| Results returned by built-in tools, and working out a user's permissions when they sign in, sign up or reload the page | Small payloads, but on paths every user hits over and over |
+| The output a Jupyter server returns for code run in chat | Only when the code execution or code interpreter engine is set to Jupyter. The cost follows how much a run prints and how many images it produces, so the difference shows on chart-heavy or output-heavy runs |
 
 **Why it is opt-in.** orjson is stricter than the standard library, so the default keeps behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
 
 Two differences do survive the fallback, neither of which affects a normal deployment:
 
 - **`NaN` and `Infinity` floats in a response body serialize as `null`** instead of raising. Starlette's own encoder is configured with `allow_nan=False`, so a response carrying those values previously failed outright and now goes out with nulls. If you have a custom tool or pipe that can emit them, this is a behaviour change to be aware of rather than a regression.
-- **Encoded output carries raw UTF-8 rather than `\uXXXX` escapes.** Both are valid JSON and every client parses them identically, but the exact bytes differ, which matters only if something downstream checksums or string-compares encoded JSON.
+- **Encoded output carries raw UTF-8 rather than `\uXXXX` escapes.** Both parse identically, so this matters only to something downstream that checksums encoded JSON. Three line separator characters stay escaped, since leaving them raw would split a streamed reply. Stored text is held raw too, and neither turning the setting on nor off needs a migration.
 
-**When not to bother.** On a single-worker, single-user instance the saving is real but invisible next to model latency. The setting earns its keep once Socket.IO traffic is crossing Redis between workers or replicas.
+**When not to bother.** On a single-worker, single-user instance the saving is real but invisible next to model latency. The setting earns its keep once Socket.IO traffic is crossing Redis between workers or replicas. The one thing that can be felt on a small instance is very long chats, which are encoded in full every time they are saved and decoded again every time they are opened.
 
 See [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself and [Scaling → Switch the JSON Encoder to orjson](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it fits in a scaled rollout.
 

@@ -25,7 +25,7 @@ An API key acts as you. It inherits your role and group permissions, and those p
 
 ### Revocable and auditable
 
-Creating a new key overwrites the old one, so rotating a leaked credential is one click and takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission. Key creation and deletion are recorded as authentication events.
+A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission. Key creation and deletion are recorded as authentication events.
 
 ---
 
@@ -89,6 +89,8 @@ Create a dedicated "API Users" or "Monitoring" group and add only the accounts t
 3. Scroll to the **API keys** section and click **Show** next to **Secrets**
 4. Click **Create new secret key**
 5. Copy the key with the copy button next to the field
+
+Once a key exists, the menu beside it holds **Create new key**, which replaces it, and **Delete**, which removes it after a confirmation. Deleting leaves the account with no key until you create another, and anything still presenting the old one is refused from that moment.
 
 :::info
 The **API keys** section is collapsed by default and shows nothing but a **Show** button until you click it. If you see the heading and no key field, that is the collapsed state, not a permission problem.
@@ -155,7 +157,9 @@ Enable **API Key Endpoint Restrictions** and list only the routes your integrati
 
 ### Key rotation
 
-Rotate long-lived integrations on a schedule by clicking **Create new secret key** from the integration's account, which replaces the old key in place. Roll one account at a time and update the consumer straight away, because the previous key is rejected the moment the new one is issued.
+Rotate long-lived integrations on a schedule by choosing **Create new key** from the integration's account, which replaces the old key in place. Roll one account at a time and update the consumer straight away, because the previous key is rejected the moment the new one is issued.
+
+Retiring an integration for good is a **Delete** rather than a rotation, since that ends the account's access instead of handing it a fresh credential.
 
 ---
 

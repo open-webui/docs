@@ -32,14 +32,14 @@ The Code Interpreter is a model capability that enables LLMs to write and execut
 ### Enabling Code Interpreter
 
 **Per-Model Setup (Admin):**
-1. Go to **Settings > Admin > AI > Models**
+1. Go to **Settings > Admin > Models**
 2. Select the model you want to configure
 3. Under **Capabilities**, enable **Code Interpreter**
 4. Save changes
 
 **Global Configuration (Admin Panel):**
 
-These settings can be configured at **Settings → Admin → Tools → Code Execution**:
+These settings can be configured at **Settings > Admin > Code Execution**:
 - Enable/disable code interpreter
 - Select engine: **Pyodide (legacy)** or **Jupyter (legacy)** (for full Python and shell access, use [Open Terminal](/features/open-terminal) instead)
 - Configure Jupyter connection settings
@@ -54,7 +54,7 @@ These settings can be configured at **Settings → Admin → Tools → Code Exec
 | `CODE_INTERPRETER_PROMPT_TEMPLATE` | (built-in) | Custom prompt template for code interpreter |
 | `CODE_INTERPRETER_BLOCKED_MODULES` | `""` | Comma-separated module names to refuse importing. Empty by default. Blocks only direct top-level imports and is an opt-in convenience filter, not a security boundary; see the [reference](/reference/env-configuration#code_interpreter_blocked_modules). |
 
-For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/dev-tools/jupyter) tutorial.
+For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/integrations/dev-tools/jupyter) tutorial. On the Jupyter engine, turning on [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) gets the output of a run into the chat faster, which is most noticeable when the code prints a lot or generates images.
 
 :::note Filesystem Prompt Injection
 When the Pyodide engine is selected, Open WebUI automatically appends a filesystem-awareness prompt to the code interpreter instructions. This tells the model about `/mnt/uploads/` and how to discover user-uploaded files. When using Jupyter, this filesystem prompt is not appended (since Jupyter has its own filesystem). You do not need to include filesystem instructions in your custom `CODE_INTERPRETER_PROMPT_TEMPLATE`. They are added automatically.
@@ -66,6 +66,7 @@ When using **Native function calling mode** with a current model (at minimum GPT
 
 - **No XML tags required**: The model calls `execute_code(code)` directly
 - **Same image handling**: Base64 image URLs in output are replaced with file URLs; model embeds via markdown
+- **Tags are not executed here**: the tag format is only taught and only acted on in Legacy mode. A model in Native mode that writes a code interpreter tag block of its own accord has it shown as text rather than run, since the code it wants executed is supposed to come through the tool call.
 
 **Requirements:**
 1. `ENABLE_CODE_INTERPRETER` must be enabled globally

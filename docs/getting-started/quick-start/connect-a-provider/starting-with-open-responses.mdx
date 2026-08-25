@@ -28,9 +28,8 @@ Open Responses builds on the OpenAI Responses API format but is designed to work
 
 ## Step 1: Add or Edit a Connection
 
-1. Go to the ⚙️ **Admin Settings**.
-2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
-3. Click ➕ **Add New Connection** or edit an existing connection.
+1. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
+2. Click ➕ **Add Connection** to create one, or click **Configure** (the gear icon) on an existing connection to edit it.
 
 ---
 
@@ -94,6 +93,10 @@ You can also include provider-specific options on a tool object (for web search,
 The **Add Custom Parameter** button is shown to administrators in the model editor. Custom parameters are forwarded to the provider as-is, so only use valid Responses API tool definitions.
 :::
 
+:::info Custom parameters set instance-wide still apply
+The same button exists under **Model Defaults** in **Settings > Admin > Models**, which applies to every model. Custom parameters from the two places are combined name by name, so adding `tools` here keeps the instance-wide ones the model does not name. Use the same name in both places and the model's value is the one sent. See [Global Model Defaults](/features/workspace/models#global-model-defaults-admin).
+:::
+
 ---
 
 ## Supported Providers
@@ -118,6 +121,12 @@ Tool calls, re-invocations, and streaming are supported for Responses API connec
 
 1. Check the [Open WebUI Discord](https://discord.gg/5rJgQTnV4s) for known issues
 2. Report bugs on [GitHub](https://github.com/open-webui/open-webui/issues)
+
+### Providers that deviate from the Responses format
+
+Not every endpoint that advertises the Responses format emits it exactly, and Open WebUI absorbs the common deviations rather than losing the reply over them. A stream that closes reporting no content keeps whatever was already streamed. A fragment arriving before the item it belongs to is skipped without truncating the rest of the answer. A provider that hands over its finished message only at the very end has that message applied, so the reply and its citations are stored and carry into the next turn.
+
+Open WebUI cannot recover content the provider never sent. If replies are consistently short or empty, compare the same prompt against the provider's own API before reporting it here.
 
 ### Stateful sessions
 

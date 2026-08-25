@@ -66,6 +66,25 @@ Administrators can change a user's role at any time via **Admin Panel > Users**.
 *   Promoting a user to `admin` grants them full control.
 *   Demoting an admin to `user` subjects them to the permission system again.
 
+### When a Role Change Takes Effect
+
+A role change ends that account's live WebSocket connections straight away, whichever route the change arrived by:
+
+*   **Admin Panel > Users**, or the user update API behind it.
+*   A SCIM directory sync, including the `active` flag that maps to the `user` and `pending` roles (see [SCIM 2.0](/features/authentication-access/auth/scim)).
+*   An OAuth or OIDC sign-in with [OAuth Role Management](/features/authentication-access/auth/sso#oauth-role-management) enabled.
+*   A sign-in carrying the [trusted role header](/features/authentication-access/auth/sso#role-management).
+
+Deleting an account ends its live connections in the same way.
+
+In a multi-replica deployment with [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager), connections are found through the shared session pool and dropped on whichever replica is holding them, not only on the replica that handled the change.
+
+The browser reconnects on its own and re-authenticates, so the features that run over that connection (channels, collaborative note editing) act on the new role instead of the one cached when the connection opened. REST API calls read the account from the database on every request, so a demoted admin loses the admin-only endpoints on their very next call regardless.
+
+:::note A role change does not revoke the person's token
+They stay signed in and keep browsing under the new role. Demotion to `pending` does lock them out, because `pending` accounts are refused on every API request and on the WebSocket handshake. To revoke tokens outright, see [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+:::
+
 ## The Primary Administrator
 
 The first account created on an instance (see [Initial Setup](#initial-setup)) is the **primary administrator**. There is no special flag for it: internally it is simply the earliest-created account, determined by its creation timestamp.
@@ -163,7 +182,7 @@ spec:
 - **Use Secrets Management**: Never hardcode `WEBUI_ADMIN_PASSWORD` in Docker Compose files or Dockerfiles. Use Docker secrets, Kubernetes secrets, or environment variable injection.
 - **Strong Passwords**: Use a strong, unique password for production deployments.
 - **Change After Setup**: Consider changing the admin password through the UI after initial deployment for enhanced security.
-- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Settings > Admin > System > General** if needed.
+- **Automatic Signup Disable**: After admin creation, sign-up is automatically disabled. You can re-enable it later via **Settings > Admin > General** if needed.
 :::
 
 :::info Behavior Details

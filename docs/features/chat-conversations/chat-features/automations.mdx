@@ -7,7 +7,7 @@ title: "Automations"
 
 Automations let you schedule prompts to run automatically at recurring times. Each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
 
-Automations can be enabled or disabled globally by an administrator via the [`ENABLE_AUTOMATIONS`](/reference/env-configuration#enable_automations) environment variable or the **Settings > Admin > System > General** toggle. When disabled, the automation worker stops processing, API endpoints return `403`, and the sidebar entry is hidden.
+Automations can be enabled or disabled globally by an administrator via the [`ENABLE_AUTOMATIONS`](/reference/env-configuration#enable_automations) environment variable or the **Settings > Admin > General** toggle. When disabled, the automation worker stops processing, API endpoints return `403`, and the sidebar entry is hidden.
 
 ## What You Can Automate
 
@@ -16,7 +16,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into one of your [folders](/features/chat-conversations/chat-features/conversation-organization)
-- Optionally attach a terminal server and working directory for runs that need terminal context
+- Give runs a terminal by configuring one on the model the automation uses
 
 ## Access Control
 
@@ -64,10 +64,17 @@ Administrators can set global limits on automation usage for non-admin users. Th
    - **Model**
    - **Schedule**
 4. (Optional) Choose a **Folder** for the chats the automation creates
-5. (Optional) Select a **Terminal** server and **Working Directory**
-6. Click **Create**
+5. Click **Create**
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
+
+### Giving a Run a Terminal
+
+The automation editor has no terminal setting. A run uses the terminal configured on the model it runs, so set that up first in **Workspace > Models**: edit the model and pick the terminal from the **Terminal** list. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default. Every automation using that model then runs with that terminal.
+
+:::info A terminal can be closed to automations
+Administrators can take an orchestrated terminal out of automations, and can give each automation a workspace of its own rather than sharing one across everything. The model editor's **Terminal** list does not reflect that, so a run can fail with an error saying the terminal is not available for automations, which means its **Automation** context is set to **Off**. Pick a different terminal for the model, or ask an administrator to reopen that one. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+:::
 
 ## Edit and Manage
 
@@ -75,7 +82,7 @@ From the Automations list, click an automation to open its dedicated editor page
 
 On the editor page, you can:
 
-- Update title, instructions, model, schedule, and terminal settings
+- Update title, instructions, model and schedule
 - Save changes
 - Run immediately with **Run now**
 - Pause/resume automation state
@@ -105,7 +112,7 @@ An automation can be assigned a folder, and every chat it creates from then on i
 
 - Only your own folders can be chosen. A folder shared with you belongs to someone else and is not offered, and naming one anyway is rejected the same way an unknown folder is.
 - The folder is a filing destination, not a project context: the chat is placed in the folder, and the folder's system prompt and attached knowledge apply to it as they do to any other chat there.
-- The automations list can be narrowed to a folder through the API and the chat tools; the list page itself does not label or filter by folder.
+- The automations list can be narrowed to a folder through the API and the chat tools; the list page itself does not label or filter by folder. Asking for the list without a folder, or with an empty one, returns every automation you have, whichever folder each is filed into.
 - Clearing the folder is a normal edit. The automation keeps running and its future chats go back to the ungrouped list; chats already created stay where they are.
 - Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running. The same happens if a folder disappears between two runs: the run notices, clears the setting, and creates its chat outside any folder rather than failing.
 - Imported automations keep their folder only if a folder with that ID exists in your account; otherwise they are imported without one.
@@ -161,6 +168,9 @@ For chat-based automation tools to be available:
 4. **`ENABLE_AUTOMATIONS`** must be enabled globally (enabled by default)
 5. The user must have the **Features > Automations** permission (admins always pass)
 
-The folder argument these tools accept is a folder ID, and it is checked against the folders you own: a folder that is not yours, or no longer exists, comes back as an error instead of being applied. On `update_automation` and `list_automations`, leaving the argument out keeps the automation's current folder or lists across all folders, while passing an empty string clears the folder or the filter.
+The folder argument these tools accept is a folder ID, and it is checked against the folders you own: a folder that is not yours, or no longer exists, comes back as an error instead of being applied.
+
+- On `update_automation`, omitting the argument or passing a blank string keeps the automation's current folder. Passing `null` clears it. The same applies to `model_id`: a blank value is ignored rather than wiping the automation's model.
+- On `list_automations`, omitting the argument or passing a blank string lists across all folders.
 
 See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for full details on all builtin tools.

@@ -1,0 +1,85 @@
+---
+sidebar_position: 10
+title: "Task Models"
+---
+
+# Task Models
+
+Open WebUI makes small model calls in the background, separately from the answer a user is waiting for. They write chat titles, generate tags, suggest follow-up questions, produce autocomplete ghost text, rewrite a message into a retrieval or web search query, rewrite a message into an image prompt and summarize older messages when [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is on.
+
+By default all of that runs on the model the user is chatting with. On an expensive flagship model it is a bill nobody planned for, and on a slow local model it makes the whole interface feel sluggish. Pointing background work at a small, fast model is the highest-value change an administrator can make here.
+
+The settings below are in **Settings > Admin > Interface**.
+
+---
+
+## Choosing the task model
+
+The **Tasks** section holds two pickers. Open WebUI picks between them based on the connection the chat model came from:
+
+| Field | Environment variable | Used when the chat model comes from |
+| :--- | :--- | :--- |
+| **Local Task Model** | [`TASK_MODEL`](/reference/env-configuration#task_model) | a connection typed **Local** (Ollama and anything else you marked local) |
+| **External Task Model** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | a connection typed **External** (OpenAI-compatible providers) |
+
+Both default to **Current Model**, which means background work runs on the chat's own model. If you name a model that is no longer available, background work falls back to the chat's model rather than failing.
+
+:::tip What to pick
+Small, fast and **non-reasoning**. A reasoning model spends seconds thinking before producing a three-word title, and you pay for those thinking tokens.
+
+- **External Task Model**: `gpt-5.4-nano`, `gemini-3.5-flash-lite`, `claude-haiku-4-5-20251001`.
+- **Local Task Model**: `qwen3.5:2b`, `gemma4:e2b`, `llama3.2:3b`.
+
+The main chat experience does not change. The background work just stops dragging.
+:::
+
+---
+
+## Task model parameters
+
+**Task Model Parameters > Configure**, in the same **Tasks** section, opens the advanced parameter controls you already know from a model and applies them to every background request. The equivalent environment variable is [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params), which takes a JSON object such as `{"max_tokens":4000,"temperature":0.3}`.
+
+Leave it empty and background requests behave as they always have: title generation and context compaction summaries stop at 1000 output tokens, and every other background task sends no parameters at all.
+
+Reach for it when:
+
+- **A title or a compaction summary comes back cut off.** This is the usual symptom of a reasoning task model. Thinking counts against the same 1000 tokens, so the budget can be gone before any answer is written. Raise `max_tokens` or turn `reasoning_effort` down.
+- **Background calls cost more than you expected.** Tag, follow-up, query and autocomplete requests carry no output limit of their own. Setting `max_tokens` puts a ceiling on all of them at once.
+- **Background output is too loose.** Lower `temperature` for steadier titles and tags.
+
+:::warning Setting anything replaces the built-in limit
+As soon as you set a single parameter, the built-in 1000-token limit on titles and compaction summaries is no longer applied. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
+:::
+
+Five of the controls in the panel have no effect on background requests: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Setting them here changes nothing.
+
+This is the only place background requests get parameters from. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
+
+---
+
+## Turning individual tasks off
+
+Each background task has a switch under **Generation** in the same panel, and an environment variable:
+
+| Task | Admin toggle | Environment variable |
+| :--- | :--- | :--- |
+| Chat title generation | **Title Generation** | [`ENABLE_TITLE_GENERATION`](/reference/env-configuration#enable_title_generation) |
+| Tag generation | **Tags Generation** | [`ENABLE_TAGS_GENERATION`](/reference/env-configuration#enable_tags_generation) |
+| Follow-up suggestions | **Follow Up Generation** | [`ENABLE_FOLLOW_UP_GENERATION`](/reference/env-configuration#enable_follow_up_generation) |
+| Autocomplete *(fires as users type)* | **Autocomplete Generation** | [`ENABLE_AUTOCOMPLETE_GENERATION`](/reference/env-configuration#enable_autocomplete_generation) |
+| Query rewriting for knowledge retrieval | **Retrieval Query Generation** | [`ENABLE_RETRIEVAL_QUERY_GENERATION`](/reference/env-configuration#enable_retrieval_query_generation) |
+| Query rewriting for web search | **Web Search Query Generation** | [`ENABLE_SEARCH_QUERY_GENERATION`](/reference/env-configuration#enable_search_query_generation) |
+
+Image prompt generation is switched off in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)).
+
+:::tip Weak hardware
+Autocomplete is the first thing to turn off. It fires as users type, so a slow task model turns the prompt box to molasses.
+:::
+
+---
+
+## Changing the prompts
+
+Every task's prompt sits next to its toggle under **Generation**, and each one is empty by default, meaning the built-in prompt is used. The [Tasks section of the environment configuration reference](/reference/env-configuration#tasks) has the full text of each built-in prompt and the placeholders it accepts.
+
+[Prompt modifiers](/features/workspace/prompts) are worth knowing about here, since task prompts often have to cope with pasted documents and long code blocks.

@@ -28,7 +28,7 @@ In a Multi-Model Chat, your prompt is sent to two or more selected models at the
 
 Admins can control access to Multi-Model Chats on a per-role or per-group basis.
 
-*   **Location**: Settings > Admin > System > General > User Permissions > Chat > **Multiple Models**
+*   **Location**: Settings > Admin > General > User Permissions > Chat > **Multiple Models**
 *   **Environment Variable**: `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS` (Default: `True`)
 
 If disabled, users will not see the "plus" button in the model selector and cannot initiate multi-model sessions.
@@ -46,8 +46,10 @@ Merging takes the outputs from all your active models and sends them (along with
 ### How to Merge
 
 1.  Start a **Multi-Model Chat** and get responses from your selected models.
-2.  Look for the **Merge** (or "Synthesize") button in the response controls area (often near the regeneration controls).
-3.  Open WebUI will generate a **new response** that aggregates the best parts of the previous outputs.
+2.  Click the branch-shaped icon below the responses, at the right, whose tooltip reads **Merge Responses**. It only appears on the last exchange in the chat, and only once every model has finished.
+3.  Open WebUI adds a **Merged Response** below the individual answers, aggregating the best parts of the previous outputs.
+
+The merged answer is stored with the chat, so it is still there when you come back to the conversation. Merging works the same on a conversation you have reopened as on one you have only just generated, so you can leave a comparison sitting for days and merge it whenever you return to it.
 
 ### Advantages of Merging
 
@@ -57,13 +59,13 @@ Merging takes the outputs from all your active models and sends them (along with
 
 ### Configuration
 
-The merging process relies on the backend **Tasks** system.
+There is nothing to configure, and that is worth knowing before you go looking:
 
-*   **Task Model**: The specific model used to perform the merger can be configured in **Settings > Admin > Experience > Interface > Tasks**. We recommend using a capable model (such as GPT-5.6 Sol or Claude Sonnet 5) as the task model for the best results.
-*   **Prompt Template**: The system uses a specialized prompt template to instruct the AI on how to synthesize the answers.
+*   **Model**: the merge runs on one of the models already in the comparison, the one whose response you are viewing when you press **Merge**. It does not use the Task Model, so the settings under **Settings > Admin > Interface** have no effect on it.
+*   **Prompt Template**: the merge uses a built-in prompt telling the model how to synthesize the answers. There is no admin field or environment variable for it.
 
 :::info Experimental
-The Merging/MOA feature is an advanced capability. While powerful, it requires a capable Task Model to work effectively.
+The Merging/MOA feature is an advanced capability. The result is only as good as the model doing the synthesizing, so run the merge from your strongest model's response rather than a small one.
 :::
 
 

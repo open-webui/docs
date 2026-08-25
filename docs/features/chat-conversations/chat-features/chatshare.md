@@ -24,7 +24,7 @@ This will enable community sharing for all users on your Open WebUI instance.
 To share a chat:
 
 1. Select the chat conversation you want to share.
-2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat.
+2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Then click on the **Share** option.
 4. Select either **Share to Open WebUI Community** (if **Enable Community Sharing** is toggled on by an **Admin**) or **Copy Link**.
 
@@ -95,12 +95,19 @@ To view a shared chat:
 3. The chat will be displayed in a read-only format.
 4. If the Admin of the Open WebUI instance from which the shared link was shared has Text-to-Speech set up, there may be an audio button for messages to be read aloud to you (situational).
 
+A chat that belongs to someone else is shown under its author: their name and profile picture sit on the messages they wrote. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app rather than through a share link, the chat's **Overview** panel labels its message nodes the same way.
+
+#### Using a Shared Chat as Context
+
+Read access to a chat also lets you attach that conversation to a chat of your own, so a model can work from it. This covers a share granted to you by name, one granted to a group you belong to, one set to **Public** and a chat sitting in a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
+The model receives the conversation as it stands now, so messages added since the link was generated are included even though the link itself still serves the older snapshot. Only the branch the conversation is currently following is passed along. The text goes in verbatim, with no chunking and no vector search.
+
 ### Updating Shared Chats
 
 To update a shared chat:
 
 1. Select the chat conversation you want to share.
-2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat.
+2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Click on the **Share** option.
 4. The **Share Chat** Modal should look different if you've shared a chat before.
 
@@ -116,7 +123,7 @@ The **Share Chat** Modal includes the following options:
 To delete a shared chat link:
 
 1. Select the chat conversation you want to delete the shared link for.
-2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat.
+2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Click on the **Share** option.
 4. The **Share Chat** Modal should look different if you've shared a chat before.
 5. Click on **delete this link**.

@@ -8,12 +8,18 @@ title: "Image Generation"
 ### General Issues
 
 - **Image Not Generating** (asking for an image produces no image, or an error appears in the chat):
-    - Check the **Images** settings in the **Settings** > **Admin** > **Experience** > **Images**. Ensure "Image Generation" is toggled **ON**.
+    - Check the **Images** settings in **Settings** > **Admin** > **Images**. Ensure "Image Generation" is toggled **ON**.
     - Ensure the **Image** toggle is on in the **Integrations** menu of the message input. Nothing image-related happens without it, in any function calling mode.
     - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
+
+- **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
+    - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
+    - The usual cause is that the file behind it is gone, deleted through **Settings** > **Data Controls** > **Manage Files** or wiped along with the data directory. A deleted file cannot be brought back, so the placeholder stays on that message.
+    - The placeholder is not clickable, so the full-screen preview does not open on an image that cannot be shown. If the message later points at a different image address, the image is loaded again.
+    - If you run more than one replica and the placeholder comes and goes, check that `/app/backend/data` really is shared between them. See [Scaling & HA → Uploaded Files or RAG Knowledge Inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible).
 
 ### ComfyUI Issues
 

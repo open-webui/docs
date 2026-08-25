@@ -33,7 +33,7 @@ The setup token is printed once when `cptr run` starts, and the setup URL only w
 
 ## I forgot my password / I'm locked out
 
-If another admin exists, they can reset your password in **Settings → Admin → Users**. Two things that trip people up first:
+If another admin exists, they can reset your password in **Admin Panel > Users**. Two things that trip people up first:
 
 - Login is rate-limited to **5 attempts per minute per IP**. If you're getting `429`, wait a minute and try again.
 - Rotating `[server] secret` in `config.toml` signs out every session; it does **not** reset any password.

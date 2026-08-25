@@ -77,7 +77,20 @@ Open WebUI's SCIM implementation supports the following operations:
 - **Get User** (`GET /Users/{id}`): Retrieve user information
 - **Update User** (`PUT /Users/{id}`, `PATCH /Users/{id}`): Update user attributes
 - **Delete User** (`DELETE /Users/{id}`): Deactivate a user account
-- **List Users** (`GET /Users`): List all users with filtering support
+- **List Users** (`GET /Users`): List externally provisioned users, with filtering support
+
+:::info Only externally provisioned accounts are visible over SCIM
+Every user operation is scoped to accounts that arrived through an identity provider, meaning those created by SCIM itself or by an OAuth or OIDC sign-in. An account created locally, such as the first administrator or anyone added by hand, is not returned by a listing and is not addressable by id, so a read, update or delete against it answers `404`.
+
+This keeps the identity provider's view limited to the accounts it owns. A local account that later signs in through the provider becomes visible at that point, since the sign-in records the provider on the account.
+:::
+
+
+:::info Deprovisioning ends live sessions
+
+The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `pending`, `active: true` sets it back to `user`. Because that is a role change, Open WebUI ends the account's live WebSocket connections as soon as the SCIM update lands, and a `pending` account is then refused on both the API and the WebSocket handshake. Deleting a user through SCIM ends their live connections the same way. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
+
+:::
 
 ### Group Operations
 - **Create Group** (`POST /Groups`): Create a new group

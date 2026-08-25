@@ -68,6 +68,7 @@ To use Apache Tika as the context extraction engine in Open WebUI, follow these 
 - Click on the `Documents` tab.
 - Change the `Default` content extraction engine dropdown to `Tika`.
 - Update the context extraction engine URL to `http://tika:9998`.
+- Set `Tika Server Version` to match the server you are running, `Tika 3.x` or `Tika 4.x`. The two major versions expose different endpoints, so a mismatch makes extraction fail against a server that is otherwise running correctly. The default is `Tika 3.x`, and the same choice is available as [`TIKA_SERVER_VERSION`](/reference/env-configuration#tika_server_version).
 - Save the changes.
 
 ## Verifying Apache Tika in Docker

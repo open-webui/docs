@@ -36,17 +36,23 @@ These eighteen can be rebound:
 | Open settings | `Cmd+.` |
 | Show shortcuts | `Cmd+/` |
 | Toggle sidebar | `Cmd+Shift+S` |
-| Toggle controls | *(unassigned)* |
+| Toggle Controls | *(unassigned)* |
 | Close modal | `Escape` |
 | Focus input | `Shift+Escape` |
 | Generate message pair | `Cmd+Shift+Enter` |
 | Regenerate response | `Cmd+R` |
+| Allow tool call | `Cmd+Alt+Enter` |
+| Deny tool call | `Cmd+Alt+Backspace` |
 | Copy last code block | `Cmd+Shift+;` |
 | Copy last response | `Cmd+Shift+C` |
 
 Anything not listed here is fixed and cannot be reassigned.
 
-Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to previous / next chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle controls** opens and closes the chat controls panel. They are left unbound so they cannot collide with an existing binding on arrival — pick keys that suit you.
+**Allow tool call** and **Deny tool call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
+
+Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to previous / next chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle Controls** opens and closes the chat controls panel. They are left unbound so they cannot collide with an existing binding on arrival, pick keys that suit you.
+
+**Delete chat** follows the [Chat Delete permission](/features/authentication-access/rbac/permissions#3-chat-permissions). If an administrator has taken it away, the shortcut stays bound and listed but does nothing, in step with the delete actions being hidden from the sidebar and the menus. Admins are always exempt.
 
 :::info Changes in this release
 Shortcuts used to be a fixed list shown in a modal. They are now rebindable and live in **Settings > Keyboard**; the separate shortcuts modal is gone.
@@ -65,3 +71,9 @@ Distinct from shortcuts, typing one of these characters in the chat input opens 
 | `#` | Knowledge and files |
 | `$` | Skills |
 | `:` | Emoji |
+
+The `/` menu includes a **Model** entry that opens the model picker with its search box focused, so you can change model without leaving the keyboard or binding anything. Typing `/model` followed by a model id switches straight to it.
+
+## Keyboard Navigation
+
+Distinct from the shortcuts above, stepping through the interface with `Tab` and `Shift+Tab` works everywhere and is unaffected by the **Enable Keyboard Shortcuts** toggle. Whatever you have reached is marked with a clear outline, so you can always see where you are. Buttons that normally appear under the pointer, such as the actions under a message, appear when you reach them with `Tab` as well.

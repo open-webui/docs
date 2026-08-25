@@ -11,7 +11,7 @@ OAuth and Single Sign-On (SSO) provide secure authentication for Open WebUI. Whe
 Most OAuth flows require the application's external URL ("redirect URI") so the provider knows where to send users after login. If this is missing, OAuth cannot complete.
 
 **Solution:**
-- Navigate to: **Admin Settings > General**
+- Navigate to: **Settings > Admin > General**
 - Ensure your **WebUI URL** field is filled in and points to your deployed instance (e.g., `https://yourwebui.yourdomain.com`)
 
 :::tip
@@ -155,9 +155,11 @@ By default, OAuth env vars **will** take priority over database values because `
 **Solutions:**
 1. **For Development/Testing:** Ensure `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (this is already the default) to always read from environment variables
 2. **For Production:** Either:
-   - Configure settings through Admin Panel instead of environment variables, OR
+   - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` and configure settings through the Admin Panel instead of environment variables, OR
    - Keep `ENABLE_OAUTH_PERSISTENT_CONFIG=false` (default) so that env vars always take priority for OAuth settings
 3. **Fresh Start:** Delete the database volume and restart with correct configuration
+
+While it is `false` the OAuth section of the Admin Panel is read-only, so an edit cannot look like it worked and then vanish on the next restart. See [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config).
 
 📌 **Example for Docker Compose:**
 ```yaml
@@ -376,6 +378,34 @@ OAUTH_PROVIDER_NAME=Authentik
 OAUTH_SCOPES=openid email profile
 ```
 
+#### Providers that add their own parameters to the ID token:
+
+**Problem:** The login fails at the callback. The browser shows `The email or password provided is incorrect`, and the log records the real reason:
+
+```
+OAuth callback failed: Unsupported {'app_id'} in header
+```
+
+Some providers add a vendor-specific parameter to the ID token header, which older versions rejected. The name varies by provider.
+
+**Solution:** Update Open WebUI. Unrecognized parameters are ignored, so nothing changes on the provider side. The signature and signing algorithm are still verified.
+
+---
+
+### 12. Existing Accounts Cannot Sign In After a Long-Delayed Upgrade
+
+**Problem:** After upgrading an instance that had been left on a version older than v0.6.41, nobody who had signed in through SSO can get back in, and password sign-in fails for those same accounts. Accounts that never used SSO are fine. The log records:
+
+```
+ERROR - Error during OAuth process: 1 validation error for UserModel
+oauth
+  Input should be a valid dictionary [type=dict_type, input_value='{"oidc": {"sub": "..."}}', input_type=str]
+```
+
+The upgrade step that moves an account's identity provider subject into its current field encoded the value twice, so it holds the text of a JSON object rather than the object. Only databases still older than v0.6.41 at the moment they were upgraded are affected, and only accounts that had a subject stored at the time.
+
+**Solution:** Update Open WebUI. A repair migration runs on startup and rewrites the affected rows, leaving every other row alone. No manual database work, no re-linking and nothing to change on the provider side. `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` does not work around it, since the fallback lookup reads the same account and fails the same way.
+
 ---
 
 ## Advanced Troubleshooting Tips
@@ -438,7 +468,9 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 ### Key Log Messages to Watch For:
 - `OAuth callback error: mismatching_state` → Session/cookie issue
 - `httpcore.ReadTimeout` → Network timeout issue
-- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established
+- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established. Every callback failure is reported to the browser with this message, so read the backend log for the actual cause
+- `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token and your version still rejects it. See [Providers that add their own parameters to the ID token](#providers-that-add-their-own-parameters-to-the-id-token)
+- `1 validation error for UserModel` on the `oauth` field → An old upgrade step stored the identity provider subject as text. See [Existing Accounts Cannot Sign In After a Long-Delayed Upgrade](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
 - `404` on callback URLs → Redirect URI misconfiguration
 
 ---
@@ -450,13 +482,14 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | 🔗 WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
 | 📝 Env var typo or missing    | Double-check against official docs; avoid non-existent vars like `OIDC_CONFIG` |
 | 🚨 Missing OPENID_PROVIDER_URL | Always required for OIDC; set to provider's `.well-known/openid-configuration` |
-| 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` or use admin panel |
+| 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` for env vars, or `true` to use the admin panel (it is read-only while `false`) |
 | 🏢 Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
 | 🧊 Proxy caching interfering  | Exclude OAuth endpoints from all server-side caches         |
 | 🍪 Cookie configuration issues | Check reverse proxy cookie settings and env vars          |
 | ⏱️ Timeout problems          | Increase `AIOHTTP_CLIENT_TIMEOUT` values                    |
 | 🔐 CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
 | 🔀 Multi-instance problems    | Configure Redis and shared secrets                          |
+| 🧬 SSO accounts locked out right after a long-delayed upgrade | Update Open WebUI; a repair migration fixes the stored identity data on startup |
 | Still stuck? | Check debug logs, test without proxy, verify provider setup |
 
 ---

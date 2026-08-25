@@ -10,7 +10,7 @@ Computer's gateway exposes each workspace as an OpenAI-compatible model, so you 
 ## Connect it
 
 1. In Computer, open **Settings → Admin → Gateway** and create a gateway API key. Copy it immediately; it's shown once and stored hashed.
-2. In Open WebUI, go to **Admin Settings → Connections** and add an **OpenAI API** connection:
+2. In Open WebUI, go to **Settings → Admin → Connections** and add an **OpenAI API** connection:
    - Base URL: `http(s)://<computer-host>/v1`
    - API key: the `sk-cptr-...` key from step 1
 3. Add these custom headers to the connection so Computer can track chat lineage and filter Open WebUI's utility requests:

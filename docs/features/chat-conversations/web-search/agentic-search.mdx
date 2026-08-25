@@ -31,8 +31,8 @@ For comprehensive information about all built-in agentic tools (including web se
 
 To unlock these features, your model needs native tool calling and reasonable multi-step reasoning — at minimum something like GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
-1.  **Enable Web Search Globally**: Ensure a search engine is configured in **Settings → Admin → Tools → Web Search**.
-2.  **Enable Model Capability**: In **Settings → Admin → AI → Models**, select your model and enable the **Web Search** capability.
+1.  **Enable Web Search Globally**: Ensure a search engine is configured in **Settings → Admin → Web Search**.
+2.  **Enable Model Capability**: In **Settings → Admin → Models**, select your model and enable the **Web Search** capability.
 3.  **Enable Default Feature**: In the same model settings, under **Default Features**, check **Web Search**. This controls whether the `search_web` and `fetch_url` tools are available by default in new chat sessions.
 4.  **Confirm Native Mode (Agentic Mode)**:
     *   Native is the default tool-calling mode as of v0.10.0, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).

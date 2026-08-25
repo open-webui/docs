@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.11.0](https://github.com/open-webui/open-webui/releases/tag/v0.11.0), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.11.1](https://github.com/open-webui/open-webui/releases/tag/v0.11.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -33,6 +33,8 @@ Please note that `ConfigVar` environment variables are clearly marked as such in
 To disable this behavior and force Open WebUI to always use your environment variables (ignoring the database), set `ENABLE_PERSISTENT_CONFIG` to `False`.
 
 **CRITICAL WARNING:** When `ENABLE_PERSISTENT_CONFIG` is `False`, you may still be able to edit settings in the Admin UI. However, these changes are **NOT saved**.
+
+The OAuth settings are the exception: they are shown read-only in the Admin Panel whenever [`ENABLE_OAUTH_PERSISTENT_CONFIG`](#enable_oauth_persistent_config) is `False`, which is its default, so there is nothing to edit and nothing to lose.
 
 :::
 
@@ -208,7 +210,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > AI > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
@@ -222,7 +224,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Admin > AI > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Example: `gpt-5.6-sol,claude-opus-5,muse-glimmer:30b-q4_K_M`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -230,7 +232,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Admin Settings → Models**.
+- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Settings → Admin → Models**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_metadata`.
 
 :::info
@@ -247,7 +249,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Admin Settings → Models**.
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings > Admin > Models** (**Model Defaults** > **Configure** > **Model Parameters**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_params`.
 
 :::info
@@ -256,6 +258,24 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Use valid JSON (for example: `{"temperature":0.7,"function_calling":"native"}`)
 - If parsing fails, Open WebUI logs the error and falls back to `{}`
+- Anything under `custom_params` (in the interface, **Add Custom Parameter**) is combined entry by entry with a model's own custom parameters, so a model that adds one of its own keeps the ones set here. A model that reuses the same name wins for that name only
+- Both this and a model's saved parameters only fill in what a request left out, so a parameter sent in the request body keeps the value the caller sent
+
+:::
+
+#### `DEFAULT_INTERFACE_SETTINGS`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: Sets instance-wide starting values for the personal options in **Settings > Interface**, so every account opens on your preferences instead of the built-in ones, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins. An option nobody has touched keeps following the default, so changing it later moves everyone who has not overridden it. The defaults also reach personal settings written outside the **Interface** page, such as `system` and `params`, which the admin editor does not offer. Configurable via **Settings > Admin > General > UI > Default Interface Settings**. See [Default Interface Settings](/features/administration/interface-defaults) for the full list of keys, their labels and their built-in values.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.default_interface_settings`.
+
+:::info
+
+`DEFAULT_INTERFACE_SETTINGS` is read from the environment as a JSON string at startup.
+
+- Use valid JSON (for example: `{"chatBubble": false, "title": {"auto": false}}`)
+- If parsing fails, or the value is not a JSON object, it is ignored and no defaults are applied
 
 :::
 
@@ -332,7 +352,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `int`
 - Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > System > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
 #### `ENABLE_AUTOMATIONS`
 
@@ -377,7 +397,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same model, tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > AI > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same model, tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_BACKGROUND_ENABLED`
@@ -464,7 +484,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `bool`
 - Default: `True`
-- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Surfaced as the "Memory System Context" toggle under **Admin Settings > General** when Memories is enabled.
+- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Injection additionally requires the user to hold the `features.memories` permission ([`USER_PERMISSIONS_FEATURES_MEMORIES`](#user_permissions_features_memories); admins are exempt). Surfaced as the "Memory System Context" toggle under **Settings > Admin > General** when Memories is enabled.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBHOOK_URL`
@@ -586,7 +606,7 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 - Type: `bool`
 - Default: `True`
 - Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > System > General > User Status**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > General > User Status**.
 
 #### `ENABLE_EASTER_EGGS`
 
@@ -708,11 +728,11 @@ Enabling `ENABLE_REALTIME_CHAT_SAVE` causes every single token generated by the 
 
 - Type: `int`
 - Default: Empty string (' '), which disables the limit (equivalent to None)
-- Description: Sets the maximum buffer size in bytes for handling stream response chunks. When a single chunk exceeds this limit, the system returns an empty JSON object and skips subsequent oversized data until encountering normally-sized chunks. This prevents memory issues when dealing with extremely large responses from certain providers (e.g., models like gemini-3.1-flash-image or services returning extensive web search data exceeding). Set to an empty string or a negative value to disable chunk size limitations entirely. Recommended values are 16-20 MB (`16777216`) or larger depending on the image size of the image generation model (4K images may need even more).
+- Description: Sets the maximum buffer size in bytes for handling stream response chunks. When a single chunk exceeds this limit, the system returns an empty JSON object and skips subsequent oversized data until encountering normally-sized chunks. This prevents memory issues when dealing with extremely large responses from certain providers (e.g., models like gemini-3.1-flash-image or services returning extensive web search data). Set to an empty string, `0` or a negative value to disable chunk size limitations entirely; a value that is not a whole number is treated the same way. With no limit set (the default), a chunk of any size is passed through in full rather than breaking the response, at the cost of holding it in memory until it is complete. Recommended values are 16-20 MB (`16777216`) or larger depending on the image size of the image generation model (4K images may need even more). This handling applies to chat responses streamed from OpenAI-compatible connections, whichever **API Type** they are set to; Ollama connections never pass through it, so the value has no effect on them.
 
 :::info
 
-It is recommended to set this to a high single-digit or low double-digit value if you run Open WebUI with high concurrency, many users, and very fast streaming models.
+It is recommended to set this to a high single-digit to low double-digit number of megabytes (the value itself is counted in bytes, so `8388608` is 8 MB) if you run Open WebUI with high concurrency, many users, and very fast streaming models.
 
 :::
 
@@ -723,7 +743,7 @@ It is recommended to set this to a high single-digit or low double-digit value i
 - Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The pre-v0.9.6 name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (old default `30`) is still honored as a fallback if this is unset; prefer the new name.
 
 :::info Hitting the limit is visible (since v0.9.6)
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. A continuation request that fails outright — the provider erroring while the loop is fetching the model's next turn — is now reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is now reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -841,11 +861,11 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Default: `True`
 - Description: Enables the HTTP response compression middleware ([starlette-compress](https://pypi.org/project/starlette-compress/)), which compresses HTTP responses using ZStd, Brotli, or Gzip, negotiated via the client's `Accept-Encoding` header. This variable is read once at startup and requires a restart to change.
 
-**What it affects — and what it doesn't:**
+**What it affects, and what it doesn't:**
 
 - Only **HTTP responses** with compressible content types (JSON API responses, HTML, JavaScript/CSS static assets, SVG, etc.) that are larger than 500 bytes get compressed.
 - **WebSocket traffic (Socket.IO) is never touched** by this middleware, regardless of this setting.
-- **Streaming chat responses (SSE, `text/event-stream`) are never compressed** either way — the content type is not in the middleware's compressible list, so the token-streaming hot path is unaffected by this setting in both directions.
+- **Streaming chat responses (SSE, `text/event-stream`) are never compressed** either way, the content type is not in the middleware's compressible list, so the token-streaming hot path is unaffected by this setting in both directions.
 
 **Trade-offs of disabling (`ENABLE_COMPRESSION_MIDDLEWARE=false`):**
 
@@ -853,14 +873,14 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - **Downside**: Responses leave the backend uncompressed. For typical JSON API responses this only adds a few kilobytes per request, which is negligible on almost any connection. Two cases grow substantially more, however: the **first (uncached) page load** of the web UI, whose JavaScript/CSS bundles amount to several megabytes uncompressed, and **large JSON payloads** such as long chat histories or large model lists, which typically compress 5–10×. On fast or local networks this is still negligible; on slow or mobile links it is noticeable.
 
 :::tip Best of both worlds: compress at the reverse proxy
-If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloudflare, ...) sits in front of Open WebUI, enable compression **there** and set `ENABLE_COMPRESSION_MIDDLEWARE=false`. Clients still receive compressed responses, while the compression work moves off the Python workers onto infrastructure built for it — CDNs and proxies can additionally cache static assets in pre-compressed form. Pair this with aggressive proxy-side caching of the content-hashed frontend bundles under `/_app/immutable/` (`Cache-Control: public, max-age=31536000, immutable`), which removes the larger-first-page-load downside for every visit after the first. This is the recommended setup for scaled deployments; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for details and an Nginx example.
+If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloudflare, ...) sits in front of Open WebUI, enable compression **there** and set `ENABLE_COMPRESSION_MIDDLEWARE=false`. Clients still receive compressed responses, while the compression work moves off the Python workers onto infrastructure built for it, CDNs and proxies can additionally cache static assets in pre-compressed form. Pair this with aggressive proxy-side caching of the content-hashed frontend bundles under `/_app/immutable/` (`Cache-Control: public, max-age=31536000, immutable`), which removes the larger-first-page-load downside for every visit after the first. This is the recommended setup for scaled deployments; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling#pair-it-with-static-asset-caching-at-the-proxy) for details and an Nginx example.
 :::
 
 #### `ENABLE_ORJSON`
 
 - Type: `bool`
 - Default: `False`
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, upstream provider responses including streamed chunks, and Socket.IO payloads. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. Off by default because orjson is stricter about what it accepts; rejected payloads fall back to the standard library automatically, as does anything encoded with a request orjson has no equivalent for, such as indented output or a custom rule for converting values before they are written. Worth enabling on clustered, Redis-backed deployments and not worth it on single-user instances. Read once at startup, so a restart is required. Added in v0.11.0.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -896,7 +916,7 @@ allowing the client to wait indefinitely.
 
 - Type: `int`
 - Default: unset (no idle cap)
-- Description: Maximum number of seconds a **streaming** request may go without receiving a chunk before it is aborted. This is an idle cap between chunks, not a cap on the whole response, so a long answer that keeps producing tokens is never cut off — only a stream that has gone silent is. `AIOHTTP_CLIENT_TIMEOUT` still bounds the total duration.
+- Description: Maximum number of seconds a **streaming** request may go without receiving a chunk before it is aborted. This is an idle cap between chunks, not a cap on the whole response, so a long answer that keeps producing tokens is never cut off, only a stream that has gone silent is. `AIOHTTP_CLIENT_TIMEOUT` still bounds the total duration.
 
 :::info
 
@@ -968,6 +988,20 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 - Type: `bool`
 - Default: `False`
 - Description: Controls whether outbound HTTP requests across the application follow `3xx` redirects. When `False` (the default since v0.9.6), redirects are not followed. This closes a class of SSRF where a public, validated URL `302`-redirects to an internal address (RFC 1918, loopback `127.0.0.1`, cloud-metadata `169.254.169.254`) that bypasses the original allowlist check. Affected call sites include the RAG web loader, image loading and base64 conversion, OAuth pre-flight, code-interpreter login, and tool-server execution. Set to `True` only if your deployment legitimately requires redirect following (e.g. shortlink-style URLs) AND you have other SSRF protections in place, typically an egress firewall or `WEB_FETCH_FILTER_LIST` covering your internal ranges.
+
+#### `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Chooses how Open WebUI turns hostnames into addresses for every outbound request. When `False` (the default), it asks the operating system, resolving names the way anything else on the machine does. When `True`, it uses the faster c-ares resolver, which stops lookups queueing behind each other on a busy instance. Read once at startup, so a restart is required.
+
+:::warning Test it before you leave it on
+
+c-ares reads `/etc/resolv.conf` and the hosts file but not other name sources, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving, and on some Windows hosts it finds no usable nameserver at all. Exercise your models, web search and any internal services after turning it on, and turn it back off if lookups start failing.
+
+The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your own image, do not upgrade it past that pin while this setting is on.
+
+:::
 
 #### `USER_AGENT`
 
@@ -1058,7 +1092,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `INFO`
-- Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.
+- Description: Sets the global logging level for all Open WebUI components. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`. The level also decides how much work the backend does: messages it filters out are never built, so raising it saves CPU as well as log volume, and the saving follows the size of the text that would have been discarded (whole request payloads, retrieval results). See [What the Log Level Costs](/getting-started/advanced-topics/logging#what-the-log-level-costs).
 
 #### `LOG_FORMAT`
 
@@ -1269,18 +1303,40 @@ when using Ollama models.
 when using OpenAI-compatible endpoints.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `TASK_MODEL_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{}`
+- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation and compaction summaries stop at 1000 output tokens and the other tasks send no parameters. Setting anything here drops that built-in limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
+
+:::info
+
+Read from the environment as a JSON string at startup, for example `{"max_tokens":4000,"temperature":0.3}`. If parsing fails, Open WebUI logs the error and falls back to `{}`.
+
+Several parameters have no effect on background requests wherever you set them: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Emoji generation ignores the setting entirely.
+
+:::
+
+#### `ENABLE_TOOL_PERMISSIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Adds a **Tool Permissions** entry to the chat input's ➕ menu, where a user picks **Full access** (run tools without asking, the default) or **Ask for approval** (stop before each tool call until it is allowed or denied). Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Automations and channel replies always run with full access, since nobody is watching the chat to approve anything. Can also be toggled in **Settings > Admin > Interface**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `ENABLE_CONTEXT_COMPACTION`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Experience > Interface**.
+- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Interface**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_MODEL`
 
 - Type: `str`
 - Default: Empty string (follow the task model)
-- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Experience > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
+- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
@@ -1294,14 +1350,14 @@ when using OpenAI-compatible endpoints.
 
 - Type: `int`
 - Default: falls back to `CONTEXT_COMPACTION_TOKEN_THRESHOLD` when unset
-- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Experience > Interface** (**Token Cap**).
+- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Interface** (**Token Cap**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_RETENTION_PERCENTAGE`
 
 - Type: `int`
 - Default: `40`
-- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Compaction always splits on a user message, so the retained portion begins at a turn boundary rather than mid-exchange. Can also be set in **Settings > Admin > Experience > Interface** (**Retained Messages**).
+- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Compaction always splits on a user message, so the retained portion begins at a turn boundary rather than mid-exchange. Can also be set in **Settings > Admin > Interface** (**Retained Messages**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -1636,7 +1692,11 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
     "config": {
       "access_grants": [
         {"principal_type": "user", "principal_id": "*", "permission": "read"}
-      ]
+      ],
+      "contexts": {
+        "chat": {"context_id": "chat_id"},
+        "automation": false
+      }
     }
   }
 ]
@@ -1644,6 +1704,12 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 For an orchestrator connection, set `policy_id` to route every terminal request through that named policy. Omitting it intentionally uses the orchestrator's service defaults through its backward-compatible unscoped route.
+
+`config.contexts` gives an orchestrator connection a separate workspace per chat or per automation, or withholds it from either, with the keys `chat` and `automation`. It is ignored on connections that are not orchestrator ones. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the values, the admin controls and the capacity trade-off.
+
+`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. The default, `default`, uploads it to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's current working directory instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+
+`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` for an orchestrator connection when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it.
 
 :::tip Helm chart auto-configuration
 When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
@@ -1761,7 +1827,7 @@ Output:
 
 - Type: `str` (JSON)
 - Default: `[]`
-- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings.
+- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Admin > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) and saving it collapses the duplicates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MESSAGE_RATING`
@@ -1925,7 +1991,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > AI > Connections > "Cache Base Model List".
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > Connections > "Cache Base Model List".
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 **How the cache works:**
@@ -1935,7 +2001,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 - **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
 - **Cache Refresh**: The cache is refreshed when:
   - The application restarts
-  - The connection settings are saved in the **Settings > Admin > AI > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
+  - The connection settings are saved in the **Settings > Admin > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
 - **No TTL**: There is no automatic time-based expiration.
 
 :::tip Performance Consideration
@@ -2012,7 +2078,7 @@ Settings for the experimental long-term memory system (**Settings → Personaliz
 
 - Type: `int`
 - Default: `2000`
-- Description: Maximum number of characters of `context`-type memories injected into the prompt. Older or lower-priority context memories beyond this budget are not included.
+- Description: Maximum number of characters of `context`-type memories injected into the prompt. Anything beyond this budget is cut off.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MEMORIES_USER_CHAR_LIMIT`
@@ -2115,7 +2181,7 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 
 Beyond the fixed user and session headers above, each connection can forward **arbitrary custom headers** whose values may embed **template placeholders** that Open WebUI substitutes for each request. Unlike the variables above, this is configured **per connection, not through an environment variable**, and it works **independently of `ENABLE_FORWARD_USER_INFO_HEADERS`** (custom headers are sent even when that toggle is `false`). They are applied **last**, so a custom header takes precedence over a built-in forwarded header of the same name.
 
-Set them in **Settings > Admin > AI > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
+Set them in **Settings > Admin > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
 
 ```json
 {
@@ -2174,6 +2240,8 @@ requests initiated by third-party websites, but only over HTTPS.
 When `ENABLE_OAUTH_SIGNUP` is enabled, setting `WEBUI_SESSION_COOKIE_SAME_SITE` to `strict` can cause login failures. This is because Open WebUI uses a session cookie to validate the callback from the OAuth provider, which helps prevent CSRF attacks.
 
 However, a `strict` session cookie is not sent with the callback request, leading to potential login issues. If you experience this problem, use the default `lax` value instead.
+
+The same session cookie carries the authorization when a user [connects their account to an OAuth 2.1 MCP tool server](/features/extensibility/mcp#connecting-an-account), so `strict` breaks that as well: the provider's redirect arrives without the cookie and the connection fails with `OAuth callback failed: OAuth callback state is invalid or expired`.
 
 :::
 
@@ -2287,15 +2355,18 @@ When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_
 
 :::info How the secret key is generated
 
-You do **not** need to manually set this variable for a secure installation. **All standard launch methods automatically generate and persist a cryptographically random key on first start:**
+You do **not** need to manually set this variable for a secure installation. **All standard launch methods automatically generate and persist a random key on first start:**
 
 | Launch method | Auto-generates? | Persisted to |
 |---|---|---|
 | **Docker** (`start.sh`) | ✅ Yes | `.webui_secret_key` file inside the container |
 | **pip install** (`open-webui serve`) | ✅ Yes | `.webui_secret_key` file in the working directory |
+| **Windows** (`backend\start_windows.bat`) | ✅ Yes | `.webui_secret_key` file next to the script |
 | **Development** (`open-webui dev`, direct `uvicorn`) | ❌ No | N/A (set `WEBUI_SECRET_KEY` yourself) |
 
-The standard Docker and `open-webui serve` methods check for the environment variable first, and if it is not set, they generate a secure random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
+The Docker, `open-webui serve` and Windows methods check for the environment variable first, and if it is not set, they generate a random key, save it to a file and inject it into the environment, all before the application starts. That is why you do not need to set it yourself when you use them.
+
+The Windows script builds its key from the command shell's own `%RANDOM%` generator, which is not a cryptographic source. That is adequate for a local install, but set `WEBUI_SECRET_KEY` explicitly on any host other people can reach.
 
 :::
 
@@ -2328,6 +2399,26 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 - Application state will be inconsistent between instances
 - Websocket connections will not function properly in distributed setups
 - Users may experience intermittent authentication failures
+
+:::
+
+#### `WEBUI_SECRET_KEY_FILE`
+
+- Type: `str`
+- Default: `.webui_secret_key`
+- Description: Where the start script writes the auto-generated `WEBUI_SECRET_KEY` on first start, and reads it back from on every later start. A relative path is resolved against the `backend` directory the script lives in. Read by `start.sh` (Docker) and `backend\start_windows.bat` only; `open-webui serve` ignores it and always uses `.webui_secret_key` in the current working directory. It has no effect when `WEBUI_SECRET_KEY` is already set in the environment, because no key file is written or read in that case.
+
+#### `WEBUI_SECRET_KEY_LENGTH`
+
+- Type: `int`
+- Default: `24`
+- Description: How much randomness goes into an auto-generated `WEBUI_SECRET_KEY`. Only read on the first start, when no key is set in the environment and no key file exists yet.
+
+:::warning The unit is not the same on every platform
+
+`start.sh` and `open-webui serve` read it as a number of **bytes** and base64-encode them, so the default `24` gives a 32-character key. `backend\start_windows.bat` reads it as a number of **characters**, so `24` gives a 24-character key. Set it per platform if you need a specific length.
+
+Avoid any value producing a key of exactly **44 characters** (`33` on Docker or `open-webui serve`, `44` on Windows), which stops Open WebUI starting for the reason given under [`ENABLE_VALVE_ENCRYPTION`](#enable_valve_encryption). The default is safe everywhere.
 
 :::
 
@@ -2479,7 +2570,7 @@ modeling files for reranking.
 
 - Type: `str`
 - Options:
-- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`, `valkey`
+- `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opengauss`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`, `valkey`
 - Default: `chroma`
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
@@ -2754,18 +2845,18 @@ Milvus Lite is embedded, so the file is held by a single process. A second proce
 - Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
 - New data is written to the 5 shared multitenancy collections
 - Application treats knowledge bases as empty until reindexed
-- Files and memories are NOT automatically migrated to the new collection schema and will appear missing
+- Memories, and files that are not in a knowledge base, are NOT automatically migrated to the new collection schema and will appear missing
 
 **Clean migration path from normal Milvus to multitenancy milvus:**
 - Before enabling multitenancy, export any critical knowledge content from the UI if possible
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
-- Navigate to `Admin Settings > Documents > Click Reindex Knowledge Base`
+- Navigate to `Settings > Admin > Documents > Click Reindex Knowledge Base`
 
-**This rebuilds ONLY knowledge base vectors into the new multitenancy collections**
-**Files, user memories, and web search history are NOT migrated by this operation**
+**This rebuilds knowledge base vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
+**User memories, web search history and files that were never added to a knowledge base are NOT migrated by this operation**
 
 **Verify knowledge bases are accessible and functional**
-- Re-upload files if file-based retrieval is critical (file metadata remains but vectors are not migrated)
+- Re-upload files that live outside any knowledge base if file-based retrieval for them is critical (file metadata remains but their vectors are not migrated)
 - User chat memories will need to be regenerated through new conversations
 
 **Cleaning up legacy collections:**
@@ -2775,7 +2866,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 
 **Current UI limitations:**
 - No one-click "migrate and cleanup" button exists
-- Vector DB reset from UI (Admin Settings > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
+- Vector DB reset from UI (Settings > Admin > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
 - Legacy collections require manual cleanup via Milvus client tools
 
 :::
@@ -2785,7 +2876,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 **Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
-- Data loss risk: File vectors and user memory vectors are NOT migrated automatically. Only knowledge base content can be reindexed (migrated).
+- Data loss risk: user memory vectors, and the vectors of files that are not in a knowledge base, are NOT migrated automatically. Reindexing migrates knowledge bases along with the per-file vectors of the files they contain.
 - Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
 - No automatic rollback: Disabling multitenancy after data is written will not restore access to the shared collections. Data would need manual extraction and re-import.
 
@@ -2793,13 +2884,13 @@ For fresh installations, no migration concerns exist
 
 **For existing installations with valuable data:**
 - Do not migrate to multitenancy mode if you do not want to handle migration and risk data loss
-- Understand that files and memories require re-upload/regeneration
+- Understand that memories, and files outside knowledge bases, require re-upload/regeneration
 - Test migration on a backup/staging environment first
 - Consider if RAM savings justify the migration effort for your use case
 
 **To perform a full reset and switch to multitenancy:**
 - Backup any critical knowledge base content externally
-- Navigate to `Admin Settings > Documents`
+- Navigate to `Settings > Admin > Documents`
 - Click `Reset Vector Storage/Knowledge` (this deletes all active mode collections and stored knowledge metadata)
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
@@ -3062,6 +3153,65 @@ For IVFFlat indexes, choosing the right number of lists is crucial for query per
 - Description: Specifies the time in seconds after which connections are recycled in the PGVector pool to prevent stale connections.
 
 
+### openGauss
+
+Use [openGauss](https://opengauss.org/) as the vector store by setting `VECTOR_DB=opengauss`. Open WebUI connects to it with the PostgreSQL driver and creates its own table with a vector column on first use, so the server has to support vector columns and `ivfflat` indexes.
+
+:::warning
+
+openGauss is a non-core integration, not maintained by the core Open WebUI team. Fixes come from outside the core Open WebUI maintenance path.
+If you want to use openGauss, be careful when upgrading Open WebUI (create backups and snapshots for rollbacks) in case internal changes in Open WebUI lead to breakage.
+
+:::
+
+:::note
+
+PostgreSQL Dependencies
+openGauss uses the same driver as `pgvector`, so the PostgreSQL dependencies have to be installed:
+
+```bash
+pip install open-webui[postgres]
+```
+
+:::
+
+#### `OPENGAUSS_DB_URL`
+
+- Type: `str`
+- Default: The value of the `DATABASE_URL` environment variable
+- Description: Sets the connection URL of the openGauss database that stores the embeddings, in the form `opengauss://user:password@host:port/dbname`. The scheme is what selects openGauss handling; a `postgresql://` URL is treated as a plain PostgreSQL server instead. The default is whatever `DATABASE_URL` is set to, so leave this unset only if `DATABASE_URL` is itself an `opengauss://` URL.
+
+#### `OPENGAUSS_INITIALIZE_MAX_VECTOR_LENGTH`
+
+- Type: `int`
+- Default: `1536`
+- Description: Sets the dimension of the vector column created on first use. Match it to your embedding model: embeddings longer than this are truncated and shorter ones are padded with zeros, both of which cost retrieval quality. The column keeps whatever dimension it was created with, so changing this afterwards does not resize an existing table.
+
+#### `OPENGAUSS_POOL_SIZE`
+
+- Type: `int`
+- Default: `None` (no connection pooling)
+- Description: Sets the number of connections to maintain in the openGauss connection pool. Pooling is only used when this is a positive number; the other `OPENGAUSS_POOL_*` variables are ignored otherwise.
+
+#### `OPENGAUSS_POOL_MAX_OVERFLOW`
+
+- Type: `int`
+- Default: `0`
+- Description: Specifies the maximum number of connections that can be created beyond `OPENGAUSS_POOL_SIZE` when the pool is exhausted.
+
+#### `OPENGAUSS_POOL_TIMEOUT`
+
+- Type: `int`
+- Default: `30`
+- Description: Sets the timeout in seconds for acquiring a connection from the openGauss pool.
+
+#### `OPENGAUSS_POOL_RECYCLE`
+
+- Type: `int`
+- Default: `3600`
+- Description: Specifies the time in seconds after which connections are recycled in the openGauss pool to prevent stale connections.
+
+
 ### Qdrant
 
 :::warning
@@ -3109,7 +3259,7 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 
 - Type: `int`
 - Default: `5`
-- Description: Sets the timeout in seconds for all requests made to the Qdrant server, helping to prevent long-running queries from stalling the application.
+- Description: Sets the timeout in seconds for all requests made to the Qdrant server, so a slow or unresponsive Qdrant cannot hold a request open indefinitely.
 
 #### `QDRANT_HNSW_M`
 
@@ -3133,7 +3283,7 @@ Currently, there is no button in the UI to only reset the vector DB. If you want
 - Remove all collections with the `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) using the native Qdrant client
 - Go to `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledge base
 
-`Reindex Knowledge Base` will ONLY migrate the knowledge base
+`Reindex Knowledge Base` migrates knowledge bases and the per-file vectors of the files inside them. Files that were never added to a knowledge base, user memories and cached web search results stay in the old collections.
 
 :::
 
@@ -3262,6 +3412,8 @@ Open WebUI uses `connect_to_custom` for Weaviate connections, which supports bot
 
 ### Oracle 23ai Vector Search (oracle23ai)
 
+The chunk details stored with each vector are read back on every knowledge base search, which [`ENABLE_ORJSON`](#enable_orjson) makes faster.
+
 #### `ORACLE_DB_USE_WALLET`
 
 -   **Type**: `bool`
@@ -3348,7 +3500,7 @@ Note: this configuration assumes that AWS credentials will be available to your 
 
 ### Valkey
 
-Use [Valkey](https://valkey.io/) with the [valkey-search](https://github.com/valkey-io/valkey-search) module as the vector store by setting `VECTOR_DB=valkey`. Indexing, KNN search and metadata filtering all run server-side in Valkey.
+Use [Valkey](https://valkey.io/) with the [valkey-search](https://github.com/valkey-io/valkey-search) module as the vector store by setting `VECTOR_DB=valkey`. Indexing, KNN search and metadata filtering all run server-side in Valkey. The chunk details stored with each vector are written on upload and read back on every knowledge base search, which [`ENABLE_ORJSON`](#enable_orjson) makes faster.
 
 :::warning Community-supported
 The Valkey backend is community-contributed and maintained on a best-effort basis.
@@ -3443,7 +3595,7 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Tools → Documents**.
+- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Documents**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
@@ -3472,6 +3624,16 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 - Type: `str`
 - Default: `http://localhost:9998`
 - Description: Sets the URL for the Apache Tika server.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `TIKA_SERVER_VERSION`
+
+- Type: `str`
+- Options:
+  - `3` - Tika 3.x
+  - `4` - Tika 4.x
+- Default: `3`
+- Description: Tells Open WebUI which Apache Tika API to speak, since the two major versions differ in the endpoints they expose. Set this to match the server you are running, or extraction fails against an otherwise healthy Tika. It can also be changed from the Documents tab in the admin settings.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DOCLING_SERVER_URL`
@@ -3588,6 +3750,15 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. MinerU was previously hardcoded to PDF only, so only add extensions your MinerU deployment actually supports.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `RAG_METADATA_MAX_VALUE_CHARS`
+
+- Type: `int`
+- Default: unset, in which case the limit follows `RAG_FILE_MAX_SIZE`, or no limit at all if that is unset too
+- Description: Drops a metadata field from what is stored alongside a document chunk when the field is a list or an object whose text runs longer than this many characters. Extraction can attach large structures to a document, and those travel into the vector store with every chunk, where they cost memory and space without helping retrieval.
+
+  Left entirely unbounded this is also a way to exhaust a server: an Office document is an archive, and one crafted to expand during extraction can turn a few hundred kilobytes into gigabytes of metadata held in memory, so a handful of uploads is enough to take an instance down. When this is unset the bound therefore follows the upload size limit, on the reasoning that a document cannot legitimately carry more metadata than the file itself is permitted to weigh. Set this explicitly to override that, and note that a deployment with no upload limit configured has no metadata limit either.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `MINERU_MAX_MARKDOWN_BYTES`
 
 - Type: `int`
@@ -3599,7 +3770,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `dict` (JSON object)
 - Default: `{}` (engine defaults)
-- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Tools → Documents** when MinerU is the content-extraction engine.
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Documents** when MinerU is the content-extraction engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `PADDLEOCR_VL_BASE_URL`
@@ -3780,6 +3951,13 @@ Provide a clear and direct response to the user's query, including inline citati
 
 ### Document Processing
 
+#### `ENABLE_KNOWLEDGE_FILE_RETENTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls what happens to a file when it is removed from a knowledge base, or when the knowledge base itself is deleted. By default the file record, the stored copy of the file and its embeddings are all deleted with it. Enable this to keep them, so that removal takes the file out of the knowledge base without destroying anything, which suits deployments that retain uploads for audit or reuse. Storage then grows with every removal, since nothing is reclaimed.
+- Persistence: No
+
 #### `CHUNK_SIZE`
 
 - Type: `int`
@@ -3863,10 +4041,17 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_RAG_CSV_SUMMARY`
+
+- Type: `bool`
+- Default: `False`
+- Description: Puts one line in front of every parsed `.csv` file naming its row count, its data row count and its column names, so a question about the size of the table is not answered from whichever rows happened to be retrieved. No summary is added when `CONTENT_EXTRACTION_ENGINE` is `external`, `tika` or `docling`, which parse `.csv` files themselves. Only files parsed after you turn it on get one, and re-indexing does not add it, so a CSV has to be re-uploaded. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
+- Persistence: Set via environment variable; changing it requires a restart (not a `ConfigVar`, so it does not appear in the admin settings).
+
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
-- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion.
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. Office and EPUB documents are checked a second time against their contents, since those formats are archives: a file whose contents unpack to far more than the file itself is refused rather than extracted, which stops a small upload from consuming the whole machine's memory. This value doubles as the default ceiling on extracted metadata, so leaving it unset removes that protection as well; see [`RAG_METADATA_MAX_VALUE_CHARS`](#rag_metadata_max_value_chars).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_MAX_COUNT`
@@ -4073,7 +4258,7 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
-- Description: Sets a model for reranking results. Locally, a Sentence-Transformer model is used.
+- Description: Sets a model for reranking results. Locally, the model is loaded as a Sentence-Transformer CrossEncoder, with one exception: `jinaai/jina-colbert-v2` is loaded as a ColBERT model, and that takes precedence over `RAG_RERANKING_ENGINE`, so it runs locally even when the engine is set to `external`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_RERANKING_BATCH_SIZE`
@@ -4374,7 +4559,7 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 
 - Type: `string` (comma-separated list)
 - Default: `""` (empty, but default blocklist is always applied)
-- Description: Configures additional URL filtering rules for web fetch operations to prevent Server-Side Request Forgery (SSRF) attacks. The system includes a default blocklist that protects against access to cloud metadata endpoints (AWS, Google Cloud, Azure, Alibaba Cloud). Entries without a ! prefix are treated as an allow list (only these domains are permitted), while entries with a ! prefix are added to the block list (these domains are always denied). The default blocklist includes !169.254.169.254, !fd00:ec2::254, !metadata.google.internal, !metadata.azure.com, and !100.100.100.200. Custom entries are merged with the default blocklist.
+- Description: Configures additional URL filtering rules for web fetch operations to prevent Server-Side Request Forgery (SSRF) attacks. The system includes a default blocklist that protects against access to cloud metadata endpoints (AWS, Google Cloud, Azure, Alibaba Cloud). Entries without a ! prefix are treated as an allow list (only these domains are permitted), while entries with a ! prefix are added to the block list (these domains are always denied). The default blocklist covers the cloud metadata addresses (`!169.254.169.254`, `!fd00:ec2::254`, `!metadata.google.internal`, `!metadata.azure.com`, `!100.100.100.200`) and, alongside them, a set of addresses that are never a legitimate destination for a fetch: the Azure platform channel reachable from every virtual machine, multicast ranges, the deprecated 6to4 relay and IPv6 site-local ranges, the anycast addresses answered by the local network's own edge device, and several prefixes reserved by specification but never routed. Custom entries are merged with it.
 
 :::info
 Example:
@@ -4457,6 +4642,9 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `yacy`
   - `yandex`: Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
   - `youcom`: Uses the [You.com](https://you.com/) YDC Index API for web search.
+  - `openserp`: Uses a self-hosted [OpenSERP](https://github.com/karust/openserp) instance. Requires `OPENSERP_BASE_URL`; no API key.
+  - `firecrawl`: Uses [Firecrawl](https://firecrawl.dev/) for search. Requires `FIRECRAWL_API_KEY`; `FIRECRAWL_API_BASE_URL` points at a self-hosted instance.
+  - `external`: Uses your own search endpoint. Requires `EXTERNAL_WEB_SEARCH_URL`; `EXTERNAL_WEB_SEARCH_API_KEY` authenticates the call.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DDGS_BACKEND`
@@ -4465,7 +4653,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Default: `auto`
 - Options: `auto` (Random), `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `wikipedia`, `yahoo`, `yandex`.
 - Description: Specifies the backend to be used by the DDGS engine.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > DDGS Backend** when DDGS is selected as the search engine.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > DDGS Backend** when DDGS is selected as the search engine.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
@@ -4486,7 +4674,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Type: `str`
 - Default: `http://localhost:7000`
 - Description: Base URL of a self-hosted [OpenSERP](https://github.com/karust/openserp) instance, used when the web search engine is set to `openserp`. Open WebUI calls its `/mega/search` endpoint, which returns results from Google, Bing, Yandex, Baidu, DuckDuckGo and Ecosia together. No API key is involved, the base URL is the only required setting. See the [OpenSERP provider guide](/features/chat-conversations/web-search/providers/openserp).
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > OpenSERP URL** when `openserp` is selected as the search engine.
 
 #### `SEARXNG_QUERY_URL`
 
@@ -4548,7 +4736,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `int`
 - Default: `8192`
-- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Admin → Tools → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
+- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Admin → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.brave_search_context_tokens`.
 
 #### `KAGI_SEARCH_API_KEY`
@@ -4617,7 +4805,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str` (JSON object)
 - Default: `''` (parsed to `{}`; effective defaults are `{"url": "https://api.linkup.so/v1/search", "depth": "standard", "outputType": "sourcedAnswer"}`)
-- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Admin → Tools → Web Search** when the `linkup` engine is selected.
+- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Admin → Web Search** when the `linkup` engine is selected.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.linkup_search_params`.
 
 #### `JINA_API_KEY`
@@ -4631,7 +4819,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Type: `str`
 - Default: `https://s.jina.ai/`
 - Description: Sets the Base URL for Jina Search API. Useful for specifying custom or regional endpoints (e.g., `https://eu-s-beta.jina.ai/`).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Jina API Base URL**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Jina API Base URL**.
 
 #### `BING_SEARCH_V7_ENDPOINT`
 
@@ -4951,7 +5139,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `int`
 - Default: `None`
 - Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Tools > Web Search > Firecrawl Timeout**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Firecrawl Timeout**.
 
 #### `PLAYWRIGHT_TIMEOUT`
 
@@ -4985,8 +5173,9 @@ This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or l
 #### `YOUTUBE_LOADER_PROXY_URL`
 
 - Type: `str`
-- Description: Sets the proxy URL for YouTube loader.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Default: unset (requests come from the server's own address)
+- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Youtube Proxy URL**.
 
 #### `YOUTUBE_LOADER_LANGUAGE`
 
@@ -5181,7 +5370,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`
-- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). Configurable via **Admin Settings → Audio → STT**.
+- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). Configurable via **Settings → Admin → Audio → STT**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Text-to-Speech
@@ -5254,7 +5443,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Admin Settings → Interface → Voice Mode Custom Prompt** (toggle).
+- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Settings → Admin → Interface → Voice Mode Custom Prompt** (toggle).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.voice.prompt.enable`.
 
 #### `VOICE_MODE_PROMPT_TEMPLATE`
@@ -5770,7 +5959,7 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Admin > System > Authentication**, alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
+- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Admin > Authentication**, alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_SIGNUP`
@@ -5804,6 +5993,14 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 By default (`False`), OAuth settings are read from your environment variables on every restart and are **not** loaded from the database, even if you previously changed them in the Admin Panel and even when `ENABLE_PERSISTENT_CONFIG` is `True`. This keeps environment variables authoritative for OAuth, which suits GitOps or immutable infrastructure where configuration lives in external files (e.g. Docker Compose, Kubernetes ConfigMaps).
 
 Set this variable to `True` to persist OAuth settings in the database and manage them through the Admin Panel after initial setup, the same way other persistent settings behave.
+
+:::
+
+:::info Read-only Admin Panel while this is `False`
+
+The environment is authoritative, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only: values stay visible, no control accepts input, and saving the page leaves them untouched. Change them in the environment and restart, or set this to `True` to manage them in the Admin Panel.
+
+[`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is the one in charge. While it is `False` nothing is saved whatever this variable says, so both have to be `True` for an edit to last.
 
 :::
 
@@ -6026,7 +6223,7 @@ In any production environment running more than one instance of Open WebUI (e.g.
 #### `WEBUI_AUTH_TRUSTED_ROLE_HEADER`
 
 - Type: `str`
-- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. See [SSO docs](/features/authentication-access/auth/sso).
+- Description: Defines the trusted request header that determines the user's role (`admin`, `user`, or `pending`) when using trusted header authentication. When set, the user's role is updated to match the header value on every sign-in. Invalid values are ignored with a warning. A role change from this header ends that account's live WebSocket connections, which reconnect and re-authenticate on their own, so the previous role cannot linger in an open tab. See [SSO docs](/features/authentication-access/auth/sso) and [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
 
 ### Google
 
@@ -6539,21 +6736,21 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**.
+- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_LDAP_GROUP_CREATION`
 
 - Type: `bool`
 - Default: `False`
-- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**.
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_GROUPS`
 
 - Type: `str`
 - Default: `memberOf`
-- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > System > Authentication**, where group management cannot be saved while this is left empty.
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > Authentication**, where group management cannot be saved while this is left empty.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ## SCIM
@@ -6618,13 +6815,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to attach web pages (URLs) in chats via the "Attach Webpage" option. When set to `False`, the "Attach Webpage" button is hidden for non-admin users. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Chat Permissions → Allow Web Upload**.
+- Description: Enables or disables user permission to attach web pages in chats. When `False`, the **Attach Webpage** option stays in the attach menu for non-admins but is greyed out with a tooltip, and an attach sent anyway is refused. Configurable per-group as **Allow Web Upload**.
 
 #### `USER_PERMISSIONS_CHAT_DELETE`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to delete chats.
+- Description: Enables or disables user permission to delete chats. When `False`, the delete controls are hidden from non-admins rather than offered and refused, in the sidebar, the chat menu, search, archived chats and data controls, and the **Delete chat** shortcut stops doing anything. Archiving is unaffected. Deleting a folder that still holds chats needs the same permission and is refused rather than hidden. Configurable per-group as **Allow Chat Delete**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_EDIT`
@@ -6638,14 +6835,14 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file. Shown as **Export Chat** in the group permission list.
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to import chats (uploading a previously exported chat back into Open WebUI). When disabled, non-admins cannot import chats.
+- Description: Enables or disables user permission to import chats, and to fork one, which copies an existing conversation into a new one. When `False`, non-admins cannot import, and the **Fork chat** action and the `/fork` command are hidden rather than shown and refused. Configurable per-group as **Allow Chat Import**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_DELETE_MESSAGE`
@@ -6748,7 +6945,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `str`
 - Default: `True`
-- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory).
+- Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). When `False`, the affected users lose the **Personalization** settings tab, the memory endpoints answer them with `403`, the model is not given the memory tools and their stored memories no longer reach the system context. Admins are exempt.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`
@@ -6924,9 +7121,9 @@ These settings control whether users can share workspace items with other users 
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
 
-- Type: `str`
-- Default: `True`
-- Description: Enables or disables **private sharing** of notes.
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables **private sharing** of notes. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
@@ -6938,7 +7135,13 @@ These settings control whether users can share workspace items with other users 
 
 ### Sharing (Public)
 
-These settings control whether users can share workspace items **publicly**.
+These settings control whether users can share workspace items **publicly**. All default to `False`, and each has a parent permission that must be on before its toggle appears: the matching private-sharing setting above for workspace items and notes, `USER_PERMISSIONS_CHAT_SHARE` for chats and `USER_PERMISSIONS_FEATURES_CALENDAR` for calendars.
+
+:::warning Re-check tools and notes after an upgrade
+
+On instances upgraded from a release predating these two variables, the admin panel showed **Tools Public Sharing** and **Notes Public Sharing** as on while the action was still refused, and saving any permission on that page wrote both as enabled for real. A value already saved is not rolled back, so open **Admin Panel > Users > Groups**, edit **Default permissions** and confirm both read the way you intend.
+
+:::
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
@@ -6963,9 +7166,9 @@ These settings control whether users can share workspace items **publicly**.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from tool create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Tools Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -6977,30 +7180,30 @@ These settings control whether users can share workspace items **publicly**.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
-- Default: `True`
-- Description: Enables or disables **public sharing** of notes.
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from note create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Notes Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of chat conversations. "Public" here means every signed-in user of the instance, not the open internet: opening a shared link still requires logging in. For links that work without an account, see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, the access-control selector in the chat share modal hides the "Public" option for non-admin users. They can still create share links scoped to specific users or groups, but cannot make a chat reachable by everyone. Admins always retain the ability to share chats publicly. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Public Sharing**.
+- Description: Enables or disables **public sharing** of chats. Public means every signed-in user of the instance rather than the open internet; for links that work without an account see [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing). When disabled, non-admins lose the **Public** option in the share modal but can still share with named users and groups. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Allows non-admin users to mark a chat share link **Open**, meaning it can be read by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and no resource type other than chats accepts this kind of grant. When disabled, the "Open" option is hidden for non-admin users and any open grant sent directly to the API is stripped before saving. Admins are always exempt. Requires `USER_PERMISSIONS_CHAT_SHARE` (Share Chat) to be enabled for the user. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
+- Description: Allows non-admin users to mark a chat share link **Open**, readable by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and only chats accept this kind of grant. When disabled, the **Open** option is hidden and an open grant sent to the API is stripped before saving. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel → Users → Groups → Permissions → Calendars Public Sharing**.
+- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Calendars Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Access Grants
@@ -7009,13 +7212,13 @@ These settings control whether users can share workspace items **publicly**.
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Users**.
+- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
 
 #### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`
 
 - Type: `bool`
 - Default: `True`
-- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel → Users → Groups → Permissions → Access Grants → Allow Sharing With Groups**.
+- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
 
 ### Import / Export
 
@@ -7383,7 +7586,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption.
+- Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption. It decides **which** instance migrates and nothing else: it does not make a mixed-version fleet safe, so a release that changes the schema still has to reach every pod at once rather than one at a time. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations).
 
 :::warning
 
@@ -7410,7 +7613,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, authenticate to an **AWS RDS** database using a short-lived **IAM auth token** (generated via boto3 `generate_db_auth_token`) instead of a static password. The token is refreshed automatically before it expires. **PostgreSQL only**, and the database host and user must be set. Requires `boto3` and AWS credentials/region available to the process (standard AWS SDK resolution).
+- Description: When enabled, authenticate to an **AWS RDS** database using a short-lived **IAM auth token** (generated via boto3 `generate_db_auth_token`) instead of a static password. The token is refreshed automatically before it expires. **PostgreSQL only**, and the database host and user must be set. Requires `boto3` and AWS credentials/region available to the process (standard AWS SDK resolution). This applies to the vector store as well when `VECTOR_DB=pgvector`, so a deployment using both connects to each without a static password.
 - Persistence: No
 
 #### `DATABASE_PASSWORD`
@@ -7450,15 +7653,16 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 #### `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
 
 - Type: `float`
-- Default: `None`
-- Description: Minimum interval, in seconds, between writes of a user's `last_active_at` timestamp to the database (this timestamp drives online/"active" presence, evaluated over a ~3-minute window). The write is throttled **per user**: within the interval, repeat activity does not hit the database.
+- Default: `60`
+- Description: Minimum interval, in seconds, between writes of a user's `last_active_at` timestamp to the database (this timestamp drives online/"active" presence, evaluated over a ~3-minute window). The write is throttled **per user**: within the interval, repeat activity does not hit the database. Set it to `0` to disable throttling and write on every request.
 
-:::warning Set this on every deployment, mandatory at scale
-**With the default (`None`, or an invalid value which becomes `0.0`), throttling is disabled and the write is unthrottled: essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance this is a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs ~minute granularity.
+:::warning Raise this at scale, and never set it to zero there
+Throttling is on by default at 60 seconds, which already collapses thousands of writes into at most one per user per interval. **Setting it to `0` disables throttling, so essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance that is a continuous flood of tiny write transactions which amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs about minute granularity.
 
-Setting a positive interval collapses thousands of these writes into at most one per user per interval. This is **free performance for any setup** and is **required** for large/production deployments; leaving it unset is a common, avoidable database bottleneck.
+**Keep it below 180 seconds.** Active presence counts users whose timestamp falls in the last 180 seconds, and that window is fixed in the code. An interval at or above it means a user's timestamp can age past the window before the next write is allowed, so they drop out of the count and reappear on the next write, which shows up as a sawtooth in the active-user metric rather than a steady figure.
 
-- **Recommended:** `60` to `120` seconds. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count before the next write is allowed. They then drop out and reappear, which shows up as a sawtooth in the active-user figure and the metric that reports it rather than a steady number.
+- **Recommended:** `120`. That halves the presence writes again while leaving a full minute of headroom inside the 180 second window, so a user who is still active is always counted. The default of `60` is also fine and needs no change.
+- Above `180` the count stops being reliable. Only go there if you do not use the active-user figure or the metric that reports it.
 - Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
 - Read once at startup; not a `ConfigVar` and not changeable from the Admin UI.
 :::
@@ -7785,6 +7989,13 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 - Default: `open-webui`
 - Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
 
+#### `REDIS_RESPONSE_STREAM_TTL`
+
+- Type: `int` (seconds)
+- Default: `3600`
+- Description: A safety net on the entries Redis holds while a response is streaming, which let a reconnecting browser pick a reply back up where it left off. An entry is deleted as soon as its response finishes, so this timeout is not the normal lifetime of one. It catches the entries whose cleanup never ran, a worker killed mid-stream or a process that died, which previously stayed in Redis forever and accumulated. Lower it to reclaim that memory sooner, raise it if a long-running response could legitimately outlive the default hour, or set `0` to keep orphaned entries indefinitely as before. Applies only when Redis is in use.
+- Persistence: No
+
 #### `REDIS_SOCKET_CONNECT_TIMEOUT`
 
 - Type: `float` (seconds) or empty string for None
@@ -8025,11 +8236,17 @@ When this variable is left empty (default), `REDIS_SOCKET_CONNECT_TIMEOUT` is au
 - Default: `25`
 - Description: The interval in seconds at which the Socket.IO/Engine.IO server sends heartbeat pings to connected websocket clients.
 
+#### `WEBSOCKET_HEARTBEAT_INTERVAL`
+
+- Type: `int` (seconds)
+- Default: unset, meaning the browser sends a heartbeat every 30 seconds and presence entries are held for 120 seconds
+- Description: How often each connected browser tells the server it is still there. The value is served to the browser, so setting it changes the client's behaviour without a rebuild, and it also lengthens how long the server keeps a presence entry before assuming the client is gone, to four times this interval or 120 seconds, whichever is larger. Raise it to cut the number of small websocket messages a large deployment handles, at the cost of a disconnected user showing as active for longer. Values are held between `5` and `90`, and anything that is not a whole number falls back to `30`.
+
 #### `WEBSOCKET_EVENT_CALLER_TIMEOUT`
 
 - Type: `int`
 - Default: unset, meaning no timeout
-- Description: Sets the timeout in seconds for the `sio.call()` used in `event_call` events. This controls how long the server waits for a user to respond to interactive prompts, forms, or dropdowns generated by tools and actions using `event_call` (e.g., `execute()` type events). Left unset the server waits indefinitely, so a prompt nobody answers holds that call open. A timeout raises into the calling plugin, so wrap the call in try/except when you set this.
+- Description: How long the server waits for someone to answer an interactive prompt, form or dropdown raised by a tool or action. Left unset it waits indefinitely, so a prompt nobody answers holds that call open. On timeout the call returns an `error` key to the calling plugin rather than raising, so check the returned value instead of wrapping it in try/except. A value that is not a whole number falls back to `300`. The browser session is untouched, so a tab that is simply unattended stays connected and can be prompted again. See [Interactive Events](/features/extensibility/plugin/development/events#interactive-events).
 
 #### `ENABLE_STAR_SESSIONS_MIDDLEWARE`
 
@@ -8064,11 +8281,13 @@ For most deployments, the default browser cookie-based session management is suf
 - Default: `1`
 - Description: Controls the number of worker processes that Uvicorn spawns to handle requests. Each worker runs its own instance of the application in a separate process.
 
-:::info
+:::warning Raising this is the worst way to scale Open WebUI
 
-When deploying in orchestrated environments like Kubernetes or using Helm charts, it's recommended to keep UVICORN_WORKERS set to 1. Container orchestration platforms already provide their own scaling mechanisms through pod replication, and using multiple workers inside containers can lead to resource allocation issues and complicate horizontal scaling strategies.
+Leave it at `1` and add containers instead: more replicas in Docker Compose, or more pods through Kubernetes and the Helm chart, behind a load balancer.
 
-If you use UVICORN_WORKERS, you also need to ensure that related environment variables for scalable multi-worker setups are set accordingly.
+Extra workers demand everything extra replicas demand, a client-server vector database, Redis, PostgreSQL and a single instance running migrations, and give you none of what replicas give you in return. They all sit in one container, so they share its memory limit and its fate: the container is a single point of failure, cannot be restarted one worker at a time, and cannot be spread across machines.
+
+If you do raise it, set the related variables for multi-worker deployments as well; the rest of this entry covers what breaks without them.
 
 :::
 
@@ -8088,12 +8307,21 @@ To handle migrations safely in multi-process/multi-pod environments, you can:
 1.  **Designate a Master (Recommended):** Set `ENABLE_DB_MIGRATIONS=False` on all but one instance/worker. The instance with `ENABLE_DB_MIGRATIONS=True` (default) will handle the migration, while others will wait or skip it.
 2.  **Scale Down:** Temporarily scale down to a single instance/worker to let migrations finish before scaling back up.
 
+Both options only settle **which** process runs the migration. Neither makes it safe to leave instances on the old version while the new one migrates, so roll a release that changes the schema out to every instance at once. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations).
+
 **For Kubernetes, Helm, and Orchestrated Setups:**
 It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a specific pod for migrations, or use an init container/job to handle migrations before scaling up the main application pods. This ensures schema updates are applied exactly once.
 :::
 
 
 ### Cache Settings
+
+#### `UVICORN_WS_PER_MESSAGE_DEFLATE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Whether the websocket server negotiates per-message compression with the browser. Chat responses arrive as a stream of very small frames, one per token, and compressing each of them costs processor time on the server for every subscriber while saving almost nothing, since there is little to compress in a fragment that size. Setting this to `false` declines the compression extension, so frames go out uncompressed. The large frames that did benefit, a finished message or a set of sources, are only a few hundred kilobytes even for a very long reply, which any network carries without a noticeable delay. Worth turning off on instances under heavy streaming load, where it shows up as measurable processor use. The default preserves the previous behaviour.
+- Persistence: No
 
 #### `CACHE_CONTROL`
 

@@ -118,7 +118,7 @@ Open WebUI's `OpenAI` TTS engine is compatible with any service that implements 
 
 ### Why the 400 Error Happens
 
-OpenRouter's [`/audio/speech` endpoint](https://openrouter.ai/docs/guides/overview/multimodal/tts) defaults `response_format` to `pcm` when the field is omitted. Open WebUI does not send `response_format` in its request payload, so OpenRouter returns raw PCM audio, which Open WebUI cannot play back — resulting in a `400 Bad Request`.
+OpenRouter's [`/audio/speech` endpoint](https://openrouter.ai/docs/guides/overview/multimodal/tts) defaults `response_format` to `pcm` when the field is omitted. Open WebUI does not send `response_format` in its request payload, so OpenRouter returns raw PCM audio, which Open WebUI cannot play back, resulting in a `400 Bad Request`.
 
 The fix is to explicitly request MP3 by adding `{"response_format": "mp3"}` to the **OpenAI Params** field (extra parameters) in the TTS settings.
 
@@ -165,7 +165,7 @@ services:
 
 :::info
 
-OpenRouter supports `mp3` and `pcm` output formats. Always select `mp3` in Open WebUI — PCM output is intended for real-time streaming pipelines and cannot be played back by Open WebUI.
+OpenRouter supports `mp3` and `pcm` output formats. Always select `mp3` in Open WebUI, PCM output is intended for real-time streaming pipelines and cannot be played back by Open WebUI.
 :::
 
 ## Testing TTS
@@ -176,7 +176,7 @@ OpenRouter supports `mp3` and `pcm` output formats. Always select `mp3` in Open 
 
 ## Response Splitting
 
-When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Admin > Experience > Audio** under **Response Splitting**.
+When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Admin > Audio** under **Response Splitting**.
 
 | Option | Description |
 |--------|-------------|

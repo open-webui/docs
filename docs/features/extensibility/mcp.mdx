@@ -15,7 +15,7 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 ## 🚀 Quick start 
 
-1. Open **⚙️ Admin Settings → Integrations**.
+1. Open **⚙️ Settings > Admin > Integrations**.
 2. Click **+ (Add Server)**.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your **Server URL** and **Auth** details (OAuth 2.1, if required).
@@ -30,15 +30,15 @@ If you are adding an MCP server, make sure **Type** is set to **MCP (Streamable 
 
 Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI connection will cause the UI to crash or display an infinite loading screen. If you encounter this:
 
-1. Disable the problematic tool connection via Admin Settings
+1. Disable the problematic tool connection via **Settings > Admin > Integrations**
 2. Re-add it with the correct **Type** set to **MCP**
 :::
 
 ## 🔒 MCP servers are admin-only {#mcp-servers-are-admin-only}
 
-MCP servers can only be added by **administrators**, under **Admin Settings → Integrations**. Regular users cannot register their own, by design.
+MCP servers can only be added by **administrators**, under **Settings > Admin > Integrations**. Regular users cannot register their own, by design.
 
-This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings → Integrations**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
+This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings > Integrations**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
 
 The difference is capability. A user-supplied OpenAPI server is a stateless HTTP URL exposing a fixed set of declared endpoints. An MCP server is far more powerful: it is stateful and capability-rich (sampling, elicitation, persistent sessions and arbitrary host command execution over stdio transports), and it runs inside Open WebUI's trust boundary with the connecting user's full scope. In practice a malicious or compromised MCP server could execute code and read or exfiltrate data with that user's access, so the capability stays admin-gated. Open WebUI's own MCP support is Streamable HTTP only, but the protocol's privileged nature is why adding one is reserved for admins.
 
@@ -94,6 +94,12 @@ With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open W
 - **Custom scopes**: provide an explicit, space- or comma-separated list to override the discovered scopes, for example to request a narrower set than the server advertises, or when the server's metadata does not list usable scopes.
 :::
 
+:::info Check OAuth Discovery
+On an MCP connection using either OAuth mode, the verify button beside the URL reads **Check OAuth Discovery**, and a green result reports "OAuth discovery successful". It fetches the OAuth discovery document and parses it, and that is the whole of what it does. The MCP server itself is never contacted and no tools are listed, so a passing check tells you the authorization server was found and tells you nothing about whether tool calls will work.
+
+With **OAuth 2.1 (Static)**, the check runs against the **OAuth Server URL** when one is set, and against the MCP **URL** when it is left empty.
+:::
+
 :::tip Choosing Between OAuth 2.1 and OAuth 2.1 (Static)
 
 - Start with **OAuth 2.1** if your server supports DCR.
@@ -101,11 +107,21 @@ With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open W
 
 :::
 
+### Connecting an account
+
+An admin registers the MCP server once. Each user then connects their own account to it: the first time someone enables an OAuth 2.1 tool from the **Integrations** menu in a chat, Open WebUI sends them to the provider, and the access they grant is stored against their account alone. Nobody else inherits it.
+
+The authorization is bound to the account that started it and to the browser session it started in, so it has to be finished in that same browser, signed in as that same person, at the address in [`WEBUI_URL`](/reference/env-configuration#webui_url). Signing out cancels one still in progress. Anything else leaves the browser back on Open WebUI with a notification saying why; enable the tool again to retry.
+
+An admin can also start the flow from the connection itself. Once the OAuth client is registered and the connection has been saved, reopening it under **Settings > Admin > Integrations** shows an **Authorize OAuth** button beside **Register Client**. It sends the same authorization request that enabling the tool in a chat sends, on the same terms: the grant is stored against the admin's own account and nobody else inherits it. The button appears only once a client is registered, and stays greyed out until the connection has been saved at least once.
+
+The provider returns the browser to the Open WebUI home page when the flow finishes, so reopen **Settings > Admin > Integrations** to carry on editing the connection.
+
 ### OAuth 2.1 (Static) Setup
 
 Use this when you already have a client ID/client secret from your identity provider.
 
-1. Open **Admin Settings → Integrations**.
+1. Open **Settings > Admin > Integrations**.
 2. Click **+ (Add Server)**.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your MCP server **URL**.
@@ -118,9 +134,11 @@ Use this when you already have a client ID/client secret from your identity prov
 After saving:
 
 1. Open a chat.
-2. Click **+ → Integrations → Tools**.
+2. Click **+ > Integrations > Tools**.
 3. Enable your MCP tool.
 4. Complete the OAuth consent/authorization flow in the browser redirect.
+
+Reopening the connection and clicking **Authorize OAuth** does the same thing for your own account without opening a chat. See [Connecting an account](#connecting-an-account).
 
 :::info
 
@@ -166,7 +184,7 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 
 The group tokens are resolved with a membership lookup that only runs when a header value actually contains one of them, so connections that do not use them are unaffected. Use them to let a tool server authorize by group instead of by individual user.
 
-Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Admin Settings → Connections → OpenAI**, so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
+Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Settings > Admin > Connections** (the **OpenAI** section), so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 
 :::note
 `{{USER_EMAIL}}` and `{{USER_ROLE}}` were added in v0.9.6. The same release also fixed MCP server connections, where custom-header templates were previously stored but **not** interpolated at request time. They now expand the same way they always have for direct connections and OpenAPI tool servers.
@@ -183,7 +201,7 @@ This field restricts which tools are exposed to the LLM.
 ### "Failed to connect to MCP server"
 
 **Symptom**: 
-The chat shows "Failed to connect to MCP server" when using a tool, even if the **Verify Connection** button in settings says "Connected".
+The chat shows "Failed to connect to MCP server" when using a tool, even if the verify button in settings reported success. On a connection using either OAuth 2.1 mode that button reads **Check OAuth Discovery**, and it confirms only that the authorization server's discovery document was found and could be parsed.
 
 **Solutions**:
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
@@ -200,7 +218,7 @@ After adding an External Tool connection, the frontend gets stuck on a loading s
 You likely configured an **MCP server** using the **OpenAPI** connection type, or entered MCP-style JSON (containing `mcpServers`) into an OpenAPI connection.
 
 **Solution**:
-1.  Open **Admin Settings → Integrations** (the sidebar still loads)
+1.  Open **Settings > Admin > Integrations** (the sidebar still loads)
 2.  **Disable** or **delete** the problematic tool connection
 3.  Refresh the page (Ctrl+F5)
 4.  Re-add the connection with the correct **Type** set to **MCP (Streamable HTTP)**
@@ -225,4 +243,4 @@ Yes. Many deployments do both.
 
 **Can users add their own MCP servers?**
 
-No. Adding MCP servers is admin-only (**Admin Settings → Integrations**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.
+No. Adding MCP servers is admin-only (**Settings > Admin > Integrations**). Users with the **Direct Tool Servers** permission can add their own **OpenAPI** tool servers, but not MCP. See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.

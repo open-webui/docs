@@ -42,9 +42,9 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 
 This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results. It only applies to Legacy function calling; in the default Native mode the model writes the prompt itself when it calls the tool.
 
-The **Image Prompt Generation** toggle is located in the **Create Image** section of **Settings > Admin > Experience > Images**.
+The **Image Prompt Generation** toggle is located in the **Create Image** section of **Settings > Admin > Images**.
 
-To customize the prompt template used for generation, go to **Settings > Admin > Experience > Interface**, in the **Generation** section.
+To customize the prompt template used for generation, go to **Settings > Admin > Interface**, in the **Generation** section.
 
 ![Screenshot showing the Image Prompt Generation toggle location in Images settings](/images/image-generation-and-editing/image-prompt-generation-toggle.png)
 

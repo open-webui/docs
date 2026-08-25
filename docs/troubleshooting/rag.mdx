@@ -11,7 +11,7 @@ This page covers the most common RAG problems and their solutions.
 
 ## Recommended Settings by Scenario
 
-RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Settings > Admin > Tools > Documents**.
+RAG performance depends heavily on your model setup. The defaults are conservative to work everywhere, but you will get much better results by tuning them to your specific deployment. All of these are configured in **Settings > Admin > Documents**.
 
 :::tip Agentic retrieval: enable kb_exec
 If your models use **native function calling**, set [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) for a noticeably better knowledge-base experience. It gives the model a filesystem-style interface (`ls`, `tree`, `grep`, `cat`, read-by-line) over your knowledge that capable models chain more reliably than the individual search tools. It has no effect in Legacy Mode. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
@@ -76,7 +76,7 @@ The embedding model determines retrieval quality. The right choice depends on yo
 | **Production, API budget available** | `text-embedding-3-small` via OpenAI | Best retrieval quality per dollar |
 | **Air-gapped / self-hosted** | `nomic-embed-text` or `mxbai-embed-large` via Ollama | No external API calls needed |
 
-After changing your embedding model, **reindex all existing documents** in **Settings > Admin > Tools > Documents** for the new embeddings to take effect.
+After changing your embedding model, **reindex all existing documents** in **Settings > Admin > Documents** for the new embeddings to take effect.
 
 ---
 
@@ -88,7 +88,7 @@ This is the most common problem, and it's typically caused by issues during cont
 
 **Solution:** Check your content extraction settings.
 
-- Navigate to: **Admin Settings > Documents**.
+- Navigate to: **Settings > Admin > Documents**.
 - Make sure you're using a robust content extraction engine such as:
   - Apache Tika
   - Docling
@@ -108,7 +108,7 @@ Open WebUI is designed to work with models that have limited context windows by 
 
 **Solutions:**
 
-- Go to **Admin Settings > Documents**
+- Go to **Settings > Admin > Documents**
 - Either:
   - **Enable "Bypass Embedding and Retrieval"**: sends full content directly without applying retrieval filters.
   - **Toggle on "Full Context Mode"**: injects more comprehensive content into the model prompt.
@@ -140,7 +140,7 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 **Solutions:**
 
 - **For Ollama Models**: Extend the model's context length:
-  - Navigate to: **Settings > Admin > AI > Models**, then click the pencil (**Edit**) on the model you want to change
+  - Navigate to: **Settings > Admin > Models**, then click the pencil (**Edit**) on the model you want to change
   - Go to **Advanced Params**
   - Modify the context length (e.g., increase to 8192+ or ideally beyond 16000 tokens if supported by your model)
 
@@ -165,7 +165,7 @@ Bad embeddings = bad retrieval. If the vector representation of your content is 
 **Solution:**
 
 - Change to a high-quality embedding model (e.g., all-MiniLM-L6-v2, Instructor X, or OpenAI embeddings)
-- Go to: **Admin Settings > Documents**
+- Go to: **Settings > Admin > Documents**
 - After changing the model, be sure to:
 After changing the model, **reindex all existing documents** so the new embeddings take effect. Embedding quality directly affects what content is retrieved.
 
@@ -182,7 +182,7 @@ This error indicates a misconfigured or missing embedding model. When Open WebUI
 
 **Solution:**
 
-- Go to: **Admin Settings > Documents > Embedding Model**
+- Go to: **Settings > Admin > Documents > Embedding Model**
 - Save the embedding model again, even if it's already selected. This forces a recheck/download.
 - If you're using a remote/external embedding tool, make sure it's running and accessible to Open WebUI.
 
@@ -199,9 +199,10 @@ After fixing the configuration, try re-embedding a document and verify no error 
 Open WebUI implements various limits to ensure system stability and prevent abuse. It is important to understand how these limits apply to different upload methods:
 
 *   **Chat Uploads:** Subject to global file size and count limits.
-    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Tools > Documents > General > Max Upload Size**.
-    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Tools > Documents > General > Max Upload Count**.
-    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Tools > Documents > General > Allowed File Extensions**.
+    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Size**.
+    *   **Office and EPUB documents** are additionally checked against what they contain, because those formats are archives. One that unpacks to far more than its own size is refused with a message about the archive being too large after decompression, even though the file itself is small. A genuine document rarely trips this; one that does is either corrupt or built to exhaust memory on whatever opens it.
+    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Count**.
+    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Documents > General > Allowed File Extensions**.
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
@@ -219,7 +220,7 @@ When using the **Markdown Header Splitter**, documents can sometimes be split in
 
 **Solution:**
 
-- Go to **Admin Settings > Documents**.
+- Go to **Settings > Admin > Documents**.
 - Increase the **Chunk Min Size Target**.
 - Setting this to a value like `1000` (or ~50-60% of your `CHUNK_SIZE`) merges small fragments with neighboring chunks, resulting in better semantic coherence and fewer total chunks.
 
@@ -253,6 +254,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 | 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups |
 | 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
 | 🧠 Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or disable native function calling |
+| 🗂 Single attached file returns nothing | Re-index to rebuild the per-file indexes |
 
 ---
 
@@ -363,7 +365,7 @@ Error generating embeddings: 429 Rate limit reached
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
-   Or configure it in the **Settings > Admin > Tools > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
+   Or configure it in the **Settings > Admin > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
    Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
@@ -380,11 +382,11 @@ If PDFs containing images with text are returning empty content:
 ✅ **Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
-   - Navigate to **Admin Settings > Documents**
+   - Navigate to **Settings > Admin > Documents**
    - Try **Apache Tika** or **Docling** for better OCR support
 
 2. **Enable PDF Image Extraction**:
-   - In **Admin Settings > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+   - In **Settings > Admin > Documents**, ensure **PDF Extract Images (OCR)** is enabled
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
@@ -490,14 +492,14 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 ✅ **Solutions (check in order):**
 
 1. **Check Global Model Settings first**:
-   - Go to **Settings > Admin > AI > Models > Model Defaults > Configure**
+   - Go to **Settings > Admin > Models > Model Defaults > Configure**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
    - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter, even if you never intended for a specific model to use native mode
    - Either change the global setting to `default`, or explicitly set `function_calling` in the per-model **Advanced Params** to override the global value
    - Also check the **Model Capabilities** section: if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
 
 :::warning Global Settings Override
-The most common cause of this issue is a global `Function Calling: native` setting in **Settings > Admin > AI > Models > Model Defaults > Configure > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
+The most common cause of this issue is a global `Function Calling: native` setting in **Settings > Admin > Models > Model Defaults > Configure > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
 :::
 
 2. **Ensure Built-in Tools are enabled for the model** (if using native mode):
@@ -521,6 +523,27 @@ Open WebUI is moving toward **agentic RAG**, where the model autonomously decide
 :::
 
 For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+
+---
+
+### 14. Attaching a Link or a YouTube Video Fails
+
+A webpage or YouTube attachment came back as an error toast. The message names the step that failed: a link that could not be read names the link, a refused YouTube transcript gives the reason, and a message about the knowledge base means the content was read and only saving it failed.
+
+`[ERROR: Could not read content from <url>]` means nothing was attached. The usual causes are a site that blocks the request or serves its content only after JavaScript runs, which [`WEB_LOADER_ENGINE=playwright`](../reference/env-configuration.mdx#web_loader_engine) handles; a proxy Open WebUI is not being told to use, see [`WEB_SEARCH_TRUST_ENV`](../reference/env-configuration.mdx#web_search_trust_env); or an address refused on purpose, since private and loopback addresses, cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](../reference/env-configuration.mdx#web_fetch_filter_list) are never requested.
+
+A YouTube attachment is the video's transcript, so a video without a usable one cannot be attached at all. Where the message says YouTube blocked the request from your server's address, common for cloud provider ranges, route it through [`YOUTUBE_LOADER_PROXY_URL`](../reference/env-configuration.mdx#youtube_loader_proxy_url). Where a transcript exists but not in the languages asked for, add yours to [`YOUTUBE_LOADER_LANGUAGE`](../reference/env-configuration.mdx#youtube_loader_language). Captions switched off by the uploader, age restriction and unavailable videos cannot be worked around.
+
+### 15. Attaching a Single File Returns No Sources
+
+Attaching one file with `#` retrieves nothing, while attaching the knowledge base that contains the same file works normally.
+
+**The Problem**: a file belonging to a knowledge base is indexed twice, once with the knowledge base and once on its own. Attaching it by itself searches only its own index, which can go missing after a vector database migration, a partial reset or a deletion made directly in the vector database.
+
+✅ **Solutions:**
+
+1. **Re-index** at **Settings > Admin > Documents > Reindex Knowledge Base Vectors**. This rebuilds each knowledge base and the per-file index of every file inside it. It re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
+2. **Re-upload the file** if it is not in any knowledge base, since re-indexing only covers knowledge bases.
 
 ---
 

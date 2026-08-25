@@ -151,7 +151,7 @@ Open WebUI forwards the Docling Parameters values to docling-serve as multipart 
 
 ## Docling Parameters Reference (Open WebUI)
 
-Configure via `DOCLING_PARAMS` JSON in **Admin Settings > Documents** or via environment variable.
+Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via environment variable.
 
 | Parameter | Type | Description | Allowed Values |
 |-----------|------|-------------|----------------|

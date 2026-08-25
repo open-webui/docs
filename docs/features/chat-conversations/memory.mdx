@@ -58,8 +58,8 @@ Each memory carries a **type** and an optional **path** (see [Memory Types & Pat
 
 Each memory has a **type** and an optional **path**:
 
-- **Type** — `user` memories are facts, preferences, or instructions **about you** (e.g. "prefers Python for backend"); `context` memories are other durable context worth carrying between chats. The two are budgeted separately when injected into the prompt (see [Background Review & Limits](#background-review--limits)).
-- **Path** — an optional stable "address" used to **group related memories** (e.g. `work/projects`), so the model can organize and browse them hierarchically with `list_memory_paths` / `read_memory_path` instead of one flat list.
+- **Type**: `user` memories are facts, preferences, or instructions **about you** (e.g. "prefers Python for backend"); `context` memories are other durable context worth carrying between chats. The two are budgeted separately when injected into the prompt (see [Background Review & Limits](#background-review--limits)).
+- **Path**: an optional stable "address" used to **group related memories** (e.g. `work/projects`), so the model can organize and browse them hierarchically with `list_memory_paths` / `read_memory_path` instead of one flat list.
 
 These are set automatically by the memory tools; you do not need to assign them manually.
 
@@ -75,8 +75,8 @@ These are set automatically by the memory tools; you do not need to assign them 
 ## Enabling Memory Tools
 
 1.  **Administrative Enablement**: Ensure the Memory feature is [enabled globally](#administrative-controls) by an administrator and that you have the required permissions.
-2.  **Native Mode (Agentic Mode)**: Enable **Native Function Calling** in the model's advanced parameters (**Settings > Admin > AI > Models > Edit** the model **> Advanced Params**).
-3.  **Minimum Model Tier**: Use a current model with solid tool calling — at minimum GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Very small models may not manage memories reliably.
+2.  **Native Mode (Agentic Mode)**: Enable **Native Function Calling** in the model's advanced parameters (**Settings > Admin > Models > Edit** the model **> Advanced Params**).
+3.  **Minimum Model Tier**: Use a current model with solid tool calling, at minimum GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Very small models may not manage memories reliably.
 4.  **Per-Model Category Toggle**: Ensure the **Memory** category is enabled for the model in **Workspace > Models > Edit > Builtin Tools** (enabled by default).
 
 :::warning Blank replies instead of memory operations
@@ -93,7 +93,7 @@ Administrators have full control over the Memory feature, including the ability 
 
 ### Global Toggle
 The Memory feature can be toggled on or off for the entire instance. When disabled, the "Personalization" tab is hidden from all users, and the memory-related API endpoints are blocked.
-- **Admin UI**: Settings > Admin > System > General > Features > **Memories**
+- **Admin UI**: Settings > Admin > General > Features > **Memories**
 - **Environment Variable**: [`ENABLE_MEMORIES`](/reference/env-configuration#enable_memories) (Default: `True`)
 
 ### Granular Permissions
@@ -101,14 +101,16 @@ Administrators can also control Memory access on a per-role or per-group basis f
 - **Admin UI**: Admin Panel > Users > Permissions > Features > **Memories**
 - **Environment Variable**: [`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories) (Default: `True`)
 
+Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab, the memory API endpoints answer them with `403`, the model is no longer handed the memory tools and their stored memories are no longer injected into the system context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
+
 ### Background Review & Limits
 
-- **Background review** — when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation and updates `context` memories automatically, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
-- **Injection budgets** — [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
+- **Background review**: when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation and updates `context` memories automatically, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
+- **Injection budgets**: [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
 
 ### Memory System Context
 By default Open WebUI injects the user's stored memories into the model's system context so the model is aware of them on every turn. This injection can be turned off independently of the memory tools: when disabled, the model can still add, update and delete memories on request, but remembered information is no longer added to the prompt automatically.
-- **Admin UI**: Settings > Admin > System > General > **Memory System Context** (shown when Memories is enabled)
+- **Admin UI**: Settings > Admin > General > **Memory System Context** (shown when Memories is enabled)
 - **Environment Variable**: [`ENABLE_MEMORY_SYSTEM_CONTEXT`](/reference/env-configuration#enable_memory_system_context) (Default: `True`)
 
 ## Privacy & Security

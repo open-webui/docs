@@ -34,9 +34,9 @@ import TabItem from '@theme/TabItem';
 
 Once Open WebUI is running:
 
-1. Go to the ⚙️ **Admin Settings**.
-2. Navigate to **Connections > OpenAI > Manage** (look for the wrench icon).
-3. Click ➕ **Add New Connection**.
+1. Go to **Settings > Admin > Connections**.
+2. Find the **Manage OpenAI API Connections** list.
+3. Click the ➕ **Add Connection** button next to it.
 
 <Tabs>
   <TabItem value="standard" label="OpenAI" default>
@@ -50,7 +50,7 @@ Once Open WebUI is running:
 
   For Microsoft Azure OpenAI deployments.
 
-  1.  Find **Provider Type** and click the button labeled **OpenAI** to switch it to **Azure OpenAI**.
+  1.  Expand **Advanced** and set the **Provider** dropdown to **Azure OpenAI**. An Azure endpoint URL usually flips this on by itself.
   2.  **URL**: Your Azure Endpoint (e.g., `https://my-resource.openai.azure.com`).
   3.  **API Version**: e.g., `2024-02-15-preview`.
   4.  **API Key**: Your Azure API Key.
@@ -64,9 +64,13 @@ Once Open WebUI is running:
 *   **Model IDs (Filter)**:
     *   *Default (Empty)*: Auto-detects all available models from the provider.
     *   *Set*: Acts as an **Allowlist**. Only the specific model IDs you enter here will be visible to users. Use this to hide older or expensive models.
+    *   *One entry per ID*: Leading and trailing spaces are stripped from what you type, and an ID that is already on the list is refused with **Model ID is already added**. Reopening a connection whose stored list contains duplicates collapses them to one entry each, and saving writes the cleaned list back.
 
 *   **Prefix ID**:
     *   If you connect multiple providers that have models with the same name (e.g., two providers both offering `qwen3.6`), add a prefix here (e.g., `groq/`) to distinguish them. The model will appear as `groq/qwen3.6`.
+
+*   **Provider**:
+    *   Tells Open WebUI what kind of server is behind the URL, which switches on extras such as Azure routing, local model management or Anthropic passthrough. Leave it at **Default** for OpenAI. See [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting).
 
 4. Click **Save** ✅.
 

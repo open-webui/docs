@@ -30,7 +30,9 @@ Create a new folder to organize your conversations:
 Organize existing chats by moving them into folders:
 
 - **Drag and Drop**: Click and drag any conversation from the sidebar into a folder.
-- **Conversation menu**: Hover a conversation in the sidebar, click the three-dot menu that appears, then choose **Move** and pick the folder.
+- **Conversation menu**: Hover a conversation in the sidebar, click the three-dot menu that appears, then choose **Move** and pick the destination folder. The entry appears once at least one folder exists.
+
+A folder highlights while you drag a chat over it when you are allowed to file the chat there, so you can see where the drop will land before you let go. A folder of your own always takes one. A folder [shared with you](#sharing-folders) takes one only with write access; with read-only access it does not highlight and does not accept the drop, so a move that would be refused anyway is never started.
 
 ### Nested Folders
 
@@ -52,13 +54,13 @@ A folder shows a count of the chats inside it you have not read yet, next to its
 - Unread state is about your own reading. Shared folders carry no badge, and chats belonging to someone else never show as unread to you, however recently they were touched.
 - A title generated automatically for a chat does not make it unread again.
 
-The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. Unread chats are listed first, each group ordered by recent activity, so what is waiting for you sits at the top of the folder rather than wherever its timestamp puts it. The list keeps itself current while you look at it — a chat that starts or finishes generating updates in place and re-sorts, a chat that arrives in the folder is inserted rather than triggering a full reload, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
+The folder's chat list marks the same state per chat: a dot for an unread conversation, and a spinner for one whose answer is still streaming. Unread chats are listed first, each group ordered by recent activity, so what is waiting for you sits at the top of the folder rather than wherever its timestamp puts it. The list keeps itself current while you look at it, a chat that starts or finishes generating updates in place and re-sorts, a chat that arrives in the folder is inserted rather than triggering a full reload, and the list reloads after a dropped connection is restored. Opening a chat from this list clears its dot immediately, without waiting for the chat to load.
 
 #### Marking Read and Unread
 
 - **Mark a chat unread**: open a chat's three-dot menu in the sidebar and choose **Mark as unread**. The chat gets its dot back, moves up with the other unread chats, and the folder count goes up again. Use it to keep a conversation on your radar after skimming it.
 - **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it; on a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
-- **Mark everything read**: the **Chats** section header in the sidebar has its own menu with **Mark all as read**, which clears every unread chat you own — loose chats and chats in folders alike — and zeroes all the folder badges at once. Archived chats are again left alone.
+- **Mark everything read**: the **Chats** section header in the sidebar has its own menu with **Mark all as read**, which clears every unread chat you own, loose chats and chats in folders alike, and zeroes all the folder badges at once. Archived chats are again left alone.
 
 ### Starting a Chat in a Folder
 
@@ -68,6 +70,10 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 2. The chat interface will show that folder is active.
 3. Any new chat you start will automatically be created inside this folder.
 4. New chats will **inherit the folder's settings** (system prompt and knowledge).
+
+Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
+
+The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. Naming a folder that does not exist is refused the same way as naming one you cannot write to.
 
 ## Folder Settings (Project Configuration)
 
@@ -109,7 +115,7 @@ Link **knowledge bases and files** to your folder:
 
 **Whose access decides what is attached.** A folder's knowledge is measured against the **folder owner**, not against whoever is editing or reading it:
 
-- Attaching a file, collection or note to a folder requires the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves — including their own private ones. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
+- Attaching a file, collection or note to a folder requires the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves, including their own private ones. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
 - Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being fed into the folder's chats, rather than continuing to serve content through the folder to everyone who can see it.
 - Entries that are not a file, collection or note, or that carry no ID, are ignored rather than passed through, since there is nothing to check them against.
 
@@ -120,13 +126,17 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 1. Hover over a folder in the sidebar and open the **three-dot menu** (⋯).
 2. Select **Share**.
 3. Add the users or groups to share with and choose their access:
-   - **Read**: they can open the folder and read its chats.
-   - **Write**: they can also rename the folder, add chats and create subfolders inside it.
+   - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it, and dragging a chat over it in the sidebar does not offer it as a drop target.
+   - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
 4. Save.
+
+The **Add Access** picker lists only the people and groups the folder is not already shared with, so you cannot add the same person twice and the list shrinks as you go. To move someone between **Read** and **Write**, or to drop them entirely, use their row in the **Access List** instead.
 
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
+- **Someone else's chat opens read-only, under their name.** Their messages carry their name and profile picture, both in the conversation and on the message nodes in the **Overview** panel. The name and picture beside a message appear only when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message.
+- **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Only the owner or an admin can delete a shared root folder** or change who it is shared with. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
 

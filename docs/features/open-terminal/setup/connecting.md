@@ -21,13 +21,13 @@ Click your **name** at the bottom of the left sidebar to open the user menu, the
 
 ![User menu showing Admin Panel option](/images/open-terminal-user-menu.png)
 
-### 2. Go to Settings → Integrations
+### 2. Go to Settings > Admin > Integrations
 
 In the Admin Panel, click **Settings** in the top nav, then click **Integrations**.
 
 The settings sidebar lists **Integrations** twice, once under **Personal** in the *Services* group and once under **Admin** in the *Tools* group. Open Terminal belongs in the Admin one. Configuring the personal entry connects the terminal to your account alone and the deployment will not work as described here.
 
-![Admin Panel, Settings → Integrations](/images/open-terminal-integrations-page.png)
+![Settings > Admin > Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
 
@@ -46,6 +46,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
 | **Auth Type** | Leave as `Bearer` (the default) |
+| **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
 
 ![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
 
@@ -59,7 +60,11 @@ Click **Save**. A green "Connected" indicator confirms the connection.
 
 Limit terminal access to specific user groups via the access control button.
 
-{/* TODO: Screenshot — The Access Grants dropdown showing available user groups with checkboxes. */}
+{/* TODO: Screenshot: The Access Grants dropdown showing available user groups with checkboxes. */}
+
+:::tip Orchestrator connections can be scoped further
+A connection Open WebUI has detected as a [Terminals orchestrator](/features/open-terminal/terminals/) gets an extra **Orchestrator > Terminal Contexts** section, where you decide whether the terminal is offered in chats and in automations, and whether everything shares one workspace or each saved chat or automation gets its own. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). A direct Open Terminal connection has no such setting and is always available in both.
+:::
 
 ### 7. Select a terminal in chat
 
@@ -115,6 +120,27 @@ If you need to test a connection without admin access, you can add one from the 
 
 ---
 
+## Chat Uploads
+
+**Chat Uploads** on the connection form decides where a file attached in the chat input goes while that terminal is selected.
+
+`Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what a connection nobody has touched does, and what happens with no terminal selected at all.
+
+`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
+
+A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
+
+Four things change with it:
+
+- **The model no longer needs to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
+- **The model is told the path only when it can act on it.** Open WebUI passes the paths of attached files to the model alongside the message when the model is using native function calling in a saved conversation. Set the model to [Legacy](#8-enable-native-function-calling) function calling, or turn its **Builtin Tools** capability off, and the file still reaches the terminal while the model is left without its location.
+- **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
+- **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
+
+The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
+
+---
+
 ## Troubleshooting
 
 ### "Connection failed" or timeout
@@ -128,7 +154,7 @@ This almost always means Open WebUI can't reach Open Terminal over the network. 
 | Both on same machine, no Docker | `http://localhost:8000` |
 | Open Terminal on another machine | `http://that-machines-ip:8000` |
 
-{/* TODO: Screenshot — A simple diagram showing Open WebUI and Open Terminal as two boxes, with an arrow between them labeled with the URL. Shows correct URLs for Docker Compose (service name) vs separate containers (host.docker.internal). */}
+{/* TODO: Screenshot: A simple diagram showing Open WebUI and Open Terminal as two boxes, with an arrow between them labeled with the URL. Shows correct URLs for Docker Compose (service name) vs separate containers (host.docker.internal). */}
 
 :::tip Quick check
 Run this command to see if Open WebUI can reach Open Terminal:
@@ -140,12 +166,24 @@ docker exec open-webui curl -s http://open-terminal:8000/health
 If it prints `{"status": "ok"}`, the connection works. If it errors, the containers can't see each other.
 :::
 
+### Nothing happens when you save a new connection
+
+Adding a connection works whether you reach Open WebUI over `https://` or over plain `http://`. On older versions the **Add Terminal Connection** dialog stayed open and saved nothing when the interface was reached over plain `http://` at a network address, a LAN IP for example, rather than on `localhost`. Browsers withhold the identifier generator a new connection needs on origins they do not treat as secure, and a new connection gets its identifier automatically when you leave the optional **ID** field blank. Typing an **ID** of your own works around it, because then there is nothing to generate.
+
+Only creating a connection from **Settings > Admin > Integrations** was affected. Editing, enabling, disabling or deleting an existing one, adding one under your own **Settings > Integrations** and connections shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) all worked regardless.
+
 ### Terminal shows up but AI doesn't use it
 
 Make sure:
 - The toggle switch next to the connection is **turned on**. Turning it off takes the terminal server out of service completely: the model is not given its tools, the terminal and file browser refuse to connect, and any proxied request to it is rejected. It is a working off switch, not just a hint to the model, so use it to retire a server without deleting the connection.
 - You've **refreshed the page** after adding the connection
 - Your model supports tool calling (most modern models do)
+
+### Terminal is missing from the picker
+
+Only terminals the user is allowed to use are listed, so check the connection's access grants and that the connection is enabled.
+
+For an orchestrator connection, [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) also decides this. A terminal whose **Chat** context is **Off** never appears in a chat, and one set to **Per chat** is hidden in temporary chats because it needs a saved conversation to attach to.
 
 ### Wrong API key
 

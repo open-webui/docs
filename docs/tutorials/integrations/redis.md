@@ -143,12 +143,12 @@ With proper `timeout` configuration, this number should fluctuate naturally (ris
 
 Open WebUI uses Redis as a **stateful store, not a disposable cache**. Its keys fall into two groups:
 
-- **TTL'd security keys** — token-revocation entries (`{prefix}:auth:token:<jti>:revoked`, set to expire exactly when the token would) and distributed locks (set with an expiry).
-- **Persistent operational keys** — the websocket **session** and **usage** pools (Redis hashes with no expiry) and cached configuration.
+- **TTL'd security keys**: token-revocation entries (`{prefix}:auth:token:<jti>:revoked`, set to expire exactly when the token would) and distributed locks (set with an expiry).
+- **Persistent operational keys**: the websocket **session** and **usage** pools (Redis hashes with no expiry) and cached configuration.
 
 Under an `allkeys-lru`, `allkeys-lfu`, or `allkeys-random` policy, Redis evicts **any** key when memory fills, including the two groups above. That can:
 
-- **silently un-revoke a signed-out token** — if the revocation key is evicted before its TTL, a token that was invalidated by logout, password change, or admin deactivation starts working again (a security regression), and
+- **silently un-revoke a signed-out token**: if the revocation key is evicted before its TTL, a token that was invalidated by logout, password change, or admin deactivation starts working again (a security regression), and
 - **break websockets, session tracking, and configuration** by evicting the persistent pools.
 
 Use **`noeviction`** (the safe default). When memory is exhausted, Redis rejects new writes with an error, which is a loud, recoverable signal, instead of silently discarding auth and session state:
@@ -515,6 +515,12 @@ If you're running multiple Uvicorn workers on a single host, add this variable:
 UVICORN_WORKERS="4"  # Adjust based on your CPU cores
 REDIS_URL="redis://redis:6379/0"  # Required when UVICORN_WORKERS > 1
 ```
+
+:::warning Prefer more containers over more workers
+
+Raising `UVICORN_WORKERS` is the weakest way to scale Open WebUI. It requires the same external services as running several containers, Redis included, while leaving every worker inside one container that shares a single memory limit and fails as a unit. Run replicas with Docker Compose, Kubernetes or the Helm chart instead, keeping one worker each. See [Scaling Open WebUI](/getting-started/advanced-topics/scaling).
+
+:::
 
 :::danger
 

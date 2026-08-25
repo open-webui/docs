@@ -37,10 +37,6 @@ If you are deploying Open WebUI for the first time, start with the [Quick Refere
 
 The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption keys for OAuth session data.
 
-**How the default works:**
-
-When running via Docker (`start.sh`) or `open-webui serve`, the application checks whether `WEBUI_SECRET_KEY` is set as an environment variable. If it is not, a random key is generated automatically and saved to `.webui_secret_key` inside the data directory. On subsequent restarts, the saved key is reloaded. This means that for single-instance deployments, no manual configuration is needed.
-
 **When you need to set it explicitly:**
 
 If you run multiple Open WebUI instances behind a load balancer, every instance must share the same key. Otherwise, a token signed by one instance will be rejected by another, causing login failures. Generate a key with `openssl rand -base64 32` and pass it as an environment variable to all replicas.
@@ -146,7 +142,7 @@ Without Redis, **signing out does not invalidate a user's token**. The token rem
 
 - A stolen or leaked token cannot be revoked by signing out
 - Changing a user's password does not invalidate their existing sessions
-- Admin-initiated account deactivation does not immediately block access
+- Deactivating an account does not revoke the token already issued to it, although the account's role is rechecked on every request
 - OIDC back-channel logout cannot revoke tokens
 
 With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.

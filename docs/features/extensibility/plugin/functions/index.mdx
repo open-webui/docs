@@ -102,7 +102,7 @@ If the code raises while it is being executed, Open WebUI switches the function 
 - **Saving over an existing function** executes the code before storing it. The save is rejected and your new source is never written, so what ends up deactivated is the version already in the database. The browser only shows a generic error, the Python error goes to the server log as `Error loading module: <function id>: <the error>`.
 - **Outside the editor**, the same execution happens every time the module is loaded again, so a function can turn itself off with nobody touching it in the admin panel. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart.
 
-Fix the code, then switch the function back on in **Admin Panel → Functions**.
+Fix the code, then switch the function back on in **Admin Panel > Functions**.
 
 ### Frontmatter
 
@@ -151,14 +151,14 @@ Always review the source code before importing. Community functions are user-con
 
 ### From a URL
 
-1. Go to **Admin Panel → Functions**.
+1. Go to **Admin Panel > Functions**.
 2. Click **Import From Link** and paste a link to the Python file.
    - GitHub URLs are automatically converted to raw file URLs.
 3. Review and save.
 
 ### Create Manually
 
-1. Go to **Admin Panel → Functions**.
+1. Go to **Admin Panel > Functions**.
 2. Click **Create**.
 3. Enter an ID (alphanumeric and underscores only), name, and description.
 4. Write your Python code in the editor.
@@ -170,7 +170,7 @@ Always review the source code before importing. Community functions are user-con
 
 ### Admin Controls
 
-Functions are managed from **Admin Panel → Functions**. Each function has the following controls:
+Functions are managed from **Admin Panel > Functions**. Each function has the following controls:
 
 | Control | Description |
 |:--------|:-----------|
@@ -201,7 +201,7 @@ Functions support a two-tier configuration system built on [Pydantic](https://do
 
 | Level | Class Name | Who Configures | Where |
 |:------|:-----------|:---------------|:------|
-| **Admin** | `Valves` | Administrators only | Admin Panel → Functions → ⚙️ |
+| **Admin** | `Valves` | Administrators only | Admin Panel > Functions > ⚙️ |
 | **User** | `UserValves` | Any user | Chat interface, per-function |
 
 **Valves** are ideal for API keys, model endpoints, and global behavior settings. **UserValves** let individual users customize behavior (e.g., their preferred language, output format, or personal API key).

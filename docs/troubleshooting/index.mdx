@@ -28,20 +28,27 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | Assistant replies are randomly blank, worse with tools enabled | [Connection Errors → Blank Replies on Tool Calls](./connection-error#-blank-replies-when-the-model-uses-a-tool) |
 | Can't connect to Ollama from Open WebUI | [Connection Errors → Ollama](./connection-error#connection-to-ollama-server) |
 | Model list takes forever to load / `500` on `/api/models` | [Connection Errors → Model List Loading](./connection-error#%EF%B8%8F-model-list-loading-issues-slow-ui--unreachable-endpoints) |
+| Intermittent "Model not found", model list emptying itself, `ClientConnectorDNSError` | [Connection Errors → Intermittent Name Lookup Failures](./connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found) |
 | `[SSL: CERTIFICATE_VERIFY_FAILED]` | [Connection Errors → SSL](./connection-error#-ssl-certificate-issues-with-internal-tools) |
 | Login loops, 401 Unauthorized, token errors across replicas | [Scaling & HA → Login Loops](./multi-replica#1-login-loops--401-unauthorized-errors) |
 | `database is locked`, data disappearing across instances | [Scaling & HA → Database](./multi-replica#4-database-corruption--locked-errors) |
 | Worker crash: `Child process [pid] died` during upload | [RAG → Worker Crashes](./rag#12-worker-dies-during-document-upload) |
 | Model ignores attached knowledge base | [RAG → Knowledge Base Not Working](./rag#13-knowledge-base-attached-to-model-not-working) |
+| `Could not read content from <url>`, or a YouTube video that will not attach | [RAG → Link and YouTube attachments](./rag#14-attaching-a-link-or-a-youtube-video-fails) |
 | Agent stops mid-task after many tool calls / `Tool-call limit reached (N iterations).` | [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) |
+| Reply on a Responses connection goes blank or stops part way when generation ends | [Open Responses → Providers that deviate from the format](/getting-started/quick-start/connect-a-provider/starting-with-open-responses#providers-that-deviate-from-the-responses-format) |
+| Model on a Responses connection answers as if its own previous reply never happened | [Open Responses → Providers that deviate from the format](/getting-started/quick-start/connect-a-provider/starting-with-open-responses#providers-that-deviate-from-the-responses-format) |
 | `NoneType object has no attribute 'encode'` | [RAG → Embedding Error](./rag#5-400-nonetype-object-has-no-attribute-encode) |
 | CUDA out of memory during embedding | [RAG → CUDA OOM](./rag#10-cuda-out-of-memory-during-embedding) |
 | OAuth redirect loops, CSRF state mismatch | [SSO & OAuth](./sso) |
 | `CSRF Warning! State not equal in request and response` | [SSO → CSRF Errors](./sso#9-session-state-mismatch-csrf-errors) |
+| SSO login ends with "The email or password provided is incorrect" and the log shows `Unsupported {'app_id'} in header` | [SSO → Provider adds its own ID token parameters](./sso#providers-that-add-their-own-parameters-to-the-id-token) |
+| Nobody who ever used SSO can sign in after an upgrade, log shows `1 validation error for UserModel` on `oauth` | [SSO → Accounts locked out after a long-delayed upgrade](./sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade) |
 | TTS loading forever, `Dataset scripts are no longer supported` | [Audio → TTS Issues](./audio#tts-loading-forever--not-working) |
 | Whisper `int8 compute type` error | [Audio → STT Issues](./audio#whisper-stt-not-working--compute-type-error) |
 | Microphone not working (non-HTTPS) | [Audio → Microphone](./audio#microphone-access-issues) |
 | Image not generating, ComfyUI workflow errors | [Image Generation](./image-generation) |
+| An image in a chat shows "Image unavailable" | [Image Generation → General Issues](./image-generation#general-issues) |
 | Web search returns empty content or proxy errors | [Web Search](./web-search) |
 | Slow performance, high RAM, OOM crashes | [Performance & RAM](./performance) |
 | Container OOM-killed when editing model/knowledge permissions (SQLite) | [Performance & RAM → SQLite Memory Footprint](./performance#4-sqlite-memory-footprint-on-constrained-containers) |
@@ -55,7 +62,7 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 
 | Guide | Covers |
 | :--- | :--- |
-| [Connection Errors](./connection-error) | HTTPS, CORS, WebSocket, reverse proxy, Ollama, SSL, Podman, MCP |
+| [Connection Errors](./connection-error) | HTTPS, CORS, WebSocket, reverse proxy, Ollama, DNS, SSL, Podman, MCP |
 | [Performance & RAM](./performance) | Speed tuning, database optimization, scaling infrastructure, resource efficiency |
 | [Context Window / Prompt Too Long](./context-window) | Why "prompt is too long" errors happen and how to manage chat history with filters |
 | [RAG](./rag) | Document ingestion, retrieval quality, embeddings, upload limits, worker crashes |

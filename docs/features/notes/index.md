@@ -88,7 +88,9 @@ Rewriting happens in the chat, there is no separate **Enhance** button. Select t
 
 ### Chat Sidebar
 
-Opens the full chat interface in a pane beside the note. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and everything else the chat input offers. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+Opens the full chat interface in a pane beside the note. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+
+**Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
 
 **Insert a response into the note.** Every assistant response carries an **Insert** button that drops that response into the note at the cursor. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
 
@@ -127,7 +129,7 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 
 The full content of the note is injected into the context window for that conversation.
 
-You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **folders** and **models** from the sidebar.
+You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **chats**, **folders** and **models** from the sidebar.
 
 ---
 
@@ -183,15 +185,16 @@ Access management options via the **More (...)** menu in the top right corner.
 
 ### Sharing
 
-* **Copy Link** to share the note URL
-* **Copy to Clipboard** to paste the content elsewhere
+**Share** in the **More (...)** menu offers **Copy link** and **Copy to clipboard**. A copied link opens the note only for someone who can already reach it.
+
+Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access and is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
 
 Administrators can control sharing via environment variables or the Admin Panel:
 
-* `USER_PERMISSIONS_NOTES_ALLOW_SHARING` for internal sharing
-* `USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING` for public links
+* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) for internal sharing (default `False`)
+* [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_notes_allow_public_sharing) for public links (default `False`)
 
-These can also be configured in **Admin Panel > Users > Groups > Default Permissions**.
+These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 ### Attachments
 

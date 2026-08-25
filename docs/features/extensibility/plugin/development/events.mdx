@@ -88,7 +88,26 @@ result = await __event_call__(
 ```
 
 :::tip Configurable Timeout
-By default `__event_call__` waits **forever** for a user response, so a prompt nobody answers holds that call open indefinitely. Set [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) to a number of seconds to bound it, and wrap the call in `try`/`except`, because a timeout raises. A call to a browser that has already disconnected is different: it returns `{"error": "Client session disconnected."}` instead, so check the result as well.
+By default `__event_call__` waits **forever** for a user response, so a prompt nobody answers holds that call open indefinitely. Set [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) to a number of seconds to bound it. Both failure modes come back as ordinary return values, never as exceptions, so check the result for an `error` key:
+
+| Situation | What `__event_call__` returns |
+|-----------|-------------------------------|
+| The browser already disconnected | `{"error": "Client session disconnected."}`, straight away |
+| Nobody answered before the timeout elapsed | `{"error": "Event call timed out. The browser tab may be inactive or closed."}` |
+
+A timeout does not disconnect the tab. If the user simply had not answered yet, their session stays live and you can prompt them again.
+
+```python
+result = await __event_call__(
+    {
+        "type": "confirmation",
+        "data": {"title": "Delete the file?", "message": "This cannot be undone."},
+    }
+)
+
+if isinstance(result, dict) and result.get("error"):
+    return f"Could not ask the user: {result['error']}"
+```
 :::
 
 ---
@@ -181,7 +200,7 @@ await __event_emitter__({"type": "status", "data": {"description": "Fetching dat
 
 When `hidden` is `true`, the status is saved to `statusHistory` but **not shown** in the current status display. This is useful for internal status tracking that shouldn't be visible to the user.
 
-Additionally, when `message.content` is empty and the last status has `hidden: true` (or no status exists at all), the frontend shows a skeleton loader instead of the status bar, so hidden statuses don't replace the loading indicator.
+Additionally, when the message has no content yet and the last status has `hidden: true` (or no status exists at all), the frontend shows a blinking typing cursor instead of the status bar, so hidden statuses don't replace the indicator that something is still running. A visible status suppresses that cursor while the message is still empty; once the first content arrives the cursor trails the text until the message is marked done, whether a status is on screen or not.
 
 ---
 
@@ -979,16 +998,16 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
 :::
 
-#### ⚠️ Requires live connection (raises or errors on tab close)
+#### ⚠️ Requires live connection (errors on tab close)
 
 | Type | Why |
 |------|-----|
-| `confirmation` | Uses `sio.call()`, waits for a client response and raises if the timeout elapses |
-| `input` | Uses `sio.call()`, waits for a client response and raises if the timeout elapses |
-| `execute` via `__event_call__` | Uses `sio.call()`, waits for a client response and raises if the timeout elapses |
+| `confirmation` | Uses `sio.call()`, waits for a client response and returns an error dictionary if the timeout elapses |
+| `input` | Uses `sio.call()`, waits for a client response and returns an error dictionary if the timeout elapses |
+| `execute` via `__event_call__` | Uses `sio.call()`, waits for a client response and returns an error dictionary if the timeout elapses |
 | `execute` via `__event_emitter__` | Fires and forgets, **will not error**, but JS may not run if no browser is connected |
 
-`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed the session is gone, so the call returns `{"error": "Client session disconnected."}` straight away. If the tab is merely inactive the call waits for [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout). That is unset by default, so it waits indefinitely; set it to a number of seconds and the call raises once it elapses.
+`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed the session is gone, so the call returns `{"error": "Client session disconnected."}` straight away. If the tab is merely inactive the call waits for [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout). That is unset by default, so it waits indefinitely; set it to a number of seconds and once it elapses the call returns `{"error": "Event call timed out. The browser tab may be inactive or closed."}`. Neither case raises, so test the return value instead of relying on `try`/`except`, and note that a timeout leaves the browser session connected: a user who was slow to answer can still be prompted again.
 
 `execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value, particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 

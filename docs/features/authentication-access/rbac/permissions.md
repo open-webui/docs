@@ -44,73 +44,83 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | Permission | Description |
 | :--- | :--- |
 | **Models Access** | **(Parent)** Access the **Models** workspace to create or edit custom models. |
-| **Models Import** | *(Requires Models Access)* Ability to import models from JSON/files. |
-| **Models Export** | *(Requires Models Access)* Ability to export models to files. |
+| **Import Models** | *(Requires Models Access)* Ability to import models from JSON/files. |
+| **Export Models** | *(Requires Models Access)* Ability to export models to files. |
 | **Knowledge Access** | Access the **Knowledge** workspace to manage knowledge bases. |
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
-| **Prompts Import** | *(Requires Prompts Access)* Ability to import prompts. |
-| **Prompts Export** | *(Requires Prompts Access)* Ability to export prompts. |
+| **Import Prompts** | *(Requires Prompts Access)* Ability to import prompts. |
+| **Export Prompts** | *(Requires Prompts Access)* Ability to export prompts. |
 | **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) is `false`, since the Tools workspace does not exist in that case. |
-| **Tools Import** | *(Requires Tools Access)* Ability to import tools. |
-| **Tools Export** | *(Requires Tools Access)* Ability to export tools. |
+| **Import Tools** | *(Requires Tools Access)* Ability to import tools. |
+| **Export Tools** | *(Requires Tools Access)* Ability to export tools. |
+| **Skills Access** | **(Parent)** Access the **Skills** workspace to create and manage reusable instruction sets. |
+| **Import Skills** | *(Requires Skills Access)* Import skills into the Skills workspace. |
+| **Export Skills** | *(Requires Skills Access)* Export skills from the Skills workspace. |
 
 :::danger ⚠️ Tools Access = Root-Equivalent Access
 **Treat the Tools Access permission as root-equivalent access.** Granting a user access to create or import Tools is equivalent to giving them shell access to your server, because Tools and Functions execute arbitrary Python code. Only grant this permission to users you would trust with direct access to your server. If you enable this permission for untrusted users, you are accepting the risk of arbitrary code execution on your host. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
-
-| **Skills Access** | Access the **Skills** workspace to create and manage reusable instruction sets. |
-| **Import Skills** | Import skills into the Skills workspace. |
-| **Export Skills** | Export skills from the Skills workspace. |
 
 ### 2. Sharing Permissions
 Controls what users can share with the community or make public.
 
 | Permission | Description |
 | :--- | :--- |
-| **Share Models** | **(Parent)** Ability to share models (make them accessible to others). |
-| **Public Models** | *(Requires Share Models)* Ability to make models publicly discoverable. |
-| **Share Knowledge** | **(Parent)** Ability to share knowledge bases. |
-| **Public Knowledge** | *(Requires Share Knowledge)* Ability to make knowledge bases public. |
-| **Share Prompts** | **(Parent)** Ability to share prompts. |
-| **Public Prompts** | *(Requires Share Prompts)* Ability to make prompts public. |
-| **Share Tools** | **(Parent)** Ability to share tools. |
-| **Public Tools** | *(Requires Share Tools)* Ability to make tools public. |
-| **Share Skills** | **(Parent)** Ability to share skills. |
-| **Public Skills** | *(Requires Share Skills)* Ability to make skills public. |
-| **Share Notes** | **(Parent)** Ability to share Notes. |
-| **Public Notes** | *(Requires Share Notes)* Ability to make Notes public. |
+| **Models Sharing** | **(Parent)** Ability to share models (make them accessible to others). |
+| **Models Public Sharing** | *(Requires Models Sharing)* Ability to make models publicly discoverable. |
+| **Knowledge Sharing** | **(Parent)** Ability to share knowledge bases. |
+| **Knowledge Public Sharing** | *(Requires Knowledge Sharing)* Ability to make knowledge bases public. |
+| **Prompts Sharing** | **(Parent)** Ability to share prompts. |
+| **Prompts Public Sharing** | *(Requires Prompts Sharing)* Ability to make prompts public. |
+| **Tools Sharing** | **(Parent)** Ability to share tools. |
+| **Tools Public Sharing** | *(Requires Tools Sharing)* Ability to make tools public. |
+| **Skills Sharing** | **(Parent)** Ability to share skills. |
+| **Skills Public Sharing** | *(Requires Skills Sharing)* Ability to make skills public. |
+| **Notes Sharing** | **(Parent)** Ability to share Notes. |
+| **Notes Public Sharing** | *(Requires Notes Sharing)* Ability to make Notes public. |
 | **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
-| **Chats Public Sharing** | *(Requires Share Chat)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
-| **Chats Open Sharing** | *(Requires Share Chat)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
+| **Chats Public Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
+| **Chats Open Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
 | **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, individual-user grants are stripped from create/update payloads; group and public sharing are unaffected. Admins are always exempt. |
-| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. Set this per group: the global default currently does not persist, see the [note in the reference](/reference/env-configuration#user_permissions_access_grants_allow_groups). |
+| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. |
+
+Every toggle in the panel's **Sharing Permissions** section is off unless you turn it on, and a public toggle is only drawn once the parent permission named in its row is on. The two **Allow Sharing With ...** rows sit in a separate **Access Grants** section and are on by default.
+
+:::warning Re-check Tools and Notes public sharing after an upgrade
+
+On instances upgraded from a release that predates **Tools Public Sharing** and **Notes Public Sharing**, the admin panel used to draw both switches as on while the backend still refused the action. Saving any permission on that page then persisted them as enabled, granting public tool and note sharing that was never configured. The panel and the enforcement now agree, but a value already written to the database is not rolled back.
+
+If you saved default permissions on an affected release, open **Admin Panel > Users > Groups**, edit **Default permissions** and confirm both switches read the way you intend. Group-level overrides are worth the same check.
+
+:::
 
 ### 3. Chat Permissions
 Controls the features available to the user inside the chat interface.
 
 | Permission | Description |
 | :--- | :--- |
-| **Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. |
-| **Model Valves** | *(Requires Chat Controls)* Access to model-specific configuration "valves". |
-| **System Prompt** | *(Requires Chat Controls)* Ability to edit the system prompt for a conversation. |
-| **Parameters** | *(Requires Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
-| **File Upload** | Ability to upload files to the chat. |
-| **Delete Chat** | Ability to delete entire chat conversations. |
-| **Delete Message** | Ability to delete individual messages. |
-| **Edit Message** | Ability to edit messages. |
-| **Continue Response** | Ability to use the "Continue" feature for truncated responses. |
-| **Regenerate Response**| Ability to regenerate an AI response. |
-| **Rate Response** | Ability to thumbs up/down responses. |
-| **Share Chat** | Ability to generate a share link for a chat. |
-| **Export Chat** | Ability to export chat history. |
-| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI). |
-| **Speech-to-Text (STT)**| Ability to use voice input. |
-| **Text-to-Speech (TTS)**| Ability to use voice output. |
-| **Audio Call** | Ability to use the real-time audio call feature. |
-| **Multiple Models** | Ability to select multiple models for a simultaneous response. |
-| **Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
-| **Enforced Temporary** | *(Requires Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
+| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. |
+| **Allow Chat Valves** | *(Requires Allow Chat Controls)* Access to model-specific configuration "valves". |
+| **Allow Chat System Prompt** | *(Requires Allow Chat Controls)* Ability to edit the system prompt for a conversation. |
+| **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
+| **Allow File Upload** | Ability to upload files to the chat. |
+| **Allow Web Upload** | Ability to attach a web page to a chat by URL, using **Attach Webpage** in the message input's attach menu ([`USER_PERMISSIONS_CHAT_WEB_UPLOAD`](/reference/env-configuration#user_permissions_chat_web_upload)). On by default. When disabled, the option is greyed out and the attach is refused. Admins are always exempt. |
+| **Allow Chat Delete** | Ability to delete entire chat conversations ([`USER_PERMISSIONS_CHAT_DELETE`](/reference/env-configuration#user_permissions_chat_delete)). On by default. When disabled, the delete controls are hidden from non-admins rather than shown and refused: the sidebar chat menu, the `Shift`+hover delete icon on a sidebar row, the chat's own top-bar menu, the search results, the per-chat delete in **Settings > Archived Chats** and **Delete All Chats** in **Settings > Data Controls**. The **Delete chat** keyboard shortcut stops doing anything, and archiving is unaffected. Deleting a folder that still holds chats needs this permission too, and that menu entry is not hidden, so it is refused rather than absent. Admins are always exempt. |
+| **Allow Delete Messages** | Ability to delete individual messages. |
+| **Allow Chat Edit** | Ability to edit messages. |
+| **Allow Continue Response** | Ability to use the "Continue" feature for truncated responses. |
+| **Allow Regenerate Response**| Ability to regenerate an AI response. |
+| **Allow Rate Response** | Ability to thumbs up/down responses. |
+| **Allow Chat Share** | Ability to generate a share link for a chat. |
+| **Allow Chat Export** | Ability to export chat history. |
+| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI) and to [fork a chat](/features/chat-conversations/chat-features/), which copies an existing conversation into a new one ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. When disabled, **Import Chats** in **Settings > Data Controls**, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all hidden from non-admins. Admins are always exempt. |
+| **Allow Speech to Text** | Ability to use voice input. |
+| **Allow Text to Speech** | Ability to use voice output. |
+| **Allow Call** | Ability to use the real-time audio call feature. |
+| **Allow Multiple Models in Chat** | Ability to select multiple models for a simultaneous response. |
+| **Allow Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
+| **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
 
 ### 4. Features Permissions
 Controls access to broad platform capabilities.
@@ -125,7 +135,7 @@ Controls access to broad platform capabilities.
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
 | **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
-| **Memories** | Access to the Memories feature for persistent user context. |
+| **Memories** | Access to the Memories feature for persistent user context. Taking it away hides the **Personalization** settings tab, blocks the memory API endpoints, withholds the memory tools from the model and stops stored memories being injected into the chat's system context. The injection check runs server-side on every chat request, so a client that still asks for memory does not get it. Admins are always exempt. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
 | **User Webhooks** | Ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default. |
@@ -169,11 +179,17 @@ Controls access to user settings areas.
 | :--- | :--- |
 | **Interface Settings Access** | Ability to access and modify interface settings in user settings. |
 
+:::info Interface Settings Access and instance defaults
+
+Taking this permission away hides the **Interface** page and refuses any attempt to save personal settings, so the people affected stay on whatever [Default Interface Settings](/features/administration/interface-defaults) you have configured. Leave it on, and those defaults are only a starting point that each person can change. Admins are exempt.
+
+:::
+
 :::info API Keys Permission Scope
 
 For API key creation:
 
-1.  **Global Toggle Required**: The feature must be enabled globally in **Admin Settings > General > API Keys**. If this is off, *no one* can generate keys.
+1.  **Global Toggle Required**: The feature must be enabled globally in **Settings > Admin > General > API Keys**. If this is off, *no one* can generate keys.
 2.  **Permission Check for Non-Admins**: Users with the `user` role must have the `features.api_keys` permission.
 3.  **Admins Are Exempt from `features.api_keys`**: Users with the `admin` role can generate API keys when API keys are globally enabled, even without that specific permission.
 

@@ -94,3 +94,27 @@ Pick one:
 - **Pre-bake or mount the model cache** into the image/volume for air-gapped deployments.
 
 See the [Offline Mode guide](/tutorials/maintenance/offline-mode) for the full offline setup.
+
+---
+
+## `WEBUI_SECRET_KEY is not set` on a fresh Windows install
+
+### Symptom
+
+On a fresh installation with no key set and no key file yet, `backend\start_windows.bat` prints `The system cannot find the file specified.` repeatedly while generating the key, then aborts:
+
+```text
+WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is enabled.
+```
+
+### Cause
+
+The key-generation step in older copies of the script wrote nothing, leaving an empty `.webui_secret_key` behind. The same copies also broke on an installation path containing spaces.
+
+### Fix
+
+Update Open WebUI, and **delete the empty `.webui_secret_key` file first** from the `backend` folder. The script only generates a key when that file is missing, so an empty one left over from the failed run gives you the same abort.
+
+Setting `WEBUI_SECRET_KEY` yourself also works, and is the right configuration for anything beyond a personal machine. With it set, the script skips key generation entirely.
+
+See [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) for how each start method generates and persists the key.
