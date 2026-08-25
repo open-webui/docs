@@ -66,6 +66,7 @@ When using **Native function calling mode** with a current model (at minimum GPT
 
 - **No XML tags required**: The model calls `execute_code(code)` directly
 - **Same image handling**: Base64 image URLs in output are replaced with file URLs; model embeds via markdown
+- **Tags are not executed here**: the tag format is only taught and only acted on in Legacy mode. A model in Native mode that writes a code interpreter tag block of its own accord has it shown as text rather than run, since the code it wants executed is supposed to come through the tool call.
 
 **Requirements:**
 1. `ENABLE_CODE_INTERPRETER` must be enabled globally
