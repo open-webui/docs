@@ -3750,6 +3750,13 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. MinerU was previously hardcoded to PDF only, so only add extensions your MinerU deployment actually supports.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `RAG_METADATA_MAX_VALUE_CHARS`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Drops a metadata field from what is stored alongside a document chunk when the field is a list or an object whose text runs longer than this many characters. Extraction can attach large structures to a document, and those travel into the vector store with every chunk, where they cost memory and space without helping retrieval. Setting a limit discards the oversized ones and keeps the rest of the metadata intact. Leave unset to store everything as before.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `MINERU_MAX_MARKDOWN_BYTES`
 
 - Type: `int`
