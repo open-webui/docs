@@ -6,6 +6,11 @@ import type * as Preset from "@docusaurus/preset-classic";
 import rehypeShiki, { type RehypeShikiOptions } from "@shikijs/rehype";
 import { type BundledLanguage, bundledLanguages } from "shiki";
 
+import {
+	createLegacyRedirects,
+	legacyRedirects,
+} from "./src/legacyRouteRedirects";
+
 const shikiPlugin: [typeof rehypeShiki, RehypeShikiOptions] = [
 	rehypeShiki,
 	{
@@ -214,6 +219,13 @@ const config: Config = {
 	} satisfies Preset.ThemeConfig,
 
 	plugins: [
+		[
+			"@docusaurus/plugin-client-redirects",
+			{
+				createRedirects: createLegacyRedirects,
+				redirects: legacyRedirects,
+			},
+		],
 		// Rank verbatim phrase matches above token results (see src/client/exactSearch.js).
 		() => ({
 			name: "docs-exact-search",
