@@ -252,6 +252,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   :::
 
   </TabItem>
+  <TabItem value="synthorai" label="Synthorai">
+
+  **Synthorai** provides a single OpenAI-compatible endpoint for models from multiple upstream providers, with per-key model permissions and spend limits.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://synthorai.io/v1` |
+  | **API Key** | Your API key from the [Synthorai console](https://synthorai.io/docs/quickstart/) |
+  | **Model IDs** | Auto-detected, leave empty or filter to specific models |
+
+  :::tip
+  `/models` returns the models **your key is permitted to use**, not the whole catalog, so the list you see depends on the key. If a model you expect is missing, check that key's model permissions rather than adding the ID by hand. The [model catalog](https://synthorai.io/models/) lists what is available overall.
+  :::
+
+  </TabItem>
   <TabItem value="openrouter" label="OpenRouter">
 
   **OpenRouter** aggregates hundreds of models from multiple providers behind a single API.
