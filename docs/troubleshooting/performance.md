@@ -492,7 +492,7 @@ VECTOR_DB=milvus
 ENABLE_MILVUS_MULTITENANCY_MODE=True
 ```
 
-Leave `MILVUS_URI` unset. The default already points at the embedded database inside your data directory, and setting the variable to that path stops the application from starting. See [`MILVUS_URI`](/reference/env-configuration#milvus_uri) for why, and for the directory that has to exist first.
+Leave `MILVUS_URI` unset. The default already points at the embedded database inside your data directory, and setting the variable to that path stops the application from starting. See [`MILVUS_URI`](/reference/env-configuration#milvus_uri-required) for why, and for the directory that has to exist first.
 
 With multitenancy on, users share one set of collections and each user's vectors are partitioned inside them. Without it, every user and every knowledge base gets its own collection, which is what makes the footprint grow far faster than the content does. On a device where storage is small or billed, this is usually the single biggest reduction available after offloading the embedding model.
 

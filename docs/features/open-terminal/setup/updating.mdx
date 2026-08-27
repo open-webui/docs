@@ -1,0 +1,147 @@
+---
+sidebar_position: 3
+title: "Updating"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Updating Open Terminal
+
+Open Terminal is a separate program from Open WebUI, so updating Open WebUI does not update it. If a feature described in these pages is missing, or a preview looks worse than it should, the usual reason is a terminal server that has been running untouched for a while.
+
+## Check which version you are running
+
+Open `http://localhost:8000/docs` in a browser, using whatever address you gave Open WebUI. The version number sits next to the **Open Terminal** title at the top of the page.
+
+If you would rather do it from a shell:
+
+```bash
+curl -s http://localhost:8000/openapi.json | python -c "import json,sys; print(json.load(sys.stdin)['info']['version'])"
+```
+
+Compare that against the [latest release](https://github.com/open-webui/open-terminal/releases). Neither request needs your API key.
+
+---
+
+## Update
+
+Your files live in a Docker volume or on your own disk, and updating replaces the program rather than the data. Nothing in `/home/user` is touched.
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+
+Three commands: fetch the new image, remove the old container, start a new one.
+
+```bash
+docker pull ghcr.io/open-webui/open-terminal
+docker rm -f open-terminal
+```
+
+Then run the same `docker run` command you used to start it:
+
+```bash
+docker run -d \
+  --name open-terminal \
+  --restart unless-stopped \
+  -p 8000:8000 \
+  -v open-terminal:/home/user \
+  -e OPEN_TERMINAL_API_KEY=your-secret-key \
+  ghcr.io/open-webui/open-terminal
+```
+
+:::warning Use the same flags as before
+`docker rm -f` deletes the container and its settings, so the new one only gets what you type on this line. In particular keep `-v open-terminal:/home/user`, which is what carries your files over, and keep the same `OPEN_TERMINAL_API_KEY` so Open WebUI can still connect. Everything you have forgotten here is simply gone from the new container.
+
+Run `docker inspect open-terminal` before removing it if you are not sure what the old one was started with.
+:::
+
+Using one of the smaller images? Pull the tag you actually run, such as `ghcr.io/open-webui/open-terminal:slim`, and put that same tag on the `docker run` line.
+
+  </TabItem>
+  <TabItem value="bare-metal" label="Bare Metal">
+
+**Installed with pip:**
+
+```bash
+pip install --upgrade open-terminal
+```
+
+Then stop the running server with **Ctrl+C** and start it again. The upgrade does not reach a process that is already running.
+
+If you installed the MCP extra, keep it on the upgrade:
+
+```bash
+pip install --upgrade "open-terminal[mcp]"
+```
+
+**Running with uvx:**
+
+uvx caches the version it first downloaded and keeps using it. Ask for the latest one explicitly:
+
+```bash
+uvx open-terminal@latest run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+  </TabItem>
+  <TabItem value="compose" label="Docker Compose">
+
+From the directory holding your `docker-compose.yml`:
+
+```bash
+docker compose pull open-terminal
+docker compose up -d open-terminal
+```
+
+The first command fetches the new image and the second recreates the container with it. Your Compose file already carries the volume and the API key, so there is nothing to retype.
+
+Leave the service name off both commands to update everything in the file, Open WebUI included.
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Confirm it worked
+
+Reload `http://localhost:8000/docs` and check the version number again. As long as the address and the API key stayed the same, there is nothing to change in Open WebUI.
+
+---
+
+## What a newer server gives you
+
+A few things in the file browser are done by the terminal server rather than by your browser, so they only appear once it is new enough:
+
+| Since | What it adds |
+| :--- | :--- |
+| 0.12.1 | Word and PowerPoint files preview as the real thing. The server renders them the way Office does, instead of the browser approximating the layout. |
+| 0.12.0 | The file browser searches file contents as well as file names, and shows the matching lines. |
+| 0.11.35 | A configurable file browser home, read-only markers on files you cannot change, and template variables in custom system prompts. |
+
+Office rendering needs the default image. The `slim`, `alpine` and `openshift` images stay deliberately small and leave LibreOffice out, so a document preview there falls back to the browser's own rendering and warns that it may differ from the download.
+
+---
+
+## Troubleshooting
+
+**The version has not changed.** Docker keeps using an image it already has when the tag is pinned to a specific version. Check the tag on your `docker run` line, and pull that tag rather than the bare name.
+
+**Word and PowerPoint previews still look approximate.** Either the server is older than 0.12.1, or it is one of the small images that ships without LibreOffice. Switch to `ghcr.io/open-webui/open-terminal` with no tag suffix.
+
+**Open WebUI says the terminal is unavailable.** The new container did not come up with the same port or key as the old one. Compare the connection in Open WebUI against the flags on your `docker run` line, and check `docker logs open-terminal`.
+
+**Files are missing after the update.** The new container was started without the volume. Stop it, and start it again with `-v open-terminal:/home/user`, or with whatever volume you used originally. The data is still in the volume and only the new container is failing to see it.
+
+---
+
+## Running Terminals
+
+[Terminals](/features/open-terminal/terminals) provisions a container per user from a policy, so operators update the image on the policy rather than by hand. Change the image there, then refresh the affected terminals as described in [Applying Changes](/features/open-terminal/terminals/orchestration/applying-changes).
+
+---
+
+## See also
+
+- [Installation](./installation), the original setup commands for each method.
+- [Connecting to Open WebUI](./connecting), if the connection needs redoing.
+- [File browser](/features/open-terminal/file-browser), what the previews above look like.
