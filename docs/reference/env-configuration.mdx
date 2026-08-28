@@ -2065,28 +2065,28 @@ Settings for the experimental long-term memory system (**Settings → Personaliz
 - Type: `bool`
 - Default: `False`
 - Description: When enabled, Open WebUI periodically reviews recent conversation in the background and updates the user's `context` memories automatically, instead of only on explicit save. Off by default.
-- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+- Persistence: This environment variable is a `ConfigVar` variable. It has no toggle in the interface, so on an instance that has already started once the environment variable is ignored and the stored value wins. Change it by posting the new value to `/api/v1/configs/import` with an admin token, or set [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) to `False` to have environment variables win on every start.
 
 #### `MEMORIES_REVIEW_INTERVAL_TURNS`
 
 - Type: `int`
 - Default: `10`
 - Description: How many conversation turns elapse between background memory reviews when `ENABLE_MEMORY_BACKGROUND_REVIEW` is enabled.
-- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+- Persistence: This environment variable is a `ConfigVar` variable. It has no toggle in the interface, so on an instance that has already started once the environment variable is ignored and the stored value wins. Change it by posting the new value to `/api/v1/configs/import` with an admin token, or set [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) to `False` to have environment variables win on every start.
 
 #### `MEMORIES_CONTEXT_CHAR_LIMIT`
 
 - Type: `int`
 - Default: `2000`
 - Description: Maximum number of characters of `context`-type memories injected into the prompt. Anything beyond this budget is cut off.
-- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+- Persistence: This environment variable is a `ConfigVar` variable. It has no toggle in the interface, so on an instance that has already started once the environment variable is ignored and the stored value wins. Change it by posting the new value to `/api/v1/configs/import` with an admin token, or set [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) to `False` to have environment variables win on every start.
 
 #### `MEMORIES_USER_CHAR_LIMIT`
 
 - Type: `int`
 - Default: `2000`
 - Description: Maximum number of characters of `user`-type memories injected into the prompt.
-- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+- Persistence: This environment variable is a `ConfigVar` variable. It has no toggle in the interface, so on an instance that has already started once the environment variable is ignored and the stored value wins. Change it by posting the new value to `/api/v1/configs/import` with an admin token, or set [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) to `False` to have environment variables win on every start.
 
 ## Security Variables
 
