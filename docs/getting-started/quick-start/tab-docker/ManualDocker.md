@@ -1,5 +1,17 @@
 ## Quick Start with Docker
 
+:::tip `:dev` is the pre-release build, and the newest fixes are in it
+Think of `:dev` as the nightly: it is rebuilt from the `dev` branch every time a change lands, and it becomes the next release unchanged. Fixes reach it the day they are made, which is often weeks before they reach `:main`.
+
+Swap the tag on any command on this page:
+
+```bash
+docker run -d -p 3000:8080 -v open-webui-dev:/app/backend/data --name open-webui-dev ghcr.io/open-webui/open-webui:dev
+```
+
+Installing it is your call, and it is a genuinely useful one: pre-release builds are tested by the people who choose to run them. Give it **its own volume**, as above, and run it beside your normal instance rather than in place of it. Full details in [Using the Dev Branch](#using-the-dev-branch).
+:::
+
 :::info
 **WebSocket** support is required. Ensure your network configuration allows WebSocket connections.
 :::
@@ -40,6 +52,7 @@ Visit [http://localhost:3000](http://localhost:3000).
 | Tag | Use case |
 |-----|----------|
 | `:main` | Standard image (recommended) |
+| `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. |
 | `:main-slim` | Smaller image, downloads Whisper and embedding models on first use |
 | `:cuda` | Nvidia GPU support (add `--gpus all` to `docker run`) |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
@@ -48,7 +61,7 @@ Visit [http://localhost:3000](http://localhost:3000).
 
 `:main` and `:latest` are the **same rolling image**: both point to the newest build from the `main` branch and are rebuilt every time a change lands there, so their digest moves forward as development continues. Note that `:latest` follows `main`; it does **not** point to the newest stable release.
 
-`:dev` is the same idea for the `dev` branch (upcoming features), also rolling.
+`:dev` is the same idea for the `dev` branch, also rolling. That is the pre-release, effectively a nightly build, and it carries fixes and features weeks before they appear under `:main`.
 
 Version tags, such as `:vX.Y.Z` and the shorter `:X.Y.Z` and `:X.Y`, are **pinned** to one stable release and never change. `:git-<commit-sha>` pins one exact commit.
 
@@ -57,11 +70,11 @@ This is why `:main` and a specific release tag can show different image digests 
 | Tag | Points to | Immutable? |
 | :--- | :--- | :--- |
 | `:main`, `:latest` | Newest build of the `main` branch | No (rolling) |
-| `:dev` | Newest build of the `dev` branch | No (rolling) |
+| `:dev` | Newest build of the `dev` branch, the pre-release | No (rolling) |
 | `:vX.Y.Z`, `:X.Y.Z`, `:X.Y` | A specific stable release | Yes |
 | `:git-<sha>` | One exact commit | Yes |
 
-For reproducible or production deployments, pin a version tag. For the newest build, use `:main` (or the identical `:latest`).
+For reproducible or production deployments, pin a version tag. For the newest build, use `:main` (or the identical `:latest`). For the next release before it is released, use `:dev`.
 
 ### Specific release versions
 
@@ -117,19 +130,26 @@ You cannot switch between single-user mode and multi-account mode after this cha
 
 ## Using the Dev Branch
 
-:::tip
-Testing dev builds is one of the most valuable ways to contribute. Run it on a test instance and report issues on [GitHub](https://github.com/open-webui/open-webui/issues).
-:::
+`:dev` is Open WebUI's pre-release channel, and in practice a nightly build: the image is rebuilt from the `dev` branch as changes land, and every change lands there before it lands anywhere else. There is no separate beta programme, because `dev` fills that role. Changes that reach it are not reverted, so the next release is `dev` as it stands on release day.
 
-The `:dev` tag contains the latest features before they reach a stable release.
+That has two consequences worth knowing:
+
+- **If you are waiting on a fix, it is probably already available.** Check the [changelog](https://github.com/open-webui/open-webui/blob/dev/CHANGELOG.md) on `dev`, then run `:dev` rather than waiting for the release.
+- **If you run Open WebUI for other people, testing the pre-release is how you avoid surprises.** A second instance on `:dev` shows you the next release before your users meet it, and tells you whether your plugins, your models and your configuration still behave.
+
+Whether to run it is entirely your decision, and running it is what makes releases good. A pre-release is only as well tested as the number of people who choose to install it, and that number is currently small.
+
+Setup is the same as any other image, with the tag changed:
 
 ```bash
-docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:dev
+docker run -d -p 3000:8080 -v open-webui-dev:/app/backend/data --name open-webui-dev --restart always ghcr.io/open-webui/open-webui:dev
 ```
 
-:::warning
-**Never share your data volume between dev and production.** Dev builds may include database migrations that are not backward-compatible. Always use a separate volume (e.g., `-v open-webui-dev:/app/backend/data`).
+:::warning Use a separate volume
+**Never share a data volume between dev and production.** Dev builds may include database migrations that a release image cannot read back, so a shared volume can leave you unable to go back to `:main`. The `-v open-webui-dev:/app/backend/data` above is a different volume from the `open-webui` one used elsewhere on this page, and that is deliberate. The container name differs too, so both can run at once.
 :::
+
+Anything that looks wrong on `:dev` is worth reporting on [GitHub](https://github.com/open-webui/open-webui/issues). Reports at that stage get fixed before the release instead of after it, which is the whole point of a pre-release existing.
 
 If Docker is not your preference, follow the [Developing Open WebUI](/getting-started/advanced-topics/development).
 

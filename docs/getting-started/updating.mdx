@@ -23,6 +23,9 @@ Before running any commands, decide how you want to track releases. The right ch
 | **Personal / homelab** | Use the `:main` tag and pull manually when you want the latest |
 | **Shared / team instance** | Pin a specific version (e.g. `:vX.Y.Z`) and use [Diun](#diun) for update notifications |
 | **Production / critical** | Pin a version, review [release notes](https://github.com/open-webui/open-webui/releases) before upgrading, test in staging first |
+| **Testing the next release** | Run the `:dev` pre-release on a second instance with its own volume, alongside whatever you run in production |
+
+Whichever row you are in, a second instance on `:dev` is worth having, and adding one costs you a tag, a volume and a port. It shows you the next release before it reaches your users, it tells you whether your plugins and your configuration still work, and anything it turns up gets fixed before the release rather than after it.
 
 ### `:main` vs. Pinned Versions
 

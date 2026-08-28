@@ -1,5 +1,9 @@
 # Docker Compose Setup
 
+:::tip `:dev` is the pre-release build, and the newest fixes are in it
+`:dev` is the nightly image, rebuilt from the `dev` branch as changes land, and it becomes the next release unchanged. Fixes reach it the day they are made. Running it is your call, and it is how pre-releases get tested. It is one word in your Compose file: see [Running the pre-release image](#running-the-pre-release-image) below, and give it its own volume.
+:::
+
 Using Docker Compose simplifies the management of multi-container Docker applications.
 
 Docker Compose requires an additional package, `docker-compose-v2`.
@@ -47,6 +51,30 @@ volumes:
 **Note:** Slim images download required models (whisper, embedding models) on first use, which may result in longer initial startup times but significantly smaller image sizes.
 
 :::
+
+## Running the pre-release image
+
+`:dev` is Open WebUI's pre-release channel, and in practice a nightly build: every change lands on the `dev` branch before it lands anywhere else, and the next release is `dev` as it stands on release day. Running it on a second instance shows you that release early, and anything you report gets fixed before it ships rather than after.
+
+Change the tag and, importantly, give it a **separate volume and a separate port**:
+
+```yaml
+services:
+  openwebui-dev:
+    image: ghcr.io/open-webui/open-webui:dev
+    ports:
+      - "3001:8080"
+    volumes:
+      - open-webui-dev:/app/backend/data
+volumes:
+  open-webui-dev:
+```
+
+:::warning Never point dev at your production volume
+Dev builds may include database migrations that a release image cannot read back, so a shared volume can leave you unable to go back to `:main`. Keep `open-webui-dev` as its own volume, as above.
+:::
+
+Add this as a second service alongside your normal one and both run at the same time, on ports 3000 and 3001. Report anything that looks wrong on [GitHub](https://github.com/open-webui/open-webui/issues). A pre-release is only as well tested as the number of people who choose to install it, so this is the single most useful thing an operator can contribute.
 
 ## Starting the Services
 

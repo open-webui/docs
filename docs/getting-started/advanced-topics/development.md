@@ -5,12 +5,32 @@ title: "Developing Open WebUI"
 
 # Developing Open WebUI
 
+:::danger Work on `dev`, never on `main`
+`dev` is the pre-release branch, and everything lands there first. Every fix and every feature goes to `dev` and stays there, so a bug fixed today is on `dev` today and reaches `main` at the next release. `main` is a snapshot of `dev` taken on release day, which means building from `main` gives you code that is already behind.
+
+A fresh `git clone` puts you on `main`. Switch before you do anything else:
+
+```bash
+git clone https://github.com/open-webui/open-webui.git
+cd open-webui
+git checkout dev
+```
+
+Pull requests are opened against `dev` as well. One opened against `main` has to be redone.
+:::
+
 **Run Open WebUI from source for development and testing.**
 
 This guide covers setting up a local development environment with the frontend (SvelteKit) and backend (Python/FastAPI) running side by side. You will need two terminal sessions, one for each.
 
 :::tip Don't need a full dev environment?
-You can test the latest changes by running the [dev Docker image](/getting-started/quick-start) instead: `docker run -d -p 3000:8080 -v open-webui-dev:/app/backend/data --name open-webui-dev ghcr.io/open-webui/open-webui:dev`
+Run the `:dev` pre-release image instead. It is the same code, rebuilt nightly as changes land, with nothing for you to build:
+
+```bash
+docker run -d -p 3000:8080 -v open-webui-dev:/app/backend/data --name open-webui-dev ghcr.io/open-webui/open-webui:dev
+```
+
+Testing it and reporting what you find is the lowest-effort way to help, and it is what makes releases good. See the [Quick Start](/getting-started/quick-start) for the details, and note the separate volume.
 :::
 
 ---
@@ -41,7 +61,10 @@ Never share your database or data directory between dev and production. Dev buil
 ```bash
 git clone https://github.com/open-webui/open-webui.git
 cd open-webui
+git checkout dev
 ```
+
+`git checkout dev` is the important line. Without it you are building the last release rather than the current code.
 
 ---
 
