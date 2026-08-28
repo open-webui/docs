@@ -50,6 +50,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | DeepSeek | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
+| Scalattice | Yes, with API key | Auto-detection works |
 
 **How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error. Each ID goes on the list once; typing one that is already there is refused with **Model ID is already added**, and any spaces around what you type are stripped off first.
 
@@ -162,6 +163,17 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   :::caution Groq retired its Llama chat models
   `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` are shut down as of 2026-08-16. Use the `gpt-oss` or `compound` models instead.
   :::
+
+  </TabItem>
+  <TabItem value="scalattice" label="Scalattice">
+
+  **Scalattice** is an OpenAI-compatible inference marketplace. Catalog models such as `qwen-3-14b` show up once you add a key.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.scalattice.cloud/v1` |
+  | **API Key** | Your API key from [scalattice.cloud/docs/developers](https://scalattice.cloud/docs/developers) |
+  | **Model IDs** | Auto-detected with a Bearer key (e.g., `qwen-3-14b`, `qwen-3-coder-30b-a3b`, `llama-3.3-70b`) |
 
   </TabItem>
   <TabItem value="perplexity" label="Perplexity">
