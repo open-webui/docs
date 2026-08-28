@@ -31,13 +31,17 @@ Use the toolbar above the file list to sort by **Name** or **Date Modified**, as
 
 Click any file to see a preview. Different file types display differently:
 
+:::info Word and PowerPoint rendering needs a recent terminal
+The terminal lays those files out itself, which needs Open Terminal 0.12.1 or newer running the default image. On anything older, or on the smaller images, the browser draws an approximation instead. See [Updating](./setup/updating) if your previews look rougher than the ones described here.
+:::
+
 ### Text and code
 Source code and text files are shown with syntax highlighting and line numbers.
 
 ![Python code with syntax highlighting and line numbers](/images/open-terminal-preview-code.png)
 
 ### PDFs
-PDF documents render directly in the browser, so you can read them without downloading.
+PDF documents render directly in the browser, so you can read them without downloading. A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. It is hidden on a narrow panel.
 
 ![File browser with rendered markdown preview](/images/open-terminal-preview-markdown.png)
 
@@ -47,18 +51,18 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
 ### Word documents (DOCX)
-`.docx` files render as **pages**, the way Word lays them out. Headers, footers, footnotes and endnotes are kept, embedded images appear where they belong, and page breaks split the document into separate pages instead of one long block of formatted text.
+`.docx` files are laid out by the terminal itself, using the same engine an office suite uses, and the preview shows the finished document. What you see is what the file prints: real pagination, headers, footers, footnotes and endnotes, embedded images, fonts and spacing.
 
-The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
+A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
 
-If a document cannot be rendered this way, the preview falls back to a simpler rendering of the same file (text, tables and images, without pages or zoom). Only when that fails too does it report an error and suggest downloading the file instead.
+Where the terminal cannot lay the document out, the browser draws it instead and the preview says that it may differ from the download. That rendering keeps the text, tables and images without matching the exact layout. Only when that fails too does it report an error and suggest downloading the file instead.
 
 ### Presentations (PPTX)
-`.pptx` files open in a **slide viewer**. Each slide is drawn from the file, so it picks up the slide background, shape fill colours, text alignment, bold, italic, font sizes and text colours, plus the position each placeholder takes from the slide's layout or master. A title lands where the layout puts it rather than in a generic default spot.
+`.pptx` files open in a **slide viewer**, one slide at a time. The terminal renders the deck the same way it renders Word documents, so each slide arrives as the finished thing: backgrounds, fills, fonts, spacing and the position every placeholder takes from the layout or master.
 
-A numbered **thumbnail strip** runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
+A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
 
-The preview is an approximation of the slide and may not show everything on it. Download the file and open it in its own application when the exact rendering matters.
+Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. Open the file in its own application when the exact rendering matters.
 
 ### Markdown
 Markdown files show a **rendered preview** (with formatted headings, links, bold text) and a toggle to switch to raw source.

@@ -86,7 +86,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
 | `textScale` | UI Scale | `null` (shown as **Default**), otherwise a number from `1` to `1.5` |
-| `highContrastMode` | High Contrast Mode | `false` |
+| `highContrastMode` | Accessibility Mode | `false` |
 | `showChatTitleInTab` | Display Chat Title in Tab | `true` |
 | `userLocation` | Allow User Location | `false` |
 | `hapticFeedback` | Haptic Feedback (Android) | `false` |
@@ -94,7 +94,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `showUpdateToast` | Toast Notifications for New Updates | `true` |
 | `showChangelog` | Show "What's New" Modal on Login | `true` |
 
-`textScale` is the **UI Scale** slider and `highContrastMode` is **High Contrast Mode**.
+`textScale` is the **UI Scale** slider and `highContrastMode` is **Accessibility Mode**, which was called **High Contrast Mode** before v0.11.2. The key kept its old name, so existing defaults keep working untouched.
 
 ### Chat
 
