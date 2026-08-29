@@ -68,7 +68,7 @@ Set any of these as the **TTS Voice** in the settings above, or per model in the
 
 ## Language
 
-Open WebUI sends the text and Gandr detects the language. To pin a language explicitly (for example `en`, `es`, `fr`, `de`, `pt`, `ar`, `zh`, `ja`), use the streaming WebSocket API described at [gandr.ai/docs](https://gandr.ai/docs); the OpenAI-compatible endpoint above needs no language configuration.
+Open WebUI sends the text and this route renders it in English; for the other languages, use Gandr's WebSocket API, which takes an explicit language parameter. To pin a language explicitly (for example `en`, `es`, `fr`, `de`, `pt`, `ar`, `zh`, `ja`), use the streaming WebSocket API described at [gandr.ai/docs](https://gandr.ai/docs); the OpenAI-compatible endpoint above needs no language configuration.
 
 ## Environment Variables Setup
 
