@@ -81,6 +81,29 @@ More detail, including how to switch one model or your whole instance to Legacy:
 
 ---
 
+## Prompt caching (KV cache)
+
+Providers cache the opening tokens of your request and charge less for the part they can reuse, so a conversation whose beginning never changes is cheaper and starts answering faster. OpenAI, Gemini and DeepSeek do this automatically; Anthropic caches only when the request asks it to, on every request. Several Open WebUI features rewrite the beginning of the request on each turn, which throws that cache away. The settings below stop them.
+
+### Recommended caching config
+
+Set these on the model in **Settings > Admin > Models**, click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
+
+| Setting | Recommended value | Why |
+|---------|-------------------|-----|
+| **System prompt** | Fixed text that does not regenerate per turn | It is the largest block that can stay cached |
+| **File Context** | **Off**, with **File Upload** left on | Stops file content being injected into every message, and this is the switch that hands the model the builtin file tools instead |
+| **Citations** | **Off**, with your citation rules written into the system prompt | Citations re-apply the RAG template and source list after every tool round, rewriting the cached opening |
+| **Builtin Tools** | On, with the categories you need enabled | Retrieval stays on demand, so results are appended at the end and the cached opening is untouched |
+| **Function calling** | **Native** | Builtin tools do not exist in Legacy mode |
+| **Memory** | Leave memories unchanged mid-chat, or set `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model fetch them with the memory tools | Memory injection writes into the system message and shifts as the conversation changes topic |
+
+Keep the tool list itself stable as well. Tool definitions sit next to the system prompt in the cached part, so switching categories or turning web search on mid-conversation invalidates the cache from that point. Voice mode needs no attention: its prompt is prepended once and stays constant for the session.
+
+More detail: [Prompt Caching (KV Cache) Optimization](/features/chat-conversations/prompt-caching).
+
+---
+
 ## Task models
 
 :::info Good to know
