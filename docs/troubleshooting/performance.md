@@ -128,7 +128,7 @@ A knowledge base search runs without holding up the worker that issued it, so ev
 -   **ChromaDB (Default)**: **NOT SAFE** for multi-worker (`UVICORN_WORKERS > 1`) or multi-replica deployments. The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. SQLite connections are not fork-safe: when uvicorn forks multiple workers, each process inherits the same database connection, and concurrent writes cause instant worker crashes (`Child process died`) or database corruption. This is a fundamental SQLite limitation, not a bug. See the [Scaling & HA troubleshooting guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for the full crash sequence and solutions.
 -   **Recommendations**:
     *   **Milvus** or **Qdrant**: Best for improved scale and performance, when run as servers. A server deployment is safe for multi-process access, because every worker talks to it over the network.
-    *   **Milvus Lite**: for small single-worker deployments only, where it is a better local store than ChromaDB. See [Swap ChromaDB for Milvus Lite](#4-swap-chromadb-for-milvus-lite-small-deployments). A Milvus server remains the right choice for anything larger, and Milvus Lite is embedded rather than a server, so it carries the same multi-process restriction as local ChromaDB. Point `MILVUS_URI` at a Milvus server before raising `UVICORN_WORKERS` or adding replicas.
+    *   **Milvus Lite**: for small single-worker deployments whose knowledge base is small and stays roughly the same size, where it uses less disk and less memory than local ChromaDB. Avoid it if you upload documents in bulk or keep adding files over time: the duplicate check Open WebUI runs before every upload scans the whole collection on Milvus Lite, so ingestion gets slower the more you have stored. See [Swap ChromaDB for Milvus Lite](#4-swap-chromadb-for-milvus-lite-small-deployments) for the measurements. A Milvus server remains the right choice for anything larger, and Milvus Lite is embedded, so it carries the same multi-process restriction as local ChromaDB. Point `MILVUS_URI` at a Milvus server before raising `UVICORN_WORKERS` or adding replicas.
     *   **PGVector**: Excellent choice if you are already using PostgreSQL. Also fully multi-process safe.
     *   **ChromaDB HTTP mode**: If you want to keep using ChromaDB, run it as a [separate server](/reference/env-configuration#chroma_http_host) so Open WebUI connects via HTTP instead of local SQLite.
 -   **Multitenancy**: If using Milvus or Qdrant, enabling multitenancy offers better resource sharing.
@@ -483,9 +483,33 @@ Local Whisper models are heavy (~500MB+ RAM).
 
 ### 4. Swap ChromaDB for Milvus Lite (Small Deployments)
 
-On a Raspberry Pi or a small VPS, the default local ChromaDB is usually the largest thing in the process after the models. Milvus Lite is an embedded database like ChromaDB, needs no server and no extra container, and holds the same content in noticeably less disk and less resident memory.
+On a Raspberry Pi or a small VPS, the default local ChromaDB is usually the largest thing in the process after the models. Milvus Lite is an embedded database like ChromaDB, needs no server and no extra container, and holds the same content in noticeably less disk and less resident memory. Read the limit below before switching, because it rules out any deployment that ingests documents in bulk.
 
-The saving comes from multitenancy, so enable it rather than switching alone:
+:::danger Not for bulk document ingestion
+
+The disk and memory saving only pays off on a knowledge base that is small and stays roughly the same size. If you plan to upload a large corpus, or to keep adding files over time, stay on ChromaDB or use a Milvus server.
+
+Open WebUI looks up the content hash of a file before storing it, so that the same document is not indexed twice. That lookup filters on a metadata field, and Milvus Lite keeps no index on metadata, so it reads the entire collection every time. Adding one file therefore costs more the more you already have stored, and the time to ingest a whole corpus grows with the square of its size.
+
+Measured against a local Milvus Lite database using Open WebUI's own collection schema (milvus-lite 3.2.1, pymilvus 2.6.14, Open WebUI 0.11.1), a single hash lookup takes:
+
+| Rows in the collection | Time for one lookup |
+| --- | --- |
+| 500 | 0.72s |
+| 1,000 | 1.43s |
+| 2,000 | 2.94s |
+| 3,000 | 4.51s |
+| 4,000 | 7.94s |
+
+The same lookup on ChromaDB stays flat at every size (0.024s at 500 rows, 0.002s at 4,000), because ChromaDB keeps metadata in SQLite with an index on it.
+
+End to end on the same machine, the same settings and the same embedding provider, ingesting markdown files ran at 8 files per minute on Milvus Lite and fell below 5 as the collection grew, against 200 to 368 files per minute on ChromaDB. Extrapolating the measured per-row cost, a 28,000 file corpus would take roughly 170 hours on Milvus Lite.
+
+This concerns ingestion. Search performance was not measured, and neither was a Milvus server, which is a different deployment from the embedded Milvus Lite described here.
+
+:::
+
+The saving comes from multitenancy, so enable it together with the switch:
 
 ```
 VECTOR_DB=milvus

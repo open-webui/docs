@@ -2740,6 +2740,10 @@ The parent directory must also exist before startup. The client opens the databa
 Milvus Lite is embedded, so the file is held by a single process. A second process cannot open it while Open WebUI is running, which includes any attempt to inspect the database from a separate shell.
 :::
 
+:::danger Milvus Lite is not suitable for bulk document ingestion
+Open WebUI checks a file's content hash against the collection before storing it, and Milvus Lite keeps no index on metadata, so that check reads the whole collection every time. Uploading a large corpus therefore gets slower with every file already stored. Keep the default ChromaDB or use a Milvus server for that. See [Swap ChromaDB for Milvus Lite](/troubleshooting/performance#4-swap-chromadb-for-milvus-lite-small-deployments) for the measurements.
+:::
+
 #### `MILVUS_DB`
 
 - Type: `str`
