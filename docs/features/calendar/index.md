@@ -145,6 +145,14 @@ Every occurrence sits at the clock time you set, read in your time zone rather t
 
 Your time zone comes from your browser and is stored on your account, so there is nothing to configure. When an account carries no usable time zone, its recurring events fall back to the server's time zone.
 
+### Daily is as often as an event can repeat
+
+From v0.11.2, an event cannot repeat more often than once a day. Saving a rule that comes back every hour, or every fifteen minutes, is refused with **Recurring events cannot repeat more often than daily**. This is checked on the server, so it applies to events created through the API and by a model, as well as ones created in the interface.
+
+Anything faster than daily is a job rather than an appointment, and it belongs in [Automations](/features/chat-conversations/chat-features/automations), which are built to run on that kind of schedule.
+
+Sub-daily events saved before the limit existed keep running as they are. They cannot be saved again until their repeat rule is changed, so editing anything else about such an event means fixing the rule at the same time.
+
 ---
 
 ## Automation Integration
