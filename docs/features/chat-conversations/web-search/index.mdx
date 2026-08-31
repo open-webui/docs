@@ -23,6 +23,10 @@ import DocCardList from '@theme/DocCardList';
 
 Let Open WebUI search the live web and fetch pages, then ground its answers in what it finds. Choose a provider, toggle search on per chat, and have the model cite or save what it retrieves.
 
+:::tip Search engine quality
+For the strongest search results, start with a hosted search API built for LLM workflows, such as [Exa](/features/chat-conversations/web-search/providers/exa), [Tavily](/features/chat-conversations/web-search/providers/tavily), [SearchApi](/features/chat-conversations/web-search/providers/searchapi), [Serper](/features/chat-conversations/web-search/providers/serper), [SerpApi](/features/chat-conversations/web-search/providers/serpapi), [Brave](/features/chat-conversations/web-search/providers/brave), or [Kagi](/features/chat-conversations/web-search/providers/kagi). [SearXNG](/features/chat-conversations/web-search/providers/searxng) is still useful when you want a self-hosted, privacy-preserving metasearch engine, but result quality depends heavily on its upstream engines, rate limits, and instance configuration.
+:::
+
 :::tip Require confirmation before searching
 Admins can require users to **confirm before a web search runs**, so a query is never sent to an external provider unintentionally. Enable it in **Settings → Admin → Web Search** (or via [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation)); the prompt text is set by [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content).
 :::
