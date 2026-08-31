@@ -5,6 +5,8 @@ title: "OpenTelemetry"
 
 Open WebUI supports **distributed tracing and metrics** export via the OpenTelemetry (OTel) protocol (OTLP). This enables integration with modern observability stacks such as **Grafana LGTM (Loki, Grafana, Tempo, Mimir)**, as well as **Jaeger**, **Tempo**, and **Prometheus** to monitor requests, database/Redis queries, response times, and more in real-time.
 
+For AI application observability backends that require custom OTLP headers, such as [Arize AX](https://arize.com/docs/ax/integrations/platforms/openwebui/openwebui-tracing), point Open WebUI at an OpenTelemetry Collector and let the collector forward traces with the required authentication headers.
+
 :::warning Additional Dependencies
 
 If you are running Open WebUI from source or via `pip` (outside of the official Docker images), OpenTelemetry dependencies **may not be installed by default**. You may need to install them manually:
@@ -121,6 +123,42 @@ docker run -d --name open-webui \
   -e OTEL_SERVICE_NAME=open-webui \
   -v open-webui:/app/backend/data \
   ghcr.io/open-webui/open-webui:main
+```
+
+### Forward traces through a collector
+
+Some OTLP backends require custom headers that are better handled in an OpenTelemetry Collector. For example, Arize AX
+requires `space_id` and `api_key` headers on its OTLP exporter. Point Open WebUI at the collector, then configure the
+collector to add the backend-specific headers:
+
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+  resource/arize_project:
+    attributes:
+      - key: openinference.project.name
+        value: open-webui
+        action: upsert
+
+exporters:
+  otlphttp/arize:
+    endpoint: https://otlp.arize.com/v1
+    headers:
+      space_id: ${env:ARIZE_SPACE_ID}
+      api_key: ${env:ARIZE_API_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resource/arize_project, batch]
+      exporters: [otlphttp/arize]
 ```
 
 ## 🚨 Troubleshooting
