@@ -8,7 +8,7 @@ title: "Agentic Search & URL Fetching"
 Open WebUI's web search has evolved from simple result injection to a fully **agentic research system**. By enabling **Native Function Calling (Agentic Mode)**, you allow quality models to independently explore the web, verify facts, and follow links autonomously.
 
 :::tip Minimum model tier (not a maintained list)
-Agentic web search needs a model that can call tools reliably and decide when to dig deeper. That does **not** mean a frontier model — cheap and fast is fine. **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B** all handle this well and are the **minimum**, each verified working at the time of writing. Only genuinely old or very small models struggle with the multi-step reasoning.
+Agentic web search needs a model that can call tools reliably and decide when to dig deeper. That does **not** mean a frontier model — cheap and fast is fine. **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Gemma 4 31B**, **Qwen 3.6 27B**, or **Muse Glimmer 30B** all handle this well and meet the minimum bar, each verified working at the time of writing. Only genuinely old or very small models struggle with the multi-step reasoning.
 
 **This list is not continuously updated** — chasing every model release is impossible and adds no value. Use whatever current model your provider offers; you don't need the latest *and greatest*, just something recent.
 :::
@@ -29,14 +29,15 @@ For comprehensive information about all built-in agentic tools (including web se
 
 ## How to Enable Agentic Behavior
 
-To unlock these features, your model needs native tool calling and reasonable multi-step reasoning — at minimum something like GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+To unlock these features, your model needs native tool calling and reasonable multi-step reasoning — at minimum something like GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, Gemma 4 31B, or Muse Glimmer 30B locally. Administrator-level configuration for these built-in system tools is handled via the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 1.  **Enable Web Search Globally**: Ensure a search engine is configured in **Settings → Admin → Web Search**.
 2.  **Enable Model Capability**: In **Settings → Admin → Models**, select your model and enable the **Web Search** capability.
 3.  **Enable Default Feature**: In the same model settings, under **Default Features**, check **Web Search**. This controls whether the `search_web` and `fetch_url` tools are available by default in new chat sessions.
 4.  **Confirm Native Mode (Agentic Mode)**:
     *   Native is the default tool-calling mode as of v0.10.0, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).
-5.  **Use a Quality Model**: Ensure you're using a frontier model with strong reasoning capabilities for best results.
+5.  **Use a Quality Search Engine**: Choose a provider that returns relevant, current results. Hosted providers built for LLM workflows usually return stronger results, while self-hosted engines like SearXNG depend heavily on upstream engines and instance configuration.
+6.  **Use a Quality Tool-Calling Model**: Use a recent model with reliable native function calling and enough context for tool schemas and search results.
 
 :::info Configuring via environment variables instead
 The steps above use the Admin Panel, which is the recommended route. If you manage your instance through env vars, set the global default with `DEFAULT_MODEL_PARAMS: '{"function_calling": "native"}'`. There is **no** separate `FUNCTION_CALLING_MODE` variable. See the [central tools guide](/features/extensibility/plugin/tools#how-to-enable-native-mode-agentic-mode) for details.

@@ -1255,11 +1255,39 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 On tagged releases `outlet()` is never invoked by `/api/chat/completions`, so a direct API integration has to follow it with `POST /api/chat/completed`. On `dev` it runs by default for direct callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
+:::info How assistant text is stored (read this before editing)
+Assistant messages carry **two** representations of their text:
+
+- **`content`** — a plain string. Backend consumers read this: memory extraction, RAG/retrieval context, context-window compaction, and follow-up generation.
+- **`output`** — a structured list of items (reasoning blocks + `message` items). **This is what the chat UI renders.** The visible response text lives in `output[].content[].text` for items where `type == "message"`.
+
+Because the UI reads `output` while backend consumers read `content`, editing **only** `message["content"]` updates the stored/derived text but **not** what the user sees on screen (and vice-versa). To make a change appear in the UI *and* stay consistent for the rest of the backend, rewrite **both** representations together:
+
+```python
+def redact(message: dict, old: str, new: str) -> None:
+    """Rewrite both the flat `content` and the structured `output` in place."""
+    # 1) Flat content — read by backend consumers (memory, RAG, context, follow-ups).
+    if isinstance(message.get("content"), str):
+        message["content"] = message["content"].replace(old, new)
+
+    # 2) Structured output — what the chat UI actually renders.
+    for item in message.get("output") or []:
+        parts = item.get("content")
+        if not isinstance(parts, list):
+            continue
+        for part in parts:
+            if isinstance(part.get("text"), str):
+                part["text"] = part["text"].replace(old, new)
+```
+
+> Scope the `output` loop to `item.get("type") == "message"` if you only want to touch the visible answer and leave the (often hidden) reasoning trace alone.
+:::
+
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
 ```python
 async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     for message in body["messages"]:
-        message["content"] = message["content"].replace("<API_KEY>", "[REDACTED]")
+        redact(message, "<API_KEY>", "[REDACTED]")  # `redact` defined above
     return body
 ```
 
@@ -1293,10 +1321,20 @@ Returning output in Markdown or another formatted style? Use the `outlet` functi
 ```python
 class Filter:
     async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
-        # Add "highlight" markdown for every response
+        # Add "highlight" markdown for every assistant response.
+        # Keep the flat `content` and the structured `output` in sync —
+        # the UI renders from `output`, the backend reads `content`.
         for message in body["messages"]:
-            if message["role"] == "assistant":  # Target model response
-                message["content"] = f"**{message['content']}**"  # Highlight with Markdown
+            if message.get("role") != "assistant":  # Target model response only
+                continue
+            if isinstance(message.get("content"), str):
+                message["content"] = f"**{message['content']}**"
+            for item in message.get("output") or []:
+                if item.get("type") != "message":
+                    continue
+                for part in item.get("content") or []:
+                    if isinstance(part.get("text"), str):
+                        part["text"] = f"**{part['text']}**"  # Highlight with Markdown
         return body
 ```
 
