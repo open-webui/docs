@@ -20,7 +20,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 **Wrap any model with custom instructions, tools, and knowledge to build specialized agents.**
 
-The Models workspace lets you create configuration presets that sit on top of any base model. Pick GPT-5.6, Claude, Qwen 3.6, or anything else connected to Open WebUI, then bind a system prompt, knowledge bases, tools, skills, and parameter overrides to it. The result is a purpose-built agent that behaves exactly the way you need without modifying the underlying model.
+The Models workspace lets you create configuration presets that sit on top of any base model. Pick GPT-5.6, Claude, Qwen 3.6, or anything else connected to Open WebUI, then bind a system prompt, knowledge bases, tools, skills, and parameter overrides to it. The result is a purpose-built agent without modifying the underlying model.
 
 A "Python Tutor" that always uses your style guide. A "Meeting Summarizer" with your company's template. A "Code Reviewer" with your linting rules baked in. Every agent is a thin wrapper: pick a base model, configure it, and share it with your team.
 
@@ -93,6 +93,14 @@ The system prompt defines the behavior and persona. Use dynamic variables for co
 You are a helpful assistant for {{ USER_NAME }}.
 The current date is {{ CURRENT_DATE }}.
 ```
+
+:::note System prompts are instructions, not a guarantee
+
+Open WebUI does not require a special format for system prompts. Plain text, Markdown lists, and short structured sections all work; the only special syntax Open WebUI handles here is supported variables such as `{{ CURRENT_DATE }}` and chat/user variables.
+
+How closely the assistant follows the prompt depends on the selected **Base Model**, the provider or local server's chat template, the full conversation context, and any extra instructions added by tools, files, RAG, skills, memory, or filters. If a prompt is configured in the right place but the model still ignores rules, compare against a stronger instruction-following model and check the provider/backend request formatting before assuming the prompt needs a different Open WebUI-specific format.
+
+:::
 
 :::tip Group-aware system prompts
 `{{ USER_GROUPS }}` lets a single shared model adapt its behavior to the caller's RBAC groups, e.g. *"You may discuss internal roadmap items only when `{{ USER_GROUPS }}` contains 'Engineering'."* The placeholder is resolved server-side at chat time, and the database lookup runs only when the variable is actually referenced in the template.
