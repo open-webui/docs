@@ -27,8 +27,9 @@ Filters sit in the middle of the flow (like checkpoints) where you decide what n
 Here’s a quick summary of what Filters do:
 
 1. **Modify User Inputs (Inlet Function)**: Tweak the input data before it reaches the AI model. This is where you enhance clarity, add context, sanitize text, or reformat messages to match specific requirements.
-2. **Intercept Model Outputs (Stream Function)**: Capture and adjust the AI’s responses **as they’re generated** by the model. This is useful for real-time modifications, like filtering out sensitive information or formatting the output for better readability.
-3. **Modify Model Outputs (Outlet Function)**: Adjust the AI's response **after it’s processed**, before showing it to the user. This can help refine, log, or adapt the data for a cleaner user experience.
+2. **Modify Every Outgoing Call (Request Function)**: Adjust the payload immediately before it is handed to the model provider, every single time one is sent. Added in v0.11.2, and covered in [The `request` step](#the-request-step) below.
+3. **Intercept Model Outputs (Stream Function)**: Capture and adjust the AI’s responses **as they’re generated** by the model. This is useful for real-time modifications, like filtering out sensitive information or formatting the output for better readability.
+4. **Modify Model Outputs (Outlet Function)**: Adjust the AI's response **after it’s processed**, before showing it to the user. This can help refine, log, or adapt the data for a cleaner user experience.
 
 > **Key Concept:** Filters are not standalone models but tools that enhance or transform the data traveling *to* and *from* models.
 
@@ -60,6 +61,11 @@ class Filter:
         print(f"inlet called: {body}")
         return body
 
+    async def request(self, body: dict) -> dict:
+        # This is where you manipulate the payload for each outgoing model call.
+        print(f"request called: {body}")
+        return body
+
     async def stream(self, event: dict) -> dict:
         # This is where you modify streamed chunks of model output.
         print(f"stream event: {event}")
@@ -70,6 +76,40 @@ class Filter:
         print(f"outlet called: {body}")
         return body
 ```
+
+---
+
+### The `request` step
+
+`request` was added in **v0.11.2**. It receives the payload that is about to be sent to the model provider, and whatever it returns is what gets sent.
+
+```python
+    async def request(self, body: dict, __user__: Optional[dict] = None) -> dict:
+        body["metadata"] = {**body.get("metadata", {}), "department": "research"}
+        return body
+```
+
+#### How it differs from `inlet`
+
+`inlet` runs **once per user turn**. `request` runs **once per call to the model**, and those are not the same number.
+
+A turn that uses tools makes several calls: one to decide which tool to use, then another after each set of tool results comes back, until the model produces a final answer. `inlet` saw only the first of those. `request` runs before every one of them, including the call made after a tool run the user had to approve.
+
+That difference decides which one you want:
+
+| Use `inlet` when | Use `request` when |
+| :--- | :--- |
+| You are reacting to what the user typed | You are enforcing something on the wire |
+| Running your logic more than once per turn would be wrong, such as billing, rate limiting or logging a turn | Running it on every call is the point, such as stamping a parameter, injecting a header or redacting content |
+| You want to change the user's message | You want to change the request, whether the messages in it came from the user, the model or a tool |
+
+Something added in `inlet` reaches the first call and can be dropped from later ones as the message list is rebuilt for each follow-up. Something added in `request` is on every call by construction, which is why enforcement belongs here.
+
+#### What to watch for
+
+`request` runs on every provider call, so anything expensive in it is paid for repeatedly inside a single answer. Keep it cheap, and keep anything that should happen once per turn in `inlet`.
+
+`inlet`, `stream` and `outlet` are unchanged, and a filter that does not define `request` behaves exactly as before.
 
 ---
 
@@ -458,10 +498,12 @@ Here's the complete flow from admin configuration to filter execution:
 - Sort by priority (from valves)
 
 **5. FILTER EXECUTION**
-- Execute inlet() filters (pre-request)
+- Execute inlet() filters (once, at the start of the turn)
+- Execute request() filters (immediately before the payload goes to the provider)
 - Send modified request to LLM
 - Execute stream() filters (during streaming)
-- Execute outlet() filters (post-response)
+- Repeat request() and stream() for every further call the turn makes, such as after tool results come back
+- Execute outlet() filters (once, after the final response)
 
 ---
 
