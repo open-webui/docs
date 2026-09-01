@@ -2459,6 +2459,8 @@ If `OFFLINE_MODE` is enabled, this `ENABLE_VERSION_UPDATE_CHECK` flag is always 
 - Downloads of embedding models from Hugging Face Hub
   - If you did not download an embedding model prior to activating `OFFLINE_MODE` any RAG, web search and document analysis functionality may not work properly. On a **fresh install** this aborts startup with `No embedding model is loaded`, see [Startup & Docker Failures](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install) for the fix.
 - Update notifications in the UI (see flag `ENABLE_VERSION_UPDATE_CHECK`)
+- Automatic updates of the embedding, reranking, and Whisper models
+- Installation of Python packages declared in function and tool `requirements` frontmatter, regardless of [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](#enable_pip_install_frontmatter_requirements). A plugin whose dependencies are not already present fails with `ModuleNotFoundError` when it loads, and the skip is only recorded in the logs, so pre-install the packages in your image.
 
 **Still functional:**
 
@@ -8396,6 +8398,8 @@ RUN pip install --no-cache-dir python-docx requests beautifulsoup4
 ```
 
 When disabled, functions and tools that import missing packages will fail with a `ModuleNotFoundError` at load time, clearly indicating which packages need to be pre-installed.
+
+[`OFFLINE_MODE`](#offline_mode) skips these installs as well, even when this variable is left enabled.
 
 :::
 
