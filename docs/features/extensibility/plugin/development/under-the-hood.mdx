@@ -99,6 +99,12 @@ Runs at module load (once per source version). The patch persists in `sys.module
 
 Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
 
+:::tip Check whether the `request` filter hook covers you first
+The most common reason people patched `generate_chat_completion` or `process_chat_payload` was to reach the payload on **every** provider call, not just the first one, because `inlet` runs once per user turn and never sees a tool-loop continuation. Since **v0.11.2** the [`request` filter hook](/features/extensibility/plugin/functions/filter#the-request-step) does exactly that as a supported hook, with no patching, no load-order hazard and no restart needed to roll back.
+
+If you are on 0.11.2+ and your patch exists to intercept outgoing payloads, migrate it to `request` and delete the patch. Note that a patch installed by an earlier version of your plugin stays live in every worker process that loaded it, so a fleet-wide restart is still required to actually drop it.
+:::
+
 ### 3. Serve a page or asset from a route
 
 ```python
