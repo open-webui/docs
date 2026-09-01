@@ -19,6 +19,10 @@ This page aims to detail the type and structure of each special argument as well
 
 A `dict` usually destined to go almost directly to the model. Although it is not strictly a special argument, it is included here for easier reference and because it contains itself some special arguments.
 
+:::note The `body` differs between a Filter's `inlet()` and `request()`
+`inlet()` sees the body early, before the pipeline has run; `request()` sees it last, as it leaves for the provider. Keys such as `features`, `variables`, `tool_ids`, `files`, `folder_id` and `skill_ids` have been popped off by then, while retrieved RAG sources and the resolved `tools` array have been added. The example below is an `inlet()`-shaped body. See [Where `request` sits in the pipeline](/features/extensibility/plugin/functions/filter#where-request-sits-in-the-pipeline).
+:::
+
 <details>
 <summary>Example</summary>
 
@@ -269,7 +273,7 @@ See the `body["messages"]` value above.
 
 The `str` of the `chat_id`, representing the unique identifier of the current chat/conversation.
 
-Pipes, Tools and a Filter's `inlet()` receive it, for invocations that originate from a chat context, including:
+Pipes, Tools and a Filter's `inlet()` and `request()` receive it, for invocations that originate from a chat context, including:
 - Regular user messages
 - Internal task calls (title generation, query generation, tag generation, etc.)
 
