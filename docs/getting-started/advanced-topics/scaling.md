@@ -365,6 +365,8 @@ CONTENT_EXTRACTION_ENGINE=tika
 TIKA_SERVER_URL=http://tika:9998
 ```
 
+If Tika or Docling don't cover your document types, or you need to route different file types to different backends, run your own service instead and set `CONTENT_EXTRACTION_ENGINE=external`. See [External Document Extraction](/features/chat-conversations/rag/document-extraction/external) for the HTTP contract.
+
 2. **Switch the embedding engine** to an external provider:
 
 ```

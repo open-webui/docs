@@ -105,9 +105,43 @@ That difference decides which one you want:
 
 Something added in `inlet` reaches the first call and can be dropped from later ones as the message list is rebuilt for each follow-up. Something added in `request` is on every call by construction, which is why enforcement belongs here.
 
-#### What to watch for
+#### Where `request` sits in the pipeline
 
-`request` runs on every provider call, so anything expensive in it is paid for repeatedly inside a single answer. Keep it cheap, and keep anything that should happen once per turn in `inlet`.
+`inlet` runs near the start of the turn; `request` runs at the end, on the payload as it is about to leave. Everything the pipeline does happens between them, and that changes what is in the `body` you receive.
+
+**Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `variables`, `tool_ids`, `terminal_id`, `files`, `folder_id`, `skill_ids` and `regeneration_prompt`. A filter that needs any of these has to be an `inlet`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
+
+**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the applied system prompt, and memory or web-search context. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
+
+Provider-shape normalization happens after `request` returns, so you still see Open WebUI's internal message shapes, not the provider's.
+
+#### Write it to be idempotent
+
+This is the one that bites. Because `request` runs again on every hop of a tool loop, and each hop passes the **whole conversation** back through your filter, any change you make must be safe to apply to a body you have already changed.
+
+```python
+# WRONG: a three-tool-call turn ends with four copies of this line.
+async def request(self, body: dict) -> dict:
+    body["messages"].insert(0, {"role": "system", "content": "Be concise."})
+    return body
+
+# RIGHT: converges to the same body no matter how many times it runs.
+async def request(self, body: dict) -> dict:
+    marker = "Be concise."
+    if not any(m.get("content") == marker for m in body["messages"]):
+        body["messages"].insert(0, {"role": "system", "content": marker})
+    return body
+```
+
+Transformations that are naturally idempotent (clamping a value, downscaling an image that is already under the limit, redacting a pattern that no longer matches) need no guard. Anything that appends, prepends, increments or accumulates does. If a once-per-turn guarantee is what you actually want, that is what `inlet` is for.
+
+#### Other things to watch for
+
+`request` runs on every provider call, so anything expensive in it is paid for repeatedly inside a single answer. Because each call re-scans the full history, cost grows with both conversation length and tool-call count. Cache on a content hash if the work is heavy.
+
+Raising from `request` aborts the whole completion, exactly as it does from `outlet` and `stream`. Only `inlet` failures are logged at debug level and otherwise treated gently; every other filter type re-raises and the call site turns it into a failed turn. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
+
+`file_handler` has no effect on a `request` filter; see [the note below](#owning-retrieval-with-file_handler).
 
 `inlet`, `stream` and `outlet` are unchanged, and a filter that does not define `request` behaves exactly as before.
 
@@ -153,7 +187,7 @@ class Filter:
 It is a **visibility / gating flag**, read once at request-dispatch time, **not** a runtime state the UI flips on your Python object. Specifically:
 
 - **Visibility:** the filter only appears in the chat UI (inline chip + Integrations menu entry) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
-- **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
+- **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `request()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
 - **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__`, which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
 
 :::warning Upgrading from pre-0.9.0 filters
@@ -221,6 +255,10 @@ class Filter:
 
 :::warning Module attribute, not `self.file_handler`
 Open WebUI reads `file_handler` from the **module object** (the file your filter lives in), not from the `Filter` instance. Setting `self.file_handler = True` inside `__init__` is silently ignored. Put the assignment at the top of the file, alongside your imports, exactly as shown above.
+:::
+
+:::note `file_handler` applies to `inlet` only
+The flag is read exclusively on the `inlet` pass, and the file references are stripped only after `inlet` filters have run. Declaring `file_handler = True` in a module whose filter defines only `request` (or `stream` / `outlet`) does nothing at all: the built-in RAG still runs, and no keys are stripped. If your goal is to transform retrieved chunks rather than replace retrieval, you do not need this flag; a `request` filter already receives the chunks after injection. See [Where `request` sits in the pipeline](#where-request-sits-in-the-pipeline).
 :::
 
 #### When to use it
@@ -509,13 +547,14 @@ Here's the complete flow from admin configuration to filter execution:
 
 ### Filter Behavior with API Requests
 
-When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), `inlet()` and `stream()` follow the same execution model as WebUI requests. `outlet()` is the one that behaves very differently for direct API callers and is covered in detail below.
+When using Open WebUI's API endpoints directly (e.g., via `curl` or external applications), `inlet()`, `request()` and `stream()` follow the same execution model as WebUI requests. `outlet()` is the one that behaves very differently for direct API callers and is covered in detail below.
 
 #### Key Behavioral Differences
 
 | Function | WebUI Request | Direct API, stable (`main`) | Direct API, pre-release (`dev`) |
 |----------|--------------|------------------------------|-----------------------------------|
 | `inlet()` | ✅ Always called | ✅ Always called | ✅ Always called |
+| `request()` | ✅ Called before every provider call | ✅ Called before every provider call | ✅ Called before every provider call |
 | `stream()` | ✅ Called during streaming | ✅ Called during streaming | ✅ Called during streaming |
 | `outlet()` | ✅ Called after response | ❌ Not called by `/api/chat/completions`, only by `/api/chat/completed` | ✅ Runs by default for API callers, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
 | `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Inert for pure API callers | ⚠️ Inert for pure API callers |
@@ -843,6 +882,8 @@ Filters can declare any of these parameters in their function signature to recei
 
 Only parameters you declare in your function signature are injected. Open WebUI inspects the signature at runtime to determine what to pass.
 
+`request()` is handed the **same set** as `inlet()`, so `__model__` resolves workspace models there exactly as shown above. The one extra is `__features__`, which carries the `features` dict after the pipeline has popped it off the body.
+
 ---
 
 ### UI Indicators & Visual Feedback
@@ -1041,7 +1082,10 @@ In the world of Open WebUI, the `inlet` function does this important prep work o
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
 :::info Want to transform RAG chunks? `inlet()` runs **before** retrieval
-At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file/collection *references*. The actual chunk text is fetched and injected later, after every inlet filter has returned. If you need to inspect or transform the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs), see [Owning Retrieval With `file_handler`](#owning-retrieval-with-file_handler) for the supported opt-in.
+At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file/collection *references*. The actual chunk text is fetched and injected later, after every inlet filter has returned. Two ways to reach the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs):
+
+- **[`request()`](#the-request-step)** runs after retrieval, so the injected chunks are already in the body. Use this to *transform* what the built-in RAG produced. Simplest option, no opt-in required.
+- **[`file_handler`](#owning-retrieval-with-file_handler)** skips the built-in RAG entirely and hands you the references. Use this to *replace* retrieval with your own.
 :::
 
 ##### Why Would You Use the `inlet`?
@@ -1255,39 +1299,11 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 On tagged releases `outlet()` is never invoked by `/api/chat/completions`, so a direct API integration has to follow it with `POST /api/chat/completed`. On `dev` it runs by default for direct callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
-:::info How assistant text is stored (read this before editing)
-Assistant messages carry **two** representations of their text:
-
-- **`content`** — a plain string. Backend consumers read this: memory extraction, RAG/retrieval context, context-window compaction, and follow-up generation.
-- **`output`** — a structured list of items (reasoning blocks + `message` items). **This is what the chat UI renders.** The visible response text lives in `output[].content[].text` for items where `type == "message"`.
-
-Because the UI reads `output` while backend consumers read `content`, editing **only** `message["content"]` updates the stored/derived text but **not** what the user sees on screen (and vice-versa). To make a change appear in the UI *and* stay consistent for the rest of the backend, rewrite **both** representations together:
-
-```python
-def redact(message: dict, old: str, new: str) -> None:
-    """Rewrite both the flat `content` and the structured `output` in place."""
-    # 1) Flat content — read by backend consumers (memory, RAG, context, follow-ups).
-    if isinstance(message.get("content"), str):
-        message["content"] = message["content"].replace(old, new)
-
-    # 2) Structured output — what the chat UI actually renders.
-    for item in message.get("output") or []:
-        parts = item.get("content")
-        if not isinstance(parts, list):
-            continue
-        for part in parts:
-            if isinstance(part.get("text"), str):
-                part["text"] = part["text"].replace(old, new)
-```
-
-> Scope the `output` loop to `item.get("type") == "message"` if you only want to touch the visible answer and leave the (often hidden) reasoning trace alone.
-:::
-
 💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
 ```python
 async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     for message in body["messages"]:
-        redact(message, "<API_KEY>", "[REDACTED]")  # `redact` defined above
+        message["content"] = message["content"].replace("<API_KEY>", "[REDACTED]")
     return body
 ```
 
@@ -1321,20 +1337,10 @@ Returning output in Markdown or another formatted style? Use the `outlet` functi
 ```python
 class Filter:
     async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
-        # Add "highlight" markdown for every assistant response.
-        # Keep the flat `content` and the structured `output` in sync —
-        # the UI renders from `output`, the backend reads `content`.
+        # Add "highlight" markdown for every response
         for message in body["messages"]:
-            if message.get("role") != "assistant":  # Target model response only
-                continue
-            if isinstance(message.get("content"), str):
-                message["content"] = f"**{message['content']}**"
-            for item in message.get("output") or []:
-                if item.get("type") != "message":
-                    continue
-                for part in item.get("content") or []:
-                    if isinstance(part.get("text"), str):
-                        part["text"] = f"**{part['text']}**"  # Highlight with Markdown
+            if message["role"] == "assistant":  # Target model response
+                message["content"] = f"**{message['content']}**"  # Highlight with Markdown
         return body
 ```
 
@@ -1405,11 +1411,12 @@ You can, but **it’s not the best practice.**:
 ## 🎉 Recap: Why Build Filter Functions?
 
 By now, you’ve learned:
-1. **Inlet** manipulates **user inputs** (pre-processing).
-2. **Stream** intercepts and modifies **streamed model outputs** (real-time).
-3. **Outlet** tweaks **AI outputs** (post-processing).
-4. Filters are best for lightweight, real-time alterations to the data flow.
-5. With **Valves**, you empower users to configure Filters dynamically for tailored behavior.
+1. **Inlet** manipulates **user inputs** (pre-processing), once per turn.
+2. **Request** adjusts the **outgoing payload** before every provider call, including each hop of a tool loop. Write it to be idempotent.
+3. **Stream** intercepts and modifies **streamed model outputs** (real-time).
+4. **Outlet** tweaks **AI outputs** (post-processing).
+5. Filters are best for lightweight, real-time alterations to the data flow.
+6. With **Valves**, you empower users to configure Filters dynamically for tailored behavior.
 
 ---
 

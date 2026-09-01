@@ -193,7 +193,7 @@ Two ways to use it, in order of simplicity:
 The defaults are reasonable for getting started. When you outgrow them, there are three knobs that matter most:
 
 - **Embedding engine.** The default (SentenceTransformers `all-MiniLM-L6-v2`) runs locally on CPU and consumes roughly 500 MB of RAM per worker. For any multi-user deployment, point at an external embeddings API (OpenAI, or Ollama with `nomic-embed-text`) via `RAG_EMBEDDING_ENGINE`.
-- **Content extraction engine.** The default uses `pypdf`, which leaks memory during heavy ingestion. For anything beyond casual use, switch to **Tika** or **Docling** via `CONTENT_EXTRACTION_ENGINE`.
+- **Content extraction engine.** The default uses `pypdf`, which leaks memory during heavy ingestion. For anything beyond casual use, switch to **Tika** or **Docling** via `CONTENT_EXTRACTION_ENGINE`, or point it at your own service with the [external engine](/features/chat-conversations/rag/document-extraction/external) if you need per-file-type routing or custom logic.
 - **Vector database.** The default ChromaDB (local SQLite-backed) does not tolerate multi-worker deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available as non-core integrations: they may break on upgrades, and fixes come from outside the core Open WebUI maintenance path. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the integration disclaimers on each provider.
 
 :::note When to worry about this
