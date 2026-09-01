@@ -1,269 +1,430 @@
 ---
-sidebar_position: 5
-title: "Under the Hood"
+sidebar_position: 999
+title: "Reserved Arguments"
 ---
-
-# Under the Hood: What the Plugin Loader Actually Does
-
-:::danger ⚠️ Critical Security Warning
-**Tools, Functions, Pipes, Filters, and Actions execute arbitrary Python code on your server.** Function creation is restricted to administrators only, and Workspace Tool creation is gated by the `workspace.tools` permission. Granting that permission is equivalent to giving the user shell access to the server. Only install from trusted sources, review code before importing, and restrict creation to trusted administrators. A malicious plugin could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
-:::
-
-Open WebUI's plugins (Tools, Functions = Filters / Pipes / Actions) are not sandboxed scripts running in some restricted runtime. They are **Python modules executed inside your Open WebUI process**, with full access to the standard library, any pip package, the entire `open_webui` codebase, the live FastAPI app, and the database. The documented hooks (`inlet`, `outlet`, `stream`, `pipe`, `action`) are *one* way to use that access. They are not the only way.
-
-This page documents what the loader really does and what that opens up, so you can build (or audit) plugins beyond the patterns shown on the per-type pages. It also lists the footguns that come with the territory.
-
----
-
-## How a plugin is loaded
-
-A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/plugin.py) handles every plugin type:
-
-1. The plugin's Python source is read from the database.
-2. A fresh `types.ModuleType` is created and registered in `sys.modules` as `function_{id}` (or `tool_{id}`).
-3. The source is fed to `exec(content, module.__dict__)`. Anything at module top level runs at this point.
-4. The loader looks for **one** entry-point class: `Tools`, `Pipe`, `Filter`, `Action` or `Event`. That class becomes the handle Open WebUI calls into.
-5. The module stays in `sys.modules` for the life of the process. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
-
-The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
-
-### When the module is re-executed
-
-Inlet/outlet hooks pass `load_from_db=True`. The loader still serves from cache if the source has not changed, but it consults the database on every call to decide that. Stream hooks pass `load_from_db=False` and read straight from cache.
-
-| Hook | DB check per call? | Module re-exec'd when? |
-|---|---|---|
-| `inlet` / `outlet` (Filter) | yes | source change between calls |
-| `stream` (Filter) | no | only when another hook re-loads it |
-| Tools, Pipes, Actions | yes on dispatch | source change between calls |
-
-Practical consequences:
-
-- **Editing a Filter via the editor takes effect on the next chat for `inlet`/`outlet`.** Stream picks it up the next time an `inlet` or `outlet` triggers a reload.
-- **Re-execution is not per-request**, so module-top-level work is paid for once per content version, not once per chat. Top-level imports, patches, and singletons are fine.
-- **Disabling or deleting a plugin** removes it from the active set. It does **not** undo anything its module top level did. The module stays in `sys.modules` and any monkey-patches it installed in other modules stay applied until the process restarts.
-
----
-
-## What you actually have access to
-
-From any hook (and from module top level):
-
-- The full `open_webui.*` package. Examples: `from open_webui.models.chats import Chats`, `from open_webui.utils.middleware import process_chat_payload`, `from open_webui.models.config import Config`.
-- The live FastAPI `Request` via `__request__`, which carries `__request__.app` (the FastAPI app), `__request__.app.state` (config, caches, handlers), and `__request__.state` (per-request scratch).
-- The reserved dunder args documented in [Reserved Arguments](./reserved-args): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
-- Events documented in [Events](./events): emit anything to the frontend, or solicit a response from the user with `event_call`.
-- Any pip package via `requirements:` frontmatter, installed at load time (gated by [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)).
-- The Python stdlib, plus everything pip-installed in the container.
-
-There is no sandbox, no allowlist, no capability system. The execution model is **"this is Python, you are inside the server process"**.
-
----
-
-## Patterns
-
-### 1. Mutate the per-request model dict from `inlet`
-
-The `__model__` you receive is **the same dict object** the rest of the request reads. Changing its keys from `inlet` changes how the rest of the pipeline behaves on this request. Example (the reasoning-content fix for DeepSeek / Kimi / MiMo):
-
-```python
-class Filter:
-    async def inlet(self, body: dict, __model__: dict = None) -> dict:
-        # Flip the per-request model to the code path that emits
-        # reasoning_content as a top-level field on assistant messages
-        # during the native tool-call loop.
-        if __model__ and __model__.get("provider") not in ("ollama", "llama.cpp"):
-            __model__["provider"] = "llama.cpp"
-        return body
-```
-
-Same trick works for any other field the middleware reads from the model dict: `params`, `meta`, custom keys you put there yourself and then read from another hook.
-
-### 2. Monkey-patch a backend function
-
-Because the plugin module can `import open_webui.*` and rebind module attributes:
-
-```python
-import open_webui.utils.middleware as _mw
-
-_original = _mw.process_chat_payload
-
-async def _patched(request, form_data, user, metadata, model):
-    # ...your wrapping logic, then delegate...
-    return await _original(request, form_data, user, metadata, model)
-
-_mw.process_chat_payload = _patched
-```
-
-Runs at module load (once per source version). The patch persists in `sys.modules` for the life of the process. Deleting or disabling the plugin **does not** revert the patch. The only clean rollback is a process restart.
-
-Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
-
-:::tip Check whether the `request` filter hook covers you first
-The most common reason people patched `generate_chat_completion` or `process_chat_payload` was to reach the payload on **every** provider call, not just the first one, because `inlet` runs once per user turn and never sees a tool-loop continuation. Since **v0.11.2** the [`request` filter hook](/features/extensibility/plugin/functions/filter#the-request-step) does exactly that as a supported hook, with no patching, no load-order hazard and no restart needed to roll back.
-
-If you are on 0.11.2+ and your patch exists to intercept outgoing payloads, migrate it to `request` and delete the patch. Note that a patch installed by an earlier version of your plugin stays live in every worker process that loaded it, so a fleet-wide restart is still required to actually drop it.
-:::
-
-### 3. Serve a page or asset from a route
-
-```python
-from fastapi.responses import HTMLResponse, Response
-
-def _ensure_routes(app):
-    if any(getattr(r, "path", None) == "/my/tool" for r in app.routes):
-        return  # idempotency guard: the loader may re-exec on edits
-
-    async def page():
-        return HTMLResponse(
-            "<html><head><link rel=stylesheet href=/my/tool.css></head>"
-            "<body><div id=app></div><script src=/my/tool.js></script></body></html>"
-        )
-
-    async def script():
-        return Response(MY_JS, media_type="application/javascript")
-
-    async def style():
-        return Response(MY_CSS, media_type="text/css")
-
-    app.add_api_route("/my/tool", page, methods=["GET"])
-    app.add_api_route("/my/tool.js", script, methods=["GET"])
-    app.add_api_route("/my/tool.css", style, methods=["GET"])
-```
-
-Call from the first hook (or a `system.startup.completed` event) that has `__request__.app` / `__app__`. The idempotency guard matters: the loader may re-execute on edits, and `add_api_route` registers the same path twice without complaint.
-
-`__app__` is the **real** FastAPI app, so a route can return anything HTTP can carry: JSON, `HTMLResponse`, JavaScript, CSS, images, even a whole bundled SPA. You can host an entire standalone tool at its own URL, shipped as a plugin, with **no frontend rebuild**. This is how a plugin serves a ToS/consent page, an approval screen, an OAuth callback, a status dashboard, or a one-click-installer UI.
-
-**The line to not blur:** a route is *your own page*. Your page can reference your own `/my/tool.js` and `/my/tool.css` and they load fine. It does **not** inject into the Open WebUI chat UI. Registering `/my/tool.js` does not make Open WebUI's own `index.html` load it; the user only gets your asset by navigating to *your* route.
-
-To put your JS/CSS into the **actual** Open WebUI SPA (a button on real messages, a theme over the real app, a first-run tour over the real interface), the frontend has to reference your asset. That means writing into the custom-CSS / custom-JS loader seam at startup, which is the indirect, fragile path. A dedicated asset-injection primitive is what would formalize that seam so multiple plugins can do it safely. Route registration alone gets you **pages**, not **injection**.
 
 :::warning
-A registered route runs on the real application and is **not** authenticated unless you add an auth dependency yourself. Anything you expose at a path is reachable by anyone who can reach the server, so gate sensitive routes (admin checks, signed tokens) explicitly.
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
 :::
 
-### 4. Spawn a background task
+# Special Arguments
 
-```python
-import asyncio
+When developping your own `Tools`, `Functions` (`Filters`, `Pipes` or `Actions`), `Pipelines` etc, you can use special arguments explore the full spectrum of what Open-WebUI has to offer.
 
-async def _loop(app):
-    while True:
-        # ...periodic work...
-        await asyncio.sleep(60)
+This page aims to detail the type and structure of each special argument as well as provide an example.
 
-def _start_once(app):
-    if getattr(app.state, "_my_plugin_started", False):
-        return
-    app.state._my_plugin_started = True
-    asyncio.create_task(_loop(app))
+### `body`
+
+A `dict` usually destined to go almost directly to the model. Although it is not strictly a special argument, it is included here for easier reference and because it contains itself some special arguments.
+
+:::note The `body` differs between a Filter's `inlet()` and `request()`
+`inlet()` sees the body early, before the pipeline has run; `request()` sees it last, as it leaves for the provider. Keys such as `features`, `variables`, `tool_ids`, `files`, `folder_id` and `skill_ids` have been popped off by then, while retrieved RAG sources and the resolved `tools` array have been added. The example below is an `inlet()`-shaped body. See [Where `request` sits in the pipeline](/features/extensibility/plugin/functions/filter#where-request-sits-in-the-pipeline).
+:::
+
+<details>
+<summary>Example</summary>
+
+```json
+
+{
+  "stream": true,
+  "model": "my-cool-model",
+  # lowercase string with - separated words: this is the ID of the model
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What is in this picture?"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdYAAAGcCAYAAABk2YF[REDACTED]"
+            # Images are passed as base64 encoded data
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "The image appears to be [REDACTED]"
+    },
+  ],
+  "features": {
+    "image_generation": false,
+    "code_interpreter": false,
+    "web_search": false
+  },
+  "stream_options": {
+    "include_usage": true
+  },
+  "metadata": "[The exact same dict as __metadata__, present for Filters, removed before a Pipe sees it]",
+  "files": "[The exact same list as __files__]"
+}
+
 ```
 
-The `app.state` flag makes it "once per process" rather than "once per source version". On a clean restart it starts fresh.
+</details>
 
-### 5. Stash state in `app.state`
+### `__user__`
+
+A `dict` with user information.
+
+Note that if the `UserValves` class is defined, its instance has to be accessed via `__user__["valves"]`. Otherwise, the `valves` keyvalue is missing entirely from `__user__`.
+
+<details>
+<summary>Example</summary>
+
+```json
+{
+  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "email": "cheesy_dude@openwebui.com",
+  "name": "Patrick",
+  "role": "user",
+  # role can be either `user` or `admin`
+  "valves": "[the UserValve instance]"
+}
+```
+
+</details>
+
+### `__metadata__`
+
+A `dict` with wide ranging information about the chat, model, files, etc.
+
+<details>
+<summary>Example</summary>
+
+```json
+{
+  "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "chat_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "session_id": "xxxxxxxxxxxxxxxxxxxx",
+  "user_prompt": "What is in this picture?",
+  # the user's most recent message, captured before any source citation wrap.
+  # this is what the native tool call loop and Pipes should read.
+  "system_prompt": "You are a helpful assistant.",
+  # the chat's system message, captured at the same point.
+  "sources": [],
+  # resolved sources for this turn (e.g. file context).
+  # Empty when no sources are attached.
+  "tool_ids": null,
+  # tool_ids is a list of str.
+  "tool_servers": [],
+  "files": "[Same as in body['files']]",
+  # If no files are given, the files key exists in __metadata__ and its value is []
+  "features": {
+    "image_generation": false,
+    "code_interpreter": false,
+    "web_search": false
+  },
+  "variables": {
+    "{{USER_NAME}}": "cheesy_username",
+    "{{USER_LOCATION}}": "Unknown",
+    "{{CURRENT_DATETIME}}": "2025-02-02 XX:XX:XX",
+    "{{CURRENT_DATE}}": "2025-02-02",
+    "{{CURRENT_TIME}}": "XX:XX:XX",
+    "{{CURRENT_WEEKDAY}}": "Monday",
+    "{{CURRENT_TIMEZONE}}": "Europe/Berlin",
+    "{{USER_LANGUAGE}}": "en-US"
+  },
+  "model": "[The exact same dict as __model__]",
+  "direct": false,
+  "params": {
+    "stream_delta_chunk_size": 1,
+    "reasoning_tags": null,
+    "compact_token_threshold": null,
+    "function_calling": "native"
+  }
+}
+
+```
+
+</details>
+
+:::tip Detecting Request Source
+
+Nothing in the metadata names the caller. What distinguishes them is the chat context: a request from the web interface always carries a `chat_id` and a `session_id`, while a direct API call gets an empty `chat_id` and a `null` `session_id` unless the client sets them itself. Both keys are always present, so test their values rather than their presence:
 
 ```python
-async def inlet(self, body, __request__):
-    cache = __request__.app.state.__dict__.setdefault("my_cache", {})
-    # ...read/write cache...
+async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+    metadata = __metadata__ or {}
+
+    if metadata.get("chat_id") and metadata.get("session_id"):
+        # Request from a chat session
+        pass
+    else:
+        # Direct API request
+        pass
     return body
 ```
 
-Shared across requests and **across plugins** in the same process. There is no namespacing: pick a unique key.
+:::
 
-### 6. Use `event_emitter` for arbitrary side effects in the UI
+:::tip Reading the user's message before the wrap
 
-`event_emitter` accepts any event shape the frontend handles: status banners, source citations, file attachments, chat-message updates, toasts. You are not restricted to the events documented on the per-type pages. See [Events](./events) for the full catalogue.
+When sources are attached, the chat-completions middleware wraps the user's most recent message with the default citation template. The wrap happens before a Pipe or `pipe()` call sees the body. It only fires when sources are attached. A Pipe that reads `body["messages"][-1]["content"]` directly will see the wrapped form.
 
-### 7. Prompt the user mid-handler with `event_call`
-
-`event_call` is `event_emitter` that **awaits a response**. Show a form, a confirmation, an input dialog, and block until the user answers. Useful inside Tool methods that need a human in the loop, or Action handlers that confirm before executing.
-
-### 8. Pipes as full provider replacements
-
-A `Pipe` replaces the entire LLM call. Open WebUI hands you the request and asks for a response back. Nothing in the middleware constrains what you put in that response, so:
-
-- wrap an external API (any provider, any protocol),
-- route between providers based on request shape,
-- run an entire agent inside `pipe()` and stream the agent's output back,
-- skip any model entirely and return canned content.
-
-A Pipe is the most powerful entry point precisely because the middleware steps out of the way.
-
-### 9. Tools that do more than their docstring says
-
-A `Tools` class's methods are exposed to the model as callable tools (their docstrings become JSON schema). The method body can do **anything**: call external APIs, emit UI events with `__event_emitter__`, stash data in `app.state`, monkey-patch on first call. The docstring is purely how the tool advertises itself to the model. The implementation is unconstrained.
-
-### 10. Actions as arbitrary one-shot operations
-
-`Action` renders a button on an assistant message. The handler runs server-side against the chat that the message belongs to, with a narrower dunder surface than Filters and Tools: `__model__`, `__id__`, `__event_emitter__`, `__event_call__`, `__request__` and `__user__`, and nothing else. Use for "approve this", "re-run with...", "send to external system", or any one-off operation a user should be able to trigger from a specific message.
-
----
-
-## Concurrency and multiple instances
-
-**Open WebUI does not serialize your plugin code and gives you no exactly-once guarantee.** Hooks and handlers run inside an async event loop and can overlap; in a multi-replica deployment the same logical work can run on several workers at once. Coordinating side effects that must happen *at most once* is your responsibility, not the platform's.
-
-Two distinct levels:
-
-- **Within one process.** Async hooks interleave. If two requests hit the same hook concurrently and it does a read-modify-write on shared state (a module global, an `app.state` cache, a file), they can race. An `asyncio.Lock` (for coroutines) or `threading.Lock` (for the offloaded thread pool) serializes them, but only *inside that one process*.
-- **Across replicas.** Each replica is a separate process with its own `sys.modules` and its own `app.state`. A module global or in-process lock coordinates *nothing* between them. Two workers can run the same handler for the same event at the same moment. Anything that must fire once globally (sending an email, provisioning a resource, writing one audit row, calling a non-idempotent external API) will fire once **per replica** unless you guard it with shared state.
-
-The shared-state primitive Open WebUI itself uses is **Redis**. In a correctly configured multi-instance deployment `REDIS_URL` is already set (it has to be, for websockets and shared caches to work across replicas). Use it to grab a distributed lock or to enforce an idempotency key:
+`__metadata__["user_prompt"]` holds the user's message before the wrap fires. Native tool call loops and Pipes both read from it, so it's safe whether sources are attached or not. Use it for any Pipe that hands the user's turn to a downstream model.
 
 ```python
-from open_webui.utils.redis import get_redis_connection
-from open_webui.env import REDIS_URL, REDIS_KEY_PREFIX
+async def pipe(self, body: dict, __metadata__: dict, __user__: dict) -> str:
+    user_prompt = __metadata__.get("user_prompt") or ""
+    system_prompt = __metadata__.get("system_prompt")
 
-# decode_responses=True so values come back as str, not bytes.
-_redis = get_redis_connection(REDIS_URL, decode_responses=True) if REDIS_URL else None
-
-
-def run_once(key: str, ttl: int = 300) -> bool:
-    """True for exactly one caller across all replicas within `ttl` seconds.
-
-    Backed by Redis `SET key value NX EX ttl` — an atomic "set if not exists"
-    with expiry, so exactly one worker gets the key and the rest get nothing.
-    """
-    if _redis is None:
-        # No Redis means a single-process deployment: there is no other
-        # replica to coordinate with, so this caller is the only one.
-        return True
-    return bool(_redis.set(f"{REDIS_KEY_PREFIX}:plugin:{key}", "1", nx=True, ex=ttl))
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": user_prompt})
+    # pass messages to your downstream model
 ```
 
-Then gate the side effect:
+If your Pipe runs through a path that skips the standard preprocessing (direct API callers, some test fixtures), `__metadata__` may be absent. In that case, scan `body["messages"]` for the last user message.
+
+:::
+
+### `__model__`
+
+A `dict` with information about the model.
+
+<details>
+<summary>Example</summary>
+
+```json
+{
+  "id": "my-cool-model",
+  "name": "My Cool Model",
+  "object": "model",
+  "created": 1746000000,
+  "owned_by": "openai",
+  # openai, ollama, anthropic, arena or unknown
+  "info": {
+      "id": "my-cool-model",
+      "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "base_model_id": "gpt-5.6-sol",
+      # this is the name of model that the model endpoint serves
+      "name": "My Cool Model",
+      "params": {
+      "system": "You are my best assistant. You answer [REDACTED]",
+      "function_calling": "native"
+      # custom options appear here, for example "Top K"
+      },
+      "meta": {
+      "profile_image_url": "/static/favicon.png",
+      "description": "Description of my-cool-model",
+      "capabilities": {
+          "vision": true,
+          "usage": true,
+          "citations": true
+      },
+      "position": 17,
+      "tags": [
+          {
+          "name": "for_friends"
+          },
+          {
+          "name": "vision_enabled"
+          }
+      ],
+      "suggestion_prompts": null
+      },
+      "access_control": {
+      "read": {
+          "group_ids": [],
+          "user_ids": []
+      },
+      "write": {
+          "group_ids": [],
+          "user_ids": []
+      }
+      },
+      "is_active": true,
+      "updated_at": 1740000000,
+      "created_at": 1740000000
+  },
+  "preset": true,
+  "actions": [],
+  "tags": [
+      {
+          "name": "for_friends"
+      },
+      {
+          "name": "vision_enabled"
+      }
+  ]
+}
+
+```
+
+</details>
+
+### `__messages__`
+
+A `list` of the previous messages. Only Tools receive it; Pipes and Filters read the same list from `body["messages"]`.
+
+See the `body["messages"]` value above.
+
+### `__chat_id__`
+
+The `str` of the `chat_id`, representing the unique identifier of the current chat/conversation.
+
+Pipes, Tools and a Filter's `inlet()` and `request()` receive it, for invocations that originate from a chat context, including:
+- Regular user messages
+- Internal task calls (title generation, query generation, tag generation, etc.)
+
+A Filter's `stream()` and `outlet()` do not get it, and neither do Actions. Read `body["chat_id"]` there instead.
+
+This allows stateful functions/pipes/manifolds to maintain per-chat state without fragmentation.
+
+See also `__metadata__["chat_id"]` for accessing the same value via the metadata dict.
+
+### `__session_id__`
+
+The `str` of the `session_id`.
+
+See the `__metadata__["session_id"]` value above.
+
+### `__message_id__`
+
+The `str` of the `message_id`.
+
+See the `__metadata__["message_id"]` value above.
+
+### `__event_emitter__`
+
+A `Callable` that delivers an event for the active chat turn through socket.io to any subscribed clients (the WebUI is the standard subscriber). The same `message_id` Open WebUI tracks for the active assistant turn is included automatically.
+
+The most familiar event is the status pill:
 
 ```python
-if run_once(f"signup-log:{event['actor']['id']}"):
-    await log_signup(event)   # runs on exactly one replica
+await __event_emitter__({
+    "type": "status",
+    "data": {"description": "Working...", "done": False},
+})
 ```
 
-Pick the `ttl` and the key deliberately. The key is what "the same work" means (a user id, an event id, a date bucket); the `ttl` is how long that claim is remembered, so a retry or a slow duplicate within the window is suppressed but the same key can legitimately recur later.
+The `type` field isn't restricted to the rendered ones. Events with arbitrary `type` strings are forwarded through socket.io with the original `type` preserved. It's useful when a Pipe needs to send a control signal or a custom UI marker that a frontend listener (e.g. a userscript) reacts to without rendering as content in the streamed message:
 
-For work that takes longer than a single atomic claim, Open WebUI ships a renewable lock helper, `RedisLock` in `backend/open_webui/socket/utils.py` (`aquire_lock()` / `renew_lock()` / `release_lock()`), which is what the websocket layer uses for its cleanup jobs. It is convenient, but it is an internal API and subject to the stability caveat in the Footguns below, the raw `set(..., nx=True, ex=...)` call above is plain redis-py and will not move.
+```python
+await __event_emitter__({
+    "type": "my-pipe:phase-changed",
+    "data": {"phase": "reasoning"},
+})
+```
 
----
+`status` events render natively in the chat, so use them for progress the user should see. Custom event types are for frontend listeners that react to events during a Pipe run without changing the visible message.
 
-## Footguns
+### `__event_call__`
 
-- **No sandboxing.** Tools and Functions execute Python in your backend process as the backend user. The security policy ([Rule 10](/security/security-policy#reporting-guidelines)) treats this as intended behaviour: granting Tool or Function creation permission is equivalent to granting shell access on the host. Treat plugin authors as administrators.
-- **Stream hooks use a stale cache.** Edits to a `stream` method only take effect after another hook (or a process restart) refreshes the module. If you edit a stream filter and the change does not seem to apply, trigger an `inlet`/`outlet` reload or restart.
-- **Cross-plugin interference is not detected.** Two plugins patching the same function, registering the same route, or writing to the same `app.state` key will collide. Load order is not deterministic. Prefer additive patterns (your own namespaces, wrappers that delegate) over destructive ones.
-- **Disabling does not unload.** The module stays in `sys.modules` and any module-level side effects stay installed. Restart the process to fully revert.
-- **No concurrency control, no exactly-once.** Open WebUI does not serialize your handlers and does not deduplicate work across replicas. Async hooks interleave within a process, and in a multi-replica deployment the same handler can run on every worker at once, a side effect that must fire once globally fires once *per replica* unless you coordinate it yourself. See [Concurrency and multiple instances](#concurrency-and-multiple-instances).
-- **`requirements:` runs `pip install` on every replica at load.** In multi-replica deployments set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and pre-install dependencies in your image; runtime installs race across workers and crash. See [Scaling → Function/Tool Dependency Installation Crashes](/troubleshooting/multi-replica#9-functiontool-dependency-installation-crashes).
-- **Internal APIs are not a stable public surface.** `open_webui.utils.*`, the internal model classes, middleware helpers, and pretty much everything outside the documented dunder args and event types can rename, move, or change signatures between releases. If your monkey-patch breaks after an upgrade, that is on you to repair.
-- **The Pipelines server is out of scope here.** This page is about in-process plugins (Tools / Functions). The separate [Pipelines](/features/extensibility/pipelines/) server runs out-of-process and does not share `sys.modules` with Open WebUI: it cannot monkey-patch the main app, but it also is not constrained by it.
+A `Callable` that sends an event and waits for the browser to answer it. Available to Pipes, Filters, Tools and Actions alike.
 
----
+It returns whatever the browser sent back. When it cannot get an answer it returns a `dict` with an `error` key instead of raising: `{"error": "Client session disconnected."}` if the tab is already gone, or `{"error": "Event call timed out. The browser tab may be inactive or closed."}` if [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) is set and elapses. Without that variable there is no timeout at all and the call waits indefinitely.
 
-## When this is the wrong tool
+### `__files__`
 
-For anything you can express through the documented hooks (filters that mutate `body`, tools that call APIs and return results, actions that emit events), **stay in the documented hooks**. The patterns above are powerful, but their durability is shallow: cross-plugin interaction, upgrade compatibility, and rollback all degrade the moment you start patching module internals.
+A `list` of files sent via the chat. Note that images are not considered files and are sent directly to the model as part of the `body["messages"]` list.
 
-If your plugin needs an interface that does not exist yet, an upstream PR is more durable than a monkey-patch.
+The actual binary of the file is not part of the arguments for performance reason, but the file remain nonetheless accessible by its path if needed. For example using `docker` the python syntax for the path could be:
 
-If you file a bug report against a code path that your plugin is monkey-patching, expect it to be closed. Reports must reproduce against an unmodified Open WebUI ([Rule 6](/security/security-policy#reporting-guidelines)).
+```python
+from pathlib import Path
+
+# `path` is a filesystem path under local storage; on S3, GCS or Azure it is a bucket URL
+the_file = Path(__files__[0]["file"]["path"])
+assert the_file.exists()
+```
+
+Note that the same files dict can also be accessed via `__metadata__["files"]` (and its value is `[]` if no files are sent) or via `body["files"]` (but the `files` key is missing entirely from `body` if no files are sent).
+
+<details>
+<summary>Example</summary>
+
+```json
+
+[
+  {
+    "type": "file",
+    "file": {
+      "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "filename": "Napoleon - Wikipedia.pdf",
+      "path": "/app/backend/data/uploads/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx_Napoleon - Wikipedia.pdf",
+      "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "hash": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "data": {
+        "content": "Napoleon - Wikipedia\n\n\nNapoleon I\n\nThe Emperor Napoleon in His Study at the\nTuileries, 1812\n\nEmperor of the French\n\n1st reign 18 May 1804 – 6 April 1814\n\nSuccessor Louis XVIII[a]\n\n2nd reign 20 March 1815 – 22 June 1815\n\nSuccessor Louis XVIII[a]\n\nFirst Consul of the French Republic\n\nIn office\n13 December 1799 – 18 May 1804\n\nBorn Napoleone Buonaparte\n15 August 1769\nAjaccio, Corsica, Kingdom of\nFrance\n\nDied 5 May 1821 (aged 51)\nLongwood, Saint Helena\n\nBurial 15 December 1840\nLes Invalides, Paris\n\nNapoleon\nNapoleon Bonaparte[b] (born Napoleone\nBuonaparte;[1][c] 15 August 1769 – 5 May 1821), later\nknown [REDACTED]",
+        # The content value is the output of the document parser, the above example is with Tika as a document parser
+      },
+      "meta": {
+        "name": "Napoleon - Wikipedia.pdf",
+        "content_type": "application/pdf",
+        "size": 10486578,
+        # in bytes, here about 10Mb
+        "data": {},
+        "collection_name": "file-96xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        # always begins by 'file'
+      },
+      "created_at": 1740000000,
+      "updated_at": 1740000000
+    },
+    "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "url": "/api/v1/files/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "name": "Napoleon - Wikipedia.pdf",
+    "collection_name": "file-96xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    "status": "uploaded",
+    "size": 10486578,
+    "error": "",
+    "itemId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    # itemId is not the same as file["id"]
+  }
+]
+
+```
+
+</details>
+
+### `__request__`
+
+An instance of `fastapi.Request`. You can read more in the [migration page](/features/extensibility/plugin/migration/) or in [fastapi's documentation](https://fastapi.tiangolo.com/reference/request/).
+
+### `__task__`
+
+A `str` for the type of task. Its value is just a shorthand for `__metadata__["task"]` if present, otherwise `None`. Only Pipes receive it; a Filter or Tool that declares it never gets the value, even during a real task call.
+
+<details>
+<summary>Possible values</summary>
+
+```json
+
+[
+    "title_generation",
+    "follow_up_generation",
+    "tags_generation",
+    "emoji_generation",
+    "query_generation",
+    "image_prompt_generation",
+    "autocomplete_generation",
+    "function_calling",
+    "moa_response_generation",
+    "context_compaction",
+    "memory_review"
+]
+```
+
+</details>
+
+### `__task_body__`
+
+A `dict` containing the `body` needed to accomplish a given `__task__`. Its value is just a shorthand for `__metadata__["task_body"]` if present, otherwise `None`.
+
+Its structure is the same as `body` above, with modifications like using the appropriate model and system message etc.
+
+### `__tools__`
+
+A `dict` keyed by tool function name, injected for Pipes only. Each value carries `tool_id`, `callable` (the awaitable that runs the tool) and `spec` (the OpenAI function spec sent to the model). Entries for local Python tools also carry `metadata`, while builtin and external tool-server entries instead carry a `type` of `builtin` or `external`.
+
+The dict is assembled by `get_tools()` in [tools.py](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/tools.py).
