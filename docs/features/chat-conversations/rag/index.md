@@ -352,7 +352,7 @@ A video is attached as its transcript, so one with no usable transcript cannot b
 
 ## Document Parsing
 
-A variety of parsers extract content from local and remote documents. For more, see the [`get_loader`](https://github.com/open-webui/open-webui/blob/2fa94956f4e500bf5c42263124c758d8613ee05e/backend/apps/rag/main.py#L328) function.
+A variety of parsers extract content from local and remote documents: built-in engines like Tika, Docling and Mistral OCR, or your own service via the [external engine](/features/chat-conversations/rag/document-extraction/external) if you need per-file-type routing or custom logic. See [Document Extraction](/features/chat-conversations/rag/document-extraction) for the full list and setup steps.
 
 :::warning Temporary Chat Limitations
 When using **Temporary Chat**, document processing is restricted to **frontend-only** operations to ensure your data stays private and is not stored on the server. Consequently, advanced backend parsing (used for formats like complex DOCX files) is disabled, which may result in raw data being seen instead of parsed text. For full document support, use a standard chat session.
