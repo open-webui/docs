@@ -11,7 +11,8 @@ Because you control that service, you also control what happens inside it. A few
 
 - **Route by file type.** One configured URL, your service decides internally which parser or model handles `.xlsx` versus `.pdf` versus everything else.
 - **Split large documents into multiple retrievable pieces.** Return one chunk per sheet, page, or slide instead of one giant blob.
-- **Apply per-user or per-tenant logic.** Open WebUI forwards the requesting user's identity with every request, so your service can enforce access rules or route to a customer-specific backend.
+- **Apply per-user logic.** Open WebUI forwards the requesting user's identity with every request, so your service can enforce access rules or route to a customer-specific backend.
+- **Forward custom headers with live values.** Configure headers like the requesting user's email or the file's name to be sent along with every extraction request, for routing, logging, or access control on your service. See [Headers](#the-contract) below.
 - **Process images and video.** The external engine is the only one that receives image and video uploads for extraction by default.
 
 ## Configuration
