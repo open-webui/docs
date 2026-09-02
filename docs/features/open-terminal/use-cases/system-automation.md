@@ -43,7 +43,7 @@ The AI checks file sizes and content to find exact duplicates, then asks you wha
 
 The AI uses image tools (which come pre-installed in Docker) to batch-convert and resize:
 
-![AI using run_command for batch file operations](/images/open-terminal-ai-install-run.png)
+![The AI converting product photos and displaying one of the results inline](/images/open-terminal-ai-batch-convert.png)
 
 ---
 
