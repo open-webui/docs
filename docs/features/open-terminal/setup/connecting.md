@@ -52,18 +52,20 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 
 ### 5. Save
 
-Click **Save**. A green "Connected" indicator confirms the connection.
+Click **Save**. The connection appears under **Open Terminal** with its toggle switched on.
 
-![Connected status with green indicator](/images/open-terminal-connected.png)
+![The saved Open Terminal connection listed and enabled](/images/open-terminal-connected.png)
 
 ### 6. (Optional) Restrict access to specific groups
 
 Limit terminal access to specific user groups via the access control button.
 
-{/* TODO: Screenshot: The Access Grants dropdown showing available user groups with checkboxes. */}
+![The access control panel listing user groups with checkboxes](/images/open-terminal-access-grants.png)
 
 :::tip Orchestrator connections can be scoped further
 A connection Open WebUI has detected as a [Terminals orchestrator](/features/open-terminal/terminals/) gets an extra **Orchestrator > Terminal Contexts** section, where you decide whether the terminal is offered in chats and in automations, and whether everything shares one workspace or each saved chat or automation gets its own. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). A direct Open Terminal connection has no such setting and is always available in both.
+
+The same section carries a **Policy** block that takes environment variables for the terminals the orchestrator starts. That is where you set `OPEN_TERMINAL_SYSTEM_PROMPT` to replace the generated system prompt with your own, along with any other [environment variable](/features/open-terminal/terminals/orchestration/environment-variables) those terminals should run with. See [System Prompts](/features/open-terminal/terminals/orchestration/system-prompts) for the template placeholders.
 :::
 
 ### 7. Select a terminal in chat
@@ -139,6 +141,8 @@ Four things change with it:
 
 The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
+![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)
+
 ---
 
 ## Troubleshooting
@@ -154,7 +158,25 @@ This almost always means Open WebUI can't reach Open Terminal over the network. 
 | Both on same machine, no Docker | `http://localhost:8000` |
 | Open Terminal on another machine | `http://that-machines-ip:8000` |
 
-{/* TODO: Screenshot: A simple diagram showing Open WebUI and Open Terminal as two boxes, with an arrow between them labeled with the URL. Shows correct URLs for Docker Compose (service name) vs separate containers (host.docker.internal). */}
+```mermaid
+flowchart TB
+    subgraph Compose["One Docker Compose project"]
+        direction LR
+        W1["Open WebUI"] -->|"http://open-terminal:8000"| T1["Open Terminal"]
+    end
+    subgraph Separate["Separate containers on one host"]
+        direction LR
+        W2["Open WebUI"] -->|"http://host.docker.internal:8000"| T2["Open Terminal"]
+    end
+    subgraph Remote["Open Terminal elsewhere"]
+        direction LR
+        W3["Open WebUI"] -->|"http://that-machines-ip:8000"| T3["Open Terminal"]
+    end
+```
+
+Compose gives the containers a shared network and resolves the service name, so the service name is the address. Separate containers have no shared name to resolve, so the request goes back out through the host. A terminal on another machine is reached the way any other host is.
+
+`localhost` only works when neither side is containerised, because inside a container `localhost` is that container rather than the machine it runs on. That is the most common cause of the timeout this section is about.
 
 :::tip Quick check
 Run this command to see if Open WebUI can reach Open Terminal:
