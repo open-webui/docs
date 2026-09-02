@@ -19,6 +19,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 **Turn Open WebUI into a full agent harness.**
 
+[View on GitHub →](https://github.com/open-webui/open-terminal)
+
 An agent harness is the system around a model that lets it do real work: instructions, context, tools, state, permissions, feedback loops, observability, and an execution environment. Open WebUI already gives you the control side of that harness: models, chats, knowledge, prompts, tools, MCP connections, memory, users, permissions, automations, and shared workflow controls. Open Terminal completes it with the part most chat products are still missing: a real computer substrate where actions run and evidence comes back.
 
 That means the agent can do real work. Not just answer questions about a task, and not just emit code you run somewhere else. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
